@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
-import { useSession, PageHeaderContainer, PageHeader, ServiceQueuesPictogram } from '@openmrs/esm-framework';
+import { useSession, PageHeaderContent, PageHeader, ServiceQueuesPictogram } from '@openmrs/esm-framework';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 import {
@@ -60,8 +60,8 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
   ]);
 
   return (
-    <PageHeaderContainer className={styles.header} data-testid="patient-queue-header">
-      <PageHeader title={title} illustration={<ServiceQueuesPictogram />} />
+    <PageHeader className={styles.header} data-testid="patient-queue-header">
+      <PageHeaderContent title={title} illustration={<ServiceQueuesPictogram />} />
       <div className={styles.dropdownContainer}>
         {showLocationDropdown && (
           <Dropdown
@@ -80,7 +80,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
         )}
         {actions}
       </div>
-    </PageHeaderContainer>
+    </PageHeader>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
-import { PageHeaderContainer, PageHeader, AppointmentsPictogram } from '@openmrs/esm-framework';
+import { PageHeader, PageHeaderContent, AppointmentsPictogram } from '@openmrs/esm-framework';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import styles from './appointments-header.scss';
 interface AppointmentHeaderProps {
@@ -15,8 +15,8 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   const { serviceTypes } = useAppointmentServices();
 
   return (
-    <PageHeaderContainer className={styles.header} data-testid="appointments-header">
-      <PageHeader title={title} illustration={<AppointmentsPictogram />} />
+    <PageHeader className={styles.header} data-testid="appointments-header">
+      <PageHeaderContent title={title} illustration={<AppointmentsPictogram />} />
       <div className={styles.dropdownContainer}>
         {typeof onChange === 'function' && (
           <Dropdown
@@ -37,7 +37,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
           />
         )}
       </div>
-    </PageHeaderContainer>
+    </PageHeader>
   );
 };
 

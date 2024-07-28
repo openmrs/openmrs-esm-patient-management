@@ -53,7 +53,6 @@
   "noPatientsInList": "There are no patients in this list",
   "offlinePatients": "Offline patients",
   "openPatientList": "Add to list",
-  "Patient Lists": "",
   "patientListMemberCount_one": "This list has {{count}} patient",
   "patientListMemberCount_other": "This list has {{count}} patients",
   "patientLists": "Patient lists",
