@@ -1,9 +1,15 @@
 import { age } from '@openmrs/esm-framework';
 import React from 'react';
-import { type WardPatientCardElement } from '../../types';
 import { useTranslation } from 'react-i18next';
+import { type Encounter } from '../../types';
 
-const WardPatientTimeSinceAdmission: WardPatientCardElement = ({ firstAdmissionOrTransferEncounter }) => {
+export interface WardPatientTimeSinceAdmissionProps {
+  firstAdmissionOrTransferEncounter: Encounter;
+}
+
+const WardPatientTimeSinceAdmission: React.FC<WardPatientTimeSinceAdmissionProps> = ({
+  firstAdmissionOrTransferEncounter,
+}) => {
   const { t } = useTranslation();
   if (firstAdmissionOrTransferEncounter) {
     const timeSinceAdmission = age(firstAdmissionOrTransferEncounter.encounterDatetime);

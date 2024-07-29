@@ -5,6 +5,7 @@ import { Search } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import { InpatientRequest } from '../types';
 
 interface AdmissionRequestsWorkspaceProps {}
 const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = () => {
@@ -40,8 +41,13 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
           />
         ) : (
           <>
-            {inpatientRequests.map((request, indx) => (
-              <AdmissionRequestCard key={indx} {...request} />
+            {inpatientRequests.map((request: InpatientRequest, i) => (
+              <AdmissionRequestCard key={`admission-request-card-${i}`}
+                patient={request.patient}
+                visit={request.visit}
+                disposition={request.disposition}
+                dispositionEncounter={request.dispositionEncounter}
+                dispositionType={request.dispositionType} />
             ))}
           </>
         )}
