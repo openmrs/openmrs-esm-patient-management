@@ -78,6 +78,10 @@
       "component": "transitionQueueEntryModal"
     },
     {
+      "name": "send-back-patient-to-queue-entry-modal",
+      "component": "sendBackPatientQueueEntryModal"
+    },
+    {
       "name": "edit-queue-entry-modal",
       "component": "editQueueEntryModal"
     },

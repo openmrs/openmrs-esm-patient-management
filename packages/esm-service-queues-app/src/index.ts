@@ -138,6 +138,13 @@ export const addNewQueueServiceWorkspace = getAsyncLifecycle(
     moduleName,
   },
 );
+export const sendBackPatientQueueEntryModal = getAsyncLifecycle(
+  () => import('./send-patient-back-toqueue/send-back-patient-toqueue.component'),
+  {
+    featureName: 'send back patient to queue',
+    moduleName,
+  },
+);
 
 // t('addNewQueueServiceRoom', 'Add new queue service room')
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
