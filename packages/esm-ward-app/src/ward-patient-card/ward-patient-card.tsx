@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { type WardPatientCardProps } from '../types';
 import { usePatientCardRows } from './ward-patient-card-row.resources';
 import styles from './ward-patient-card.scss';
@@ -7,8 +6,7 @@ import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 
 const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
-  const { locationUuid } = useParams();
-  const patientCardRows = usePatientCardRows(locationUuid);
+  const patientCardRows = usePatientCardRows();
 
   return (
     <div className={styles.wardPatientCard}>

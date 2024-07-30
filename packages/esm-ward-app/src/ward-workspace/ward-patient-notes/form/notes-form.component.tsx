@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { Button, Column, Form, InlineLoading, Row, Stack, TextArea } from '@carbon/react';
+import { Button, Column, Form, InlineLoading, InlineNotification, Row, Stack, TextArea } from '@carbon/react';
 import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { savePatientNote } from './notes-form.resource';
 import styles from './notes-form.scss';
 import { moduleName } from '../../../constant';
-import useEmrConfiguration from '../../../hooks/useEmrApiConfig';
+import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 
 type NotesFormData = z.infer<typeof noteFormSchema>;
 
@@ -31,7 +31,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   promptBeforeClosing,
   onWorkspaceClose,
 }) => {
-  const { emrConfiguration } = useEmrConfiguration();
+  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { t } = useTranslation();
   const session = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,6 +110,20 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+      {errorFetchingEmrConfiguration && (
+        <div className={styles.formError}>
+          <InlineNotification
+            kind="error"
+            title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
+            subtitle={t(
+              'fetchingEmrConfigurationFailed',
+              'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
+            )}
+            lowContrast
+            hideCloseButton
+          />
+        </div>
+      )}
       <Stack className={styles.formContainer} gap={2}>
         <Row className={styles.row}>
           <Column sm={1}>
@@ -143,7 +157,11 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
           </Column>
         </Row>
       </Stack>
-      <Button kind="primary" className={styles.saveButton} disabled={isSubmitting} type="submit">
+      <Button
+        kind="primary"
+        className={styles.saveButton}
+        disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
+        type="submit">
         {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
       </Button>
     </Form>
