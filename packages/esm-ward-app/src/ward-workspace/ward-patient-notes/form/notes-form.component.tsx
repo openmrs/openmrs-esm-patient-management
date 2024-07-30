@@ -5,19 +5,12 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Column, Form, InlineLoading, Row, Stack, TextArea } from '@carbon/react';
-import {
-  createErrorHandler,
-  ResponsiveWrapper,
-  showSnackbar,
-  translateFrom,
-  useConfig,
-  useSession,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { savePatientNote } from './notes-form.resource';
 import styles from './notes-form.scss';
 import { moduleName } from '../../../constant';
-import { type ConfigObject } from '../../../config-schema';
+import useEmrConfiguration from '../../../hooks/useEmrApiConfig';
 
 type NotesFormData = z.infer<typeof noteFormSchema>;
 
@@ -38,10 +31,9 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   promptBeforeClosing,
   onWorkspaceClose,
 }) => {
+  const { emrConfiguration } = useEmrConfiguration();
   const { t } = useTranslation();
   const session = useSession();
-  const config = useConfig<ConfigObject>();
-  const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid } = config.notesConfig;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rows, setRows] = useState<number>();
 
@@ -70,15 +62,20 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
       encounterDatetime: dayjs(new Date()).format(),
       patient: patientUuid,
       location: locationUuid,
-      encounterType: encounterTypeUuid,
+      encounterType: emrConfiguration?.visitNoteEncounterType.uuid,
       encounterProviders: [
         {
-          encounterRole: clinicianEncounterRole,
+          encounterRole: emrConfiguration?.clinicianEncounterRole.uuid,
           provider: providerUuid,
         },
       ],
       obs: wardClinicalNote
-        ? [{ concept: { uuid: encounterNoteTextConceptUuid, display: '' }, value: wardClinicalNote }]
+        ? [
+            {
+              concept: { uuid: emrConfiguration?.consultFreeTextCommentsConcept.uuid, display: '' },
+              value: wardClinicalNote,
+            },
+          ]
         : [],
     };
 

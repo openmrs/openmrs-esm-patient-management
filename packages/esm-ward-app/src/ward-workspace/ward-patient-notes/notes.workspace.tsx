@@ -1,22 +1,19 @@
 import React, { useMemo } from 'react';
 import styles from './notes.style.scss';
 import { type DefaultWorkspaceProps, ExtensionSlot } from '@openmrs/esm-framework';
-import { getWardStore } from '../../store';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import { type WardPatientCardProps } from '../../types';
+
+interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
 
 const WardPatientNotesWorkspace = ({
   promptBeforeClosing,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
-  setOnCloseCallback,
-}: DefaultWorkspaceProps) => {
-  const wardStore = getWardStore();
-  const { patient, visit, bed } = wardStore.getState().activeBedSelection;
-
-  setOnCloseCallback(() => {
-    wardStore.setState({ activeBedSelection: null });
-  });
-
+  patient,
+  visit,
+  bed,
+}: WardPatientNotesWorkspaceProps) => {
   const notesFormExtensionState = useMemo(
     () => ({
       patient,

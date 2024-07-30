@@ -2,6 +2,7 @@ export * from './active-visits.mock';
 export * from './address.mock';
 export * from './appointments.mock';
 export * from './auto-generation-options.mock';
+export * from './emr-api-config.mock';
 export * from './identifier-types.mock';
 export * from './identifiers.mock';
 export * from './locations.mock';

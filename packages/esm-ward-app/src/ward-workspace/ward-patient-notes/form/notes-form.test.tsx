@@ -1,11 +1,10 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import { savePatientNote } from './notes-form.resource';
 import PatientNotesForm from './notes-form.component';
-import { mockPatient, mockSession } from '__mocks__';
-import { ConfigMock } from '../../../../../../__mocks__/patient-note-config.mock';
+import { emrApiConfigMock, mockPatient, mockSession } from '__mocks__';
 
 const testProps = {
   patientUuid: mockPatient.uuid,
@@ -19,7 +18,6 @@ const testProps = {
 
 const mockSavePatientNote = savePatientNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -29,10 +27,13 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     createErrorHandler: jest.fn(),
     showSnackbar: jest.fn(),
-    useConfig: jest.fn().mockReturnValue(() => ConfigMock),
     useSession: jest.fn().mockReturnValue(() => mockSession),
   };
 });
+
+jest.mock('../../../hooks/useEmrApiConfig', () => ({
+  useEmrApiConfig: jest.fn().mockReturnValue(() => ({ emrApiConfig: emrApiConfigMock })),
+}));
 
 jest.mock('./notes-form.resource', () => ({
   savePatientNote: jest.fn(),
@@ -49,11 +50,11 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   const successPayload = {
     encounterProviders: expect.arrayContaining([
       {
-        encounterRole: ConfigMock.notesConfig.clinicianEncounterRole,
+        encounterRole: emrApiConfigMock.clinicianEncounterRole.uuid,
         provider: undefined,
       },
     ]),
-    encounterType: ConfigMock.notesConfig.encounterTypeUuid,
+    encounterType: emrApiConfigMock.visitNoteEncounterType.uuid,
     location: undefined,
     obs: expect.arrayContaining([
       {
@@ -110,7 +111,6 @@ test('renders an error snackbar if there was a problem recording a visit note', 
 });
 
 function renderWardPatientNotesForm() {
-  mockUseConfig.mockReturnValue(ConfigMock);
   mockUseSession.mockReturnValue(mockSession);
   render(<PatientNotesForm {...testProps} />);
 }

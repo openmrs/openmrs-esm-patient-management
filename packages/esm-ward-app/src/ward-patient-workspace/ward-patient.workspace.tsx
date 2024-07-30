@@ -10,21 +10,15 @@ import {
   usePatient,
 } from '@openmrs/esm-framework';
 import styles from './ward-patient.style.scss';
-import { getWardStore } from '../store';
+import { type WardPatientCardProps } from '../types';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-export default function WardPatientWorkspace({ setTitle, setOnCloseCallback }: DefaultWorkspaceProps) {
-  const { t } = useTranslation();
-  const wardStore = getWardStore();
-  const {
-    patient: { uuid },
-  } = wardStore.getState().activeBedSelection;
-  const { patient, isLoading, error } = usePatient(uuid);
+interface WardPatientWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
 
-  setOnCloseCallback(() => {
-    wardStore.setState({ activeBedSelection: null });
-  });
+export default function WardPatientWorkspace({ setTitle, patient: { uuid } }: WardPatientWorkspaceProps) {
+  const { t } = useTranslation();
+  const { patient, isLoading, error } = usePatient(uuid);
 
   useEffect(() => {
     if (isLoading) {
