@@ -13,7 +13,7 @@ interface EmrApiConfigurationResponse {
 
 export default function useEmrConfiguration() {
   const swrData = useSWRImmutable<FetchResponse<EmrApiConfigurationResponse>>(
-    `${restBaseUrl}/emrapi/onfiguration`,
+    `${restBaseUrl}/emrapi/configuration`,
     openmrsFetch,
   );
 
