@@ -6,18 +6,20 @@
   padding: spacing.$spacing-05;
 }
 
-[data-extension-id='patient-search-bar'] {
-  & > div {
-    width: 100%;
+.searchBarWrapper {
+  [data-extension-id='patient-search-bar'] {
+    & > div {
+      width: 100%;
 
-    & input {
-      background-color: $ui-02;
-      border-bottom: none;
-      min-height: spacing.$spacing-09;
-    }
+      & input {
+        background-color: $ui-02;
+        border-bottom: none;
+        min-height: spacing.$spacing-09;
+      }
 
-    & button {
-      height: spacing.$spacing-09;
+      & button {
+        height: 3rem;
+      }
     }
   }
 }
