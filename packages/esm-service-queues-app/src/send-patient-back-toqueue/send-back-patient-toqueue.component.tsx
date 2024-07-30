@@ -38,7 +38,6 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
   const { t } = useTranslation();
   const { concepts } = useConfig<ConfigObject>();
   const { data, error, isLoading } = useQueueEntry(patientUuid);
-
   const allowedPriorities = data?.queue?.allowedPriorities ?? [];
   const allowedStatuses = data?.queue?.allowedStatuses ?? [];
   const uppercaseText = (text: string) => text.toUpperCase();
@@ -116,10 +115,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
   if (!data) {
     return (
       <Tile>
-        <ModalHeader
-          closeModal={closeModal}
-          title={t('sendPatientToPreviousQueue', 'Transfer Patient to Prior Queue?')}
-        />
+        <ModalHeader closeModal={closeModal} title={t('sendPatientToAQueue', 'Add to a queue')} />
         <ModalBody>
           <div className={styles.modalBody}>
             <h5>{t('patientNotInQueue', 'The patient is not in the queue')}</h5>
@@ -132,10 +128,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
   return (
     <div>
       <Form onSubmit={handleSubmit(onSubmit, onError)}>
-        <ModalHeader
-          closeModal={closeModal}
-          title={t('sendPatientToPreviousQueue', 'Transfer Patient to Prior Queue?')}
-        />
+        <ModalHeader closeModal={closeModal} title={t('sendPatientToAQueue', 'Add to a queue')} />
         <ModalBody>
           <div className={styles.modalBody}>
             <h5>
@@ -216,7 +209,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
               <Controller
                 name="status"
                 control={control}
-                defaultValue={data?.status?.uuid}
+                defaultValue={data?.queue?.allowedStatuses[2].uuid}
                 render={({ field: { value, onChange } }) => (
                   <RadioButtonGroup
                     className={styles.radioButtonWrapper}
