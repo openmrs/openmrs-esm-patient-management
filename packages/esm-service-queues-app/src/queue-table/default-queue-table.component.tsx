@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
+import { DataTableSkeleton, Dropdown, Layer, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
   closeWorkspace,
@@ -11,7 +11,6 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
   updateSelectedQueueStatus,
   updateSelectedService,
@@ -19,13 +18,14 @@ import {
   useSelectedQueueStatus,
   useSelectedService,
 } from '../helpers/helpers';
+import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
+import useQueueStatuses from '../hooks/useQueueStatuses';
+import useQueueServices from '../hooks/useQueueService';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
-import { useColumns } from './cells/columns.resource';
-import useQueueStatuses from '../hooks/useQueueStatuses';
-import useQueueServices from '../hooks/useQueueService';
 
 const serviceQueuesPatientSearchWorkspace = 'service-queues-patient-search';
 
@@ -91,63 +91,65 @@ function DefaultQueueTable() {
   }, [queueEntries, searchTerm]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+    <div className={styles.defaultQueueTable}>
+      <Layer className={styles.container}>
+        <div className={styles.headerContainer}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+          </div>
+          <div className={styles.headerButtons}>
+            <ExtensionSlot
+              name="patient-search-button-slot"
+              state={{
+                isOpen: isPatientSearchOpen,
+                searchQuery: patientSearchQuery,
+                buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                buttonProps: {
+                  kind: 'secondary',
+                  renderIcon: (props) => <Add size={16} {...props} />,
+                  size: 'sm',
+                },
+                searchQueryUpdatedAction: (searchQuery: string) => {
+                  setPatientSearchQuery(searchQuery);
+                },
+                selectPatientAction: (selectedPatientUuid: string) => {
+                  setIsPatientSearchOpen(false);
+                  launchWorkspace(serviceQueuesPatientSearchWorkspace, {
+                    selectedPatientUuid,
+                    currentServiceQueueUuid: selectedService?.serviceUuid,
+                    handleBackToSearchList,
+                  });
+                },
+              }}
+            />
+          </div>
         </div>
-        <div className={styles.headerButtons}>
-          <ExtensionSlot
-            name="patient-search-button-slot"
-            state={{
-              isOpen: isPatientSearchOpen,
-              searchQuery: patientSearchQuery,
-              buttonText: t('addPatientToQueue', 'Add patient to queue'),
-              overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-              buttonProps: {
-                kind: 'secondary',
-                renderIcon: (props) => <Add size={16} {...props} />,
-                size: 'sm',
-              },
-              searchQueryUpdatedAction: (searchQuery: string) => {
-                setPatientSearchQuery(searchQuery);
-              },
-              selectPatientAction: (selectedPatientUuid: string) => {
-                setIsPatientSearchOpen(false);
-                launchWorkspace(serviceQueuesPatientSearchWorkspace, {
-                  selectedPatientUuid,
-                  currentServiceQueueUuid: selectedService?.serviceUuid,
-                  handleBackToSearchList,
-                });
-              },
-            }}
-          />
-        </div>
-      </div>
-      {!isLoading ? (
-        <div className={styles.paddedQueueTable}>
-          <QueueTable
-            queueEntries={filteredQueueEntries ?? []}
-            isValidating={isValidating}
-            queueUuid={null}
-            statusUuid={null}
-            ExpandedRow={QueueTableExpandedRow}
-            tableFilter={[
-              <QueueDropdownFilter />,
-              <StatusDropdownFilter />,
-              <TableToolbarSearch
-                className={styles.search}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t('searchThisList', 'Search this list')}
-                size={isDesktop(layout) ? 'sm' : 'lg'}
-              />,
-              <ClearQueueEntries queueEntries={filteredQueueEntries} />,
-            ]}
-          />
-        </div>
-      ) : (
-        <DataTableSkeleton role="progressbar" />
-      )}
+        {!isLoading ? (
+          <div>
+            <QueueTable
+              queueEntries={filteredQueueEntries ?? []}
+              isValidating={isValidating}
+              queueUuid={null}
+              statusUuid={null}
+              ExpandedRow={QueueTableExpandedRow}
+              tableFilter={[
+                <QueueDropdownFilter />,
+                <StatusDropdownFilter />,
+                <TableToolbarSearch
+                  className={styles.search}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={t('searchThisList', 'Search this list')}
+                  size={isDesktop(layout) ? 'sm' : 'lg'}
+                />,
+                <ClearQueueEntries queueEntries={filteredQueueEntries} />,
+              ]}
+            />
+          </div>
+        ) : (
+          <DataTableSkeleton role="progressbar" />
+        )}
+      </Layer>
     </div>
   );
 }

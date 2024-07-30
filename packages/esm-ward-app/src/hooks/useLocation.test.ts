@@ -1,7 +1,7 @@
-import { renderHook } from '@testing-library/react';
-import useLocation from './useLocation';
 import useSWRImmutable from 'swr/immutable';
+import { renderHook } from '@testing-library/react';
 import { restBaseUrl } from '@openmrs/esm-framework';
+import useLocation from './useLocation';
 
 jest.mock('swr/immutable', () =>
   jest.fn().mockReturnValue({
@@ -23,7 +23,7 @@ describe('useLocation hook', () => {
     );
   });
 
-  it('should call useLocation with given rep', () => {
+  it('should call useLocation with the given custom representation', () => {
     const { result } = renderHook(() => useLocation('testUUID', 'custom:(display,uuid,links)'));
     expect(useSWRImmutableMock).toHaveBeenCalledWith(
       `${restBaseUrl}/location/testUUID?v=custom:(display,uuid,links)`,

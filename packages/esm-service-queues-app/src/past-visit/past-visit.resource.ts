@@ -25,7 +25,7 @@ export function usePastVisits(patientUuid: string) {
 
   return {
     visits: data ? previousVisit : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };

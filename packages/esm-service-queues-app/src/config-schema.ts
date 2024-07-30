@@ -60,6 +60,85 @@ export const defaultQueueTable: TableDefinitions = {
 };
 
 export const configSchema = {
+  appointmentStatuses: {
+    _type: Type.Array,
+    _description: 'Configurable appointment status (status of appointments)',
+    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
+  },
+  biometrics: biometricsConfigSchema,
+  concepts: {
+    defaultPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default priority for the queues eg Not urgent.',
+      _default: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
+    },
+    defaultStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default status for the queues eg Waiting.',
+      _default: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
+    },
+    defaultTransitionStatus: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
+      _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
+    },
+    diastolicBloodPressureUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    emergencyPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
+      _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
+    },
+    heightUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    historicalObsConceptUuid: {
+      _type: Type.Array,
+      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
+      _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    },
+    oxygenSaturationUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    pulseUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    respiratoryRateUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    systolicBloodPressureUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    temperatureUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    weightUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
+  contactAttributeType: {
+    _type: Type.UUID,
+    _description:
+      'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
+    _default: '',
+  },
+  customPatientChartUrl: {
+    _type: Type.String,
+    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
+      Available arguments: patientUuid, openmrsSpaBase, openBase
+      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
+    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
+  },
   dashboardTitle: {
     _type: Type.Object,
     _description: 'The title to be displayed on the service queues dashboard',
@@ -76,77 +155,10 @@ export const configSchema = {
       value: 'Service queues',
     },
   },
-  concepts: {
-    defaultPriorityConceptUuid: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the default priority for the queues eg Not urgent.',
-      _default: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
-    },
-    emergencyPriorityConceptUuid: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
-      _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
-    },
-    defaultStatusConceptUuid: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the default status for the queues eg Waiting.',
-      _default: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
-    },
-    defaultTransitionStatus: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
-      _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
-    },
-    systolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    diastolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    pulseUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    temperatureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    oxygenSaturationUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    heightUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    weightUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    respiratoryRateUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    historicalObsConceptUuid: {
-      _type: Type.Array,
-      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
-      _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
-    },
-  },
-  contactAttributeType: {
-    _type: Type.UUID,
-    _description:
-      'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
+  defaultFacilityUrl: {
+    _type: Type.String,
     _default: '',
-  },
-  vitals: vitalsConfigSchema,
-  biometrics: biometricsConfigSchema,
-  appointmentStatuses: {
-    _type: Type.Array,
-    _description: 'Configurable appointment status (status of appointments)',
-    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
+    _description: 'Custom URL to load default facility if it is not in the session',
   },
   defaultIdentifierTypes: {
     _type: Type.Array,
@@ -155,34 +167,6 @@ export const configSchema = {
     },
     _description: 'The identifier types to be display on all patient search result page',
     _default: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
-  },
-  showRecommendedVisitTypeTab: {
-    _type: Type.Boolean,
-    _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
-    _default: false,
-  },
-  visitTypeResourceUrl: {
-    _type: Type.String,
-    _description: 'The `visitTypeResourceUrl`',
-    _default: null,
-  },
-  customPatientChartUrl: {
-    _type: Type.String,
-    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _description: `Template URL that will be used when clicking on the patient name in the queues table.
-      Available arguments: patientUuid, openmrsSpaBase, openBase
-      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
-    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
-  },
-  defaultFacilityUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'Custom URL to load default facility if it is not in the session',
-  },
-  visitQueueNumberAttributeUuid: {
-    _type: Type.String,
-    _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: null,
   },
   queueTables: {
     columnDefinitions: {
@@ -368,6 +352,22 @@ export const configSchema = {
       ),
     ],
   },
+  showRecommendedVisitTypeTab: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
+    _default: false,
+  },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.String,
+    _description: 'The UUID of the visit attribute that contains the visit queue number.',
+    _default: null,
+  },
+  visitTypeResourceUrl: {
+    _type: Type.String,
+    _description: 'The `visitTypeResourceUrl`',
+    _default: null,
+  },
+  vitals: vitalsConfigSchema,
   _validators: [
     validator((config: ConfigObject) => {
       const queueNumberColumnDefs = [
@@ -393,35 +393,35 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 }
 
 export interface ConfigObject {
-  dashboardTitle: {
-    key: string;
-    value: string;
-  };
+  appointmentStatuses: Array<string>;
+  biometrics: BiometricsConfigObject;
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
     defaultTransitionStatus: string;
-    systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
-    pulseUuid: string;
-    temperatureUuid: string;
-    oxygenSaturationUuid: string;
-    heightUuid: string;
-    weightUuid: string;
-    respiratoryRateUuid: string;
     emergencyPriorityConceptUuid: string;
+    heightUuid: string;
     historicalObsConceptUuid: Array<string>;
+    oxygenSaturationUuid: string;
+    pulseUuid: string;
+    respiratoryRateUuid: string;
+    systolicBloodPressureUuid: string;
+    temperatureUuid: string;
+    weightUuid: string;
   };
   contactAttributeType: Array<string>;
-  vitals: VitalsConfigObject;
-  biometrics: BiometricsConfigObject;
-  appointmentStatuses: Array<string>;
-  defaultIdentifierTypes: Array<string>;
-  showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
-  visitTypeResourceUrl: string;
-  visitQueueNumberAttributeUuid: string | null;
+  defaultIdentifierTypes: Array<string>;
+  dashboardTitle: {
+    key: string;
+    value: string;
+  };
   queueTables: TablesConfig;
+  showRecommendedVisitTypeTab: boolean;
+  visitQueueNumberAttributeUuid: string | null;
+  visitTypeResourceUrl: string;
+  vitals: VitalsConfigObject;
 }
 
 interface TablesConfig {
@@ -431,7 +431,7 @@ interface TablesConfig {
     A list of table definitions. A queue table (whether it is displaying entries from a
     particular queue+status combination, from a particular queue, or from multiple queues)
     will determine what columns to show based on these definitions. If multiple TableDefinitions
-    have matching appliedTo criteria, the first one will be used.       
+    have matching appliedTo criteria, the first one will be used.
   */
   tableDefinitions: TableDefinitions[];
 }

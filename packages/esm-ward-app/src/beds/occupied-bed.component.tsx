@@ -1,8 +1,8 @@
-import { Tag } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import WardPatientCard from '../ward-patient-card/ward-patient-card';
+import { Tag } from '@carbon/react';
 import { type WardBedProps } from '../ward-view/ward-bed.component';
+import WardPatientCard from '../ward-patient-card/ward-patient-card';
 import styles from './occupied-bed.scss';
 
 const OccupiedBed: React.FC<WardBedProps> = ({ wardPatients, bed }) => {

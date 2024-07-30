@@ -8,6 +8,7 @@ interface FHIRResponse {
   type: string;
   resourceType: string;
 }
+
 export function useQueueLocations() {
   const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
   const { data, error, isLoading } = useSWRImmutable<{ data: FHIRResponse }>(apiUrl, openmrsFetch);

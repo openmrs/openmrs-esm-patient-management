@@ -1,20 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, within } from '@testing-library/react';
-import { useSession } from '@openmrs/esm-framework';
-import { mockSession } from '__mocks__';
+import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import type { PatientList } from '../api/types';
+import { type ConfigSchema, configSchema } from '../config-schema';
+import { mockSession } from '__mocks__';
 import ListsTable from './lists-table.component';
 
-const mockedUseSession = jest.mocked(useSession);
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(() => ({
-    patientListsToShow: 10,
-  })),
-  isDesktop: jest.fn(() => true),
-}));
+const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = jest.mocked(useConfig<ConfigSchema>);
 
 const tableHeaders = [
   { header: 'List name', key: '1' },
@@ -75,7 +69,13 @@ const patientLists: Array<PatientList> = [
 ];
 
 describe('ListsTable', () => {
-  beforeEach(() => mockedUseSession.mockReturnValue(mockSession.data));
+  beforeEach(() => {
+    mockUseSession.mockReturnValue(mockSession.data);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      patientListsToShow: 10,
+    });
+  });
 
   it('renders a loading state when patient list data is getting fetched', () => {
     render(<ListsTable error={null} headers={tableHeaders} isLoading listType={'My lists'} patientLists={[]} />);

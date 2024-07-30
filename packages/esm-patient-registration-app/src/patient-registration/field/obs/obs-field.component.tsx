@@ -1,16 +1,15 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
-import { OpenmrsDatePicker, parseDate, useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
-import styles from './../field.scss';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
+import styles from './../field.scss';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -19,7 +18,6 @@ export interface ObsFieldProps {
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
-
   const config = useConfig<RegistrationConfig>();
 
   if (!config.registrationObs.encounterTypeUuid) {

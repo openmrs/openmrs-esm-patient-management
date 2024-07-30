@@ -275,6 +275,7 @@
   "ticketNumber": "Ticket Number",
   "time": "Time",
   "timeCannotBeInFuture": "Time cannot be in the future",
+  "timeCannotBePriorToPreviousQueueEntry": "Time cannot be before start of previous queue entry: {{time}}",
   "timeOfTransition": "Time of transition",
   "tirageNotYetCompleted": "Triage has not yet been completed",
   "today": "Today",

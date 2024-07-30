@@ -188,7 +188,7 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
   return {
     serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }

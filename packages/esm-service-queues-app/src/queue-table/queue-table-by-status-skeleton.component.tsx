@@ -1,12 +1,8 @@
-import { DataTableSkeleton, SkeletonText, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { DataTableSkeleton, SkeletonText } from '@carbon/react';
 import React from 'react';
 import styles from './queue-table.scss';
-import classNames from 'classnames';
 
 export const QueueTableByStatusSkeleton = () => {
-  const layout = useLayoutType();
-
   return (
     <div className={styles.container}>
       <div className={styles.statusTableContainer}>

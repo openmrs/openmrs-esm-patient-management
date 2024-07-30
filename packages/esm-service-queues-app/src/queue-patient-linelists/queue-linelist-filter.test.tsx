@@ -1,23 +1,31 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
 import QueueLinelistFilter from './queue-linelist-filter.workspace';
 
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseVisitTypes = jest.mocked(useVisitTypes);
+
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: jest.fn(() => 'tablet'),
-  useVisitTypes: jest.fn(() => mockVisitTypes),
-  toOpemrsIsoString: jest.fn(),
+  toOmrsIsoString: jest.fn(),
 }));
 
 const workspaceProps = {
   closeWorkspace: jest.fn(),
   promptBeforeClosing: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
+  setTitle: jest.fn(),
 };
 
 describe('QueueLinelistFilter', () => {
+  beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+  });
+
   it('renders the form with filter elements', () => {
     render(<QueueLinelistFilter {...workspaceProps} />);
 

@@ -4,16 +4,16 @@ import { type RegistrationConfig } from '../config-schema';
 import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 
 export interface PatientRegistrationContextProps {
-  identifierTypes: Array<any>;
-  values: FormValues;
-  validationSchema: any;
-  inEditMode: boolean;
-  setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
-  setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   currentPhoto: string;
-  isOffline: boolean;
+  identifierTypes: Array<any>;
+  inEditMode: boolean;
   initialFormValues: FormValues;
+  isOffline: boolean;
+  setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
+  setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
   setInitialFormValues?: React.Dispatch<SetStateAction<FormValues>>;
+  validationSchema: any;
+  values: FormValues;
 }
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);

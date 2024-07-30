@@ -4,24 +4,6 @@ import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarc
 import { useField } from 'formik';
 import ComboInput from '../../input/combo-input/combo-input.component';
 
-interface AddressHierarchyLevelsProps {
-  orderedAddressFields: Array<any>;
-}
-
-const AddressHierarchyLevels: React.FC<AddressHierarchyLevelsProps> = ({ orderedAddressFields }) => {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      {orderedAddressFields.map((attribute) => (
-        <AddressComboBox key={attribute.id} attribute={attribute} />
-      ))}
-    </>
-  );
-};
-
-export default AddressHierarchyLevels;
-
 interface AddressComboBoxProps {
   attribute: {
     id: string;
@@ -30,6 +12,10 @@ interface AddressComboBoxProps {
     label: string;
     required?: boolean;
   };
+}
+
+interface AddressHierarchyLevelsProps {
+  orderedAddressFields: Array<any>;
 }
 
 const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
@@ -71,3 +57,15 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
     />
   );
 };
+
+const AddressHierarchyLevels: React.FC<AddressHierarchyLevelsProps> = ({ orderedAddressFields }) => {
+  return (
+    <>
+      {orderedAddressFields.map((attribute) => (
+        <AddressComboBox key={attribute.id} attribute={attribute} />
+      ))}
+    </>
+  );
+};
+
+export default AddressHierarchyLevels;

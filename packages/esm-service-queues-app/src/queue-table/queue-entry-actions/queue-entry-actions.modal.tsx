@@ -172,13 +172,33 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       });
   };
 
-  const isTimeInvalid = useMemo(() => {
+  // non-null if the selected date+time is invalid
+  const timeInvalidMessage = useMemo(() => {
     const now = new Date();
     const startAtDate = new Date(formState.transitionDate);
     const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
     startAtDate.setHours(hour, minute, 0, 0);
-    return startAtDate > now;
-  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat]);
+
+    const previousQueueEntryStartTimeStr = queueEntry.previousQueueEntry?.startedAt;
+    const previousQueueEntryStartTime = previousQueueEntryStartTimeStr
+      ? new Date(previousQueueEntryStartTimeStr)
+      : null;
+
+    if (startAtDate > now) {
+      return t('timeCannotBeInFuture', 'Time cannot be in the future');
+    }
+    if (startAtDate <= previousQueueEntryStartTime) {
+      return t(
+        'timeCannotBePriorToPreviousQueueEntry',
+        'Time cannot be before start of previous queue entry: {{time}}',
+        {
+          time: previousQueueEntryStartTime.toLocaleString(),
+          interpolation: { escapeValue: false },
+        },
+      );
+    }
+    return null;
+  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat, t]);
 
   const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
 
@@ -329,8 +349,8 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   onChange={(event) => setTransitionTime(event.target.value)}
                   pattern={time12HourFormatRegexPattern}
                   value={formState.transitionTime}
-                  invalid={isTimeInvalid}
-                  invalidText={t('timeCannotBeInFuture', 'Time cannot be in the future')}
+                  invalid={timeInvalidMessage != null}
+                  invalidText={timeInvalidMessage}
                   disabled={!formState.modifyDefaultTransitionDateTime}>
                   <TimePickerSelect
                     id="visitStartTimeSelect"

@@ -1,23 +1,29 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockMappedQueueEntry } from '__mocks__';
-import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { mockServices, mockSession, mockLocations, mockMappedQueueEntry } from '__mocks__';
+import {
+  type FetchResponse,
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { updateQueueEntry } from './active-visits-table.resource';
 import ChangeStatus from './change-status-dialog.component';
 
-const mockedUseConfig = useConfig as jest.Mock;
-const mockShowSnackbar = showSnackbar as jest.Mock;
-const mockUpdateQueueEntry = updateQueueEntry as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUpdateQueueEntry = jest.mocked(updateQueueEntry);
+const mockUseSession = jest.mocked(useSession);
+const mockUseLocations = jest.mocked(useLocations);
 
-jest.mock('./active-visits-table.resource', () => {
-  const originalModule = jest.requireActual('./active-visits-table.resource');
-
-  return {
-    ...originalModule,
-    updateQueueEntry: jest.fn(),
-  };
-});
+jest.mock('./active-visits-table.resource', () => ({
+  ...jest.requireActual('./active-visits-table.resource'),
+  updateQueueEntry: jest.fn(),
+}));
 
 jest.mock('../patient-search/hooks/useQueueLocations', () => {
   return {
@@ -33,29 +39,31 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    toOmrsIsoString: jest.fn(),
-    toDateObjectStrict: jest.fn(),
-    useLocations: jest.fn().mockImplementation(() => mockLocations.data),
-    useSession: jest.fn().mockImplementation(() => mockSession.data),
-  };
-});
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  toOmrsIsoString: jest.fn(),
+  toDateObjectStrict: jest.fn(),
+  useLocations: jest.fn(),
+}));
 
 describe('Queue entry details', () => {
-  beforeEach(() =>
-    mockedUseConfig.mockReturnValue({
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
       concepts: {},
-    } as ConfigObject),
-  );
+    } as ConfigObject);
+    mockUseLocations.mockReturnValue(mockLocations.data.results);
+    mockUseSession.mockReturnValue(mockSession.data);
+  });
 
   it('should update a queue entry and display toast message', async () => {
     const user = userEvent.setup();
 
-    mockUpdateQueueEntry.mockResolvedValueOnce({ data: mockMappedQueueEntry, status: 201, statusText: 'Updated' });
+    mockUpdateQueueEntry.mockResolvedValueOnce({
+      data: mockMappedQueueEntry,
+      status: 201,
+      statusText: 'Updated',
+    } as FetchResponse);
 
     renderUpdateQueueEntryDialog();
     expect(screen.getByText(/queue service/i)).toBeInTheDocument();
@@ -138,7 +146,11 @@ describe('Queue entry details', () => {
 
   test('should show error message when user tries to update queue entry without selecting required fields', async () => {
     const user = userEvent.setup();
-    mockUpdateQueueEntry.mockResolvedValueOnce({ data: mockMappedQueueEntry, status: 201, statusText: 'Updated' });
+    mockUpdateQueueEntry.mockResolvedValueOnce({
+      data: mockMappedQueueEntry,
+      status: 201,
+      statusText: 'Updated',
+    } as FetchResponse);
 
     renderUpdateQueueEntryDialog();
 

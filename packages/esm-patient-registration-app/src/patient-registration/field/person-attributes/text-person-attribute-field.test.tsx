@@ -9,6 +9,8 @@ describe('TextPersonAttributeField', () => {
     format: 'java.lang.String',
     display: 'Referred by',
     uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
+    description: 'Referred by',
+    name: 'Referred by',
   };
 
   it('renders the input field with a label', () => {
