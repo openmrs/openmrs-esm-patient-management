@@ -1,5 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 @import '../../root.scss';
 
 .form {
@@ -10,7 +12,11 @@
 }
 
 .formContent {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
+}
+
+.formError {
+  margin: -1rem -1rem 1rem -1rem;
 }
 
 .buttonSet button {
@@ -19,9 +25,9 @@
 }
 
 .BedSelectionDropdown {
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
 }
 
 .errorNotifications {
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }

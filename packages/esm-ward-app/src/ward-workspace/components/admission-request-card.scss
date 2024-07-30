@@ -1,18 +1,18 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .admissionRequestCard {
   background-color: $ui-03;
   border: 1px solid $color-gray-30;
   height: fit-content;
   color: $color-gray-70;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .admissionRequestCardHeaderContainer {
-  padding: spacing.$spacing-03;
+  padding: layout.$spacing-03;
 }
 
 .admissionRequestCardHeader {
@@ -22,14 +22,14 @@
 
   > div:not(:first-of-type)::before {
     content: '·';
-    padding: spacing.$spacing-02;
+    padding: layout.$spacing-02;
   }
 }
 
 .admissionEncounterDetails {
   @include type.type-style('helper-text-01');
   color: $text-02;
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
 }
 
 .admissionRequestActionBar {

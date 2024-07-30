@@ -200,16 +200,10 @@ export const configSchema: ConfigSchema = {
       },
     },
   },
-  admissionEncounterTypeUuid: {
-    _type: Type.UUID,
-    _description: 'The encounter type UUID for admission encountertype',
-    _default: '260566e1-c909-4d61-a96f-c1019291a09d',
-  },
 };
 
 export interface WardConfigObject {
   wardPatientCards: WardPatientCardsConfig;
-  admissionEncounterTypeUuid: string;
 }
 
 export interface WardPatientCardsConfig {

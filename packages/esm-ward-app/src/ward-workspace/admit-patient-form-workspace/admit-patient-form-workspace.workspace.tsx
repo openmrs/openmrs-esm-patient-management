@@ -19,8 +19,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, Row, Column, DropdownSkeleton, Dropdown, ButtonSet, Button } from '@carbon/react';
 import { InlineNotification } from '@carbon/react';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
-import type { WardConfigObject } from '../../config-schema';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 
 interface AdmitPatientFormWorkspaceProps extends DefaultWorkspaceProps {
   patient: Patient;
@@ -36,7 +36,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const { location } = useWardLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
-  const { admissionEncounterTypeUuid } = useConfig<WardConfigObject>();
+  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { isLoading, admissionLocation, mutate: mutateAdmissionLocation } = useAdmissionLocation();
   const beds = useMemo(() => (isLoading ? [] : filterBeds(admissionLocation)), [admissionLocation]);
@@ -53,7 +53,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
     () =>
       z.object({
         bedId: z.number({
-          required_error: t('bedSelectionRequired', 'Please select a bed to move forward'),
+          required_error: t('bedSelectionRequired', 'Please select a bed'),
         }),
       }),
     [],
@@ -80,7 +80,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
       setShowErrorNotifications(false);
       setIsSubmitting(true);
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
-      createEncounter(patient.uuid, admissionEncounterTypeUuid, location?.uuid)
+      createEncounter(patient.uuid, emrConfiguration.admissionEncounterType.uuid, location?.uuid)
         .then(async (response) => {
           if (response.ok) {
             return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
@@ -105,7 +105,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
           closeWorkspaceWithSavedChanges();
         });
     },
-    [beds, patient, admissionEncounterTypeUuid, location, closeWorkspaceWithSavedChanges],
+    [beds, patient, emrConfiguration, location, closeWorkspaceWithSavedChanges],
   );
 
   const onError = useCallback((values) => {
@@ -116,6 +116,20 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   return (
     <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
       <div className={styles.formContent}>
+        {errorFetchingEmrConfiguration && (
+          <div className={styles.formError}>
+            <InlineNotification
+              kind="error"
+              title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
+              subtitle={t(
+                'fetchingEmrConfigurationFailed',
+                'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
+              )}
+              lowContrast
+              hideCloseButton
+            />
+          </div>
+        )}
         <Row>
           <Column>
             <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
@@ -163,7 +177,10 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
         <Button size="xl" kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" size="xl" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          size="xl"
+          disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}>
           {!isSubmitting ? t('save', 'Save') : t('saving', 'Saving...')}
         </Button>
       </ButtonSet>
