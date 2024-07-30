@@ -28,7 +28,7 @@ const AdmissionRequestsWorkspace: React.FC<DefaultWorkspaceProps> = () => {
   return (
     <div className={styles.admissionRequestsWorkspace}>
       {inpatientRequests.map((admissionRequest, indx) => (
-        <AdmissionRequestCard key={indx} patient={admissionRequest.patient} />
+        <AdmissionRequestCard key={`inpatient-request-workspace-card-${indx}`} patient={admissionRequest.patient} />
       ))}
     </div>
   );
