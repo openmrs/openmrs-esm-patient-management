@@ -62,12 +62,6 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
     formState: { isSubmitting, errors },
     getValues,
   } = useForm<ChangeStatusForm>({
-    defaultValues: {
-      location: data?.queue?.service?.display || '',
-      service: data?.queueComingFrom?.service?.display || '',
-      status: data?.status?.display || '',
-      priority: data?.priority?.display || '',
-    },
     resolver: zodResolver(schema),
   });
 
@@ -159,6 +153,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
             <Controller
               name="location"
               control={control}
+              defaultValue={data?.queueComingFrom?.location?.uuid}
               render={({ field: { onChange, value } }) => (
                 <Select
                   labelText={t('selectQueueLocation', 'Select a queue location')}
@@ -185,6 +180,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
             <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
             <Controller
               name="service"
+              defaultValue={data?.queueComingFrom?.uuid}
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Select
@@ -220,6 +216,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
               <Controller
                 name="status"
                 control={control}
+                defaultValue={data?.status?.uuid}
                 render={({ field: { value, onChange } }) => (
                   <RadioButtonGroup
                     className={styles.radioButtonWrapper}
@@ -243,6 +240,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
             <Controller
               control={control}
               name="priority"
+              defaultValue={data?.priority?.uuid}
               render={({ field: { onChange } }) => (
                 <>
                   <ContentSwitcher
