@@ -43,7 +43,6 @@ import {
   useMutateAppointments,
 } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
-import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
 import {
@@ -54,9 +53,9 @@ import {
   moduleName,
   weekDays,
 } from '../constants';
-import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
-import uniqBy from 'lodash/uniqBy';
+import Workload from '../workload/workload.component';
+import styles from './appointments-form.scss';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 

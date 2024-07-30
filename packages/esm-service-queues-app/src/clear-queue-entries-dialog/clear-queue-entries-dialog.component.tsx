@@ -20,7 +20,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
   const handleClearQueueBatchRequest = useCallback(() => {
     setIsSubmitting(true);
     batchClearQueueEntries(queueEntries).then(
-      (response) => {
+      () => {
         closeModal();
         showSnackbar({
           isLowContrast: true,

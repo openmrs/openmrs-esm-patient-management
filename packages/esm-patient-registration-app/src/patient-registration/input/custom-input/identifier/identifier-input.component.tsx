@@ -17,7 +17,7 @@ interface IdentifierInputProps {
   fieldName: string;
 }
 
-export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
+const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
   const { identifierTypes } = useContext(ResourcesContext);
@@ -154,3 +154,5 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     </div>
   );
 };
+
+export default IdentifierInput;

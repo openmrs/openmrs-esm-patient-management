@@ -1,14 +1,23 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchButton from './patient-search-button.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
-}));
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 describe('PatientSearchButton', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      search: {
+        disableTabletSearchOnKeyUp: false,
+        patientResultUrl: '',
+        showRecentlySearchedPatients: false,
+      },
+    });
+  });
   it('renders with default props', () => {
     render(<PatientSearchButton />);
 

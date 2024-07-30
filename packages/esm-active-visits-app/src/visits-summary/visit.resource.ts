@@ -1,5 +1,5 @@
-import { openmrsFetch, restBaseUrl, type OpenmrsResource, type Visit } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { openmrsFetch, restBaseUrl, type OpenmrsResource, type Visit } from '@openmrs/esm-framework';
 
 export interface Encounter {
   uuid: string;
@@ -158,7 +158,7 @@ export function useVisit(visitUuid: string) {
 
   return {
     visit: data ? data.data : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };

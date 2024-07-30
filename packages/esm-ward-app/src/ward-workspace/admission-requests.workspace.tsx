@@ -1,12 +1,10 @@
 import React from 'react';
-import styles from './admission-requests-workspace.scss';
-import AdmissionRequestCard from './admission-request-card.component';
+import { useTranslation } from 'react-i18next';
+import { InlineNotification, Loading } from '@carbon/react';
 import { getCoreTranslation, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import useWardLocation from '../hooks/useWardLocation';
-import { Loading } from '@carbon/react';
-import { InlineNotification } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
+import AdmissionRequestCard from './admission-request-card.component';
+import styles from './admission-requests-workspace.scss';
 
 const AdmissionRequestsWorkspace: React.FC<DefaultWorkspaceProps> = () => {
   const { t } = useTranslation();
@@ -29,8 +27,9 @@ const AdmissionRequestsWorkspace: React.FC<DefaultWorkspaceProps> = () => {
 
   return (
     <div className={styles.admissionRequestsWorkspace}>
-      {admissionRequests.map((admissionRequest, indx) => (
-        <AdmissionRequestCard key={indx} patient={admissionRequest.patient} />
+      {/* TODO: Use a unique key from the admissionRequest object */}
+      {admissionRequests.map((admissionRequest, index) => (
+        <AdmissionRequestCard key={index} patient={admissionRequest.patient} />
       ))}
     </div>
   );

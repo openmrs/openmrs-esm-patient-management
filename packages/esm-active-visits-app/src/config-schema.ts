@@ -19,16 +19,6 @@ export interface IdentifiersDefinition {
 
 export const configSchema = {
   activeVisits: {
-    pageSize: {
-      _type: Type.Number,
-      _description: 'Count of active visits to be shown in a single page.',
-      _default: 10,
-    },
-    pageSizes: {
-      _type: Type.Array,
-      _description: 'Customizable page sizes that user can choose',
-      _default: [10, 20, 50],
-    },
     identifiers: {
       _type: Type.Array,
       _description: 'Customizable list of identifiers to display on active visits table',
@@ -52,6 +42,16 @@ export const configSchema = {
         },
       },
       _default: null,
+    },
+    pageSize: {
+      _type: Type.Number,
+      _description: 'Count of active visits to be shown in a single page.',
+      _default: 10,
+    },
+    pageSizes: {
+      _type: Type.Array,
+      _description: 'Customizable page sizes that user can choose',
+      _default: [10, 20, 50],
     },
   },
 };

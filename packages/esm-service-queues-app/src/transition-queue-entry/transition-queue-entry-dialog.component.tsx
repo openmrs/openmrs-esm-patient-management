@@ -8,9 +8,9 @@ import {
   updateQueueEntry,
 } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
-import styles from './transition-queue-entry-dialog.scss';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
+import styles from './transition-queue-entry-dialog.scss';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;

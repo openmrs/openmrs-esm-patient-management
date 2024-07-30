@@ -2,6 +2,7 @@ import { Type, validators } from '@openmrs/esm-framework';
 
 export const configSchema = {
   search: {
+    // TODO: Rename this config property
     patientResultUrl: {
       _type: Type.String,
       _default: '${openmrsSpaBase}/patient/${patientUuid}/chart/',
@@ -53,8 +54,8 @@ export const configSchema = {
 export type PatientSearchConfig = {
   search: {
     disableTabletSearchOnKeyUp: boolean;
-    patientSearchResult: string;
-    showRecentlySearchedPatients: string;
+    patientResultUrl: string;
+    showRecentlySearchedPatients: boolean;
   };
   contactAttributeType: Array<string>;
   defaultIdentifier: string;

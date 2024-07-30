@@ -1,4 +1,4 @@
-import { type Location, useLocations, useSession } from '@openmrs/esm-framework';
+import { type Location, useSession } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import useLocation from './useLocation';
 

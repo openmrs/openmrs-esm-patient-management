@@ -21,10 +21,12 @@ export interface FieldDefinition {
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
 }
+
 export interface CustomConceptAnswer {
   uuid: string;
   label?: string;
 }
+
 export interface Gender {
   label?: string;
   value: string;

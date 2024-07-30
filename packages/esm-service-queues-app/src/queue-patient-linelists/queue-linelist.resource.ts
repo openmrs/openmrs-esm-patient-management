@@ -12,7 +12,7 @@ export function useAppointments() {
   return {
     appointmentQueueEntries: data ? data?.data : [],
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }
@@ -25,7 +25,7 @@ export function useCheckedInAppointments() {
   return {
     checkedInAppointments: data ? data?.data : [],
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }
@@ -41,7 +41,7 @@ export function useProviders() {
   return {
     providers: data ? data.data?.results : [],
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }
@@ -77,7 +77,7 @@ export function usePatientAppointments(patientUuid: string, startDate) {
 
   return {
     upcomingAppointment: upcomingAppointments ? upcomingAppointments?.[0] : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };
