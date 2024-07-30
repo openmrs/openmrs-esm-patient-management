@@ -5,6 +5,7 @@ import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import { savePatientNote } from './notes-form.resource';
 import PatientNotesForm from './notes-form.component';
 import { emrApiConfigMock, mockPatient, mockSession } from '__mocks__';
+import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 
 const testProps = {
   patientUuid: mockPatient.uuid,
@@ -31,13 +32,21 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('../../../hooks/useEmrApiConfig', () => ({
-  useEmrApiConfig: jest.fn().mockReturnValue(() => ({ emrApiConfig: emrApiConfigMock })),
-}));
-
 jest.mock('./notes-form.resource', () => ({
   savePatientNote: jest.fn(),
 }));
+
+jest.mock('../../../hooks/useEmrConfiguration', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+(useEmrConfiguration as jest.Mock).mockReturnValue({
+  emrConfiguration: emrApiConfigMock,
+  mutateEmrConfiguration: jest.fn(),
+  isLoadingEmrConfiguration: false,
+  errorFetchingEmrConfiguration: null,
+});
 
 test('renders the visit notes form with all the relevant fields and values', () => {
   renderWardPatientNotesForm();

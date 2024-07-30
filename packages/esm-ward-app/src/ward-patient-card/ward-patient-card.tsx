@@ -20,7 +20,7 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
           //   activeBedSelection?.patient.uuid === props.patient?.uuid,
         })}
         onClick={() => {
-          launchWorkspace('ward-patient-notes-workspace', { ...props });
+          launchWorkspace('ward-patient-workspace', { ...props });
         }}>
         {/* Name will not be displayed; just there for a11y */}
         {getPatientName(props.patient.person)}
