@@ -97,6 +97,15 @@ export const configSchema = {
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
+    defaultUrgentPriorityStatus: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default priority for a service in the queues eg urgent.',
+      _default: 'ef5718cd-d6d5-4fcf-bb82-cc4afaa90603',
+    },
+    defualtWaitStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
       _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -400,6 +409,8 @@ export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
+    defaultUrgentPriorityStatus: string;
+    defualtWaitStatusConceptUuid: string;
     defaultTransitionStatus: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
@@ -431,7 +442,7 @@ interface TablesConfig {
     A list of table definitions. A queue table (whether it is displaying entries from a
     particular queue+status combination, from a particular queue, or from multiple queues)
     will determine what columns to show based on these definitions. If multiple TableDefinitions
-    have matching appliedTo criteria, the first one will be used.       
+    have matching appliedTo criteria, the first one will be used.
   */
   tableDefinitions: TableDefinitions[];
 }
