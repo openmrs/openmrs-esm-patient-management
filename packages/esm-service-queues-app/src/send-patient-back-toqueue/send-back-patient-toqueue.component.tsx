@@ -233,7 +233,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
             <Controller
               control={control}
               name="priority"
-              defaultValue={data?.priority?.uuid}
+              defaultValue={data?.queue.allowedPriorities[2]?.uuid}
               render={({ field: { onChange } }) => (
                 <>
                   <ContentSwitcher

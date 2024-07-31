@@ -256,7 +256,7 @@
   "selectVisitType": "Please select a Visit Type",
   "sendBackPatientBackSuccess": "Patient sent back to queue Successfully",
   "sendPatientBack": "Back to queue",
-  "sendPatientToPreviousQueue": "Transfer Patient to Prior Queue?",
+  "sendPatientToAQueue": "Add to a queue",
   "serve": "Serve",
   "servePatient": "Serve patient",
   "service": "Service",
