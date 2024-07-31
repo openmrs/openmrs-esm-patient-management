@@ -57,8 +57,8 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           concept={concept}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
-          dateFormat={fieldDefinition.dateFormat}
-          placeholder={fieldDefinition.placeholder}
+          minDate={fieldDefinition.minDate}
+          maxDate={fieldDefinition.maxDate}
         />
       );
     case 'Coded':
@@ -159,14 +159,37 @@ interface DateObsFieldProps {
   concept: ConceptResponse;
   label: string;
   required?: boolean;
-  dateFormat?: string;
-  placeholder?: string;
+  minDate?: string;
+  maxDate?: string;
 }
 
-function DateObsField({ concept, label, required, placeholder }: DateObsFieldProps) {
+const evaluateConfigDate = (dateString: string): Date | string | null => {
+  if (!dateString) {
+    return null;
+  }
+
+  if (dateString === 'today') {
+    return new Date();
+  }
+
+  const date = new Date(dateString);
+  if (!isNaN(date.getTime())) {
+    return date;
+  }
+
+  return 'Invalid min or max date!';
+};
+
+function DateObsField({ concept, label, required, maxDate, minDate }: DateObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
   const { setFieldValue } = useContext(PatientRegistrationContext);
+
+  const evaluatedMinDate = evaluateConfigDate(minDate);
+  const evaluatedMaxDate = evaluateConfigDate(maxDate);
+  const configDateError =
+    (typeof evaluatedMinDate === 'string' && evaluatedMinDate) ||
+    (typeof evaluatedMaxDate === 'string' && evaluatedMaxDate);
 
   const onDateChange = (date: Date) => {
     setFieldValue(fieldName, date);
@@ -188,6 +211,8 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
                   isInvalid={errors[fieldName] && touched[fieldName]}
                   invalidText={t(meta.error)}
                   value={field.value}
+                  minDate={typeof evaluatedMinDate !== 'string' && evaluatedMinDate}
+                  maxDate={typeof evaluatedMaxDate !== 'string' && evaluatedMaxDate}
                 />
               </>
             );
