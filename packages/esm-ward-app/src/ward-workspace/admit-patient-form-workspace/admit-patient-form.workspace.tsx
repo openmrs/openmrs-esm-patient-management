@@ -126,7 +126,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
                 showSnackbar({
                   kind: 'success',
                   title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
-                  subtitle: t('patientAdmittedButBedNotAssigned', 'Patient admitted successfully to {{location}}', {
+                  subtitle: t('patientAdmittedWoBed', 'Patient admitted successfully to {{location}}', {
                     location: location?.display,
                   }),
                 });
