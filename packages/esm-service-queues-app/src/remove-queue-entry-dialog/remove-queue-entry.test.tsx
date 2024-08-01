@@ -8,11 +8,6 @@ import RemoveQueueEntryDialog from './remove-queue-entry.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  voidQueueEntry: jest.fn(),
-}));
-
 describe('RemoveQueueEntryDialog', () => {
   const queueEntry = {
     queueUuid: 'fa1e98f1-f002-4174-9e55-34d60951e710',

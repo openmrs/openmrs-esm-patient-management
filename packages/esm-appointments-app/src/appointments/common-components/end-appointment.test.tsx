@@ -1,26 +1,30 @@
 import React from 'react';
+import { of } from 'rxjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { updateVisit, showSnackbar, useVisit } from '@openmrs/esm-framework';
+import { updateVisit, showSnackbar, useVisit, type VisitReturnType } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import EndAppointmentModal from './end-appointment.modal';
 
-const mockUseVisit = useVisit as jest.Mock;
 const closeModal = jest.fn();
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  updateVisit: jest.fn().mockReturnValue({ toPromise: jest.fn().mockResolvedValue({}) }),
-}));
+const mockUseVisit = jest.mocked(useVisit);
+const mockUpdateVisit = jest.mocked(updateVisit);
 
 jest.mock('../../patient-appointments/patient-appointments.resource', () => ({
   changeAppointmentStatus: jest.fn().mockResolvedValue({}),
 }));
 
+jest.mock('../../form/appointments-form.resource', () => ({
+  useMutateAppointments: jest.fn().mockReturnValue({ mutateAppointments: jest.fn() }),
+}));
+
 describe('EndAppointmentModal', () => {
-  it('has a cancel button that closes the model', async () => {
+  beforeEach(() => {
+    mockUpdateVisit.mockImplementation(() => of({}));
+  });
+
+  it('has a cancel button that closes the modal', async () => {
     const user = userEvent.setup();
-    mockUseVisit.mockReturnValue({});
 
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 
@@ -32,7 +36,6 @@ describe('EndAppointmentModal', () => {
   it('should update appointment status but not visit on submit if no active visit', async () => {
     const user = userEvent.setup();
 
-    mockUseVisit.mockReturnValue({});
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 
     const submitButton = screen.getByRole('button', { name: /check out/i });
@@ -55,9 +58,9 @@ describe('EndAppointmentModal', () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({
-      mutate: jest.fn(),
       activeVisit: { location: { uuid: 'def' }, visitType: { uuid: 'ghi' }, startDatetime: new Date() },
-    });
+      mutate: jest.fn(),
+    } as unknown as VisitReturnType);
 
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 

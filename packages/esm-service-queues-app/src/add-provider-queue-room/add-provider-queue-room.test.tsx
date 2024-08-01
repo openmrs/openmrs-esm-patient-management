@@ -7,13 +7,6 @@ import AddProviderQueueRoom from './add-provider-queue-room.component';
 const mockCloseModal = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useCurrentProvider: jest.fn().mockReturnValue({
-    currentProvider: { uuid: 'provider-uuid-1' },
-  }),
-}));
-
 jest.mock('./add-provider-queue-room.resource', () => ({
   addProviderToQueueRoom: jest.fn(),
   updateProviderToQueueRoom: jest.fn().mockResolvedValue({ status: 200 }),

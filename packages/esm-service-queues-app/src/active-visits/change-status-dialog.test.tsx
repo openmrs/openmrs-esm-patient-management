@@ -39,13 +39,6 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  toOmrsIsoString: jest.fn(),
-  toDateObjectStrict: jest.fn(),
-  useLocations: jest.fn(),
-}));
-
 describe('Queue entry details', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
