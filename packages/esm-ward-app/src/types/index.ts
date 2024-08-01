@@ -166,7 +166,7 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   retired?: boolean;
 }
 
-export interface PatientNotePayload {
+export interface EncounterPayload {
   encounterDatetime: string; // date and time the encounter was created (ISO8601 Long) (REQUIRED)
   encounterType: string; // uuid of the encounter type - initial visit, return visit etc. (REQUIRED)
   patient: string; // the patient to whom the encounter applies

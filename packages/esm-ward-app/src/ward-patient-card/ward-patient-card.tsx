@@ -14,11 +14,7 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
         <WardPatientCardRow key={i} {...props} />
       ))}
       <button
-        className={classNames(styles.wardPatientCardButton, {
-          // [styles.activeWardPatientCardButton]:
-          //   activeBedSelection?.bed.uuid === props.bed?.uuid &&
-          //   activeBedSelection?.patient.uuid === props.patient?.uuid,
-        })}
+        className={classNames(styles.wardPatientCardButton, {})}
         onClick={() => {
           launchWorkspace('ward-patient-workspace', { ...props });
         }}>
