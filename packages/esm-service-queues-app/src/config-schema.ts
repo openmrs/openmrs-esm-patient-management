@@ -97,14 +97,14 @@ export const configSchema = {
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
-    defaultUrgentPriorityStatus: {
+    defaultUrgentPriorityOnLabStatus: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for a service in the queues eg urgent.',
-      _default: 'ef5718cd-d6d5-4fcf-bb82-cc4afaa90603',
+      _default: '',
     },
-    defualtWaitStatusConceptUuid: {
+    defualtWaitStatusOnLabConceptUuid: {
       _type: Type.ConceptUuid,
-      _default: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      _default: '',
     },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
