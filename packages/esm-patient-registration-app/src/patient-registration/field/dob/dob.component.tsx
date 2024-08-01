@@ -45,8 +45,8 @@ export const DobField: React.FC = () => {
   );
 
   const onDateChange = useCallback(
-    (birthdate: CalendarDate) => {
-      setFieldValue('birthdate', birthdate?.toDate(getLocalTimeZone()));
+    (birthdate: Date) => {
+      setFieldValue('birthdate', birthdate);
     },
     [setFieldValue],
   );
@@ -106,12 +106,9 @@ export const DobField: React.FC = () => {
               onChange={onDateChange}
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+              invalidText={t(birthdateMeta.error)}
               value={birthdate.value}
             />
-            {!!(birthdateMeta.touched && birthdateMeta.error) && (
-              <div className={styles.radioFieldError}>{birthdateMeta.error && t(birthdateMeta.error)}</div>
-            )}
           </div>
         ) : (
           <div className={styles.grid}>

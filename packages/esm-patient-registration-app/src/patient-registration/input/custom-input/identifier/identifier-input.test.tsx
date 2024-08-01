@@ -6,13 +6,8 @@ import { type PatientIdentifierType } from '../../../patient-registration.types'
 import { initialFormValues } from '../../../patient-registration.component';
 import IdentifierInput from './identifier-input.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  validator: jest.fn(),
-}));
-
 // TODO: Fix this test
-describe.skip('identifier input', () => {
+xdescribe('identifier input', () => {
   const openmrsID = {
     name: 'OpenMRS ID',
     fieldName: 'openMrsId',

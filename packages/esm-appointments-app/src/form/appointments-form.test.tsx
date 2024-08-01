@@ -28,11 +28,6 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseSession = jest.mocked(useSession);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLocations: jest.fn(),
-}));
-
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
   useForm: jest.fn().mockImplementation(() => ({

@@ -2,28 +2,31 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
-import type { AddressTemplate, FormValues } from '../patient-registration.types';
+import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
 import { type Resources, ResourcesContext } from '../../offline.resources';
+import type { AddressTemplate, FormValues } from '../patient-registration.types';
 import { PatientRegistrationContext } from '../patient-registration-context';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  getLocale: jest.fn().mockReturnValue('en'),
-  OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
-    return (
-      <>
-        <label htmlFor={id}>{labelText}</label>
-        <input
-          id={id}
-          value={value ? dayjs(value).format('DD/MM/YYYY') : undefined}
-          onChange={(evt) => onChange(dayjs(evt.target.value).toDate())}
-        />
-      </>
-    );
-  }),
-}));
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        id={id}
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+      />
+    </>
+  );
+});
 
 const predefinedAddressTemplate = {
   uuid: 'test-address-template-uuid',
@@ -135,27 +138,32 @@ describe('Field', () => {
         </Formik>
       </ResourcesContext.Provider>
     );
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+    });
   });
 
   it('should render NameField component when name prop is "name"', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         name: {
+          allowUnidentifiedPatients: true,
           displayMiddleName: true,
-          unidentifiedPatient: true,
           defaultUnknownGivenName: 'UNKNOWN',
           defaultUnknownFamilyName: 'UNKNOWN',
         },
-      },
-    }));
+      } as RegistrationConfig['fieldConfigurations'],
+    });
 
     render(<Field name="name" />, { wrapper: ContextWrapper });
-
     expect(screen.getByText('Full Name')).toBeInTheDocument();
   });
 
   it('should render GenderField component when name prop is "gender"', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         gender: [
           {
@@ -164,33 +172,26 @@ describe('Field', () => {
             id: 'male',
           },
         ],
-      },
-    }));
+      } as unknown as RegistrationConfig['fieldConfigurations'],
+    });
 
     render(<Field name="gender" />, { wrapper: ContextWrapper });
-
     expect(screen.getByLabelText('Male')).toBeInTheDocument();
   });
 
   it('should render DobField component when name prop is "dob"', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
-      fieldConfigurations: {
-        dob: {
-          minAgeLimit: 0,
-          maxAgeLimit: 120,
-        },
-      },
-    }));
     render(<Field name="dob" />, { wrapper: ContextWrapper });
     expect(screen.getByText('Birth')).toBeInTheDocument();
   });
 
   it('should render AddressComponent component when name prop is "address"', () => {
     jest.mock('./address/address-hierarchy.resource', () => ({
-      ...(jest.requireActual('../address-hierarchy.resource') as jest.Mock),
+      ...jest.requireActual('../address-hierarchy.resource'),
       useOrderedAddressHierarchyLevels: jest.fn(),
     }));
-    (useConfig as jest.Mock).mockImplementation(() => ({
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -199,18 +200,18 @@ describe('Field', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
+      } as RegistrationConfig['fieldConfigurations'],
+    });
 
     render(<Field name="address" />, { wrapper: ContextWrapper });
-
     expect(screen.getByText('Address')).toBeInTheDocument();
   });
 
   it('should render Identifiers component when name prop is "id"', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       defaultPatientIdentifierTypes: ['OpenMRS ID'],
-    }));
+    });
 
     const openmrsID = {
       name: 'OpenMRS ID',
@@ -284,9 +285,11 @@ describe('Field', () => {
   it('should return null and report an error for an invalid field name', () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    (useConfig as jest.Mock).mockImplementation(() => ({
-      fieldDefinitions: [{ id: 'weight' }],
-    }));
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [{ id: 'weight' }] as RegistrationConfig['fieldDefinitions'],
+    });
+
     let error = null;
 
     try {

@@ -6,11 +6,6 @@ import { DeathInfoSection } from './death-info-section.component';
 import { type FormValues } from '../../patient-registration.types';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  validator: jest.fn(),
-}));
-
 const initialContextValues = {
   currentPhoto: 'data:image/png;base64,1234567890',
   identifierTypes: [],
