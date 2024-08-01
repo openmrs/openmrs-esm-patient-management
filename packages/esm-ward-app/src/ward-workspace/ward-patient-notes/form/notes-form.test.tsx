@@ -21,16 +21,13 @@ const mockSavePatientNote = savePatientNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockUseSession = useSession as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    createErrorHandler: jest.fn(),
-    showSnackbar: jest.fn(),
-    useSession: jest.fn().mockReturnValue(() => mockSession),
-  };
-});
+jest.mock('@openmrs/esm-framework', () => ({
+  createErrorHandler: jest.fn(),
+  showSnackbar: jest.fn(),
+  translateFrom: jest.fn(),
+  ResponsiveWrapper: jest.fn(({ children }) => <>{children}</>),
+  useSession: jest.fn().mockReturnValue(() => mockSession),
+}));
 
 jest.mock('./notes-form.resource', () => ({
   savePatientNote: jest.fn(),
