@@ -44,12 +44,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const zodSchema = useMemo(
     () =>
       z.object({
-        bedId:
-          isBedManagementModuleInstalled && beds.length > 0
-            ? z.number({
-                required_error: t('bedSelectionRequired', 'Please select a bed'),
-              })
-            : z.number().optional(),
+        bedId: z.number().optional(),
       }),
     [isBedManagementModuleInstalled, beds],
   );

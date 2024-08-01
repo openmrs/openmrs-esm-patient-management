@@ -161,22 +161,6 @@ describe('Testing AdmitPatientForm', () => {
     expect(screen.getByText('No beds configured for Inpatient Ward location')).toBeInTheDocument();
   });
 
-  it('should throw validation error to select a bed if beds are configured', async () => {
-    mockedUseAdmissionLocation.mockReturnValueOnce({
-      isLoading: false,
-      isValidating: false,
-      admissionLocation: mockAdmissionLocation,
-      mutate: jest.fn(),
-      error: null,
-    });
-    const user = userEvent.setup();
-    renderAdmissionForm();
-    const admitButton = screen.getByRole('button', { name: 'Admit' });
-    expect(admitButton).toBeEnabled();
-    await user.click(admitButton);
-    expect(screen.getAllByText('Please select a bed')).toHaveLength(2);
-  });
-
   it('should submit the form, create encounter and submit bed', async () => {
     mockedUseAdmissionLocation.mockReturnValueOnce({
       isLoading: false,
