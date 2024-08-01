@@ -36,7 +36,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
     const bedNumber = bedLayout.bedNumber;
     const patients =
       bedLayout.patients.length === 0
-        ? [t('emptyBed', 'Empty')]
+        ? [t('emptyText', 'Empty')]
         : bedLayout.patients.map((patient) => patient?.person?.preferredName?.display);
     return [bedNumber, ...patients].join(' · ');
   }, []);
