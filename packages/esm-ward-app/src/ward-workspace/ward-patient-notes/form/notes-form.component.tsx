@@ -1,12 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Column, Form, InlineLoading, InlineNotification, Row, Stack, TextArea } from '@carbon/react';
-import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import {
+  createErrorHandler,
+  type DefaultWorkspaceProps,
+  type PatientUuid,
+  ResponsiveWrapper,
+  showSnackbar,
+  translateFrom,
+  useSession,
+} from '@openmrs/esm-framework';
 import { savePatientNote } from './notes-form.resource';
 import styles from './notes-form.scss';
 import { moduleName } from '../../../constant';
@@ -21,15 +28,14 @@ const noteFormSchema = z.object({
   }),
 });
 
-interface PatientNotesFormProps extends DefaultPatientWorkspaceProps {
-  onWorkspaceClose: () => void;
+interface PatientNotesFormProps extends DefaultWorkspaceProps {
+  patientUuid: PatientUuid;
 }
 
 const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   promptBeforeClosing,
-  onWorkspaceClose,
 }) => {
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { t } = useTranslation();
@@ -37,15 +43,17 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rows, setRows] = useState<number>();
 
-  const { control, handleSubmit, watch, getValues, setValue, formState } = useForm<NotesFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isDirty },
+  } = useForm<NotesFormData>({
     mode: 'onSubmit',
     resolver: zodResolver(noteFormSchema),
     defaultValues: {
       wardClinicalNote: '',
     },
   });
-
-  const { isDirty } = formState;
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -54,57 +62,60 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
 
-  const onSubmit = (data: NotesFormData) => {
-    const { wardClinicalNote } = data;
-    setIsSubmitting(true);
+  const onSubmit = useCallback(
+    (data: NotesFormData) => {
+      const { wardClinicalNote } = data;
+      setIsSubmitting(true);
 
-    const notePayload = {
-      encounterDatetime: dayjs(new Date()).format(),
-      patient: patientUuid,
-      location: locationUuid,
-      encounterType: emrConfiguration?.visitNoteEncounterType.uuid,
-      encounterProviders: [
-        {
-          encounterRole: emrConfiguration?.clinicianEncounterRole.uuid,
-          provider: providerUuid,
-        },
-      ],
-      obs: wardClinicalNote
-        ? [
-            {
-              concept: { uuid: emrConfiguration?.consultFreeTextCommentsConcept.uuid, display: '' },
-              value: wardClinicalNote,
-            },
-          ]
-        : [],
-    };
+      const notePayload = {
+        encounterDatetime: dayjs(new Date()).format(),
+        patient: patientUuid,
+        location: locationUuid,
+        encounterType: emrConfiguration?.visitNoteEncounterType.uuid,
+        encounterProviders: [
+          {
+            encounterRole: emrConfiguration?.clinicianEncounterRole.uuid,
+            provider: providerUuid,
+          },
+        ],
+        obs: wardClinicalNote
+          ? [
+              {
+                concept: { uuid: emrConfiguration?.consultFreeTextCommentsConcept.uuid, display: '' },
+                value: wardClinicalNote,
+              },
+            ]
+          : [],
+      };
 
-    const abortController = new AbortController();
+      const abortController = new AbortController();
 
-    savePatientNote(abortController, notePayload)
-      .then(() => {
-        closeWorkspaceWithSavedChanges({ onWorkspaceClose });
-        showSnackbar({
-          isLowContrast: true,
-          subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
-          kind: 'success',
-          title: t('visitNoteSaved', 'Patient note saved'),
+      savePatientNote(notePayload, abortController)
+        .then(() => {
+          closeWorkspaceWithSavedChanges();
+          showSnackbar({
+            isLowContrast: true,
+            subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
+            kind: 'success',
+            title: t('visitNoteSaved', 'Patient note saved'),
+          });
+        })
+        .catch((err) => {
+          createErrorHandler();
+
+          showSnackbar({
+            title: t('patientNoteSaveError', 'Error saving patient note'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: err?.message,
+          });
+        })
+        .finally(() => {
+          setIsSubmitting(false);
         });
-      })
-      .catch((err) => {
-        createErrorHandler();
-
-        showSnackbar({
-          title: t('patientNoteSaveError', 'Error saving patient note'),
-          kind: 'error',
-          isLowContrast: false,
-          subtitle: err?.message,
-        });
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
+    },
+    [emrConfiguration, patientUuid, locationUuid, providerUuid],
+  );
 
   const onError = (errors) => console.error(errors);
 
@@ -142,8 +153,8 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
                     placeholder={t('wardClinicalNotePlaceholder', 'Write any notes here')}
                     value={value}
                     onBlur={onBlur}
-                    invalid={!!formState.errors.wardClinicalNote}
-                    invalidText={formState.errors.wardClinicalNote?.message}
+                    invalid={!!errors.wardClinicalNote}
+                    invalidText={errors.wardClinicalNote?.message}
                     onChange={(event) => {
                       onChange(event);
                       const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component

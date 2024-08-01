@@ -3,7 +3,7 @@ import { type WardPatientCardProps } from '../types';
 import { usePatientCardRows } from './ward-patient-card-row.resources';
 import styles from './ward-patient-card.scss';
 import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
-import classNames from 'classnames';
+import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/ward-patient.workspace';
 
 const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
   const patientCardRows = usePatientCardRows();
@@ -14,9 +14,12 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
         <WardPatientCardRow key={i} {...props} />
       ))}
       <button
-        className={classNames(styles.wardPatientCardButton, {})}
+        className={styles.wardPatientCardButton}
         onClick={() => {
-          launchWorkspace('ward-patient-workspace', { ...props });
+          launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
+            patientUuid: props.patient.uuid,
+            ...props,
+          });
         }}>
         {/* Name will not be displayed; just there for a11y */}
         {getPatientName(props.patient.person)}

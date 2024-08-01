@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenuButton, launchWorkspace, StickyNoteAddIcon } from '@openmrs/esm-framework';
+import { type WardPatientNotesWorkspaceProps } from './notes.workspace';
 
-export default function WardPatientNotesActionButton({ additionalProps: workspaceProps }: { additionalProps: object }) {
+export default function WardPatientNotesActionButton() {
   const { t } = useTranslation();
 
   return (
@@ -10,7 +11,7 @@ export default function WardPatientNotesActionButton({ additionalProps: workspac
       getIcon={(props) => <StickyNoteAddIcon {...props} size={16} />}
       label={t('PatientNote', 'Patient Note')}
       iconDescription={t('PatientNote', 'Patient Note')}
-      handler={() => launchWorkspace('ward-patient-notes-workspace', workspaceProps)}
+      handler={() => launchWorkspace<WardPatientNotesWorkspaceProps>('ward-patient-notes-workspace')}
       type={'ward-patient-notes'}
     />
   );

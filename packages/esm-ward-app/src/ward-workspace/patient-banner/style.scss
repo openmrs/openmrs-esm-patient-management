@@ -1,4 +1,4 @@
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .patientBanner {
@@ -6,7 +6,7 @@
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  padding: spacing.$spacing-04;
+  padding: layout.$spacing-04;
   background: $ui-01;
 }
 
@@ -17,7 +17,7 @@
 
     &::before {
       content: '·';
-      padding: 0 spacing.$spacing-02;
+      padding: 0 layout.$spacing-02;
     }
   }
 }

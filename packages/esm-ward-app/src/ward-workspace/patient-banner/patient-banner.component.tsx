@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { useConfig } from '@openmrs/esm-framework';
 import { defaultPatientCardElementConfig, type WardConfigObject } from '../../config-schema';
-import { useParams } from 'react-router-dom';
 import { getPatientCardElementFromDefinition } from '../../ward-patient-card/ward-patient-card-row.resources';
 import type { PatientCardElementType, WardPatientCardProps } from '../../types';
 import styles from './style.scss';
+import useWardLocation from '../../hooks/useWardLocation';
 
 const WardPatientWorkspaceBanner = ({ bed, patient, visit }: WardPatientCardProps) => {
-  const { locationUuid } = useParams();
+  const { location } = useWardLocation();
   const { wardPatientCards } = useConfig<WardConfigObject>();
   const { cardDefinitions } = wardPatientCards;
 
@@ -16,7 +16,7 @@ const WardPatientWorkspaceBanner = ({ bed, patient, visit }: WardPatientCardProp
     const cardDefinition = cardDefinitions.find((cardDef) => {
       const appliedTo = cardDef.appliedTo;
 
-      return appliedTo == null || appliedTo.some((criteria) => criteria.location == locationUuid);
+      return appliedTo == null || appliedTo.some((criteria) => criteria.location == location.uuid);
     });
 
     const headerRow = cardDefinition.rows.find((cardDef) => cardDef.rowType === 'header');

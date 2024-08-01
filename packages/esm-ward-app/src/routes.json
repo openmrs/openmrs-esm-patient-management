@@ -43,7 +43,7 @@
     },
     {
       "component": "wardPatientNotesActionButtonExtension",
-      "name": "ward-in-patient-notes-action-button",
+      "name": "ward-inpatient-notes-form-action-button",
       "slot": "action-menu-ward-patient-items-slot"
     }
   ],
@@ -60,7 +60,6 @@
       "type": "ward-patient-notes",
       "title": "In-patient notes",
       "sidebarFamily": "ward-patient",
-      "width": "wider",
       "hasOwnSidebar": true
     },
     {

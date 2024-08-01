@@ -7,6 +7,7 @@ import {
   type DefaultWorkspaceProps,
   ExtensionSlot,
   getPatientName,
+  type PatientUuid,
   usePatient,
 } from '@openmrs/esm-framework';
 import styles from './ward-patient.style.scss';
@@ -14,11 +15,13 @@ import { type WardPatientCardProps } from '../types';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-interface WardPatientWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
+export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {
+  patientUuid: PatientUuid;
+}
 
-export default function WardPatientWorkspace({ setTitle, patient: { uuid } }: WardPatientWorkspaceProps) {
+export default function WardPatientWorkspace({ setTitle, patientUuid }: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
-  const { patient, isLoading, error } = usePatient(uuid);
+  const { patient, isLoading, error } = usePatient(patientUuid);
 
   useEffect(() => {
     if (isLoading) {

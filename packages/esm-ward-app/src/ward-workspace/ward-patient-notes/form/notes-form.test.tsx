@@ -1,10 +1,10 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
 import { savePatientNote } from './notes-form.resource';
 import PatientNotesForm from './notes-form.component';
-import { emrApiConfigMock, mockPatient, mockSession } from '__mocks__';
+import { emrConfigurationMock, mockPatient, mockSession } from '__mocks__';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 
 const testProps = {
@@ -19,27 +19,21 @@ const testProps = {
 
 const mockSavePatientNote = savePatientNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockUseSession = useSession as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => ({
-  createErrorHandler: jest.fn(),
-  showSnackbar: jest.fn(),
-  translateFrom: jest.fn(),
-  ResponsiveWrapper: jest.fn(({ children }) => <>{children}</>),
-  useSession: jest.fn().mockReturnValue(() => mockSession),
-}));
+const mockedCreateErrorHandler = jest.mocked(createErrorHandler);
+const mockedTranslateFrom = jest.mocked(translateFrom);
+const mockedResponsiveWrapper = jest.mocked(ResponsiveWrapper);
+const mockedUseSession = jest.mocked(useSession);
 
 jest.mock('./notes-form.resource', () => ({
   savePatientNote: jest.fn(),
 }));
 
-jest.mock('../../../hooks/useEmrConfiguration', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
+jest.mock('../../../hooks/useEmrConfiguration', () => jest.fn());
 
-(useEmrConfiguration as jest.Mock).mockReturnValue({
-  emrConfiguration: emrApiConfigMock,
+const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
+
+mockedUseEmrConfiguration.mockReturnValue({
+  emrConfiguration: emrConfigurationMock,
   mutateEmrConfiguration: jest.fn(),
   isLoadingEmrConfiguration: false,
   errorFetchingEmrConfiguration: null,
@@ -56,11 +50,11 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   const successPayload = {
     encounterProviders: expect.arrayContaining([
       {
-        encounterRole: emrApiConfigMock.clinicianEncounterRole.uuid,
+        encounterRole: emrConfigurationMock.clinicianEncounterRole.uuid,
         provider: undefined,
       },
     ]),
-    encounterType: emrApiConfigMock.visitNoteEncounterType.uuid,
+    encounterType: emrConfigurationMock.visitNoteEncounterType.uuid,
     location: undefined,
     obs: expect.arrayContaining([
       {
@@ -84,7 +78,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   await userEvent.click(submitButton);
 
   expect(mockSavePatientNote).toHaveBeenCalledTimes(1);
-  expect(mockSavePatientNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
+  expect(mockSavePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
 });
 
 test('renders an error snackbar if there was a problem recording a visit note', async () => {
@@ -117,6 +111,6 @@ test('renders an error snackbar if there was a problem recording a visit note', 
 });
 
 function renderWardPatientNotesForm() {
-  mockUseSession.mockReturnValue(mockSession);
+  mockedUseSession.mockReturnValue(mockSession);
   render(<PatientNotesForm {...testProps} />);
 }

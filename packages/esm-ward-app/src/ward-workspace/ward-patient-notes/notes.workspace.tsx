@@ -4,7 +4,7 @@ import { type DefaultWorkspaceProps, ExtensionSlot } from '@openmrs/esm-framewor
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import { type WardPatientCardProps } from '../../types';
 
-interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
+export interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
 
 const WardPatientNotesWorkspace = ({
   promptBeforeClosing,
