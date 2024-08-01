@@ -2,7 +2,6 @@ import React, { type ChangeEvent, useCallback, useContext } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
-import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
@@ -106,6 +105,7 @@ export const DobField: React.FC = () => {
               onChange={onDateChange}
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+              isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
               invalidText={t(birthdateMeta.error)}
               value={birthdate.value}
             />
