@@ -6,11 +6,19 @@ import AdmissionRequestCardActions from './admission-request-card-actions.compon
 
 interface AdmissionRequestCardProps extends InpatientRequest {}
 
-const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({ patient, dispositionEncounter }) => {
+const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({
+  patient,
+  dispositionEncounter,
+  dispositionType,
+}) => {
   return (
     <div className={styles.admissionRequestCard}>
       <AdmissionRequestCardHeader patient={patient} dispositionEncounter={dispositionEncounter} />
-      <AdmissionRequestCardActions patient={patient} dispositionEncounter={dispositionEncounter} />
+      <AdmissionRequestCardActions
+        patient={patient}
+        dispositionType={dispositionType}
+        dispositionEncounter={dispositionEncounter}
+      />
     </div>
   );
 };

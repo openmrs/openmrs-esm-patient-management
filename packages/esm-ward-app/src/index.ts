@@ -29,7 +29,7 @@ export const admissionRequestWorkspace = getAsyncLifecycle(
 );
 
 export const admitPatientFormWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/admit-patient-form-workspace/admit-patient-form-workspace.workspace'),
+  () => import('./ward-workspace/admit-patient-form-workspace/admit-patient-form.workspace'),
   options,
 );
 

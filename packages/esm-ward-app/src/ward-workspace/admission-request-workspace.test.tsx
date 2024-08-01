@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema } from '@openmrs/esm-framework';
+import { defineConfigSchema, getLocale } from '@openmrs/esm-framework';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import { configSchema } from '../config-schema';
 import useWardLocation from '../hooks/useWardLocation';
@@ -14,6 +14,10 @@ jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
 jest.mock('../hooks/useWardLocation', () => jest.fn());
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  getLocale: jest.fn().mockReturnValue('en'),
+}));
 
 const mockUseWardLocation = useWardLocation as jest.Mock;
 mockUseWardLocation.mockReturnValue({
