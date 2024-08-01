@@ -1,4 +1,4 @@
-import { useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import {
   builtInPatientCardElements,
@@ -6,7 +6,7 @@ import {
   type PatientCardElementDefinition,
   type WardConfigObject,
 } from '../config-schema';
-import type { WardPatientCardElement, WardPatientCardProps } from '../types';
+import type { WardPatientCardElement, WardPatient } from '../types';
 import WardPatientAge from './row-elements/ward-patient-age';
 import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import wardPatientAddress from './row-elements/ward-patient-header-address';
@@ -18,6 +18,9 @@ import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags'
 
 import wardPatientIdentifier from './row-elements/ward-patient-identifier';
 import useWardLocation from '../hooks/useWardLocation';
+import WardPatientTimeOnWard from './row-elements/ward-patient-time-on-ward';
+import { t } from 'i18next';
+import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-since-admission';
 
 export function usePatientCardRows() {
   const {
@@ -40,7 +43,20 @@ export function usePatientCardRows() {
       );
     }
     for (const patientCardElementDef of patientCardElementDefinitions) {
-      patientCardElementsMap.set(patientCardElementDef.id, getPatientCardElementFromDefinition(patientCardElementDef));
+      const element = getPatientCardElementFromDefinition(patientCardElementDef);
+      if (element == null) {
+        showSnackbar({
+          title: t('configError', 'Configuration Error'),
+          kind: 'error',
+          subtitle: t(
+            'unknownElementType2',
+            "Unknown element type '{{elementType}}', check the ward app configurations",
+            { elementType: patientCardElementDef.elementType },
+          ),
+        });
+      } else {
+        patientCardElementsMap.set(patientCardElementDef.id, element);
+      }
     }
 
     const cardDefinition = cardDefinitions.find((cardDef) => {
@@ -56,7 +72,7 @@ export function usePatientCardRows() {
         return slot;
       });
 
-      const WardPatientCardRow: React.FC<WardPatientCardProps> = (props) => {
+      const WardPatientCardRow: React.FC<WardPatient> = (props) => {
         return (
           <div className={styles.wardPatientCardRow + ' ' + (rowType == 'header' ? styles.wardPatientCardHeader : '')}>
             {patientCardElements.map((PatientCardElement, i) => (
@@ -95,6 +111,15 @@ function getPatientCardElementFromDefinition(
       return wardPatientIdentifier(config);
     case 'patient-coded-obs-tags': {
       return wardPatientCodedObsTags(config.codedObsTags);
+    }
+    case 'time-on-ward': {
+      return WardPatientTimeOnWard;
+    }
+    case 'time-since-admission': {
+      return WardPatientTimeSinceAdmission;
+    }
+    default: {
+      throw new Error('Unknown element type: ' + elementType);
     }
   }
 }

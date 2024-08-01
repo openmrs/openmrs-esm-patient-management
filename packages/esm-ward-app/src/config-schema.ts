@@ -32,6 +32,8 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
   'patient-age',
   'patient-address',
   'patient-identifier',
+  'time-on-ward',
+  'time-since-admission',
 ];
 
 export const configSchema: ConfigSchema = {
