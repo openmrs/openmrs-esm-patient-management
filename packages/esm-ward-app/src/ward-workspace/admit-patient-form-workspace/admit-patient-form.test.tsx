@@ -188,7 +188,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
     expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(2);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('undefined/encounter', {
+    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/encounter', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -199,7 +199,7 @@ describe('Testing AdmitPatientForm', () => {
         location: mockAdmissionLocation.ward.uuid,
       },
     });
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('undefined/beds/3', {
+    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/beds/3', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -240,7 +240,7 @@ describe('Testing AdmitPatientForm', () => {
   it('should show warning snackbar if encounter was created and bed assignment was not successful', async () => {
     // @ts-ignore - matching whole FetchResponse type is not necessary
     mockedOpenmrsFetch.mockImplementation((url) => {
-      if (url.startsWith('undefined/beds')) {
+      if (url.startsWith('/ws/rest/v1/beds')) {
         return Promise.reject(new Error('Failed to assign bed'));
       }
       return Promise.resolve({
@@ -295,7 +295,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
     expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(1);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('undefined/encounter', {
+    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/encounter', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
