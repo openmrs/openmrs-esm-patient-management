@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import styles from './notes.style.scss';
 import { type DefaultWorkspaceProps, ExtensionSlot } from '@openmrs/esm-framework';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import { type WardPatientCardProps } from '../../types';
@@ -26,7 +25,7 @@ const WardPatientNotesWorkspace = ({
   );
 
   return (
-    <div className={styles.workspaceContainer}>
+    <div>
       <WardPatientWorkspaceBanner patient={patient} bed={bed} visit={visit} />
       <ExtensionSlot name="ward-patient-notes-workspace-slot" state={notesFormExtensionState} />
     </div>
