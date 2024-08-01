@@ -14,7 +14,7 @@ export function useQueueRooms(location: string, queueUuid: string) {
 
   return {
     rooms: data ? data?.data?.results : [],
-    isError: error,
+    error,
     isLoading,
   };
 }
@@ -69,7 +69,7 @@ export function useProvidersQueueRoom(providerUuid: string) {
 
   return {
     providerRoom: data ? data?.data?.results : [],
-    isError: error,
+    error,
     isLoading,
     mutate,
   };

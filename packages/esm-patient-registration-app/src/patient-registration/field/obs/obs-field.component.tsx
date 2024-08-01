@@ -1,16 +1,15 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
-import { OpenmrsDatePicker, parseDate, useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
-import styles from './../field.scss';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
+import styles from './../field.scss';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -19,7 +18,6 @@ export interface ObsFieldProps {
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
-
   const config = useConfig<RegistrationConfig>();
 
   if (!config.registrationObs.encounterTypeUuid) {
@@ -170,9 +168,8 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
   const fieldName = `obs.${concept.uuid}`;
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
-  const onDateChange = ([date]) => {
-    const refinedDate = date instanceof Date ? new Date(date.setHours(0, 0, 0, 0)) : new Date(date);
-    setFieldValue(fieldName, refinedDate);
+  const onDateChange = (date: Date) => {
+    setFieldValue(fieldName, date);
   };
 
   return (
@@ -186,14 +183,12 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
                   id={fieldName}
                   {...field}
                   isRequired={required}
-                  onChange={(date) => onDateChange([date])}
+                  onChange={onDateChange}
                   labelText={label ?? concept.display}
                   isInvalid={errors[fieldName] && touched[fieldName]}
+                  invalidText={t(meta.error)}
                   value={field.value}
                 />
-                {errors[fieldName] && touched[fieldName] && (
-                  <div className={styles.radioFieldError}>{meta.error && t(meta.error)}</div>
-                )}
               </>
             );
           }}

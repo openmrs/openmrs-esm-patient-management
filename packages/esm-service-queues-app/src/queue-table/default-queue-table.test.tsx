@@ -2,33 +2,26 @@ import React from 'react';
 import { of } from 'rxjs';
 import { screen } from '@testing-library/react';
 import { useConfig, useSession, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
-import { mockServices, mockSession, mockQueueEntries } from '__mocks__';
+import {
+  mockServices,
+  mockSession,
+  mockQueueEntries,
+  mockQueueRooms,
+  mockLocationTriage,
+  mockLocationSurgery,
+} from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { type ConfigObject, configSchema } from '../config-schema';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
-import { configSchema } from '../config-schema';
 
-const mockedUseConfig = useConfig as jest.Mock;
-const mockUseQueueEntries = useQueueEntries as jest.Mock;
-const mockQueueLocations = useQueueLocations as jest.Mock;
-const mockUseQueueRooms = useQueueRooms as jest.Mock;
-const mockUseSession = useSession as jest.Mock;
-
-mockedUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
-  visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  customPatientChartUrl: 'someUrl',
-});
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-  };
-});
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseQueueEntries = jest.mocked(useQueueEntries);
+const mockQueueLocations = jest.mocked(useQueueLocations);
+const mockUseQueueRooms = jest.mocked(useQueueRooms);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('../hooks/useQueues', () => {
   return {
@@ -36,51 +29,47 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-jest.mock('../patient-search/hooks/useQueueLocations', () => {
-  const originalModule = jest.requireActual('../patient-search/hooks/useQueueLocations');
+jest.mock('../patient-search/hooks/useQueueLocations', () => ({
+  ...jest.requireActual('../patient-search/hooks/useQueueLocations'),
+  useQueueLocations: jest.fn(),
+}));
 
-  return {
-    ...originalModule,
-    useQueueLocations: jest.fn(),
-  };
-});
+jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => ({
+  ...jest.requireActual('../add-provider-queue-room/add-provider-queue-room.resource'),
+  useQueueRooms: jest.fn(),
+}));
 
-jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => {
-  const originalModule = jest.requireActual('../add-provider-queue-room/add-provider-queue-room.resource');
+jest.mock('../hooks/useQueueEntries', () => ({
+  ...jest.requireActual('../hooks/useQueueEntries'),
+  useQueueEntries: jest.fn(),
+}));
 
-  return {
-    ...originalModule,
-    useQueueRooms: jest.fn(),
-  };
-});
+jest.mock('../helpers/helpers', () => ({
+  ...jest.requireActual('../helpers/helpers'),
+  getSelectedServiceName: jest.fn().mockReturnValue(of({ serviceName: 'All' })),
+}));
 
-jest.mock('../hooks/useQueueEntries', () => {
-  const originalModule = jest.requireActual('../hooks/useQueueEntries');
-
-  return {
-    ...originalModule,
-    useQueueEntries: jest.fn(),
-  };
-});
-
-jest.mock('../helpers/helpers', () => {
-  const originalModule = jest.requireActual('../helpers/helpers');
-
-  return {
-    ...originalModule,
-    getSelectedServiceName: jest.fn().mockReturnValue(of({ serviceName: 'All' })),
-  };
-});
-
-describe('DefaultQueueTable: ', () => {
+describe('DefaultQueueTable', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue(mockSession);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      customPatientChartUrl: 'someUrl',
+      visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    });
+    mockUseSession.mockReturnValue(mockSession.data);
   });
 
   it('renders an empty state view if data is unavailable', async () => {
-    mockQueueLocations.mockReturnValue({ queueLocations: [] });
-    mockUseQueueRooms.mockReturnValue({ rooms: [] });
-    mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false });
+    mockQueueLocations.mockReturnValue({ queueLocations: [], isLoading: false, error: null });
+    mockUseQueueRooms.mockReturnValue({ rooms: [], isLoading: false, error: undefined });
+    mockUseQueueEntries.mockReturnValue({
+      queueEntries: [],
+      isLoading: false,
+      error: undefined,
+      totalCount: 0,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
 
     rendeDefaultQueueTable();
 
@@ -92,9 +81,20 @@ describe('DefaultQueueTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
-    mockQueueLocations.mockReturnValue({ queueLocations: mockQueueLocations });
-    mockUseQueueRooms.mockReturnValue({ rooms: mockUseQueueRooms });
-    mockUseQueueEntries.mockReturnValue({ queueEntries: mockQueueEntries, isLoading: false });
+    mockQueueLocations.mockReturnValue({
+      queueLocations: [mockLocationSurgery, mockLocationTriage],
+      isLoading: false,
+      error: null,
+    });
+    mockUseQueueRooms.mockReturnValue({ rooms: mockQueueRooms.data.results, isLoading: false, error: undefined });
+    mockUseQueueEntries.mockReturnValue({
+      queueEntries: mockQueueEntries,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+      totalCount: 2,
+    });
 
     rendeDefaultQueueTable();
 

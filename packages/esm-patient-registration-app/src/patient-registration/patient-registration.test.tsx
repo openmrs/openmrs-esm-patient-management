@@ -1,24 +1,31 @@
 import React from 'react';
+import dayjs from 'dayjs';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
-import type { AddressTemplate, Encounter } from './patient-registration.types';
-import { type RegistrationConfig } from '../config-schema';
-import { FormManager } from './form-manager';
-import { ResourcesContext } from '../offline.resources';
-import { PatientRegistration } from './patient-registration.component';
-import { saveEncounter, savePatient } from './patient-registration.resource';
+import {
+  type FetchResponse,
+  getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
+  showSnackbar,
+  useConfig,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
-import dayjs from 'dayjs';
-import { CalendarDate, parseDate } from '@internationalized/date';
+import { saveEncounter, savePatient } from './patient-registration.resource';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../config-schema';
+import type { AddressTemplate, Encounter } from './patient-registration.types';
+import { ResourcesContext } from '../offline.resources';
+import { FormManager } from './form-manager';
+import { PatientRegistration } from './patient-registration.component';
 
-const mockedUseConfig = useConfig as jest.Mock;
-const mockedUsePatient = usePatient as jest.Mock;
-const mockedSaveEncounter = saveEncounter as jest.Mock;
-const mockedSavePatient = savePatient as jest.Mock;
-const mockedShowSnackbar = showSnackbar as jest.Mock;
+const mockSaveEncounter = jest.mocked(saveEncounter);
+const mockSavePatient = savePatient as jest.Mock;
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUsePatient = jest.mocked(usePatient);
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 
 jest.mock('./field/field.resource', () => ({
   useConcept: jest.fn().mockImplementation((uuid: string) => {
@@ -86,38 +93,26 @@ jest.mock('react-router-dom', () => ({
   useParams: jest.fn().mockReturnValue({ patientUuid: undefined }),
 }));
 
-jest.mock('./patient-registration.resource', () => {
-  const originalModule = jest.requireActual('./patient-registration.resource');
+jest.mock('./patient-registration.resource', () => ({
+  ...jest.requireActual('./patient-registration.resource'),
+  saveEncounter: jest.fn(),
+  savePatient: jest.fn(),
+}));
 
-  return {
-    ...originalModule,
-    saveEncounter: jest.fn(),
-    savePatient: jest.fn(),
-  };
-});
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    validator: jest.fn(),
-    getLocale: jest.fn().mockReturnValue('en'),
-    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
-      return (
-        <>
-          <label htmlFor={id}>{labelText}</label>
-          <input
-            id={id}
-            value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-            onChange={(evt) => {
-              onChange(dayjs(evt.target.value).toDate());
-            }}
-          />
-        </>
-      );
-    }),
-  };
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        id={id}
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+      />
+    </>
+  );
 });
 
 const mockResourcesContextValue = {
@@ -140,7 +135,9 @@ let mockOpenmrsConfig: RegistrationConfig = {
   ],
   fieldDefinitions: [],
   fieldConfigurations: {
-    phone: null,
+    phone: {
+      personAttributeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+    },
     dateOfBirth: {
       allowEstimatedDateOfBirth: true,
       useEstimatedDateOfBirth: {
@@ -251,11 +248,11 @@ function Wrapper({ children }) {
 
 describe('Registering a new patient', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
-    mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
-    mockedSaveEncounter.mockClear();
-    mockedShowSnackbar.mockClear();
-    jest.clearAllMocks();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      ...mockOpenmrsConfig,
+    });
+    mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
   });
 
   it('renders without crashing', () => {
@@ -279,7 +276,7 @@ describe('Registering a new patient', () => {
 
     await fillRequiredFields();
     await user.click(await screen.findByText(/Register Patient/i));
-    expect(mockedSavePatient).toHaveBeenCalledWith(
+    expect(mockSavePatient).toHaveBeenCalledWith(
       expect.objectContaining({
         identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' },
         person: {
@@ -301,23 +298,23 @@ describe('Registering a new patient', () => {
   it('should not save the patient if validation fails', async () => {
     const user = userEvent.setup();
 
-    const mockedSavePatientForm = jest.fn();
-    render(<PatientRegistration isOffline={false} savePatientForm={mockedSavePatientForm} />, { wrapper: Wrapper });
+    const mockSavePatientForm = jest.fn();
+    render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />, { wrapper: Wrapper });
 
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
     await user.type(givenNameInput, '5');
     await user.click(screen.getByText(/Register Patient/i));
 
-    expect(mockedSavePatientForm).not.toHaveBeenCalled();
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
   // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
   it.skip('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
-    mockedSaveEncounter.mockResolvedValue({});
-    mockedUseConfig.mockReturnValue(configWithObs);
+    mockSaveEncounter.mockResolvedValue({} as unknown as FetchResponse);
+    mockUseConfig.mockReturnValue(configWithObs);
 
     render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
       wrapper: Wrapper,
@@ -334,9 +331,9 @@ describe('Registering a new patient', () => {
 
     await user.click(screen.getByText(/Register Patient/i));
 
-    expect(mockedSavePatient).toHaveBeenCalled();
+    expect(mockSavePatient).toHaveBeenCalled();
 
-    expect(mockedSaveEncounter).toHaveBeenCalledWith(
+    expect(mockSaveEncounter).toHaveBeenCalledWith(
       expect.objectContaining<Partial<Encounter>>({
         encounterType: 'reg-enc-uuid',
         patient: 'new-pt-uuid',
@@ -353,7 +350,7 @@ describe('Registering a new patient', () => {
   it.skip('retries saving registration obs after a failed attempt', async () => {
     const user = userEvent.setup();
 
-    mockedUseConfig.mockReturnValue(configWithObs);
+    mockUseConfig.mockReturnValue(configWithObs);
 
     render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
       wrapper: Wrapper,
@@ -364,52 +361,48 @@ describe('Registering a new patient', () => {
     const weight = within(customSection).getByLabelText('Weight (kg) (optional)');
     await user.type(weight, '-999');
 
-    mockedSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
+    mockSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
 
     const registerPatientButton = screen.getByText(/Register Patient/i);
 
     await user.click(registerPatientButton);
 
-    expect(mockedSavePatient).toHaveBeenCalledTimes(1);
-    expect(mockedSaveEncounter).toHaveBeenCalledTimes(1);
+    expect(mockSavePatient).toHaveBeenCalledTimes(1);
+    expect(mockSaveEncounter).toHaveBeenCalledTimes(1);
 
-    expect(mockedShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ subtitle: 'an error message' })),
-      mockedSaveEncounter.mockResolvedValue({});
+    expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ subtitle: 'an error message' })),
+      mockSaveEncounter.mockResolvedValue({} as FetchResponse);
 
     await user.click(registerPatientButton);
-    expect(mockedSavePatient).toHaveBeenCalledTimes(2);
-    expect(mockedSaveEncounter).toHaveBeenCalledTimes(2);
+    expect(mockSavePatient).toHaveBeenCalledTimes(2);
+    expect(mockSaveEncounter).toHaveBeenCalledTimes(2);
 
-    expect(mockedShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+    expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
   });
 });
 
 describe('Updating an existing patient record', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
-    mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
-    mockedSaveEncounter.mockClear();
-    mockedShowSnackbar.mockClear();
-    jest.clearAllMocks();
+    mockUseConfig.mockReturnValue(mockOpenmrsConfig);
+    mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
   });
 
   it('edits patient demographics', async () => {
     const user = userEvent.setup();
+    mockSavePatient.mockResolvedValue({} as FetchResponse);
 
-    mockedSavePatient.mockResolvedValue({});
+    const mockUseParams = useParams as jest.Mock;
 
-    const mockedUseParams = useParams as jest.Mock;
+    mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
 
-    mockedUseParams.mockReturnValue({ patientUuid: mockPatient.id });
-
-    mockedUsePatient.mockReturnValue({
+    mockUsePatient.mockReturnValue({
       isLoading: false,
       patient: mockPatient,
       patientUuid: mockPatient.id,
       error: null,
     });
 
-    render(<PatientRegistration isOffline={false} savePatientForm={mockedSavePatient} />, { wrapper: Wrapper });
+    render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatient} />, { wrapper: Wrapper });
 
     const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
     const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
@@ -433,7 +426,7 @@ describe('Updating an existing patient record', () => {
     await user.type(familyNameInput, 'Smith');
     await user.click(screen.getByText(/Update patient/i));
 
-    expect(mockedSavePatient).toHaveBeenCalledWith(
+    expect(mockSavePatient).toHaveBeenCalledWith(
       false,
       {
         '0': {

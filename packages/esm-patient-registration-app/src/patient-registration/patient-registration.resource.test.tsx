@@ -8,10 +8,6 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('savePatient', () => {
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
-
   it('appends patient uuid in url if provided', () => {
     mockOpenmrsFetch.mockImplementationOnce((url) => url);
     savePatient(null, '1234');

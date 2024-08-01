@@ -7,10 +7,6 @@ describe('CancelPatientEdit component', () => {
   const mockClose = jest.fn();
   const mockOnConfirm = jest.fn();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders the modal and triggers close and onConfirm functions', async () => {
     const user = userEvent.setup();
 

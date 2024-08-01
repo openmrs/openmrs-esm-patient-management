@@ -2,20 +2,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
-import { IdentifierInput } from './identifier-input.component';
+import { type PatientIdentifierType } from '../../../patient-registration.types';
 import { initialFormValues } from '../../../patient-registration.component';
-import { type PatientIdentifierType } from '../../../patient-registration-types';
+import IdentifierInput from './identifier-input.component';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    validator: jest.fn(),
-  };
-});
-
-describe.skip('identifier input', () => {
+// TODO: Fix this test
+xdescribe('identifier input', () => {
   const openmrsID = {
     name: 'OpenMRS ID',
     fieldName: 'openMrsId',
@@ -43,8 +35,10 @@ describe.skip('identifier input', () => {
     ],
     autoGenerationSource: null,
   };
+
   const setupIdentifierInput = async (identifierType: PatientIdentifierType) => {
     initialFormValues['source-for-' + identifierType.fieldName] = identifierType.identifierSources[0].name;
+
     render(
       <Formik initialValues={initialFormValues} onSubmit={null}>
         <Form>

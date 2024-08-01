@@ -1,34 +1,32 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockLocations } from '__mocks__';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockUseAppointmentServiceData, mockSession } from '__mocks__';
+import { screen } from '@testing-library/react';
+import {
+  type FetchResponse,
+  getDefaultsFromConfigSchema,
+  openmrsFetch,
+  useConfig,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
+import { mockUseAppointmentServiceData, mockSession, mockLocations } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment } from './appointments-form.resource';
+import { configSchema, type ConfigObject } from '../config-schema';
 import AppointmentForm from './appointments-form.component';
 
-const testProps = {
+const defaultProps = {
+  context: 'creating',
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
 };
 
-const mockCreateAppointment = saveAppointment as jest.Mock;
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useLocations: jest.fn().mockImplementation(() => mockLocations.data.results),
-    useSession: jest.fn().mockImplementation(() => mockSession.data),
-    useConfig: jest.fn(() => ({
-      appointmentTypes: ['Scheduled', 'WalkIn'],
-    })),
-  };
-});
+const mockCreateAppointment = jest.mocked(saveAppointment);
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseLocations = jest.mocked(useLocations);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('react-hook-form', () => ({
   ...jest.requireActual('react-hook-form'),
@@ -89,20 +87,25 @@ jest.mock('react-hook-form', () => ({
   }),
 }));
 
-jest.mock('./appointments-form.resource', () => {
-  const originalModule = jest.requireActual('./appointments-form.resource');
-
-  return {
-    ...originalModule,
-    saveAppointment: jest.fn(),
-  };
-});
+jest.mock('./appointments-form.resource', () => ({
+  ...jest.requireActual('./appointments-form.resource'),
+  saveAppointment: jest.fn(),
+}));
 
 describe('AppointmentForm', () => {
-  it('renders the appointments form showing all the relevant fields and values', async () => {
-    mockOpenmrsFetch.mockReturnValue(mockUseAppointmentServiceData);
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+    });
+    mockUseLocations.mockReturnValue(mockLocations.data.results);
+    mockUseSession.mockReturnValue(mockSession.data);
+  });
 
-    renderAppointmentsForm();
+  it('renders the appointments form showing all the relevant fields and values', async () => {
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -129,25 +132,25 @@ describe('AppointmentForm', () => {
   it('closes the form and the workspace when the cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
+    mockOpenmrsFetch.mockResolvedValueOnce(mockUseAppointmentServiceData as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
     await user.click(cancelButton);
 
-    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('renders a success snackbar  upon successfully scheduling an appointment', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
-    mockCreateAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' });
+    mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockCreateAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -182,10 +185,10 @@ describe('AppointmentForm', () => {
       },
     };
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
+    mockOpenmrsFetch.mockResolvedValueOnce({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
     mockCreateAppointment.mockRejectedValueOnce(error);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -206,7 +209,3 @@ describe('AppointmentForm', () => {
     await user.click(saveButton);
   });
 });
-
-function renderAppointmentsForm() {
-  renderWithSwr(<AppointmentForm {...testProps} />);
-}

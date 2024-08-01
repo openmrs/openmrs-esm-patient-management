@@ -2,13 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
-import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import ListsDashboard from './lists-dashboard.component';
 
-const mockedUseLocation = jest.mocked(useLocation);
-const mockedUseSession = jest.mocked(useSession);
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockUseLocation = jest.mocked(useLocation);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -17,7 +17,7 @@ jest.mock('react-router-dom', () => ({
 
 describe('ListsDashboard', () => {
   beforeEach(() => {
-    mockedUseLocation.mockReturnValue({
+    mockUseLocation.mockReturnValue({
       pathname: '/',
       search: '',
       hash: '',
@@ -25,9 +25,9 @@ describe('ListsDashboard', () => {
       key: 'default',
     });
 
-    mockedUseSession.mockReturnValue(mockSession.data);
+    mockUseSession.mockReturnValue(mockSession.data);
 
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       data: {
         results: [
           {
@@ -86,7 +86,7 @@ describe('ListsDashboard', () => {
           },
         ],
       },
-    });
+    } as unknown as FetchResponse);
   });
 
   it('renders the patient list page UI correctly', async () => {

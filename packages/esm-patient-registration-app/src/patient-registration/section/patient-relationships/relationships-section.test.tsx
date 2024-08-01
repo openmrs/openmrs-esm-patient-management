@@ -1,8 +1,9 @@
 import React from 'react';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type Resources, ResourcesContext } from '../../../offline.resources';
+import { type FormValues } from '../../patient-registration.types';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 import { RelationshipsSection } from './relationships-section.component';
 
 jest.mock('../../patient-registration.resource', () => ({
@@ -26,6 +27,19 @@ let mockResourcesContextValue = {
   identifierTypes: [],
   relationshipTypes: null,
 } as Resources;
+
+const initialContextValues = {
+  currentPhoto: 'data:image/png;base64,1234567890',
+  identifierTypes: [],
+  inEditMode: false,
+  initialFormValues: {} as FormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldValue: jest.fn(),
+  setInitialFormValues: jest.fn(),
+  validationSchema: null,
+  values: {} as FormValues,
+};
 
 describe('RelationshipsSection', () => {
   it('renders a loader when relationshipTypes are not available', () => {
@@ -76,11 +90,7 @@ describe('RelationshipsSection', () => {
           }}
           onSubmit={null}>
           <Form>
-            <PatientRegistrationContext.Provider
-              value={{
-                setFieldValue: jest.fn(),
-                setInitialFormValues: jest.fn(),
-              }}>
+            <PatientRegistrationContext.Provider value={initialContextValues}>
               <RelationshipsSection />
             </PatientRegistrationContext.Provider>
           </Form>

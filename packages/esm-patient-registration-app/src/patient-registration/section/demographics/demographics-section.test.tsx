@@ -1,37 +1,30 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import dayjs from 'dayjs';
 import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { type FormValues } from '../../patient-registration.types';
-import dayjs from 'dayjs';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
-  return {
-    ...originalModule,
-    validator: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ({
-      fieldConfigurations: { dateOfBirth: { useEstimatedDateOfBirth: { enabled: true, dayOfMonth: 0, month: 0 } } },
-    })),
-    getLocale: jest.fn().mockReturnValue('en'),
-    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
-      return (
-        <>
-          <label htmlFor={id}>{labelText}</label>
-          <input
-            id={id}
-            value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-            onChange={(evt) => {
-              onChange(dayjs(evt.target.value).toDate());
-            }}
-          />
-        </>
-      );
-    }),
-  };
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        id={id}
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+      />
+    </>
+  );
 });
 
 jest.mock('../../field/name/name-field.component', () => {
@@ -64,8 +57,18 @@ jest.mock('../../field/id/id-field.component', () => {
   };
 });
 
-describe('demographics section', () => {
-  const formValues: FormValues = initialFormValues;
+describe('Demographics section', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldConfigurations: {
+        dateOfBirth: {
+          allowEstimatedDateOfBirth: true,
+          useEstimatedDateOfBirth: { enabled: true, dayOfMonth: 0, month: 0 },
+        },
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+  });
 
   const setupSection = async (birthdateEstimated?: boolean, addNameInLocalLanguage?: boolean) => {
     render(
@@ -83,7 +86,7 @@ describe('demographics section', () => {
               isOffline: true,
               setCapturePhotoProps: (value) => {},
             }}>
-            <DemographicsSection fields={['name', 'gender', 'dob']} id="demographics" />
+            <DemographicsSection fields={['name', 'gender', 'dob']} />
           </PatientRegistrationContext.Provider>
         </Form>
       </Formik>,

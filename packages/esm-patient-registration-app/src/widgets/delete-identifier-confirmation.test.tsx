@@ -8,10 +8,6 @@ describe('DeleteIdentifierConfirmationModal component', () => {
   const mockIdentifierName = 'Identifier Name';
   const mockIdentifierValue = 'Identifier Value';
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders the modal and triggers deleteIdentifier function', async () => {
     const user = userEvent.setup();
 

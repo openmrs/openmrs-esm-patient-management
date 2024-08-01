@@ -6,15 +6,6 @@ import { DeathInfoSection } from './death-info-section.component';
 import { type FormValues } from '../../patient-registration.types';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    validator: jest.fn(),
-  };
-});
-
 const initialContextValues = {
   currentPhoto: 'data:image/png;base64,1234567890',
   identifierTypes: [],
@@ -34,7 +25,7 @@ describe('Death info section', () => {
   const renderDeathInfoSection = (isDead) => {
     initialContextValues.values.isDead = isDead;
 
-    return render(
+    render(
       <PatientRegistrationContext.Provider value={initialContextValues}>
         <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
           <Form>
