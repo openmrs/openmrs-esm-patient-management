@@ -4,11 +4,6 @@ import { getValidationSchema } from './patient-registration-validation';
 
 const mockGetConfig = jest.mocked(getConfig);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  getConfig: jest.fn(),
-}));
-
 describe('Patient registration validation', () => {
   beforeEach(() => {
     mockGetConfig.mockResolvedValue({

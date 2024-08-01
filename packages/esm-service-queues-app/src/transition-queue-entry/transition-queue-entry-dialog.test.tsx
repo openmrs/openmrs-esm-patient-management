@@ -14,12 +14,6 @@ import TransitionQueueEntryModal from './transition-queue-entry-dialog.component
 const mockNavigate = jest.mocked(navigate);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  toOmrsIsoString: jest.fn(),
-  toDateObjectStrict: jest.fn(),
-}));
-
 jest.mock('../active-visits/active-visits-table.resource', () => ({
   serveQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
   updateQueueEntry: jest.fn().mockResolvedValue({ status: 201 }),
@@ -67,7 +61,7 @@ describe('TransitionQueueEntryModal', () => {
     const closeModal = jest.fn();
     render(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
-    expect(screen.getByText('Serve patient')).toBeInTheDocument();
+    expect(screen.getByText(/Serve patient/i)).toBeInTheDocument();
     expect(screen.getByText(/Patient name :/i)).toBeInTheDocument();
   });
 

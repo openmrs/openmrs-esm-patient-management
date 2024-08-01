@@ -19,11 +19,6 @@ const defaultProps = {
   toggleSearchType: mockToggleSearchType,
 };
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLocations: jest.fn(),
-}));
-
 describe('ScheduledVisits', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
