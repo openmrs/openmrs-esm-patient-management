@@ -14,10 +14,6 @@ jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
 jest.mock('../hooks/useWardLocation', () => jest.fn());
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  getLocale: jest.fn().mockReturnValue('en'),
-}));
 
 const mockUseWardLocation = useWardLocation as jest.Mock;
 mockUseWardLocation.mockReturnValue({
