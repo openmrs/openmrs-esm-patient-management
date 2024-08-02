@@ -1,6 +1,8 @@
 import { mockPatientAlice } from './patient.mock';
 import { mockLocationInpatientWard } from './locations.mock';
 import { type InpatientRequest } from '@openmrs/esm-ward-app/src/types';
+import { mockPastVisit } from './visits.mock';
+import { mockAddress } from './address.mock';
 
 export const mockInpatientRequest: InpatientRequest = {
   patient: mockPatientAlice,
@@ -70,5 +72,10 @@ export const mockInpatientRequest: InpatientRequest = {
     setMembers: [],
     attributes: [],
     resourceVersion: '2.0',
+  },
+  dispositionEncounter: {
+    uuid: '6c047a20-c2bf-43ef-9e88-6da7b17e8c1a',
+    display: 'Admit to hospital',
+    encounterDatetime: '2021-09-28T11:00:00.000Z',
   },
 };

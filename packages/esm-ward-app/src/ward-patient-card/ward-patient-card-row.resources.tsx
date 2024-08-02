@@ -1,32 +1,32 @@
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   builtInPatientCardElements,
   defaultPatientCardElementConfig,
   type PatientCardElementDefinition,
   type WardConfigObject,
 } from '../config-schema';
-import type { WardPatientCardElement, WardPatient } from '../types';
+import useWardLocation from '../hooks/useWardLocation';
+import type { WardPatient, WardPatientCardElement } from '../types';
 import WardPatientAge from './row-elements/ward-patient-age';
 import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
-import wardPatientAddress from './row-elements/ward-patient-header-address';
-import WardPatientName from './row-elements/ward-patient-name';
-import React from 'react';
-import styles from './ward-patient-card.scss';
-import wardPatientObs from './row-elements/ward-patient-obs';
 import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags';
-
+import WardPatientGender from './row-elements/ward-patient-gender.component';
+import wardPatientAddress from './row-elements/ward-patient-header-address';
 import wardPatientIdentifier from './row-elements/ward-patient-identifier';
-import useWardLocation from '../hooks/useWardLocation';
+import WardPatientName from './row-elements/ward-patient-name';
+import wardPatientObs from './row-elements/ward-patient-obs';
 import WardPatientTimeOnWard from './row-elements/ward-patient-time-on-ward';
-import { t } from 'i18next';
 import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-since-admission';
+import styles from './ward-patient-card.scss';
 
 export function usePatientCardRows() {
   const {
     location: { uuid: locationUuid },
   } = useWardLocation();
   const { wardPatientCards } = useConfig<WardConfigObject>();
+  const { t } = useTranslation();
   const patientCardRows = useMemo(() => {
     const { cardDefinitions, patientCardElementDefinitions } = wardPatientCards;
 
@@ -90,7 +90,7 @@ export function usePatientCardRows() {
   return patientCardRows;
 }
 
-function getPatientCardElementFromDefinition(
+export function getPatientCardElementFromDefinition(
   patientCardElementDef: PatientCardElementDefinition,
 ): WardPatientCardElement {
   const { elementType, config } = patientCardElementDef;
@@ -103,6 +103,9 @@ function getPatientCardElementFromDefinition(
       return WardPatientAge;
     case 'patient-address': {
       return wardPatientAddress(config.address);
+    }
+    case 'patient-gender': {
+      return WardPatientGender;
     }
     case 'patient-obs': {
       return wardPatientObs(config.obs);

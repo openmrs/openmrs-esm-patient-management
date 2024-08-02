@@ -1,0 +1,23 @@
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.patientBanner {
+  @extend .dotSeparatedChildren;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: layout.$spacing-04;
+  background: $ui-01;
+}
+
+.dotSeparatedChildren {
+  > div:not(div:first-of-type) {
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '·';
+      padding: 0 layout.$spacing-02;
+    }
+  }
+}

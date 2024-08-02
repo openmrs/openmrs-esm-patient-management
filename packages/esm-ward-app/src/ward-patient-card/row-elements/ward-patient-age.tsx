@@ -1,8 +1,7 @@
-import { age } from '@openmrs/esm-framework';
+import { age, type Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import { type WardPatientCardElement } from '../../types';
 
-const WardPatientAge: WardPatientCardElement = ({ patient }) => {
+const WardPatientAge: React.FC<{ patient: Patient }> = ({ patient }) => {
   return <div>{age(patient.person?.birthdate)}</div>;
 };
 

@@ -7,7 +7,7 @@ const WardPatientTimeSinceAdmission: WardPatientCardElement = ({ firstAdmissionO
   const { t } = useTranslation();
   if (firstAdmissionOrTransferEncounter) {
     const timeSinceAdmission = age(firstAdmissionOrTransferEncounter.encounterDatetime);
-    return <div>{t('timeSinceAdmission', 'Admited: {{timeSinceAdmission}} ago', { timeSinceAdmission })}</div>;
+    return <div>{t('timeSinceAdmission', 'Admitted: {{timeSinceAdmission}} ago', { timeSinceAdmission })}</div>;
   } else {
     return <></>;
   }

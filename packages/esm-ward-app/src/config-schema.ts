@@ -1,5 +1,5 @@
-import { Type, validators, type ConfigSchema, type PersonAddress } from '@openmrs/esm-framework';
-import { patientCardElementTypes, type PatientCardElementType } from './types';
+import { type ConfigSchema, type PersonAddress, Type, validators } from '@openmrs/esm-framework';
+import { type PatientCardElementType, patientCardElementTypes } from './types';
 
 const defaultWardPatientCard: WardPatientCardDefinition = {
   id: 'default-card',
