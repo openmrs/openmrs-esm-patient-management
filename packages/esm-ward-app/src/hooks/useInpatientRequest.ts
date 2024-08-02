@@ -7,7 +7,10 @@ import { useMemo } from 'react';
 const defaultRep =
   'custom:(dispositionLocation,dispositionType,disposition,dispositionEncounter:full,patient:default,dispositionObsGroup,visit)';
 
-export function useInpatientRequest(dispositionType: Array<DispositionType> = ['ADMIT'], rep: string = defaultRep) {
+export function useInpatientRequest(
+  dispositionType: Array<DispositionType> = ['ADMIT', 'TRANSFER'],
+  rep: string = defaultRep,
+) {
   const { location } = useWardLocation();
   const searchParams = new URLSearchParams();
   searchParams.set('dispositionType', dispositionType.join(','));

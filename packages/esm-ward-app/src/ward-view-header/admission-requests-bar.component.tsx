@@ -4,11 +4,10 @@ import { Button, InlineNotification } from '@carbon/react';
 import { ArrowRightIcon, isDesktop, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import { useTranslation } from 'react-i18next';
-import useWardLocation from '../hooks/useWardLocation';
 import styles from './admission-requests.scss';
 
 const AdmissionRequestsBar = () => {
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(['ADMIT']);
+  const { inpatientRequests, isLoading, error } = useInpatientRequest(['ADMIT', 'TRANSFER']);
   const { t } = useTranslation();
   const layout = useLayoutType();
 
