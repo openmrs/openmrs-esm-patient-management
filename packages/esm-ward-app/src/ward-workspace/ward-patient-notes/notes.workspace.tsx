@@ -16,7 +16,7 @@ const WardPatientNotesWorkspace = ({
   const notesFormExtensionState = useMemo(
     () => ({
       patient,
-      patientUuid: patient.uuid,
+      patientUuid: patient?.uuid,
       promptBeforeClosing,
       closeWorkspace,
       closeWorkspaceWithSavedChanges,

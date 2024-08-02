@@ -30,6 +30,8 @@ const WardPatientWorkspaceBanner = ({ bed, patient, visit }: WardPatientCardProp
     );
   }, [cardDefinitions]);
 
+  if (!(patient && bed && visit)) return null;
+
   return (
     <div className={styles.patientBanner}>
       {bannerElements.map((BannerElement) => (
