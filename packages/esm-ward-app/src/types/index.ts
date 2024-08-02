@@ -1,11 +1,11 @@
 import type {
+  Concept,
+  Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
+  Patient,
   Person,
   Visit,
-  Location,
-  Patient,
-  Concept,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
@@ -47,6 +47,7 @@ export interface AdmissionLocationFetchResponse {
   ward: Location;
   bedLayouts: Array<BedLayout>;
 }
+
 export interface Bed {
   id: number;
   uuid: string;
@@ -163,4 +164,25 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   name?: string;
   description?: string;
   retired?: boolean;
+}
+
+export interface EncounterPayload {
+  encounterDatetime?: string;
+  encounterType: string;
+  patient: string;
+  location: string;
+  encounterProviders?: Array<{ encounterRole: string; provider: string }>;
+  obs: Array<ObsPayload>;
+  form?: string;
+  orders?: Array<any>;
+  visit?: string;
+}
+
+export interface ObsPayload {
+  concept: Concept;
+  value?: string;
+  groupMembers?: Array<{
+    concept: Concept;
+    value: string;
+  }>;
 }

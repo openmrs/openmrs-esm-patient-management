@@ -8,7 +8,6 @@ import {
 import { configSchema } from './config-schema';
 import rootComponent from './root.component';
 import { moduleName } from './constant';
-import WardPatientActionButton from './ward-patient-workspace/ward-patient-action-button.extension';
 import { createDashboardLink } from './createDashboardLink.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -39,7 +38,21 @@ export const wardPatientWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const wardPatientActionButtonExtension = getSyncLifecycle(WardPatientActionButton, options);
+// t("inpatientNotesWorkspaceTitle", "In-patient notes")
+export const wardPatientNotesWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/notes.workspace'),
+  options,
+);
+
+export const wardPatientActionButtonExtension = getAsyncLifecycle(
+  () => import('./ward-patient-workspace/ward-patient-action-button.extension'),
+  options,
+);
+
+export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/notes-action-button.extension'),
+  options,
+);
 
 export function startupApp() {
   registerBreadcrumbs([]);

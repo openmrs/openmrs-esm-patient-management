@@ -1,5 +1,5 @@
 import { useConfig } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   builtInPatientCardElements,
   defaultPatientCardElementConfig,
@@ -11,7 +11,6 @@ import WardPatientAge from './row-elements/ward-patient-age';
 import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import wardPatientAddress from './row-elements/ward-patient-header-address';
 import WardPatientName from './row-elements/ward-patient-name';
-import React from 'react';
 import styles from './ward-patient-card.scss';
 import wardPatientObs from './row-elements/ward-patient-obs';
 import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags';
