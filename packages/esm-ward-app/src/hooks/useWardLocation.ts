@@ -5,7 +5,7 @@ import useLocation from './useLocation';
 export default function useWardLocation(): {
   location: Location;
   isLoadingLocation: boolean;
-  errorFetchingLocation: Error;
+  errorFetchingLocation: Error | undefined;
   invalidLocation: boolean;
 } {
   const { locationUuid: locationUuidFromUrl } = useParams();

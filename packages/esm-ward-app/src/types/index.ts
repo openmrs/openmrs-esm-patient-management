@@ -11,7 +11,7 @@ import type React from 'react';
 
 export interface WardPatientCardProps {
   patient: Patient;
-  visit: Visit;
+  visit?: Visit;
   bed?: Bed;
 }
 
@@ -28,6 +28,7 @@ export type WardPatient = {
 export const patientCardElementTypes = [
   'bed-number',
   'patient-name',
+  'patient-gender',
   'patient-age',
   'patient-address',
   'patient-obs',
