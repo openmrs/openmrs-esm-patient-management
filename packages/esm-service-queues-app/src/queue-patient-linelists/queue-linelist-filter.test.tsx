@@ -8,11 +8,6 @@ import QueueLinelistFilter from './queue-linelist-filter.workspace';
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  toOmrsIsoString: jest.fn(),
-}));
-
 const workspaceProps = {
   closeWorkspace: jest.fn(),
   promptBeforeClosing: jest.fn(),

@@ -34,7 +34,7 @@ const AdmissionRequestsBar = () => {
         })}
       </span>
       <Button
-        onClick={() => launchWorkspace('admission-requests-workspace', { inpatientRequests })}
+        onClick={() => launchWorkspace('admission-requests-workspace')}
         renderIcon={ArrowRightIcon}
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}>

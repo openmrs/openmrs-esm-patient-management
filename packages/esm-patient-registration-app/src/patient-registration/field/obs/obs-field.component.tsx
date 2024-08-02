@@ -168,9 +168,8 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
   const fieldName = `obs.${concept.uuid}`;
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
-  const onDateChange = ([date]) => {
-    const refinedDate = date instanceof Date ? new Date(date.setHours(0, 0, 0, 0)) : new Date(date);
-    setFieldValue(fieldName, refinedDate);
+  const onDateChange = (date: Date) => {
+    setFieldValue(fieldName, date);
   };
 
   return (
@@ -184,14 +183,12 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
                   id={fieldName}
                   {...field}
                   isRequired={required}
-                  onChange={(date) => onDateChange([date])}
+                  onChange={onDateChange}
                   labelText={label ?? concept.display}
                   isInvalid={errors[fieldName] && touched[fieldName]}
+                  invalidText={t(meta.error)}
                   value={field.value}
                 />
-                {errors[fieldName] && touched[fieldName] && (
-                  <div className={styles.radioFieldError}>{meta.error && t(meta.error)}</div>
-                )}
               </>
             );
           }}
@@ -214,7 +211,7 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required, customC
   const fieldName = `obs.${concept.uuid}`;
 
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
-    customConceptAnswers.length ? '' : answerConceptSetUuid ?? concept.uuid,
+    customConceptAnswers.length ? '' : (answerConceptSetUuid ?? concept.uuid),
   );
 
   const answers = useMemo(

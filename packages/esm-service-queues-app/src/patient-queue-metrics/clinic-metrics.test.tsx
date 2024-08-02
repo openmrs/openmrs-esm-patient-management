@@ -17,11 +17,6 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseSession = jest.mocked(useSession);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLocations: jest.fn(),
-}));
-
 jest.mock('./queue-metrics.resource', () => ({
   ...jest.requireActual('./queue-metrics.resource'),
   useServiceMetricsCount: jest.fn().mockReturnValue(5),

@@ -2,7 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
-import { mockAdmissionLocation, mockLocationInpatientWard, mockPatientAlice, mockPatientBrian } from '__mocks__';
+import {
+  mockAdmissionLocation,
+  mockLocationInpatientWard,
+  mockPatientAlice,
+  mockPatientBrian,
+} from '../../../../__mocks__';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import useWardLocation from '../hooks/useWardLocation';
 import OccupiedBed from './occupied-bed.component';

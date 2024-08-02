@@ -5,11 +5,6 @@ import { DummyDataInput, dummyFormValues } from './dummy-data-input.component';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  validator: jest.fn(),
-}));
-
 describe('Dummy data input', () => {
   let formValues: FormValues = initialFormValues;
 

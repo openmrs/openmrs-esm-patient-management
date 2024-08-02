@@ -2,6 +2,7 @@ import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-fram
 import type { DispositionType, InpatientRequestFetchResponse } from '../types';
 import useSWR from 'swr';
 import useWardLocation from './useWardLocation';
+import { useMemo } from 'react';
 
 const defaultRep =
   'custom:(dispositionLocation,dispositionType,disposition,dispositionEncounter:full,patient:default,dispositionObsGroup,visit)';
@@ -21,8 +22,13 @@ export function useInpatientRequest(
     openmrsFetch,
   );
 
-  return {
-    inpatientRequests: data?.data?.results,
-    ...rest,
-  };
+  const results = useMemo(
+    () => ({
+      inpatientRequests: data?.data?.results,
+      ...rest,
+    }),
+    [data, rest],
+  );
+
+  return results;
 }
