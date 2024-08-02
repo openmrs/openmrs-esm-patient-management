@@ -2,12 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ListDetailsTable from './list-details-table.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  isDesktop: jest.fn(() => true),
-}));
-
-describe('ListDetailsTable Component', () => {
+describe('ListDetailsTable', () => {
   const patients = [
     {
       identifier: '123abced',
@@ -48,12 +43,12 @@ describe('ListDetailsTable Component', () => {
     },
   ];
 
-  const mockedOnChange = jest.fn();
+  const mockOnChange = jest.fn();
 
   let pagination = {
     usePagination: true,
     currentPage: 1,
-    onChange: mockedOnChange,
+    onChange: mockOnChange,
     pageSize: 10,
     totalItems: 100,
     pagesUnknown: false,

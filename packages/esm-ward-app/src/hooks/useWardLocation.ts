@@ -1,11 +1,11 @@
-import { type Location, useLocations, useSession } from '@openmrs/esm-framework';
+import { type Location, useSession } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import useLocation from './useLocation';
 
 export default function useWardLocation(): {
   location: Location;
   isLoadingLocation: boolean;
-  errorFetchingLocation: Error;
+  errorFetchingLocation: Error | undefined;
   invalidLocation: boolean;
 } {
   const { locationUuid: locationUuidFromUrl } = useParams();

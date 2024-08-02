@@ -1,4 +1,6 @@
 import * as Yup from 'yup';
+import camelCase from 'lodash-es/camelCase';
+import { parseDate } from '@openmrs/esm-framework';
 import {
   type AddressValidationSchemaType,
   type FormValues,
@@ -7,9 +9,6 @@ import {
   type PatientIdentifierValue,
   type Encounter,
 } from './patient-registration.types';
-import { parseDate } from '@openmrs/esm-framework';
-import camelCase from 'lodash-es/camelCase';
-import capitalize from 'lodash-es/capitalize';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
@@ -205,9 +204,9 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
   return result;
 }
 
-export const filterUndefinedPatientIdenfier = (patientIdenfiers) =>
+export const filterOutUndefinedPatientIdentifiers = (patientIdentifiers) =>
   Object.fromEntries(
-    Object.entries<PatientIdentifierValue>(patientIdenfiers).filter(
+    Object.entries<PatientIdentifierValue>(patientIdentifiers).filter(
       ([key, value]) => value.identifierValue !== undefined,
     ),
   );

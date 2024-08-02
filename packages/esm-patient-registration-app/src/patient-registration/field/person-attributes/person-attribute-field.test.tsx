@@ -9,41 +9,37 @@ import { PersonAttributeField } from './person-attribute-field.component';
 jest.mock('./person-attributes.resource');
 jest.mock('../field.resource');
 
-const mockedUsePersonAttributeType = usePersonAttributeType as jest.Mock;
-const mockedUseConceptAnswers = useConceptAnswers as jest.Mock;
+const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
+const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
 
-let fieldDefinition: FieldDefinition;
+const mockPersonAttributeType = {
+  format: 'java.lang.String',
+  display: 'Referred by',
+  uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
+  name: 'Referred by',
+  description: 'The person who referred the patient',
+};
+
+let fieldDefinition: FieldDefinition = {
+  id: 'referredby',
+  label: 'Referred by',
+  type: 'person attribute',
+  uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
+  answerConceptSetUuid: '6682d17f-0777-45e4-a39b-93f77eb3531c',
+  validation: {
+    matches: '',
+    required: true,
+  },
+  showHeading: true,
+};
 
 describe('PersonAttributeField', () => {
-  let mockPersonAttributeType = {
-    format: 'java.lang.String',
-    display: 'Referred by',
-    uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
-  };
-
   beforeEach(() => {
-    fieldDefinition = {
-      id: 'referredby',
-      label: 'Referred by',
-      type: 'person attribute',
-      uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
-      answerConceptSetUuid: '6682d17f-0777-45e4-a39b-93f77eb3531c',
-      validation: {
-        matches: '',
-        required: true,
-      },
-      showHeading: true,
-    };
-    mockedUsePersonAttributeType.mockReturnValue({
+    mockUsePersonAttributeType.mockReturnValue({
       data: mockPersonAttributeType,
       isLoading: false,
       error: null,
-      uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7d',
     });
-  });
-
-  afterEach(() => {
-    jest.resetAllMocks();
   });
 
   it('renders the text input field for String format', () => {
@@ -74,23 +70,24 @@ describe('PersonAttributeField', () => {
         </Form>
       </Formik>,
     );
+
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
   it('renders the coded attribute field for Concept format', () => {
-    mockedUsePersonAttributeType.mockReturnValue({
-      data: { ...mockPersonAttributeType, format: 'org.openmrs.Concept' },
-      isLoading: false,
-      error: null,
-    });
-
     fieldDefinition = {
       id: 'referredby',
       ...fieldDefinition,
       label: 'Referred by',
     };
 
-    mockedUseConceptAnswers.mockReturnValueOnce({
+    mockUsePersonAttributeType.mockReturnValue({
+      data: { ...mockPersonAttributeType, format: 'org.openmrs.Concept' },
+      isLoading: false,
+      error: null,
+    });
+
+    mockUseConceptAnswers.mockReturnValueOnce({
       data: [
         { uuid: '1', display: 'Option 1' },
         { uuid: '2', display: 'Option 2' },
@@ -114,7 +111,7 @@ describe('PersonAttributeField', () => {
   });
 
   it('renders an error notification if attribute type has unknown format', () => {
-    mockedUsePersonAttributeType.mockReturnValue({
+    mockUsePersonAttributeType.mockReturnValue({
       data: { ...mockPersonAttributeType, format: 'unknown' },
       isLoading: false,
       error: null,
@@ -133,7 +130,7 @@ describe('PersonAttributeField', () => {
   });
 
   it('renders an error notification if unable to fetch attribute type', () => {
-    mockedUsePersonAttributeType.mockReturnValue({
+    mockUsePersonAttributeType.mockReturnValue({
       data: null,
       isLoading: false,
       error: new Error('Failed to fetch attribute type'),
@@ -160,7 +157,7 @@ describe('PersonAttributeField', () => {
   });
 
   it('renders a skeleton if attribute type is loading', async () => {
-    mockedUsePersonAttributeType.mockReturnValue({
+    mockUsePersonAttributeType.mockReturnValue({
       data: null,
       isLoading: true,
       error: null,
@@ -181,8 +178,8 @@ describe('PersonAttributeField', () => {
         </Form>
       </Formik>,
     );
+
     await screen.findByRole('heading', { name: /attribute/i });
-    const input = screen.queryByLabelText(/Referred by/i);
-    expect(input).not.toBeInTheDocument(); // checks that the input is not rendered when the attribute type is loading
+    expect(screen.queryByLabelText(/Referred by/i)).not.toBeInTheDocument();
   });
 });

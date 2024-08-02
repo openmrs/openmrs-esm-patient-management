@@ -1,17 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, isDesktop, useConfig } from '@openmrs/esm-framework';
+import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchLaunch from './patient-search-icon.component';
-import { isDesktop } from '@openmrs/esm-framework';
 
-const isDesktopMock = isDesktop as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  isDesktop: jest.fn(),
-  useOnClickOutside: jest.fn(),
-  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
-}));
+const mockIsDesktop = jest.mocked(isDesktop);
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -24,7 +19,14 @@ jest.mock('react-router-dom', () => ({
 
 describe('PatientSearchLaunch', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      search: {
+        disableTabletSearchOnKeyUp: false,
+        patientResultUrl: configSchema.search.patientResultUrl._default,
+        showRecentlySearchedPatients: false,
+      },
+    });
   });
 
   it('renders without errors', () => {
@@ -34,7 +36,6 @@ describe('PatientSearchLaunch', () => {
 
   it('toggles search input when search button is clicked', async () => {
     const user = userEvent.setup();
-
     render(<PatientSearchLaunch />);
 
     const searchButton = screen.getByTestId('searchPatientIcon');
@@ -50,7 +51,7 @@ describe('PatientSearchLaunch', () => {
 
   it('displays search input in overlay on mobile', async () => {
     const user = userEvent.setup();
-    isDesktopMock.mockReturnValue(false);
+    mockIsDesktop.mockReturnValue(false);
 
     render(<PatientSearchLaunch />);
 

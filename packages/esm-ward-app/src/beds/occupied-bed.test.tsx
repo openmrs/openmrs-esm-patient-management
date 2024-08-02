@@ -1,14 +1,16 @@
-import { render, screen } from '@testing-library/react';
-import OccupiedBed from './occupied-bed.component';
 import React from 'react';
-import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
+import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
-import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
-import { mockAdmittedPatient } from '../../../../__mocks__/patient.mock';
-import { mockLocationInpatientWard } from '../../../../__mocks__/locations.mock';
+import {
+  mockAdmissionLocation,
+  mockLocationInpatientWard,
+  mockPatientAlice,
+  mockPatientBrian,
+} from '../../../../__mocks__';
+import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import useWardLocation from '../hooks/useWardLocation';
-import { mockPatientAlice, mockPatientBrian } from '__mocks__';
+import OccupiedBed from './occupied-bed.component';
 
 const defaultConfig = getDefaultsFromConfigSchema(configSchema);
 
@@ -29,7 +31,7 @@ mockedUseWardLocation.mockReturnValue({
 const mockBedToUse = mockBedLayouts[0];
 const mockBed = bedLayoutToBed(mockBedToUse);
 
-describe('Occupied bed: ', () => {
+describe('Occupied bed', () => {
   it('renders a single bed with patient details', () => {
     render(<OccupiedBed wardPatients={[{ patient: mockPatientAlice, admitted: true }]} bed={mockBed} />);
     const patientName = screen.getByText('Alice Johnson');
@@ -46,11 +48,11 @@ describe('Occupied bed: ', () => {
   it('renders a divider for shared patients', () => {
     render(
       <OccupiedBed
+        bed={mockBed}
         wardPatients={[
           { patient: mockPatientAlice, admitted: true },
           { patient: mockPatientBrian, admitted: true },
         ]}
-        bed={mockBed}
       />,
     );
     const bedShareText = screen.getByTitle('Bed share');

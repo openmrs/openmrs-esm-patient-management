@@ -4,13 +4,13 @@ import { Button, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
 import IdentifierSelectionOverlay from './identifier-selection-overlay.component';
-import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
+import IdentifierInput from '../../input/custom-input/identifier/identifier-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import {
-  type FormValues,
-  type IdentifierSource,
-  type PatientIdentifierType,
-  type PatientIdentifierValue,
+import type {
+  FormValues,
+  IdentifierSource,
+  PatientIdentifierType,
+  PatientIdentifierValue,
 } from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
 import styles from '../field.scss';
@@ -58,7 +58,7 @@ export function deleteIdentifierType(identifiers: FormValues['identifiers'], ide
 
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useContext(ResourcesContext);
-  const isLoading = !identifierTypes;
+  const isLoading = !identifierTypes?.length;
   const { values, setFieldValue, initialFormValues, isOffline } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -67,7 +67,6 @@ export const Identifiers: React.FC = () => {
   const { defaultPatientIdentifierTypes } = config;
 
   useEffect(() => {
-    // Initialization
     if (identifierTypes) {
       const identifiers = {};
       identifierTypes
@@ -108,23 +107,23 @@ export const Identifiers: React.FC = () => {
 
   if (isLoading && !isOffline) {
     return (
-      <div data-testid="loading-skeleton" className={styles.halfWidthInDesktopView}>
+      <div className={styles.halfWidthInDesktopView}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
         </div>
-        <SkeletonText />
+        <SkeletonText role="progressbar" />
       </div>
     );
   }
 
   return (
     <div className={styles.halfWidthInDesktopView}>
-      <UserHasAccess privilege={['Get Identifier Types', 'Add Patient Identifiers']}>
+      <UserHasAccess privilege={['Get Identifier Types', 'Add patient identifiers']}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
           <Button
             kind="ghost"
-            className={styles.setIDNumberButton}
+            className={styles.configureIdentifiersButton}
             onClick={() => setShowIdentifierOverlay(true)}
             size={isDesktop(layout) ? 'sm' : 'md'}>
             {t('configure', 'Configure')} <ArrowRight size={16} />

@@ -9,6 +9,6 @@ export const useDefaultLoginLocation = () => {
   return {
     defaultFacility: data ? data?.data : null,
     isLoading: isLoading,
-    isError: error,
+    error,
   };
 };

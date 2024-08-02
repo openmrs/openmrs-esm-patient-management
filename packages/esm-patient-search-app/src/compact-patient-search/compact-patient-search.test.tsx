@@ -1,30 +1,19 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import {
-  defineConfigSchema,
-  getDefaultsFromConfigSchema,
-  navigate,
-  useConfig,
-  useSession,
-} from '@openmrs/esm-framework';
-import { configSchema } from '../config-schema';
+import { getDefaultsFromConfigSchema, navigate, useConfig, useSession } from '@openmrs/esm-framework';
+import { mockSession } from '__mocks__';
+import { configSchema, type PatientSearchConfig } from '../config-schema';
 import CompactPatientSearchComponent from './compact-patient-search.component';
 
-defineConfigSchema('@openmrs/esm-patient-search-app', configSchema);
-
-const mockedUseConfig = useConfig as jest.Mock;
-const mockedUseSession = useSession as jest.Mock;
-const mockedNavigate = navigate as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
+const mockUseSession = jest.mocked(useSession);
+const mockNavigate = jest.mocked(navigate);
 
 describe('CompactPatientSearchComponent', () => {
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
-    mockedUseSession.mockReturnValue({
-      sessionLocation: {
-        uuid: 'location-uuid',
-      },
-    });
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUseSession.mockReturnValue(mockSession.data);
   });
 
   it('renders a compact search bar', () => {
@@ -42,9 +31,13 @@ describe('CompactPatientSearchComponent', () => {
   });
 
   it('renders a list of recently searched patients when a search term is not provided and the showRecentlySearchedPatients config property is set', async () => {
-    mockedUseConfig.mockReturnValue({
+    mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      search: { showRecentlySearchedPatients: true },
+      search: {
+        showRecentlySearchedPatients: true,
+        disableTabletSearchOnKeyUp: true,
+        patientResultUrl: configSchema.search.patientResultUrl._default,
+      },
     });
     render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
     const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
@@ -60,6 +53,6 @@ describe('CompactPatientSearchComponent', () => {
     await user.type(searchbox, 'John');
     const searchButton = screen.getByRole('button', { name: /search/i });
     await user.click(searchButton);
-    expect(mockedNavigate).toHaveBeenCalledWith({ to: expect.stringMatching(/.*\/search\?query=John/) });
+    expect(mockNavigate).toHaveBeenCalledWith({ to: expect.stringMatching(/.*\/search\?query=John/) });
   });
 });

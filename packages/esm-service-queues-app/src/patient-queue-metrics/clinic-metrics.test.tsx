@@ -1,20 +1,26 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  getDefaultsFromConfigSchema,
+  openmrsFetch,
+  useConfig,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
 import { mockMetrics, mockServiceTypes, mockLocations, mockSession } from '__mocks__';
+import { type ConfigObject, configSchema } from '../config-schema';
 import ClinicMetrics from './clinic-metrics.component';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseLocations = jest.mocked(useLocations);
+const mockUseSession = jest.mocked(useSession);
 
-jest.mock('./queue-metrics.resource', () => {
-  const originalModule = jest.requireActual('./queue-metrics.resource');
-
-  return {
-    ...originalModule,
-    useServiceMetricsCount: jest.fn().mockReturnValue(5),
-  };
-});
+jest.mock('./queue-metrics.resource', () => ({
+  ...jest.requireActual('./queue-metrics.resource'),
+  useServiceMetricsCount: jest.fn().mockReturnValue(5),
+}));
 
 jest.mock('../hooks/useQueues', () => {
   return {
@@ -22,44 +28,37 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-jest.mock('./clinic-metrics.resource', () => {
-  const originalModule = jest.requireActual('./clinic-metrics.resource');
+jest.mock('./clinic-metrics.resource', () => ({
+  ...jest.requireActual('./clinic-metrics.resource'),
+  useActiveVisits: jest.fn().mockReturnValue({
+    activeVisitsCount: mockMetrics.activeVisitsCount,
+  }),
+  useAverageWaitTime: jest.fn().mockReturnValue({ waitTime: mockMetrics.waitTime }),
+}));
 
-  return {
-    ...originalModule,
-    useAverageWaitTime: jest.fn().mockImplementation(() => ({ waitTime: mockMetrics.waitTime })),
-    useActiveVisits: jest.fn().mockImplementation(() => ({ activeVisitsCount: mockMetrics.activeVisitsCount })),
-  };
-});
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useLocations: jest.fn().mockImplementation(() => mockLocations.data),
-    useSession: jest.fn().mockImplementation(() => mockSession.data),
-  };
-});
-
-jest.mock('../helpers/helpers', () => {
-  const originalModule = jest.requireActual('../helpers/helpers');
-
-  return {
-    ...originalModule,
-    useSelectedServiceName: jest.fn().mockReturnValue('All'),
-  };
-});
+jest.mock('../helpers/helpers', () => ({
+  ...jest.requireActual('../helpers/helpers'),
+  useSelectedServiceName: jest.fn().mockReturnValue('All'),
+}));
 
 describe('Clinic metrics', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+    });
+    mockUseLocations.mockReturnValue(mockLocations.data.results);
+    mockUseSession.mockReturnValue(mockSession.data);
+  });
+
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
-    mockedUseConfig.mockReturnValue({
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
       visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
     });
 
-    mockedOpenmrsFetch.mockReturnValue({ data: mockMetrics });
+    mockOpenmrsFetch.mockResolvedValue({ data: mockMetrics } as unknown as FetchResponse);
 
-    renderClinicMetrics();
+    render(<ClinicMetrics />);
 
     await screen.findByText(/Checked in patients/i);
     expect(screen.getByText(/100/i)).toBeInTheDocument();
@@ -70,7 +69,3 @@ describe('Clinic metrics', () => {
     expect(screen.getByText(/69/i)).toBeInTheDocument();
   });
 });
-
-function renderClinicMetrics() {
-  render(<ClinicMetrics />);
-}

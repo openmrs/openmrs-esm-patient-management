@@ -1,20 +1,29 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type PatientSearchConfig, configSchema } from './config-schema';
 import PatientSearchRootComponent from './root.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  isDesktop: jest.fn(),
-  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
-}));
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 describe('PatientSearchRootComponent', () => {
-  const originalPushState = window.history.pushState;
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      search: {
+        disableTabletSearchOnKeyUp: false,
+        patientResultUrl: '',
+        showRecentlySearchedPatients: false,
+      },
+    });
+  });
 
-  // Restore the original pushState after all tests
   afterAll(() => {
     window.history.pushState = originalPushState;
   });
+
+  const originalPushState = window.history.pushState;
+
   it('should render PatientSearchPageComponent when accessing /search', () => {
     window.history.pushState({}, 'Patient Search', 'openmrs/spa/search');
     render(<PatientSearchRootComponent />);
