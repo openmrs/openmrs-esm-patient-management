@@ -43,6 +43,12 @@
       "type":"admission-requests"
     },
     {
+      "name":"admit-patient-form-workspace",
+      "component": "admitPatientFormWorkspace",
+      "title":"admissionRequests",
+      "type":"admission-requests"
+    },
+    {
       "name": "ward-patient-workspace",
       "component": "wardPatientWorkspace",
       "type": "ward",

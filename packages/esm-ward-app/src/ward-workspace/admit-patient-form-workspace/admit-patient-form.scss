@@ -1,0 +1,33 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@import '../../root.scss';
+
+.form {
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.formContent {
+  padding: layout.$spacing-05;
+}
+
+.formError {
+  margin: -1rem -1rem 1rem -1rem;
+}
+
+.buttonSet button {
+  max-width: unset !important;
+  width: 50% !important;
+}
+
+.BedSelectionDropdown {
+  margin-top: layout.$spacing-03;
+}
+
+.errorNotifications {
+  margin-top: layout.$spacing-05;
+}
