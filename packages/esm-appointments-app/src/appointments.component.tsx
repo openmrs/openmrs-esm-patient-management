@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import AppointmentTabs from './appointments/appointment-tabs.component';
 import AppointmentsHeader from './header/appointments-header.component';
 import AppointmentMetrics from './metrics/appointments-metrics.component';
@@ -30,7 +30,7 @@ const Appointments: React.FC = () => {
   return (
     <SelectedDateContext.Provider value={{ selectedDate, setSelectedDate }}>
       <AppointmentsHeader
-        title={t('home', 'Home')}
+        title={t('appointments', 'Appointments')}
         appointmentServiceType={appointmentServiceType}
         onChange={setAppointmentServiceType}
       />

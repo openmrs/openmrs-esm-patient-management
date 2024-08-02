@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react';
 import classnames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList } from '@carbon/react';
-import { navigate } from '@openmrs/esm-framework';
+import { Tab, Tabs, TabList, Button } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
+import { navigate, PageHeader, PageHeaderContent, PatientListsPictogram } from '@openmrs/esm-framework';
 import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
 import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
-import Header from '../header/header.component';
 import ListsTable from '../lists-table/lists-table.component';
 import styles from './lists-dashboard.scss';
 
@@ -42,6 +42,16 @@ const ListsDashboard: React.FC = () => {
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
+  const newCohortUrl = window.getOpenmrsSpaBase() + 'home/patient-lists?new_cohort=true';
+  const handleShowNewListOverlay = () => {
+    // URL navigation is in place to know either to open the create list overlay or not
+    // The url /patient-list?new_cohort=true is being used in the "Add patient to list" widget
+    // in the patient chart. The button in the above mentioned widget "Create new list", navigates
+    // to /patient-list?new_cohort=true to open the overlay directly.
+    navigate({
+      to: newCohortUrl,
+    });
+  };
 
   const isCreatingPatientList =
     Object.fromEntries(
@@ -67,7 +77,18 @@ const ListsDashboard: React.FC = () => {
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
-        <Header />
+        <PageHeader>
+          <PageHeaderContent title={t('patientLists', 'Patient Lists')} illustration={<PatientListsPictogram />} />
+          <Button
+            className={styles.newListButton}
+            kind="ghost"
+            iconDescription="Add"
+            renderIcon={(props) => <Add {...props} size={16} />}
+            onClick={handleShowNewListOverlay}
+            size="sm">
+            {t('newList', 'New list')}
+          </Button>
+        </PageHeader>
         <Tabs
           className={styles.tabs}
           onChange={({ selectedIndex }) => {
