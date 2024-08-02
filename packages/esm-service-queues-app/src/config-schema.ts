@@ -125,10 +125,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    systolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     temperatureUuid: {
       _type: Type.ConceptUuid,
       _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -411,8 +407,8 @@ export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
-    defaultUrgentPriorityStatus: string;
-    defualtWaitStatusConceptUuid: string;
+    defaultUrgentPriorityOnLabStatus: string;
+    defualtWaitStatusOnLabConceptUuid: string;
     defaultTransitionStatus: string;
     diastolicBloodPressureUuid: string;
     emergencyPriorityConceptUuid: string;
