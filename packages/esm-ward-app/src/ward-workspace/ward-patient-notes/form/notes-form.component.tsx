@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -68,16 +67,9 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
       setIsSubmitting(true);
 
       const notePayload = {
-        encounterDatetime: dayjs(new Date()).format(),
         patient: patientUuid,
         location: locationUuid,
         encounterType: emrConfiguration?.visitNoteEncounterType.uuid,
-        encounterProviders: [
-          {
-            encounterRole: emrConfiguration?.clinicianEncounterRole.uuid,
-            provider: providerUuid,
-          },
-        ],
         obs: wardClinicalNote
           ? [
               {

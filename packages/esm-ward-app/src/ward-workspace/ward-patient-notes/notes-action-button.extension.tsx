@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenuButton, launchWorkspace, StickyNoteAddIcon } from '@openmrs/esm-framework';
-import { type WardPatientNotesWorkspaceProps } from './notes.workspace';
+import { type WardPatientNotesWorkspaceProps } from './types';
 
 export default function WardPatientNotesActionButton() {
   const { t } = useTranslation();

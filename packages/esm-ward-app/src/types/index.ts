@@ -167,11 +167,11 @@ export interface EncounterRole extends OpenmrsResourceStrict {
 }
 
 export interface EncounterPayload {
-  encounterDatetime: string;
+  encounterDatetime?: string;
   encounterType: string;
   patient: string;
   location: string;
-  encounterProviders: Array<{ encounterRole: string; provider: string }>;
+  encounterProviders?: Array<{ encounterRole: string; provider: string }>;
   obs: Array<ObsPayload>;
   form?: string;
   orders?: Array<any>;

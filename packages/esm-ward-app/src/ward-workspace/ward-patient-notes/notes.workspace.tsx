@@ -1,33 +1,21 @@
 import React, { useMemo } from 'react';
-import { type DefaultWorkspaceProps, ExtensionSlot } from '@openmrs/esm-framework';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
-import { type WardPatientCardProps } from '../../types';
+import { type WardPatientNotesWorkspaceProps } from './types';
+import PatientNotesForm from './form/notes-form.component';
 
-export interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
-
-const WardPatientNotesWorkspace = ({
-  promptBeforeClosing,
-  closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  patient,
-  visit,
-  bed,
-}: WardPatientNotesWorkspaceProps) => {
-  const notesFormExtensionState = useMemo(
+const WardPatientNotesWorkspace = ({ patient, visit, bed, ...restWorkspaceProps }: WardPatientNotesWorkspaceProps) => {
+  const notesFormState = useMemo(
     () => ({
-      patient,
       patientUuid: patient?.uuid,
-      promptBeforeClosing,
-      closeWorkspace,
-      closeWorkspaceWithSavedChanges,
+      ...restWorkspaceProps,
     }),
-    [patient, closeWorkspace, closeWorkspaceWithSavedChanges, promptBeforeClosing],
+    [patient, restWorkspaceProps],
   );
 
   return (
     <div>
       <WardPatientWorkspaceBanner patient={patient} bed={bed} visit={visit} />
-      <ExtensionSlot name="ward-patient-notes-workspace-slot" state={notesFormExtensionState} />
+      <PatientNotesForm {...notesFormState} />
     </div>
   );
 };

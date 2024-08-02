@@ -3,7 +3,7 @@ import { type WardPatientCardProps } from '../types';
 import { usePatientCardRows } from './ward-patient-card-row.resources';
 import styles from './ward-patient-card.scss';
 import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
-import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/ward-patient.workspace';
+import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/types';
 
 const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
   const patientCardRows = usePatientCardRows();

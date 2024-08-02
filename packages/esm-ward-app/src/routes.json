@@ -36,12 +36,6 @@
       "slot": "action-menu-ward-patient-items-slot"
     },
     {
-      "name": "ward-patient-notes-form",
-      "component": "wardPatientNotesFormExtension",
-      "slot": "ward-patient-notes-workspace-slot",
-      "order": 1
-    },
-    {
       "component": "wardPatientNotesActionButtonExtension",
       "name": "ward-inpatient-notes-form-action-button",
       "slot": "action-menu-ward-patient-items-slot"
@@ -58,15 +52,15 @@
       "name": "ward-patient-notes-workspace",
       "component": "wardPatientNotesWorkspace",
       "type": "ward-patient-notes",
-      "title": "In-patient notes",
+      "title": "inpatientNotesWorkspaceTitle",
       "sidebarFamily": "ward-patient",
       "hasOwnSidebar": true
     },
     {
-      "name":"admit-patient-form-workspace",
+      "name": "admit-patient-form-workspace",
       "component": "admitPatientFormWorkspace",
-      "title":"admissionRequests",
-      "type":"admission-requests"
+      "title": "admissionRequests",
+      "type": "admission-requests"
     },
     {
       "name": "ward-patient-workspace",

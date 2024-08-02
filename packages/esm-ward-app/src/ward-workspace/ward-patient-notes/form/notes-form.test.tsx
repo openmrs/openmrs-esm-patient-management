@@ -65,7 +65,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
     patient: mockPatient.uuid,
   };
 
-  mockSavePatientNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' });
+  mockSavePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
 
   renderWardPatientNotesForm();
 
