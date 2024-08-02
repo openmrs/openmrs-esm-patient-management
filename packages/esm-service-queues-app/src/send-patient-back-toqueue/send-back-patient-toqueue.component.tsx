@@ -41,8 +41,8 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
   const allowedPriorities = data?.queue?.allowedPriorities ?? [];
   const allowedStatuses = data?.queue?.allowedStatuses ?? [];
   const uppercaseText = (text: string) => text.toUpperCase();
-  const defualtWaitStatus = concepts?.defualtWaitStatusOnLabConceptUuid;
-  const defualtUrgentStatus = concepts?.defaultUrgentPriorityOnLabStatus;
+  const defualtWaitStatus = concepts?.defaultResultReviewConceptUuid;
+  const defualtUrgentStatus = concepts?.defaultResultReviewConceptUuid;
 
   const schema = useMemo(
     () =>

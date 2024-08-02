@@ -82,13 +82,9 @@ export const configSchema = {
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
-    defaultUrgentPriorityOnLabStatus: {
+    defaultResultReviewConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for a service in the queues eg urgent.',
-      _default: '',
-    },
-    defualtWaitStatusOnLabConceptUuid: {
-      _type: Type.ConceptUuid,
       _default: '',
     },
     systolicBloodPressureUuid: {
@@ -407,8 +403,7 @@ export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
-    defaultUrgentPriorityOnLabStatus: string;
-    defualtWaitStatusOnLabConceptUuid: string;
+    defaultResultReviewConceptUuid: string;
     defaultTransitionStatus: string;
     diastolicBloodPressureUuid: string;
     emergencyPriorityConceptUuid: string;
