@@ -211,7 +211,7 @@ describe('Testing AdmitPatientForm', () => {
     });
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
-      subtitle: '{{patientName}} has been successfully admitted to the bed bed3',
+      subtitle: '{{patientName}} has been successfully admitted and assigned to bed bed3',
       title: 'Patient admitted successfully',
     });
   });
@@ -232,7 +232,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(1);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'error',
-      title: 'Failed to create Admission Encounter encounter',
+      title: 'Failed to admit patient',
       subtitle: 'Failed to create encounter',
     });
   });
@@ -266,7 +266,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'warning',
       title: 'Patient admitted successfully',
-      subtitle: 'Patient admitted successfully but no bed was assigned to the patient',
+      subtitle: 'Patient admitted successfully but fail to assign bed to patient',
     });
   });
 

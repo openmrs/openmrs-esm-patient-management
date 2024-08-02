@@ -91,7 +91,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
           (err: Error) => {
             showSnackbar({
               kind: 'error',
-              title: t('errorCreatingEncounter', 'Failed to create {{encounterType}} encounter', {
+              title: t('errorCreatingEncounter', 'Failed to admit patient', {
                 encounterType:
                   dispositionType === 'ADMIT'
                     ? emrConfiguration.admissionEncounterType.display
@@ -110,7 +110,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
                   title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
                   subtitle: t(
                     'patientAdmittedSuccessfullySubtitle',
-                    '{{patientName}} has been successfully admitted to the bed {{bedNumber}}',
+                    '{{patientName}} has been successfully admitted and assigned to bed {{bedNumber}}',
                     {
                       patientName: patient.person.preferredName.display,
                       bedNumber: bedSelected.bedNumber,
@@ -137,7 +137,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
               title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
               subtitle: t(
                 'patientAdmittedButBedNotAssigned',
-                'Patient admitted successfully but no bed was assigned to the patient',
+                'Patient admitted successfully but fail to assign bed to patient',
               ),
             });
             mutateAdmissionLocation();
