@@ -41,8 +41,8 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
   const allowedPriorities = data?.queue?.allowedPriorities ?? [];
   const allowedStatuses = data?.queue?.allowedStatuses ?? [];
   const uppercaseText = (text: string) => text.toUpperCase();
-  const defualtWaitStatus = concepts?.defaultResultReviewConceptUuid;
-  const defualtUrgentStatus = concepts?.defaultResultReviewConceptUuid;
+  const defaultWaitStatus = concepts?.defaultStatusConceptUuid;
+  const defaultResultReviewUrgencyStatus = concepts?.defaultResultReviewPriorityConceptUuid;
 
   const schema = useMemo(
     () =>
@@ -211,7 +211,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
               <Controller
                 name="status"
                 control={control}
-                defaultValue={defualtWaitStatus}
+                defaultValue={defaultWaitStatus}
                 render={({ field: { value, onChange } }) => (
                   <RadioButtonGroup
                     className={styles.radioButtonWrapper}
@@ -235,7 +235,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
             <Controller
               control={control}
               name="priority"
-              defaultValue={defualtUrgentStatus}
+              defaultValue={defaultResultReviewUrgencyStatus}
               render={({ field: { onChange } }) => (
                 <>
                   <ContentSwitcher
