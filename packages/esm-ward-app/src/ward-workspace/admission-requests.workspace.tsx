@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './admission-requests-workspace.scss';
 import AdmissionRequestCard from './components/admission-request-card.component';
-import { type InpatientRequest } from '../types';
 import { Search } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +12,7 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
     inpatientRequests,
     isLoading: isLoadingInpatientRequests,
     error: errorFetchingInpatientRequests,
-  } = useInpatientRequest();
+  } = useInpatientRequest(['ADMIT', 'TRANSFER']);
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = React.useState('');
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
