@@ -68,8 +68,8 @@ const WardViewWithBedManagement = () => {
             patient: patient,
             visit: null,
             admitted: false,
-            encounterAssigningToCurrentInpatientLocation: null,
-            firstAdmissionOrTransferEncounter: null, // TODO: populate this after O3-3704
+            encounterAssigningToCurrentInpatientLocation: null, // populate after BED-13
+            firstAdmissionOrTransferEncounter: null,
           };
         }
       });
