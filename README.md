@@ -21,7 +21,7 @@ Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
 This monorepo uses [yarn](https://yarnpkg.com).
 
-To install the dependancies, run:
+To install the dependencies, run:
 
 ```bash
 yarn install
@@ -142,11 +142,11 @@ Then, in a separate terminal, run:
 yarn test-e2e --headed
 ```
 
-Please read [our e2e test guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing#end-to-end-testing-with-playwright) for more information about E2E testing.
+Please read [our E2E testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/end-to-end-testing) for more information about E2E testing.
 
 ### Updating Playwright
 
-To upgrade your Playwright version, ensure that you update both the package.json file and the [e2e/support/bamboo/playwright.Dockerfile](e2e/support/bamboo/playwright.Dockerfile).
+To upgrade your Playwright version, update both the package.json file and the [e2e/support/bamboo/playwright.Dockerfile](e2e/support/bamboo/playwright.Dockerfile).
 
 ## Design patterns
 
@@ -178,7 +178,7 @@ After running it, make a PR or merge to `main` with the resulting changeset.
 Once the version bump is merged, go to GitHub and
 [draft a new release](https://github.com/openmrs/openmrs-esm-patient-management/releases/new). 
 The tag should be prefixed with `v` (e.g., `v3.2.1`), while the release title
-should just be the version number (e.g., `3.2.1`). The creation of the GitHub release
+should be the version number (e.g., `3.2.1`). The creation of the GitHub release
 will cause GitHub Actions to publish the packages, completing the release process.
 
 > Don't run `npm publish` or `yarn publish`. Use the above process.
