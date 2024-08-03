@@ -26,7 +26,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ConfigObject } from '../config-schema';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import { useQueueEntry } from './send-back-patient-toqueue.resource';
+import { useQueueEntry } from './add-patient-to-queue.resource';
 import { updateQueueEntry } from '../active-visits/active-visits-table.resource';
 
 interface SendBackPatientProps {
