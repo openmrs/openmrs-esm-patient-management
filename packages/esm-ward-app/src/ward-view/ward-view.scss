@@ -14,8 +14,19 @@
 
 .wardViewMain {
   background-color: #e4e4e4;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   display: grid;
   gap: spacing.$spacing-05;
   padding: spacing.$spacing-05;
+}
+
+.errorStateWrapper {
+  grid-column: span 3;
+}
+
+.wardViewHeaderWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: spacing.$spacing-05;
 }
