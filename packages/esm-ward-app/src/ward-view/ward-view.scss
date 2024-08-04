@@ -3,7 +3,7 @@
 .wardView {
   background-color: #e4e4e4;
   position: absolute;
-  top: var(--omrs-topnav-height);
+  top: spacing.$spacing-05;
   bottom: 0;
   left: 0;
   right: 0;

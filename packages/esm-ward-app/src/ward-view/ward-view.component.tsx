@@ -16,15 +16,7 @@ import UnassignedPatient from '../beds/unassigned-patient.component';
 const pageSize = 6;
 
 const WardView = () => {
-  const { inpatientAdmissions, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
-  const {
-    admissionLocation,
-    isLoading: isLoadingAdmissionLocation,
-    error: errorLoadingAdmissionLocation,
-  } = useAdmissionLocation();
-  const { t } = useTranslation();
-
-  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
+  const { admissionLocation } = useAdmissionLocation();
 
   const { goTo, results } = usePagination(admissionLocation?.bedLayouts, pageSize);
 
@@ -33,68 +25,83 @@ const WardView = () => {
     bedLayouts: results,
   };
 
+  return (
+    <div className={styles.wardView}>
+      <div className={styles.wardViewHeaderWrapper}>
+        <WardViewHeader />
+        {admissionLocation && (
+          <PaginationNav
+            itemsShown={5}
+            totalItems={Math.ceil(admissionLocation.bedLayouts.length / pageSize)}
+            onChange={(c: number) => goTo(c + 1)}
+          />
+        )}
+      </div>
+      <WardViewMain paginatedAdmissionLocation={paginatedAdmissionLocation} />
+      <WorkspaceContainer overlay contextKey="ward" />
+    </div>
+  );
+};
+
+const WardViewMain = ({
+  paginatedAdmissionLocation,
+}: {
+  paginatedAdmissionLocation: AdmissionLocationFetchResponse;
+}) => {
+  const { inpatientAdmissions, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
+  const {
+    isLoading: isLoadingAdmissionLocation,
+    error: errorLoadingAdmissionLocation,
+    admissionLocation,
+  } = useAdmissionLocation();
+  const { t } = useTranslation();
+
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
+
   if (isLoadingPatients || isLoadingAdmissionLocation) {
     return (
-      <div className={styles.wardView}>
-        <div className={styles.wardViewMain}>
-          {Array(6)
-            .fill(0)
-            ?.map((_, i) => <EmptyBedSkeleton key={i} />)}
-        </div>
+      <div className={styles.wardViewMain}>
+        {Array(6)
+          .fill(0)
+          ?.map((_, i) => <EmptyBedSkeleton key={i} />)}
       </div>
     );
   }
 
   if (errorLoadingAdmissionLocation) {
     return (
-      <div className={styles.wardView}>
-        <ErrorState
-          error={t('errorOccurredLoadingAdmissionLocations', 'An error occurred loading admission location')}
-          headerTitle={t('errorLoadingAdmissionLocations', 'Error loading admission location')}
-        />
-      </div>
+      <ErrorState
+        error={t('errorOccurredLoadingAdmissionLocations', 'An error occurred loading admission location')}
+        headerTitle={t('errorLoadingAdmissionLocations', 'Error loading admission location')}
+      />
     );
   }
 
-  // if (errorLoadingPatients) {
-  //   return (
-  //     <div className={styles.wardView}>
-  //       <ErrorState
-  //         error={t('anErrorOccurredPatients', 'An error occurred loading patients')}
-  //         headerTitle={t('errorLoadingPatients', 'Error loading admitted patients')}
-  //       />
-  //     </div>
-  //   );
-  // }
+  if (errorLoadingPatients) {
+    return (
+      <ErrorState
+        error={t('anErrorOccurredPatients', 'An error occurred loading patients')}
+        headerTitle={t('errorLoadingPatients', 'Error loading admitted patients')}
+      />
+    );
+  }
 
-  // if (!inpatientAdmissions) {
-  //   return (
-  //     <EmptyState displayText={'There are no current inpatient admissions'} headerTitle={'No Patient Admissions'} />
-  //   );
-  // }
+  if (!inpatientAdmissions) {
+    return (
+      <EmptyState displayText={'There are no current inpatient admissions'} headerTitle={'No Patient Admissions'} />
+    );
+  }
 
   if (!admissionLocation) {
     <EmptyState displayText={'There are no current admission location'} headerTitle={'No admission Location'} />;
   }
-
   return (
-    <div className={styles.wardView}>
-      <div className={styles.wardViewHeaderWrapper}>
-        <WardViewHeader />
-        <PaginationNav
-          itemsShown={5}
-          totalItems={Math.ceil(admissionLocation.bedLayouts.length / pageSize)}
-          onChange={(c: number) => goTo(c + 1)}
-        />
-      </div>
-      <div className={styles.wardViewMain}>
-        {isBedManagementModuleInstalled ? (
-          <WardViewWithBedManagement admissionLocation={paginatedAdmissionLocation} />
-        ) : (
-          <WardViewWithoutBedManagement />
-        )}
-      </div>
-      <WorkspaceContainer overlay contextKey="ward" />
+    <div className={styles.wardViewMain}>
+      {isBedManagementModuleInstalled ? (
+        <WardViewWithBedManagement admissionLocation={paginatedAdmissionLocation} />
+      ) : (
+        <WardViewWithoutBedManagement />
+      )}
     </div>
   );
 };

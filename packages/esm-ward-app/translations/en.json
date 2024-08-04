@@ -2,16 +2,15 @@
   "admissionRequests": "Admission Requests",
   "admissionRequestsCount_one": "{{count}} admission request",
   "admissionRequestsCount_other": "{{count}} admission requests",
+  "anErrorOccurredPatients": "An error occurred loading patients",
   "bedShare": "Bed share",
   "emptyBed": "Empty bed",
+  "errorLoadingAdmissionLocations": "Error loading admission location",
   "errorLoadingPatientAdmissionRequests": "Error Loading patient admission requests",
   "errorLoadingPatients": "Error loading admitted patients",
-  "errorLoadingWardLocation": "Error loading ward location",
+  "errorOccurredLoadingAdmissionLocations": "An error occurred loading admission location",
   "failedToLoadPatientWorkspace": "Ward patient workspace has failed to load.",
-  "invalidLocationSpecified": "Invalid location specified",
-  "invalidWardLocation": "Invalid ward location: {{location}}",
   "manage": "Manage",
   "noBedsConfigured": "No beds configured for this location",
-  "wardPatientWorkspaceTitle": "Ward Patient",
-  "wards": "Wards"
+  "wardPatientWorkspaceTitle": "Ward Patient"
 }
