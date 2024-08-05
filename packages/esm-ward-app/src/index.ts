@@ -1,5 +1,6 @@
 import {
   defineConfigSchema,
+  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
@@ -9,6 +10,9 @@ import { configSchema } from './config-schema';
 import rootComponent from './root.component';
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
+import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-colored-obs-tags';
+import WardPatientActionButton from './ward-patient-workspace/ward-patient-action-button.extension';
+import ColoredObsTagsCardRowExtension from './ward-patient-card/colored-obs-tags-card-row/colored-obs-tags-card-row.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -23,7 +27,7 @@ export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'w
 
 // t('admissionRequests', 'Admission Requests')
 export const admissionRequestWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/admission-requests.workspace'),
+  () => import('./ward-workspace/admission-request-workspace/admission-requests.workspace'),
   options,
 );
 
@@ -54,9 +58,12 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
+export const coloredObsTagCardRowExtension = getSyncLifecycle(ColoredObsTagsCardRowExtension, options);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
   registerFeatureFlag(
     'bedmanagement-module',
     'Bed Management Module',

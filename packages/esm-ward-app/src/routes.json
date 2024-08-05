@@ -39,6 +39,11 @@
       "component": "wardPatientNotesActionButtonExtension",
       "name": "ward-inpatient-notes-form-action-button",
       "slot": "action-menu-ward-patient-items-slot"
+    },
+    {
+      "component": "coloredObsTagCardRowExtension",
+      "name": "colored-obs-tags-card-row",
+      "slot": "ward-patient-card-slot"
     }
   ],
   "workspaces": [

@@ -1,19 +1,19 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema, getLocale } from '@openmrs/esm-framework';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import { configSchema } from '../config-schema';
-import useWardLocation from '../hooks/useWardLocation';
+import { defineConfigSchema } from '@openmrs/esm-framework';
+import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import { configSchema } from '../../config-schema';
+import useWardLocation from '../../hooks/useWardLocation';
 import AdmissionRequestsWorkspace from './admission-requests.workspace';
-import { mockInpatientRequest, mockLocationInpatientWard } from '../../../../__mocks__';
-import { renderWithSwr } from '../../../../tools';
+import { mockInpatientRequest, mockLocationInpatientWard } from '../../../../../__mocks__';
+import { renderWithSwr } from '../../../../../tools';
 
 defineConfigSchema('@openmrs/esm-ward-app', configSchema);
 
-jest.mock('../hooks/useInpatientRequest', () => ({
+jest.mock('../../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
-jest.mock('../hooks/useWardLocation', () => jest.fn());
+jest.mock('../../hooks/useWardLocation', () => jest.fn());
 
 const mockUseWardLocation = useWardLocation as jest.Mock;
 mockUseWardLocation.mockReturnValue({

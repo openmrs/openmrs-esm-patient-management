@@ -1,24 +1,23 @@
 import React from 'react';
-import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
-import { type PatientAddressElementConfig } from '../../config-schema';
+import { type Patient } from '@openmrs/esm-framework';
+import { type AddressElementDefinition } from '../../config-schema';
 
-const wardPatientAddress = (config: PatientAddressElementConfig) => {
-  const wardPatientAddress: WardPatientCardElement = ({ patient }) => {
-    const { addressFields } = config;
+export interface WardPatientAddressProps {
+  patient: Patient;
+  config: AddressElementDefinition;
+}
 
-    const preferredAddress = patient?.person?.preferredAddress;
+const WardPatientAddress: React.FC<WardPatientAddressProps> = ({ patient, config }) => {
+  const preferredAddress = patient?.person?.preferredAddress;
 
-    return (
-      <div className={styles.wardPatientAddress}>
-        {addressFields?.map((field, i) =>
-          preferredAddress?.[field] ? <div key={i}>{preferredAddress?.[field] as string}</div> : <div key={i}></div>,
-        )}
-      </div>
-    );
-  };
-
-  return wardPatientAddress;
+  return (
+    <>
+      {config.fields?.map((field, i) =>
+        preferredAddress?.[field] ? <div key={i}>{preferredAddress?.[field] as string}</div> : <div key={i}></div>,
+      )}
+    </>
+  );
 };
 
-export default wardPatientAddress;
+export default WardPatientAddress;

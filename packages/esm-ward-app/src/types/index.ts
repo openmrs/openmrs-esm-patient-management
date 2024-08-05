@@ -22,21 +22,6 @@ export type WardPatient = {
   firstAdmissionOrTransferEncounter: Encounter;
 };
 
-export const patientCardElementTypes = [
-  'bed-number',
-  'patient-name',
-  'patient-gender',
-  'patient-age',
-  'patient-address',
-  'patient-obs',
-  'patient-coded-obs-tags',
-  'admission-time',
-  'patient-identifier',
-  'time-on-ward',
-  'time-since-admission',
-] as const;
-export type PatientCardElementType = (typeof patientCardElementTypes)[number];
-
 // server-side types defined in openmrs-module-bedmanagement:
 
 // note "AdmissionLocationResponse" isn't the clearest name, but it matches the endpoint; endpoint fetches bed information (including info about patients in those beds) for a location (as provided by the bed management module)
@@ -102,6 +87,7 @@ export interface InpatientRequest {
   dispositionEncounter?: Encounter;
   dispositionObsGroup?: Observation;
   dispositionLocation?: Location;
+  visit: Visit;
 }
 
 export type DispositionType = 'ADMIT' | 'TRANSFER' | 'DISCHARGE';

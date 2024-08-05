@@ -65,6 +65,14 @@
   display: none;
 }
 
+.wardPatientCardExtensionSlot {
+  display: none;
+
+  &:has(div:not(:empty)) {
+    display: block;
+  }
+}
+
 .wardPatientCardHeader {
   @extend .dotSeparatedChildren;
   display: flex;
@@ -117,7 +125,7 @@
 }
 
 .dotSeparatedChildren {
-  > div:not(div:first-of-type) {
+  > div:not(div:first-of-type):not(:empty) {
     display: flex;
     align-items: center;
 

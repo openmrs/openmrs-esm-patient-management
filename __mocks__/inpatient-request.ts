@@ -6,6 +6,35 @@ import { mockAddress } from './address.mock';
 
 export const mockInpatientRequest: InpatientRequest = {
   patient: mockPatientAlice,
+  visit: {
+    uuid: 'e5727d7e-8e1e-4615-bc3a-abd69e63234a',
+    display: 'Clinic or Hospital Visit @ KGH - 06/27/2024 07:40 PM',
+    patient: {
+      uuid: mockPatientAlice.uuid,
+      display: mockPatientAlice.display,
+    },
+    visitType: {
+      uuid: 'f01c54cb-2225-471a-9cd5-d348552c337c',
+      display: 'Clinic or Hospital Visit',
+    },
+    indication: null,
+    location: mockLocationInpatientWard,
+    startDatetime: '2024-06-27T19:40:16.000+0000',
+    stopDatetime: null,
+    encounters: [
+      {
+        uuid: '78f4dff6-197a-4314-b702-e1f796bf7531',
+        display: 'Consultation 07/23/2024',
+      },
+      {
+        uuid: '9e4cf2b3-8587-4999-93d6-3a3cbd50f9d8',
+        display: 'Sierra Leone MCH Triage 07/16/2024',
+      },
+    ],
+    attributes: [],
+    voided: false,
+    resourceVersion: '1.9',
+  },
   dispositionLocation: mockLocationInpatientWard,
   dispositionType: 'ADMIT',
   disposition: {

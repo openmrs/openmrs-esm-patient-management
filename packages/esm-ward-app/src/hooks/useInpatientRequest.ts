@@ -4,8 +4,16 @@ import useSWR from 'swr';
 import useWardLocation from './useWardLocation';
 import { useMemo } from 'react';
 
+// prettier-ignore
 const defaultRep =
-  'custom:(dispositionLocation,dispositionType,disposition,dispositionEncounter:full,patient:default,dispositionObsGroup,visit)';
+  'custom:(' +
+    'dispositionLocation,' +
+    'dispositionType,' +
+    'disposition,' +
+    'dispositionEncounter:full,' +
+    'patient:default,' +
+    'dispositionObsGroup,' +
+    'visit)';
 
 export function useInpatientRequest(
   dispositionType: Array<DispositionType> = ['ADMIT', 'TRANSFER'],

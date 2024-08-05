@@ -20,6 +20,7 @@
   "female": "Female",
   "fetchingEmrConfigurationFailed": "Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.",
   "inpatientNotesWorkspaceTitle": "In-patient notes",
+  "invalidElementIdCopy": "The configuration provided is invalid. It contains the following unknown element ID:",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "male": "Male",
