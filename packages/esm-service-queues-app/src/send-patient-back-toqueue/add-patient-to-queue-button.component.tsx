@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './send-back-button-toqueue.scss';
+import styles from './add-patient-to-queue-button.scss';
 import { showModal } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
 

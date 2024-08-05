@@ -19,7 +19,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import styles from './send-back-patient-toqueue.scss';
+import styles from './add-patient-to-queue.scss';
 import { useQueues } from '../hooks/useQueues';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -275,7 +275,7 @@ const SendBackPatientToQueue: React.FC<SendBackPatientProps> = ({ closeModal, pa
                   />
                 </div>
               ) : (
-                t('returnPatientToQueue', 'Return patient to queue')
+                t('addToAQueue', 'Add to a queue')
               )}
             </>
           </Button>
