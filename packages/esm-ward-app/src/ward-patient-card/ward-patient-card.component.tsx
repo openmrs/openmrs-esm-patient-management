@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { type Encounter, type Bed } from '../types';
-import { useCurrentWardCardConfig, WardPatientCardElement } from './ward-patient-card-row.resources';
+import { WardPatientCardElement } from './ward-patient-card-element.component';
+import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
 import styles from './ward-patient-card.scss';
 import { ExtensionSlot, getPatientName, launchWorkspace, type Patient, type Visit } from '@openmrs/esm-framework';
 import WardPatientName from './row-elements/ward-patient-name';

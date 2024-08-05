@@ -27,7 +27,7 @@ export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'w
 
 // t('admissionRequests', 'Admission Requests')
 export const admissionRequestWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/admission-requests.workspace'),
+  () => import('./ward-workspace/admission-request-workspace/admission-requests.workspace'),
   options,
 );
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import WardPatientCard from '../ward-patient-card/ward-patient-card';
+import WardPatientCard from '../ward-patient-card/ward-patient-card.component';
 import styles from './unassigned-patient.scss';
 import { type WardPatient } from '../types';
 

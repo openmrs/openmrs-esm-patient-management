@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from './admission-requests-workspace.scss';
-import AdmissionRequestCard from './components/admission-request-card.component';
+import AdmissionRequestCard from '../admission-request-card/admission-request-card.component';
 import { Search } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import { InpatientRequest } from '../types';
+import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import { type InpatientRequest } from '../../types';
 
 interface AdmissionRequestsWorkspaceProps {}
 const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = () => {
@@ -42,12 +42,14 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
         ) : (
           <>
             {inpatientRequests.map((request: InpatientRequest, i) => (
-              <AdmissionRequestCard key={`admission-request-card-${i}`}
+              <AdmissionRequestCard
+                key={`admission-request-card-${i}`}
                 patient={request.patient}
                 visit={request.visit}
                 disposition={request.disposition}
                 dispositionEncounter={request.dispositionEncounter}
-                dispositionType={request.dispositionType} />
+                dispositionType={request.dispositionType}
+              />
             ))}
           </>
         )}

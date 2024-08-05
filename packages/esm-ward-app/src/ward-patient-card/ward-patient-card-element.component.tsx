@@ -1,45 +1,15 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification } from '@carbon/react';
 import { type Patient, useConfig, type Visit } from '@openmrs/esm-framework';
-import { defaultWardPatientCard, type WardConfigObject } from '../config-schema';
-import useWardLocation from '../hooks/useWardLocation';
+import { type WardConfigObject } from '../config-schema';
 import WardPatientAge from './row-elements/ward-patient-age';
 import WardPatientTimeOnWard from './row-elements/ward-patient-time-on-ward';
 import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-since-admission';
 import WardPatientObs from './row-elements/ward-patient-obs';
 import WardPatientIdentifier from './row-elements/ward-patient-identifier';
 import WardPatientAddress from './row-elements/ward-patient-header-address';
-import type { WardPatientCardProps } from './ward-patient-card';
 import { type Encounter } from '../types';
-
-export function useCurrentWardCardConfig() {
-  const { wardPatientCards } = useConfig<WardConfigObject>();
-  const {
-    location: { uuid: locationUuid },
-  } = useWardLocation();
-
-  const currentWardCardConfig = useMemo(() => {
-    const cardDefinition = wardPatientCards.cardDefinitions.find((cardDef) => {
-      return (
-        cardDef.appliedTo == null ||
-        cardDef.appliedTo?.length == 0 ||
-        cardDef.appliedTo.some((criteria) => criteria.location == locationUuid)
-      );
-    });
-
-    return cardDefinition;
-  }, [wardPatientCards, locationUuid]);
-
-  if (!currentWardCardConfig) {
-    console.warn(
-      'No ward card configuration has `appliedTo` criteria that matches the current location. Using the default configuration.',
-    );
-    return defaultWardPatientCard;
-  }
-
-  return currentWardCardConfig;
-}
 
 export interface WardPatientCardElementProps {
   elementId: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { type WardPatientCardExtensionProps } from '../ward-patient-card';
+import { type WardPatientCardExtensionProps } from '../ward-patient-card.component';
 import WardPatientCodedObsTags from '../row-elements/ward-patient-coded-obs-tags';
 import { useConfig } from '@openmrs/esm-framework';
 import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
