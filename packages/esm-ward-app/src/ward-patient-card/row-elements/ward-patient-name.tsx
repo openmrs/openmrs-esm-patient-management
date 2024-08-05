@@ -1,8 +1,8 @@
+import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
 
-const WardPatientName: WardPatientCardElement = ({ patient }) => {
+const WardPatientName: React.FC<{ patient: Patient }> = ({ patient }) => {
   // TODO confirm "display" is based on name template?
   return <div className={styles.wardPatientName}>{patient?.person?.preferredName?.display}</div>;
 };

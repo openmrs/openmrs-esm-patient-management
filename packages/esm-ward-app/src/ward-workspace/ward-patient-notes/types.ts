@@ -1,4 +1,4 @@
 import type { DefaultWorkspaceProps } from '@openmrs/esm-framework';
-import { type WardPatientCardProps } from '../../types';
+import { type WardPatient } from '../../types';
 
-export interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatientCardProps {}
+export interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatient {}

@@ -8,11 +8,11 @@ import styles from './occupied-bed.scss';
 const OccupiedBed: React.FC<WardBedProps> = ({ wardPatients, bed }) => {
   return (
     <div className={styles.occupiedBed}>
-      {wardPatients.map(({ patient, visit }, index: number) => {
+      {wardPatients.map((wardPatient, index: number) => {
         const last = index === wardPatients.length - 1;
         return (
-          <div key={'occupied-bed-pt-' + patient.uuid}>
-            <WardPatientCard patient={patient} visit={visit} bed={bed} />
+          <div key={'occupied-bed-pt-' + wardPatient.patient.uuid}>
+            <WardPatientCard {...wardPatient} bed={bed} />
             {!last && <BedShareDivider />}
           </div>
         );

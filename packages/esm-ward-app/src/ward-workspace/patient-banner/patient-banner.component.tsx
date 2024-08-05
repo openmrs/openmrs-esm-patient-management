@@ -1,15 +1,16 @@
-import React, { useMemo } from 'react';
 import { useConfig } from '@openmrs/esm-framework';
+import React, { useMemo } from 'react';
 import { defaultPatientCardElementConfig, type WardConfigObject } from '../../config-schema';
-import { getPatientCardElementFromDefinition } from '../../ward-patient-card/ward-patient-card-row.resources';
-import type { PatientCardElementType, WardPatientCardProps } from '../../types';
-import styles from './style.scss';
 import useWardLocation from '../../hooks/useWardLocation';
+import type { PatientCardElementType, WardPatient } from '../../types';
+import { getPatientCardElementFromDefinition } from '../../ward-patient-card/ward-patient-card-row.resources';
+import styles from './style.scss';
 
-const WardPatientWorkspaceBanner = ({ bed, patient, visit }: WardPatientCardProps) => {
+const WardPatientWorkspaceBanner = (props: WardPatient) => {
   const { location } = useWardLocation();
   const { wardPatientCards } = useConfig<WardConfigObject>();
   const { cardDefinitions } = wardPatientCards;
+  const {patient, bed, visit} = props;
 
   // extract configured elements for the patient card header to use for the banner section
   const bannerElements = useMemo(() => {
@@ -35,7 +36,7 @@ const WardPatientWorkspaceBanner = ({ bed, patient, visit }: WardPatientCardProp
   return (
     <div className={styles.patientBanner}>
       {bannerElements.map((BannerElement) => (
-        <BannerElement patient={patient} visit={visit} bed={bed} />
+        <BannerElement {...props} />
       ))}
     </div>
   );

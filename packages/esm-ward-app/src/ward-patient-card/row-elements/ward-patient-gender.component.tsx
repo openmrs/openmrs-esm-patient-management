@@ -1,8 +1,8 @@
+import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import { type WardPatientCardElement } from '../../types';
 import { useTranslation } from 'react-i18next';
 
-const WardPatientGender: WardPatientCardElement = ({ patient }) => {
+const WardPatientGender: React.FC<{ patient: Patient }> = ({ patient }) => {
   const { t } = useTranslation();
   const getGender = (gender: string): string => {
     switch (gender) {

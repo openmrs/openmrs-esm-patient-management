@@ -3,7 +3,9 @@ import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.compone
 import { type WardPatientNotesWorkspaceProps } from './types';
 import PatientNotesForm from './form/notes-form.component';
 
-const WardPatientNotesWorkspace = ({ patient, visit, bed, ...restWorkspaceProps }: WardPatientNotesWorkspaceProps) => {
+const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
+  const { patient, visit, bed, admitted, encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter, ...restWorkspaceProps } = props;
+  const wardPatient = { patient, visit, bed, admitted, encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter };
   const notesFormState = useMemo(
     () => ({
       patientUuid: patient?.uuid,
@@ -14,7 +16,7 @@ const WardPatientNotesWorkspace = ({ patient, visit, bed, ...restWorkspaceProps 
 
   return (
     <div>
-      <WardPatientWorkspaceBanner patient={patient} bed={bed} visit={visit} />
+      <WardPatientWorkspaceBanner {...wardPatient} />
       <PatientNotesForm {...notesFormState} />
     </div>
   );
