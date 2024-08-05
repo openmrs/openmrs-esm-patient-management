@@ -3,7 +3,6 @@ import { translateFrom, type OpenmrsResource } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type PatientCodedObsTagsElementConfig } from '../../config-schema';
-import { moduleName } from '../../constant';
 import { useObs } from '../../hooks/useObs';
 import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
@@ -21,7 +20,7 @@ import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient
  */
 const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
   const WardPatientCodedObsTags: WardPatientCardElement = ({ patient, visit }) => {
-    const { conceptUuid, summaryLabel, summaryLabelColor, summaryLabelI18nModule } = config;
+    const { conceptUuid, summaryLabel, summaryLabelColor} = config;
     const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
     const { t } = useTranslation();
     const { data: conceptToTagColorMap } = useConceptToTagColorMap(config);
@@ -35,9 +34,7 @@ const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
       });
 
       const summaryLabelToDisplay =
-        summaryLabel != null
-          ? translateFrom(summaryLabelI18nModule ?? moduleName, summaryLabel)
-          : obsToDisplay?.[0]?.concept?.display;
+        summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;
 
       const obsNodes = obsToDisplay?.map((o) => {
         const { display, uuid } = o.value as OpenmrsResource;
