@@ -78,13 +78,8 @@
       "component": "transitionQueueEntryModal"
     },
     {
-      "name": "send-back-patient-to-queue-entry-modal",
-      "component": "sendBackPatientQueueEntryModal"
-    },
-     {
-      "name": "send-back-patient-to-queue-entry-btn",
-      "component": "sendBackPatientToQueueBtn",
-      "slot": "completed-lab-extension-slot"
+      "name": "add-patient-to-queue-entry-modal",
+      "component": "addPatientToQueueModal"
     },
     {
       "name": "edit-queue-entry-modal",
