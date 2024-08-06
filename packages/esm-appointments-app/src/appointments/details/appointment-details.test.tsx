@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { type Appointment } from '../../types';
+import { usePatient } from '@openmrs/esm-framework';
+import { mockPatient } from 'tools';
+import type { AppointmentKind, AppointmentStatus, Appointment } from '../../types';
 import AppointmentDetails from './appointment-details.component';
 
 const appointment: Appointment = {
@@ -17,17 +19,17 @@ const appointment: Appointment = {
   service: {
     appointmentServiceId: 1,
     name: 'Outpatient',
-    description: null,
+    description: '',
     startTime: '',
     endTime: '',
     maxAppointmentsLimit: null,
-    durationMins: null,
+    durationMins: undefined,
     location: {
       uuid: '8d6c993e-c2cc-11de-8d13-0010c6dffd0f',
     },
     uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
     initialAppointmentStatus: 'Scheduled',
-    creatorName: null,
+    creatorName: '',
   },
   provider: {
     uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66',
@@ -36,16 +38,19 @@ const appointment: Appointment = {
   location: { name: 'HIV Clinic', uuid: '2131aff8-2e2a-480a-b7ab-4ac53250262b' },
   startDateTime: 1630326900000,
   endDateTime: 1630327200000,
-  appointmentKind: 'WalkIn',
-  status: 'Scheduled',
+  appointmentKind: 'WalkIn' as AppointmentKind.WALKIN,
+  status: 'Scheduled' as AppointmentStatus.SCHEDULED,
   comments: 'Some comments',
   additionalInfo: null,
   providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
   recurring: false,
   voided: false,
+  dateAppointmentScheduled: '',
   teleconsultationLink: null,
   extensions: [],
 };
+
+const mockUsePatient = jest.mocked(usePatient);
 
 jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
   usePatientAppointmentHistory: () => ({
@@ -58,25 +63,21 @@ jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
   }),
 }));
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    usePatient: jest.fn().mockImplementation((...args) => ({
-      patient: {
-        birthDate: '22-Mar-2020',
-        telecom: [
-          {
-            uuid: 'tel-uuid-1',
-            value: '0899129989932',
-          },
-        ],
-      },
-    })),
-  };
-});
-
 test('renders appointment details correctly', async () => {
+  mockUsePatient.mockReturnValue({
+    error: null,
+    isLoading: false,
+    patientUuid: mockPatient.id,
+    patient: {
+      birthDate: '22-Mar-2020',
+      telecom: [
+        {
+          value: '0899129989932',
+        },
+      ],
+    },
+  });
+
   render(<AppointmentDetails appointment={appointment} />);
   expect(screen.getByText(/Patient name/i)).toBeInTheDocument();
   expect(screen.getByText(/John Wilson/i)).toBeInTheDocument();

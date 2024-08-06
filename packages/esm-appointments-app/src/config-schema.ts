@@ -2,93 +2,30 @@ import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
 import { spaHomePage } from './constants';
 
 export const configSchema = {
-  concepts: {
-    visitQueueNumberAttributeUuid: {
-      _type: Type.String,
-      _description: 'The UUID of the visit attribute that contains the visit queue number.',
-      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
-  },
-  appointmentTypes: {
-    _type: Type.Array,
-    _description: 'Configurable appointment types (types of appointments)',
-    _default: ['Scheduled'],
-  },
-  appointmentStatuses: {
-    _type: Type.Array,
-    _description: 'Configurable appointment status (status of appointments)',
-    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
-  },
-  daysOfTheWeek: {
-    _type: Type.Array,
-    _description: 'Configurable days of the week',
-    _default: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-  },
-  useBahmniAppointmentsUI: {
+  allowAllDayAppointments: {
     _type: Type.Boolean,
-    _description: 'Open links in Bahmni Appointments UI instead of O3 UI',
+    _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
     _default: false,
-  },
-
-  useFullViewPrivilege: {
-    _type: Type.Boolean,
-    _description: "If set to 'false', will always display the full view, disregarding any privilege",
-    _default: false,
-  },
-
-  fullViewPrivilege: {
-    _type: Type.String,
-    _description: 'Name of the privilege to display the full view of the Appointments dashboard widget.',
-    _default: "Today's Appointments Widget: Display Full View",
-  },
-  bahmniAppointmentsUiBaseUrl: {
-    _type: Type.String,
-    _description: 'Configurable base URL that points to the Bahmni Appointments UI',
-    _default: '/appointments',
   },
   appointmentsBaseUrl: {
     _type: Type.String,
     _description: 'Configurable alternative URL for the Appointments UI. Eg, the Bahmni Appointments UI URL',
     _default: `${spaHomePage}`,
   },
-  hiddenFormFields: {
+  appointmentStatuses: {
     _type: Type.Array,
-    _description: 'Array of form controls to be hidden on form load',
-    _default: [],
+    _description: 'Configurable appointment status (status of appointments)',
+    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
   },
-  showServiceQueueFields: {
-    _type: Type.Boolean,
-    _description: 'Whether start visit form should display service queue fields`',
-    _default: false,
+  appointmentTypes: {
+    _type: Type.Array,
+    _description: 'Configurable appointment types (types of appointments)',
+    _default: ['Scheduled'],
   },
-  defaultFacilityUrl: {
+  bahmniAppointmentsUiBaseUrl: {
     _type: Type.String,
-    _default: `${restBaseUrl}/kenyaemr/default-facility`,
-    _description: 'Custom URL to load default facility if it is not in the session',
-  },
-  customPatientChartUrl: {
-    _type: Type.String,
-    _description: `Template URL that will be used when clicking on the patient name in the queues table.
-      Available argument: patientUuid, openmrsSpaBase, openBase
-      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
-    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
-  },
-  patientIdentifierType: {
-    _type: Type.String,
-    _description: 'The name of the patient identifier type to be used for the patient identifier field',
-    _default: '',
-  },
-  showUnscheduledAppointmentsTab: {
-    _type: Type.Boolean,
-    _description:
-      'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
-    _default: false,
-  },
-  allowAllDayAppointments: {
-    _type: Type.Boolean,
-    _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
-    _default: false,
+    _description: 'Configurable base URL that points to the Bahmni Appointments UI',
+    _default: '/appointments',
   },
   checkInButton: {
     enabled: {
@@ -119,26 +56,74 @@ export const configSchema = {
       _default: '',
     },
   },
+  concepts: {
+    visitQueueNumberAttributeUuid: {
+      _type: Type.String,
+      _description: 'The UUID of the visit attribute that contains the visit queue number.',
+      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    },
+  },
+  customPatientChartUrl: {
+    _type: Type.String,
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
+      Available argument: patientUuid, openmrsSpaBase, openBase
+      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
+    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
+    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
+  },
+  daysOfTheWeek: {
+    _type: Type.Array,
+    _description: 'Configurable days of the week',
+    _default: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  },
+  defaultFacilityUrl: {
+    _type: Type.String,
+    _default: `${restBaseUrl}/kenyaemr/default-facility`,
+    _description: 'Custom URL to load default facility if it is not in the session',
+  },
+  fullViewPrivilege: {
+    _type: Type.String,
+    _description: 'Name of the privilege to display the full view of the Appointments dashboard widget.',
+    _default: "Today's Appointments Widget: Display Full View",
+  },
+  hiddenFormFields: {
+    _type: Type.Array,
+    _description: 'Array of form controls to be hidden on form load',
+    _default: [],
+  },
+  patientIdentifierType: {
+    _type: Type.String,
+    _description: 'The name of the patient identifier type to be used for the patient identifier field',
+    _default: '',
+  },
+  showServiceQueueFields: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display service queue fields`',
+    _default: false,
+  },
+  showUnscheduledAppointmentsTab: {
+    _type: Type.Boolean,
+    _description:
+      'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
+    _default: false,
+  },
+  useBahmniAppointmentsUI: {
+    _type: Type.Boolean,
+    _description: 'Open links in Bahmni Appointments UI instead of O3 UI',
+    _default: false,
+  },
+  useFullViewPrivilege: {
+    _type: Type.Boolean,
+    _description: "If set to 'false', will always display the full view, disregarding any privilege",
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
-  concepts: {
-    visitQueueNumberAttributeUuid: string;
-  };
-  appointmentTypes: Array<string>;
-  daysOfTheWeek: Array<string>;
-  appointmentStatuses: Array<string>;
-  useBahmniAppointmentsUI: boolean;
-  useFullViewPrivilege: boolean;
-  fullViewPrivilege: string;
-  appointmentComments: Array<string>;
-  hiddenFormFields: Array<string>;
-  showServiceQueueFields: boolean;
-  defaultFacilityUrl: string;
-  customPatientChartUrl: string;
-  patientIdentifierType: string;
-  showUnscheduledAppointmentsTab: boolean;
   allowAllDayAppointments: boolean;
+  appointmentComments: Array<string>;
+  appointmentStatuses: Array<string>;
+  appointmentTypes: Array<string>;
   checkInButton: {
     enabled: boolean;
     showIfActiveVisit: boolean;
@@ -148,4 +133,17 @@ export interface ConfigObject {
     enabled: boolean;
     customUrl: string;
   };
+  concepts: {
+    visitQueueNumberAttributeUuid: string;
+  };
+  customPatientChartUrl: string;
+  daysOfTheWeek: Array<string>;
+  defaultFacilityUrl: string;
+  fullViewPrivilege: string;
+  hiddenFormFields: Array<string>;
+  patientIdentifierType: string;
+  showServiceQueueFields: boolean;
+  showUnscheduledAppointmentsTab: boolean;
+  useBahmniAppointmentsUI: boolean;
+  useFullViewPrivilege: boolean;
 }

@@ -1,55 +1,59 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { formatDate } from '@openmrs/esm-framework';
 import { useVisit } from './visit.resource';
 import VisitDetailComponent from './visit-detail.component';
 
+const defaultProps = {
+  patientUuid: '691eed12-c0f1-11e2-94be-8c13b969e334',
+  visitUuid: '497b8b17-54ec-4726-87ec-3c4da8cdcaeb',
+};
+const mockUseVisit = jest.mocked(useVisit);
+
 jest.mock('./visit.resource');
 
-const mockedUseVisit = useVisit as jest.Mock;
-
-describe('VisitDetailComponent', () => {
-  const visitUuid = '497b8b17-54ec-4726-87ec-3c4da8cdcaeb';
-  const patientUuid = '691eed12-c0f1-11e2-94be-8c13b969e334';
-
-  it('renders loading indicator when data is loading', () => {
-    mockedUseVisit.mockReturnValueOnce({
+describe('VisitDetail', () => {
+  it('renders a loading spinner when data is loading', () => {
+    mockUseVisit.mockReturnValueOnce({
       visit: null,
+      error: undefined,
       isLoading: true,
+      isValidating: false,
     });
 
-    render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
+    render(<VisitDetailComponent {...defaultProps} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it('should render visit details and switches when data is available', () => {
-    let visitDate = new Date();
-    mockedUseVisit.mockReturnValueOnce({
+  it('renders a visit detail overview when data is available', () => {
+    const mockVisitDate = new Date();
+    mockUseVisit.mockReturnValueOnce({
       visit: {
-        uuid: visitUuid,
-        visitType: { display: 'Some Visit Type' },
-        startDatetime: visitDate,
         encounters: [],
+        startDatetime: mockVisitDate.toISOString(),
+        uuid: defaultProps.visitUuid,
+        visitType: { display: 'Some Visit Type', uuid: 'some-visit-type-uuid' },
       },
+      error: undefined,
       isLoading: false,
+      isValidating: false,
     });
 
-    render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
+    render(<VisitDetailComponent {...defaultProps} />);
 
     expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
-    expect(screen.getByText(formatDate(visitDate), { collapseWhitespace: false })).toBeInTheDocument();
-
+    expect(screen.getByText(formatDate(mockVisitDate), { collapseWhitespace: false })).toBeInTheDocument();
     expect(screen.getByText('All Encounters')).toBeInTheDocument();
     expect(screen.getByText('Visit Summary')).toBeInTheDocument();
   });
 
-  it('should render EncounterLists when "All Encounters" switch is selected', () => {
-    mockedUseVisit.mockReturnValue({
+  it('render the Encounter Lists view when the "All Encounters" tab is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockUseVisit.mockReturnValue({
       visit: {
-        uuid: visitUuid,
-        visitType: { display: 'Some Visit Type' },
-        startDatetime: '2023-07-30T12:34:56Z',
         encounters: [
           {
             uuid: 'encounter-1',
@@ -59,25 +63,26 @@ describe('VisitDetailComponent', () => {
             obs: [],
           },
         ],
+        startDatetime: '2023-07-30T12:34:56Z',
+        visitType: { display: 'Some Visit Type', uuid: 'some-visit-type-uuid' },
+        uuid: defaultProps.visitUuid,
       },
+      error: undefined,
       isLoading: false,
+      isValidating: false,
     });
 
-    render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
+    render(<VisitDetailComponent {...defaultProps} />);
 
-    act(() => {
-      screen.getByText('All Encounters').click();
-    });
-
+    await user.click(screen.getByText('All Encounters'));
     expect(screen.getByTestId('encountersTable')).toBeInTheDocument();
   });
 
-  it('should render VisitSummaries when "Visit Summary" switch is selected', () => {
-    mockedUseVisit.mockReturnValue({
+  it('renders the Visit Summaries view when the "Visit Summary" tab is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockUseVisit.mockReturnValue({
       visit: {
-        uuid: visitUuid,
-        visitType: { display: 'Some Visit Type' },
-        startDatetime: '2023-07-30T12:34:56Z',
         encounters: [
           {
             uuid: 'encounter-1',
@@ -96,27 +101,18 @@ describe('VisitDetailComponent', () => {
             orders: [],
           },
         ],
+        startDatetime: '2023-07-30T12:34:56Z',
+        visitType: { display: 'Some Visit Type', uuid: 'some-visit-type-uuid' },
+        uuid: defaultProps.visitUuid,
       },
+      error: undefined,
       isLoading: false,
+      isValidating: false,
     });
 
-    render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
+    render(<VisitDetailComponent {...defaultProps} />);
 
-    act(() => {
-      screen.getByText('Visit Summary').click();
-    });
-
+    await user.click(screen.getByText('Visit Summary'));
     expect(screen.getByRole('tablist', { name: 'Visit summary tabs' })).toBeInTheDocument();
-  });
-
-  it('should render loading indicator when data is loading', () => {
-    mockedUseVisit.mockReturnValue({
-      visit: null,
-      isLoading: false,
-    });
-
-    render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
-
-    expect(screen.queryByRole('button', { name: 'All Encounters' })).not.toBeInTheDocument();
   });
 });

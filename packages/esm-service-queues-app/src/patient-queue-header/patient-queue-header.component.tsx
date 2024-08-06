@@ -47,7 +47,10 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
       if (queueLocations.length === 1) {
         handleQueueLocationChange({ selectedItem: queueLocations[0] });
       }
-      if (queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid)) {
+      if (
+        queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid) &&
+        currentQueueLocationUuid
+      ) {
         handleQueueLocationChange({
           selectedItem: {
             id: userSession?.sessionLocation?.uuid,

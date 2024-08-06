@@ -1,11 +1,11 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { renderWithSwr } from '../../../../tools/test-utils';
 import { screen } from '@testing-library/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
-import AdmissionRequestsBar from './admission-requests-bar.component';
-import { mockInpatientRequest } from '../../../../__mocks__/inpatient-request';
+import { renderWithSwr } from 'tools';
+import { mockInpatientRequest } from '__mocks__';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import AdmissionRequestsBar from './admission-requests-bar.component';
 
 jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
@@ -18,6 +18,7 @@ const mockInpatientRequestResponse = {
   isLoading: false,
   inpatientRequests: [mockInpatientRequest],
 };
+
 jest.mocked(useInpatientRequest).mockReturnValue(mockInpatientRequestResponse);
 
 describe('Admission Requests Button', () => {

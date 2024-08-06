@@ -1,16 +1,22 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { type Appointment } from '../../types';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../../config-schema';
+import type { Appointment, AppointmentKind, AppointmentStatus } from '../../types';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
+import { getByTextWithMarkup } from 'tools';
 import AppointmentsTable from './appointments-table.component';
-import { configSchema } from '../../config-schema';
-import { getByTextWithMarkup } from '../../../../../tools/test-utils';
 
-defineConfigSchema('@openmrs/esm-appointments-app', configSchema);
+const defaultProps = {
+  appointments: [],
+  isLoading: false,
+  scheduleType: 'Scheduled',
+  tableHeading: 'scheduled',
+  visits: [],
+};
 
-const appointments: Array<Appointment> = [
+const mockAppointments = [
   {
     uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
     appointmentNumber: '00001',
@@ -21,8 +27,6 @@ const appointments: Array<Appointment> = [
       uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
       gender: 'M',
       age: '35',
-      birthDate: '1986-04-03T00:00:00.000+0000',
-      phoneNumber: '0700000000',
     },
     service: {
       appointmentServiceId: 1,
@@ -45,8 +49,8 @@ const appointments: Array<Appointment> = [
     },
     location: { name: 'HIV Clinic', uuid: '2131aff8-2e2a-480a-b7ab-4ac53250262b' },
     startDateTime: new Date().toISOString(),
-    appointmentKind: 'WalkIn',
-    status: 'Scheduled',
+    appointmentKind: 'WalkIn' as AppointmentKind,
+    status: 'Scheduled' as AppointmentStatus,
     comments: 'Some comments',
     additionalInfo: null,
     providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
@@ -55,34 +59,26 @@ const appointments: Array<Appointment> = [
     teleconsultationLink: null,
     extensions: [],
   },
-];
+] as unknown as Array<Appointment>;
 
-const mockedDownloadAppointmentsAsExcel = downloadAppointmentsAsExcel as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
+const mockDownloadAppointmentsAsExcel = jest.mocked(downloadAppointmentsAsExcel);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../../helpers/excel');
 jest.mock('../../hooks/useOverlay');
 
 describe('AppointmentsTable', () => {
-  const props = {
-    appointments: [],
-    isLoading: false,
-    tableHeading: 'scheduled',
-    visits: [],
-    scheduleType: 'Scheduled',
-  };
-
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
+    mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       customPatientChartUrl: 'url-to-patient-chart',
-      checkInButton: { enabled: false },
-      checkOutButton: { enabled: false },
+      checkInButton: { enabled: false, showIfActiveVisit: false, customUrl: null },
+      checkOutButton: { enabled: false, customUrl: null },
     });
   });
 
   it('renders an empty state if appointments data is unavailable', async () => {
-    render(<AppointmentsTable {...props} />);
+    renderAppointmentsTable();
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
 
@@ -90,13 +86,13 @@ describe('AppointmentsTable', () => {
   });
 
   it('renders a loading state when fetching data', () => {
-    render(<AppointmentsTable {...props} isLoading={true} />);
+    renderAppointmentsTable({ isLoading: true });
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders a tabular overview of the scheduled appointments', async () => {
-    render(<AppointmentsTable {...props} appointments={appointments} />);
+    renderAppointmentsTable({ appointments: mockAppointments });
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
     expect(screen.getByRole('search', { name: /filter table/i })).toBeInTheDocument();
@@ -109,12 +105,10 @@ describe('AppointmentsTable', () => {
   it('updates the search string when the search input changes', async () => {
     const user = userEvent.setup();
 
-    render(<AppointmentsTable {...props} appointments={appointments} />);
+    renderAppointmentsTable({ appointments: mockAppointments });
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
-
     const searchInput = screen.getByRole('searchbox');
-
     await user.type(searchInput, 'John');
     expect(searchInput).toHaveValue('John');
   });
@@ -122,13 +116,16 @@ describe('AppointmentsTable', () => {
   it('clicking the download button should download the scheduled appointments as an excel file', async () => {
     const user = userEvent.setup();
 
-    render(<AppointmentsTable {...props} appointments={appointments} />);
+    renderAppointmentsTable({ appointments: mockAppointments });
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
     const downloadButton = screen.getByRole('button', { name: /download/i });
-
     await user.click(downloadButton);
     expect(downloadButton).toBeInTheDocument();
-    expect(mockedDownloadAppointmentsAsExcel).toHaveBeenCalledWith(appointments, expect.anything());
+    expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(mockAppointments, expect.anything());
   });
 });
+
+function renderAppointmentsTable(props = {}) {
+  render(<AppointmentsTable {...defaultProps} {...props} />);
+}

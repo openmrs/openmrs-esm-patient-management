@@ -23,7 +23,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
         size={isDesktop(layout) ? 'sm' : 'lg'}>
         {t('transition', 'Transition')}
       </Button>
-      <OverflowMenu aria-label="Actions menu" size={isDesktop(layout) ? 'sm' : 'lg'} flipped>
+      <OverflowMenu aria-label="Actions menu" size={isDesktop(layout) ? 'sm' : 'lg'} align="left" flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           aria-label={t('edit', 'Edit')}

@@ -154,36 +154,36 @@ export interface RelationshipValue {
 }
 
 export interface FormValues {
-  patientUuid: string;
-  givenName: string;
-  middleName: string;
-  familyName: string;
+  additionalFamilyName: string;
   additionalGivenName: string;
   additionalMiddleName: string;
-  additionalFamilyName: string;
   addNameInLocalLanguage: boolean;
-  gender: string;
-  birthdate: Date | string;
-  yearsEstimated: number;
-  monthsEstimated: number;
-  birthdateEstimated: boolean;
-  telephoneNumber: string;
-  isDead: boolean;
-  deathDate: string;
-  deathCause: string;
-  relationships: Array<RelationshipValue>;
-  identifiers: {
-    [identifierFieldName: string]: PatientIdentifierValue;
+  address: {
+    [addressField: string]: string;
   };
   attributes?: {
     [attributeTypeUuid: string]: string;
   };
+  birthdate: Date | string;
+  birthdateEstimated: boolean;
+  deathCause: string;
+  deathDate: string;
+  familyName: string;
+  gender: string;
+  givenName: string;
+  identifiers: {
+    [identifierFieldName: string]: PatientIdentifierValue;
+  };
+  isDead: boolean;
+  middleName: string;
+  monthsEstimated: number;
   obs?: {
     [conceptUuid: string]: string;
   };
-  address: {
-    [addressField: string]: string;
-  };
+  patientUuid: string;
+  relationships: Array<RelationshipValue>;
+  telephoneNumber: string;
+  yearsEstimated: number;
 }
 
 export interface PatientUuidMapType {

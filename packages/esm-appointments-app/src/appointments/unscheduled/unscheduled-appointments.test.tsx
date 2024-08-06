@@ -1,49 +1,51 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { getByTextWithMarkup } from '../../../../../tools/test-utils';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../../config-schema';
+import { getByTextWithMarkup } from 'tools';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import UnscheduledAppointments from './unscheduled-appointments.component';
 
-const mockDownloadAppointmentsAsExcel = downloadUnscheduledAppointments as jest.Mock;
-const mockUseUnscheduledAppointments = useUnscheduledAppointments as jest.Mock;
+const mockDownloadAppointmentsAsExcel = jest.mocked(downloadUnscheduledAppointments);
+const mockUseUnscheduledAppointments = jest.mocked(useUnscheduledAppointments);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../../helpers/excel');
 jest.mock('../../hooks/useOverlay');
 jest.mock('../../hooks/useUnscheduledAppointments');
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    useConfig: jest.fn(() => ({
-      customPatientChartUrl: 'someUrl',
-    })),
-  };
-});
+const mockUnscheduledAppointments = [
+  {
+    age: 20,
+    dob: 1262304000,
+    dateTime: new Date(),
+    gender: 'M',
+    identifier: '1234-56-78',
+    name: 'Test Patient',
+    phoneNumber: '123-456-7890',
+    uuid: '1234',
+  },
+  {
+    age: 30,
+    dob: 1262304000,
+    dateTime: new Date(),
+    gender: 'F',
+    identifier: '2345-67-89',
+    name: 'Another Patient',
+    phoneNumber: '',
+    uuid: '5678',
+  },
+];
 
-describe('UnscheduledAppointments component', () => {
-  const mockUnscheduledAppointments = [
-    {
-      uuid: '1234',
-      name: 'Test Patient',
-      identifier: '1234-56-78',
-      gender: 'M',
-      phoneNumber: '123-456-7890',
-      age: 20,
-      dob: 1262304000,
-    },
-    {
-      uuid: '5678',
-      name: 'Another Patient',
-      identifier: '2345-67-89',
-      gender: 'F',
-      phoneNumber: '',
-      age: 30,
-      dob: 1262304000,
-    },
-  ];
+describe('UnscheduledAppointments', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      customPatientChartUrl: 'someUrl',
+    });
+  });
 
   it('renders the component correctly', async () => {
     mockUseUnscheduledAppointments.mockReturnValue({
@@ -108,12 +110,9 @@ describe('UnscheduledAppointments component', () => {
     });
 
     render(<UnscheduledAppointments />);
-
     const downloadButton = await screen.findByText('Download');
     expect(downloadButton).toBeInTheDocument();
-
     await user.click(downloadButton);
-
     expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(mockUnscheduledAppointments);
   });
 
@@ -125,7 +124,6 @@ describe('UnscheduledAppointments component', () => {
     });
 
     render(<UnscheduledAppointments />);
-
     expect(getByTextWithMarkup('There are no unscheduled appointments to display')).toBeInTheDocument();
   });
 });

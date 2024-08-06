@@ -33,7 +33,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
-  const { data: appointmentsData, isError, isLoading } = usePatientAppointments(patientUuid, startDate, ac);
+  const { data: appointmentsData, error, isLoading } = usePatientAppointments(patientUuid, startDate, ac);
 
   const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
@@ -49,8 +49,8 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
     setUpcomingAppointment(appointment);
   };
 
-  if (isError) {
-    return <ErrorState headerTitle={headerTitle} error={isError} />;
+  if (error) {
+    return <ErrorState headerTitle={headerTitle} error={error} />;
   }
   if (isLoading) {
     return (

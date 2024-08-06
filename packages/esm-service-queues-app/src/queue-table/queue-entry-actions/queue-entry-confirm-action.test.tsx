@@ -1,14 +1,14 @@
-import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
-import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import React from 'react';
-import { renderWithSwr } from 'tools';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
+import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { mockQueues, mockQueueEntryAlice } from '__mocks__';
+import { renderWithSwr } from 'tools';
+import EndQueueEntryModal from './end-queue-entry.modal';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
 import VoidQueueEntryModal from './void-queue-entry.modal';
-import EndQueueEntryModal from './end-queue-entry.modal';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('../../hooks/useQueues', () => {
   return {
@@ -18,7 +18,7 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-describe('UndoTransitionQueueEntryModal: ', () => {
+describe('UndoTransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
@@ -32,22 +32,28 @@ describe('UndoTransitionQueueEntryModal: ', () => {
   });
 
   it('has an working submit button', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
+
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    const submitButton = screen.getByRole('button', { name: /Undo transition/ });
+    const submitButton = screen.getByRole('button', { name: /undo transition/i });
     expect(submitButton).toBeEnabled();
-    await user.click(submitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
-    expect(showSnackbar).toHaveBeenCalled();
+    await user.click(submitButton);
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      kind: 'success',
+      subtitle: 'Queue entry transition undo success',
+      title: 'Undo transition success',
+    });
   });
 });
 
-describe('VoidQueueEntryModal: ', () => {
+describe('VoidQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
@@ -61,9 +67,10 @@ describe('VoidQueueEntryModal: ', () => {
   });
 
   it('has an working submit button', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
     renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
@@ -71,12 +78,16 @@ describe('VoidQueueEntryModal: ', () => {
     expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
-    expect(showSnackbar).toHaveBeenCalled();
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      kind: 'success',
+      subtitle: 'Queue entry deleted successfully',
+      title: 'Queue entry deleted successfully',
+    });
   });
 });
 
-describe('EndQueueEntryModal: ', () => {
+describe('EndQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
@@ -90,17 +101,23 @@ describe('EndQueueEntryModal: ', () => {
   });
 
   it('has an working submit button', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
+
     renderWithSwr(<EndQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Remove patient/ });
     expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
-    expect(showSnackbar).toHaveBeenCalled();
+    expect(showSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      kind: 'success',
+      subtitle: 'Paient removed from queue successfully',
+      title: 'Patient removed',
+    });
   });
 });

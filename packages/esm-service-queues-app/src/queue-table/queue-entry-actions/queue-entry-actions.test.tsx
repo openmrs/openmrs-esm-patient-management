@@ -1,13 +1,13 @@
-import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
-import { mockQueueEntryBrian, mockQueueSurgery, mockStatusInService, mockQueues } from '__mocks__';
 import React from 'react';
-import { renderWithSwr } from 'tools';
-import TransitionQueueEntryModal from './transition-queue-entry.modal';
 import userEvent from '@testing-library/user-event';
-import EditQueueEntryModal from './edit-queue-entry.modal';
+import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { screen } from '@testing-library/react';
+import { mockQueues, mockQueueEntryAlice } from '__mocks__';
+import { renderWithSwr } from 'tools';
+import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
+import VoidQueueEntryModal from './void-queue-entry.modal';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('../../hooks/useQueues', () => {
   return {
@@ -17,136 +17,67 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-describe('TransitionQueueEntryModal: ', () => {
-  const queueEntry = mockQueueEntryBrian;
-  const { queue } = queueEntry;
-  const { allowedStatuses, allowedPriorities } = queue;
-
-  const nextQueue = mockQueueSurgery;
-
-  it('renders the dialog with the right status and priority options', () => {
-    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
-    expect(screen.getByText(queueEntry.patient.display)).toBeInTheDocument();
-
-    for (const status of allowedStatuses) {
-      const expectedStatusDisplay =
-        queueEntry.status.uuid == status.uuid ? `${status.display} (Current)` : status.display;
-      expect(screen.getByRole('radio', { name: expectedStatusDisplay })).toBeInTheDocument();
-    }
-
-    for (const pri of allowedPriorities) {
-      const expectedPriorityDisplay = queueEntry.priority.uuid == pri.uuid ? `${pri.display} (Current)` : pri.display;
-      expect(screen.getByRole('radio', { name: expectedPriorityDisplay })).toBeInTheDocument();
-    }
-  });
+describe('UndoTransitionQueueEntryModal', () => {
+  const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
     const closeModal = jest.fn();
     const user = userEvent.setup();
 
-    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
   });
 
-  it('has a disabled submit button when selected queue and status is same as before', () => {
-    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
-    const submitButton = screen.getByRole('button', { name: /Transition patient/ });
-    expect(submitButton).toBeDisabled();
-  });
-
-  it('has an working submit button when selected queue and status is different from before', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+  it('has an working submit button', async () => {
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+      data: [],
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
-    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    // change queue
-    const queueDropdown = screen.getByRole('combobox', { name: /Select a queue/ });
-    await queueDropdown.click();
-    const queueSelection = screen.getByRole('option', {
-      name: `${nextQueue.display} - ${nextQueue.location?.display}`,
-    });
-    await user.selectOptions(queueDropdown, queueSelection);
+    renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    // change status
-    const inServiceRadioButton = screen.getByText(mockStatusInService.display);
-    await inServiceRadioButton.click();
-
-    const submitButton = screen.getByRole('button', { name: /Transition patient/ });
+    const submitButton = screen.getByRole('button', { name: /Undo transition/ });
     expect(submitButton).toBeEnabled();
-    await submitButton.click();
+    await user.click(submitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
+    expect(mockOpenmrsFetch).toHaveBeenCalled();
     expect(showSnackbar).toHaveBeenCalled();
   });
 });
 
-describe('EditQueueEntryModal: ', () => {
-  const queueEntry = mockQueueEntryBrian;
-  const { queue } = queueEntry;
-  const { allowedStatuses, allowedPriorities } = queue;
-
-  const nextQueue = mockQueueSurgery;
-
-  it('renders the dialog with the right status and priority options', () => {
-    renderWithSwr(<EditQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
-    expect(screen.getByText(queueEntry.patient.display)).toBeInTheDocument();
-
-    for (const status of allowedStatuses) {
-      const expectedStatusDisplay =
-        queueEntry.status.uuid == status.uuid ? `${status.display} (Current)` : status.display;
-      expect(screen.getByRole('radio', { name: expectedStatusDisplay })).toBeInTheDocument();
-    }
-
-    for (const pri of allowedPriorities) {
-      const expectedPriorityDisplay = queueEntry.priority.uuid == pri.uuid ? `${pri.display} (Current)` : pri.display;
-      expect(screen.getByRole('radio', { name: expectedPriorityDisplay })).toBeInTheDocument();
-    }
-  });
+describe('VoidQueueEntryModal', () => {
+  const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
     const closeModal = jest.fn();
     const user = userEvent.setup();
 
-    renderWithSwr(<EditQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
   });
 
-  it('has a enabled submit button when selected queue and status is same as before', () => {
-    renderWithSwr(<EditQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
-    const submitButton = screen.getByRole('button', { name: /Edit queue entry/ });
-    expect(submitButton).toBeEnabled();
-  });
-
-  it('has an working submit button when selected queue and status is different from before', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+  it('has an working submit button', async () => {
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+      data: [],
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
-    renderWithSwr(<EditQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    // change queue
-    const queueDropdown = screen.getByRole('combobox', { name: /Select a queue/ });
-    await queueDropdown.click();
-    const queueSelection = screen.getByRole('option', {
-      name: `${nextQueue.display} - ${nextQueue.location?.display}`,
-    });
-    await user.selectOptions(queueDropdown, queueSelection);
+    renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    // change status
-    const inServiceRadioButton = screen.getByText(mockStatusInService.display);
-    await inServiceRadioButton.click();
-
-    const submitButton = screen.getByRole('button', { name: /Edit queue entry/ });
+    const submitButton = screen.getByRole('button', { name: /Delete queue entry/ });
     expect(submitButton).toBeEnabled();
-    await submitButton.click();
+    await user.click(submitButton);
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
+    expect(mockOpenmrsFetch).toHaveBeenCalled();
     expect(showSnackbar).toHaveBeenCalled();
   });
 });

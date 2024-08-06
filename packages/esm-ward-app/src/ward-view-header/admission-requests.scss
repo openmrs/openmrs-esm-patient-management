@@ -16,6 +16,10 @@
       fill: #78a9ff !important;
     }
   }
+
+  & > button:hover {
+    color: #78a9ff;
+  }
 }
 
 .movementIcon {

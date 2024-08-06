@@ -21,7 +21,7 @@ export function useVitalsConceptMetadata() {
     : new Map<string, string>([]);
   return {
     data: conceptUnits,
-    isError: error,
+    error,
     isLoading,
     conceptMetadata,
   };

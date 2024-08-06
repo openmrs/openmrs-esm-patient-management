@@ -81,7 +81,7 @@ export function useMissingQueueEntries() {
   return {
     activeVisits: formattedActiveVisits,
     isLoading: !data && !visitsError && !queueError,
-    isError: !visitsError && !queueError,
+    error: !visitsError && !queueError,
     visitsIsValidating,
     mutateQueueEntries,
   };

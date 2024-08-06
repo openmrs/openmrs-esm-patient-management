@@ -2,17 +2,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { defineConfigSchema, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { configSchema } from '../../config-schema';
+import { getDefaultsFromConfigSchema, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { configSchema, type ConfigObject } from '../../config-schema';
+import { mockSession } from '__mocks__';
 import VisitFormQueueFields from './visit-form-queue-fields.component';
 
-defineConfigSchema('@openmrs/esm-service-queues-app', configSchema);
-
-const mockUseLayoutType = useLayoutType as jest.Mock;
-mockUseLayoutType.mockReturnValue('small-desktop');
-
-const mockUseSession = useSession as jest.Mock;
-mockUseSession.mockReturnValue({ sessionLocation: { uuid: '1' } });
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('../hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(() => ({
@@ -36,6 +33,14 @@ jest.mock('../../hooks/useQueues', () => {
 });
 
 describe('VisitFormQueueFields', () => {
+  beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('small-desktop');
+    mockUseSession.mockReturnValue(mockSession.data);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+    });
+  });
+
   it('renders the form fields and returns the set values', async () => {
     const user = userEvent.setup();
     const setFormFields = jest.fn();

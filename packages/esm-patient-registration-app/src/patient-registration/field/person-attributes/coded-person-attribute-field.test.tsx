@@ -1,16 +1,16 @@
 import React from 'react';
+import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { useConceptAnswers } from '../field.resource';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
-import { Form, Formik } from 'formik';
 
 jest.mock('formik', () => ({
   ...jest.requireActual('formik'),
 }));
 
-jest.mock('../field.resource'); // Mock the useConceptAnswers hook
+jest.mock('../field.resource');
 
-const mockedUseConceptAnswers = useConceptAnswers as jest.Mock;
+const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
 
 describe('CodedPersonAttributeField', () => {
   const conceptAnswers = [
@@ -27,8 +27,7 @@ describe('CodedPersonAttributeField', () => {
   const answerConceptSetUuid = '6682d17f-0777-45e4-a39b-93f77eb3531c';
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockedUseConceptAnswers.mockReturnValue({
+    mockUseConceptAnswers.mockReturnValue({
       data: conceptAnswers,
       isLoading: false,
     });
@@ -45,6 +44,7 @@ describe('CodedPersonAttributeField', () => {
               answerConceptSetUuid={null}
               label={personAttributeType.display}
               customConceptAnswers={[]}
+              required={false}
             />
           </Form>
         </Formik>,
@@ -53,7 +53,7 @@ describe('CodedPersonAttributeField', () => {
   });
 
   it('shows error if the concept answer set does not have any concept answers', () => {
-    mockedUseConceptAnswers.mockReturnValue({
+    mockUseConceptAnswers.mockReturnValue({
       data: [],
       isLoading: false,
     });
@@ -67,6 +67,7 @@ describe('CodedPersonAttributeField', () => {
               answerConceptSetUuid={answerConceptSetUuid}
               label={personAttributeType.display}
               customConceptAnswers={[]}
+              required={false}
             />
           </Form>
         </Formik>,
@@ -84,6 +85,7 @@ describe('CodedPersonAttributeField', () => {
             answerConceptSetUuid={answerConceptSetUuid}
             label={personAttributeType.display}
             customConceptAnswers={[]}
+            required={false}
           />
         </Form>
       </Formik>,
@@ -113,6 +115,7 @@ describe('CodedPersonAttributeField', () => {
                 label: 'Special Option B',
               },
             ]}
+            required={false}
           />
         </Form>
       </Formik>,

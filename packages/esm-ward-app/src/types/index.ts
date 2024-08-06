@@ -1,41 +1,26 @@
 import type {
+  Concept,
+  Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
+  Patient,
   Person,
   Visit,
-  Location,
-  Patient,
-  Concept,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
-export interface WardPatientCardProps {
-  patient: Patient;
-  visit: Visit;
-  bed?: Bed;
-}
-
-export type WardPatientCardRow = React.FC<WardPatientCardProps>;
-export type WardPatientCardElement = React.FC<WardPatientCardProps>;
+export type WardPatientCardRow = React.FC<WardPatient>;
+export type WardPatientCardElement = React.FC<WardPatient>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
   patient: Patient;
-  visit?: Visit;
+  visit: Visit;
+  bed?: Bed;
   admitted: boolean;
+  encounterAssigningToCurrentInpatientLocation: Encounter;
+  firstAdmissionOrTransferEncounter: Encounter;
 };
-
-export const patientCardElementTypes = [
-  'bed-number',
-  'patient-name',
-  'patient-age',
-  'patient-address',
-  'patient-obs',
-  'patient-coded-obs-tags',
-  'admission-time',
-  'patient-identifier',
-] as const;
-export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -46,6 +31,7 @@ export interface AdmissionLocationFetchResponse {
   ward: Location;
   bedLayouts: Array<BedLayout>;
 }
+
 export interface Bed {
   id: number;
   uuid: string;
@@ -101,6 +87,7 @@ export interface InpatientRequest {
   dispositionEncounter?: Encounter;
   dispositionObsGroup?: Observation;
   dispositionLocation?: Location;
+  visit: Visit;
 }
 
 export type DispositionType = 'ADMIT' | 'TRANSFER' | 'DISCHARGE';
@@ -113,6 +100,18 @@ export interface InpatientAdmissionFetchResponse {
 export interface InpatientAdmission {
   patient: Patient;
   visit: Visit;
+
+  // the encounter of type "Admission" or "Transfer" that is responsible
+  // for assigning the patient to the current inpatient location. For example,
+  // if the patient has been admitted /transferred to multiple locations as follows:
+  // A -> B -> A
+  // then encounterAssigningToCurrentInpatientLocation
+  // would be the transfer encounter that lands the patient back to A.
+  encounterAssigningToCurrentInpatientLocation: Encounter;
+
+  // the first encounter of the visit that is of encounterType "Admission" or "Transfer",
+  // regardless of the admission location
+  firstAdmissionOrTransferEncounter: Encounter;
 }
 
 // TODO: Move these types to esm-core
@@ -162,4 +161,25 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   name?: string;
   description?: string;
   retired?: boolean;
+}
+
+export interface EncounterPayload {
+  encounterDatetime?: string;
+  encounterType: string;
+  patient: string;
+  location: string;
+  encounterProviders?: Array<{ encounterRole: string; provider: string }>;
+  obs: Array<ObsPayload>;
+  form?: string;
+  orders?: Array<any>;
+  visit?: string;
+}
+
+export interface ObsPayload {
+  concept: Concept;
+  value?: string;
+  groupMembers?: Array<{
+    concept: Concept;
+    value: string;
+  }>;
 }

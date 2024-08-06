@@ -5,57 +5,57 @@ export const mockedAddressTemplate = {
   lines: [
     [
       {
-        isToken: 'IS_NOT_ADDR_TOKEN',
+        isToken: 'IS_NOT_ADDR_TOKEN' as const,
         displayText: '',
       },
       {
-        isToken: 'IS_ADDR_TOKEN',
+        isToken: 'IS_ADDR_TOKEN' as const,
         displayText: 'Village',
-        codeName: 'cityVillage',
+        codeName: 'cityVillage' as const,
         displaySize: '40',
       },
       {
-        isToken: 'IS_NOT_ADDR_TOKEN',
+        isToken: 'IS_NOT_ADDR_TOKEN' as const,
         displayText: ', ',
       },
       {
-        isToken: 'IS_ADDR_TOKEN',
+        isToken: 'IS_ADDR_TOKEN' as const,
         displayText: 'Commune',
-        codeName: 'address1',
+        codeName: 'address1' as const,
         displaySize: '40',
       },
     ],
     [
       {
-        isToken: 'IS_NOT_ADDR_TOKEN',
+        isToken: 'IS_NOT_ADDR_TOKEN' as const,
         displayText: '',
       },
       {
-        isToken: 'IS_ADDR_TOKEN',
+        isToken: 'IS_ADDR_TOKEN' as const,
         displayText: 'District',
-        codeName: 'countyDistrict',
+        codeName: 'countyDistrict' as const,
         displaySize: '40',
       },
       {
-        isToken: 'IS_NOT_ADDR_TOKEN',
+        isToken: 'IS_NOT_ADDR_TOKEN' as const,
         displayText: ', ',
       },
       {
-        isToken: 'IS_ADDR_TOKEN',
+        isToken: 'IS_ADDR_TOKEN' as const,
         displayText: 'Province',
-        codeName: 'stateProvince',
+        codeName: 'stateProvince' as const,
         displaySize: '40',
       },
     ],
     [
       {
-        isToken: 'IS_NOT_ADDR_TOKEN',
+        isToken: 'IS_NOT_ADDR_TOKEN' as const,
         displayText: '',
       },
       {
-        isToken: 'IS_ADDR_TOKEN',
+        isToken: 'IS_ADDR_TOKEN' as const,
         displayText: 'Country',
-        codeName: 'country',
+        codeName: 'country' as const,
         displaySize: '40',
       },
     ],

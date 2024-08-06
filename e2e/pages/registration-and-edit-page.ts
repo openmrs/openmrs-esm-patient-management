@@ -7,7 +7,11 @@ export interface PatientRegistrationFormValues {
   middleName?: string;
   familyName?: string;
   sex?: PatientRegistrationSex;
-  birthdate?: string;
+  birthdate?: {
+    day: string;
+    month: string;
+    year: string;
+  };
   postalCode?: string;
   address1?: string;
   address2?: string;
@@ -26,7 +30,10 @@ export class RegistrationAndEditPage {
   readonly middleNameInput = () => this.page.locator('#middleName');
   readonly familyNameInput = () => this.page.locator('#familyName');
   readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=gender-option-${sex}]`);
-  readonly birthdateInput = () => this.page.locator('#birthdate');
+  readonly birthDateInput = () => this.page.locator('#birthdate');
+  readonly birthdateDayInput = () => this.birthDateInput().locator('[data-type="day"]');
+  readonly birthdateMonthInput = () => this.birthDateInput().locator('[data-type="month"]');
+  readonly birthdateYearInput = () => this.birthDateInput().locator('[data-type="year"]');
   readonly address1Input = () => this.page.locator('#address1');
   readonly countryInput = () => this.page.locator('#country');
   readonly countyDistrictInput = () => this.page.locator('#countyDistrict');
@@ -50,8 +57,10 @@ export class RegistrationAndEditPage {
     await tryFill(this.middleNameInput(), formValues.middleName);
     await tryFill(this.familyNameInput(), formValues.familyName);
     formValues.sex && (await this.sexRadioButton(formValues.sex).check());
-    // TODO: O3-3482 Broken due to the date picker and should be fixed
-    // await tryFill(this.birthdateInput(), formValues.birthdate);
+    this.birthDateInput().getByRole('presentation').focus();
+    await tryFill(this.birthdateDayInput(), formValues.birthdate.day);
+    await tryFill(this.birthdateMonthInput(), formValues.birthdate.month);
+    await tryFill(this.birthdateYearInput(), formValues.birthdate.year);
     await tryFill(this.phoneInput(), formValues.phone);
     await tryFill(this.emailInput(), formValues.email);
     await tryFill(this.address1Input(), formValues.address1);

@@ -1,0 +1,44 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.admissionRequestCard {
+  background-color: $ui-03;
+  border: 1px solid $color-gray-30;
+  height: fit-content;
+  color: $color-gray-70;
+  margin-bottom: layout.$spacing-05;
+}
+
+.admissionRequestCardHeaderContainer {
+  padding: layout.$spacing-03;
+}
+
+.admissionRequestCardHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  > div:not(:first-of-type)::before {
+    content: '·';
+    padding: layout.$spacing-02;
+  }
+}
+
+.admissionEncounterDetails {
+  @include type.type-style('helper-text-01');
+  color: $text-02;
+  margin-top: layout.$spacing-03;
+}
+
+.admissionRequestActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid $text-03;
+
+  svg {
+    fill: $interactive-01 !important;
+  }
+}
