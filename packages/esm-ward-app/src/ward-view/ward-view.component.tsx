@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { InlineNotification, PaginationNav } from '@carbon/react';
+import { PaginationNav } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { WorkspaceContainer, useFeatureFlag, ErrorState, usePagination } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -48,7 +48,11 @@ const WardViewMain = ({
 }: {
   paginatedAdmissionLocation: AdmissionLocationFetchResponse;
 }) => {
-  const { inpatientAdmissions, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
+  const {
+    inpatientAdmissions,
+    isLoading: isLoadingPatientAdmissions,
+    error: errorLoadingPatientAdmissions,
+  } = useInpatientAdmission();
   const {
     isLoading: isLoadingAdmissionLocation,
     error: errorLoadingAdmissionLocation,
@@ -58,7 +62,7 @@ const WardViewMain = ({
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
-  if (isLoadingPatients || isLoadingAdmissionLocation) {
+  if (isLoadingPatientAdmissions || isLoadingAdmissionLocation) {
     return (
       <div className={styles.wardViewMain}>
         {Array(6)
@@ -77,7 +81,11 @@ const WardViewMain = ({
     );
   }
 
-  if (errorLoadingPatients) {
+  if (!admissionLocation) {
+    <EmptyState displayText={'There are no current admission location'} headerTitle={'No admission Location'} />;
+  }
+
+  if (errorLoadingPatientAdmissions) {
     return (
       <ErrorState
         error={t('anErrorOccurredPatients', 'An error occurred loading patients')}
@@ -92,9 +100,6 @@ const WardViewMain = ({
     );
   }
 
-  if (!admissionLocation) {
-    <EmptyState displayText={'There are no current admission location'} headerTitle={'No admission Location'} />;
-  }
   return (
     <div className={styles.wardViewMain}>
       {isBedManagementModuleInstalled ? (
@@ -123,7 +128,9 @@ const WardViewWithBedManagement = ({ admissionLocation }: { admissionLocation: A
 
   if (bedLayouts?.length == 0) {
     return (
-      <EmptyState displayText="No beds" headerTitle={t('noBedsConfigured', 'No beds configured for this location')} />
+      <div className={styles.noBedsStateWrapper}>
+        <EmptyState displayText="No beds" headerTitle={t('noBedsConfigured', 'No beds configured for this location')} />
+      </div>
     );
   }
 
@@ -131,33 +138,41 @@ const WardViewWithBedManagement = ({ admissionLocation }: { admissionLocation: A
   const wardBeds = bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
     const bed = bedLayoutToBed(bedLayout);
-
-    const wardPatients: WardPatient[] = patients?.map((patient) => {
+    const wardPatients: WardPatient[] = patients.map((patient) => {
       const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
-
       if (inpatientAdmission) {
-        return { patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true };
+        return { ...inpatientAdmission, admitted: true };
       } else {
         // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
-        return { patient: patient, visit: null, admitted: false };
+        return {
+          patient: patient,
+          visit: null,
+          admitted: false,
+          encounterAssigningToCurrentInpatientLocation: null, // populate after BED-13
+          firstAdmissionOrTransferEncounter: null,
+        };
       }
     });
-
     return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
   });
 
-  const patientsInBedsUuids = bedLayouts?.flatMap((bedLayout) => bedLayout.patients?.map((patient) => patient.uuid));
-
+  const patientsInBedsUuids = bedLayouts?.flatMap((bedLayout) => bedLayout.patients.map((patient) => patient.uuid));
   const wardUnassignedPatients =
     inpatientAdmissions &&
     inpatientAdmissions
       .filter(
         (inpatientAdmission) => !patientsInBedsUuids || !patientsInBedsUuids.includes(inpatientAdmission.patient.uuid),
       )
-      ?.map((inpatientAdmission) => {
+      .map((inpatientAdmission) => {
         return (
           <UnassignedPatient
-            wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
+            wardPatient={{
+              patient: inpatientAdmission.patient,
+              visit: inpatientAdmission.visit,
+              admitted: true,
+              encounterAssigningToCurrentInpatientLocation: null,
+              firstAdmissionOrTransferEncounter: inpatientAdmission.firstAdmissionOrTransferEncounter,
+            }}
             key={inpatientAdmission.patient.uuid}
           />
         );
@@ -174,16 +189,14 @@ const WardViewWithBedManagement = ({ admissionLocation }: { admissionLocation: A
 // display to use if not using bed management
 const WardViewWithoutBedManagement = () => {
   const { inpatientAdmissions } = useInpatientAdmission();
-
   const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
     return (
       <UnassignedPatient
-        wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
+        wardPatient={{ ...inpatientAdmission, admitted: true }}
         key={inpatientAdmission.patient.uuid}
       />
     );
   });
-
   return <>{wardPatients}</>;
 };
 
