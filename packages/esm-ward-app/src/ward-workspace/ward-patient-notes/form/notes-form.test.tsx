@@ -48,6 +48,12 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
 test('renders a success snackbar upon successfully recording a visit note', async () => {
   const successPayload = {
+    encounterProviders: expect.arrayContaining([
+      {
+        encounterRole: emrConfigurationMock.clinicianEncounterRole.uuid,
+        provider: undefined,
+      },
+    ]),
     encounterType: emrConfigurationMock.visitNoteEncounterType.uuid,
     location: undefined,
     obs: expect.arrayContaining([
