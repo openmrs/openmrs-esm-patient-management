@@ -1,9 +1,14 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.defaultQueueTable {
+  margin: 1rem;
+}
 
 .container {
-  background-color: $ui-01;
+  border: 1px solid colors.$gray-20;
 }
 
 .headerContainer {
@@ -16,7 +21,10 @@
 
 .headerButtons {
   display: flex;
-  flex-flow: column;
+  justify-content: space-between;
+  .filterSearch {
+    margin-left: layout.$spacing-05;
+  }
 }
 
 .filterContainer {
@@ -52,16 +60,21 @@
 }
 
 .statusTableContainer {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
+  background-color: $ui-01;
 }
 
 .statusTableHeader {
+  padding: layout.$spacing-03 0;
+}
+
+.tableHeader {
   padding: 8px 0;
 }
 
 .tableContainer {
   background-color: $ui-01;
-  margin: 0 spacing.$spacing-05;
+  // margin: 0 layout.$spacing-05;
   padding: 0;
 
   a {
@@ -76,6 +89,11 @@
     background-color: $ui-03;
   }
 
+  .toolbarContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .toolbarContent {
     display: flex;
     z-index: 1; // prevent dropdown from getting covered by table elements
@@ -84,12 +102,6 @@
   :global(.cds--table-toolbar) {
     position: static;
     overflow: visible;
-  }
-}
-
-.queueTable tr:last-of-type {
-  td {
-    border-bottom: none;
   }
 }
 
@@ -111,7 +123,7 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 
   h4:after {
     content: '';
@@ -146,7 +158,7 @@ html[dir='rtl'] {
   .headerContainer {
     svg {
       margin-left: 0;
-      margin-right: spacing.$spacing-03;
+      margin-right: layout.$spacing-03;
     }
     h4 {
       text-align: right;
@@ -160,10 +172,10 @@ html[dir='rtl'] {
       text-align: right;
       .serviceColor {
         margin-right: 0;
-        margin-left: spacing.$spacing-03;
+        margin-left: layout.$spacing-03;
       }
       button {
-        padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+        padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
         text-align: right;
       }
     }
@@ -171,14 +183,14 @@ html[dir='rtl'] {
 }
 
 .tabList {
-  padding-left: spacing.$spacing-05;
+  padding-left: layout.$spacing-05;
 }
 
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
-  margin: 0 spacing.$spacing-05;
+  padding: 2rem 0;
+  // margin: 0 layout.$spacing-05;
 }
 
 .tile {

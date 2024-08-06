@@ -6,10 +6,22 @@ import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
 
-const mockedUseConfig = jest.mocked(useConfig);
+const defaultProps = {
+  currentPage: 0,
+  data: [],
+  fetchError: null,
+  hasMore: false,
+  isLoading: false,
+  loadingNewData: false,
+  setPage: jest.fn(),
+  totalResults: 1,
+  query: 'John',
+};
+
+const mockUseConfig = jest.mocked(useConfig);
 
 describe('PatientSearch', () => {
-  beforeEach(() => mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a loading state when search results are being fetched', () => {
     renderPatientSearch({
@@ -73,6 +85,7 @@ describe('PatientSearch', () => {
               uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
               display: 'Outpatient Clinic',
             },
+            preferred: true,
           },
         ],
         person: {
@@ -83,7 +96,7 @@ describe('PatientSearch', () => {
           deathDate: null,
           gender: 'M',
           personName: {
-            display: 'John Doe Smith',
+            display: 'Smith, John Doe',
             givenName: 'John',
             middleName: 'Doe',
             familyName: 'Smith',
@@ -101,33 +114,21 @@ describe('PatientSearch', () => {
     });
 
     expect(
-      screen.getByRole('link', { name: /John Doe Smith Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+      screen.getByRole('link', { name: /Smith, John Doe Male · 34 yrs · OpenMRS ID 1000NLY/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
     );
-    expect(screen.getByRole('heading', { name: /John Doe Smith/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
     expect(screen.getByRole('img')).toBeInTheDocument();
   });
 });
 
-function renderPatientSearch(otherProps = {}) {
-  const mockProps = {
-    currentPage: 0,
-    data: [],
-    fetchError: null,
-    hasMore: false,
-    isLoading: false,
-    loadingNewData: false,
-    setPage: jest.fn(),
-    totalResults: 1,
-    query: 'John',
-  };
-
-  return render(
+function renderPatientSearch(props = {}) {
+  render(
     <PatientSearchContext.Provider value={{}}>
-      <PatientSearch {...mockProps} {...otherProps} />
+      <PatientSearch {...defaultProps} {...props} />
     </PatientSearchContext.Provider>,
   );
 }

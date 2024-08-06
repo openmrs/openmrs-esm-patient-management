@@ -1,29 +1,22 @@
 import React from 'react';
-import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { age } from '@openmrs/esm-framework';
-import { mockPatient } from 'tools';
+import { mockPatient, mockPatientWithLongName, mockPatientWithoutFormattedName } from 'tools';
 import PatientInfo from './patient-info.component';
 
-const mockAge = age as jest.Mock;
+const mockAge = jest.mocked(age);
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    age: jest.fn(),
-  };
-});
+describe('Patient info', () => {
+  it.each([
+    [mockPatient, 'Wilson, John'],
+    [mockPatientWithLongName, 'family name, Some very long given name'],
+    [mockPatientWithoutFormattedName, 'given middle family name'],
+  ])(`should render patient info correctly`, async (patient, displayName) => {
+    mockAge.mockReturnValue('35');
 
-describe('Patient Info', () => {
-  test('should render patient info correctly', async () => {
-    const user = userEvent.setup();
+    renderPatientInfo(patient);
 
-    mockAge.mockReturnValue(35);
-
-    renderPatientInfo();
-
-    expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(displayName))).toBeInTheDocument();
     expect(screen.getByText(/35/)).toBeInTheDocument();
     expect(screen.getByText(/Male/i)).toBeInTheDocument();
     expect(screen.getByText(/04 — Apr — 1972/i)).toBeInTheDocument();
@@ -34,6 +27,6 @@ describe('Patient Info', () => {
   });
 });
 
-const renderPatientInfo = () => {
-  render(<PatientInfo handlePatientInfoClick={() => {}} patient={mockPatient} />);
+const renderPatientInfo = (patient) => {
+  render(<PatientInfo handlePatientInfoClick={() => {}} patient={patient} />);
 };

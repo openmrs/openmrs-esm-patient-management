@@ -1,14 +1,80 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": "^2.2.0",
+    "emrapi": "^2.0.0 || 2.0.0-SNAPSHOT"
+  },
+  "optionalBackendDependencies": {
+    "bedmanagement": {
+      "version": "^6.0.0 || 6.0.0-SNAPSHOT",
+      "feature": {
+        "flagName": "bedmanagement-module",
+        "label": "Ward App Patient Service",
+        "description": "This module, if installed, provides services for managing patients admitted to the ward."
+      }
+    }
   },
   "extensions": [
-  ],
-  "pages": [
+    {
+      "name": "ward-dashboard-link",
+      "component": "wardDashboardLink",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "ward",
+        "slot": "ward-dashboard-slot",
+        "title": "Wards"
+      }
+    },
     {
       "component": "root",
-      "route": "ward"
+      "name": "ward-dashboard",
+      "slot": "ward-dashboard-slot"
+    },
+    {
+      "component": "wardPatientActionButtonExtension",
+      "name": "ward-patient-action-button",
+      "slot": "action-menu-ward-patient-items-slot"
+    },
+    {
+      "component": "wardPatientNotesActionButtonExtension",
+      "name": "ward-inpatient-notes-form-action-button",
+      "slot": "action-menu-ward-patient-items-slot"
+    },
+    {
+      "component": "coloredObsTagCardRowExtension",
+      "name": "colored-obs-tags-card-row",
+      "slot": "ward-patient-card-slot"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "admission-requests-workspace",
+      "component": "admissionRequestWorkspace",
+      "title": "admissionRequests",
+      "type": "admission-requests"
+    },
+    {
+      "name": "ward-patient-notes-workspace",
+      "component": "wardPatientNotesWorkspace",
+      "type": "ward-patient-notes",
+      "title": "inpatientNotesWorkspaceTitle",
+      "sidebarFamily": "ward-patient",
+      "hasOwnSidebar": true
+    },
+    {
+      "name": "admit-patient-form-workspace",
+      "component": "admitPatientFormWorkspace",
+      "title": "admissionRequests",
+      "type": "admission-requests"
+    },
+    {
+      "name": "ward-patient-workspace",
+      "component": "wardPatientWorkspace",
+      "type": "ward",
+      "title": "Ward Patient",
+      "width": "extra-wide",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
     }
   ]
 }

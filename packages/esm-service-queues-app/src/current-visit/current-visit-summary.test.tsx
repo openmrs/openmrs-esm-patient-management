@@ -1,20 +1,20 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { useVisit } from './current-visit.resource';
 import { mockPastVisit } from '__mocks__';
+import { useVisit } from './current-visit.resource';
 import CurrentVisit from './current-visit-summary.component';
 
-const useVisitMock = useVisit as jest.Mock;
+const useVisitMock = jest.mocked(useVisit);
 
 jest.mock('./current-visit.resource', () => ({
-  useVisit: jest.fn(() => ({
+  useVisit: jest.fn().mockReturnValue({
     visit: {
       visitType: { display: 'Visit Type' },
       encounters: [],
     },
-    isError: false,
+    error: null,
     isLoading: false,
-  })),
+  }),
 }));
 
 const patientUuid = mockPastVisit.data.results[0].patient.uuid;
@@ -24,17 +24,18 @@ describe('CurrentVisit', () => {
   it('renders visit details correctly', async () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
-    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText('Visit Type')).toBeInTheDocument();
     expect(screen.getByText('Scheduled for today')).toBeInTheDocument();
     expect(screen.getByText('On time')).toBeInTheDocument();
   });
-  it('should render skeleton when loading', async () => {
-    useVisitMock.mockImplementationOnce(() => ({
-      visit: undefined,
-      isError: false,
+  it('renders a loading skeleton when fetching data', async () => {
+    useVisitMock.mockReturnValue({
+      visit: null,
+      error: null,
       isLoading: true,
-    }));
+      isValidating: false,
+    });
 
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 

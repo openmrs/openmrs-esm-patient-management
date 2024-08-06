@@ -188,12 +188,12 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
   return {
     serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }
 
-export async function addQueueEntry(
+export async function postQueueEntry(
   visitUuid: string,
   queueUuid: string,
   patientUuid: string,

@@ -18,7 +18,7 @@ import { type FormValues, type CapturePhotoProps } from './patient-registration.
 import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
+import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
@@ -34,7 +34,7 @@ export interface PatientRegistrationProps {
 }
 
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
-  const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
+  const { currentSession, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
@@ -71,7 +71,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
-    const updatedFormValues = { ...values, identifiers: filterUndefinedPatientIdenfier(values.identifiers) };
+    const updatedFormValues = { ...values, identifiers: filterOutUndefinedPatientIdentifiers(values.identifiers) };
     try {
       await savePatientForm(
         !inEditMode,
@@ -159,7 +159,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             <div>
               <div className={styles.stickyColumn}>
                 <h4>
-                  {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
+                  {inEditMode
+                    ? t('editPatientDetails', 'Edit patient details')
+                    : t('createNewPatient', 'Create new patient')}
                 </h4>
                 {showDummyData && <DummyDataInput setValues={props.setValues} />}
                 <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
@@ -183,12 +185,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                       className={styles.spinner}
                       description={`${t('submitting', 'Submitting')} ...`}
                       iconDescription="submitting"
-                      status="active"
                     />
                   ) : inEditMode ? (
-                    t('updatePatient', 'Update Patient')
+                    t('updatePatient', 'Update patient')
                   ) : (
-                    t('registerPatient', 'Register Patient')
+                    t('registerPatient', 'Register patient')
                   )}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>

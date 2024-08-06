@@ -4,14 +4,15 @@
 
 # OpenMRS Patient Management
 
-This repository contains frontend modules for the OpenMRS SPA. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
+This repository contains frontend modules for O3. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
 
 - [Active visits app](packages/esm-active-visits-app/)
 - [Appointments app](packages/esm-appointments-app/)
-- [Service queues](packages/esm-service-queues-app/README.md)
-- [Patient search](packages/esm-patient-search-app)
-- [Patient registration](packages/esm-patient-registration-app)
+- [Bed management](packages/esm-bed-management-app/)
 - [Patient list management](packages/esm-patient-list-management-app)
+- [Patient registration](packages/esm-patient-registration-app)
+- [Patient search](packages/esm-patient-search-app)
+- [Service queues](packages/esm-service-queues-app/README.md)
 - [Ward](packages/esm-ward-app)
 
 ## Setup
@@ -20,7 +21,8 @@ Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
 This monorepo uses [yarn](https://yarnpkg.com).
 
-To install the dependancies, run:
+To install the dependencies, run:
+
 ```bash
 yarn install
 ```
@@ -68,7 +70,6 @@ git checkout package.json
 yarn
 ```
 
-
 ## Contributing
 
 Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/contributing) guide.
@@ -78,25 +79,25 @@ Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/
 To run tests for all packages, run:
 
 ```bash
-yarn turbo test
+yarn turbo run test
 ```
 
 To run tests in `watch` mode, run:
 
 ```bash
-yarn turbo test:watch
+yarn turbo run test:watch
 ```
 
 To run tests for a specific package, pass the package name to the `--filter` flag. For example, to run tests for `esm-patient-conditions-app`, run:
 
 ```bash
-yarn turbo test --filter="esm-patient-conditions-app"
+yarn turbo test --filter=@openmrs/esm-patient-conditions-app
 ```
 
 To run a specific test file, run:
 
 ```bash
-yarn turbo test -- basic-search
+yarn turbo run test -- basic-search
 ```
 
 The above command will only run tests in the file or files that match the provided string.
@@ -104,22 +105,23 @@ The above command will only run tests in the file or files that match the provid
 You can also run the matching tests from above in watch mode by running:
 
 ```bash
-yarn turbo test:watch --basic-search
+yarn turbo run test:watch --basic-search
 ```
 
 To generate a `coverage` report, run:
 
 ```bash
-yarn turbo coverage
+yarn turbo run coverage
 ```
 
 By default, `turbo` will cache test runs. This means that re-running tests wihout changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
 
 ```bash
-yarn turbo test --force
+yarn turbo run test --force
 ```
 
 ### Unit tests
+
 To run unit tests, use:
 
 ```sh
@@ -140,13 +142,13 @@ Then, in a separate terminal, run:
 yarn test-e2e --headed
 ```
 
-Please read [our e2e test guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing#end-to-end-testing-with-playwright) for more information about E2E testing.
+Please read [our E2E testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/end-to-end-testing) for more information about E2E testing.
 
-### Updating Playwright Version
+### Updating Playwright
 
-To upgrade your Playwright version, ensure that you update both the package.json file and the [e2e/support/bamboo/playwright.Dockerfile](e2e/support/bamboo/playwright.Dockerfile).
+To upgrade your Playwright version, update both the package.json file and the [e2e/support/bamboo/playwright.Dockerfile](e2e/support/bamboo/playwright.Dockerfile).
 
-## Design Patterns
+## Design patterns
 
 For documentation about our design patterns, please visit our [design system](https://zeroheight.com/23a080e38/p/880723--introduction) documentation website.
 
@@ -176,8 +178,7 @@ After running it, make a PR or merge to `main` with the resulting changeset.
 Once the version bump is merged, go to GitHub and
 [draft a new release](https://github.com/openmrs/openmrs-esm-patient-management/releases/new). 
 The tag should be prefixed with `v` (e.g., `v3.2.1`), while the release title
-should just be the version number (e.g., `3.2.1`). The creation of the GitHub release
+should be the version number (e.g., `3.2.1`). The creation of the GitHub release
 will cause GitHub Actions to publish the packages, completing the release process.
 
 > Don't run `npm publish` or `yarn publish`. Use the above process.
-

@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { Visit } from '@openmrs/esm-framework';
+import type { Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
 import type { Provider } from '../../packages/esm-appointments-app/src/types/index';
 import type { Encounter } from '../../packages/esm-active-visits-app/src/visits-summary/visit.resource';
@@ -9,7 +9,7 @@ import {
   deletePatient,
   endVisit,
   generateRandomPatient,
-  Patient,
+  type Patient,
   startVisit,
   getProvider,
 } from '../commands';

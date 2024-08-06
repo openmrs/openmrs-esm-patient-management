@@ -1,14 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
 import { getByTextWithMarkup } from 'tools';
 import ListDetails from './list-details.component';
 
-const mockedUsePatientListDetails = usePatientListDetails as jest.Mock;
-const mockedUsePatientListMembers = usePatientListMembers as jest.Mock;
-const mockedDeletePatientList = deletePatientList as jest.Mock;
+const mockUsePatientListDetails = jest.mocked(usePatientListDetails);
+const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
+const mockDeletePatientList = jest.mocked(deletePatientList);
 
 jest.mock('../api/hooks', () => ({
   usePatientListDetails: jest.fn(),
@@ -17,22 +18,18 @@ jest.mock('../api/hooks', () => ({
 
 jest.mock('../api/api-remote');
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-  navigate: jest.fn(),
-  ExtensionSlot: jest.fn(),
-}));
-
-const mockedPatientListDetails = {
+const mockPatientListDetails = {
   name: 'Test Patient List',
   description: 'This is a test patient list',
   size: 1,
   startDate: '2023-08-14',
-};
+} as OpenmrsCohort;
 
-const mockedPatientListMembers = [
+const mockPatientListMembers = [
   {
+    name: 'MINDSCAPE Cohort',
+    description:
+      'Mental Illness and Neuroimaging Study for Personalized Assessment and Care Evaluation (develops personalized treatment plans for mental illness based on brain imaging and individual factors)',
     patient: {
       person: {
         display: 'John Doe',
@@ -45,22 +42,31 @@ const mockedPatientListMembers = [
       ],
       uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
     },
+    attributes: [],
+    endDate: null,
     startDate: '2023-08-10',
     uuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0db',
+    voided: false,
   },
-];
+] as OpenmrsCohortMember[];
 
 describe('ListDetails', () => {
   beforeEach(() => {
-    mockedUsePatientListDetails.mockReturnValue({
-      listDetails: mockedPatientListDetails,
+    mockUsePatientListDetails.mockReturnValue({
+      listDetails: mockPatientListDetails,
+      error: null,
+      isLoading: false,
+      mutateListDetails: jest.fn().mockResolvedValue({}),
     });
 
-    mockedUsePatientListMembers.mockReturnValue({
-      listMembers: mockedPatientListMembers,
+    mockUsePatientListMembers.mockReturnValue({
+      listMembers: mockPatientListMembers,
+      isLoadingListMembers: false,
+      error: null,
+      mutateListMembers: jest.fn().mockResolvedValue({}),
     });
 
-    mockedDeletePatientList.mockResolvedValue({});
+    mockDeletePatientList.mockResolvedValue({});
   });
 
   it('renders patient list details page', async () => {
@@ -77,8 +83,11 @@ describe('ListDetails', () => {
   });
 
   it('renders an empty state view if a list has no patients', async () => {
-    mockedUsePatientListMembers.mockReturnValue({
+    mockUsePatientListMembers.mockReturnValue({
       listMembers: [],
+      isLoadingListMembers: false,
+      error: null,
+      mutateListMembers: jest.fn().mockResolvedValue({}),
     });
 
     render(<ListDetails />);
@@ -87,12 +96,12 @@ describe('ListDetails', () => {
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
-  it('opens overlay with a form when the "Edit name or description" button is clicked', () => {
+  it('opens overlay with a form when the "Edit name or description" button is clicked', async () => {
     render(<ListDetails />);
 
-    userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText('Actions'));
     const editBtn = screen.getByText('Edit name or description');
-    userEvent.click(editBtn);
+    await userEvent.click(editBtn);
   });
 
   it('deletes patient list and navigates back to the list page', async () => {
@@ -105,7 +114,8 @@ describe('ListDetails', () => {
     expect(screen.getByText('Delete')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
 
-    expect(screen.getByText('Delete').closest('button')).not.toHaveAttribute('disabled');
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(screen.getByText('Delete').closest('button')).toBeEnabled();
 
     await userEvent.click(screen.getByText('Cancel'));
   });

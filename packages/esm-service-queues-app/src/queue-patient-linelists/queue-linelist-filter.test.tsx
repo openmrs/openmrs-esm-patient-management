@@ -1,19 +1,28 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
-import QueueLinelistFilter from './queue-linelist-filter.component';
+import QueueLinelistFilter from './queue-linelist-filter.workspace';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: jest.fn(() => 'tablet'),
-  useVisitTypes: jest.fn(() => mockVisitTypes),
-  toOpemrsIsoString: jest.fn(),
-}));
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseVisitTypes = jest.mocked(useVisitTypes);
+
+const workspaceProps = {
+  closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  setTitle: jest.fn(),
+};
 
 describe('QueueLinelistFilter', () => {
+  beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    mockUseVisitTypes.mockReturnValue(mockVisitTypes);
+  });
+
   it('renders the form with filter elements', () => {
-    render(<QueueLinelistFilter closePanel={jest.fn()} />);
+    render(<QueueLinelistFilter {...workspaceProps} />);
 
     expect(screen.getByText('Gender')).toBeInTheDocument();
     expect(screen.getByLabelText('Age')).toBeInTheDocument();
@@ -28,20 +37,20 @@ describe('QueueLinelistFilter', () => {
 
   it('calls closePanel function when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    const closePanelMock = jest.fn();
+    const closeWorkspace = jest.fn();
 
-    render(<QueueLinelistFilter closePanel={closePanelMock} />);
+    render(<QueueLinelistFilter {...{ ...workspaceProps, closeWorkspace }} />);
 
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
 
-    expect(closePanelMock).toHaveBeenCalledTimes(1);
+    expect(closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('updates gender state when a radio button is selected', async () => {
     const user = userEvent.setup();
 
-    render(<QueueLinelistFilter closePanel={jest.fn()} />);
+    render(<QueueLinelistFilter {...workspaceProps} />);
 
     const maleRadioButton = screen.getByLabelText('Male');
     await user.click(maleRadioButton);
@@ -51,7 +60,7 @@ describe('QueueLinelistFilter', () => {
 
   it('updates startAge state when a number is entered', async () => {
     const user = userEvent.setup();
-    render(<QueueLinelistFilter closePanel={jest.fn()} />);
+    render(<QueueLinelistFilter {...workspaceProps} />);
 
     const startAgeInput = screen.getByLabelText('Between');
     await user.type(startAgeInput, '10');
@@ -62,7 +71,7 @@ describe('QueueLinelistFilter', () => {
   it('updates returnDate state when date input changes', async () => {
     const user = userEvent.setup();
 
-    render(<QueueLinelistFilter closePanel={jest.fn()} />);
+    render(<QueueLinelistFilter {...workspaceProps} />);
 
     const returnDateInput = screen.getByLabelText('Date');
 
@@ -75,7 +84,7 @@ describe('QueueLinelistFilter', () => {
   it('should open the visit type dropdown and close after selection', async () => {
     const user = userEvent.setup();
 
-    render(<QueueLinelistFilter closePanel={jest.fn()} />);
+    render(<QueueLinelistFilter {...workspaceProps} />);
 
     const visitTypeDropdown = screen.getByRole('combobox', { name: /Select visit type/i });
     await user.click(visitTypeDropdown);

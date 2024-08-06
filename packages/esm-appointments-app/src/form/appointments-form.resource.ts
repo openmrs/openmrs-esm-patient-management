@@ -77,7 +77,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
 
   return {
     data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutate,
@@ -92,7 +92,7 @@ export function useAppointmentService() {
 
   return {
     data: data ? data.data : null,
-    isError: error,
+    error,
     isLoading,
   };
 }
@@ -144,6 +144,22 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
   return await openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
+export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
+  return await openmrsFetch(`${restBaseUrl}/appointments/conflicts`, {
+    method: 'POST',
+    body: {
+      patientUuid: appointmentPayload.patientUuid,
+      serviceUuid: appointmentPayload.serviceUuid,
+      startDateTime: appointmentPayload.startDateTime,
+      endDateTime: appointmentPayload.endDateTime,
+      providers: [],
+      locationUuid: appointmentPayload.locationUuid,
+      appointmentKind: appointmentPayload.appointmentKind,
+    },
     headers: { 'Content-Type': 'application/json' },
   });
 };

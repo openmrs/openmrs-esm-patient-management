@@ -38,7 +38,7 @@ const tableHeaders = [
   },
 ];
 
-const testProps = {
+const defaultProps = {
   title: 'Scheduled appointments',
   patientData: mockMappedAppointmentsData.data,
   headers: tableHeaders,
@@ -46,13 +46,13 @@ const testProps = {
   isLoading: false,
 };
 
-describe('QueuePatientBaseTable: ', () => {
+describe('QueuePatientBaseTable', () => {
   it('renders a tabular overview of appointments data when available', async () => {
     const user = userEvent.setup();
 
     renderQueueBaseTable();
 
-    expect(screen.queryByText(/scheduled appointments/i)).toBeInTheDocument();
+    expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
     const expectedColumnHeaders = [/name/, /return date/, /gender/, /age/, /visit type/, /phone number/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe('QueuePatientBaseTable: ', () => {
     const searchBox = screen.getByRole('searchbox');
     await user.type(searchBox, 'John');
 
-    expect(screen.queryByText(/john wilson/i)).toBeInTheDocument();
+    expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
     expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
 
     await user.clear(searchBox);
@@ -80,14 +80,13 @@ describe('QueuePatientBaseTable: ', () => {
   });
 
   it('renders an empty state view if data is unavailable', async () => {
-    testProps.patientData = [];
-    renderQueueBaseTable();
+    renderQueueBaseTable({ patientData: [] });
 
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
   });
 });
 
-function renderQueueBaseTable() {
-  renderWithSwr(<QueuePatientBaseTable {...testProps} />);
+function renderQueueBaseTable(props = {}) {
+  renderWithSwr(<QueuePatientBaseTable {...defaultProps} {...props} />);
 }

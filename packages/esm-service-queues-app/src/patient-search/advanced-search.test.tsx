@@ -2,14 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AdvancedSearch from './advanced-search.component';
 
-describe('AdvancedSearch: ', () => {
-  test('renders the advanced patient search in an overlay', () => {
-    renderAdvancedSearch();
+describe('AdvancedSearch', () => {
+  test('renders the advanced patient search in an overlay', async () => {
+    render(<AdvancedSearch toggleSearchType={jest.fn()} />);
 
     expect(screen.getByRole('button', { name: /back to simple search/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^search$/i })).toBeInTheDocument();
-    expect(screen.findAllByText(/any/i));
+
+    await screen.findAllByText(/any/i);
+
     expect(screen.getByRole('tab', { name: /^male$/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^female$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /name/i })).toBeInTheDocument();
@@ -22,8 +24,3 @@ describe('AdvancedSearch: ', () => {
     expect(screen.getByRole('textbox', { name: /post code/i })).toBeInTheDocument();
   });
 });
-
-function renderAdvancedSearch() {
-  const toggleSearchType = jest.fn();
-  render(<AdvancedSearch toggleSearchType={toggleSearchType} />);
-}

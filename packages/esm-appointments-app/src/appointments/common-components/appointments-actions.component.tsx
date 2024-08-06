@@ -68,7 +68,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
             {t('checkOut', 'Check out')}
           </Button>
         );
-      case checkInButton.enabled && !hasActiveVisitToday && isTodaysAppointment: {
+      case checkInButton.enabled && (!hasActiveVisitToday || checkInButton.showIfActiveVisit) && isTodaysAppointment: {
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       }
       default:

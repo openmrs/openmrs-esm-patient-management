@@ -48,6 +48,7 @@ export interface Appointment {
   recurring: boolean;
   service: AppointmentService;
   startDateTime: string | any;
+  dateAppointmentScheduled: string | any;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -60,6 +61,7 @@ export interface Appointment {
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
+
 export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
@@ -120,6 +122,7 @@ export interface Observation {
 export interface AppointmentPayload {
   patientUuid: string;
   serviceUuid: string;
+  dateAppointmentScheduled: string;
   startDateTime: string;
   endDateTime: string;
   appointmentKind: string;
@@ -131,6 +134,7 @@ export interface AppointmentPayload {
   uuid?: string;
   providerUuid?: string | OpenmrsResource;
 }
+
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
   missedAppointmentsCount;
@@ -142,6 +146,7 @@ export interface AppointmentSummary {
   appointmentService: OpenmrsResource;
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
+
 export interface Provider {
   uuid: string;
   display: string;
@@ -156,6 +161,7 @@ export enum DurationPeriod {
   weekly,
   daily,
 }
+
 export interface Identifier {
   identifier: string;
   identifierName?: string;

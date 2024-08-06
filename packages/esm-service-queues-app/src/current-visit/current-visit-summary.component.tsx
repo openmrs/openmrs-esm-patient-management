@@ -12,7 +12,7 @@ interface CurrentVisitProps {
 
 const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
-  const { visit, isError, isLoading } = useVisit(visitUuid);
+  const { visit, isLoading } = useVisit(visitUuid);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;

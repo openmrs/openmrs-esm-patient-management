@@ -6,10 +6,21 @@ import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
-const mockedUseConfig = jest.mocked(useConfig);
+const defaultProps = {
+  currentPage: 0,
+  data: [],
+  fetchError: null,
+  hasMore: false,
+  isLoading: false,
+  loadingNewData: false,
+  setPage: jest.fn(),
+  totalResults: 0,
+};
+
+const mockUseConfig = jest.mocked(useConfig);
 
 describe('RecentlySearchedPatients', () => {
-  beforeEach(() => mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a loading state when search results are being fetched', () => {
     renderRecentlySearchedPatients({
@@ -73,6 +84,7 @@ describe('RecentlySearchedPatients', () => {
               uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
               display: 'Outpatient Clinic',
             },
+            preferred: true,
           },
         ],
         person: {
@@ -83,7 +95,7 @@ describe('RecentlySearchedPatients', () => {
           deathDate: null,
           gender: 'M',
           personName: {
-            display: 'John Doe Smith',
+            display: 'Smith, John Doe',
             givenName: 'John',
             middleName: 'Doe',
             familyName: 'Smith',
@@ -101,33 +113,22 @@ describe('RecentlySearchedPatients', () => {
     });
 
     expect(
-      screen.getByRole('link', { name: /John Doe Smith Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+      screen.getByRole('link', { name: /Smith, John Doe Male · 34 yrs · OpenMRS ID 1000NLY/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
     );
-    expect(screen.getByRole('heading', { name: /John Doe Smith/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Smith, John Doe/i })).toBeInTheDocument();
     expect(screen.getByRole('img')).toBeInTheDocument();
     expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
   });
 });
 
-function renderRecentlySearchedPatients(overrideProps = {}) {
-  const mockProps = {
-    currentPage: 0,
-    data: [],
-    fetchError: null,
-    hasMore: false,
-    isLoading: false,
-    loadingNewData: false,
-    setPage: jest.fn(),
-    totalResults: 0,
-  };
-
-  return render(
+function renderRecentlySearchedPatients(props = {}) {
+  render(
     <PatientSearchContext.Provider value={{}}>
-      <RecentlySearchedPatients {...mockProps} {...overrideProps} />
+      <RecentlySearchedPatients {...defaultProps} {...props} />
     </PatientSearchContext.Provider>,
   );
 }

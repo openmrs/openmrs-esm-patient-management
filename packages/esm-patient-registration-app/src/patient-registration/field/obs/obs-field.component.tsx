@@ -1,13 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from './../field.scss';
 
 export interface ObsFieldProps {
@@ -17,7 +18,6 @@ export interface ObsFieldProps {
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
-
   const config = useConfig<RegistrationConfig>();
 
   if (!config.registrationObs.encounterTypeUuid) {
@@ -49,6 +49,16 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           concept={concept}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
+        />
+      );
+    case 'Date':
+      return (
+        <DateObsField
+          concept={concept}
+          label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
+          dateFormat={fieldDefinition.dateFormat}
+          placeholder={fieldDefinition.placeholder}
         />
       );
     case 'Coded':
@@ -142,6 +152,49 @@ function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
         }}
       </Field>
     </div>
+  );
+}
+
+interface DateObsFieldProps {
+  concept: ConceptResponse;
+  label: string;
+  required?: boolean;
+  dateFormat?: string;
+  placeholder?: string;
+}
+
+function DateObsField({ concept, label, required, placeholder }: DateObsFieldProps) {
+  const { t } = useTranslation();
+  const fieldName = `obs.${concept.uuid}`;
+  const { setFieldValue } = useContext(PatientRegistrationContext);
+
+  const onDateChange = (date: Date) => {
+    setFieldValue(fieldName, date);
+  };
+
+  return (
+    <Layer>
+      <div className={styles.dobField}>
+        <Field name={fieldName}>
+          {({ field, form: { touched, errors }, meta }) => {
+            return (
+              <>
+                <OpenmrsDatePicker
+                  id={fieldName}
+                  {...field}
+                  isRequired={required}
+                  onChange={onDateChange}
+                  labelText={label ?? concept.display}
+                  isInvalid={errors[fieldName] && touched[fieldName]}
+                  invalidText={t(meta.error)}
+                  value={field.value}
+                />
+              </>
+            );
+          }}
+        </Field>
+      </div>
+    </Layer>
   );
 }
 

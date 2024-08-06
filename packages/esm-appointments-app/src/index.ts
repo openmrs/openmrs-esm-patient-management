@@ -25,7 +25,8 @@ import earlyAppointmentsComponent from './appointments/scheduled/early-appointme
 import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
 import patientAppointmentsOverviewComponent from './patient-appointments/patient-appointments-overview.component';
 import patientUpcomingAppointmentsComponent from './patient-appointments/patient-upcoming-appointments-card.component';
-
+import appointementsForm from './form/appointments-form.component';
+import patientSearch from './patient-search/patient-search.component';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-appointments-app';
@@ -78,6 +79,10 @@ export const appointmentsList = getSyncLifecycle(appointmentsListComponent, opti
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
 
+export const appointementForm = getSyncLifecycle(appointementsForm, options);
+
+export const searchPatient = getSyncLifecycle(patientSearch, options);
+
 // t('Appointments', 'Appointments')
 export const patientAppointmentsSummaryDashboardLink = getSyncLifecycle(
   createPatientChartDashboardLink({ ...patientChartDashboardMeta, moduleName }),
@@ -94,13 +99,18 @@ export const patientAppointmentsOverview = getSyncLifecycle(patientAppointmentsO
 export const patientUpcomingAppointmentsWidget = getSyncLifecycle(patientUpcomingAppointmentsComponent, options);
 
 export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
-  () => import('./patient-appointments/patient-appointments-cancel-modal.component'),
+  () => import('./patient-appointments/patient-appointments-cancel.modal'),
   options,
 );
 
 export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
 
 export const endAppointmentModal = getAsyncLifecycle(
-  () => import('./appointments/common-components/end-appointment-modal.component'),
+  () => import('./appointments/common-components/end-appointment.modal'),
+  options,
+);
+
+export const homeAppointmentsTile = getAsyncLifecycle(
+  () => import('./homepage-tile/appointments-tile.component'),
   options,
 );

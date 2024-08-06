@@ -1,63 +1,55 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import head from 'lodash-es/head';
+import { first } from 'rxjs/operators';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  Switch,
   ContentSwitcher,
-  RadioTile,
-  TileGroup,
   DataTableSkeleton,
   InlineLoading,
   InlineNotification,
+  RadioTile,
+  Switch,
+  TileGroup,
 } from '@carbon/react';
 import {
   formatDatetime,
-  useLayoutType,
-  parseDate,
-  ErrorState,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showSnackbar,
-  useSession,
-  useLocations,
   type NewVisitPayload,
+  parseDate,
   saveVisit,
-  useVisitTypes,
-  useVisit,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
   useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+  useVisit,
+  useVisitTypes,
 } from '@openmrs/esm-framework';
 import { type Appointment, SearchTypes } from '../types';
-import styles from './patient-scheduled-visits.scss';
-import { useScheduledVisits } from './hooks/useScheduledVisits';
-import isNil from 'lodash-es/isNil';
-import { addQueueEntry } from './visit-form/queue.resource';
-import { first } from 'rxjs/operators';
-import { convertTime12to24, type amPm } from '../helpers/time-helpers';
-import dayjs from 'dayjs';
-import head from 'lodash-es/head';
+import { postQueueEntry } from './visit-form/queue.resource';
+import { convertTime12to24 } from '../helpers/time-helpers';
 import { useQueueLocations } from './hooks/useQueueLocations';
 import { useQueues } from '../hooks/useQueues';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
-interface PatientScheduledVisitsProps {
-  toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
-  patientUuid: string;
-  closePanel: () => void;
-}
+import styles from './patient-scheduled-visits.scss';
 
 enum visitType {
   RECENT = 'Recent',
   FUTURE = 'Future',
 }
 
-const ScheduledVisits: React.FC<{
+const ScheduledVisitsForVisitType: React.FC<{
   visits;
   visitType;
   scheduledVisitHeader;
   patientUuid;
-  closePanel: () => void;
-}> = ({ visits, scheduledVisitHeader, patientUuid, closePanel }) => {
+  closeWorkspace: () => void;
+}> = ({ visits, scheduledVisitHeader, patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const [visitsIndex, setVisitsIndex] = useState(0);
   const [hasPriority, setHasPriority] = useState(false);
@@ -67,9 +59,9 @@ const ScheduledVisits: React.FC<{
   const { queues, isLoading: isLoadingQueues } = useQueues(userLocation);
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = useState(new Date());
-  const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
+  const timeFormat = new Date().getHours() >= 12 ? 'PM' : 'AM';
+  const visitDate = new Date();
+  const visitTime = dayjs(new Date()).format('hh:mm');
   const [appointment, setAppointment] = useState<Appointment>();
   const [patientId, setPatientId] = useState('');
   const allVisitTypes = useVisitTypes();
@@ -77,7 +69,7 @@ const ScheduledVisits: React.FC<{
   const config = useConfig<ConfigObject>();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const { queueLocations } = useQueueLocations();
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
+  const selectedQueueLocation = queueLocations[0]?.id;
 
   // TODO: This needs fixing, we cannot just take the first queue and assume that is what is wanted
   const service = head(queues)?.uuid;
@@ -109,7 +101,6 @@ const ScheduledVisits: React.FC<{
         location: userLocation,
       };
 
-      const abortController = new AbortController();
       if (currentVisit) {
         showSnackbar({
           title: t('startVisitError', 'Error starting visit'),
@@ -126,7 +117,7 @@ const ScheduledVisits: React.FC<{
           .subscribe(
             (response) => {
               if (response.status === 201) {
-                addQueueEntry(
+                postQueueEntry(
                   response.data.uuid,
                   patientId,
                   priority,
@@ -147,7 +138,7 @@ const ScheduledVisits: React.FC<{
                           `${hours} : ${minutes}`,
                         ),
                       });
-                      closePanel();
+                      closeWorkspace();
                       setIsSubmitting(false);
                       mutateQueueEntries();
                     }
@@ -192,7 +183,7 @@ const ScheduledVisits: React.FC<{
       appointment,
       selectedQueueLocation,
       visitQueueNumberAttributeUuid,
-      closePanel,
+      closeWorkspace,
       mutateQueueEntries,
     ],
   );
@@ -270,46 +261,41 @@ const ScheduledVisits: React.FC<{
   );
 };
 
+interface PatientScheduledVisitsProps {
+  appointments: { recentVisits: Appointment[]; futureVisits: Appointment[] };
+  toggleSearchType: (searchMode: SearchTypes) => void;
+  patientUuid: string;
+  closeWorkspace: () => void;
+}
+
 const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
+  appointments,
   toggleSearchType,
   patientUuid,
-  closePanel,
+  closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { appointments, isLoading, isError } = useScheduledVisits(patientUuid);
-
-  if (isError) {
-    return <ErrorState headerTitle={t('errorFetchingAppoinments', 'Error fetching appointments')} error={isError} />;
-  }
-
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
-  if (isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits)) {
-    toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, true);
-  }
 
   return (
     <div className={styles.container}>
-      <ScheduledVisits
+      <ScheduledVisitsForVisitType
         visitType={visitType.RECENT}
         visits={appointments?.recentVisits}
         scheduledVisitHeader={t('recentScheduledVisits', '{{count}} visit(s) scheduled for +/- 7 days', {
           count: appointments?.recentVisits?.length,
         })}
         patientUuid={patientUuid}
-        closePanel={closePanel}
+        closeWorkspace={closeWorkspace}
       />
-      <ScheduledVisits
+      <ScheduledVisitsForVisitType
         visitType={visitType.FUTURE}
         visits={appointments?.futureVisits}
         scheduledVisitHeader={t('futureScheduledVisits', '{{count}} visit(s) scheduled for dates in the future', {
           count: appointments?.futureVisits?.length,
         })}
         patientUuid={patientUuid}
-        closePanel={closePanel}
+        closeWorkspace={closeWorkspace}
       />
 
       <div className={styles['text-divider']}>{t('orInProperFormat', 'Or')}</div>
@@ -318,16 +304,13 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
         <Button
           kind="ghost"
           iconDescription="Start another visit type"
-          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, false)}>
+          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM)}>
           {t('anotherVisitType', 'Start another visit type')}
         </Button>
       </div>
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button
-          className={styles.button}
-          kind="secondary"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid, false)}>
+        <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.SEARCH_RESULTS)}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

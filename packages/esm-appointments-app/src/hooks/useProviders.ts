@@ -12,7 +12,7 @@ export function useProviders() {
   return {
     providers: data ? data.data?.results : [],
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }

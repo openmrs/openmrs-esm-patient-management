@@ -1,15 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
-import PatientAppointmentsTable from './patient-appointments-table';
+import PatientAppointmentsTable from './patient-appointments-table.component';
 import styles from './patient-appointments-base.scss';
-import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
-import AppointmentForm from '../form/appointments-form.component';
+
 import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
 
 interface PatientAppointmentsBaseProps {
@@ -33,7 +32,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const {
     data: appointmentsData,
-    isError,
+    error,
     isLoading,
     isValidating,
   } = usePatientAppointments(patientUuid, startDate, new AbortController());
@@ -42,16 +41,16 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
       launchPatientWorkspace('appointments-form-workspace');
     } else {
-      launchOverlay(
-        t('addAppointment', 'Add Appointment'),
-        <AppointmentForm context="creating" closeWorkspace={closeOverlay} patientUuid={patientUuid} />,
-      );
+      launchWorkspace('add-appointment', {
+        context: 'creating',
+        patientUuid,
+      });
     }
   };
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-  if (isError) {
-    return <ErrorState headerTitle={headerTitle} error={isError} />;
+  if (error) {
+    return <ErrorState headerTitle={headerTitle} error={error} />;
   }
   if (Object.keys(appointmentsData)?.length) {
     return (

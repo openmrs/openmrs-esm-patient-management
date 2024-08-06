@@ -35,7 +35,7 @@ export function useActiveVisits() {
   return {
     activeVisitsCount: uniquePatientUUIDs.size,
     isLoading,
-    isError: error,
+    error,
     isValidating,
   };
 }
@@ -51,7 +51,7 @@ export function useAverageWaitTime(serviceUuid: string, statusUuid: string) {
   return {
     waitTime: data ? data?.data : null,
     isLoading,
-    isError: error,
+    error,
     isValidating,
     mutate,
   };

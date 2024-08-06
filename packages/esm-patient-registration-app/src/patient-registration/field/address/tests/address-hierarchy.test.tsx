@@ -1,40 +1,75 @@
 import React from 'react';
-import { cleanup, render, screen } from '@testing-library/react';
-import { AddressComponent } from '../address-field.component';
+import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { mockedAddressTemplate, mockedOrderedFields, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
+import { type AddressTemplate } from '../../../patient-registration.types';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../../config-schema';
 import { type Resources, ResourcesContext } from '../../../../offline.resources';
-import { PatientRegistrationContext } from '../../../patient-registration-context';
-import { useConfig } from '@openmrs/esm-framework';
+import {
+  PatientRegistrationContext,
+  type PatientRegistrationContextProps,
+} from '../../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
-import { mockedAddressTemplate, mockedOrderedFields } from '__mocks__';
+import { AddressComponent } from '../address-field.component';
 
-// Mocking the AddressSearchComponent
-jest.mock('../address-search.component', () => jest.fn(() => <div data-testid="address-search-bar" />));
-// Mocking the AddressHierarchyLevels
-jest.mock('../address-hierarchy-levels.component', () => jest.fn(() => <div data-testid="address-hierarchy-levels" />));
-// Mocking the SkeletonText
-jest.mock('@carbon/react', () => ({
-  ...jest.requireActual('@carbon/react'),
-  SkeletonText: jest.fn(() => <div data-testid="skeleton-text" />),
-  InlineNotification: jest.fn(() => <div data-testid="inline-notification" />),
-}));
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseOrderedAddressHierarchyLevels = jest.mocked(useOrderedAddressHierarchyLevels);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(),
-}));
+const mockResourcesContextValue = {
+  addressTemplate: {} as AddressTemplate,
+  currentSession: mockSession.data,
+  identifierTypes: [],
+  relationshipTypes: [],
+} as Resources;
+
+const mockInitialFormValues = {
+  additionalFamilyName: '',
+  additionalGivenName: '',
+  additionalMiddleName: '',
+  addNameInLocalLanguage: false,
+  address: {},
+  birthdate: '',
+  birthdateEstimated: false,
+  deathCause: '',
+  deathDate: '',
+  familyName: 'Doe',
+  gender: 'male',
+  givenName: 'John',
+  identifiers: mockOpenmrsId,
+  isDead: false,
+  middleName: 'Test',
+  monthsEstimated: 0,
+  patientUuid: mockPatient.uuid,
+  relationships: [],
+  telephoneNumber: '',
+  yearsEstimated: 0,
+};
+
+const initialContextValues: PatientRegistrationContextProps = {
+  currentPhoto: '',
+  inEditMode: false,
+  identifierTypes: [],
+  initialFormValues: mockInitialFormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldValue: jest.fn(),
+  setInitialFormValues: jest.fn(),
+  validationSchema: null,
+  values: mockInitialFormValues,
+};
 
 jest.mock('../address-hierarchy.resource', () => ({
-  ...(jest.requireActual('../address-hierarchy.resource') as jest.Mock),
+  ...jest.requireActual('../address-hierarchy.resource'),
   useOrderedAddressHierarchyLevels: jest.fn(),
 }));
 
-async function renderAddressHierarchy(addressTemplate = mockedAddressTemplate) {
+async function renderAddressHierarchy(contextValues: PatientRegistrationContextProps) {
   await render(
-    <ResourcesContext.Provider value={{ addressTemplate } as unknown as Resources}>
-      <Formik initialValues={{}} onSubmit={null}>
+    <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <Formik initialValues={mockInitialFormValues} onSubmit={null}>
         <Form>
-          <PatientRegistrationContext.Provider value={{ setFieldValue: jest.fn() } as any}>
+          <PatientRegistrationContext.Provider value={contextValues}>
             <AddressComponent />
           </PatientRegistrationContext.Provider>
         </Form>
@@ -43,11 +78,10 @@ async function renderAddressHierarchy(addressTemplate = mockedAddressTemplate) {
   );
 }
 
-describe('Testing address hierarchy', () => {
-  beforeEach(cleanup);
-
-  it('should render skeleton when address template is loading', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+describe('Address hierarchy', () => {
+  it('renders a loading skeleton when the address template is loading', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -56,21 +90,22 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: false,
-      errorFetchingFieldOrder: null,
-    }));
-    // @ts-ignore
-    renderAddressHierarchy(null);
-    const skeletonText = screen.getByTestId('skeleton-text');
-    expect(skeletonText).toBeInTheDocument();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    renderAddressHierarchy(initialContextValues);
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it('should render skeleton when address hierarchy is enabled and addresshierarchy order is loading', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+  it('renders a loading skeleton when the address hierarchy feature is enabled and address hierarchy order levels are loading', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -79,20 +114,22 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: true,
-      errorFetchingFieldOrder: null,
-    }));
-    renderAddressHierarchy();
-    const skeletonText = screen.getByTestId('skeleton-text');
-    expect(skeletonText).toBeInTheDocument();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    renderAddressHierarchy(initialContextValues);
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it('should render skeleton when address hierarchy is enabled and addresshierarchy order is loading', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+  it('renders a loading skeleton when the address hierarchy feature is enabled and address hierarchy order levels are loading', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -101,20 +138,22 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: false,
-      errorFetchingFieldOrder: true,
-    }));
-    renderAddressHierarchy();
-    const inlineNotification = screen.getByTestId('inline-notification');
-    expect(inlineNotification).toBeInTheDocument();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    renderAddressHierarchy(initialContextValues);
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it('should render the address component with address hierarchy disabled', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+  it('renders the address component with address hierarchy disabled', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -123,14 +162,19 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: false,
-      errorFetchingFieldOrder: null,
-    }));
-    renderAddressHierarchy();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
+
+    renderAddressHierarchy(initialContextValues);
+
     const allFields = mockedAddressTemplate.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
     allFields.forEach((field) => {
       const textFieldInput = screen.getByLabelText(`${field.displayText} (optional)`);
@@ -138,8 +182,9 @@ describe('Testing address hierarchy', () => {
     });
   });
 
-  it('should render the fields in order if the address hierarcy is enabled', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+  it('renders the address hierarchy fields in order if the address hierarchy feature is enabled', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -148,14 +193,19 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: false,
-      errorFetchingFieldOrder: null,
-    }));
-    renderAddressHierarchy();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
+
+    renderAddressHierarchy(initialContextValues);
+
     const allFields = mockedAddressTemplate.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
     const orderMap = Object.fromEntries(mockedOrderedFields.map((field, indx) => [field, indx]));
     allFields.sort(
@@ -168,8 +218,9 @@ describe('Testing address hierarchy', () => {
     });
   });
 
-  it('should render quick search bar on above the fields when address hierarchy is enabled and quicksearch is set to true', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+  it('renders the quick search bar above the address hierarchy fields when the address hierarchy feature is enabled and useQuickSearch is set to true', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -178,20 +229,26 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: false,
-      errorFetchingFieldOrder: null,
-    }));
-    renderAddressHierarchy();
-    const addressSearchBar = screen.getByTestId('address-search-bar');
-    expect(addressSearchBar).toBeInTheDocument();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
+
+    renderAddressHierarchy(initialContextValues);
+
+    const searchbox = screen.getByRole('searchbox', { name: /search address/i });
+    expect(searchbox).toBeInTheDocument();
   });
 
-  it('should render combo boxes fields when address hierarchy is enabled and searchAddressByLevel is set to true', () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+  it('renders combobox fields when address hierarchy is enabled and searchAddressByLevel is set to true', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -200,15 +257,28 @@ describe('Testing address hierarchy', () => {
             searchAddressByLevel: true,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: [],
       isLoadingFieldOrder: false,
-      errorFetchingFieldOrder: null,
-    }));
-    renderAddressHierarchy();
-    const addressHierarchyLevels = screen.getByTestId('address-hierarchy-levels');
-    expect(addressHierarchyLevels).toBeInTheDocument();
+      errorFetchingFieldOrder: undefined,
+    });
+
+    mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
+
+    renderAddressHierarchy(initialContextValues);
+
+    const allFields = mockedAddressTemplate.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
+    const orderMap = Object.fromEntries(mockedOrderedFields.map((field, indx) => [field, indx]));
+    allFields.sort(
+      (existingField1, existingField2) =>
+        orderMap[existingField1.codeName ?? 0] - orderMap[existingField2.codeName ?? 0],
+    );
+    allFields.forEach((field) => {
+      const textFieldInput = screen.getByLabelText(`${field.displayText} (optional)`);
+      expect(textFieldInput).toBeInTheDocument();
+    });
   });
 });

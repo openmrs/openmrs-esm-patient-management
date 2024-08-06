@@ -1,14 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import CompactPatientBanner from './compact-patient-banner.component';
-import { defineConfigSchema, getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
+import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext } from '../patient-search-context';
-import { configSchema } from '../config-schema';
+import CompactPatientBanner from './compact-patient-banner.component';
 
-defineConfigSchema('@openmrs/esm-patient-search-app', configSchema);
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
-const mockedUseConfig = jest.mocked(useConfig);
 const patients: Array<SearchedPatient> = [
   {
     attributes: [],
@@ -32,6 +31,7 @@ const patients: Array<SearchedPatient> = [
           uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
           display: 'Outpatient Clinic',
         },
+        preferred: true,
       },
     ],
     person: {
@@ -42,7 +42,7 @@ const patients: Array<SearchedPatient> = [
       deathDate: null,
       gender: 'M',
       personName: {
-        display: 'John Doe Smith',
+        display: 'Smith, John Doe',
         givenName: 'John',
         middleName: 'Doe',
         familyName: 'Smith',
@@ -53,7 +53,7 @@ const patients: Array<SearchedPatient> = [
 ];
 
 describe('CompactPatientBanner', () => {
-  beforeEach(() => mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a compact patient banner', () => {
     render(
@@ -63,10 +63,10 @@ describe('CompactPatientBanner', () => {
     );
 
     expect(
-      screen.getByRole('link', { name: /John Doe Smith Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+      screen.getByRole('link', { name: /Smith, John Doe Male · 34 yrs · OpenMRS ID 1000NLY/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${patients[0].uuid}/chart/`);
     expect(screen.getByRole('img')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /John Doe Smith/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
   });
 });

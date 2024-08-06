@@ -1,18 +1,36 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { useConfig } from '@openmrs/esm-framework';
-import { type FieldDefinition } from '../../../config-schema';
+import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { esmPatientRegistrationSchema, type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
+import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
+import { mockOpenmrsId, mockPatient } from '__mocks__';
 
-const mockUseConfig = useConfig as jest.Mock;
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+const mockUseConcept = jest.mocked(useConcept);
+const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
-jest.mock('../field.resource'); // Mock the useConceptAnswers hook
+jest.mock('../field.resource');
 
-const mockedUseConcept = useConcept as jest.Mock;
-const mockedUseConceptAnswers = useConceptAnswers as jest.Mock;
-
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        id={id}
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+      />
+    </>
+  );
+});
 const useConceptMockImpl = (uuid: string) => {
   let data;
   if (uuid == 'weight-uuid') {
@@ -40,6 +58,14 @@ const useConceptMockImpl = (uuid: string) => {
         { display: 'USA', uuid: 'usa' },
         { display: 'Mexico', uuid: 'mex' },
       ],
+      setMembers: [],
+    };
+  } else if (uuid == 'vaccination-date-uuid') {
+    data = {
+      uuid: 'vaccination-date-uuid',
+      display: 'Vaccination Date',
+      datatype: { display: 'Date', uuid: 'date' },
+      answers: [],
       setMembers: [],
     };
   } else {
@@ -79,19 +105,21 @@ const useConceptAnswersMockImpl = (uuid: string) => {
 };
 
 type FieldProps = {
-  children: ({ field, form: { touched, errors } }) => React.ReactNode;
+  children: ({ field, form: { touched, errors }, meta }) => React.ReactNode;
 };
 
 jest.mock('formik', () => ({
   ...(jest.requireActual('formik') as object),
-  Field: jest.fn(({ children }: FieldProps) => <>{children({ field: {}, form: { touched: {}, errors: {} } })}</>),
+  Field: jest.fn(({ children }: FieldProps) => (
+    <>{children({ field: {}, form: { touched: {}, errors: {} }, meta: { error: undefined } })}</>
+  )),
   useField: jest.fn(() => [{ value: null }, {}]),
 }));
 
 const textFieldDef: FieldDefinition = {
   id: 'chief-complaint',
   type: 'obs',
-  label: '',
+  label: 'Chief complaint',
   placeholder: '',
   showHeading: false,
   uuid: 'chief-complaint-uuid',
@@ -106,7 +134,7 @@ const textFieldDef: FieldDefinition = {
 const numberFieldDef: FieldDefinition = {
   id: 'weight',
   type: 'obs',
-  label: '',
+  label: 'Weight',
   placeholder: '',
   showHeading: false,
   uuid: 'weight-uuid',
@@ -118,10 +146,25 @@ const numberFieldDef: FieldDefinition = {
   customConceptAnswers: [],
 };
 
+const dateFieldDef: FieldDefinition = {
+  id: 'vac_date',
+  type: 'obs',
+  label: 'Vaccination date',
+  placeholder: '',
+  showHeading: false,
+  uuid: 'vaccination-date-uuid',
+  validation: {
+    required: false,
+    matches: null,
+  },
+  answerConceptSetUuid: null,
+  customConceptAnswers: [],
+};
+
 const codedFieldDef: FieldDefinition = {
   id: 'nationality',
   type: 'obs',
-  label: '',
+  label: 'Nationality',
   placeholder: '',
   showHeading: false,
   uuid: 'nationality-uuid',
@@ -133,57 +176,112 @@ const codedFieldDef: FieldDefinition = {
   customConceptAnswers: [],
 };
 
+const mockInitialFormValues = {
+  additionalFamilyName: '',
+  additionalGivenName: '',
+  additionalMiddleName: '',
+  addNameInLocalLanguage: false,
+  address: {},
+  birthdate: null,
+  birthdateEstimated: false,
+  deathCause: '',
+  deathDate: '',
+  familyName: 'Doe',
+  gender: 'male',
+  givenName: 'John',
+  identifiers: mockOpenmrsId,
+  isDead: false,
+  middleName: 'Test',
+  monthsEstimated: 0,
+  patientUuid: mockPatient.uuid,
+  relationships: [],
+  telephoneNumber: '',
+  yearsEstimated: 0,
+};
+
+const initialContextValues: PatientRegistrationContextProps = {
+  currentPhoto: null,
+  inEditMode: false,
+  identifierTypes: [],
+  initialFormValues: mockInitialFormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldValue: jest.fn(),
+  setInitialFormValues: jest.fn(),
+  validationSchema: null,
+  values: mockInitialFormValues,
+};
+
 describe('ObsField', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue({ registrationObs: { encounterTypeUuid: 'reg-enc-uuid' } });
-    mockedUseConcept.mockImplementation(useConceptMockImpl);
-    mockedUseConceptAnswers.mockImplementation(useConceptAnswersMockImpl);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      registrationObs: { encounterTypeUuid: 'reg-enc-uuid' },
+    } as RegistrationConfig);
+    mockUseConcept.mockImplementation(useConceptMockImpl);
+    mockUseConceptAnswers.mockImplementation(useConceptAnswersMockImpl);
   });
 
   it("logs an error and doesn't render if no registration encounter type is provided", () => {
-    mockUseConfig.mockReturnValue({ registrationObs: { encounterTypeUuid: null } });
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      registrationObs: { encounterTypeUuid: null },
+    } as RegistrationConfig);
+
     console.error = jest.fn();
     render(<ObsField fieldDefinition={textFieldDef} />);
     expect(console.error).toHaveBeenCalledWith(
       expect.stringMatching(/no registration encounter type has been configured/i),
     );
-    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('renders a text box for text concept', () => {
     render(<ObsField fieldDefinition={textFieldDef} />);
-    // I don't know why the labels aren't in the DOM, but they aren't
-    // expect(screen.getByLabelText("Chief Complaint")).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+
+    expect(screen.getByRole('textbox', { name: 'Chief complaint (optional)' })).toBeInTheDocument();
   });
 
   it('renders a number box for number concept', () => {
     render(<ObsField fieldDefinition={numberFieldDef} />);
-    // expect(screen.getByLabelText("Weight (kg)")).toBeInTheDocument();
-    expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+
+    expect(screen.getByRole('spinbutton', { name: 'Weight (optional)' })).toBeInTheDocument();
+  });
+
+  // TODO: Fix this test
+  xit('renders a datepicker for date concept', async () => {
+    render(
+      <PatientRegistrationContext.Provider value={initialContextValues}>
+        <ObsField fieldDefinition={dateFieldDef} />
+      </PatientRegistrationContext.Provider>,
+    );
+
+    const datePickerInput = screen.getByRole('textbox');
+    expect(datePickerInput).toBeInTheDocument();
+
+    await userEvent.type(datePickerInput, '28/05/2024');
+    expect(datePickerInput).toHaveValue('28/05/2024');
   });
 
   it('renders a select for a coded concept', () => {
     render(<ObsField fieldDefinition={codedFieldDef} />);
-    // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
-    expect(select).toHaveDisplayValue('Select an option');
+
+    expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'USA' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Mexico' })).toBeInTheDocument();
   });
 
   it('select uses answerConcept for answers when it is provided', async () => {
-    const user = userEvent.setup();
-
     render(<ObsField fieldDefinition={{ ...codedFieldDef, answerConceptSetUuid: 'other-countries-uuid' }} />);
-    // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
-    await user.selectOptions(select, 'Kenya');
+
+    expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Kenya' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Uganda' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'USA' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Mexico' })).not.toBeInTheDocument();
   });
 
   it('select uses customConceptAnswers for answers when provided', async () => {
-    const user = userEvent.setup();
-
     render(
       <ObsField
         fieldDefinition={{
@@ -197,9 +295,9 @@ describe('ObsField', () => {
         }}
       />,
     );
-    // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
-    await user.selectOptions(select, 'Mozambique');
+
+    expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Mozambique' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Uganda' })).not.toBeInTheDocument();
   });
 });

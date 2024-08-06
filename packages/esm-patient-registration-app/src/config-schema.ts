@@ -12,6 +12,7 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder?: string;
+  dateFormat?: string;
   showHeading: boolean;
   validation?: {
     required: boolean;
@@ -20,10 +21,12 @@ export interface FieldDefinition {
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
 }
+
 export interface CustomConceptAnswer {
   uuid: string;
   label?: string;
 }
+
 export interface Gender {
   label?: string;
   value: string;
