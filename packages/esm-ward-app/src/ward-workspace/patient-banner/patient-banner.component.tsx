@@ -12,7 +12,7 @@ const WardPatientWorkspaceBanner = (props: WardPatient) => {
     props;
 
   if (!(patient && visit)) {
-    console.warn('Patient details and visit details where not received by the workspace');
+    console.warn('Patient details and visit details were not received by the workspace');
     return null;
   }
 
