@@ -70,6 +70,12 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
         patient: patientUuid,
         location: locationUuid,
         encounterType: emrConfiguration?.visitNoteEncounterType.uuid,
+        encounterProviders: [
+          {
+            encounterRole: emrConfiguration?.clinicianEncounterRole.uuid,
+            provider: providerUuid,
+          },
+        ],
         obs: wardClinicalNote
           ? [
               {
