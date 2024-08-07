@@ -5,24 +5,8 @@ import PatientNotesForm from './form/notes-form.component';
 import PatientNotesHistory from './history/notes-container.component';
 
 const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
-  const {
-    patient,
-    visit,
-    bed,
-    admitted,
-    encounterAssigningToCurrentInpatientLocation,
-    firstAdmissionOrTransferEncounter,
-    ...restWorkspaceProps
-  } = props;
-
-  const wardPatient = {
-    patient,
-    visit,
-    bed,
-    admitted,
-    encounterAssigningToCurrentInpatientLocation,
-    firstAdmissionOrTransferEncounter,
-  };
+  const { patient, visit, bed, admitted, inpatientAdmission, inpatientRequest, ...restWorkspaceProps } = props;
+  const wardPatient = { patient, visit, bed, admitted, inpatientAdmission, inpatientRequest };
   const notesFormState = useMemo(
     () => ({
       patientUuid: patient?.uuid,

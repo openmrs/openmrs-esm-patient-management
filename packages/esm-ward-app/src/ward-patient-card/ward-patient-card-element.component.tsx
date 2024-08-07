@@ -9,26 +9,22 @@ import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-sinc
 import WardPatientObs from './row-elements/ward-patient-obs';
 import WardPatientIdentifier from './row-elements/ward-patient-identifier';
 import WardPatientAddress from './row-elements/ward-patient-header-address';
-import { type Encounter } from '../types';
+import { WardPatient, type Encounter } from '../types';
 
-export interface WardPatientCardElementProps {
+export interface WardPatientCardElementProps extends WardPatient {
   elementId: string;
-  patient: Patient;
-  visit: Visit;
-  encounterAssigningToCurrentInpatientLocation: Encounter;
-  firstAdmissionOrTransferEncounter: Encounter;
 }
 
 export const WardPatientCardElement: React.FC<WardPatientCardElementProps> = ({
   elementId,
   patient,
   visit,
-  encounterAssigningToCurrentInpatientLocation,
-  firstAdmissionOrTransferEncounter,
+  inpatientAdmission,
 }) => {
   const { obsElementDefinitions, identifierElementDefinitions, addressElementDefinitions } =
     useConfig<WardConfigObject>().wardPatientCards;
   const { t } = useTranslation();
+  const {encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter} = inpatientAdmission ?? {};
 
   switch (elementId) {
     case 'patient-age':

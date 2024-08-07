@@ -9,8 +9,7 @@ import type {
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
-export type WardPatientCardRow = React.FC<WardPatient>;
-export type WardPatientCardElement = React.FC<WardPatient>;
+export type WardPatientCard = React.FC<WardPatient>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
@@ -18,8 +17,9 @@ export type WardPatient = {
   visit: Visit;
   bed?: Bed;
   admitted: boolean;
-  encounterAssigningToCurrentInpatientLocation: Encounter;
-  firstAdmissionOrTransferEncounter: Encounter;
+
+  inpatientAdmission: InpatientAdmission;
+  inpatientRequest: InpatientRequest;
 };
 
 // server-side types defined in openmrs-module-bedmanagement:

@@ -1,14 +1,8 @@
 import React from 'react';
 import styles from '../ward-patient-card.scss';
-import { type WardPatientCardElement } from '../../types';
+import { Bed } from '../../types';
 
-export interface WardPatientBedNumberProps {
-  bed: {
-    bedNumber: string;
-  };
-}
-
-const WardPatientBedNumber: React.FC<WardPatientBedNumberProps> = ({ bed }) => {
+const WardPatientBedNumber: React.FC<{bed: Bed}> = ({ bed }) => {
   if (!bed) {
     return <></>;
   }

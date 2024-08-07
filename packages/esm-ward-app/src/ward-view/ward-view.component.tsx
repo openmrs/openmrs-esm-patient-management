@@ -58,18 +58,20 @@ const WardViewWithBedManagement = () => {
     const wardBeds = bedLayouts?.map((bedLayout) => {
       const { patients } = bedLayout;
       const bed = bedLayoutToBed(bedLayout);
-      const wardPatients: WardPatient[] = patients.map((patient) => {
+      const wardPatients: WardPatient[] = patients.map((patient) : WardPatient => {
         const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
         if (inpatientAdmission) {
-          return { ...inpatientAdmission, admitted: true };
+          const { patient, visit } = inpatientAdmission;
+          return { patient, visit, bed, admitted: true, inpatientAdmission, inpatientRequest: null };
         } else {
           // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
           return {
             patient: patient,
             visit: null,
+            bed,
             admitted: false,
-            encounterAssigningToCurrentInpatientLocation: null, // populate after BED-13
-            firstAdmissionOrTransferEncounter: null,
+            inpatientAdmission: null, // populate after BED-13
+            inpatientRequest: null
           };
         }
       });
@@ -91,8 +93,8 @@ const WardViewWithBedManagement = () => {
                 patient: inpatientAdmission.patient,
                 visit: inpatientAdmission.visit,
                 admitted: true,
-                encounterAssigningToCurrentInpatientLocation: null,
-                firstAdmissionOrTransferEncounter: inpatientAdmission.firstAdmissionOrTransferEncounter,
+                inpatientAdmission,
+                inpatientRequest: null,
               }}
               key={inpatientAdmission.patient.uuid}
             />
@@ -145,9 +147,10 @@ const WardViewWithoutBedManagement = () => {
 
   if (inpatientAdmissions) {
     const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
+      const { patient, visit } = inpatientAdmission;
       return (
         <UnassignedPatient
-          wardPatient={{ ...inpatientAdmission, admitted: true }}
+          wardPatient={{ patient, visit, admitted: true, inpatientAdmission, inpatientRequest: null }}
           key={inpatientAdmission.patient.uuid}
         />
       );

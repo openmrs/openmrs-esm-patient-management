@@ -46,9 +46,9 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
                 key={`admission-request-card-${i}`}
                 patient={request.patient}
                 visit={request.visit}
-                disposition={request.disposition}
-                dispositionEncounter={request.dispositionEncounter}
-                dispositionType={request.dispositionType}
+                inpatientRequest={request}
+                admitted={false}
+                inpatientAdmission={null}
               />
             ))}
           </>

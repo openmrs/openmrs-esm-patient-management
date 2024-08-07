@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { type Bed, type Encounter } from '../types';
+import { type WardPatientCard } from '../types';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
 import styles from './ward-patient-card.scss';
@@ -9,26 +9,12 @@ import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import classNames from 'classnames';
 import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/types';
 
-export interface WardPatientCardProps {
-  patient: Patient;
-  visit: Visit;
-  bed?: Bed;
-  admitted: boolean;
-  encounterAssigningToCurrentInpatientLocation: Encounter;
-  firstAdmissionOrTransferEncounter: Encounter;
-}
-
-export interface WardPatientCardExtensionProps extends WardPatientCardProps {
-  patientUuid: string;
-}
-
-const WardPatientCard: React.FC<WardPatientCardProps> = ({
+const WardPatientCard: WardPatientCard = ({
   patient,
   visit,
   bed,
   admitted,
-  firstAdmissionOrTransferEncounter,
-  encounterAssigningToCurrentInpatientLocation,
+  inpatientAdmission,
 }) => {
   const { id, headerRowElements, footerRowElements } = useCurrentWardCardConfig();
 
@@ -57,8 +43,9 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
             elementId={elementId}
             patient={patient}
             visit={visit}
-            firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter}
-            encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
+            admitted={admitted}
+            inpatientAdmission={inpatientAdmission}
+            inpatientRequest={null}
           />
         ))}
         <ExtensionSlot name={headerExtensionSlotName} state={extensionSlotState} />
@@ -75,8 +62,9 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
             elementId={elementId}
             patient={patient}
             visit={visit}
-            firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter}
-            encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
+            admitted={admitted}
+            inpatientAdmission={inpatientAdmission}
+            inpatientRequest={null}
           />
         ))}
         <ExtensionSlot name={footerExtensionSlotName} state={extensionSlotState} />
@@ -90,8 +78,8 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
             visit,
             bed,
             admitted,
-            firstAdmissionOrTransferEncounter,
-            encounterAssigningToCurrentInpatientLocation,
+            inpatientAdmission,
+            inpatientRequest: null,
           });
         }}>
         {/* Name will not be displayed; just there for a11y */}
