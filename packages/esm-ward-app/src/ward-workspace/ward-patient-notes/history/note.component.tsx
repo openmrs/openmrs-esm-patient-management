@@ -31,7 +31,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note }) => {
   return (
     <Tile className={styles.noteTile}>
       <div className={styles.noteHeader}>
-        <span className={styles.noteProviderRole}>Nurse’s note</span>
+        <span className={styles.noteProviderRole}>Note</span>
         <span className={styles.noteDateAndTime}>
           {formattedDate}, {formattedTime}
         </span>

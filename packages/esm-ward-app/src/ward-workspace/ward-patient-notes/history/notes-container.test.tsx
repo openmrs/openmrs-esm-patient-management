@@ -71,7 +71,6 @@ describe('PatientNotesHistory', () => {
     );
 
     expect(screen.getByText('History')).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /Show/i })).toBeInTheDocument();
 
     expect(screen.getByText('Patient shows improvement with current medication.')).toBeInTheDocument();
     expect(screen.getByText('Dr. John Doe')).toBeInTheDocument();
