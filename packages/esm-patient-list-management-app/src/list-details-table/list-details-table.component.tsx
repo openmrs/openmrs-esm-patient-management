@@ -388,7 +388,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     <>
       <BackButton />
       <Layer>
-        <Tile className={styles.tile} data-openmrs-role="Patient Emply tile">
+        <Tile className={styles.tile} data-openmrs-role="Patient Empty tile">
           <div className={styles.illo}>
             <EmptyDataIllustration />
           </div>
