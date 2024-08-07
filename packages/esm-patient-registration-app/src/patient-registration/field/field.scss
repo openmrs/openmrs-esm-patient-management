@@ -1,6 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .productiveHeading02 {
   @include type.type-style('heading-compact-02');
@@ -10,7 +11,7 @@
 .productiveHeading02Light {
   @include type.type-style('heading-compact-02');
   margin-bottom: 1rem;
-  color: #525252;
+  color: colors.$gray-70;
 }
 
 .label01 {
@@ -20,11 +21,11 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: spacing.$spacing-05;
+  column-gap: layout.$spacing-05;
 }
 
 .halfWidthInDesktopView {
-  width: calc(50% - spacing.$spacing-05);
+  width: calc(50% - layout.$spacing-05);
 }
 
 .patientPhoto {
@@ -64,11 +65,11 @@
 
 .sexField,
 .dobField {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .dobContentSwitcherLabel {
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .identifierLabelText {
@@ -76,20 +77,20 @@
   align-items: center;
 }
 
-.setIDNumberButton {
-  margin-bottom: spacing.$spacing-05;
-}
+.configureIdentifiersButton {
+  margin: 0 0 layout.$spacing-05 layout.$spacing-05;
 
-.setIDNumberButton > svg {
-  margin-left: spacing.$spacing-03;
-}
+  svg {
+    margin-left: layout.$spacing-03;
+  }
 
-.customField {
-  margin-bottom: spacing.$spacing-05;
+  .customField {
+    margin-bottom: layout.$spacing-05;
+  }
 }
 
 .attributeField {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
@@ -97,25 +98,29 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
   }
+
   .nameField {
     grid-row: 2;
     grid-column: 1;
   }
+
   .photoExtension {
     grid-column: 1;
     grid-row: 1;
     justify-self: start;
   }
+
   .radioButton label {
-    height: spacing.$spacing-09 !important;
+    height: layout.$spacing-09 !important;
   }
+
   .halfWidthInDesktopView {
     width: 100%;
   }
 }
 
 .radioFieldError {
-  color: #da1e28;
+  color: colors.$red-60;
   display: block;
   font-weight: 400;
   max-height: 12.5rem;

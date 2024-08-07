@@ -1,0 +1,43 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.caption01 {
+  @include type.type-style('legal-01');
+}
+
+.productiveHeading01 {
+  @include type.type-style('heading-compact-01');
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+}
+
+.productiveHeading03 {
+  @include type.type-style('heading-03');
+}
+
+.productiveHeading04 {
+  @include type.type-style('heading-04');
+}
+
+.bodyLong01 {
+  @include type.type-style('body-01');
+}
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
+}
+
+.text01 {
+  color: colors.$gray-100;
+}
+
+.text02 {
+  color: colors.$gray-70;
+}
+
+.label01 {
+  @include type.type-style('label-01');
+}

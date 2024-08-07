@@ -1,0 +1,51 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  flex-grow: 1;
+}
+
+.tileContainer {
+  border: 1px solid colors.$gray-20;
+  height: 7.875rem;
+  padding: layout.$spacing-05;
+  margin: layout.$spacing-03 layout.$spacing-03;
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: layout.$spacing-03;
+}
+
+.headerLabel {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-70;
+}
+
+.totalsLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.totalsValue {
+  @include type.type-style('heading-04');
+  color: colors.$gray-100;
+}
+
+.headerLabelContainer {
+  margin-bottom: 1rem;
+}
+
+.link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: colors.$blue-60;
+
+  svg {
+    margin-left: layout.$spacing-03;
+  }
+}

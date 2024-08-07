@@ -1,0 +1,74 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.cardContainer {
+  background-color: colors.$white-0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.buttonMain {
+  background-color: colors.$white-0;
+  color: colors.$teal-60;
+  cursor: text;
+}
+
+.sectionLoader {
+  text-align: center;
+}
+
+.buttonMain {
+  &:active,
+  &:focus,
+  &:hover {
+    color: colors.$teal-60 !important;
+    background-color: colors.$white-0 !important;
+  }
+}
+
+.inactiveMain {
+  margin-bottom: 4rem;
+}
+
+.buttonContainer {
+  display: flex;
+}
+
+.buttonItems {
+  flex: auto;
+}
+
+.pageHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: layout.$spacing-05;
+  background-color: #ededed;
+}
+
+.pageHeader {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: colors.$blue-60;
+
+  svg {
+    margin-left: layout.$spacing-03;
+  }
+}
+
+.loader {
+  margin: 2rem;
+}

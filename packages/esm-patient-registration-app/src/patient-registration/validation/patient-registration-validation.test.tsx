@@ -1,21 +1,45 @@
-import { defineConfigSchema, getConfig } from '@openmrs/esm-framework';
+import { getConfig } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../../config-schema';
 import { getValidationSchema } from './patient-registration-validation';
-import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../config-schema';
-describe('Patient Registration Validation', () => {
-  beforeAll(() => {
-    defineConfigSchema('@openmrs/esm-patient-registration-app', esmPatientRegistrationSchema);
+
+const mockGetConfig = jest.mocked(getConfig);
+
+describe('Patient registration validation', () => {
+  beforeEach(() => {
+    mockGetConfig.mockResolvedValue({
+      fieldConfigurations: {
+        gender: [
+          {
+            label: 'M',
+            value: 'male',
+          },
+          {
+            label: 'F',
+            value: 'female',
+          },
+          {
+            label: 'O',
+            value: 'other',
+          },
+          {
+            label: 'U',
+            value: 'unknown',
+          },
+        ],
+      },
+    });
   });
 
   const validFormValues = {
-    givenName: 'John',
-    familyName: 'Doe',
-    additionalGivenName: '',
     additionalFamilyName: '',
-    gender: 'male',
+    additionalGivenName: '',
     birthdate: new Date('1990-01-01'),
     birthdateEstimated: false,
     deathDate: null,
     email: 'john.doe@example.com',
+    familyName: 'Doe',
+    gender: 'male',
+    givenName: 'John',
     identifiers: {
       nationalId: {
         required: true,
@@ -29,7 +53,8 @@ describe('Patient Registration Validation', () => {
   };
 
   const validateFormValues = async (formValues) => {
-    const config = (await getConfig('@openmrs/esm-patient-registration-app')) as any as RegistrationConfig;
+    const config = (await getConfig('@openmrs/esm-patient-registration-app')) as unknown as RegistrationConfig;
+
     const validationSchema = getValidationSchema(config);
     try {
       await validationSchema.validate(formValues, { abortEarly: false });

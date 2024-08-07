@@ -1,3 +1,5 @@
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface SearchedPatient {
   patientId: number;
   uuid: string;

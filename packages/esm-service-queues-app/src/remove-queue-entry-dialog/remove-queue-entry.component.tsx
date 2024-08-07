@@ -6,7 +6,7 @@ import { type MappedQueueEntry } from '../types';
 import { startOfDay } from '../constants';
 import { useCheckedInAppointments, endQueueEntry } from './remove-queue-entry.resource';
 import styles from './remove-queue-entry.scss';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 
 interface RemoveQueueEntryDialogProps {
   queueEntry: MappedQueueEntry;

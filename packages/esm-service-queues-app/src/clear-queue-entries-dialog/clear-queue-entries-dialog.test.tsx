@@ -4,24 +4,22 @@ import { render, screen } from '@testing-library/react';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
 import ClearQueueEntriesDialog from './clear-queue-entries-dialog.component';
 
-const mockBatchClearQueueEntries = batchClearQueueEntries as jest.Mock;
+const mockBatchClearQueueEntries = jest.mocked(batchClearQueueEntries);
+const mockCloseModal = jest.fn();
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-}));
+const defaultProps = {
+  queueEntries: [],
+  closeModal: mockCloseModal,
+};
 
 jest.mock('./clear-queue-entries-dialog.resource');
-
-jest.mock('../hooks/useMutateQueueEntries', () => ({
+jest.mock('../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 
 describe('ClearQueueEntriesDialog Component', () => {
-  const visitQueueEntriesMock = [];
-
   it('renders the component with warning message', () => {
-    render(<ClearQueueEntriesDialog visitQueueEntries={visitQueueEntriesMock} closeModal={() => {}} />);
+    renderClearQueueEntriesDialog();
 
     expect(screen.getByRole('heading', { name: 'Service queue' })).toBeInTheDocument();
     expect(screen.getByText('Clear all queue entries?')).toBeInTheDocument();
@@ -29,15 +27,17 @@ describe('ClearQueueEntriesDialog Component', () => {
     expect(screen.getByText('Clear queue')).toBeInTheDocument();
   });
 
-  it('should close modal when clicked on cancel', async () => {
+  it('should close modal when the cancel button is clicked', async () => {
     const user = userEvent.setup();
-    const closeModalMock = jest.fn();
 
-    mockBatchClearQueueEntries.mockImplementationOnce(() => Promise.resolve());
-    render(<ClearQueueEntriesDialog visitQueueEntries={visitQueueEntriesMock} closeModal={closeModalMock} />);
+    mockBatchClearQueueEntries.mockResolvedValue(undefined);
+    renderClearQueueEntriesDialog();
 
     await user.click(screen.getByText('Cancel'));
-
-    expect(closeModalMock).toHaveBeenCalled();
+    expect(mockCloseModal).toHaveBeenCalledTimes(1);
   });
 });
+
+function renderClearQueueEntriesDialog(props = {}) {
+  render(<ClearQueueEntriesDialog {...defaultProps} {...props} />);
+}

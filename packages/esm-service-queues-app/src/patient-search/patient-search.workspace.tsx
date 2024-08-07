@@ -4,10 +4,10 @@ import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
 import {
-  ArrowLeftIcon,
   type DefaultWorkspaceProps,
-  displayName,
+  ArrowLeftIcon,
   ErrorState,
+  getPatientName,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
@@ -43,7 +43,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   const { activeVisit } = useVisit(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
   const [showContactDetails, setContactDetails] = useState(false);
-  const { appointments, isLoading, isError } = useScheduledVisits(selectedPatientUuid);
+  const { appointments, isLoading, error } = useScheduledVisits(selectedPatientUuid);
 
   const hasAppointments = !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits));
 
@@ -76,44 +76,44 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
     }
   }, [searchType, handleBackToSearchList]);
 
-  const patientName = patient && displayName(patient);
+  const patientName = patient && getPatientName(patient);
   return patient ? (
-    <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
-      <div className={styles.patientBannerContainer}>
-        <div className={styles.patientBanner}>
-          <div className={styles.patientPhoto}>
-            <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+    <div className={styles.patientSearchContainer}>
+      <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
+        <div className={styles.patientBannerContainer}>
+          <div className={styles.patientBanner}>
+            <div className={styles.patientPhoto}>
+              <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+            </div>
+            <PatientBannerPatientInfo patient={patient} />
+            <PatientBannerToggleContactDetailsButton
+              showContactDetails={showContactDetails}
+              toggleContactDetails={() => setContactDetails(!showContactDetails)}
+            />
           </div>
-          <PatientBannerPatientInfo patient={patient} />
-          <PatientBannerToggleContactDetailsButton
-            showContactDetails={showContactDetails}
-            toggleContactDetails={() => setContactDetails(!showContactDetails)}
-          />
+          {showContactDetails ? (
+            <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
+          ) : null}
         </div>
-        {showContactDetails ? (
-          <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
-        ) : null}
-      </div>
-      <div className={styles.backButton}>
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
-          iconDescription={backButtonDescription}
-          size="sm"
-          onClick={() => handleBackToAction()}>
-          <span>{backButtonDescription}</span>
-        </Button>
-      </div>
-      <div>
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
+            iconDescription={backButtonDescription}
+            size="sm"
+            onClick={handleBackToAction}>
+            <span>{backButtonDescription}</span>
+          </Button>
+        </div>
         {activeVisit ? (
           <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
         ) : (
           <>
-            {isError ? (
-              <ErrorState headerTitle={t('errorFetchingAppointments', 'Error fetching appointments')} error={isError} />
+            {error ? (
+              <ErrorState headerTitle={t('errorFetchingAppointments', 'Error fetching appointments')} error={error} />
             ) : null}
 
-            {isLoading && !isError ? (
+            {isLoading && !error ? (
               <DataTableSkeleton role="progressbar" />
             ) : searchType === SearchTypes.SCHEDULED_VISITS && hasAppointments ? (
               <PatientScheduledVisits
@@ -127,8 +127,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
             ) : null}
           </>
         )}
-      </div>
-    </AddPatientToQueueContext.Provider>
+      </AddPatientToQueueContext.Provider>
+    </div>
   ) : null;
 };
 

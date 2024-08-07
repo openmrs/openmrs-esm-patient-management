@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-management",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "private": true,
   "description": "Patient management microfrontend for the OpenMRS 3.x frontend",
   "workspaces": [
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
+    "@internationalized/date": "^3.5.4",
     "classnames": "^2.3.2",
     "react-hook-form": "^7.46.2",
     "swr": "^2.0.1",
@@ -28,7 +29,7 @@
     "@carbon/react": "~1.37.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
-    "@playwright/test": "1.44.0",
+    "@playwright/test": "1.45.2",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.29",
     "@testing-library/dom": "^9.3.3",
@@ -52,7 +53,9 @@
     "dayjs": "^1.8.36",
     "dotenv": "^16.0.3",
     "eslint": "^8.55.0",
+    "eslint-plugin-jest-dom": "^5.4.0",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-testing-library": "^6.2.2",
     "husky": "^8.0.3",
     "i18next": "^21.10.0",
     "i18next-parser": "^6.6.0",
@@ -70,7 +73,7 @@
     "sass": "^1.29.0",
     "sass-loader": "^10.1.0",
     "swc-loader": "^0.2.3",
-    "turbo": "^2.0.3",
+    "turbo": "^2.0.6",
     "typedoc": "^0.22.15",
     "typescript": "^4.0.3",
     "webpack": "^5.74.0",

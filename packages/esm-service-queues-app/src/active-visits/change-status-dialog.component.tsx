@@ -25,7 +25,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ConfigObject } from '../config-schema';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;

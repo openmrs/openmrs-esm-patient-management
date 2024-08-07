@@ -48,16 +48,6 @@
   margin-top: spacing.$spacing-05;
 }
 
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) {
-  .form {
-    height: calc(100vh - 6rem);
-  }
-}
-
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) {
-  .form {
-    height: calc(100vh - 3rem);
-  }
+.form {
+  height: 100%;
 }

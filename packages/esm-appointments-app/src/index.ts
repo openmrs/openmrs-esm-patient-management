@@ -99,13 +99,18 @@ export const patientAppointmentsOverview = getSyncLifecycle(patientAppointmentsO
 export const patientUpcomingAppointmentsWidget = getSyncLifecycle(patientUpcomingAppointmentsComponent, options);
 
 export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
-  () => import('./patient-appointments/patient-appointments-cancel-modal.component'),
+  () => import('./patient-appointments/patient-appointments-cancel.modal'),
   options,
 );
 
 export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
 
 export const endAppointmentModal = getAsyncLifecycle(
-  () => import('./appointments/common-components/end-appointment-modal.component'),
+  () => import('./appointments/common-components/end-appointment.modal'),
+  options,
+);
+
+export const homeAppointmentsTile = getAsyncLifecycle(
+  () => import('./homepage-tile/appointments-tile.component'),
   options,
 );

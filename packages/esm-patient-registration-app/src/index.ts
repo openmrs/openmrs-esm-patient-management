@@ -63,6 +63,6 @@ export const editPatientDetailsButton = getSyncLifecycle(editPatientDetailsButto
 });
 
 export const deleteIdentifierConfirmationModal = getAsyncLifecycle(
-  () => import('./widgets/delete-identifier-confirmation-modal'),
+  () => import('./widgets/delete-identifier-confirmation.modal'),
   options,
 );

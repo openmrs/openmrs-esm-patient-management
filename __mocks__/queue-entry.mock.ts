@@ -137,11 +137,19 @@ export const mockQueueEntryAlice: QueueEntry = {
     attributes: [
       {
         attributeType: {
-          uuid: 'queue-number-visit-attr-uuid',
+          uuid: 'queue-number-visit-attr-type-uuid',
         },
         value: '42',
+        uuid: 'queue-number-visit-attr-uuid',
       },
     ],
+    encounters: [],
+    visitType: {
+      uuid: 'visit-type-uuid',
+      display: 'Facility Visit',
+    },
+    visitTypeUuid: 'visit-type-uuid',
+    startDatetime: '2022-04-03T07:22:00.000+0000',
   } as Visit,
   sortWeight: 0,
   queueComingFrom: mockQueueTriage,

@@ -1,29 +1,27 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Home from './home.component';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema } from './config-schema';
+import { type ConfigObject, configSchema } from './config-schema';
+import Home from './home.component';
 
-const mockedUseConfig = useConfig as jest.Mock;
-
-mockedUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
-  concepts: {
-    visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  },
-});
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('./helpers/helpers', () => ({
   ...jest.requireActual('./helpers/helpers'),
   useSelectedQueueLocationName: jest.fn(() => 'Test Location'),
 }));
 
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+});
+
 describe('Home Component', () => {
   it('renders PatientQueueHeader, ClinicMetrics when activeTicketScreen is not "screen"', () => {
     // Mock window.location.pathname
     const originalLocation = window.location;
     delete window.location;
-    window.location = { pathname: '/some-path' };
+    window.location = { pathname: '/some-path' } as Location;
 
     render(<Home />);
 
@@ -38,10 +36,10 @@ describe('Home Component', () => {
   it('renders QueueScreen when activeTicketScreen is "screen"', () => {
     const originalLocation = window.location;
     delete window.location;
-    window.location = { pathname: '/some-path/screen' };
+    window.location = { pathname: '/some-path/screen' } as Location;
 
     render(<Home />);
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
 
     window.location = originalLocation;
   });

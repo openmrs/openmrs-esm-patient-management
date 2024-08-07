@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
-import PatientAppointmentsTable from './patient-appointments-table';
+import PatientAppointmentsTable from './patient-appointments-table.component';
 import styles from './patient-appointments-base.scss';
 
 import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
@@ -32,7 +32,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const {
     data: appointmentsData,
-    isError,
+    error,
     isLoading,
     isValidating,
   } = usePatientAppointments(patientUuid, startDate, new AbortController());
@@ -49,8 +49,8 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   };
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-  if (isError) {
-    return <ErrorState headerTitle={headerTitle} error={isError} />;
+  if (error) {
+    return <ErrorState headerTitle={headerTitle} error={error} />;
   }
   if (Object.keys(appointmentsData)?.length) {
     return (

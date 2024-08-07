@@ -1,15 +1,22 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
-import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
-import { useQueueLocations } from '../hooks/useQueueLocations';
-import styles from './visit-form-queue-fields.scss';
-import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
+import {
+  InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
+  RadioButtonSkeleton,
+  Select,
+  SelectItem,
+  SelectSkeleton,
+  TextInput,
+} from '@carbon/react';
+import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
 import { useQueues } from '../../hooks/useQueues';
+import { useQueueLocations } from '../hooks/useQueueLocations';
 import { type ConfigObject } from '../../config-schema';
-import { SelectSkeleton } from '@carbon/react';
-import { RadioButtonSkeleton } from '@carbon/react';
 import { AddPatientToQueueContext } from '../patient-search.workspace';
+import styles from './visit-form-queue-fields.scss';
 
 export interface VisitFormQueueFieldsProps {
   setFormFields: (fields: {

@@ -26,7 +26,7 @@ export function useVisit(visitUuid: string) {
 
   return {
     visit: data ? data.data : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };

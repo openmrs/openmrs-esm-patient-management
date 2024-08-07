@@ -70,10 +70,10 @@ export const AddressComponent: React.FC = () => {
     );
   }, [isLoadingFieldOrder, errorFetchingFieldOrder, orderedFields, addressLayout]);
 
-  if (!addressTemplate) {
+  if (addressTemplate && !Object.keys(addressTemplate)?.length) {
     return (
       <AddressComponentContainer>
-        <SkeletonText />
+        <SkeletonText role="progressbar" />
       </AddressComponentContainer>
     );
   }

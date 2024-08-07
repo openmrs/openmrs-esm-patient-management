@@ -41,7 +41,7 @@ import { type NewVisitPayload, type PatientProgram } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type ConfigObject } from '../../config-schema';
 import { datePickerFormat, datePickerPlaceHolder } from '../../constants';
 import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
@@ -327,16 +327,16 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) =>
           )}
 
           <VisitFormQueueFields setFormFields={setVisitFormFields} />
-          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
-              {t('discard', 'Discard')}
-            </Button>
-            <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-              {t('startVisit', 'Start visit')}
-            </Button>
-          </ButtonSet>
         </Stack>
       </div>
+      <ButtonSet className={isTablet ? styles.tabletButtons : styles.desktopButtons}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          {t('discard', 'Discard')}
+        </Button>
+        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {t('startVisit', 'Start visit')}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 };

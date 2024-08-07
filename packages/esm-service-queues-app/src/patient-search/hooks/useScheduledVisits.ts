@@ -46,7 +46,7 @@ export function useScheduledVisits(patientUuid: string) {
 
   return {
     appointments: data ? { recentVisits, futureVisits } : null,
-    isError: error,
+    error,
     isLoading,
   };
 }

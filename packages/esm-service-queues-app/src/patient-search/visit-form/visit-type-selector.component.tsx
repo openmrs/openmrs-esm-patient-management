@@ -1,23 +1,21 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
-import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { useTranslation } from 'react-i18next';
-import { Layer, Search, RadioButtonGroup, RadioButton, StructuredListSkeleton, Tile } from '@carbon/react';
 import {
-  ResponsiveWrapper,
-  reportError,
-  useDebounce,
-  useLayoutType,
-  usePagination,
-  useVisitTypes,
-  type VisitType,
-} from '@openmrs/esm-framework';
+  InlineNotification,
+  Layer,
+  RadioButton,
+  RadioButtonGroup,
+  Search,
+  StructuredListSkeleton,
+  Tile,
+} from '@carbon/react';
+import { ResponsiveWrapper, useDebounce, useLayoutType, useVisitTypes, type VisitType } from '@openmrs/esm-framework';
 import EmptyDataIllustration from '../empty-data-illustration.component';
 import styles from './visit-type-selector.scss';
 import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
 import { type PatientProgram } from '../../types';
-import { InlineNotification } from '@carbon/react';
 
 export interface VisitTypeSelectorProps {
   onChange: (event) => void;

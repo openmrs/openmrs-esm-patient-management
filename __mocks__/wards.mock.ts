@@ -1,6 +1,6 @@
-import { type AdmissionLocation, type BedType } from '../packages/esm-ward-app/src/types';
+import { type AdmissionLocationFetchResponse, type BedType } from '../packages/esm-ward-app/src/types';
 import { mockLocationInpatientWard } from './locations.mock';
-import { mockPatientAlice } from './patient.mock';
+import { mockPatientAlice, mockPatientBrian } from './patient.mock';
 
 const mockBedType: BedType = {
   uuid: '0000-bed-type',
@@ -10,7 +10,7 @@ const mockBedType: BedType = {
   resourceVersion: '',
 };
 
-export const mockAdmissionLocation: AdmissionLocation = {
+export const mockAdmissionLocation: AdmissionLocationFetchResponse = {
   totalBeds: 4,
   occupiedBeds: 1,
   ward: mockLocationInpatientWard,
@@ -24,7 +24,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'OCCUPIED',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: mockPatientAlice,
+      patients: [mockPatientAlice],
       bedTagMaps: [],
     },
     {
@@ -36,7 +36,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'AVAILABLE',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: null,
+      patients: [],
       bedTagMaps: [],
     },
     {
@@ -48,7 +48,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'AVAILABLE',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: null,
+      patients: [],
       bedTagMaps: [],
     },
     {
@@ -60,8 +60,15 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'AVAILABLE',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: null,
+      patients: [],
       bedTagMaps: [],
     },
   ],
 };
+
+export const mockInpatientAdmissions = [
+  {
+    patient: mockPatientBrian,
+    visit: null,
+  },
+];

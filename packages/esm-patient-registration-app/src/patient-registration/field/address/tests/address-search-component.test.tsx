@@ -4,16 +4,16 @@ import { render, screen } from '@testing-library/react';
 import { Formik, Form, useFormikContext } from 'formik';
 import { type Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
-import { useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../../config-schema';
 import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from '__mocks__';
 import AddressSearchComponent from '../address-search.component';
 
-useAddressHierarchy;
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(),
-}));
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseAddressHierarchy = jest.mocked(useAddressHierarchy);
+const mockUseOrderedAddressHierarchyLevels = jest.mocked(useOrderedAddressHierarchyLevels);
+const mockUseFormikContext = useFormikContext as jest.Mock;
 
 jest.mock('../address-hierarchy.resource', () => ({
   ...(jest.requireActual('../address-hierarchy.resource') as jest.Mock),
@@ -60,7 +60,8 @@ const setFieldValue = jest.fn();
 
 describe('Testing address search bar', () => {
   beforeEach(() => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         address: {
           useAddressHierarchy: {
@@ -69,24 +70,24 @@ describe('Testing address search bar', () => {
             searchAddressByLevel: false,
           },
         },
-      },
-    }));
-    (useOrderedAddressHierarchyLevels as jest.Mock).mockImplementation(() => ({
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+    mockUseOrderedAddressHierarchyLevels.mockReturnValue({
       orderedFields: mockedOrderedFields,
       isLoadingFieldOrder: false,
       errorFetchingFieldOrder: null,
-    }));
-    (useFormikContext as jest.Mock).mockImplementation(() => ({
+    });
+    mockUseFormikContext.mockReturnValue({
       setFieldValue,
-    }));
+    });
   });
 
   it('should render the search bar', () => {
-    (useAddressHierarchy as jest.Mock).mockImplementation(() => ({
+    mockUseAddressHierarchy.mockReturnValue({
       addresses: [],
       error: null,
       isLoading: false,
-    }));
+    });
 
     renderAddressHierarchy();
 
@@ -100,11 +101,11 @@ describe('Testing address search bar', () => {
   it("should render only the results for the search term matched address' parents", async () => {
     const user = userEvent.setup();
 
-    (useAddressHierarchy as jest.Mock).mockImplementation(() => ({
+    mockUseAddressHierarchy.mockReturnValue({
       addresses: mockedAddressOptions,
       error: null,
       isLoading: false,
-    }));
+    });
 
     renderAddressHierarchy();
 
