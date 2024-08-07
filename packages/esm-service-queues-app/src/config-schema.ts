@@ -82,11 +82,6 @@ export const configSchema = {
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
-    defaultResultReviewPriorityConceptUuid: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the default priority for request from lab in the queues eg result review.',
-      _default: '',
-    },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
       _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
