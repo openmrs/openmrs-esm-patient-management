@@ -1,0 +1,58 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.workspaceContent {
+  padding: spacing.$spacing-05;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspaceForm {
+  margin-top: spacing.$spacing-05;
+  flex: 1;
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.buttonSet {
+  display: flex;
+  align-items: center;
+  margin: 0 -1rem -1rem -1rem;
+
+  button {
+    max-width: unset !important;
+    width: 50% !important;
+
+    > svg {
+      fill: currentColor !important;
+    }
+  }
+}
+
+.radioButtonGroup {
+  margin-top: spacing.$spacing-03;
+  fieldset {
+    flex-direction: column;
+    align-items: flex-start;
+
+    :global(.cds--radio-button-wrapper) {
+      margin-bottom: spacing.$spacing-04;
+    }
+  }
+}
+
+.notifications {
+  margin-top: spacing.$spacing-05;
+}
