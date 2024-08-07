@@ -13,10 +13,10 @@ import {
   translateFrom,
   useSession,
 } from '@openmrs/esm-framework';
-import { savePatientNote } from './notes-form.resource';
 import styles from './notes-form.scss';
 import { moduleName } from '../../../constant';
-import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
+import { savePatientNote } from '../notes.resource';
+import { type EmrApiConfigurationResponse } from '../../../types';
 
 type NotesFormData = z.infer<typeof noteFormSchema>;
 
@@ -29,14 +29,19 @@ const noteFormSchema = z.object({
 
 interface PatientNotesFormProps extends DefaultWorkspaceProps {
   patientUuid: PatientUuid;
+  emrConfiguration: EmrApiConfigurationResponse;
+  isLoadingEmrConfiguration: boolean;
+  errorFetchingEmrConfiguration: Error;
 }
 
 const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   promptBeforeClosing,
+  emrConfiguration,
+  isLoadingEmrConfiguration,
+  errorFetchingEmrConfiguration,
 }) => {
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { t } = useTranslation();
   const session = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -120,18 +125,16 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
       {errorFetchingEmrConfiguration && (
-        <div className={styles.formError}>
-          <InlineNotification
-            kind="error"
-            title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
-            subtitle={t(
-              'fetchingEmrConfigurationFailed',
-              'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
-            )}
-            lowContrast
-            hideCloseButton
-          />
-        </div>
+        <InlineNotification
+          kind="error"
+          title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
+          subtitle={t(
+            'fetchingEmrConfigurationFailed',
+            'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
+          )}
+          lowContrast
+          hideCloseButton
+        />
       )}
       <Stack className={styles.formContainer} gap={2}>
         <Row className={styles.row}>
