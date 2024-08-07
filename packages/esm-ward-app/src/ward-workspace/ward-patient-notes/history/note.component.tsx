@@ -6,7 +6,7 @@ import styles from './styles.scss';
 
 export const InPatientNoteSkeleton: React.FC = () => {
   return (
-    <Tile className={styles.noteTile}>
+    <Tile className={styles.noteTile} data-testid="in-patient-note-skeleton">
       <div className={styles.noteHeader}>
         <SkeletonText heading width="30%" />
         <SkeletonText width="20%" />

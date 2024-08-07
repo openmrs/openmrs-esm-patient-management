@@ -1,110 +1,96 @@
 import React from 'react';
-import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
-import { savePatientNote } from './notes-form.resource';
-import PatientNotesForm from './notes-form.component';
-import { emrConfigurationMock, mockPatient, mockSession } from '__mocks__';
-import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
+import PatientNotesHistory from './notes-container.component';
+import { usePatientNotes } from '../notes.resource';
 
-const testProps = {
-  patientUuid: mockPatient.uuid,
-  closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  onWorkspaceClose: jest.fn(),
-  setOnCloseCallback: jest.fn(),
-};
-
-const mockSavePatientNote = savePatientNote as jest.Mock;
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockedCreateErrorHandler = jest.mocked(createErrorHandler);
-const mockedTranslateFrom = jest.mocked(translateFrom);
-const mockedResponsiveWrapper = jest.mocked(ResponsiveWrapper);
-const mockedUseSession = jest.mocked(useSession);
-
-jest.mock('./notes-form.resource', () => ({
-  savePatientNote: jest.fn(),
+jest.mock('../notes.resource', () => ({
+  usePatientNotes: jest.fn(),
 }));
 
-jest.mock('../../../hooks/useEmrConfiguration', () => jest.fn());
+const mockPatientUuid = 'sample-patient-uuid';
+const mockEmrConfiguration = {
+  visitNoteEncounterType: { uuid: 'visit-note-encounter-type' },
+  consultFreeTextCommentsConcept: { uuid: 'consult-free-text-comments-concept' },
+};
 
-const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
+const mockPatientNotes = [
+  {
+    id: 'note-1',
+    diagnoses: '',
+    encounterDate: '2024-08-01',
+    encounterNote: 'Patient shows improvement with current medication.',
+    encounterNoteRecordedAt: '2024-08-01T12:34:56Z',
+    encounterProvider: 'Dr. John Doe',
+    encounterProviderRole: 'Endocrinologist',
+  },
+  {
+    id: 'note-2',
+    diagnoses: '',
+    encounterDate: '2024-08-02',
+    encounterNote: 'Blood pressure is slightly elevated. Consider adjusting medication.',
+    encounterNoteRecordedAt: '2024-08-02T14:22:00Z',
+    encounterProvider: 'Dr. Jane Smith',
+    encounterProviderRole: 'Cardiologist',
+  },
+];
 
-mockedUseEmrConfiguration.mockReturnValue({
-  emrConfiguration: emrConfigurationMock,
-  mutateEmrConfiguration: jest.fn(),
-  isLoadingEmrConfiguration: false,
-  errorFetchingEmrConfiguration: null,
-});
+describe('PatientNotesHistory', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
 
-test('renders the visit notes form with all the relevant fields and values', () => {
-  renderWardPatientNotesForm();
+  test('renders the component with header and dropdown', () => {
+    usePatientNotes.mockReturnValue({
+      patientNotes: [],
+      isLoadingPatientNotes: false,
+    });
 
-  expect(screen.getByRole('textbox', { name: /Write your notes/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Save/i })).toBeInTheDocument();
-});
+    render(
+      <PatientNotesHistory
+        patientUuid={mockPatientUuid}
+        emrConfiguration={mockEmrConfiguration}
+        isLoadingEmrConfiguration={false}
+      />,
+    );
 
-test('renders a success snackbar upon successfully recording a visit note', async () => {
-  const successPayload = {
-    encounterType: emrConfigurationMock.visitNoteEncounterType.uuid,
-    location: undefined,
-    obs: expect.arrayContaining([
-      {
-        concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-        value: 'Sample clinical note',
-      },
-    ]),
-    patient: mockPatient.uuid,
-  };
+    expect(screen.getByText('History')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /Show/i })).toBeInTheDocument();
+  });
 
-  mockSavePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
+  test('displays loading skeletons when loading', () => {
+    usePatientNotes.mockReturnValue({
+      patientNotes: [],
+      isLoadingPatientNotes: true,
+    });
 
-  renderWardPatientNotesForm();
+    render(
+      <PatientNotesHistory
+        patientUuid={mockPatientUuid}
+        emrConfiguration={mockEmrConfiguration}
+        isLoadingEmrConfiguration={true}
+      />,
+    );
 
-  const note = screen.getByRole('textbox', { name: /Write your notes/i });
-  await userEvent.clear(note);
-  await userEvent.type(note, 'Sample clinical note');
-  expect(note).toHaveValue('Sample clinical note');
+    expect(screen.getAllByTestId('in-patient-note-skeleton')).toHaveLength(4);
+  });
 
-  const submitButton = screen.getByRole('button', { name: /Save/i });
-  await userEvent.click(submitButton);
+  test('displays patient notes when available', () => {
+    usePatientNotes.mockReturnValue({
+      patientNotes: mockPatientNotes,
+      isLoadingPatientNotes: false,
+    });
 
-  expect(mockSavePatientNote).toHaveBeenCalledTimes(1);
-  expect(mockSavePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
-});
+    render(
+      <PatientNotesHistory
+        patientUuid={mockPatientUuid}
+        emrConfiguration={mockEmrConfiguration}
+        isLoadingEmrConfiguration={false}
+      />,
+    );
 
-test('renders an error snackbar if there was a problem recording a visit note', async () => {
-  const error = {
-    message: 'Internal Server Error',
-    response: {
-      status: 500,
-      statusText: 'Internal Server Error',
-    },
-  };
-
-  mockSavePatientNote.mockRejectedValueOnce(error);
-  renderWardPatientNotesForm();
-
-  const note = screen.getByRole('textbox', { name: /Write your notes/i });
-  await userEvent.clear(note);
-  await userEvent.type(note, 'Sample clinical note');
-  expect(note).toHaveValue('Sample clinical note');
-
-  const submitButton = screen.getByRole('button', { name: /Save/i });
-
-  await userEvent.click(submitButton);
-
-  expect(mockedShowSnackbar).toHaveBeenCalledWith({
-    isLowContrast: false,
-    kind: 'error',
-    subtitle: 'Internal Server Error',
-    title: 'Error saving patient note',
+    expect(screen.getByText('Patient shows improvement with current medication.')).toBeInTheDocument();
+    expect(screen.getByText('Dr. John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Blood pressure is slightly elevated. Consider adjusting medication.')).toBeInTheDocument();
+    expect(screen.getByText('Dr. Jane Smith')).toBeInTheDocument();
   });
 });
-
-function renderWardPatientNotesForm() {
-  mockedUseSession.mockReturnValue(mockSession);
-  render(<PatientNotesForm {...testProps} />);
-}
