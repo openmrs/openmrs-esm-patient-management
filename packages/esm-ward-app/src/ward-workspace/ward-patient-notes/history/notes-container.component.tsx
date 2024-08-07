@@ -31,6 +31,8 @@ const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({
 
   const isLoading = isLoadingPatientNotes || isLoadingEmrConfiguration;
 
+  if (!isLoading && patientNotes.length === 0) return null;
+
   return (
     <div className={styles.notesContainer}>
       <div className={styles.notesContainerHeader}>
