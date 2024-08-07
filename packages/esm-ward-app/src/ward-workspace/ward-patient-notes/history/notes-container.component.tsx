@@ -5,7 +5,7 @@ import { usePatientNotes } from '../notes.resource';
 import InPatientNote, { InPatientNoteSkeleton } from './note.component';
 import { type EmrApiConfigurationResponse } from '../../../types';
 import styles from './styles.scss';
-import { Dropdown } from '@carbon/react';
+import { Dropdown, InlineNotification } from '@carbon/react';
 
 interface PatientNotesHistoryProps {
   patientUuid: PatientUuid;
@@ -21,7 +21,7 @@ const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const [filter, setFilter] = useState('');
-  const { patientNotes, isLoadingPatientNotes } = usePatientNotes(
+  const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
     patientUuid,
     emrConfiguration?.visitNoteEncounterType?.uuid,
     emrConfiguration?.consultFreeTextCommentsConcept.uuid,
@@ -31,7 +31,7 @@ const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({
 
   const isLoading = isLoadingPatientNotes || isLoadingEmrConfiguration;
 
-  if (!isLoading && patientNotes.length === 0) return null;
+  if (!isLoading && patientNotes.length === 0 && !errorFetchingPatientNotes) return null;
 
   return (
     <div className={styles.notesContainer}>
@@ -55,6 +55,18 @@ const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({
       {patientNotes.map((patientNote) => (
         <InPatientNote key={patientNote.id} note={patientNote} />
       ))}
+      {errorFetchingPatientNotes && (
+        <InlineNotification
+          kind="error"
+          title={t('patientNotesDidntLoad', "Patient notes didn't load")}
+          subtitle={t(
+            'fetchingPatientNotesFailed',
+            'Fetching patient notes failed. Try refreshing the page or contact your system administrator.',
+          )}
+          lowContrast
+          hideCloseButton
+        />
+      )}
     </div>
   );
 };

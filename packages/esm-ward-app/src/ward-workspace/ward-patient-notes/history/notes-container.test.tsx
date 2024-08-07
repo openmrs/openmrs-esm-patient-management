@@ -39,24 +39,6 @@ describe('PatientNotesHistory', () => {
     jest.resetAllMocks();
   });
 
-  test('renders the component with header and dropdown', () => {
-    usePatientNotes.mockReturnValue({
-      patientNotes: [],
-      isLoadingPatientNotes: false,
-    });
-
-    render(
-      <PatientNotesHistory
-        patientUuid={mockPatientUuid}
-        emrConfiguration={mockEmrConfiguration}
-        isLoadingEmrConfiguration={false}
-      />,
-    );
-
-    expect(screen.getByText('History')).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /Show/i })).toBeInTheDocument();
-  });
-
   test('displays loading skeletons when loading', () => {
     usePatientNotes.mockReturnValue({
       patientNotes: [],
@@ -87,6 +69,9 @@ describe('PatientNotesHistory', () => {
         isLoadingEmrConfiguration={false}
       />,
     );
+
+    expect(screen.getByText('History')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /Show/i })).toBeInTheDocument();
 
     expect(screen.getByText('Patient shows improvement with current medication.')).toBeInTheDocument();
     expect(screen.getByText('Dr. John Doe')).toBeInTheDocument();
