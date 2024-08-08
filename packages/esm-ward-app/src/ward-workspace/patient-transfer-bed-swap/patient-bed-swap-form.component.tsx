@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import type { PatientTransferAndSwapWorkspaceProps } from './types';
 import styles from './patient-transfer-swap.scss';
 import { Form, ButtonSet, Button } from '@carbon/react';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
@@ -13,11 +12,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { filterBeds } from '../../ward-view/ward-view.resource';
 import type { BedLayout } from '../../types';
 import { InlineNotification } from '@carbon/react';
+import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
 
 export default function PatientBedSwapForm({
   promptBeforeClosing,
   closeWorkspaceWithSavedChanges,
-}: PatientTransferAndSwapWorkspaceProps) {
+}: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { isLoading, admissionLocation } = useAdmissionLocation();
