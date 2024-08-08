@@ -275,6 +275,7 @@
   "ticketNumber": "מספר כרטיס",
   "time": "זמן",
   "timeCannotBeInFuture": "Time cannot be in the future",
+  "timeCannotBePriorToPreviousQueueEntry": "Time cannot be before start of previous queue entry: {{time}}",
   "timeOfTransition": "Time of transition",
   "tirageNotYetCompleted": "הטריאז' עדיין לא הושלם",
   "today": "היום",
