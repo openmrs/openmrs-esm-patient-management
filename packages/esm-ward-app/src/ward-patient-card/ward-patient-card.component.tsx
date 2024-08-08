@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { type Encounter, type Bed } from '../types';
+import { type Bed, type Encounter } from '../types';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
 import styles from './ward-patient-card.scss';
