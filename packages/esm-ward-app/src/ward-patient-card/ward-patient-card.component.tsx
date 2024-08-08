@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { type WardPatientCard } from '../types';
+import { type WardPatientWorkspaceProps, type WardPatientCard } from '../types';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
 import styles from './ward-patient-card.scss';
@@ -7,15 +7,9 @@ import { ExtensionSlot, getPatientName, launchWorkspace, type Patient, type Visi
 import WardPatientName from './row-elements/ward-patient-name';
 import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import classNames from 'classnames';
-import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/types';
 
-const WardPatientCard: WardPatientCard = ({
-  patient,
-  visit,
-  bed,
-  admitted,
-  inpatientAdmission,
-}) => {
+const WardPatientCard: WardPatientCard = (wardPatient) => {
+  const { patient, visit, bed, admitted, inpatientAdmission } = wardPatient;
   const { id, headerRowElements, footerRowElements } = useCurrentWardCardConfig();
 
   const headerExtensionSlotName =
@@ -73,13 +67,7 @@ const WardPatientCard: WardPatientCard = ({
         className={styles.wardPatientCardButton}
         onClick={() => {
           launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
-            patientUuid: patient.uuid,
-            patient,
-            visit,
-            bed,
-            admitted,
-            inpatientAdmission,
-            inpatientRequest: null,
+            wardPatient,
           });
         }}>
         {/* Name will not be displayed; just there for a11y */}

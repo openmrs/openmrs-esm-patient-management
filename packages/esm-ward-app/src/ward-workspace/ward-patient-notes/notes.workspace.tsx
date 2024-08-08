@@ -1,19 +1,15 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import { type WardPatientWorkspaceProps } from '../../types';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
-import { type WardPatientNotesWorkspaceProps } from './types';
 import PatientNotesForm from './form/notes-form.component';
 import PatientNotesHistory from './history/notes-container.component';
 
-const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
-  const { patient, visit, bed, admitted, inpatientAdmission, inpatientRequest, ...restWorkspaceProps } = props;
-  const wardPatient = { patient, visit, bed, admitted, inpatientAdmission, inpatientRequest };
-  const notesFormState = useMemo(
-    () => ({
-      patientUuid: patient?.uuid,
-      ...restWorkspaceProps,
-    }),
-    [patient, restWorkspaceProps],
-  );
+const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceProps> = (props) => {
+  const { wardPatient, ...restWorkspaceProps } = props;
+  const notesFormState = {
+    patientUuid: wardPatient.patient?.uuid,
+    ...restWorkspaceProps,
+  };
 
   return (
     <div>

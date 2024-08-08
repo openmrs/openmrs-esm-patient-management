@@ -1,5 +1,6 @@
 import type {
   Concept,
+  DefaultWorkspaceProps,
   Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
@@ -21,6 +22,9 @@ export type WardPatient = {
   inpatientAdmission: InpatientAdmission;
   inpatientRequest: InpatientRequest;
 };
+export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
+  wardPatient: WardPatient;
+}
 
 // server-side types defined in openmrs-module-bedmanagement:
 
