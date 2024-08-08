@@ -2,16 +2,18 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PatientNotesHistory from './notes-container.component';
 import { usePatientNotes } from '../notes.resource';
+import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
+import { emrConfigurationMock } from '__mocks__';
+
+const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
+
+jest.mock('../../../hooks/useEmrConfiguration', () => jest.fn());
 
 jest.mock('../notes.resource', () => ({
   usePatientNotes: jest.fn(),
 }));
 
 const mockPatientUuid = 'sample-patient-uuid';
-const mockEmrConfiguration = {
-  visitNoteEncounterType: { uuid: 'visit-note-encounter-type' },
-  consultFreeTextCommentsConcept: { uuid: 'consult-free-text-comments-concept' },
-};
 
 const mockPatientNotes = [
   {
@@ -40,35 +42,37 @@ describe('PatientNotesHistory', () => {
   });
 
   test('displays loading skeletons when loading', () => {
+    mockedUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: emrConfigurationMock,
+      mutateEmrConfiguration: jest.fn(),
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+    });
+
     usePatientNotes.mockReturnValue({
       patientNotes: [],
       isLoadingPatientNotes: true,
     });
 
-    render(
-      <PatientNotesHistory
-        patientUuid={mockPatientUuid}
-        emrConfiguration={mockEmrConfiguration}
-        isLoadingEmrConfiguration={true}
-      />,
-    );
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} />);
 
     expect(screen.getAllByTestId('in-patient-note-skeleton')).toHaveLength(4);
   });
 
   test('displays patient notes when available', () => {
+    mockedUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: emrConfigurationMock,
+      mutateEmrConfiguration: jest.fn(),
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+    });
+
     usePatientNotes.mockReturnValue({
       patientNotes: mockPatientNotes,
       isLoadingPatientNotes: false,
     });
 
-    render(
-      <PatientNotesHistory
-        patientUuid={mockPatientUuid}
-        emrConfiguration={mockEmrConfiguration}
-        isLoadingEmrConfiguration={false}
-      />,
-    );
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} />);
 
     expect(screen.getByText('History')).toBeInTheDocument();
 

@@ -5,6 +5,7 @@ import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, use
 import { savePatientNote } from '../notes.resource';
 import PatientNotesForm from './notes-form.component';
 import { emrConfigurationMock, mockPatient, mockSession } from '__mocks__';
+import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 
 const testProps = {
   patientUuid: mockPatient.uuid,
@@ -14,7 +15,6 @@ const testProps = {
   setTitle: jest.fn(),
   onWorkspaceClose: jest.fn(),
   setOnCloseCallback: jest.fn(),
-  emrConfiguration: emrConfigurationMock,
 };
 
 const mockSavePatientNote = savePatientNote as jest.Mock;
@@ -27,6 +27,17 @@ const mockedUseSession = jest.mocked(useSession);
 jest.mock('../notes.resource', () => ({
   savePatientNote: jest.fn(),
 }));
+
+jest.mock('../../../hooks/useEmrConfiguration', () => jest.fn());
+
+const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
+
+mockedUseEmrConfiguration.mockReturnValue({
+  emrConfiguration: emrConfigurationMock,
+  mutateEmrConfiguration: jest.fn(),
+  isLoadingEmrConfiguration: false,
+  errorFetchingEmrConfiguration: null,
+});
 
 test('renders the visit notes form with all the relevant fields and values', () => {
   renderWardPatientNotesForm();
