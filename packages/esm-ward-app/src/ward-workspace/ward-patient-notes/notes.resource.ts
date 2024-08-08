@@ -15,14 +15,19 @@ export function savePatientNote(payload: EncounterPayload, abortController: Abor
   });
 }
 
-export function usePatientNotes(patientUuid: string, encounterType: string, conceptUuid: string): UsePatientNotes {
+export function usePatientNotes(
+  patientUuid: string,
+  visitUuid: string,
+  encounterType: string,
+  conceptUuid: string,
+): UsePatientNotes {
   const customRepresentation =
     'custom:(uuid,display,encounterDatetime,patient,obs,' +
     'encounterProviders:(uuid,display,' +
     'encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display))),' +
     'diagnoses';
-  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterType}&v=${customRepresentation}`;
+  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterType}&visit=${visitUuid}&v=${customRepresentation}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<VisitEncountersFetchResponse>, Error>(
     patientUuid && encounterType ? encountersApiUrl : null,

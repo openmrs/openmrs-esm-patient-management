@@ -35,7 +35,7 @@ const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
     <div>
       <WardPatientWorkspaceBanner {...wardPatient} />
       <PatientNotesForm {...notesFormState} />
-      <PatientNotesHistory patientUuid={patient?.uuid} />
+      <PatientNotesHistory patientUuid={patient?.uuid} visitUuid={visit.uuid} />
     </div>
   );
 };
