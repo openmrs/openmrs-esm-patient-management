@@ -61,10 +61,16 @@ const WardViewWithBedManagement = () => {
       const wardPatients: WardPatient[] = patients.map((patient) => {
         const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
         if (inpatientAdmission) {
-          return { patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true };
+          return { ...inpatientAdmission, admitted: true };
         } else {
           // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
-          return { patient: patient, visit: null, admitted: false };
+          return {
+            patient: patient,
+            visit: null,
+            admitted: false,
+            encounterAssigningToCurrentInpatientLocation: null, // populate after BED-13
+            firstAdmissionOrTransferEncounter: null,
+          };
         }
       });
       return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
@@ -81,7 +87,13 @@ const WardViewWithBedManagement = () => {
         .map((inpatientAdmission) => {
           return (
             <UnassignedPatient
-              wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
+              wardPatient={{
+                patient: inpatientAdmission.patient,
+                visit: inpatientAdmission.visit,
+                admitted: true,
+                encounterAssigningToCurrentInpatientLocation: null,
+                firstAdmissionOrTransferEncounter: inpatientAdmission.firstAdmissionOrTransferEncounter,
+              }}
               key={inpatientAdmission.patient.uuid}
             />
           );
@@ -135,7 +147,7 @@ const WardViewWithoutBedManagement = () => {
     const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
       return (
         <UnassignedPatient
-          wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
+          wardPatient={{ ...inpatientAdmission, admitted: true }}
           key={inpatientAdmission.patient.uuid}
         />
       );

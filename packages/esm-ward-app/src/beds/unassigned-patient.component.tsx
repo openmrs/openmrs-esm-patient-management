@@ -1,5 +1,5 @@
 import React from 'react';
-import WardPatientCard from '../ward-patient-card/ward-patient-card';
+import WardPatientCard from '../ward-patient-card/ward-patient-card.component';
 import styles from './unassigned-patient.scss';
 import { type WardPatient } from '../types';
 
@@ -11,7 +11,7 @@ const UnassignedPatient: React.FC<UnassignedPatientProps> = ({ wardPatient }) =>
   return (
     <div className={styles.unassignedPatient}>
       <div key={'unassigned-bed-pt-' + wardPatient.patient.uuid}>
-        <WardPatientCard patient={wardPatient.patient} visit={wardPatient.visit} />
+        <WardPatientCard {...wardPatient} />
       </div>
     </div>
   );

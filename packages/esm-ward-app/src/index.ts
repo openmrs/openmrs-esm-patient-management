@@ -1,5 +1,6 @@
 import {
   defineConfigSchema,
+  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
@@ -8,8 +9,10 @@ import {
 import { configSchema } from './config-schema';
 import rootComponent from './root.component';
 import { moduleName } from './constant';
-import WardPatientActionButton from './ward-patient-workspace/ward-patient-action-button.extension';
 import { createDashboardLink } from './createDashboardLink.component';
+import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-colored-obs-tags';
+import WardPatientActionButton from './ward-patient-workspace/ward-patient-action-button.extension';
+import ColoredObsTagsCardRowExtension from './ward-patient-card/colored-obs-tags-card-row/colored-obs-tags-card-row.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -24,7 +27,12 @@ export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'w
 
 // t('admissionRequests', 'Admission Requests')
 export const admissionRequestWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/admission-requests.workspace'),
+  () => import('./ward-workspace/admission-request-workspace/admission-requests.workspace'),
+  options,
+);
+
+export const admitPatientFormWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/admit-patient-form-workspace/admit-patient-form.workspace'),
   options,
 );
 
@@ -34,11 +42,28 @@ export const wardPatientWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const wardPatientActionButtonExtension = getSyncLifecycle(WardPatientActionButton, options);
+// t("inpatientNotesWorkspaceTitle", "In-patient notes")
+export const wardPatientNotesWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/notes.workspace'),
+  options,
+);
+
+export const wardPatientActionButtonExtension = getAsyncLifecycle(
+  () => import('./ward-patient-workspace/ward-patient-action-button.extension'),
+  options,
+);
+
+export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/notes-action-button.extension'),
+  options,
+);
+
+export const coloredObsTagCardRowExtension = getSyncLifecycle(ColoredObsTagsCardRowExtension, options);
 
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
   registerFeatureFlag(
     'bedmanagement-module',
     'Bed Management Module',

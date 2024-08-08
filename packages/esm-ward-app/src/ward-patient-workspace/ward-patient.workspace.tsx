@@ -1,23 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, InlineNotification } from '@carbon/react';
-import {
-  type DefaultWorkspaceProps,
-  ExtensionSlot,
-  attach,
-  getPatientName,
-  usePatient,
-  age,
-} from '@openmrs/esm-framework';
+import { age, attach, ExtensionSlot, getPatientName, usePatient } from '@openmrs/esm-framework';
 import styles from './ward-patient.style.scss';
+import { type WardPatientWorkspaceProps } from './types';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
-  patientUuid: string;
-}
-
-export default function WardPatientWorkspace({ patientUuid, setTitle }: WardPatientWorkspaceProps) {
+export default function WardPatientWorkspace({ setTitle, patientUuid }: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
   const { patient, isLoading, error } = usePatient(patientUuid);
 
