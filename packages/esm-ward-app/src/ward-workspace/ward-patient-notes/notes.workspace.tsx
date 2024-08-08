@@ -3,7 +3,6 @@ import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.compone
 import { type WardPatientNotesWorkspaceProps } from './types';
 import PatientNotesForm from './form/notes-form.component';
 import PatientNotesHistory from './history/notes-container.component';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 
 const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
   const {
@@ -15,7 +14,6 @@ const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
     firstAdmissionOrTransferEncounter,
     ...restWorkspaceProps
   } = props;
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
 
   const wardPatient = {
     patient,
@@ -28,23 +26,16 @@ const WardPatientNotesWorkspace = (props: WardPatientNotesWorkspaceProps) => {
   const notesFormState = useMemo(
     () => ({
       patientUuid: patient?.uuid,
-      emrConfiguration,
-      isLoadingEmrConfiguration,
-      errorFetchingEmrConfiguration,
       ...restWorkspaceProps,
     }),
-    [patient, restWorkspaceProps, errorFetchingEmrConfiguration, emrConfiguration, isLoadingEmrConfiguration],
+    [patient, restWorkspaceProps],
   );
 
   return (
     <div>
       <WardPatientWorkspaceBanner {...wardPatient} />
       <PatientNotesForm {...notesFormState} />
-      <PatientNotesHistory
-        patientUuid={patient?.uuid}
-        emrConfiguration={emrConfiguration}
-        isLoadingEmrConfiguration={isLoadingEmrConfiguration}
-      />
+      <PatientNotesHistory patientUuid={patient?.uuid} />
     </div>
   );
 };

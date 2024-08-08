@@ -3,22 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { type PatientUuid } from '@openmrs/esm-framework';
 import { usePatientNotes } from '../notes.resource';
 import InPatientNote, { InPatientNoteSkeleton } from './note.component';
-import { type EmrApiConfigurationResponse } from '../../../types';
 import styles from './styles.scss';
 import { InlineNotification } from '@carbon/react';
+import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 
 interface PatientNotesHistoryProps {
   patientUuid: PatientUuid;
-  emrConfiguration: EmrApiConfigurationResponse;
-  isLoadingEmrConfiguration: boolean;
 }
 
-const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({
-  patientUuid,
-  emrConfiguration,
-  isLoadingEmrConfiguration,
-}) => {
+const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+
   const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
     patientUuid,
     emrConfiguration?.visitNoteEncounterType?.uuid,

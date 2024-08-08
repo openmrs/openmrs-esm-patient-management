@@ -1,6 +1,7 @@
 import React from 'react';
 import { type PatientNote } from '../types';
 import { SkeletonText, Tag, Tile } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import styles from './styles.scss';
 
@@ -23,6 +24,7 @@ interface InPatientNoteProps {
 }
 
 const InPatientNote: React.FC<InPatientNoteProps> = ({ note }) => {
+  const { t } = useTranslation();
   const formattedDate = note.encounterNoteRecordedAt
     ? dayjs(note.encounterNoteRecordedAt).format('dddd, D MMM YYYY')
     : '';
@@ -31,7 +33,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note }) => {
   return (
     <Tile className={styles.noteTile}>
       <div className={styles.noteHeader}>
-        <span className={styles.noteProviderRole}>Note</span>
+        <span className={styles.noteProviderRole}>{t('note', 'Note')}</span>
         <span className={styles.noteDateAndTime}>
           {formattedDate}, {formattedTime}
         </span>

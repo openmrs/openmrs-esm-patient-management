@@ -183,13 +183,3 @@ export interface ObsPayload {
     value: string;
   }>;
 }
-
-export interface EmrApiConfigurationResponse {
-  admissionEncounterType: OpenmrsResource;
-  clinicianEncounterRole: OpenmrsResource;
-  consultFreeTextCommentsConcept: OpenmrsResource;
-  visitNoteEncounterType: OpenmrsResource;
-  transferWithinHospitalEncounterType: OpenmrsResource;
-  // There are many more keys to this object, but we only need these for now
-  // Add more keys as needed
-}
