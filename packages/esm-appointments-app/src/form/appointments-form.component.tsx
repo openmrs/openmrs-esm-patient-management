@@ -778,12 +778,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
                   <Select
                     id="appointmentStatus"
-                    invalidText="Required"
+                    invalid={!!fieldState?.error?.message}
+                    invalidText={fieldState?.error?.message}
                     labelText={t('selectAppointmentStatus', 'Select status')}
                     onChange={onChange}
                     value={value}
                     ref={ref}
-                    invalid={fieldState?.error?.message}
                     onBlur={onBlur}>
                     <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
                     {appointmentStatuses?.length > 0 &&
