@@ -13,7 +13,7 @@ import {
   translateFrom,
   useSession,
 } from '@openmrs/esm-framework';
-import { savePatientNote } from './notes-form.resource';
+import { savePatientNote } from '../notes.resource';
 import styles from './notes-form.scss';
 import { moduleName } from '../../../constant';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
