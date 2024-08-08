@@ -138,12 +138,20 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         .refine((duration) => (isAllDayAppointment ? true : duration > 0), {
           message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
         }),
-      location: z.string().refine((value) => value !== ''),
-      provider: z.string().refine((value) => value !== ''),
+      location: z.string().refine((value) => value !== '', {
+        message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
+      }),
+      provider: z.string().refine((value) => value !== '', {
+        message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
+      }),
       appointmentStatus: z.string().optional(),
       appointmentNote: z.string(),
-      appointmentType: z.string().refine((value) => value !== ''),
-      selectedService: z.string().refine((value) => value !== ''),
+      appointmentType: z.string().refine((value) => value !== '', {
+        message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
+      }),
+      selectedService: z.string().refine((value) => value !== '', {
+        message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
+      }),
       recurringPatternType: z.enum(['DAY', 'WEEK']),
       recurringPatternPeriod: z.number(),
       recurringPatternDaysOfWeek: z.array(z.string()),
@@ -438,15 +446,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             <Controller
               name="location"
               control={control}
-              render={({ field: { onChange, value, onBlur, ref } }) => (
+              render={({ field: { onChange, value, onBlur, ref }, fieldState }) => (
                 <Select
                   id="location"
-                  invalidText="Required"
                   labelText={t('selectALocation', 'Select a location')}
                   onChange={onChange}
                   onBlur={onBlur}
                   value={value}
-                  ref={ref}>
+                  ref={ref}
+                  invalid={!!fieldState?.error?.message}
+                  invalidText={fieldState?.error?.message}>
                   <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
                   {locations?.length > 0 &&
                     locations.map((location) => (
@@ -465,13 +474,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             <Controller
               name="dateAppointmentScheduled"
               control={control}
-              render={({ field: { onChange, value, ref } }) => (
+              render={({ field: { onChange, value, ref }, fieldState }) => (
                 <DatePicker
                   datePickerType="single"
                   dateFormat={datePickerFormat}
                   value={value}
                   maxDate={new Date()}
-                  onChange={([date]) => onChange(date)}>
+                  onChange={([date]) => onChange(date)}
+                  invalid={!!fieldState?.error?.message}
+                  invalidText={fieldState?.error?.message}>
                   <DatePickerInput
                     id="dateAppointmentScheduledPickerInput"
                     labelText={t('dateScheduledDetail', 'Date appointment issued')}
@@ -493,7 +504,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
                 <Select
                   id="service"
-                  invalidText="Required"
                   labelText={t('selectService', 'Select a service')}
                   onChange={(event) => {
                     onChange(event);
@@ -505,7 +515,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   onBlur={onBlur}
                   value={value}
                   ref={ref}
-                  invalid={fieldState?.error?.message}>
+                  invalid={!!fieldState?.error?.message}
+                  invalidText={fieldState?.error?.message}>
                   <SelectItem text={t('chooseService', 'Select service')} value="" />
                   {services?.length > 0 &&
                     services.map((service) => (
@@ -529,13 +540,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 <Select
                   disabled={!appointmentTypes?.length}
                   id="appointmentType"
-                  invalidText="Required"
                   labelText={t('selectAppointmentType', 'Select the type of appointment')}
                   onChange={onChange}
                   value={value}
                   ref={ref}
                   onBlur={onBlur}
-                  invalid={fieldState?.error?.message}>
+                  invalid={!!fieldState?.error?.message}
+                  invalidText={fieldState?.error?.message}>
                   <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                   {appointmentTypes?.length > 0 &&
                     appointmentTypes.map((appointmentType, index) => (
