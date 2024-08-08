@@ -506,11 +506,22 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   id="service"
                   labelText={t('selectService', 'Select a service')}
                   onChange={(event) => {
+                    if (context === 'creating') {
+                      setValue(
+                        'duration',
+                        services?.find((service) => service.name === event.target.value)?.durationMins,
+                      );
+                    } else if (context === 'editing') {
+                      const previousServiceDuration = services?.find(
+                        (service) => service.name === getValues('selectedService'),
+                      )?.durationMins;
+                      const selectedServiceDuration = services?.find((service) => service.name === event.target.value)
+                        ?.durationMins;
+                      if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
+                        setValue('duration', selectedServiceDuration);
+                      }
+                    }
                     onChange(event);
-                    setValue(
-                      'duration',
-                      services?.find((service) => service.name === event.target.value)?.durationMins,
-                    );
                   }}
                   onBlur={onBlur}
                   value={value}
