@@ -19,7 +19,7 @@ export function useLatestQueueEntry(patientUuid: string) {
     return data;
   };
 
-  const { data, error, isLoading, mutate } = useSWRImmutable<{ results: QueueEntry[] }>(url, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<{ results: QueueEntry[] }>(url, fetcher);
 
   const queueEntry =
     data?.results.reduce((latestEntry, currentEntry) => {

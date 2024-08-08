@@ -138,10 +138,10 @@ export const addNewQueueServiceWorkspace = getAsyncLifecycle(
     moduleName,
   },
 );
-export const addPatientToQueueModal = getAsyncLifecycle(
+export const transitionPatientToLatestQueue = getAsyncLifecycle(
   () => import('./transition-latest-queue-entry/transition-latest-queue-entry.component'),
   {
-    featureName: 'add patient to a queue modal',
+    featureName: 'transition patient to new queue',
     moduleName,
   },
 );

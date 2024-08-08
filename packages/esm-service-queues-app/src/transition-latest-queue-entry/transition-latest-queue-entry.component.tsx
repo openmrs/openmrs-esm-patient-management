@@ -25,7 +25,7 @@ const TransitionLatestQueueEntry: React.FC<TransitionLatestQueueEntryProps> = ({
     <TransitionQueueEntryModal
       queueEntry={queueEntry}
       closeModal={closeModal}
-      modalTitle={t('TransitionLatestQueueEntry', 'Transition patient to latest queue')}
+      modalTitle={t('TransitionLatestQueueEntry', "Transition patient's latest queue")}
     />
   );
 };

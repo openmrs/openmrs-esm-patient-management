@@ -78,8 +78,8 @@
       "component": "transitionQueueEntryModal"
     },
     {
-      "name": "add-patient-to-queue-entry-modal",
-      "component": "addPatientToQueueModal"
+      "name": "transition-patient-to-latest-queue-modal",
+      "component": "transitionPatientToLatestQueue"
     },
     {
       "name": "edit-queue-entry-modal",

@@ -398,7 +398,6 @@ export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
-    defaultResultReviewPriorityConceptUuid: string;
     defaultTransitionStatus: string;
     diastolicBloodPressureUuid: string;
     emergencyPriorityConceptUuid: string;
