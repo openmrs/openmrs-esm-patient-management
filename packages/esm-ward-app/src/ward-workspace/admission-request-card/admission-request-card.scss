@@ -20,10 +20,16 @@
   align-items: center;
   flex-wrap: wrap;
 
-  > div:not(:first-of-type)::before {
+  > div:not(:first-of-type):not(:empty)::before {
     content: '·';
     padding: layout.$spacing-02;
   }
+}
+
+.admissionRequestCardRow {
+  padding: layout.$spacing-05;
+  margin: layout.$spacing-03;
+  background-color: white;
 }
 
 .admissionEncounterDetails {

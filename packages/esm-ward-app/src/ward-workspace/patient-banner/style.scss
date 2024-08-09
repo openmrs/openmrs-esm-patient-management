@@ -11,7 +11,7 @@
 }
 
 .dotSeparatedChildren {
-  > div:not(div:first-of-type) {
+  > div:not(div:first-of-type):not(:empty) {
     display: flex;
     align-items: center;
 

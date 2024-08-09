@@ -1,18 +1,13 @@
-import React, { useCallback } from 'react';
-import styles from './admission-request-card.scss';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowRightIcon, launchWorkspace, useLayoutType, type Patient } from '@openmrs/esm-framework';
-import type { DispositionType, Encounter } from '../../types';
+import { ArrowRightIcon, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { WardPatientCard } from '../../types';
 import type { AdmitPatientFormWorkspaceProps } from '../admit-patient-form-workspace/types';
+import styles from './admission-request-card.scss';
 
-interface AdmissionRequestCardActionsProps {
-  patient: Patient;
-  dispositionType: DispositionType;
-  dispositionEncounter: Encounter;
-}
-
-const AdmissionRequestCardActions: React.FC<AdmissionRequestCardActionsProps> = ({ patient, dispositionType }) => {
+const AdmissionRequestCardActions: WardPatientCard = ({ patient, inpatientRequest }) => {
+  const { dispositionType } = inpatientRequest;
   const { t } = useTranslation();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
   const launchPatientAdmissionForm = useCallback(
