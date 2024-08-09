@@ -76,6 +76,9 @@ describe('Testing AdmitPatientForm', () => {
           uuid: 'transfer-within-hospital-encounter-type-uuid',
           display: 'Transfer Within Hospital Encounter Type',
         },
+        clinicianEncounterRole: {
+          uuid: 'clinician-encounter-role-uuid',
+        },
       },
       mutateEmrConfiguration: jest.fn(),
     });
@@ -304,6 +307,7 @@ describe('Testing AdmitPatientForm', () => {
         patient: mockPatientAlice.uuid,
         encounterType: 'admission-encounter-type-uuid',
         location: mockAdmissionLocation.ward.uuid,
+        obs: [],
       },
     });
     expect(mockedShowSnackbar).toHaveBeenCalledWith({

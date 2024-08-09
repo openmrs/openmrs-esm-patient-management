@@ -21,7 +21,7 @@ export default function PatientTransferAndSwapSiderailIcon(additionalProps: Pati
       label={t('transfers', 'Transfers')}
       iconDescription={t('transfers', 'Transfers')}
       handler={handler}
-      type="ward"
+      type="transfer-swap-bed-form"
     />
   );
 }

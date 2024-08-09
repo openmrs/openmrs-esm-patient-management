@@ -17,9 +17,10 @@ import useWardLocation from '../../hooks/useWardLocation';
 import type { ObsPayload } from '../../types';
 import { RadioButtonGroup } from '@carbon/react';
 import { RadioButton } from '@carbon/react';
+import { useInpatientAdmission } from '../../hooks/useInpatientAdmission';
+import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 
 export default function PatientTransferForm({
-  closeWorkspace,
   closeWorkspaceWithSavedChanges,
   patient,
   patientUuid,
@@ -29,13 +30,14 @@ export default function PatientTransferForm({
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
-  const { user, currentProvider } = useSession();
+  const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const dispositionsWithTypeTransfer = useMemo(
     () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
     [emrConfiguration],
   );
-  const { mutate } = useAdmissionLocation();
+  const { mutate: mutateAdmissionLocation } = useAdmissionLocation();
+  const { mutate: mutateInpatientRequest } = useInpatientRequest();
 
   const zodSchema = useMemo(
     () =>
@@ -122,15 +124,18 @@ export default function PatientTransferForm({
           },
         ],
       })
-        .then((resp) => {
-          if (resp.ok) {
-            closeWorkspaceWithSavedChanges();
-            mutate();
-          }
+        .then(() => {
+          showSnackbar({
+            title: t('patientTransferRequestCreated', 'Patient transfer request created'),
+            kind: 'success',
+          });
+          closeWorkspaceWithSavedChanges();
+          mutateAdmissionLocation();
+          mutateInpatientRequest();
         })
         .catch((err: Error) => {
           showSnackbar({
-            title: t('errorSavingEncounter', 'Error saving encounter'),
+            title: t('errorCreatingTransferRequest', 'Error creating transfer request'),
             subtitle: err.message,
             kind: 'error',
           });
@@ -144,7 +149,8 @@ export default function PatientTransferForm({
       emrConfiguration,
       patientUuid,
       dispositionsWithTypeTransfer,
-      mutate,
+      mutateAdmissionLocation,
+      mutateInpatientRequest,
     ],
   );
 

@@ -40,7 +40,7 @@ export default function LocationSelector(props: LocationSelectorProps) {
       criteria.push(['_getpagesoffset', ((page - 1) * size).toString()]);
     }
     return criteria;
-  }, [debouncedSearchTerm, page]);
+  }, [debouncedSearchTerm, page, emrConfiguration]);
   const { locations, isLoading, totalLocations } = useLocations(filterCriteria, !emrConfiguration);
 
   const handlePageChange = useCallback(
@@ -76,9 +76,13 @@ export default function LocationSelector(props: LocationSelectorProps) {
       ) : (
         <ResponsiveWrapper>
           <RadioButtonGroup {...props} className={styles.radioButtonGroup} value="" orientation="vertical">
-            {locations?.map((location) => (
-              <RadioButton key={location.id} labelText={location.name} value={location.id} />
-            ))}
+            {locations?.length > 0 ? (
+              locations?.map((location) => (
+                <RadioButton key={location.id} labelText={location.name} value={location.id} />
+              ))
+            ) : (
+              <span className={styles.bodyShort01}>{t('noLocationsFound', 'No locations found')}</span>
+            )}
           </RadioButtonGroup>
         </ResponsiveWrapper>
       )}

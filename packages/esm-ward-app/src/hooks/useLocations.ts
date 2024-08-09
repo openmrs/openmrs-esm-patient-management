@@ -55,7 +55,7 @@ export default function useLocations(filterCriteria: Array<Array<string>> = [], 
 
   const results = useMemo(() => {
     return {
-      locations: data?.data?.entry.map((entry) => entry.resource),
+      locations: data?.data?.entry?.map((entry) => entry.resource),
       totalLocations,
       ...rest,
     };

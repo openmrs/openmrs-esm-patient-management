@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { getGlobalStore, useFeatureFlag, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import PatientTransferForm from './patient-transfer-form.component';
+import PatientTransferForm from './patient-transfer-request-form.component';
 import PatientBedSwapForm from './patient-bed-swap-form.component';
 import styles from './patient-transfer-swap.scss';
 import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 
 type TransferSection = 'transfer' | 'bed-swap';
 
@@ -16,6 +17,7 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
 
   return (
     <div className={styles.workspaceContent}>
+      <WardPatientWorkspaceBanner {...props} />
       {isBedManagementModuleInstalled && (
         <div>
           <h2 className={styles.productiveHeading02}>{t('typeOfTransfer', 'Type of transfer')}</h2>
