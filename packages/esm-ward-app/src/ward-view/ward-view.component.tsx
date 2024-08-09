@@ -58,20 +58,19 @@ const WardViewWithBedManagement = () => {
     const wardBeds = bedLayouts?.map((bedLayout) => {
       const { patients } = bedLayout;
       const bed = bedLayoutToBed(bedLayout);
-      const wardPatients: WardPatient[] = patients.map((patient) : WardPatient => {
+      const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
         const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
         if (inpatientAdmission) {
           const { patient, visit } = inpatientAdmission;
-          return { patient, visit, bed, admitted: true, inpatientAdmission, inpatientRequest: null };
+          return { patient, visit, bed, inpatientAdmission, inpatientRequest: null };
         } else {
           // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
           return {
             patient: patient,
             visit: null,
             bed,
-            admitted: false,
             inpatientAdmission: null, // populate after BED-13
-            inpatientRequest: null
+            inpatientRequest: null,
           };
         }
       });
@@ -92,7 +91,6 @@ const WardViewWithBedManagement = () => {
               wardPatient={{
                 patient: inpatientAdmission.patient,
                 visit: inpatientAdmission.visit,
-                admitted: true,
                 inpatientAdmission,
                 inpatientRequest: null,
               }}
@@ -150,7 +148,7 @@ const WardViewWithoutBedManagement = () => {
       const { patient, visit } = inpatientAdmission;
       return (
         <UnassignedPatient
-          wardPatient={{ patient, visit, admitted: true, inpatientAdmission, inpatientRequest: null }}
+          wardPatient={{ patient, visit, inpatientAdmission, inpatientRequest: null }}
           key={inpatientAdmission.patient.uuid}
         />
       );

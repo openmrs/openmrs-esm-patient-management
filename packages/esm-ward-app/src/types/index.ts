@@ -14,12 +14,30 @@ export type WardPatientCard = React.FC<WardPatient>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
+  /**
+   * The patient and their current visit. These values are taken either
+   * from either the inpatientAdmission object, the inpatientRequest object
+   * or the admissionLocation object (which contains the bed)
+   */
   patient: Patient;
   visit: Visit;
-  bed?: Bed;
-  admitted: boolean;
 
+  /**
+   * the bed assigned to the patient. This object is only set if the patient
+   * has a bed assigned
+   */
+  bed?: Bed;
+
+  /**
+   * The admission detail. This object is only set if the patient has been
+   * admitted to the ward
+   */
   inpatientAdmission: InpatientAdmission;
+
+  /**
+   * The admission request. The object is only set if the patient has a
+   * pending admission / transfer request.
+   */
   inpatientRequest: InpatientRequest;
 };
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {

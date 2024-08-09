@@ -47,7 +47,6 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
                 patient={request.patient}
                 visit={request.visit}
                 inpatientRequest={request}
-                admitted={false}
                 inpatientAdmission={null}
               />
             ))}

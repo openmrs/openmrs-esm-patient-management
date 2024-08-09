@@ -9,7 +9,7 @@ import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import classNames from 'classnames';
 
 const WardPatientCard: WardPatientCard = (wardPatient) => {
-  const { patient, visit, bed, admitted, inpatientAdmission } = wardPatient;
+  const { patient, visit, bed, inpatientAdmission } = wardPatient;
   const { id, headerRowElements, footerRowElements } = useCurrentWardCardConfig();
 
   const headerExtensionSlotName =
@@ -37,7 +37,6 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
             elementId={elementId}
             patient={patient}
             visit={visit}
-            admitted={admitted}
             inpatientAdmission={inpatientAdmission}
             inpatientRequest={null}
           />
@@ -56,7 +55,6 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
             elementId={elementId}
             patient={patient}
             visit={visit}
-            admitted={admitted}
             inpatientAdmission={inpatientAdmission}
             inpatientRequest={null}
           />

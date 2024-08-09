@@ -1,8 +1,8 @@
 import React from 'react';
+import { type Bed } from '../../types';
 import styles from '../ward-patient-card.scss';
-import { Bed } from '../../types';
 
-const WardPatientBedNumber: React.FC<{bed: Bed}> = ({ bed }) => {
+const WardPatientBedNumber: React.FC<{ bed: Bed }> = ({ bed }) => {
   if (!bed) {
     return <></>;
   }
