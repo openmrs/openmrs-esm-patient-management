@@ -1,23 +1,27 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './patient-transfer-swap.scss';
-import { Form, ButtonSet, Button } from '@carbon/react';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { RadioButtonGroup } from '@carbon/react';
-import { RadioButton } from '@carbon/react';
-import { RadioButtonSkeleton } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { filterBeds } from '../../ward-view/ward-view.resource';
 import type { BedLayout } from '../../types';
-import { InlineNotification } from '@carbon/react';
 import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import useWardLocation from '../../hooks/useWardLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import {
+  Form,
+  ButtonSet,
+  Button,
+  RadioButtonGroup,
+  RadioButton,
+  RadioButtonSkeleton,
+  InlineNotification,
+} from '@carbon/react';
 
 export default function PatientBedSwapForm({
   promptBeforeClosing,

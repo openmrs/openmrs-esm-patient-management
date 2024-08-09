@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ResponsiveWrapper, showSnackbar, useSession, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useSession } from '@openmrs/esm-framework';
 import styles from './patient-transfer-swap.scss';
-import { Form, ButtonSet, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { z } from 'zod';
@@ -9,16 +8,12 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
 import LocationSelector from '../../location-selector/location-selector.component';
-import { TextArea } from '@carbon/react';
-import { InlineNotification } from '@carbon/react';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
 import type { ObsPayload } from '../../types';
-import { RadioButtonGroup } from '@carbon/react';
-import { RadioButton } from '@carbon/react';
-import { useInpatientAdmission } from '../../hooks/useInpatientAdmission';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import { Form, ButtonSet, Button, TextArea, InlineNotification, RadioButtonGroup, RadioButton } from '@carbon/react';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,

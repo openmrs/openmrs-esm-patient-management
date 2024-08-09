@@ -27,16 +27,6 @@ interface FhirResponse {
   entry: Array<FhirLocation>;
 }
 
-function getUrl(url: string) {
-  const urlObj = new URL(url);
-  // For production
-  if (urlObj.origin === window.location.origin) {
-    return url;
-  }
-
-  return new URL(`${urlObj.pathname}${urlObj.search ? `?${urlObj.search}` : ''}`, window.location.origin).href;
-}
-
 export default function useLocations(filterCriteria: Array<Array<string>> = [], skip: boolean = false) {
   const [totalLocations, setTotalLocations] = useState(0);
   const [url, setUrl] = useState(`${fhirBaseUrl}/Location`);

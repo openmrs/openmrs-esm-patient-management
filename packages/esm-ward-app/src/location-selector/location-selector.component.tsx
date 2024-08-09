@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import styles from './location-selector.scss';
 import useLocations from '../hooks/useLocations';
-import { RadioButton, Search, RadioButtonGroup, RadioButtonSkeleton } from '@carbon/react';
+import { RadioButton, Search, RadioButtonGroup, RadioButtonSkeleton, IconButton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -96,7 +95,7 @@ export default function LocationSelector(props: LocationSelectorProps) {
             })}
           </span>
           <div>
-            <Button
+            <IconButton
               className={classNames(styles.button, styles.buttonLeft)}
               disabled={page === 1}
               onClick={() => handlePageChange({ page: page - 1 })}
@@ -105,7 +104,7 @@ export default function LocationSelector(props: LocationSelectorProps) {
               kind="ghost"
               iconDescription={t('previousPage', 'Previous page')}
             />
-            <Button
+            <IconButton
               className={styles.button}
               disabled={page * size >= totalLocations}
               onClick={() => handlePageChange({ page: page + 1 })}

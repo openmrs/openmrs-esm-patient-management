@@ -1,10 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .workspaceContent {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -23,7 +22,7 @@
 }
 
 .workspaceForm {
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   flex: 1;
 }
 
@@ -41,7 +40,7 @@
 .buttonSet {
   display: flex;
   align-items: center;
-  margin: 0 -1rem -1rem -1rem;
+  margin: 0 -layout.$spacing-05 -layout.$spacing-05 -layout.$spacing-05;
 
   button {
     max-width: unset !important;
@@ -54,17 +53,17 @@
 }
 
 .radioButtonGroup {
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
   fieldset {
     flex-direction: column;
     align-items: flex-start;
 
     :global(.cds--radio-button-wrapper) {
-      margin-bottom: spacing.$spacing-04;
+      margin-bottom: layout.$spacing-04;
     }
   }
 }
 
 .notifications {
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }

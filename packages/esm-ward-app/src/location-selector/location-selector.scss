@@ -1,7 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 @import '../root.scss';
 
 .locationSelector {
