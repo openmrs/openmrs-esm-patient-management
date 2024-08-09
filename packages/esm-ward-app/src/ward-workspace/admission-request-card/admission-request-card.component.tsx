@@ -4,19 +4,11 @@ import AdmissionRequestCardActions from './admission-request-card-actions.compon
 import AdmissionRequestCardHeader from './admission-request-card-header.component';
 import styles from './admission-request-card.scss';
 
-const AdmissionRequestCard: WardPatientCard = ({
-  patient,
-  inpatientRequest,
-}) => {
-  const { dispositionEncounter, dispositionType } = inpatientRequest;
+const AdmissionRequestCard: WardPatientCard = (wardPatient) => {
   return (
     <div className={styles.admissionRequestCard}>
-      <AdmissionRequestCardHeader patient={patient} dispositionEncounter={dispositionEncounter} />
-      <AdmissionRequestCardActions
-        patient={patient}
-        dispositionType={dispositionType}
-        dispositionEncounter={dispositionEncounter}
-      />
+      <AdmissionRequestCardHeader {...wardPatient} />
+      <AdmissionRequestCardActions {...wardPatient} />
     </div>
   );
 };

@@ -44,6 +44,11 @@
       "component": "coloredObsTagCardRowExtension",
       "name": "colored-obs-tags-card-row",
       "slot": "ward-patient-card-slot"
+    },
+    {
+      "component": "admissionRequestNoteRowExtension",
+      "name": "admission-request-note-card-row",
+      "slot": "ward-patient-card-slot"
     }
   ],
   "workspaces": [
