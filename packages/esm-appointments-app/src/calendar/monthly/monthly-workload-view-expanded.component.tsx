@@ -29,7 +29,12 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
 
   return (
     <Popover open={isOpen} align="top" ref={popoverRef}>
-      <button className={styles.showMoreItems} onClick={() => setIsOpen((prev) => !prev)}>
+      <button
+        className={styles.showMoreItems}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen((prev) => !prev);
+        }}>
         {t('countMore', '{{count}} more', { count })}
       </button>
       <PopoverContent>
