@@ -26,7 +26,7 @@ export type WardPatient = {
    * the bed assigned to the patient. This object is only set if the patient
    * has a bed assigned
    */
-  bed?: Bed;
+  bed: Bed;
 
   /**
    * The admission detail. This object is only set if the patient has been

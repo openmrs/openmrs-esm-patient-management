@@ -91,6 +91,7 @@ const WardViewWithBedManagement = () => {
               wardPatient={{
                 patient: inpatientAdmission.patient,
                 visit: inpatientAdmission.visit,
+                bed: null,
                 inpatientAdmission,
                 inpatientRequest: null,
               }}
@@ -148,7 +149,7 @@ const WardViewWithoutBedManagement = () => {
       const { patient, visit } = inpatientAdmission;
       return (
         <UnassignedPatient
-          wardPatient={{ patient, visit, inpatientAdmission, inpatientRequest: null }}
+          wardPatient={{ patient, visit, bed: null, inpatientAdmission, inpatientRequest: null }}
           key={inpatientAdmission.patient.uuid}
         />
       );

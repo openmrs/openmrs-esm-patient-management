@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
-import { type WardPatientWorkspaceProps, type WardPatientCard } from '../types';
-import { WardPatientCardElement } from './ward-patient-card-element.component';
-import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
-import styles from './ward-patient-card.scss';
-import { ExtensionSlot, getPatientName, launchWorkspace, type Patient, type Visit } from '@openmrs/esm-framework';
-import WardPatientName from './row-elements/ward-patient-name';
-import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
+import { ExtensionSlot, getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import classNames from 'classnames';
+import React from 'react';
+import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
+import { type WardPatientCard, type WardPatientWorkspaceProps } from '../types';
+import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
+import WardPatientName from './row-elements/ward-patient-name';
+import { WardPatientCardElement } from './ward-patient-card-element.component';
+import styles from './ward-patient-card.scss';
 
 const WardPatientCard: WardPatientCard = (wardPatient) => {
-  const { patient, visit, bed, inpatientAdmission } = wardPatient;
+  const { patient, bed } = wardPatient;
   const { id, headerRowElements, footerRowElements } = useCurrentWardCardConfig();
 
   const headerExtensionSlotName =
@@ -17,14 +17,6 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
   const rowsExtensionSlotName = id == 'default' ? 'ward-patient-card-slot' : `ward-patient-card-${id}-slot`;
   const footerExtensionSlotName =
     id == 'default' ? 'ward-patient-card-footer-slot' : `ward-patient-card-footer-${id}-slot`;
-
-  const extensionSlotState = useMemo(() => {
-    return {
-      patient,
-      visit,
-      bed,
-    };
-  }, [patient, visit, bed]);
 
   return (
     <div className={styles.wardPatientCard}>
@@ -35,17 +27,14 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
           <WardPatientCardElement
             key={`ward-card-${patient.uuid}-header-${i}`}
             elementId={elementId}
-            patient={patient}
-            visit={visit}
-            inpatientAdmission={inpatientAdmission}
-            inpatientRequest={null}
+            {...wardPatient}
           />
         ))}
-        <ExtensionSlot name={headerExtensionSlotName} state={extensionSlotState} />
+        <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
       <ExtensionSlot
         name={rowsExtensionSlotName}
-        state={extensionSlotState}
+        state={wardPatient}
         className={classNames(styles.wardPatientCardRow, styles.wardPatientCardExtensionSlot)}
       />
       <div className={styles.wardPatientCardRow}>
@@ -53,13 +42,10 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
           <WardPatientCardElement
             key={`ward-card-${patient.uuid}-footer-${i}`}
             elementId={elementId}
-            patient={patient}
-            visit={visit}
-            inpatientAdmission={inpatientAdmission}
-            inpatientRequest={null}
+            {...wardPatient}
           />
         ))}
-        <ExtensionSlot name={footerExtensionSlotName} state={extensionSlotState} />
+        <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
       </div>
       <button
         className={styles.wardPatientCardButton}
