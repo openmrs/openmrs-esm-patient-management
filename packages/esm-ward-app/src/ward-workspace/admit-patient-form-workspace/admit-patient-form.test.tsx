@@ -12,7 +12,7 @@ import {
 import type { DispositionType } from '../../types';
 import type { AdmitPatientFormWorkspaceProps } from './types';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
-import { openmrsFetch, showSnackbar, useFeatureFlag } from '@openmrs/esm-framework';
+import { openmrsFetch, provide, showSnackbar, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
@@ -36,6 +36,7 @@ const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockedUseAdmissionLocation = jest.mocked(useAdmissionLocation);
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
+const mockedUseSession = jest.mocked(useSession);
 
 const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
   patient: mockPatientAlice,
@@ -61,6 +62,14 @@ describe('Testing AdmitPatientForm', () => {
       admissionLocation: mockAdmissionLocation,
       mutate: jest.fn(),
       error: undefined,
+    });
+    mockedUseSession.mockReturnValue({
+      currentProvider: {
+        uuid: 'current-provider-uuid',
+        identifier: 'current-provider-identifier',
+      },
+      authenticated: true,
+      sessionId: 'session-id',
     });
     mockedUseFeatureFlag.mockReturnValue(true);
     mockedUseEmrConfiguration.mockReturnValue({
@@ -200,6 +209,13 @@ describe('Testing AdmitPatientForm', () => {
         patient: mockPatientAlice.uuid,
         encounterType: 'admission-encounter-type-uuid',
         location: mockAdmissionLocation.ward.uuid,
+        obs: [],
+        encounterProviders: [
+          {
+            provider: 'current-provider-uuid',
+            encounterRole: 'clinician-encounter-role-uuid',
+          },
+        ],
       },
     });
     expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/beds/3', {
@@ -308,6 +324,12 @@ describe('Testing AdmitPatientForm', () => {
         encounterType: 'admission-encounter-type-uuid',
         location: mockAdmissionLocation.ward.uuid,
         obs: [],
+        encounterProviders: [
+          {
+            provider: 'current-provider-uuid',
+            encounterRole: 'clinician-encounter-role-uuid',
+          },
+        ],
       },
     });
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
