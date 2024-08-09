@@ -1,23 +1,13 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import type { Encounter } from './types';
+import type { Encounter, EncounterPayload } from './types';
 
-export function createEncounter(
-  patientUuid: string,
-  encounterTypeUuid: string,
-  encounterLocation: string,
-  encounterDetails: object = {},
-) {
+export function createEncounter(encounterPayload: EncounterPayload) {
   return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: {
-      ...encounterDetails,
-      patient: patientUuid,
-      encounterType: encounterTypeUuid,
-      location: encounterLocation,
-    },
+    body: encounterPayload,
   });
 }
 

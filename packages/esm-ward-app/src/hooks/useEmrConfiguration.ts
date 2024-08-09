@@ -1,6 +1,7 @@
 import { type FetchResponse, openmrsFetch, type OpenmrsResource, restBaseUrl } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
+import type { DispositionType } from '../types';
 
 interface EmrApiConfigurationResponse {
   admissionEncounterType: OpenmrsResource;
@@ -8,6 +9,26 @@ interface EmrApiConfigurationResponse {
   consultFreeTextCommentsConcept: OpenmrsResource;
   visitNoteEncounterType: OpenmrsResource;
   transferWithinHospitalEncounterType: OpenmrsResource;
+  supportsTransferLocationTag: OpenmrsResource;
+  dispositionDescriptor: {
+    admissionLocationConcept: OpenmrsResource;
+    dateOfDeathConcept: OpenmrsResource;
+    dispositionConcept: OpenmrsResource;
+    internalTransferLocationConcept: OpenmrsResource;
+    dispositionSetConcept: OpenmrsResource;
+  };
+  dispositions: Array<{
+    encounterTypes: null;
+    keepsVisitOpen: null;
+    additionalObs: null;
+    careSettingTypes: ['OUTPATIENT'];
+    name: string;
+    conceptCode: string;
+    type: DispositionType;
+    actions: [];
+    excludedEncounterTypes: Array<string>;
+    uuid: string;
+  }>;
   // There are many more keys to this object, but we only need these for now
   // Add more keys as needed
 }

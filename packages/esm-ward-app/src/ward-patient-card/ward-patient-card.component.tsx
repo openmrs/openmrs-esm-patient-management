@@ -84,7 +84,7 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
-          launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
+          launchWorkspace<WardPatientWorkspaceProps>('patient-transfer-swap-workspace', {
             patientUuid: patient.uuid,
             patient,
             visit,
