@@ -8,8 +8,7 @@ import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-n
 
 const WardPatientWorkspaceBanner = (props: WardPatient) => {
   const { headerRowElements } = useCurrentWardCardConfig();
-  const { patient, bed, visit, firstAdmissionOrTransferEncounter, encounterAssigningToCurrentInpatientLocation } =
-    props;
+  const { patient, bed, visit } = props;
 
   if (!(patient && visit)) {
     console.warn('Patient details and visit details were not received by the workspace');
@@ -24,10 +23,7 @@ const WardPatientWorkspaceBanner = (props: WardPatient) => {
         <WardPatientCardElement
           key={`ward-card-${patient.uuid}-header-${i}`}
           elementId={elementId}
-          patient={patient}
-          visit={visit}
-          firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter}
-          encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
+          {...props}
         />
       ))}
     </div>

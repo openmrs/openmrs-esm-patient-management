@@ -1,34 +1,30 @@
+import { InlineNotification } from '@carbon/react';
+import { useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineNotification } from '@carbon/react';
-import { type Patient, useConfig, type Visit } from '@openmrs/esm-framework';
 import { type WardConfigObject } from '../config-schema';
+import { type WardPatient } from '../types';
 import WardPatientAge from './row-elements/ward-patient-age';
+import WardPatientAddress from './row-elements/ward-patient-header-address';
+import WardPatientIdentifier from './row-elements/ward-patient-identifier';
+import WardPatientObs from './row-elements/ward-patient-obs';
 import WardPatientTimeOnWard from './row-elements/ward-patient-time-on-ward';
 import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-since-admission';
-import WardPatientObs from './row-elements/ward-patient-obs';
-import WardPatientIdentifier from './row-elements/ward-patient-identifier';
-import WardPatientAddress from './row-elements/ward-patient-header-address';
-import { type Encounter } from '../types';
 
-export interface WardPatientCardElementProps {
+export interface WardPatientCardElementProps extends WardPatient {
   elementId: string;
-  patient: Patient;
-  visit: Visit;
-  encounterAssigningToCurrentInpatientLocation: Encounter;
-  firstAdmissionOrTransferEncounter: Encounter;
 }
 
 export const WardPatientCardElement: React.FC<WardPatientCardElementProps> = ({
   elementId,
   patient,
   visit,
-  encounterAssigningToCurrentInpatientLocation,
-  firstAdmissionOrTransferEncounter,
+  inpatientAdmission,
 }) => {
   const { obsElementDefinitions, identifierElementDefinitions, addressElementDefinitions } =
     useConfig<WardConfigObject>().wardPatientCards;
   const { t } = useTranslation();
+  const { encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
 
   switch (elementId) {
     case 'patient-age':

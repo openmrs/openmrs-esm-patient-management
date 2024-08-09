@@ -16,7 +16,6 @@
   "errorLoadingPatientAdmissionRequests": "Error Loading patient admission requests",
   "errorLoadingPatients": "Error loading admitted patients",
   "errorLoadingWardLocation": "Error loading ward location",
-  "failedToLoadPatientWorkspace": "Ward patient workspace has failed to load.",
   "female": "Female",
   "fetchingEmrConfigurationFailed": "Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.",
   "fetchingPatientNotesFailed": "Fetching patient notes failed. Try refreshing the page or contact your system administrator.",
@@ -47,6 +46,5 @@
   "unknown": "Unknown",
   "visitNoteSaved": "Patient note saved",
   "wardClinicalNotePlaceholder": "Write any notes here",
-  "wardPatientWorkspaceTitle": "Ward Patient",
   "wards": "Wards"
 }
