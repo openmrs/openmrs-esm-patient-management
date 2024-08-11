@@ -3,13 +3,13 @@ import { render, screen } from '@testing-library/react';
 import Appointments from './appointments.component';
 
 describe('Appointments', () => {
-  it('should render correctly', () => {
+  it('renders the appointments dashboard', async () => {
     render(<Appointments />);
 
-    expect(screen.getByTitle(/patient queue illustration/i)).toBeInTheDocument();
-    expect(screen.getByText(/^appointments$/i)).toBeInTheDocument();
-    expect(screen.getByText(/home/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/DD-MMM-YYYY/i)).toBeInTheDocument();
+    await screen.findByText(/^appointments$/i);
     expect(screen.getByRole('button', { name: /appointments calendar/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/dd-mmm-yyyy/i)).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /view/i })).toBeInTheDocument();
+    expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
   });
 });
