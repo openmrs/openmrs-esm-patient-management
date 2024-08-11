@@ -1,0 +1,7 @@
+@use '@carbon/styles/scss/spacing';
+
+.modalBody {
+  padding-bottom: spacing.$spacing-03;
+  overflow-y: auto;
+  max-height: calc(100vh - 210px);
+}

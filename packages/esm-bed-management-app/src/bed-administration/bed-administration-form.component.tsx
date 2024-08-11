@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { type Location } from '@openmrs/esm-framework';
 import type { BedType, BedFormData } from '../types';
 import { type BedAdministrationData } from './bed-administration-types';
+import styles from './bed-administration-form.scss';
 
 const numberInString = z.string().transform((val, ctx) => {
   const parsed = parseInt(val);
@@ -119,7 +120,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
       <ModalHeader title={headerTitle} />
       <Form onSubmit={handleSubmit(onSubmit, onError)}>
-        <ModalBody hasScrollingContent>
+        <ModalBody className={styles.modalBody}>
           <Stack gap={3}>
             <FormGroup legendText={''}>
               <Controller
