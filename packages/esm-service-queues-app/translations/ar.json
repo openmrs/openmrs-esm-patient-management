@@ -275,6 +275,7 @@
   "ticketNumber": "رقم التذكرة",
   "time": "الوقت",
   "timeCannotBeInFuture": "Time cannot be in the future",
+  "timeCannotBePriorToPreviousQueueEntry": "Time cannot be before start of previous queue entry: {{time}}",
   "timeOfTransition": "Time of transition",
   "tirageNotYetCompleted": "لم يتم الانتهاء من الترياج بعد",
   "today": "اليوم",
