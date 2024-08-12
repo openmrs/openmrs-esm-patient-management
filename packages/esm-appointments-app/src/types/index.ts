@@ -27,9 +27,14 @@ export enum AppointmentKind {
   WALKIN = 'WalkIn',
   VIRTUAL = 'Virtual',
 }
-
+export interface Telecom {
+  system?: string;
+  value: string;
+  use?: string;
+}
 // TODO: remove interface elements that aren't actually present on the Appointment object returned from the Appointment API
 export interface Appointment {
+  phoneNumber: string;
   appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
@@ -42,6 +47,7 @@ export interface Appointment {
     uuid: string;
     age?: string;
     gender?: string;
+    telecom?: Array<{ id: string; value: string }>;
   };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;

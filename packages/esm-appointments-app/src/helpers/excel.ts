@@ -8,14 +8,21 @@ import { type Appointment } from '../types';
  * @param {string} [fileName] - The name of the downloaded file
  */
 export function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
-  const appointmentsJSON = appointments?.map((appointment: Appointment) => ({
-    'Patient name': appointment.patient.name,
-    Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
-    Age: appointment.patient.age,
-    Identifier: appointment.patient.identifier ?? '--',
-    'Appointment type': appointment.service?.name,
-    Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-  }));
+  const appointmentsJSON = appointments?.map((appointment: Appointment) => {
+    const phoneNumbers = appointment.patient.telecom
+      ? appointment.patient.telecom.map((contact) => contact.value).join(', ')
+      : '--';
+
+    return {
+      'Patient name': appointment.patient.name,
+      Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
+      Age: appointment.patient.age,
+      Identifier: appointment.patient.identifier ?? '--',
+      'Appointment type': appointment.service?.name,
+      Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
+      'Phone Number': phoneNumbers,
+    };
+  });
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
