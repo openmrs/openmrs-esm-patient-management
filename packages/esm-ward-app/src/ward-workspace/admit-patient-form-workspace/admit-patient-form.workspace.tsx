@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { showSnackbar, useFeatureFlag } from '@openmrs/esm-framework';
+import { showSnackbar, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import styles from './admit-patient-form.scss';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import useWardLocation from '../../hooks/useWardLocation';
@@ -25,6 +25,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
 }) => {
   const { t } = useTranslation();
   const { location } = useWardLocation();
+  const { currentProvider } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
@@ -70,15 +71,23 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
       setShowErrorNotifications(false);
       setIsSubmitting(true);
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
-      createEncounter(
-        patient.uuid,
-        dispositionType === 'ADMIT'
-          ? emrConfiguration.admissionEncounterType.uuid
-          : dispositionType === 'TRANSFER'
-            ? emrConfiguration.transferWithinHospitalEncounterType.uuid
-            : null,
-        location?.uuid,
-      )
+      createEncounter({
+        patient: patient.uuid,
+        encounterType:
+          dispositionType === 'ADMIT'
+            ? emrConfiguration.admissionEncounterType.uuid
+            : dispositionType === 'TRANSFER'
+              ? emrConfiguration.transferWithinHospitalEncounterType.uuid
+              : null,
+        location: location?.uuid,
+        encounterProviders: [
+          {
+            provider: currentProvider?.uuid,
+            encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
+          },
+        ],
+        obs: [],
+      })
         .then(
           async (response) => {
             if (response.ok) {
@@ -149,7 +158,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
           setIsSubmitting(false);
         });
     },
-    [beds, patient, emrConfiguration, location, closeWorkspaceWithSavedChanges, dispositionType],
+    [beds, patient, emrConfiguration, location, closeWorkspaceWithSavedChanges, dispositionType, currentProvider],
   );
 
   const onError = useCallback((values) => {
