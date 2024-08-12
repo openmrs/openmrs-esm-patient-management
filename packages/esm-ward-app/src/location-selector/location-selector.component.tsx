@@ -74,7 +74,7 @@ export default function LocationSelector(props: LocationSelectorProps) {
         </div>
       ) : (
         <ResponsiveWrapper>
-          <RadioButtonGroup {...props} className={styles.radioButtonGroup} value="" orientation="vertical">
+          <RadioButtonGroup {...props} className={styles.radioButtonGroup} orientation="vertical">
             {locations?.length > 0 ? (
               locations?.map((location) => (
                 <RadioButton key={location.id} labelText={location.name} value={location.id} />

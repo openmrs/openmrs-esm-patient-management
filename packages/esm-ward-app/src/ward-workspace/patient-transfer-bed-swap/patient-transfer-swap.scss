@@ -40,7 +40,7 @@
 .buttonSet {
   display: flex;
   align-items: center;
-  margin: 0 -layout.$spacing-05 -layout.$spacing-05 -layout.$spacing-05;
+  margin: 0 (-(layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05));
 
   button {
     max-width: unset !important;
