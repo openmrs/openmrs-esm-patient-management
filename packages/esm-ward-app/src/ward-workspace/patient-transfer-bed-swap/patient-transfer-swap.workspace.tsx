@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import PatientTransferForm from './patient-transfer-request-form.component';
 import PatientBedSwapForm from './patient-bed-swap-form.component';
 import styles from './patient-transfer-swap.scss';
-import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import type { WardPatientWorkspaceProps } from '../../types';
 
 const TransferSection = {
   TRANSFER: 'transfer',
@@ -22,7 +22,7 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
 
   return (
     <div className={styles.workspaceContent}>
-      <WardPatientWorkspaceBanner {...props} />
+      <WardPatientWorkspaceBanner {...props?.wardPatient} />
       {isBedManagementModuleInstalled && (
         <div>
           <h2 className={styles.productiveHeading02}>{t('typeOfTransfer', 'Type of transfer')}</h2>

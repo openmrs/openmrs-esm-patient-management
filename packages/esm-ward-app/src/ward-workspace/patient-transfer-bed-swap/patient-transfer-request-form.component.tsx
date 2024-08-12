@@ -6,21 +6,20 @@ import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
 import LocationSelector from '../../location-selector/location-selector.component';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { ObsPayload } from '../../types';
+import type { ObsPayload, WardPatientWorkspaceProps } from '../../types';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import { Form, ButtonSet, Button, TextArea, InlineNotification, RadioButtonGroup, RadioButton } from '@carbon/react';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,
-  patient,
-  patientUuid,
+  wardPatient,
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
+  const { patient } = wardPatient ?? {};
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,7 +102,7 @@ export default function PatientTransferForm({
       }
 
       createEncounter({
-        patient: patientUuid,
+        patient: patient.uuid,
         encounterType: emrConfiguration.visitNoteEncounterType.uuid,
         location: location.uuid,
         encounterProviders: [
@@ -142,7 +141,7 @@ export default function PatientTransferForm({
       currentProvider,
       location,
       emrConfiguration,
-      patientUuid,
+      patient.uuid,
       dispositionsWithTypeTransfer,
       mutateAdmissionLocation,
       mutateInpatientRequest,

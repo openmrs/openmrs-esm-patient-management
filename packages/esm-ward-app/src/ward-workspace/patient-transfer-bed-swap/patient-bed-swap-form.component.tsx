@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout } from '../../types';
-import type { WardPatientWorkspaceProps } from '../../ward-patient-workspace/types';
+import type { BedLayout, WardPatientWorkspaceProps } from '../../types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { showSnackbar, useSession } from '@openmrs/esm-framework';
@@ -26,9 +25,9 @@ import {
 export default function PatientBedSwapForm({
   promptBeforeClosing,
   closeWorkspaceWithSavedChanges,
-  patientUuid,
-  patient,
+  wardPatient,
 }: WardPatientWorkspaceProps) {
+  const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { isLoading, admissionLocation } = useAdmissionLocation();
@@ -65,7 +64,7 @@ export default function PatientBedSwapForm({
 
   const getBedInformation = useCallback(
     (bed: BedLayout) => {
-      const patients = bed.patients.map((patient) => patient?.person?.preferredName?.display);
+      const patients = bed.patients.map((bedPatient) => bedPatient?.person?.preferredName?.display);
       const bedNumber = bed.bedNumber;
       return [bedNumber, ...(patients.length ? patients : [t('empty', 'Empty')])].join(' · ');
     },
@@ -76,7 +75,7 @@ export default function PatientBedSwapForm({
   const bedDetails = useMemo(
     () =>
       beds.map((bed) => {
-        const isPatientAssignedToBed = bed.patients.find((patient) => patient.uuid === patientUuid);
+        const isPatientAssignedToBed = bed.patients.find((bedPatient) => bedPatient.uuid === patient.uuid);
         return { id: bed.bedId, label: getBedInformation(bed), isPatientAssignedToBed };
       }),
     [beds, getBedInformation],
@@ -87,7 +86,7 @@ export default function PatientBedSwapForm({
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
       setShowErrorNotifications(false);
       createEncounter({
-        patient: patientUuid,
+        patient: patient.uuid,
         encounterType: emrConfiguration.transferWithinHospitalEncounterType.uuid,
         location: location?.uuid,
         encounterProviders: [
@@ -100,7 +99,7 @@ export default function PatientBedSwapForm({
       })
         .then(async (response) => {
           if (response.ok) {
-            return assignPatientToBed(values.bedId, patientUuid, response.data.uuid);
+            return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
           }
         })
         .then((response) => {
@@ -132,7 +131,7 @@ export default function PatientBedSwapForm({
           setIsSubmitting(false);
         });
     },
-    [setShowErrorNotifications],
+    [setShowErrorNotifications, patient, emrConfiguration, currentProvider, location, beds],
   );
 
   const onError = useCallback(() => {

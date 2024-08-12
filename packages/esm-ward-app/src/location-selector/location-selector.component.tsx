@@ -33,7 +33,7 @@ export default function LocationSelector(props: LocationSelectorProps) {
     }
     criteria.push(['_count', size.toString()]);
     if (emrConfiguration) {
-      criteria.push(['_tag', emrConfiguration.supportsTransferLocationTag.display]);
+      criteria.push(['_tag', emrConfiguration.supportsTransferLocationTag.name]);
     }
     if (page > 1) {
       criteria.push(['_getpagesoffset', ((page - 1) * size).toString()]);
