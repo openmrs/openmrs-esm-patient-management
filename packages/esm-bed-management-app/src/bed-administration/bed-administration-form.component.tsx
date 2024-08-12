@@ -117,10 +117,10 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
-      <Form onSubmit={handleSubmit(onSubmit, onError)}>
-        <ModalBody className={styles.modalBody}>
+    <Form onSubmit={handleSubmit(onSubmit, onError)} className={styles.form}>
+      <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
+        <ModalHeader title={headerTitle} />
+        <ModalBody hasScrollingContent>
           <Stack gap={3}>
             <FormGroup legendText={''}>
               <Controller
@@ -285,8 +285,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
             <span>{t('save', 'Save')}</span>
           </Button>
         </ModalFooter>
-      </Form>
-    </ComposedModal>
+      </ComposedModal>
+    </Form>
   );
 };
 
