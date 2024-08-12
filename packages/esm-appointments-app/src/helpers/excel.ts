@@ -1,28 +1,36 @@
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, openmrsFetch, fhirBaseUrl } from '@openmrs/esm-framework';
 import * as XLSX from 'xlsx';
 import { type Appointment } from '../types';
+
+async function fetchPatient(patientUuid: string): Promise<fhir.Patient> {
+  const apiUrl = `${fhirBaseUrl}/Patient/${patientUuid}`;
+  return openmrsFetch(apiUrl).then(({ data }) => data);
+}
 
 /**
  * Downloads the provided appointments as an Excel file.
  * @param {Array<Appointment>} appointments - The list of appointments to download.
  * @param {string} [fileName] - The name of the downloaded file
  */
-export function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
-  const appointmentsJSON = appointments?.map((appointment: Appointment) => {
-    const phoneNumbers = appointment.patient.telecom
-      ? appointment.patient.telecom.map((contact) => contact.value).join(', ')
-      : '--';
+export async function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
+  const appointmentsJSON = await Promise.all(
+    appointments.map(async (appointment: Appointment) => {
+      const patientinfo = await fetchPatient(appointment.patient.uuid);
+      const phoneNumber = patientinfo?.telecom
+        ? patientinfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
+        : '--';
 
-    return {
-      'Patient name': appointment.patient.name,
-      Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
-      Age: appointment.patient.age,
-      Identifier: appointment.patient.identifier ?? '--',
-      'Appointment type': appointment.service?.name,
-      Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-      'Phone Number': phoneNumbers,
-    };
-  });
+      return {
+        'Patient name': appointment.patient.name,
+        Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
+        Age: appointment.patient.age,
+        Identifier: appointment.patient.identifier ?? '--',
+        'Appointment type': appointment.service?.name,
+        Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
+        'Phone Number': phoneNumber,
+      };
+    }),
+  );
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
