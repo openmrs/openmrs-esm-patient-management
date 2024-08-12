@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import styles from './location-selector.scss';
-import useLocations from '../hooks/useLocations';
-import { RadioButton, Search, RadioButtonGroup, RadioButtonSkeleton, IconButton } from '@carbon/react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { IconButton, RadioButton, RadioButtonGroup, RadioButtonSkeleton, Search } from '@carbon/react';
+import { type RadioButtonGroupProps } from '@carbon/react/lib/components/RadioButtonGroup/RadioButtonGroup';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -11,15 +11,14 @@ import {
   useDebounce,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import classNames from 'classnames';
-import type { RadioButtonGroupProps } from '@carbon/react/lib/components/RadioButtonGroup/RadioButtonGroup';
 import useEmrConfiguration from '../hooks/useEmrConfiguration';
-
-const size = 5;
+import useLocations from '../hooks/useLocations';
+import styles from './location-selector.scss';
 
 interface LocationSelectorProps extends RadioButtonGroupProps {}
 
 export default function LocationSelector(props: LocationSelectorProps) {
+  const size = 5;
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
   const isTablet = !isDesktop(useLayoutType());
@@ -98,21 +97,19 @@ export default function LocationSelector(props: LocationSelectorProps) {
             <IconButton
               className={classNames(styles.button, styles.buttonLeft)}
               disabled={page === 1}
-              onClick={() => handlePageChange({ page: page - 1 })}
-              hasIconOnly
-              renderIcon={ChevronLeftIcon}
               kind="ghost"
-              iconDescription={t('previousPage', 'Previous page')}
-            />
+              label={t('previousPage', 'Previous page')}
+              onClick={() => handlePageChange({ page: page - 1 })}>
+              <ChevronLeftIcon />
+            </IconButton>
             <IconButton
               className={styles.button}
               disabled={page * size >= totalLocations}
-              onClick={() => handlePageChange({ page: page + 1 })}
-              hasIconOnly
-              renderIcon={ChevronRightIcon}
               kind="ghost"
-              iconDescription={t('nextPage', 'Next page')}
-            />
+              label={t('nextPage', 'Next page')}
+              onClick={() => handlePageChange({ page: page + 1 })}>
+              <ChevronRightIcon />
+            </IconButton>
           </div>
         </div>
       )}

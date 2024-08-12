@@ -10,7 +10,7 @@ interface EmptyBedProps {
 
 const EmptyBed: React.FC<EmptyBedProps> = ({ bed }) => {
   const { t } = useTranslation();
-  
+
   return (
     <div className={styles.container}>
       <span className={`${wardPatientCardStyles.wardPatientBedNumber} ${wardPatientCardStyles.empty}`}>

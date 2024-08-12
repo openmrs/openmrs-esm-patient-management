@@ -20,11 +20,7 @@ const WardPatientWorkspaceBanner = (props: WardPatient) => {
       {bed ? <WardPatientBedNumber bed={bed} /> : null}
       <WardPatientName patient={patient} />
       {headerRowElements.map((elementId, i) => (
-        <WardPatientCardElement
-          key={`ward-card-${patient.uuid}-header-${i}`}
-          elementId={elementId}
-          {...props}
-        />
+        <WardPatientCardElement key={`ward-card-${patient.uuid}-header-${i}`} elementId={elementId} {...props} />
       ))}
     </div>
   );
