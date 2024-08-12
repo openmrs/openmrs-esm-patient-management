@@ -29,7 +29,7 @@ const AdmissionRequestsBar = () => {
     <div className={styles.admissionRequestsContainer}>
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
-        {t('admissionRequestsCount', '{{count}} admission requests', {
+        {t('admissionRequestsCount', '{{count}} admission request(s)', {
           count: inpatientRequests.length,
         })}
       </span>

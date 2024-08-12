@@ -1,7 +1,4 @@
-import { type Concept, type DefaultWorkspaceProps, type OpenmrsResource } from '@openmrs/esm-framework';
-import { type WardPatient } from '../../types';
-
-export interface WardPatientNotesWorkspaceProps extends DefaultWorkspaceProps, WardPatient {}
+import { type Concept, type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface VisitEncountersFetchResponse {
   results: Array<RESTPatientNote>;

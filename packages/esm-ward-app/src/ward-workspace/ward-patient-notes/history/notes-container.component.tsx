@@ -9,14 +9,16 @@ import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 
 interface PatientNotesHistoryProps {
   patientUuid: PatientUuid;
+  visitUuid: string;
 }
 
-const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid }) => {
+const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
 
   const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
     patientUuid,
+    visitUuid,
     emrConfiguration?.visitNoteEncounterType?.uuid,
     emrConfiguration?.consultFreeTextCommentsConcept.uuid,
   );
