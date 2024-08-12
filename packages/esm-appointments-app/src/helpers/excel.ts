@@ -27,7 +27,7 @@ export async function downloadAppointmentsAsExcel(appointments: Array<Appointmen
         Identifier: appointment.patient.identifier ?? '--',
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        'Phone Number': phoneNumber,
+        'Telephone Number': phoneNumber,
       };
     }),
   );
