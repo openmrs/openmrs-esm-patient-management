@@ -67,6 +67,17 @@ export const admissionRequestNoteRowExtension = getAsyncLifecycle(
   options,
 );
 
+// t('transfers', 'Transfers')
+export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-transfer-bed-swap/patient-transfer-swap.workspace'),
+  options,
+);
+
+export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/transfer-workspace-siderail.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);

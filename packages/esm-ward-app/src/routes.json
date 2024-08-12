@@ -46,6 +46,11 @@
       "slot": "ward-patient-card-slot"
     },
     {
+      "name": "transfer-swap-patient-siderail-button",
+      "slot": "action-menu-ward-patient-items-slot",
+      "component": "patientTransferAndSwapWorkspaceSiderailIcon"
+    },
+    {
       "component": "admissionRequestNoteRowExtension",
       "name": "admission-request-note-card-row",
       "slot": "ward-patient-card-slot"
@@ -78,6 +83,14 @@
       "type": "ward",
       "title": "Ward Patient",
       "width": "extra-wide",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "patient-transfer-swap-workspace",
+      "component": "patientTransferAndSwapWorkspace",
+      "title": "transfers",
+      "type": "transfer-swap-bed-form",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"
     }

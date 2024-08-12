@@ -198,10 +198,7 @@ export interface EncounterPayload {
 }
 
 export interface ObsPayload {
-  concept: Concept;
+  concept: Concept | string;
   value?: string;
-  groupMembers?: Array<{
-    concept: Concept;
-    value: string;
-  }>;
+  groupMembers?: Array<ObsPayload>;
 }
