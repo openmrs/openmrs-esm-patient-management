@@ -6,8 +6,8 @@ import PatientNotesHistory from './history/notes-container.component';
 
 const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceProps> = (props) => {
   const { wardPatient, ...restWorkspaceProps } = props;
-  const patientUuid = wardPatient.patient?.uuid;
-  const { visit } = wardPatient;
+  const patientUuid = wardPatient?.patient?.uuid;
+
   const notesFormState = {
     patientUuid,
     ...restWorkspaceProps,
@@ -17,7 +17,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceProps> = (props) =
     <div>
       <WardPatientWorkspaceBanner {...wardPatient} />
       <PatientNotesForm {...notesFormState} />
-      <PatientNotesHistory patientUuid={patientUuid} visitUuid={visit.uuid} />
+      <PatientNotesHistory patientUuid={patientUuid} visitUuid={wardPatient?.visit.uuid} />
     </div>
   );
 };
