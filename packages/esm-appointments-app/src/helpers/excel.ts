@@ -1,6 +1,8 @@
-import { formatDate, openmrsFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import { formatDate, openmrsFetch, fhirBaseUrl, getConfig, useConfig } from '@openmrs/esm-framework';
 import * as XLSX from 'xlsx';
 import { type Appointment } from '../types';
+import { type ConfigObject } from '../config-schema';
+import { moduleName } from '../constants';
 
 async function fetchPatient(patientUuid: string): Promise<fhir.Patient> {
   const apiUrl = `${fhirBaseUrl}/Patient/${patientUuid}`;
@@ -13,12 +15,16 @@ async function fetchPatient(patientUuid: string): Promise<fhir.Patient> {
  * @param {string} [fileName] - The name of the downloaded file
  */
 export async function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
+  const config = await getConfig<ConfigObject>(moduleName);
+  const INCLUDE_TELEPHONE_NUMBERS = config.includeTelephoneNumbers ?? false;
+
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
       const patientinfo = await fetchPatient(appointment.patient.uuid);
-      const phoneNumber = patientinfo?.telecom
-        ? patientinfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
-        : '--';
+      const phoneNumber =
+        INCLUDE_TELEPHONE_NUMBERS && patientinfo?.telecom
+          ? patientinfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
+          : '';
 
       return {
         'Patient name': appointment.patient.name,
@@ -27,10 +33,20 @@ export async function downloadAppointmentsAsExcel(appointments: Array<Appointmen
         Identifier: appointment.patient.identifier ?? '--',
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        'Telephone Number': phoneNumber,
+        ...(INCLUDE_TELEPHONE_NUMBERS ? { 'Telephone number': phoneNumber } : {}),
       };
     }),
   );
+
+  const headers = [
+    'Patient name',
+    'Gender',
+    'Age',
+    'Identifier',
+    'Appointment type',
+    'Date',
+    ...(INCLUDE_TELEPHONE_NUMBERS ? ['Telephone number'] : []),
+  ];
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
