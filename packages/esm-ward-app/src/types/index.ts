@@ -40,6 +40,7 @@ export type WardPatient = {
    */
   inpatientRequest: InpatientRequest;
 };
+
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
 }
@@ -134,6 +135,9 @@ export interface InpatientAdmission {
   // the first encounter of the visit that is of encounterType "Admission" or "Transfer",
   // regardless of the admission location
   firstAdmissionOrTransferEncounter: Encounter;
+
+  // the current in patient request
+  currentInpatientRequest: InpatientRequest;
 }
 
 // TODO: Move these types to esm-core

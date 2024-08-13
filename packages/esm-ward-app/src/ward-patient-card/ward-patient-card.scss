@@ -79,12 +79,19 @@
   flex-wrap: wrap;
 }
 
-.wardPatientCardWaitingFor {
+.wardPatientCardPendingItemsRow {
+  @extend .wardPatientCardRow;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-flow: row;
   color: $ui-02;
   background-color: colors.$gray-80;
+}
+
+.wardPatientCardDispositionTypeContainer {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
 }
 
 .wardPatientName {
