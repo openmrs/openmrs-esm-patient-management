@@ -79,6 +79,14 @@
   flex-wrap: wrap;
 }
 
+.wardPatientCardWaitingFor {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  color: $ui-02;
+  background-color: colors.$gray-80;
+}
+
 .wardPatientName {
   @include type.type-style('heading-compact-02');
   color: $text-02;
