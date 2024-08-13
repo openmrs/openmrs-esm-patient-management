@@ -8,7 +8,7 @@
   height: layout.$spacing-12;
   background-color: colors.$white-0;
   display: flex;
-  padding-left: 8px;
+  padding-left: layout.$spacing-03;
   justify-content: space-between;
   border-bottom: 1px solid colors.$gray-20;
 }
@@ -52,7 +52,7 @@
 }
 
 .middot {
-  margin: 0 layout.$spacing-02;
+  margin: 0 layout.$spacing-03;
 }
 
 .view {
@@ -66,7 +66,7 @@ svg.iconOverrides {
 }
 
 .svgContainer svg {
-  width: 72px;
-  height: 72px;
+  width: 4.5rem;
+  height: 4.5rem;
   fill: var(--brand-03);
 }

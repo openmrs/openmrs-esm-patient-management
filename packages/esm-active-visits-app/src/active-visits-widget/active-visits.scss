@@ -1,6 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '~@openmrs/esm-styleguide/src/vars' as *;
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   margin: 0 layout.$spacing-05;
@@ -67,7 +67,7 @@
 
 .visitSummaryContainer {
   width: 100%;
-  max-width: 768px;
+  max-width: 48rem;
   margin: layout.$spacing-05 auto;
 }
 

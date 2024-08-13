@@ -1,6 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '~@openmrs/esm-styleguide/src/vars' as *;
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wrapper {
   margin-top: layout.$spacing-03;
@@ -68,13 +68,13 @@
 
 .desktopTabs {
   button {
-    height: 32px;
+    height: layout.$spacing-07;
   }
 }
 
 .tabletTabs {
   button {
-    height: 48px;
+    height: layout.$spacing-09;
   }
 }
 

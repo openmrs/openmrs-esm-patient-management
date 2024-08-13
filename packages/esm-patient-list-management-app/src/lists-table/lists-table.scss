@@ -72,7 +72,7 @@
 .filterEmptyStateContent {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: layout.$spacing-02;
+  margin-bottom: layout.$spacing-03;
 }
 
 .filterEmptyStateHelper {

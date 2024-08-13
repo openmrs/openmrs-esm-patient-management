@@ -1,6 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '~@openmrs/esm-styleguide/src/vars' as *;
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .label01 {
   @include type.type-style('label-01');
@@ -17,7 +17,7 @@
   position: absolute;
   left: 0;
   background-color: #fff;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   z-index: 99;
   border: 1px solid $ui-03;
 }

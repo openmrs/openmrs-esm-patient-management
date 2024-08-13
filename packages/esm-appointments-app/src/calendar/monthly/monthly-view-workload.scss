@@ -1,7 +1,7 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '~@openmrs/esm-styleguide/src/vars' as *;
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .monthly-cell {
   border-left: 1px solid colors.$gray-20;
@@ -50,7 +50,7 @@
   position: relative;
   border-right: 1px solid colors.$gray-20;
   border-bottom: 1px solid colors.$gray-20;
-  min-height: 120px;
+  min-height: 7.5rem;
   color: colors.$white;
 
   .week-time {
@@ -143,11 +143,11 @@
 }
 
 .smallDesktop {
-  height: 100px;
+  height: 6.25rem;
 }
 
 .largeDesktop {
-  height: 150px;
+  height: 9.375rem;
 }
 
 .red {
