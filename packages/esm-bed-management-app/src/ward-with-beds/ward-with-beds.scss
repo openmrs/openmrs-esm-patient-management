@@ -1,14 +1,14 @@
 @use '@carbon/layout';
 
 .container {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .backButton {
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin-left: 1rem;
+  margin-left: layout.$spacing-05;
 
   button {
     display: flex;

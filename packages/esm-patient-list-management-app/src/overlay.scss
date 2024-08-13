@@ -1,13 +1,13 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import './style.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .desktopOverlay {
   position: fixed;
   right: 0;
   width: 37rem;
-  top: spacing.$spacing-09;
-  height: calc(100vh - 3rem);
+  top: layout.$spacing-09;
+  height: calc(100vh - layout.$spacing-09);
   min-width: 27rem;
   background-color: $ui-01;
   border-left: 1px solid $text-03;
@@ -27,7 +27,7 @@
   z-index: 9999;
   background-color: $ui-01;
   overflow: hidden;
-  padding-top: spacing.$spacing-09;
+  padding-top: layout.$spacing-09;
   display: grid;
   grid-template-rows: 1fr auto;
 }
@@ -47,12 +47,12 @@
   align-items: center;
   background-color: $ui-03;
   border-bottom: 1px solid $text-03;
-  height: 3rem;
+  height: layout.$spacing-09;
 }
 
 .headerContent {
   @include type.type-style('heading-compact-02');
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
   color: $ui-05;
 }
 
@@ -63,7 +63,7 @@
 }
 
 .overlayContent {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   overflow-y: auto;
 }
 
@@ -84,6 +84,6 @@
 }
 
 :global(.omrs-breakpoint-lt-desktop) .buttonsGroup {
-  padding: spacing.$spacing-06 spacing.$spacing-05;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }

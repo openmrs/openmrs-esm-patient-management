@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../../patient-registration/patient-registration.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .fieldRow {
   display: flex;
@@ -10,7 +10,7 @@
 }
 
 .subFieldRow {
-  margin-bottom: 5px;
+  margin-bottom: 0.3125rem;
 }
 
 .label {
@@ -20,7 +20,7 @@
 
 .textID,
 .comboInput {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .requiredField {
@@ -28,15 +28,15 @@
 }
 
 .input {
-  margin-right: 5px;
+  margin-right: 0.3125rem;
 }
 
 .checkboxField {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  width: 400px;
-  margin-left: 10px;
+  width: 25rem;
+  margin-left: 0.625rem;
 }
 
 .textInput {
@@ -50,9 +50,9 @@
 }
 
 .checkboxInput {
-  height: 1.5rem !important;
-  width: 1.5rem !important;
-  margin-top: 8px;
+  height: layout.$spacing-06 !important;
+  width: layout.$spacing-06 !important;
+  margin-top: layout.$spacing-03;
 }
 
 .selectInput {
@@ -114,5 +114,5 @@
 
 .comboInputItemOption {
   margin: 0;
-  padding-left: 1rem;
+  padding-left: layout.$spacing-05;
 }

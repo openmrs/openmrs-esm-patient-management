@@ -1,6 +1,5 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .searchArea {
   display: flex;

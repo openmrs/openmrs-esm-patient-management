@@ -1,15 +1,15 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .refineSeachContainer {
   h2 {
-    margin: spacing.$spacing-03 0;
+    margin: layout.$spacing-03 0;
   }
 }
 
 .field {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 
   input {
     min-width: unset !important;
@@ -17,7 +17,7 @@
 }
 
 .fieldTabletOrOverlay {
-  margin-bottom: spacing.$spacing-07;
+  margin-bottom: layout.$spacing-07;
 
   input {
     min-width: unset !important;
@@ -27,10 +27,10 @@
 .dobFields {
   display: grid;
   grid-template-columns: 1fr 1fr 1.25fr;
-  grid-gap: spacing.$spacing-03;
+  grid-gap: layout.$spacing-03;
   input {
     min-width: unset !important;
-    padding-right: spacing.$spacing-02 !important;
+    padding-right: layout.$spacing-02 !important;
   }
 }
 
@@ -40,7 +40,7 @@
 }
 
 .refineSearchBanner {
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  padding: layout.$spacing-03 layout.$spacing-05;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,7 +52,7 @@
 }
 
 .padded {
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
 }
 
 .refineSearchDialogOpener {
@@ -61,7 +61,7 @@
 
 .refineSearchDialogContainer {
   position: absolute;
-  top: spacing.$spacing-09;
+  top: layout.$spacing-09;
   bottom: 0;
   left: 0;
   right: 0;
@@ -81,46 +81,46 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-05;
+  padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .refineSearchDialogGenderSexRow {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
-  grid-gap: 5rem;
-  padding: 0 spacing.$spacing-05;
+  grid-gap: layout.$spacing-11;
+  padding: 0 layout.$spacing-05;
 }
 
 .labelText {
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .phoneLastVisitRow {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-gap: 5rem;
-  padding: 0 spacing.$spacing-05;
+  grid-gap: layout.$spacing-11;
+  padding: 0 layout.$spacing-05;
 }
 
 .phonePostcode {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  grid-gap: spacing.$spacing-05;
+  grid-gap: layout.$spacing-05;
 }
 
 .buttonSet {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
 .paddedButtons {
-  margin: spacing.$spacing-07 spacing.$spacing-05;
+  margin: layout.$spacing-07 layout.$spacing-05;
 }
 
 .filtersAppliedCount {
-  padding: 0 spacing.$spacing-03;
+  padding: 0 layout.$spacing-03;
   background-color: $color-blue-60-2;
   color: $ui-01;
 }
@@ -132,6 +132,18 @@
   color: $ui-02;
 
   p {
-    margin-left: spacing.$spacing-03;
+    margin-left: layout.$spacing-03;
   }
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
 }

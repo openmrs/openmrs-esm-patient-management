@@ -1,7 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wrapper {
   position: relative;
@@ -13,7 +12,7 @@
 }
 
 .calendarViewContainer {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 .backgroundColor {
   margin: 1px 0 0;

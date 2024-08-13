@@ -1,9 +1,10 @@
 @use '@carbon/colors';
+@use '@carbon/layout';
 @use '@carbon/type';
 
 .widgetCard {
   border: 1px solid colors.$gray-20;
-  margin: 1.5rem;
+  margin: layout.$spacing-06;
 
   :global(.cds--modal-content) {
     margin-bottom: unset;
@@ -26,9 +27,9 @@
 .flexContainer {
   display: flex;
   justify-content: space-between;
-  padding: 0 1rem;
-  margin-top: 2rem;
-  margin-left: 0.5rem;
+  padding: 0 layout.$spacing-05;
+  margin-top: layout.$spacing-07;
+  margin-left: layout.$spacing-03;
 }
 
 .filterContainer {
@@ -39,7 +40,7 @@
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: 1rem;
+    height: layout.$spacing-05;
   }
 }
 
@@ -52,7 +53,7 @@
 .tileContainer {
   background-color: colors.$white-0;
   border-top: 1px solid colors.$gray-20;
-  padding: 3rem 0;
+  padding: layout.$spacing-09 0;
 }
 
 .tile {
@@ -72,7 +73,7 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-70;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .helper {
@@ -84,7 +85,7 @@
   @include type.type-style('body-compact-02');
   color: colors.$gray-70;
   width: 80%;
-  margin: 1.5rem auto;
+  margin: layout.$spacing-06 auto;
   overflow: hidden;
   text-align: center;
 
@@ -100,12 +101,12 @@
   }
 
   &::before {
-    right: 0.5rem;
+    right: layout.$spacing-03;
     margin-left: -50%;
   }
 
   &::after {
-    left: 0.5rem;
+    left: layout.$spacing-03;
     margin-right: -50%;
   }
 }

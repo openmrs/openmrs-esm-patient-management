@@ -1,9 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .searchResultsDesktop {
-  height: calc(100vh - 4rem);
+  height: calc(100vh - layout.$spacing-10);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -11,19 +11,19 @@
 
 .searchResultsTabletOrOverlay {
   height: 100%;
-  margin-bottom: spacing.$spacing-09;
+  margin-bottom: layout.$spacing-09;
 }
 
 .broadBottomMargin {
-  margin-bottom: 5rem;
+  margin-bottom: layout.$spacing-11;
 }
 
 .resultsHeader {
-  margin: spacing.$spacing-05 0rem spacing.$spacing-03 0rem;
+  margin: layout.$spacing-05 0 layout.$spacing-03 0;
 }
 
 .leftPaddedResultHeader {
-  margin-left: spacing.$spacing-05;
+  margin-left: layout.$spacing-05;
 }
 
 .productiveHeading02 {
@@ -38,30 +38,30 @@
 .emptySearchResultsTile {
   text-align: center;
   margin: 0;
-  padding: spacing.$spacing-08 0;
+  padding: layout.$spacing-08 0;
 }
 
 .paddedEmptySearchResultsTile {
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .emptyResultText {
   @include type.type-style('heading-02');
   color: $text-02;
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
 }
 
 .actionText {
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
   @include type.type-style('body-01');
   color: $text-02;
-  margin: spacing.$spacing-03 auto 0;
+  margin: layout.$spacing-03 auto 0;
   max-width: 13.75rem;
   text-align: center;
 }
 
 .spacer {
-  padding: spacing.$spacing-05 0;
+  padding: layout.$spacing-05 0;
 }
 
 .pagination {
@@ -72,11 +72,11 @@
 .errorMessage {
   @include type.type-style('heading-compact-02');
   margin-top: 2.25rem;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .errorCopy {
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   @include type.type-style('body-01');
   color: $text-02;
 }
@@ -85,12 +85,12 @@
 .advancedSearchPage {
   width: 100%;
   display: flex;
-  grid-column-gap: spacing.$spacing-09;
+  grid-column-gap: layout.$spacing-09;
 }
 
 .dobFields {
   display: flex;
   input {
-    margin-left: spacing.$spacing-05;
+    margin-left: layout.$spacing-05;
   }
 }
