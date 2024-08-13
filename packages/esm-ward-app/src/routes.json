@@ -49,6 +49,11 @@
       "name": "transfer-swap-patient-siderail-button",
       "slot": "action-menu-ward-patient-items-slot",
       "component": "patientTransferAndSwapWorkspaceSiderailIcon"
+    },
+    {
+      "component": "admissionRequestNoteRowExtension",
+      "name": "admission-request-note-card-row",
+      "slot": "ward-patient-card-slot"
     }
   ],
   "workspaces": [
