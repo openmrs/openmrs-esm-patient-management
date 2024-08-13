@@ -1,9 +1,10 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { VisitTypeSelector } from './visit-type-selector.component';
 import { render, screen } from '@testing-library/react';
-import { mockPatient, mockVisitTypes } from '__mocks__';
+import { mockVisitTypes } from '__mocks__';
 import { useVisitTypes } from '@openmrs/esm-framework';
+import { VisitTypeSelector } from './visit-type-selector.component';
 
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
 
@@ -28,7 +29,7 @@ describe('VisitTypeSelector', () => {
   it('renders the first 5 visit types with a search bar if there are more than 5', () => {
     render(<VisitTypeSelector onChange={() => {}} />);
 
-    expect(screen.queryByRole('searchbox')).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
 
     mockVisitTypes.slice(0, 5).forEach((visitType) => {
       const radioButton = screen.getByLabelText(visitType.display);

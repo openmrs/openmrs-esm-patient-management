@@ -1,15 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { type ConfigObject, configSchema } from '../config-schema';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '__mocks__';
 import AppointmentsTable from './scheduled-appointments-table.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: () => ({
-    appointmentStatuses: ['All', 'Scheduled', 'Completed'],
-  }),
-}));
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('./queue-linelist.resource', () => ({
   useAppointments: () => ({
@@ -19,6 +16,13 @@ jest.mock('./queue-linelist.resource', () => ({
 }));
 
 describe('AppointmentsTable', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentStatuses: ['All', 'Scheduled', 'Completed'],
+    });
+  });
+
   it('renders appointments when loading is complete', () => {
     render(<AppointmentsTable />);
 
@@ -28,7 +32,6 @@ describe('AppointmentsTable', () => {
 
   it('filters appointments based on status selection', async () => {
     const user = userEvent.setup();
-
     render(<AppointmentsTable />);
 
     const statusDropdown = screen.getAllByLabelText('Status:');

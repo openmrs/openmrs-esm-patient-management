@@ -67,29 +67,28 @@ export const mockSession = {
       display: 'admin',
       username: '',
       systemId: 'admin',
-      locale: 'en',
-      allowedLocales: ['en', 'en-GB', 'es', 'fr', 'he', 'km'],
       userProperties: {
         loginAttempts: '0',
       },
       person: {
         uuid: '0775e6b7-f439-40e5-87a3-2bd11f3b9ee5',
         display: 'Test User',
-        links: [],
       },
-      links: [],
       privileges: [
         {
           uuid: '62431c71-5244-11ea-a771-0242ac160002',
           display: 'Manage Appointment Services',
+          links: [],
         },
         {
           uuid: '6206682c-5244-11ea-a771-0242ac160002',
           display: 'Manage Appointments',
+          links: [],
         },
         {
           uuid: '6280ff58-5244-11ea-a771-0242ac160002',
           display: 'Manage Appointment Specialities',
+          links: [],
         },
       ],
       roles: [
@@ -110,7 +109,9 @@ export const mockSession = {
         },
       ],
       retired: false,
+      locale: 'en_GB',
+      allowedLocales: ['en_GB'],
     },
-    sessionId: '39570a50-abb2-4f44-b146-a288ec35064b',
+    sessionId: 'D4F7D4D4-6A6D-4D4D-8D4D-4D4D4D4D4D4D',
   },
 };

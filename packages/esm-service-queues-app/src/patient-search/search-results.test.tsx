@@ -3,15 +3,7 @@ import { screen, render } from '@testing-library/react';
 import { age } from '@openmrs/esm-framework';
 import SearchResults from './search-results.component';
 
-const mockAge = age as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    age: jest.fn(),
-  };
-});
+const mockAge = jest.mocked(age);
 
 const patients = [
   {
@@ -63,7 +55,7 @@ const mockToggleSearchType = jest.fn();
 
 describe('Search Results', () => {
   it('should search results page', () => {
-    mockAge.mockReturnValue(35);
+    mockAge.mockReturnValue('35');
     renderSearchResults();
     expect(screen.getByText(/John Smith/)).toBeInTheDocument();
     expect(screen.getByText(/35/)).toBeInTheDocument();

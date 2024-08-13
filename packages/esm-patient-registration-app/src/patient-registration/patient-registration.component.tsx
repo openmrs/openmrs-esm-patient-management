@@ -18,7 +18,7 @@ import { type FormValues, type CapturePhotoProps } from './patient-registration.
 import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
+import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
@@ -34,7 +34,7 @@ export interface PatientRegistrationProps {
 }
 
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
-  const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
+  const { currentSession, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
@@ -71,7 +71,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
-    const updatedFormValues = { ...values, identifiers: filterUndefinedPatientIdenfier(values.identifiers) };
+    const updatedFormValues = { ...values, identifiers: filterOutUndefinedPatientIdentifiers(values.identifiers) };
     try {
       await savePatientForm(
         !inEditMode,

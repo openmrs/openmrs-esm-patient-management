@@ -77,7 +77,7 @@ export function useCheckedInAppointments(patientUuid: string, startDate: string)
 
   return {
     data: data ? appointments : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };

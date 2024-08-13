@@ -43,7 +43,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   const { activeVisit } = useVisit(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
   const [showContactDetails, setContactDetails] = useState(false);
-  const { appointments, isLoading, isError } = useScheduledVisits(selectedPatientUuid);
+  const { appointments, isLoading, error } = useScheduledVisits(selectedPatientUuid);
 
   const hasAppointments = !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits));
 
@@ -109,11 +109,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
           <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
         ) : (
           <>
-            {isError ? (
-              <ErrorState headerTitle={t('errorFetchingAppointments', 'Error fetching appointments')} error={isError} />
+            {error ? (
+              <ErrorState headerTitle={t('errorFetchingAppointments', 'Error fetching appointments')} error={error} />
             ) : null}
 
-            {isLoading && !isError ? (
+            {isLoading && !error ? (
               <DataTableSkeleton role="progressbar" />
             ) : searchType === SearchTypes.SCHEDULED_VISITS && hasAppointments ? (
               <PatientScheduledVisits

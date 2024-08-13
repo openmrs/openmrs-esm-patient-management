@@ -1,4 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import head from 'lodash-es/head';
+import { first } from 'rxjs/operators';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -27,16 +30,13 @@ import {
   useVisitTypes,
 } from '@openmrs/esm-framework';
 import { type Appointment, SearchTypes } from '../types';
-import styles from './patient-scheduled-visits.scss';
 import { postQueueEntry } from './visit-form/queue.resource';
-import { first } from 'rxjs/operators';
 import { convertTime12to24 } from '../helpers/time-helpers';
-import dayjs from 'dayjs';
-import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
 import { useQueues } from '../hooks/useQueues';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
+import styles from './patient-scheduled-visits.scss';
 
 enum visitType {
   RECENT = 'Recent',

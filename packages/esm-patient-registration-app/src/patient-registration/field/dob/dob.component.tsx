@@ -2,7 +2,6 @@ import React, { type ChangeEvent, useCallback, useContext } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
-import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
@@ -45,8 +44,8 @@ export const DobField: React.FC = () => {
   );
 
   const onDateChange = useCallback(
-    (birthdate: CalendarDate) => {
-      setFieldValue('birthdate', birthdate?.toDate(getLocalTimeZone()));
+    (birthdate: Date) => {
+      setFieldValue('birthdate', birthdate);
     },
     [setFieldValue],
   );
@@ -107,11 +106,9 @@ export const DobField: React.FC = () => {
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of Birth')}
               isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+              invalidText={t(birthdateMeta.error)}
               value={birthdate.value}
             />
-            {!!(birthdateMeta.touched && birthdateMeta.error) && (
-              <div className={styles.radioFieldError}>{birthdateMeta.error && t(birthdateMeta.error)}</div>
-            )}
           </div>
         ) : (
           <div className={styles.grid}>

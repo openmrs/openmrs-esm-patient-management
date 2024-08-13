@@ -4,7 +4,7 @@ import AppointmentsCalendarView from './appointments-calendar-view.component';
 
 describe('Appointment calendar view', () => {
   it('renders appointments in calendar view from appointments list', async () => {
-    renderAppointmentsCalendarListView();
+    render(<AppointmentsCalendarView />);
 
     const expectedTableRows = [
       /John Wilson 30-Aug-2021 03:35 03:35 Dr James Cook Outpatient Walk in appointments/,
@@ -16,7 +16,3 @@ describe('Appointment calendar view', () => {
     });
   });
 });
-
-function renderAppointmentsCalendarListView() {
-  render(<AppointmentsCalendarView />);
-}
