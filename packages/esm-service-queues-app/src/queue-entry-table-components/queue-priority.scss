@@ -1,9 +1,8 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .tag {
-  margin: 0.25rem 0;
+  margin: layout.$spacing-02 0;
   white-space: nowrap;
 }
 

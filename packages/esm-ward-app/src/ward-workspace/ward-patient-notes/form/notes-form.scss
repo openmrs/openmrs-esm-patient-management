@@ -3,7 +3,7 @@
 @use '@carbon/type';
 
 .formContainer {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .form {

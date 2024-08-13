@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .header {
   @include type.type-style('body-compact-02');
@@ -10,7 +10,7 @@
   border-left: 0px;
   display: flex;
   justify-content: space-between;
-  padding-right: 1rem;
+  padding-right: layout.$spacing-05;
 }
 
 .left-justified-items {
@@ -22,7 +22,7 @@
 .right-justified-items {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  padding-top: 1rem;
+  padding-top: layout.$spacing-05;
 }
 
 .page-name {
@@ -31,7 +31,7 @@
 
 .page-labels {
   p:first-of-type {
-    margin-bottom: 0.25rem;
+    margin-bottom: layout.$spacing-02;
   }
 }
 
@@ -42,11 +42,11 @@
 }
 
 .value {
-  margin-left: 0.25rem;
+  margin-left: layout.$spacing-02;
 }
 
 .middot {
-  margin: 0 0.5rem;
+  margin: 0 layout.$spacing-03;
 }
 
 .view {
@@ -57,7 +57,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 0.5rem;
+  margin-top: layout.$spacing-03;
 }
 
 .dropdown {
@@ -67,7 +67,7 @@
   }
 
   :global(.cds--dropdown--inline .cds--list-box__menu) {
-    left: -4rem;
+    left: -(layout.$spacing-10);
   }
 }
 
@@ -75,7 +75,7 @@
 html[dir='rtl'] {
   .date-and-location {
     margin-right: unset;
-    margin-left: spacing.$spacing-05;
+    margin-left: layout.$spacing-05;
     & > svg:first-child {
       order: -1;
     }

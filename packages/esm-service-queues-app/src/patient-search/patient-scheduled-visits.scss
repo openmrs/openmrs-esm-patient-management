@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   background-color: $ui-background;
@@ -15,7 +15,7 @@
 }
 
 .visitTile {
-  margin: spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
 
   &:global(.cds--tile--is-selected:focus) {
     background-color: $color-blue-10;
@@ -37,19 +37,19 @@
 }
 
 .recentlyScheduledVisitsContainer {
-  margin-top: spacing.$spacing-06;
-  margin-bottom: spacing.$spacing-10;
+  margin-top: layout.$spacing-06;
+  margin-bottom: layout.$spacing-10;
 }
 
 .row {
-  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
 }
 
 .backButton {
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: spacing.$spacing-03 0;
+  margin: layout.$spacing-03 0;
   padding: 0;
   @include type.type-style('body-compact-01');
 
@@ -58,8 +58,8 @@
 
     svg {
       order: 1;
-      margin-right: 0.5rem;
-      margin-left: 0rem !important;
+      margin-right: layout.$spacing-03;
+      margin-left: 0 !important;
     }
 
     span {
@@ -84,7 +84,7 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -94,7 +94,7 @@
 .text-divider {
   display: flex;
   align-items: center;
-  margin: spacing.$spacing-08 25%;
+  margin: layout.$spacing-08 25%;
   @include type.type-style('heading-03');
   color: $text-02;
 }
@@ -108,24 +108,24 @@
 }
 
 .text-divider::before {
-  margin-right: spacing.$spacing-05;
+  margin-right: layout.$spacing-05;
 }
 
 .text-divider::after {
-  margin-left: spacing.$spacing-05;
+  margin-left: layout.$spacing-05;
 }
 
 .buttonContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .prioritySwitcher {
-  margin: spacing.$spacing-03 0 spacing.$spacing-03;
+  margin: layout.$spacing-03 0 layout.$spacing-03;
 }
 
 .emptyAppointment {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }

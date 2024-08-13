@@ -1,6 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .metricsContainer {
   display: flex;
@@ -18,7 +18,7 @@
 
 .actionBtn {
   display: flex;
-  column-gap: 0.5rem;
+  column-gap: layout.$spacing-03;
 }
 
 .comboBtn {

@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .label01 {
   @include type.type-style('label-01');
@@ -23,7 +23,7 @@
 }
 
 .suggestions li {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   line-height: 1.29;
   color: #525252;
   border-bottom: 1px solid #8d8d8d;

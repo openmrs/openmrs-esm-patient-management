@@ -1,4 +1,4 @@
-@import '../root.scss';
+@use '@carbon/layout';
 
 .patientSearchPage {
   display: flex;
@@ -6,5 +6,5 @@
 }
 
 .patientSearchComponent {
-  margin-top: 1rem;
+  margin-top: layout.$spacing-05;
 }

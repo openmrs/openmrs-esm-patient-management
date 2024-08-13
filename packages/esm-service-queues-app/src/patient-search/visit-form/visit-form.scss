@@ -1,25 +1,24 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   flex: 1;
 
   & section {
-    margin: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
+    margin: layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
   }
 }
 
 .heading {
   @include type.type-style('heading-03');
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .sectionTitle {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .dateTimeSection {
@@ -27,7 +26,7 @@
 }
 
 .radioButton {
-  margin: spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
 }
 
 .headerGridRow {
@@ -38,7 +37,7 @@
 .dataGridRow {
   display: grid;
   grid-template-columns: 50% 10% 1fr;
-  margin: spacing.$spacing-03 spacing.$spacing-05;
+  margin: layout.$spacing-03 layout.$spacing-05;
   width: 100%;
 }
 
@@ -50,7 +49,7 @@
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -58,14 +57,14 @@
 }
 
 .tabletButtons {
-  padding: spacing.$spacing-06 spacing.$spacing-05;
-  margin-top: spacing.$spacing-10;
+  padding: layout.$spacing-06 layout.$spacing-05;
+  margin-top: layout.$spacing-10;
   background-color: $ui-02;
 }
 
 .desktopButtons {
-  padding: 0rem;
-  margin-top: spacing.$spacing-10;
+  padding: 0;
+  margin-top: layout.$spacing-10;
 }
 
 @media screen and (max-width: 600px) {

@@ -1,7 +1,6 @@
-@use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .patientSearchResult,
 .deceased.patientSearchResult {
@@ -12,7 +11,7 @@
   align-items: center;
   border: none;
   border-bottom: 1px solid $ui-03;
-  padding: 0rem spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
 
   &:hover,
   &:focus {
@@ -35,13 +34,13 @@
 .patientName {
   @include type.type-style('heading-02');
   color: $text-02;
-  margin-right: spacing.$spacing-02;
+  margin-right: layout.$spacing-02;
 }
 
 .patientAvatar {
-  width: spacing.$spacing-09;
-  height: spacing.$spacing-09;
-  margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
+  width: layout.$spacing-09;
+  height: layout.$spacing-09;
+  margin: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03 0;
   border-radius: 1px;
   font-weight: unset;
   line-height: unset;
@@ -51,20 +50,20 @@
   width: 100%;
   display: flex;
   flex-flow: column wrap;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   cursor: pointer;
 }
 
 .demographics {
   display: flex;
   align-items: center;
-  margin-top: spacing.$spacing-02;
+  margin-top: layout.$spacing-02;
   @include type.type-style('body-compact-01');
   color: $text-02;
 }
 
 .identifier {
-  margin: 0rem spacing.$spacing-03;
+  margin: 0 layout.$spacing-03;
 }
 
 .identifiers {
@@ -73,16 +72,16 @@
 }
 
 .actionsContainer {
-  padding-top: spacing.$spacing-03;
-  margin-top: spacing.$spacing-05;
+  padding-top: layout.$spacing-03;
+  margin-top: layout.$spacing-05;
 }
 
 .middot {
-  margin: 0 0.25rem;
+  margin: 0 layout.$spacing-02;
 }
 
 .configuredTag {
-  margin: spacing.$spacing-01 spacing.$spacing-03;
+  margin: layout.$spacing-01 layout.$spacing-03;
 }
 
 .configuredLabel {
@@ -97,6 +96,6 @@
 }
 
 .skeletonIcon {
-  height: 3rem;
-  width: 3rem;
+  height: layout.$spacing-09;
+  width: layout.$spacing-09;
 }

@@ -1,10 +1,9 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
-  padding-bottom: spacing.$spacing-07;
+  padding-bottom: layout.$spacing-07;
   background-color: $ui-01;
 }
 
@@ -16,8 +15,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: spacing.$spacing-05;
-  margin: spacing.$spacing-03;
+  padding: layout.$spacing-05;
+  margin: layout.$spacing-03;
   border-top: 1px solid $text-03;
   border-bottom: 1px solid $text-03;
 }
@@ -25,19 +24,19 @@
 .title {
   @include type.type-style('body-compact-02');
 
-  margin: 0 spacing.$spacing-04 spacing.$spacing-04;
+  margin: 0 layout.$spacing-04 layout.$spacing-04;
 }
 
 .subTitle {
   @include type.type-style('label-01');
   color: $text-02;
-  margin: spacing.$spacing-01;
-  margin-left: spacing.$spacing-04;
+  margin: layout.$spacing-01;
+  margin-left: layout.$spacing-04;
 }
 
 .filterTile {
   border-bottom: 1px solid $text-03;
-  margin-bottom: spacing.$spacing-04;
+  margin-bottom: layout.$spacing-04;
   background-color: $ui-01;
 }
 
@@ -46,7 +45,7 @@
 }
 
 .tableContainer {
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   padding: 0;
 }
 
@@ -66,12 +65,12 @@
   }
 
   tr {
-    width: spacing.$spacing-01;
+    width: layout.$spacing-01;
   }
 
   .toolbarContent {
-    height: spacing.$spacing-07;
-    margin-bottom: spacing.$spacing-02;
+    height: layout.$spacing-07;
+    margin-bottom: layout.$spacing-02;
   }
 }
 
@@ -84,7 +83,7 @@
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: spacing.$spacing-11 0;
+  padding: layout.$spacing-11 0;
 }
 
 .tile {
@@ -101,7 +100,7 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .helper {

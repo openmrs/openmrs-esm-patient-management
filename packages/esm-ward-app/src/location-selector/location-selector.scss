@@ -1,7 +1,5 @@
-@use '@carbon/type';
 @use '@carbon/layout';
 @use '~@openmrs/esm-styleguide/src/vars' as *;
-@import '../root.scss';
 
 .locationSelector {
   border: 1px solid $ui-03;

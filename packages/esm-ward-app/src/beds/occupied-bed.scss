@@ -1,5 +1,4 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars';
 
 .occupiedBed {
@@ -11,7 +10,7 @@
 .bedDivider {
   background-color: vars.$ui-02;
   color: vars.$text-02;
-  padding: spacing.$spacing-01;
+  padding: layout.$spacing-01;
   display: flex;
   align-items: center;
   justify-content: space-between;

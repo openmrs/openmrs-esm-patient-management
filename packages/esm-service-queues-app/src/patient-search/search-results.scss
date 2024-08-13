@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .patientChart {
   text-decoration: none;
@@ -25,9 +25,9 @@
 }
 
 .patientAvatar {
-  width: spacing.$spacing-11;
-  height: spacing.$spacing-11;
-  margin: spacing.$spacing-05 spacing.$spacing-05 0;
+  width: layout.$spacing-11;
+  height: layout.$spacing-11;
+  margin: layout.$spacing-05 layout.$spacing-05 0;
   border-radius: 1px;
 }
 
@@ -35,7 +35,7 @@
   width: 100%;
   display: flex;
   flex-flow: column wrap;
-  margin: spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
   cursor: pointer;
 }
 
@@ -51,8 +51,8 @@
 }
 
 .actionsContainer {
-  padding-top: spacing.$spacing-03;
-  margin-top: spacing.$spacing-05;
+  padding-top: layout.$spacing-03;
+  margin-top: layout.$spacing-05;
 }
 
 .sortingCriteriaSelect {
@@ -67,7 +67,7 @@
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: spacing.$spacing-05;
+    height: layout.$spacing-05;
   }
 
   :global(.cds--list-box__menu) {
@@ -75,6 +75,6 @@
   }
 
   :global(.cds--label) {
-    margin-right: spacing.$spacing-02;
+    margin-right: layout.$spacing-02;
   }
 }

@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   border-bottom: 0.0125rem solid $color-gray-30;
@@ -10,7 +10,7 @@
 
 .patientInfoContainer {
   background-color: $ui-02;
-  padding: 0 0 0 spacing.$spacing-05;
+  padding: 0 0 0 layout.$spacing-05;
   display: flex;
   align-items: center;
   min-height: 7rem;
@@ -18,7 +18,7 @@
 
 .activePatientInfoContainer {
   background-color: $color-blue-10;
-  padding: 0 0 0 spacing.$spacing-05;
+  padding: 0 0 0 layout.$spacing-05;
   display: flex;
   align-items: center;
   min-height: 7rem;
@@ -29,14 +29,14 @@
 }
 
 .patientInfoContent {
-  margin: spacing.$spacing-05 0 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 0 layout.$spacing-05;
   width: 100%;
 }
 
 .demographics {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  margin-top: spacing.$spacing-02;
+  margin-top: layout.$spacing-02;
 }
 
 .identifier {
@@ -50,11 +50,11 @@
   align-items: center;
 
   & > button {
-    min-height: 2rem;
+    min-height: layout.$spacing-07;
   }
 }
 
 .patientEditBtn {
   color: $ui-05;
-  margin: spacing.$spacing-03;
+  margin: layout.$spacing-03;
 }

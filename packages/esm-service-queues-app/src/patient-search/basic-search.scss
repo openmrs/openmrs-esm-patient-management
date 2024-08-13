@@ -1,11 +1,11 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .searchboxContainer {
   display: flex;
   align-items: center;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .searchboxLayer {
@@ -14,7 +14,7 @@
 
 .tileContainer {
   :global(.omrs-breakpoint-gt-tablet) & {
-    margin: 0 1.5rem 0;
+    margin: 0 layout.$spacing-06 0;
   }
 
   :global(.omrs-breakpoint-lt-desktop) & {
@@ -28,7 +28,7 @@
   flex-flow: column wrap;
   align-items: center;
   justify-content: center;
-  padding: 2rem 0 1.5rem;
+  padding: layout.$spacing-07 0 layout.$spacing-06;
   text-align: center;
   border: 1px solid $ui-03;
 }
@@ -43,7 +43,7 @@
 
   .secondaryText {
     width: 12rem;
-    margin-top: 0.25rem;
+    margin-top: layout.$spacing-02;
     @include type.type-style('body-01');
   }
 }
@@ -52,7 +52,7 @@
   @include type.type-style('heading-03');
   color: $text-02;
   width: 12rem;
-  margin: 3rem auto;
+  margin: layout.$spacing-09 auto;
   overflow: hidden;
   text-align: center;
 
@@ -68,12 +68,12 @@
   }
 
   &::before {
-    right: 1rem;
+    right: layout.$spacing-05;
     margin-left: -50%;
   }
 
   &::after {
-    left: 1rem;
+    left: layout.$spacing-05;
     margin-right: -50%;
   }
 }
@@ -113,13 +113,13 @@
   @include type.type-style('label-01');
   color: $text-02;
   border-bottom: 0.063rem solid $ui-03;
-  padding: spacing.$spacing-03 0rem;
+  padding: layout.$spacing-03 0;
 }
 
 .emptyResultText {
   @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   margin-bottom: 0.313rem;
 }
 
@@ -130,8 +130,8 @@
 
 .emptySearchResultsTile {
   text-align: center;
-  margin-top: spacing.$spacing-05;
-  padding: spacing.$spacing-09 0rem;
+  margin-top: layout.$spacing-05;
+  padding: layout.$spacing-09 0;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {

@@ -1,13 +1,12 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .admissionRequestsWorkspace {
-  padding: spacing.$spacing-04;
+  padding: layout.$spacing-04;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  gap: layout.$spacing-05;
 }
 .content {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
 }

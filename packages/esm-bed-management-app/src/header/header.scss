@@ -23,8 +23,8 @@
 .right-justified-items {
   @include type.type-style('body-compact-02');
   color: colors.$gray-70;
-  margin: 0.5rem;
-  padding-top: 0.75rem;
+  margin: layout.$spacing-03;
+  padding-top: layout.$spacing-04;
 }
 
 .page-name {
@@ -33,26 +33,26 @@
 }
 
 .page-labels {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .middot {
-  margin: 0 0.5rem;
+  margin: 0 layout.$spacing-03;
 }
 
 .date-and-location {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 1rem;
+  margin-right: layout.$spacing-05;
 }
 
 .value {
-  margin-left: 0.25rem;
+  margin-left: layout.$spacing-02;
 }
 
 .middot {
-  margin: 0 0.5rem;
+  margin: 0 layout.$spacing-02;
 }
 
 .view {

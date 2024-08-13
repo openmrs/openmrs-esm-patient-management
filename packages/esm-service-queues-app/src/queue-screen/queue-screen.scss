@@ -1,14 +1,16 @@
+@use '@carbon/layout';
+
 .gridFlow {
   display: flex;
   flex-direction: row;
-  padding: 2rem;
+  padding: layout.$spacing-07;
   flex-wrap: wrap;
 }
 
 .card {
   border-radius: 0.9rem;
   border: 1px solid #343332;
-  margin: 1.5rem;
+  margin: layout.$spacing-06;
   padding: 1.3rem;
   width: 30%;
   text-align: center;
@@ -16,13 +18,13 @@
 }
 
 .header {
-  font-size: 2rem;
+  font-size: layout.$spacing-07;
   font-weight: bold;
   color: black;
 }
 
 .headerBlinking {
-  font-size: 2rem;
+  font-size: layout.$spacing-07;
   font-weight: bold;
   color: red;
   animation: blinker 1s linear infinite;

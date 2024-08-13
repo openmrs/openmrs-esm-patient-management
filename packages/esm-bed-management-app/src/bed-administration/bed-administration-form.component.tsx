@@ -267,7 +267,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
               <InlineNotification
                 lowContrast
                 title={t('error', 'Error')}
-                style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+                style={{ minWidth: '100%', margin: '0', padding: '0' }}
                 role="alert"
                 kind="error"
                 subtitle={t('pleaseFillField', formStateError) + '.'}
