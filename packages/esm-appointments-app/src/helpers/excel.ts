@@ -1,10 +1,12 @@
-import { formatDate, openmrsFetch, fhirBaseUrl, getConfig, useConfig } from '@openmrs/esm-framework';
+import { formatDate, openmrsFetch, fhirBaseUrl, getConfig } from '@openmrs/esm-framework';
 import * as XLSX from 'xlsx';
 import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
 
 async function fetchPatient(patientUuid: string): Promise<fhir.Patient> {
+  // Fetch the FHIR Patient object because telephone numbers are not included
+  // in the standard appointments REST response
   const apiUrl = `${fhirBaseUrl}/Patient/${patientUuid}`;
   return openmrsFetch(apiUrl).then(({ data }) => data);
 }
