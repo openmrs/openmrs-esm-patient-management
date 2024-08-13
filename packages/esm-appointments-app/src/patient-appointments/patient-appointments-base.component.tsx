@@ -52,7 +52,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
-  if (Object.keys(appointmentsData)?.length) {
+  if (appointmentsData && Object.keys(appointmentsData)?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
