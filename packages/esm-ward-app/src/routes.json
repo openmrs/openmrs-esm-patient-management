@@ -93,6 +93,12 @@
       "type": "transfer-swap-bed-form",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "patient-transfer-request-workspace",
+      "component": "patientTransferRequestWorkspace",
+      "title": "transferRequest",
+      "type": "transfer-request-form"
     }
   ]
 }

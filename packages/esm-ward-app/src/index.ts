@@ -78,6 +78,12 @@ export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
   options,
 );
 
+// t('transferRequest', 'Transfer request')
+export const patientTransferRequestWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-transfer-request-workspace/patient-transfer-request.workspace'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
