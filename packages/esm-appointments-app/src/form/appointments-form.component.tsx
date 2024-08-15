@@ -178,8 +178,20 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         path: ['appointmentDateTime.recurringPatternEndDate'],
         message: 'A recurring appointment should have an end date',
       },
-    );
+    )
+    .refine(
+      (formValues) => {
+        const appointmentDate = formValues.appointmentDateTime?.startDate;
+        const dateAppointmentScheduled = formValues.dateAppointmentScheduled;
 
+        if (!appointmentDate || !dateAppointmentScheduled) return true;
+        return dateAppointmentScheduled < appointmentDate;
+      },
+      {
+        path: ['dateAppointmentScheduled'],
+        message: 'Date appointment issued cannot be after the appointment date',
+      },
+    );
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
   const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
@@ -469,33 +481,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="dateAppointmentScheduled"
-              control={control}
-              render={({ field: { onChange, value, ref }, fieldState }) => (
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
-                  value={value}
-                  maxDate={new Date()}
-                  onChange={([date]) => onChange(date)}
-                  invalid={!!fieldState?.error?.message}
-                  invalidText={fieldState?.error?.message}>
-                  <DatePickerInput
-                    id="dateAppointmentScheduledPickerInput"
-                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
-                    style={{ width: '100%' }}
-                    placeholder={datePickerPlaceHolder}
-                    ref={ref}
-                  />
-                </DatePicker>
-              )}
-            />
-          </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
           <span className={styles.heading}>{t('service', 'Service')}</span>
           <ResponsiveWrapper>
             <Controller
@@ -540,7 +525,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             />
           </ResponsiveWrapper>
         </section>
-
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('appointmentType_title', 'Appointment Type')}</span>
           <ResponsiveWrapper>
@@ -825,6 +809,38 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               )}
             />
           </ResponsiveWrapper>
+        </section>
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
+          <ResponsiveWrapper>
+            <Controller
+              name="dateAppointmentScheduled"
+              control={control}
+              render={({ field: { onChange, value, ref }, fieldState }) => (
+                <DatePicker
+                  datePickerType="single"
+                  dateFormat={datePickerFormat}
+                  value={value}
+                  maxDate={new Date()}
+                  onChange={([date]) => onChange(date)}
+                  invalid={!!fieldState?.error?.message}
+                  invalidText={fieldState?.error?.message}>
+                  <DatePickerInput
+                    id="dateAppointmentScheduledPickerInput"
+                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    style={{ width: '100%' }}
+                    placeholder={datePickerPlaceHolder}
+                    ref={ref}
+                  />
+                </DatePicker>
+              )}
+            />
+          </ResponsiveWrapper>
+          {errors.dateAppointmentScheduled && (
+            <div style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+              {errors.dateAppointmentScheduled.message}
+            </div>
+          )}
         </section>
 
         <section className={styles.formGroup}>
