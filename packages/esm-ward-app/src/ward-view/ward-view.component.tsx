@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { WorkspaceContainer, useFeatureFlag } from '@openmrs/esm-framework';
+import { useFeatureFlag, WorkspaceContainer } from '@openmrs/esm-framework';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
@@ -61,8 +61,8 @@ const WardViewWithBedManagement = () => {
       const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
         const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
         if (inpatientAdmission) {
-          const { patient, visit } = inpatientAdmission;
-          return { patient, visit, bed, inpatientAdmission, inpatientRequest: null };
+          const { patient, visit, currentInpatientRequest } = inpatientAdmission;
+          return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
         } else {
           // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
           return {
