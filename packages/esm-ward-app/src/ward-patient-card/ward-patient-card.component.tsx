@@ -8,7 +8,7 @@ import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import WardPatientName from './row-elements/ward-patient-name';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import styles from './ward-patient-card.scss';
-import WardPatientTransfer from './row-elements/ward-patient-transfer';
+import WardPatientPendingTransfer from './row-elements/ward-patient-pending-transfer';
 
 const WardPatientCard: WardPatientCard = (wardPatient) => {
   const { patient, bed } = wardPatient;
@@ -37,7 +37,7 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
       {wardPatient?.inpatientRequest ? (
         <div className={styles.wardPatientCardPendingItemsRow}>
           <Hourglass className={styles.hourGlassIcon} size="16" />:
-          <WardPatientTransfer wardPatient={wardPatient} />
+          <WardPatientPendingTransfer wardPatient={wardPatient} />
         </div>
       ) : null}
       <ExtensionSlot

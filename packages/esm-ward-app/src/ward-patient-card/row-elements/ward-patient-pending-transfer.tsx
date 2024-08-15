@@ -8,7 +8,7 @@ export interface WardPatientTransferProps {
   wardPatient: WardPatient;
 }
 
-const WardPatientTransfer: React.FC<WardPatientTransferProps> = ({ wardPatient }) => {
+const WardPatientPendingTransfer: React.FC<WardPatientTransferProps> = ({ wardPatient }) => {
   const { t } = useTranslation();
 
   const { dispositionType, dispositionLocation } = wardPatient?.inpatientRequest;
@@ -35,4 +35,4 @@ const WardPatientTransfer: React.FC<WardPatientTransferProps> = ({ wardPatient }
   );
 };
 
-export default WardPatientTransfer;
+export default WardPatientPendingTransfer;
