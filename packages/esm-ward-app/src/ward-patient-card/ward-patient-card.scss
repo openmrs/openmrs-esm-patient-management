@@ -79,6 +79,21 @@
   flex-wrap: wrap;
 }
 
+.wardPatientCardPendingItemsRow {
+  @extend .wardPatientCardRow;
+  display: flex;
+  align-items: center;
+  flex-flow: row;
+  color: $ui-02;
+  background-color: colors.$gray-80;
+}
+
+.wardPatientCardDispositionTypeContainer {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
 .wardPatientName {
   @include type.type-style('heading-compact-02');
   color: $text-02;
@@ -110,6 +125,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.movementIcon {
+  padding: layout.$spacing-02;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: $color-blue-60-2;
+  margin-left: layout.$spacing-03;
+  margin-right: layout.$spacing-02;
 }
 
 .wardPatientAddress {

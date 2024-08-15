@@ -9,10 +9,11 @@ export function useInpatientAdmission() {
   // prettier-ignore
   const customRepresentation =
     'custom:(visit,' +
-      'patient:(uuid,identifiers,voided,' +
-        'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)),' + 
-      'encounterAssigningToCurrentInpatientLocation:(encounterDatetime),' +
-      'firstAdmissionOrTransferEncounter:(encounterDatetime),' +
+    'patient:(uuid,identifiers,voided,' +
+    'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)),' +
+    'encounterAssigningToCurrentInpatientLocation:(encounterDatetime),' +
+    'currentInpatientRequest:(dispositionLocation,dispositionType,disposition:(uuid,display),dispositionEncounter:(uuid,display),dispositionObsGroup:(uuid,display),visit:(uuid),patient:(uuid)),' +
+    'firstAdmissionOrTransferEncounter:(encounterDatetime),' +
     ')';
   const { data, ...rest } = useSWR<FetchResponse<InpatientAdmissionFetchResponse>, Error>(
     location

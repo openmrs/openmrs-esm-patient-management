@@ -1,12 +1,14 @@
 import { ExtensionSlot, getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
+import { Hourglass } from '@carbon/react/icons';
 import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
 import { type WardPatientCard, type WardPatientWorkspaceProps } from '../types';
 import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import WardPatientName from './row-elements/ward-patient-name';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import styles from './ward-patient-card.scss';
+import WardPatientPendingTransfer from './row-elements/ward-patient-pending-transfer';
 
 const WardPatientCard: WardPatientCard = (wardPatient) => {
   const { patient, bed } = wardPatient;
@@ -32,6 +34,12 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
+      {wardPatient?.inpatientRequest ? (
+        <div className={styles.wardPatientCardPendingItemsRow}>
+          <Hourglass className={styles.hourGlassIcon} size="16" />:
+          <WardPatientPendingTransfer wardPatient={wardPatient} />
+        </div>
+      ) : null}
       <ExtensionSlot
         name={rowsExtensionSlotName}
         state={wardPatient}
