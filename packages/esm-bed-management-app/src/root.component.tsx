@@ -4,10 +4,10 @@ import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
 import Home from './home.component';
 import LeftPanel from './left-panel/left-panel.component';
 import WardWithBeds from './ward-with-beds/ward-with-beds.component';
-import styles from './root.scss';
 import BedAdministrationTable from './bed-administration/bed-administration-table.component';
 import BedTagAdministrationTable from './bed-tag/bed-tag-administration-table.component';
 import BedTypeAdministrationTable from './bed-type/bed-type-administration-table.component';
+import styles from './root.scss';
 
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;

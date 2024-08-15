@@ -1,7 +1,7 @@
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .monthly-cell {
   border-left: 1px solid colors.$gray-20;
@@ -37,7 +37,7 @@
   display: list-item;
 
   span:not(:first-child) {
-    margin: 0rem 0.75rem;
+    margin: 0 layout.$spacing-04;
   }
 }
 
@@ -50,7 +50,7 @@
   position: relative;
   border-right: 1px solid colors.$gray-20;
   border-bottom: 1px solid colors.$gray-20;
-  min-height: 120px;
+  min-height: 7.5rem;
   color: colors.$white;
 
   .week-time {
@@ -84,7 +84,7 @@
   display: flex;
   flex-direction: column;
   align-items: start;
-  margin: 0.1rem 0.1rem 0.5rem 0.1rem;
+  margin: 0.1rem 0.1rem layout.$spacing-03 0.1rem;
 
   & > span {
     @include type.type-style('label-02');
@@ -93,8 +93,8 @@
 
 .serviceArea {
   width: 100%;
-  padding: 0.125rem;
-  margin-right: 0.5rem;
+  padding: layout.$spacing-01;
+  margin-right: layout.$spacing-03;
   display: grid;
   grid-template-columns: 4fr 1fr;
   justify-content: flex-start;
@@ -119,7 +119,7 @@
 }
 
 .totals {
-  padding: 0.125rem;
+  padding: layout.$spacing-01;
   display: grid;
   grid-template-columns: 4fr 1fr;
   justify-content: flex-start;
@@ -143,11 +143,11 @@
 }
 
 .smallDesktop {
-  height: 100px;
+  height: 6.25rem;
 }
 
 .largeDesktop {
-  height: 150px;
+  height: 9.375rem;
 }
 
 .red {

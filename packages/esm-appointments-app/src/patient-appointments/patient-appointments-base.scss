@@ -1,18 +1,13 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
-
-// TO DO Move this styles to style - guide
-// https://github.com/openmrs/openmrs-esm-core/blob/master/packages/framework/esm-styleguide/src/_vars.scss
-$color-blue-30: #a6c8ff;
-$color-blue-10: #edf5ff;
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .widgetCard {
   border: 1px solid $ui-03;
   max-width: 60rem;
   margin: auto;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
 .productiveHeading01 {
@@ -31,35 +26,35 @@ $color-blue-10: #edf5ff;
 }
 
 .contentSwitcherWrapper > div button:first-child {
-  border-top: 1px solid $color-blue-30;
-  border-bottom: 1px solid $color-blue-30;
-  border-left: 1px solid $color-blue-30;
+  border-top: 1px solid colors.$blue-30;
+  border-bottom: 1px solid colors.$blue-30;
+  border-left: 1px solid colors.$blue-30;
   border-right: none;
-  border-radius: spacing.$spacing-02 0 0px spacing.$spacing-02;
+  border-radius: layout.$spacing-02 0 0px layout.$spacing-02;
 }
 
 .contentSwitcherWrapper > div button:last-child {
-  border-top: 1px solid $color-blue-30;
-  border-bottom: 1px solid $color-blue-30;
-  border-right: 1px solid $color-blue-30;
+  border-top: 1px solid colors.$blue-30;
+  border-bottom: 1px solid colors.$blue-30;
+  border-right: 1px solid colors.$blue-30;
   border-left: none;
-  border-radius: 0px spacing.$spacing-02 spacing.$spacing-02 0px;
+  border-radius: 0px layout.$spacing-02 layout.$spacing-02 0px;
 }
 
 .contentSwitcherWrapper > div > button[aria-selected='true'],
 .contentSwitcherWrapper > div > button[aria-selected='true']:first-child {
-  background-color: $color-blue-10;
-  color: $color-blue-60-2;
-  border-color: $color-blue-60-2;
-  border-right: 1px solid $color-blue-60-2;
+  background-color: colors.$blue-10;
+  color: colors.$blue-60;
+  border-color: colors.$blue-60;
+  border-right: 1px solid colors.$blue-60;
 }
 
 .contentSwitcherWrapper > div > button[aria-selected='true'],
 .contentSwitcherWrapper > div > button[aria-selected='true']:last-child {
-  background-color: $color-blue-10;
-  color: $color-blue-60-2;
-  border-color: $color-blue-60-2;
-  border-left: 1px solid $color-blue-60-2;
+  background-color: colors.$blue-10;
+  color: colors.$blue-60;
+  border-color: colors.$blue-60;
+  border-left: 1px solid colors.$blue-60;
 }
 
 .contentSwitcherWrapper > div > button[aria-selected='true']:focus {
@@ -68,16 +63,16 @@ $color-blue-10: #edf5ff;
 
 .divider {
   width: 1px;
-  height: spacing.$spacing-05;
+  height: layout.$spacing-05;
   color: colors.$gray-20;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .content {
   @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tile {

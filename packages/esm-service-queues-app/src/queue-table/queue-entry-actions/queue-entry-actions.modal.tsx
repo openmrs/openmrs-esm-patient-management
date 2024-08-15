@@ -1,3 +1,5 @@
+import React, { useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
@@ -18,16 +20,14 @@ import {
   TimePicker,
   TimePickerSelect,
 } from '@carbon/react';
-import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
-import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
 import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
-import styles from './queue-entry-actons-modal.scss';
+import styles from './queue-entry-actions-modal.scss';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;

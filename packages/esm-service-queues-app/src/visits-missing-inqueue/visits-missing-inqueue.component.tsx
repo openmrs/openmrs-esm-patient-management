@@ -34,10 +34,10 @@ import {
   ConfigurableLink,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import styles from './visits-missing-inqueue.scss';
 import { type ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
 import { Add } from '@carbon/react/icons';
 import { type ConfigObject } from '../config-schema';
+import styles from './visits-missing-inqueue.scss';
 
 interface PaginationData {
   goTo: (page: number) => void;

@@ -1,12 +1,10 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .advancedPatientSearchDesktop {
   display: flex;
   justify-content: space-between;
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
 }
 
 .advancedPatientSearchTabletOrOverlay {
@@ -18,13 +16,13 @@
 }
 
 .refineSearchDesktop {
-  margin-right: spacing.$spacing-09;
+  margin-right: layout.$spacing-09;
   width: 18rem;
 }
 
 .patientSearchResultsDesktop {
   min-width: 37.5rem;
-  margin-right: 4rem;
+  margin-right: layout.$spacing-10;
 }
 
 .patientSearchResultsTabletOrOverlay {
@@ -33,5 +31,5 @@
 }
 
 :global(.omrs-breakpoint-lt-desktop) .advancedPatientSearchTabletOrOverlay {
-  height: calc(100vh - 6rem - 2px);
+  height: calc(100vh - layout.$spacing-11 - 2px);
 }

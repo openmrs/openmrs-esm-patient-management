@@ -6,7 +6,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-content: space-between;
-  padding: 1rem;
+  padding: layout.$spacing-05;
 }
 
 .buttonMain {
@@ -29,7 +29,7 @@
 }
 
 .inactiveMain {
-  margin-bottom: 4rem;
+  margin-bottom: layout.$spacing-10;
 }
 
 .buttonContainer {
@@ -70,5 +70,5 @@
 }
 
 .loader {
-  margin: 2rem;
+  margin: layout.$spacing-07;
 }

@@ -1,12 +1,12 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @use '@carbon/colors';
 
 .appointmentDetailsContainer {
   min-height: fit-content;
   background-color: colors.$white;
-  padding: spacing.$spacing-05;
-  margin: spacing.$spacing-03;
+  padding: layout.$spacing-05;
+  margin: layout.$spacing-03;
 }
 
 .title {
@@ -20,9 +20,9 @@
 }
 
 .tags {
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   display: flex;
-  column-gap: spacing.$spacing-03;
+  column-gap: layout.$spacing-03;
 
   & > div {
     margin: 0;
@@ -32,13 +32,13 @@
 .patientInfoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  column-gap: spacing.$spacing-05;
-  margin-top: spacing.$spacing-05;
+  column-gap: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
 .gridTitle {
   @include type.type-style('label-02');
-  margin-bottom: spacing.$spacing-04;
+  margin-bottom: layout.$spacing-04;
   color: colors.$gray-70;
 }
 
@@ -50,7 +50,7 @@
 .historyGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  row-gap: spacing.$spacing-05;
+  row-gap: layout.$spacing-05;
 }
 
 .historyGridLabel {
@@ -59,13 +59,13 @@
 }
 .historyGridCount {
   @include type.type-style('heading-02');
-  margin-top: spacing.$spacing-01;
+  margin-top: layout.$spacing-01;
   color: colors.$blue-60;
 }
 
 .historyGridCountRed {
   @include type.type-style('heading-02');
-  margin-top: spacing.$spacing-01;
+  margin-top: layout.$spacing-01;
   color: colors.$red-60;
 }
 
@@ -73,7 +73,7 @@
   @include type.type-style('label-01');
   color: colors.$gray-70;
   font-weight: bold;
-  margin-right: spacing.$spacing-02;
+  margin-right: layout.$spacing-02;
 }
 
 .labelContainer {

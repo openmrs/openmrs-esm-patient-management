@@ -121,7 +121,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
         rowCount={pageSize}
         showHeader={false}
         showToolbar={false}
-        style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
+        style={{ ...style, backgroundColor: 'transparent', padding: '0' }}
         zebra
       />
     );

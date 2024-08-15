@@ -1,4 +1,3 @@
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
 @use '@carbon/layout';
 
@@ -7,9 +6,9 @@
 }
 
 .patientAvatar {
-  width: 5rem;
-  height: 5rem;
-  margin: 1rem;
+  width: layout.$spacing-11;
+  height: layout.$spacing-11;
+  margin: layout.$spacing-05;
   border-radius: 1px;
 }
 
@@ -22,6 +21,6 @@
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .titleContent {
-    margin-left: 1rem;
+    margin-left: layout.$spacing-05;
   }
 }

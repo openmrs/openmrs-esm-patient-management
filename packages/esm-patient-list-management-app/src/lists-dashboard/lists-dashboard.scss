@@ -1,10 +1,9 @@
-@use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../style.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
-  margin: 1rem 0;
+  margin: layout.$spacing-05 0;
 }
 
 .dashboardContainer {
@@ -16,7 +15,7 @@
   height: 100%;
   width: 100%;
   background-color: $ui-02;
-  height: calc(100vh - 3rem);
+  height: calc(100vh - layout.$spacing-09);
 }
 
 .tabs {
@@ -24,7 +23,7 @@
 }
 
 .tablist {
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
 }
 
 .tab {
@@ -46,7 +45,7 @@
 }
 
 .listsTableContainer {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   background-color: $ui-01;
   height: calc(100vh - 12rem);
 }
@@ -62,12 +61,12 @@
 
 .desktopRow,
 .desktopHeader {
-  height: spacing.$spacing-07 !important;
+  height: layout.$spacing-07 !important;
 }
 
 .tabletRow,
 .tabletHeader {
-  height: spacing.$spacing-09 !important;
+  height: layout.$spacing-09 !important;
 }
 
 // Search Overlay
@@ -84,7 +83,7 @@
   grid-row: 2 / 4;
   grid-column: 1 / 2;
   background-color: $ui-01;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 // Results Overlay
@@ -93,11 +92,11 @@
   @include type.type-style('body-compact-01');
   color: $text-02;
   border-bottom: solid 1px #e0e0e0;
-  padding: spacing.$spacing-04 0;
+  padding: layout.$spacing-04 0;
 }
 
 .patientListResultsTableContainer {
-  margin: spacing.$spacing-03;
+  margin: layout.$spacing-03;
 }
 
 .starButton {
