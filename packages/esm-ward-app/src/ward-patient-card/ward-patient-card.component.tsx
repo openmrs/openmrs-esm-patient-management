@@ -36,7 +36,7 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
       </div>
       {wardPatient?.inpatientRequest ? (
         <div className={styles.wardPatientCardPendingItemsRow}>
-          <Hourglass className={styles.hourGlassIcon} size="24" />:
+          <Hourglass className={styles.hourGlassIcon} size="16" />:
           <WardPatientTransfer wardPatient={wardPatient} />
         </div>
       ) : null}

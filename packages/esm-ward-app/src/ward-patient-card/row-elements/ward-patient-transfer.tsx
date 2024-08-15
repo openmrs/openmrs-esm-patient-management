@@ -11,18 +11,21 @@ export interface WardPatientTransferProps {
 const WardPatientTransfer: React.FC<WardPatientTransferProps> = ({ wardPatient }) => {
   const { t } = useTranslation();
 
-  const { dispositionType } = wardPatient?.inpatientRequest;
+  const { dispositionType, dispositionLocation } = wardPatient?.inpatientRequest;
   const message = useMemo(() => {
     if (dispositionType === 'TRANSFER') {
-      return t('transferToDeliveryWard', 'Transfer to Delivery ward');
+      if (dispositionLocation) {
+        return t('transferToDispositionLocation', 'Transfer to {{location}}', { location: dispositionLocation.name });
+      }
+      return t('pendingTransfer', 'Pending Transfer');
     }
     if (dispositionType === 'DISCHARGE') {
-      return t('transferToDeliveryWard', 'Transfer to Delivery ward');
+      return t('pendingDischarge', 'Pending Discharge');
     }
     return '';
-  }, [dispositionType]);
+  }, [dispositionType, dispositionLocation]);
 
-  if (dispositionType === 'ADMIT') return null;
+  if (!(dispositionType === 'TRANSFER' || dispositionType === 'DISCHARGE')) return null;
 
   return (
     <div className={styles.wardPatientCardDispositionTypeContainer}>
