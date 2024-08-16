@@ -37,7 +37,7 @@ import {
 } from '@openmrs/esm-framework';
 import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
-import { downloadAppointmentsAsExcel } from '../../helpers/excel';
+import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
@@ -154,7 +154,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                   noToday: true,
                 })
               : null;
-            downloadAppointmentsAsExcel(appointments, `${tableHeading}_appointments_${date}`);
+            exportAppointmentsToSpreadsheet(appointments, `${tableHeading}_appointments_${date}`);
           }}>
           {t('download', 'Download')}
         </Button>

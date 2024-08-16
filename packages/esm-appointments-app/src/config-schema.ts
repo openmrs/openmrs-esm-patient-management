@@ -2,9 +2,9 @@ import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
 import { spaHomePage } from './constants';
 
 export const configSchema = {
-  includeTelephoneNumbersInExcelDownload: {
+  includePhoneNumberInExcelSpreadsheet: {
     _type: Type.Boolean,
-    _description: 'Whether to include phone numbers in the Excel export.',
+    _description: 'Whether to include phone numbers in the exported Excel spreadsheet',
     _default: false,
   },
   allowAllDayAppointments: {
@@ -151,5 +151,5 @@ export interface ConfigObject {
   showUnscheduledAppointmentsTab: boolean;
   useBahmniAppointmentsUI: boolean;
   useFullViewPrivilege: boolean;
-  includeTelephoneNumbersInExcelDownload: boolean;
+  includePhoneNumberInExcelSpreadsheet: boolean;
 }

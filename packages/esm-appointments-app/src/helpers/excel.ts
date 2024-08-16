@@ -1,32 +1,26 @@
-import { formatDate, openmrsFetch, fhirBaseUrl, getConfig } from '@openmrs/esm-framework';
 import * as XLSX from 'xlsx';
+import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
 
-async function fetchCurrentPatient(patientUuid: string): Promise<fhir.Patient> {
-  // Fetch the FHIR Patient object because telephone numbers are not included
-  // in the standard appointments REST response
-  const apiUrl = `${fhirBaseUrl}/Patient/${patientUuid}`;
-  return openmrsFetch(apiUrl).then(({ data }) => data);
-}
-
 /**
- * Downloads the provided appointments as an Excel file.
- * @param {Array<Appointment>} appointments - The list of appointments to download.
+ * Exports the provided appointments as an Excel spreadsheet.
+ * @param {Array<Appointment>} appointments - The list of appointments to export.
  * @param {string} [fileName] - The name of the downloaded file
  */
-export async function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
+export async function exportAppointmentsToSpreadsheet(appointments: Array<Appointment>, fileName = 'Appointments') {
   const config = await getConfig<ConfigObject>(moduleName);
-  const includeTelephoneNumbers = config.includeTelephoneNumbersInExcelDownload ?? false;
+  const includePhoneNumbers = config.includePhoneNumberInExcelSpreadsheet ?? false;
 
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
       const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
       const phoneNumber =
-        includeTelephoneNumbers && patientInfo?.telecom
+        includePhoneNumbers && patientInfo?.telecom
           ? patientInfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
           : '';
+
       return {
         'Patient name': appointment.patient.name,
         Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
@@ -34,20 +28,10 @@ export async function downloadAppointmentsAsExcel(appointments: Array<Appointmen
         Identifier: appointment.patient.identifier ?? '--',
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        ...(includeTelephoneNumbers ? { 'Telephone number': phoneNumber } : {}),
+        ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
       };
     }),
   );
-
-  const headers = [
-    'Patient name',
-    'Gender',
-    'Age',
-    'Identifier',
-    'Appointment type',
-    'Date',
-    ...(includeTelephoneNumbers ? ['Telephone number'] : []),
-  ];
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
@@ -55,11 +39,11 @@ export async function downloadAppointmentsAsExcel(appointments: Array<Appointmen
 }
 
 /**
-Downloads unscheduled appointments as an Excel file.
-@param {Array<Object>} unscheduledAppointments - The list of unscheduled appointments to download.
+Exports unscheduled appointments as an Excel spreadsheet.
+@param {Array<Object>} unscheduledAppointments - The list of unscheduled appointments to export.
 @param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
 */
-export function downloadUnscheduledAppointments(
+export function exportUnscheduledAppointmentsToSpreadsheet(
   unscheduledAppointments: Array<any>,
   fileName = `Unscheduled appointments ${formatDate(new Date(), { year: true, time: true })}`,
 ) {
