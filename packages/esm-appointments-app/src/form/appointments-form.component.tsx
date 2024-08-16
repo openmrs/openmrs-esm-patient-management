@@ -176,7 +176,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       },
       {
         path: ['appointmentDateTime.recurringPatternEndDate'],
-        message: t('A recurring appointment should have an end date'),
+        message: t('recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
       },
     )
     .refine(
@@ -189,7 +189,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       },
       {
         path: ['dateAppointmentScheduled'],
-        message: t('Date appointment issued cannot be after the appointment date'),
+        message: t(
+          'dateAppointmentIssuedCannotBeAfterAppointmentDate',
+          'Date appointment issued cannot be after the appointment date',
+        ),
       },
     );
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
