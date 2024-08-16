@@ -4,7 +4,7 @@ import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
 
-async function fetchPatient(patientUuid: string): Promise<fhir.Patient> {
+async function fetchCurrentPatient(patientUuid: string): Promise<fhir.Patient> {
   // Fetch the FHIR Patient object because telephone numbers are not included
   // in the standard appointments REST response
   const apiUrl = `${fhirBaseUrl}/Patient/${patientUuid}`;
@@ -18,16 +18,15 @@ async function fetchPatient(patientUuid: string): Promise<fhir.Patient> {
  */
 export async function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
   const config = await getConfig<ConfigObject>(moduleName);
-  const INCLUDE_TELEPHONE_NUMBERS = config.includeTelephoneNumbers ?? false;
+  const includeTelephoneNumbers = config.includeTelephoneNumbersInExcelDownload ?? false;
 
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
-      const patientinfo = await fetchPatient(appointment.patient.uuid);
+      const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
       const phoneNumber =
-        INCLUDE_TELEPHONE_NUMBERS && patientinfo?.telecom
-          ? patientinfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
+        includeTelephoneNumbers && patientInfo?.telecom
+          ? patientInfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
           : '';
-
       return {
         'Patient name': appointment.patient.name,
         Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
@@ -35,7 +34,7 @@ export async function downloadAppointmentsAsExcel(appointments: Array<Appointmen
         Identifier: appointment.patient.identifier ?? '--',
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        ...(INCLUDE_TELEPHONE_NUMBERS ? { 'Telephone number': phoneNumber } : {}),
+        ...(includeTelephoneNumbers ? { 'Telephone number': phoneNumber } : {}),
       };
     }),
   );
@@ -47,7 +46,7 @@ export async function downloadAppointmentsAsExcel(appointments: Array<Appointmen
     'Identifier',
     'Appointment type',
     'Date',
-    ...(INCLUDE_TELEPHONE_NUMBERS ? ['Telephone number'] : []),
+    ...(includeTelephoneNumbers ? ['Telephone number'] : []),
   ];
 
   const worksheet = createWorksheet(appointmentsJSON);

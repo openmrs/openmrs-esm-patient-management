@@ -2,7 +2,7 @@ import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
 import { spaHomePage } from './constants';
 
 export const configSchema = {
-  includeTelephoneNumbers: {
+  includeTelephoneNumbersInExcelDownload: {
     _type: Type.Boolean,
     _description: 'Whether to include phone numbers in the Excel export.',
     _default: false,
@@ -151,5 +151,5 @@ export interface ConfigObject {
   showUnscheduledAppointmentsTab: boolean;
   useBahmniAppointmentsUI: boolean;
   useFullViewPrivilege: boolean;
-  includeTelephoneNumbers: boolean;
+  includeTelephoneNumbersInExcelDownload: boolean;
 }
