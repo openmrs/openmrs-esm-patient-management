@@ -12,7 +12,7 @@ const useTotalVisits = () => {
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch);
 
   return {
-    data: data?.data.results,
+    data: data?.data?.results,
     error,
     isLoading,
   };
