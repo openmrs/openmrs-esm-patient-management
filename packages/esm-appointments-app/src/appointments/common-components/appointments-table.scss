@@ -1,18 +1,18 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .expandedRow > td > div {
   max-height: max-content !important;
 }
 
 .expandedRow td {
-  padding: 0 2rem;
+  padding: 0 layout.$spacing-07;
 }
 
 .expandedRow th[colspan] td[colspan] > div:first-child {
-  padding: 0 1rem;
+  padding: 0 layout.$spacing-05;
 }
 
 .hiddenRow {
@@ -52,7 +52,7 @@
     &:after {
       content: '';
       display: block;
-      width: 2rem;
+      width: layout.$spacing-07;
       padding-top: 3px;
       border-bottom: 0.375rem solid var(--brand-03);
     }
@@ -90,13 +90,13 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
+  padding: layout.$spacing-11 0;
 }
 
 .tile {

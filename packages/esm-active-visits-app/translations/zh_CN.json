@@ -23,7 +23,7 @@
   "noVisitsToDisplay": "没有就诊可显示",
   "orderDurationAndUnit": "持续 {{duration}} {{durationUnit}}。",
   "orderIndefiniteDuration": "无限期",
-  "patients": "Patients",
+  "patients": "患者",
   "provider": "提供者",
   "quantity": "数量",
   "refills": "补充处方",

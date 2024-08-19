@@ -1,14 +1,14 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   display: flex;
-  gap: spacing.$spacing-04;
+  gap: layout.$spacing-04;
   justify-content: center;
   align-items: center;
   border: 1px dashed $ui-04;
-  padding: spacing.$spacing-03 spacing.$spacing-04;
+  padding: layout.$spacing-03 layout.$spacing-04;
   height: fit-content;
 }
 
@@ -24,5 +24,5 @@
 }
 
 .skeletonText {
-  width: 100px;
+  width: 6.25rem;
 }

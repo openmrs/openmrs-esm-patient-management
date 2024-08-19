@@ -1,0 +1,48 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.locationSelector {
+  border: 1px solid $ui-03;
+  background-color: $ui-01;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .locationSelector {
+  background-color: $ui-02;
+}
+
+.radioButtonGroup {
+  padding: layout.$spacing-03 layout.$spacing-05;
+  width: 100%;
+
+  :global(.cds--radio-button-wrapper) {
+    padding: layout.$spacing-02;
+
+    :global(.cds--radio-button__label) {
+      align-items: center;
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  padding-left: layout.$spacing-05;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $ui-03;
+}
+
+.button {
+  svg {
+    fill: $ui-05 !important;
+  }
+}
+
+.buttonLeft {
+  border-right: 1px solid $ui-03 !important;
+  border-left: 1px solid $ui-03 !important;
+}
+
+.borderedButton {
+  border-left: 1px solid $ui-03;
+  border-right: 1px solid $ui-03;
+}

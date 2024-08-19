@@ -1,4 +1,5 @@
-@import '../../root.scss';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .paginationBar {
   width: 100%;
@@ -16,5 +17,5 @@
 }
 
 .activeButton {
-  border-bottom: 0.25rem solid $brand-01;
+  border-bottom: layout.$spacing-02 solid $brand-01;
 }

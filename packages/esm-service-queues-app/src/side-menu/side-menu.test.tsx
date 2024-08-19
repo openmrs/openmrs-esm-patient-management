@@ -5,7 +5,6 @@ import SideMenu from './side-menu.component';
 jest.mock('@openmrs/esm-framework', () => ({
   LeftNavMenu: () => <div data-testid="left-nav-menu">Mocked LeftNavMenu</div>,
 }));
-jest.mock('@openmrs/esm-framework');
 
 describe('SideMenu', () => {
   it('renders the LeftNavMenu', () => {

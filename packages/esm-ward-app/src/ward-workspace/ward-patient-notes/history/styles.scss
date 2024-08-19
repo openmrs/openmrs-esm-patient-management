@@ -1,0 +1,61 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.notesContainer {
+  margin: layout.$spacing-04;
+  padding-bottom: layout.$spacing-04;
+}
+
+.notesContainerHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-02;
+}
+
+.notesContainerTitle {
+  font-weight: 600;
+  font-size: layout.$spacing-05;
+  color: #393939;
+}
+
+.noteTile {
+  padding: layout.$spacing-04;
+  margin-bottom: layout.$spacing-04;
+}
+
+.noteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: layout.$spacing-04;
+}
+
+.noteProviderRole {
+  flex-grow: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $text-02;
+}
+
+.noteBody {
+  font-size: 0.875rem;
+  color: $text-02;
+}
+
+.noteDateAndTime {
+  font-size: layout.$spacing-04;
+  color: $text-02;
+}
+
+.noteProviderName {
+  font-size: layout.$spacing-04;
+  margin-top: layout.$spacing-04;
+  color: $text-02;
+}
+
+.noteSkeletonContainer {
+  height: layout.$spacing-13;
+}

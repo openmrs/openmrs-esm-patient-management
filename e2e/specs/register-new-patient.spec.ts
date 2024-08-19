@@ -6,55 +6,54 @@ import { deletePatient, getPatient } from '../commands';
 
 let patientUuid: string;
 
-// TODO: O3-3482 Broken due to the date picker and should be fixed
-test.describe.fixme('Broken due to the date picker and should be fixed', () => {
-  test('Register a new patient', async ({ page, api }) => {
-    test.setTimeout(5 * 60 * 1000);
-    const patientRegistrationPage = new RegistrationAndEditPage(page);
+test('Register a new patient', async ({ page, api }) => {
+  test.setTimeout(5 * 60 * 1000);
+  const patientRegistrationPage = new RegistrationAndEditPage(page);
 
-    // TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
-    const formValues: PatientRegistrationFormValues = {
-      givenName: `Johnny`,
-      middleName: 'Donny',
-      familyName: `Ronny`,
-      sex: 'male',
-      birthdate: '01/02/2020',
-      postalCode: '',
-      address1: 'Bom Jesus Street',
-      address2: '',
-      country: 'Brazil',
-      stateProvince: 'Pernambuco',
-      cityVillage: 'Recife',
-      phone: '5555551234',
-    };
+  // TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
+  const formValues: PatientRegistrationFormValues = {
+    givenName: `Johnny`,
+    middleName: 'Donny',
+    familyName: `Ronny`,
+    sex: 'male',
+    birthdate: { day: '01', month: '02', year: '2020' },
+    postalCode: '',
+    address1: 'Bom Jesus Street',
+    address2: '',
+    country: 'Brazil',
+    stateProvince: 'Pernambuco',
+    cityVillage: 'Recife',
+    phone: '5555551234',
+  };
 
-    await test.step('When I visit the registration page', async () => {
-      await patientRegistrationPage.goto();
-      await patientRegistrationPage.waitUntilTheFormIsLoaded();
-    });
+  await test.step('When I visit the registration page', async () => {
+    await patientRegistrationPage.goto();
+    await patientRegistrationPage.waitUntilTheFormIsLoaded();
+  });
 
-    await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
-      await patientRegistrationPage.fillPatientRegistrationForm(formValues);
-    });
+  await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
+    await patientRegistrationPage.fillPatientRegistrationForm(formValues);
+  });
 
-    await test.step("Then I should be redirected to the new patient's chart page and a new patient record should be created from the information captured in the form", async () => {
-      await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$'));
-      const patientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? null;
-      await expect(patientUuid).not.toBeNull();
+  await test.step("Then I should be redirected to the new patient's chart page and a new patient record should be created from the information captured in the form", async () => {
+    await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$'));
+    const patientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? null;
+    expect(patientUuid).not.toBeNull();
 
-      const patient = await getPatient(api, patientUuid);
-      const { person } = patient;
-      const { givenName, middleName, familyName, sex } = formValues;
+    const patient = await getPatient(api, patientUuid);
+    const { person } = patient;
+    const { givenName, middleName, familyName, sex } = formValues;
 
-      await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
-      await expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
-      await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
-      await expect(person.preferredAddress.address1).toBe(formValues.address1);
-      await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
-      await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
-      await expect(person.preferredAddress.country).toBe(formValues.country);
-      await expect(person.attributes[0].display).toBe(formValues.phone);
-    });
+    expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
+    expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
+    expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(
+      `${formValues.birthdate.day}/${formValues.birthdate.month}/${formValues.birthdate.year}`,
+    );
+    expect(person.preferredAddress.address1).toBe(formValues.address1);
+    expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
+    expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
+    expect(person.preferredAddress.country).toBe(formValues.country);
+    expect(person.attributes[0].display).toBe(formValues.phone);
   });
 });
 
@@ -99,7 +98,7 @@ test('Register an unknown patient', async ({ api, page }) => {
 
   await test.step('And I should see the newly recorded unknown patient dispalyed on the dashboard', async () => {
     const patient = await getPatient(api, /patient\/(.+)\/chart/.exec(page.url())?.[1]);
-    await expect(patient?.person?.display).toBe('UNKNOWN UNKNOWN');
+    expect(patient?.person?.display).toBe('UNKNOWN UNKNOWN');
   });
 });
 

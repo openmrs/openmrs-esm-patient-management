@@ -1,5 +1,5 @@
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .metricsBorder {
   border: 0.0625rem solid $ui-03;
@@ -7,5 +7,5 @@
   display: flex;
   justify-content: space-between;
   flex-flow: row wrap;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }

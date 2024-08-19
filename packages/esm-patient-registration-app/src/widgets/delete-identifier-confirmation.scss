@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../patient-registration/patient-registration.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .productiveHeading {
   @include type.type-style('heading-compact-02');
@@ -9,7 +9,7 @@
 .modalContent {
   width: 100%;
   background-color: $ui-01;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 .modalSubtitle {
@@ -18,15 +18,15 @@
 
 .modalBody {
   @include type.type-style('body-compact-01');
-  margin: spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
 }
 
 .buttonSet {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-left: -(spacing.$spacing-05);
-  margin-right: -(spacing.$spacing-05);
-  margin-bottom: -(spacing.$spacing-05);
+  margin-left: -(layout.$spacing-05);
+  margin-right: -(layout.$spacing-05);
+  margin-bottom: -(layout.$spacing-05);
 }
 
 .buttonSet > button {

@@ -1,12 +1,18 @@
 import { SkeletonText, Tag } from '@carbon/react';
-import { translateFrom, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type Patient, translateFrom, type Visit, type OpenmrsResource } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type PatientCodedObsTagsElementConfig } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
-import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
 import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
+import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
+
+interface WardPatientCodedObsTagsProps {
+  config: ColoredObsTagsCardRowConfigObject;
+  patient: Patient;
+  visit: Visit;
+}
 
 /**
  * The WardPatientCodedObsTags displays observations of coded values of a particular concept in the active visit as tags.
@@ -36,42 +42,44 @@ const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
       const summaryLabelToDisplay =
         summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;
 
-      const obsNodes = obsToDisplay?.map((o) => {
-        const { display, uuid } = o.value as OpenmrsResource;
+    const summaryLabelToDisplay =
+      summaryLabel != null
+        ? translateFrom(summaryLabelI18nModule ?? moduleName, summaryLabel)
+        : obsToDisplay?.[0]?.concept?.display;
 
-        const color = conceptToTagColorMap?.get(uuid);
-        if (color) {
-          return (
-            <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
-              {display}
-            </Tag>
-          );
-        } else {
-          return null;
-        }
-      });
+    const obsNodes = obsToDisplay?.map((o) => {
+      const { display, uuid } = o.value as OpenmrsResource;
 
-      const obsWithNoTagCount = obsNodes.filter((o) => o == null).length;
-      if (obsNodes?.length > 0 || obsWithNoTagCount > 0) {
+      const color = conceptToTagColorMap?.get(uuid);
+      if (color) {
         return (
-          <div>
-            <span className={styles.wardPatientObsLabel}>
-              {obsNodes}
-              {obsWithNoTagCount > 0 ? (
-                <Tag type={summaryLabelColor}>
-                  {t('countItems', '{{count}} {{item}}', { count: obsWithNoTagCount, item: summaryLabelToDisplay })}
-                </Tag>
-              ) : null}
-            </span>
-          </div>
+          <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
+            {display}
+          </Tag>
         );
       } else {
         return null;
       }
-    }
-  };
+    });
 
-  return WardPatientCodedObsTags;
+    const obsWithNoTagCount = obsNodes.filter((o) => o == null).length;
+    if (obsNodes?.length > 0 || obsWithNoTagCount > 0) {
+      return (
+        <div>
+          <span className={styles.wardPatientObsLabel}>
+            {obsNodes}
+            {obsWithNoTagCount > 0 ? (
+              <Tag type={summaryLabelColor}>
+                {t('countItems', '{{count}} {{item}}', { count: obsWithNoTagCount, item: summaryLabelToDisplay })}
+              </Tag>
+            ) : null}
+          </span>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
 };
 
-export default wardPatientCodedObsTags;
+export default WardPatientCodedObsTags;

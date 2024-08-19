@@ -31,8 +31,8 @@ import {
   useSelectedQueueLocationUuid,
   useSelectedService,
 } from '../helpers/helpers';
-import styles from './add-provider-queue-room.scss';
 import useQueueServices from '../hooks/useQueueService';
+import styles from './add-provider-queue-room.scss';
 
 interface AddProviderQueueRoomProps {
   providerUuid: string;
@@ -46,7 +46,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const currentService = useSelectedService();
   const currentIsPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
-  const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
+  const { providerRoom } = useProvidersQueueRoom(providerUuid);
   const [queueRoomUuid, setQueueRoomUuid] = useState('');
   const [queueProviderMapUuid, setQueueProviderMapUuid] = useState('');
 
@@ -148,11 +148,11 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
       <ModalBody>
         <Form onSubmit={onSubmit}>
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
             <Dropdown
               id="queueLocation"
               aria-label={t('selectQueueLocation', 'Select a queue location')}
               label=""
+              titleText={t('queueLocation', 'Queue location')}
               type="default"
               items={queueLocations}
               itemToString={(item) => (item ? item.name : '')}
@@ -163,12 +163,12 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
           </section>
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
             <Dropdown
               id="service"
               aria-label={t('selectService', 'Select a service')}
               type="default"
               label=""
+              titleText={t('queueService', 'Queue service')}
               items={services ?? []}
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}

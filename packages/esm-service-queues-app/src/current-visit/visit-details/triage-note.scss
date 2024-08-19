@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .subHeading {
   @include type.type-style('label-01');
@@ -8,20 +8,20 @@
 }
 
 .emptyText {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   @include type.type-style('body-02');
 }
 
 .unit {
   @include type.type-style('body-compact-01');
   color: var(--text-02);
-  margin-left: spacing.$spacing-02;
+  margin-left: layout.$spacing-02;
 }
 
 .vitalValues {
   @include type.type-style('body-compact-02');
   color: $ui-05;
-  margin-left: spacing.$spacing-02;
+  margin-left: layout.$spacing-02;
 }
 
 .grid {
@@ -39,13 +39,13 @@
 
 .danger-icon {
   color: $danger;
-  height: spacing.$spacing-02;
-  width: spacing.$spacing-02;
-  margin-left: spacing.$spacing-02;
+  height: layout.$spacing-02;
+  width: layout.$spacing-02;
+  margin-left: layout.$spacing-02;
 }
 
 .iconWrapper {
-  margin-left: spacing.$spacing-02;
+  margin-left: layout.$spacing-02;
 }
 
 .critically-low,
@@ -81,7 +81,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.25rem 0.5rem;
+  margin: layout.$spacing-02 layout.$spacing-03;
 }
 
 .tile {

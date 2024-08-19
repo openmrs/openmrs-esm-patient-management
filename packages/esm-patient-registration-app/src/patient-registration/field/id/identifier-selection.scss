@@ -1,8 +1,8 @@
-@use '@carbon/styles/scss/spacing';
-@import '../../patient-registration.scss';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -10,28 +10,32 @@
 }
 
 .tablet {
-  padding: 1.5rem 1rem;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: $ui-02;
 }
 
 .desktop {
-  padding: 0rem;
+  padding: 0;
 }
 
 .radioGroup {
   background-color: $ui-01;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 .radioButton {
   margin: 0 !important;
   label {
-    height: spacing.$spacing-07;
+    height: layout.$spacing-07;
   }
+}
+
+.space05 {
+  margin: layout.$spacing-05 0;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
   .radioButton label {
-    height: spacing.$spacing-09 !important;
+    height: layout.$spacing-09 !important;
   }
 }

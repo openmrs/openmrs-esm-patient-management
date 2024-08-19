@@ -1,0 +1,35 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.form {
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.formContent {
+  padding: layout.$spacing-05;
+}
+
+.formError {
+  margin: (-(layout.$spacing-05)) (-(layout.$spacing-05)) layout.$spacing-05 (-(layout.$spacing-05));
+}
+
+.buttonSet button {
+  max-width: unset !important;
+  width: 50% !important;
+}
+
+.bedSelectionDropdown {
+  margin-top: layout.$spacing-03;
+}
+
+.errorNotifications {
+  margin-top: layout.$spacing-05;
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+}

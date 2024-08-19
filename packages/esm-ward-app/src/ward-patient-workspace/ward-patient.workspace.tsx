@@ -1,60 +1,30 @@
-import React, { useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { InlineNotification } from '@carbon/react';
-import { InlineLoading } from '@carbon/react';
-import {
-  type DefaultWorkspaceProps,
-  ExtensionSlot,
-  attach,
-  getPatientName,
-  usePatient,
-  age,
-} from '@openmrs/esm-framework';
+import { age, attach, ExtensionSlot, type Patient } from '@openmrs/esm-framework';
+import React, { useEffect } from 'react';
+import { type WardPatientWorkspaceProps } from '../types';
 import styles from './ward-patient.style.scss';
+import { useTranslation } from 'react-i18next';
+import { getGender } from '../ward-patient-card/row-elements/ward-patient-gender.component';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
-  patientUuid: string;
-}
-
-export default function WardPatientWorkspace({ patientUuid, setTitle }: WardPatientWorkspaceProps) {
-  const { t } = useTranslation();
-  const { patient, isLoading, error } = usePatient(patientUuid);
-
+export default function WardPatientWorkspace({ setTitle, wardPatient: { patient } }: WardPatientWorkspaceProps) {
   useEffect(() => {
-    if (isLoading) {
-      setTitle(t('wardPatientWorkspaceTitle', 'Ward Patient'), <InlineLoading />);
-    } else if (patient) {
-      setTitle(getPatientName(patient), <PatientWorkspaceTitle patient={patient} />);
-    } else if (error) {
-      setTitle(t('wardPatientWorkspaceTitle', 'Ward Patient'));
-    }
-  }, [patient]);
+    setTitle(patient.person.display, <PatientWorkspaceTitle patient={patient} />);
+  }, []);
 
   return (
     <div className={styles.workspaceContainer}>
-      {isLoading ? (
-        <InlineLoading />
-      ) : patient ? (
-        <WardPatientWorkspaceView patient={patient} />
-      ) : error ? (
-        <InlineNotification>{error.message}</InlineNotification>
-      ) : (
-        <InlineNotification>
-          {t('failedToLoadPatientWorkspace', 'Ward patient workspace has failed to load.')}
-        </InlineNotification>
-      )}
+      <WardPatientWorkspaceView patient={patient} />
     </div>
   );
 }
 
 interface WardPatientWorkspaceViewProps {
-  patient: fhir.Patient;
+  patient: Patient;
 }
 
-function WardPatientWorkspaceView({ patient }: WardPatientWorkspaceViewProps) {
-  const extensionSlotState = useMemo(() => ({ patient, patientUuid: patient.id }), [patient]);
+const WardPatientWorkspaceView: React.FC<WardPatientWorkspaceViewProps> = ({ patient }) => {
+  const extensionSlotState = { patient, patientUuid: patient.uuid };
 
   return (
     <>
@@ -66,14 +36,16 @@ function WardPatientWorkspaceView({ patient }: WardPatientWorkspaceViewProps) {
       </div>
     </>
   );
-}
+};
 
-function PatientWorkspaceTitle({ patient }: { patient: fhir.Patient }) {
+const PatientWorkspaceTitle: React.FC<WardPatientWorkspaceViewProps> = ({ patient }) => {
+  const { t } = useTranslation();
+
   return (
     <>
-      <div>{getPatientName(patient)} &nbsp;</div>
-      <div className={styles.headerPatientDetail}>&middot; &nbsp; {patient.gender}</div>
-      <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.birthDate)}</div>
+      <div>{patient.person.display} &nbsp;</div>
+      <div className={styles.headerPatientDetail}>&middot; &nbsp; {getGender(t, patient.person?.gender)}</div>
+      <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
     </>
   );
-}
+};

@@ -12,7 +12,7 @@ interface PastVisitProps {
 
 const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { visits, isError, isLoading } = usePastVisits(patientUuid);
+  const { visits, isLoading } = usePastVisits(patientUuid);
 
   if (isLoading) {
     return <StructuredListSkeleton role="progressbar" />;

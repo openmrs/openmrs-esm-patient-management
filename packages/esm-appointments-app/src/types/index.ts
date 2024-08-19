@@ -27,7 +27,6 @@ export enum AppointmentKind {
   WALKIN = 'WalkIn',
   VIRTUAL = 'Virtual',
 }
-
 // TODO: remove interface elements that aren't actually present on the Appointment object returned from the Appointment API
 export interface Appointment {
   appointmentKind: AppointmentKind;
@@ -61,6 +60,7 @@ export interface Appointment {
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
+
 export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
@@ -133,6 +133,7 @@ export interface AppointmentPayload {
   uuid?: string;
   providerUuid?: string | OpenmrsResource;
 }
+
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
   missedAppointmentsCount;
@@ -144,6 +145,7 @@ export interface AppointmentSummary {
   appointmentService: OpenmrsResource;
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
+
 export interface Provider {
   uuid: string;
   display: string;
@@ -158,6 +160,7 @@ export enum DurationPeriod {
   weekly,
   daily,
 }
+
 export interface Identifier {
   identifier: string;
   identifierName?: string;

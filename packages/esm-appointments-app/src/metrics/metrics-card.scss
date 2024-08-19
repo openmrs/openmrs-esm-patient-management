@@ -1,7 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   flex-grow: 1;
@@ -10,7 +10,7 @@
 .tileContainer {
   border: 1px solid $ui-03;
   height: 7.875rem;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -20,7 +20,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .headerLabel {
@@ -61,9 +61,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   justify-self: flex-end;
-  column-gap: spacing.$spacing-03;
-  row-gap: spacing.$spacing-03;
-  margin: spacing.$spacing-03;
+  column-gap: layout.$spacing-03;
+  row-gap: layout.$spacing-03;
+  margin: layout.$spacing-03;
 
   & > span {
     font-size: 0.625rem !important;

@@ -1,54 +1,62 @@
-import { Type, validators, type ConfigSchema, type PersonAddress } from '@openmrs/esm-framework';
-import { patientCardElementTypes, type PatientCardElementType } from './types';
+import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
-const defaultWardPatientCard: WardPatientCardDefinition = {
-  id: 'default-card',
-  rows: [
-    {
-      rowType: 'header',
-      elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address', 'patient-identifier'],
-    },
-  ],
+export const defaultWardPatientCard: WardPatientCardDefinition = {
+  id: 'default',
+  headerRowElements: ['patient-age', 'patient-address', 'patient-identifier'],
+  footerRowElements: [],
   appliedTo: null,
 };
 
-const defaultPatientAddressFields: Array<keyof PersonAddress> = ['cityVillage', 'country'];
-const defaultIdentifierTypeUuid = null;
-const defaultLabel = null;
-export const defaultPatientCardElementConfig: PatientCardElementConfig = {
-  address: {
-    addressFields: defaultPatientAddressFields,
-  },
-  obs: null,
-  identifier: {
-    identifierTypeUuid: defaultIdentifierTypeUuid,
-  },
-  codedObsTags: null,
-};
+export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission'];
 
-export const builtInPatientCardElements: PatientCardElementType[] = [
-  'bed-number',
-  'patient-name',
-  'patient-age',
-  'patient-address',
-  'patient-identifier',
-];
+export const addressFields = [
+  'cityVillage',
+  'stateProvince',
+  'country',
+  'postalCode',
+  'countyDistrict',
+  'latitude',
+  'longitude',
+  'address1',
+  'address2',
+  'address3',
+  'address4',
+  'address5',
+  'address6',
+  'address7',
+  'address8',
+  'address9',
+  'address10',
+  'address11',
+  'address12',
+  'address13',
+  'address14',
+  'address15',
+] as const;
+
+type AddressField = keyof typeof addressFields;
 
 export const configSchema: ConfigSchema = {
   wardPatientCards: {
     _description: 'Configure the display of ward patient cards',
-    patientCardElementDefinitions: {
+    obsElementDefinitions: {
       _type: Type.Array,
+      _description: 'Defines obs display elements that can be included in the card header or footer.',
       _default: [],
       _elements: {
         id: {
           _type: Type.String,
-          _description: 'The unique identifier for this custom patient card element',
+          _description: 'The unique identifier for this patient card element',
         },
-        elementType: {
+        conceptUuid: {
+          _type: Type.UUID,
+          _description: 'Identifies the concept to use to identify the desired observations.',
+        },
+        label: {
           _type: Type.String,
-          _description: 'The patient card element type',
-          _validators: [validators.oneOf(patientCardElementTypes)],
+          _description:
+            "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
+          _default: null,
         },
         config: {
           address: {
@@ -119,27 +127,7 @@ export const configSchema: ConfigSchema = {
             },
             summaryLabelColor: {
               _type: Type.String,
-              _description:
-                'The color of the summary tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors',
-              _default: null,
-            },
-            tags: {
-              _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
-              _type: Type.Array,
-              _elements: {
-                color: {
-                  _type: Type.String,
-                  _description:
-                    'Color of the tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors.',
-                },
-                appliedToConceptSets: {
-                  _type: Type.Array,
-                  _description: `The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets will be displayed as their own tag with the specified color. If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.`,
-                  _elements: {
-                    _type: Type.UUID,
-                  },
-                },
-              },
+              _validators: [validators.oneOf(addressFields)],
             },
           },
         },
@@ -153,31 +141,36 @@ export const configSchema: ConfigSchema = {
       _elements: {
         id: {
           _type: Type.String,
-          _description: 'The unique identifier for this card definition. Currently unused, but that might change.',
+          _description:
+            'The unique identifier for this card definition. This is used to set the name of the extension slot the card has, where the rows go. The slot name is "ward-patient-card-<id>", unless the id is "default", in which case the slot name is "ward-patient-card".',
+          _default: 'default',
         },
-        rows: {
+        headerRowElements: {
           _type: Type.Array,
+          _description: `IDs of patient card elements to appear in the header row. These can be built-in, or custom ones can be defined in patientCardElementDefinitions. Built-in elements are: '${builtInPatientCardElements.join(
+            "', '",
+          )}'.`,
           _elements: {
-            id: {
-              _type: Type.String,
-              _description: 'The unique identifier for this card row. Currently unused, but that might change.',
-            },
-            elements: {
-              _type: Type.Array,
-              _element: {
-                _type: Type.String,
-                _description: 'The ID of the (bulit-in or custom) patient card elements to appear in this card row',
-                _validators: [validators.oneOf(patientCardElementTypes)],
-              },
-            },
+            _type: Type.String,
+          },
+        },
+        footerRowElements: {
+          _type: Type.Array,
+          _description: `IDs of patient card elements to appear in the footer row. These can be built-in, or custom ones can be defined in patientCardElementDefinitions. Built-in elements are: '${builtInPatientCardElements.join(
+            "', '",
+          )}'.`,
+          _elements: {
+            _type: Type.String,
           },
         },
         appliedTo: {
           _type: Type.Array,
+          _description:
+            'Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
           _elements: {
             location: {
               _type: Type.UUID,
-              _description: 'The UUID of the location. If not provided, applies to all queues.',
+              _description: 'The UUID of the location. If not provided, applies to all wards.',
               _default: null,
             },
           },
@@ -192,51 +185,18 @@ export interface WardConfigObject {
 }
 
 export interface WardPatientCardsConfig {
-  patientCardElementDefinitions: Array<PatientCardElementDefinition>;
+  obsElementDefinitions: Array<ObsElementDefinition>;
+  identifierElementDefinitions: Array<IdentifierElementDefinition>;
+  addressElementDefinitions: Array<AddressElementDefinition>;
   cardDefinitions: Array<WardPatientCardDefinition>;
 }
 
-export interface WardPatientCardDefinition {
+export interface ObsElementDefinition {
   id: string;
-  rows: Array<{
-    /**
-     * The type of row. Currently, only "header" is supported
-     */
-    rowType: 'header';
-
-    /**
-     * an array of (either built-in or custom) patient card element ids
-     */
-    elements: Array<string>;
-  }>;
-  appliedTo?: Array<{
-    /**
-     * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
-     */
-    location: string;
-  }>;
-}
-
-export type PatientCardElementDefinition = {
-  id: string;
-  elementType: PatientCardElementType;
-  config?: PatientCardElementConfig;
-};
-
-export interface PatientAddressElementConfig {
-  addressFields: Array<keyof PersonAddress>;
-}
-
-export interface PatientObsElementConfig {
-  /**
-   * Required. Identifies the concept to use to identify the desired observations.
-   */
   conceptUuid: string;
-
-  /**
-   * Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name.
-   * (Note that this can be set to an empty string to not show a label)
-   */
+  onlyWithinCurrentVisit: boolean;
+  orderBy: 'ascending' | 'descending';
+  limit: number;
   label?: string;
 
 
@@ -256,16 +216,9 @@ export interface PatientObsElementConfig {
   onlyWithinCurrentVisit?: boolean;
 }
 
-export interface PatientIdentifierElementConfig {
-  /**
-   * By default the preferred patient identifier is chosen,but
-   * if uuid is given the identifier corresponding to uuid is displayed
-   */
-  identifierTypeUuid: string | null;
-  /**
-   * Optional. The custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.
-   * (Note that this can be set to an empty string to not show a label)
-   */
+export interface IdentifierElementDefinition {
+  id: string;
+  identifierTypeUuid: string;
   label?: string;
 }
 export interface PatientCodedObsTagsElementConfig {
@@ -281,36 +234,19 @@ export interface PatientCodedObsTagsElementConfig {
    */
   summaryLabel?: string;
 
-  /**
-   * The color of the summary tag.
-   * See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors
-   */
-  summaryLabelColor?: string;
-
-  /**
-   * An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets
-   * will be displayed as their own tags with the specified color. Any observation with coded values not belonging to
-   * any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times,
-   * the first matching applied-to rule takes precedence.
-   */
-  tags: Array<{
-    /**
-     * Color of the tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors.
-     */
-    color: string;
-
-    /**
-     * The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets
-     * will be displayed as their own tag with the specified color.
-     * If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.
-     */
-    appliedToConceptSets: Array<string>;
-  }>;
+export interface AddressElementDefinition {
+  id: string;
+  fields: Array<AddressField>;
 }
 
-export type PatientCardElementConfig = {
-  address: PatientAddressElementConfig;
-  obs: PatientObsElementConfig;
-  identifier: PatientIdentifierElementConfig;
-  codedObsTags: PatientCodedObsTagsElementConfig;
-};
+export interface WardPatientCardDefinition {
+  id: string;
+  headerRowElements: Array<string>;
+  footerRowElements: Array<string>;
+  appliedTo?: Array<{
+    /**
+     * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
+     */
+    location: string;
+  }>;
+}

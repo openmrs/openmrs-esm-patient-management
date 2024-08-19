@@ -1,10 +1,10 @@
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
 
 .appointmentServiceContainer {
-  margin: spacing.$spacing-05 spacing.$spacing-05;
+  margin: layout.$spacing-05 layout.$spacing-05;
 
   & > div {
-    padding: spacing.$spacing-03 0;
+    padding: layout.$spacing-03 0;
   }
 }
 
@@ -13,11 +13,11 @@
   bottom: 0;
   left: 0;
   right: 0;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .button {
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;

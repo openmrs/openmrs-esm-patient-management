@@ -1,41 +1,49 @@
 import type {
+  Concept,
+  DefaultWorkspaceProps,
+  Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
+  Patient,
   Person,
   Visit,
-  Location,
-  Patient,
-  Concept,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
-export interface WardPatientCardProps {
-  patient: Patient;
-  visit: Visit;
-  bed?: Bed;
-}
-
-export type WardPatientCardRow = React.FC<WardPatientCardProps>;
-export type WardPatientCardElement = React.FC<WardPatientCardProps>;
+export type WardPatientCard = React.FC<WardPatient>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
+  /**
+   * The patient and their current visit. These values are taken either
+   * from either the inpatientAdmission object, the inpatientRequest object
+   * or the admissionLocation object (which contains the bed)
+   */
   patient: Patient;
-  visit?: Visit;
-  admitted: boolean;
+  visit: Visit;
+
+  /**
+   * the bed assigned to the patient. This object is only set if the patient
+   * has a bed assigned
+   */
+  bed: Bed;
+
+  /**
+   * The admission detail. This object is only set if the patient has been
+   * admitted to the ward
+   */
+  inpatientAdmission: InpatientAdmission;
+
+  /**
+   * The admission request. The object is only set if the patient has a
+   * pending admission / transfer request.
+   */
+  inpatientRequest: InpatientRequest;
 };
 
-export const patientCardElementTypes = [
-  'bed-number',
-  'patient-name',
-  'patient-age',
-  'patient-address',
-  'patient-obs',
-  'patient-coded-obs-tags',
-  'admission-time',
-  'patient-identifier',
-] as const;
-export type PatientCardElementType = (typeof patientCardElementTypes)[number];
+export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
+  wardPatient: WardPatient;
+}
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -46,6 +54,7 @@ export interface AdmissionLocationFetchResponse {
   ward: Location;
   bedLayouts: Array<BedLayout>;
 }
+
 export interface Bed {
   id: number;
   uuid: string;
@@ -101,6 +110,7 @@ export interface InpatientRequest {
   dispositionEncounter?: Encounter;
   dispositionObsGroup?: Observation;
   dispositionLocation?: Location;
+  visit: Visit;
 }
 
 export type DispositionType = 'ADMIT' | 'TRANSFER' | 'DISCHARGE';
@@ -113,6 +123,21 @@ export interface InpatientAdmissionFetchResponse {
 export interface InpatientAdmission {
   patient: Patient;
   visit: Visit;
+
+  // the encounter of type "Admission" or "Transfer" that is responsible
+  // for assigning the patient to the current inpatient location. For example,
+  // if the patient has been admitted /transferred to multiple locations as follows:
+  // A -> B -> A
+  // then encounterAssigningToCurrentInpatientLocation
+  // would be the transfer encounter that lands the patient back to A.
+  encounterAssigningToCurrentInpatientLocation: Encounter;
+
+  // the first encounter of the visit that is of encounterType "Admission" or "Transfer",
+  // regardless of the admission location
+  firstAdmissionOrTransferEncounter: Encounter;
+
+  // the current in patient request
+  currentInpatientRequest: InpatientRequest;
 }
 
 // TODO: Move these types to esm-core
@@ -162,4 +187,22 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   name?: string;
   description?: string;
   retired?: boolean;
+}
+
+export interface EncounterPayload {
+  encounterDatetime?: string;
+  encounterType: string;
+  patient: string;
+  location: string;
+  encounterProviders?: Array<{ encounterRole: string; provider: string }>;
+  obs: Array<ObsPayload>;
+  form?: string;
+  orders?: Array<any>;
+  visit?: string;
+}
+
+export interface ObsPayload {
+  concept: Concept | string;
+  value?: string;
+  groupMembers?: Array<ObsPayload>;
 }
