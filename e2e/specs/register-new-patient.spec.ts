@@ -5,7 +5,7 @@ import { deletePatient, getPatient } from '../commands';
 
 let patientUuid: string;
 
-test('Register a new patient', async ({ page, api }) => {
+test('Register a new patient', async ({ page }) => {
   test.setTimeout(5 * 60 * 1000);
   const patientRegistrationPage = new RegistrationAndEditPage(page);
 
@@ -38,7 +38,12 @@ test('Register a new patient', async ({ page, api }) => {
     const patientChartUrlRegex = new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$');
     await page.waitForURL(patientChartUrlRegex);
     await expect(page).toHaveURL(patientChartUrlRegex);
-    await expect(page.getByText(/Johnny Donny Ronny/i)).toBeVisible();
+    await page.locator('header[data-openmrs-role="patient banner"]').waitFor();
+    await expect(page.locator('header[data-openmrs-role="patient banner"]')).toBeVisible();
+  });
+
+  await test.step("And I should the newly registered patient's details in the patient banner", async () => {
+    await expect(page.getByText(/johnny donny ronny/i)).toBeVisible();
     await expect(page.getByText(/male/i)).toBeVisible();
     await expect(page.getByText(/4 yrs, 6 mths/i)).toBeVisible();
     await expect(page.getByText(/01 — Feb — 2020/i)).toBeVisible();
