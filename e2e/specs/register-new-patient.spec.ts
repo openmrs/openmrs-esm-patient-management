@@ -45,8 +45,7 @@ test('Register a new patient', async ({ page }) => {
   });
 
   await test.step("And I should the newly registered patient's details displayed in the patient banner", async () => {
-    await page.locator('[data-openmrs-role="patient banner"]').waitFor();
-    await expect(page.locator('[data-openmrs-role="patient banner"]')).toBeVisible();
+    await expect(page.getByRole('banner', { name: /patient banner/i })).toBeVisible();
     await expect(page.getByText(/johnny donny ronny/i)).toBeVisible();
     await expect(page.getByText(/male/i)).toBeVisible();
     await expect(page.getByText(/4 yrs, 6 mths/i)).toBeVisible();
