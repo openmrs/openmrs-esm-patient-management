@@ -58,74 +58,73 @@ export const configSchema: ConfigSchema = {
             "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
           _default: null,
         },
-        config: {
-          address: {
-            _description: 'Config for the patientCardElementType "patient-address"',
-            addressFields: {
-              _type: Type.Array,
-              _description: 'defines which address fields to show',
-              _default: defaultPatientAddressFields,
-            },
+        orderBy: {
+          _type: Type.String,
+          _description:
+            "One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly.",
+          _default: 'descending',
+          _validators: [validators.oneOf(['ascending', 'descending'])],
+        },
+        limit: {
+          _type: Type.Number,
+          _description:
+            'If set to a number greater than one, this will show multiple obs for this concept, which will appear as a list. Set to 0 for unlimited.',
+          _default: 1,
+        },
+        onlyWithinCurrentVisit: {
+          _type: Type.Boolean,
+          _description:
+            'Optional. If true, limits display to only observations within current visit. Defaults to false',
+          _default: false,
+        },
+      },
+    },
+    identifierElementDefinitions: {
+      _type: Type.Array,
+      _description: `Defines patient identifier elements that can be included in the card header or footer. The default element 'patient-identifier' displays the preferred identifier.`,
+      _default: [
+        {
+          id: 'patient-identifier',
+        },
+      ],
+      _elements: {
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for this patient card element',
+        },
+        identifierTypeUuid: {
+          _type: Type.UUID,
+          _description:
+            'The UUID of the identifier type to display. If not provided, defaults to the preferred identifier.',
+          _default: null,
+        },
+        label: {
+          _type: Type.String,
+          _description:
+            'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
+          _default: null,
+        },
+      },
+    },
+    addressElementDefinitions: {
+      _type: Type.Array,
+      _description: 'Defines patient address elements that can be included in the card header or footer.',
+      _default: [
+        {
+          id: 'patient-address',
+          fields: ['cityVillage', 'country'],
+        },
+      ],
+      _elements: {
+        fields: {
+          id: {
+            _type: Type.String,
+            _description: 'The unique identifier for this patient card element',
           },
-          obs: {
-            _description: 'Config for the patientCardElementType "patient-obs"',
-            conceptUuid: {
-              _type: Type.UUID,
-              _description: 'Required. Identifies the concept to use to identify the desired observations.',
-              _default: null,
-            },
-            label: {
-              _type: Type.String,
-              _description:
-                "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
-              _default: null,
-            },
-            orderBy: {
-              _type: Type.String,
-              _description:
-                "Optional. One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly. Defaults to ascending.",
-              _default: 'descending',
-              _validators: [validators.oneOf(['ascending', 'descending'])],
-            },
-            limit: {
-              _type: Type.Number,
-              _description: 'Optional. Limits the max number of obs to display. Unlimited by default.',
-              _default: null,
-            },
-            onlyWithinCurrentVisit: {
-              _type: Type.Boolean,
-              _description:
-                'Optional. If true, limits display to only observations within current visit. Defaults to false',
-              _default: false,
-            },
-          },
-          identifier: {
-            _description: 'Config for the patientCardElementType "patient-identifier"',
-            identifierTypeUuid: {
-              _type: Type.UUID,
-              _description: 'The UUID of the identifier type to display',
-              _default: defaultIdentifierTypeUuid,
-            },
-            label: {
-              _type: Type.String,
-              _description:
-                'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
-              _default: defaultLabel,
-            },
-          },
-          codedObsTags: {
-            _description: 'Config for the patientCardElementType "patient-coded-obs-tags"',
-            conceptUuid: {
-              _type: Type.UUID,
-              _description: 'Required. Identifies the concept to use to identify the desired observations.',
-              _default: null,
-            },
-            summaryLabel: {
-              _type: Type.String,
-              _description: `Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag shows the count of the number of answers that are present but not configured to show as their own tags. If not provided, defaults to the name of the concept.`,
-              _default: null,
-            },
-            summaryLabelColor: {
+          fields: {
+            _type: Type.Array,
+            _description: 'The fields of the address to display',
+            _elements: {
               _type: Type.String,
               _validators: [validators.oneOf(addressFields)],
             },
@@ -198,22 +197,6 @@ export interface ObsElementDefinition {
   orderBy: 'ascending' | 'descending';
   limit: number;
   label?: string;
-
-
-  /**
-   * Optional. One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly. Defaults to descending.
-   */
-  orderBy?: 'ascending' | 'descending';
-
-  /**
-   * Optional. Limits the max number of obs to display. Unlimited by default.
-   */
-  limit?: number;
-
-  /**
-   * Optional. If true, limits display to only observations within current visit
-   */
-  onlyWithinCurrentVisit?: boolean;
 }
 
 export interface IdentifierElementDefinition {
@@ -221,18 +204,6 @@ export interface IdentifierElementDefinition {
   identifierTypeUuid: string;
   label?: string;
 }
-export interface PatientCodedObsTagsElementConfig {
-  /**
-   * Required. Identifies the concept to use to identify the desired observations.
-   */
-  conceptUuid: string;
-
-  /**
-   * Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag
-   * shows the count of the number of answers that are present but not configured to show as their own tags. If not
-   * provided, defaults to the name of the concept.
-   */
-  summaryLabel?: string;
 
 export interface AddressElementDefinition {
   id: string;

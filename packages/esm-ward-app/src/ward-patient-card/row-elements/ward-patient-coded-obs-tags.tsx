@@ -2,7 +2,7 @@ import { SkeletonText, Tag } from '@carbon/react';
 import { type Patient, translateFrom, type Visit, type OpenmrsResource } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PatientCodedObsTagsElementConfig } from '../../config-schema';
+import { moduleName } from '../../constant';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
@@ -24,27 +24,23 @@ interface WardPatientCodedObsTagsProps {
  * @param config
  * @returns
  */
-const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
-  const WardPatientCodedObsTags: WardPatientCardElement = ({ patient, visit }) => {
-    const { conceptUuid, summaryLabel, summaryLabelColor} = config;
-    const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
-    const { t } = useTranslation();
-    const { data: conceptToTagColorMap } = useConceptToTagColorMap(config);
+const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ config, patient, visit }) => {
+  const { conceptUuid, summaryLabel, summaryLabelColor } = config;
+  const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
+  const { t } = useTranslation();
+  const { data: conceptToTagColorMap } = useConceptToTagColorMap(config.tags);
 
-    if (isLoading) {
-      return <SkeletonText />;
-    } else {
-      const obsToDisplay = data?.data?.results?.filter((o) => {
-        const matchVisit = o.encounter.visit?.uuid == visit?.uuid;
-        return matchVisit || visit == null; // TODO: remove visit == null hack when server API supports returning visit
-      });
-
-      const summaryLabelToDisplay =
-        summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;
+  if (isLoading) {
+    return <SkeletonText />;
+  } else {
+    const obsToDisplay = data?.data?.results?.filter((o) => {
+      const matchVisit = o.encounter.visit?.uuid == visit?.uuid;
+      return matchVisit || visit == null; // TODO: remove visit == null hack when server API supports returning visit
+    });
 
     const summaryLabelToDisplay =
       summaryLabel != null
-        ? translateFrom(summaryLabelI18nModule ?? moduleName, summaryLabel)
+        ? t(summaryLabel)
         : obsToDisplay?.[0]?.concept?.display;
 
     const obsNodes = obsToDisplay?.map((o) => {

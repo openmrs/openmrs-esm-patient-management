@@ -19,27 +19,35 @@ const identifierCompareFunction = (pi1: PatientIdentifier, pi2: PatientIdentifie
   return comp;
 };
 
-const wardPatientIdentifier = (config: PatientCardElementConfig) => {
-  const WardPatientIdentifier: WardPatientCardElement = ({ patient }) => {
-    const { t } = useTranslation();
-    const { identifier } = config;
-    const { identifierTypeUuid, label } = identifier;
-    const patientIdentifiers = patient.identifiers.filter(
-      (patientIdentifier: PatientIdentifier) =>
-        identifierTypeUuid == null || patientIdentifier.identifierType?.uuid === identifierTypeUuid,
-    );
-    patientIdentifiers.sort(identifierCompareFunction);
-    const patientIdentifier = patientIdentifiers[0];
-    const labelToDisplay =
-      label != label != null ? t(label) : patientIdentifier?.identifierType?.name;
-    return (
-      <div>
-        {labelToDisplay ? <Tag>{t('identifierTypelabel', '{{label}}:', { label: labelToDisplay })}</Tag> : <></>}
-        <span>{patientIdentifier?.identifier}</span>
-      </div>
-    );
-  };
-  return WardPatientIdentifier;
+export interface WardPatientIdentifierProps {
+  patient: Patient;
+  /** If the config is not passed, this will be the default identifier element, which uses the preferred identifier type. */
+  config?: IdentifierElementDefinition;
+}
+
+const defaultConfig: IdentifierElementDefinition = {
+  id: 'patient-identifier',
+  identifierTypeUuid: null,
+};
+
+const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ config: configProp, patient }) => {
+  const { t } = useTranslation();
+  const config = configProp ?? defaultConfig;
+  const { identifierTypeUuid, label } = config;
+  const patientIdentifiers = patient.identifiers.filter(
+    (patientIdentifier: PatientIdentifier) =>
+      identifierTypeUuid == null || patientIdentifier.identifierType?.uuid === identifierTypeUuid,
+  );
+  patientIdentifiers.sort(identifierCompareFunction);
+  const patientIdentifier = patientIdentifiers[0];
+  const labelToDisplay =
+    label != null ? t(label) : patientIdentifier?.identifierType?.name;
+  return (
+    <div>
+      {labelToDisplay ? <Tag>{t('identifierTypelabel', '{{label}}:', { label: labelToDisplay })}</Tag> : <></>}
+      <span>{patientIdentifier?.identifier}</span>
+    </div>
+  );
 };
 
 export default WardPatientIdentifier;
