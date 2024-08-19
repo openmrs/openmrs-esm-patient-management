@@ -48,9 +48,6 @@ interface QueueTableProps {
   // if provided, adds addition table toolbar elements
   tableFilter?: React.ReactNode[];
 
-  // if provided, adds title to the top-left
-  header?: string;
-
   isLoading?: boolean;
 }
 
@@ -62,7 +59,6 @@ function QueueTable({
   queueTableColumnsOverride,
   ExpandedRow,
   tableFilter,
-  header,
   isLoading,
 }: QueueTableProps) {
   const { t } = useTranslation();
@@ -109,7 +105,6 @@ function QueueTable({
         <>
           <TableContainer className={styles.tableContainer}>
             <div className={styles.toolbarContainer}>
-              <h5 className={styles.tableHeader}>{header}</h5>
               {isValidating ? (
                 <span>
                   <InlineLoading />
