@@ -4,12 +4,13 @@ import { Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-discharge.scss';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
-import type { ObsPayload, WardPatientWorkspaceProps } from '../../types';
+import type { WardPatientWorkspaceProps } from '../../types';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import { Exit } from '@carbon/react/icons';
 
 const DischargeTypes = {
   MEDICAL: 'medical',
@@ -32,16 +33,10 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
 
   const submitDischarge = useCallback(() => {
     setIsSubmitting(true);
-    const obs: Array<ObsPayload> = [
-      {
-        concept: emrConfiguration.dischargeForm.uuid,
-        value: '',
-      },
-    ];
 
     createEncounter({
-      patient: props?.wardPatient?.patient?.uuid,
-      encounterType: emrConfiguration.dischargeForm.uuid,
+      patient: wardPatient?.patient?.uuid,
+      encounterType: emrConfiguration.exitFromInpatientEncounterType.uuid,
       location: location.uuid,
       encounterProviders: [
         {
@@ -102,9 +97,12 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
         <ExtensionSlot name="ward-patient-discharge-slot" />
         <ButtonSet className={styles.buttonSet}>
           <Button
-            type="submit"
-            size="xl"
-            disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration}
+            size="sm"
+            kind="ghost"
+            renderIcon={(props) => <Exit size={16} {...props} />}
+            disabled={
+              isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient?.patient
+            }
             onClick={submitDischarge}>
             {t('proceedWithPatientDischarge', 'Proceed with patient discharge')}
           </Button>
