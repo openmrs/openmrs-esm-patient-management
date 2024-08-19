@@ -13,6 +13,7 @@ interface EmrApiConfigurationResponse {
   consultFreeTextCommentsConcept: OpenmrsResource;
   visitNoteEncounterType: OpenmrsResource;
   transferWithinHospitalEncounterType: OpenmrsResource;
+  dischargeForm: OpenmrsResource;
   supportsTransferLocationTag: LocationTag;
   supportsAdmissionLocationTag: LocationTag;
   supportsLoginLocationTag: LocationTag;
