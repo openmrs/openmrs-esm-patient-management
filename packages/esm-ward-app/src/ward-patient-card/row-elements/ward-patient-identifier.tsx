@@ -24,7 +24,7 @@ const wardPatientIdentifier = (config: PatientCardElementConfig) => {
   const WardPatientIdentifier: WardPatientCardElement = ({ patient }) => {
     const { t } = useTranslation();
     const { identifier } = config;
-    const { identifierTypeUuid, labelI18nModule: labelModule, label } = identifier;
+    const { identifierTypeUuid, label } = identifier;
     const patientIdentifiers = patient.identifiers.filter(
       (patientIdentifier: PatientIdentifier) =>
         identifierTypeUuid == null || patientIdentifier.identifierType?.uuid === identifierTypeUuid,
@@ -32,7 +32,7 @@ const wardPatientIdentifier = (config: PatientCardElementConfig) => {
     patientIdentifiers.sort(identifierCompareFunction);
     const patientIdentifier = patientIdentifiers[0];
     const labelToDisplay =
-      label != null ? translateFrom(labelModule ?? moduleName, label) : patientIdentifier?.identifierType?.name;
+      label != label != null ? t(label) : patientIdentifier?.identifierType?.name;
     return (
       <div>
         {labelToDisplay ? <Tag>{t('identifierTypelabel', '{{label}}:', { label: labelToDisplay })}</Tag> : <></>}

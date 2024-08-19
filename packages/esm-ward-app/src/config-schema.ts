@@ -104,11 +104,6 @@ export const configSchema: ConfigSchema = {
                 'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
               _default: defaultLabel,
             },
-            labelI18nModule: {
-              _type: Type.String,
-              _description: 'Optional. The custom module to use for translation of the label',
-              _default: null,
-            },
           },
           codedObsTags: {
             _description: 'Config for the patientCardElementType "patient-coded-obs-tags"',
@@ -272,10 +267,6 @@ export interface PatientIdentifierElementConfig {
    * (Note that this can be set to an empty string to not show a label)
    */
   label?: string;
-  /**
-   * Optional. The custom module to use for translation of the label
-   */
-  labelI18nModule?: string;
 }
 export interface PatientCodedObsTagsElementConfig {
   /**
