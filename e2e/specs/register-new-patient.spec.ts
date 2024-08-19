@@ -32,6 +32,7 @@ test('Register a new patient', async ({ page }) => {
 
   await test.step('And then I fill the registration form and then click the `Submit` button', async () => {
     await patientRegistrationPage.fillPatientRegistrationForm(formValues);
+    await expect(page.getByText(/new patient created/i)).toBeVisible();
   });
 
   await test.step("Then I should be redirected to the new patient's chart page", async () => {
@@ -40,27 +41,27 @@ test('Register a new patient', async ({ page }) => {
     await expect(page).toHaveURL(patientChartUrlRegex);
   });
 
-  await test.step('And I should see a success toast notification', async () => {
-    await expect(page.getByText(/new patient created/i)).toBeVisible();
-  });
-
   await test.step("And I should the newly registered patient's details displayed in the patient banner", async () => {
-    await page.getByRole('banner', { name: /patient banner/i }).waitFor({ timeout: 10000 });
-    await expect(page.getByRole('banner', { name: /patient banner/i })).toBeVisible();
-    await expect(page.getByText(/johnny donny ronny/i)).toBeVisible();
-    await expect(page.getByText(/male/i)).toBeVisible();
-    await expect(page.getByText(/4 yrs, 6 mths/i)).toBeVisible();
-    await expect(page.getByText(/01 — Feb — 2020/i)).toBeVisible();
-    await expect(page.getByText(/OpenMRS ID/i)).toBeVisible();
-    await page.getByRole('button', { name: /show details/i }).click();
-    await expect(page.getByRole('button', { name: /hide details/i })).toBeVisible();
-    await expect(page.getByText(/^address$/i)).toBeVisible();
-    await expect(page.getByText(/address line 1: bom jesus street/i)).toBeVisible();
-    await expect(page.getByText(/city: recife/i)).toBeVisible();
-    await expect(page.getByText(/state: pernambuco/i)).toBeVisible();
-    await expect(page.getByText(/country: brazil/i)).toBeVisible();
-    await expect(page.getByText(/contact details/i)).toBeVisible();
-    await expect(page.getByText(/telephone number: 5555551234/i)).toBeVisible();
+    const patientBanner = page.locator('header[aria-label="patient banner"]');
+    await patientBanner.waitFor({ state: 'visible' });
+
+    await expect(page.getByLabel('patient banner').getByText(/johnny donny ronny/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/male/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/4 yrs, 6 mths/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/01 — Feb — 2020/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/OpenMRS ID/i)).toBeVisible();
+    await page
+      .getByLabel('patient banner')
+      .getByRole('button', { name: /show details/i })
+      .click();
+    await expect(page.getByLabel('patient banner').getByRole('button', { name: /hide details/i })).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/^address$/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/address line 1: bom jesus street/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/city: recife/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/state: pernambuco/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/country: brazil/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/contact details/i)).toBeVisible();
+    await expect(page.getByLabel('patient banner').getByText(/telephone number: 5555551234/i)).toBeVisible();
   });
 });
 
