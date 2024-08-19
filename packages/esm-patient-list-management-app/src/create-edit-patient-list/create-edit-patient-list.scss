@@ -1,18 +1,17 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../style.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .header {
   @include type.type-style('heading-compact-02');
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .input {
-  margin-top: spacing.$spacing-07;
+  margin-top: layout.$spacing-07;
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;

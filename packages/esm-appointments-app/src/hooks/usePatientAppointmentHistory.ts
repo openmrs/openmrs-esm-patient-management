@@ -42,7 +42,7 @@ export function usePatientAppointmentHistory(patientUuid: string) {
 
   return {
     appointmentsCount: { missedAppointments, completedAppointments, cancelledAppointments, upcomingAppointments },
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };

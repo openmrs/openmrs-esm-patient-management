@@ -12,8 +12,8 @@ import {
   useLayoutType,
   isDesktop,
 } from '@openmrs/esm-framework';
-import styles from './scheduled-appointments.scss';
 import SelectedDateContext from '../../hooks/selectedDateContext';
+import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
 

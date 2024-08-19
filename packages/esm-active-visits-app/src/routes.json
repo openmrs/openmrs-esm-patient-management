@@ -14,6 +14,16 @@
       "name": "visit-summary-widget",
       "slot": "visit-summary-slot",
       "component": "visitDetail"
+    },
+    {
+      "name": "active-visits-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeActiveVisitsTile"
+    },
+    {
+      "name": "total-visits-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeTotalVisitsTile"
     }
   ],
   "pages": []

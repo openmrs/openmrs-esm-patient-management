@@ -28,7 +28,7 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
 
   return (
     <div>
-      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} />
+      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} showLocationDropdown />
       <div className={styles.gridFlow}>
         {rowData.map((row) => (
           <div className={styles.card} key={row.id}>

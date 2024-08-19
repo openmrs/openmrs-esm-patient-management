@@ -1,13 +1,9 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
-
-.title {
-  color: var(--omrs-color-brand-teal);
-}
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .submit {
-  width: 250px;
+  width: 15.625rem;
 }
 
 .submit:hover {
@@ -32,17 +28,17 @@
   max-width: 50rem;
 }
 
+:global(.omrs-breakpoint-lt-desktop) {
+  .infoGrid {
+    max-width: unset;
+  }
+}
+
 .label01 {
   @include type.type-style('label-01');
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-05;
   color: $ui-04;
-}
-
-.productiveHeading02 {
-  @include type.type-style('heading-compact-02');
-  color: $ui-04;
-  cursor: pointer;
 }
 
 .space05 {
@@ -57,8 +53,8 @@
 .stickyColumn {
   position: sticky;
   margin-top: layout.$spacing-05;
-  // 3rem for the nav height and 1rem for top margin
-  top: 4rem;
+  // layout.$spacing-09 for the nav height and layout.$spacing-05 for top margin
+  top: layout.$spacing-10;
 }
 
 .touchTarget a:active {
@@ -83,18 +79,8 @@
   }
 }
 
-.main {
-  background-color: white;
-}
-
-:global(.omrs-breakpoint-lt-desktop) {
-  .infoGrid {
-    max-width: unset;
-  }
-}
-
 .spinner {
-  min-height: 1rem;
+  min-height: layout.$spacing-05;
   width: max-content;
 
   :global(.cds--inline-loading__text) {

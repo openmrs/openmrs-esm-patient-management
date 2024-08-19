@@ -51,7 +51,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           )}
           {patient && patient?.telecom
             ? patient.telecom.map((contact, i) => (
-                <div className={styles.labelContainer}>
+                <div key={i} className={styles.labelContainer}>
                   <p className={styles.labelBold}>{t('Contact', 'Contact {{index}}', { index: i + 1 })}: </p>
                   <p className={styles.label}>{contact.value}</p>
                 </div>

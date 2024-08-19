@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   flex-grow: 1;
@@ -15,7 +15,7 @@
 }
 
 .tileContainerWithoutBorder {
-  height: 4.875rem;
+  padding: layout.$spacing-04;
 }
 
 .tileHeader {
@@ -35,14 +35,14 @@
 
 .headerLabelContainer {
   display: flex;
-  height: spacing.$spacing-07;
+  height: layout.$spacing-07;
 
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
-    margin-top: -0.75rem;
+    margin-top: -(layout.$spacing-04);
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: 1rem;
+    height: layout.$spacing-05;
   }
 }

@@ -1,13 +1,13 @@
-@use '@carbon/styles/scss/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 $openmrs-background-grey: #ededed;
 
 .formGroup {
   display: flex;
-  margin-bottom: spacing.$spacing-02;
-  padding: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-02;
+  padding: layout.$spacing-05;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .formGroup {
@@ -29,13 +29,13 @@ $openmrs-background-grey: #ededed;
 .heading {
   color: colors.$gray-70;
   @include type.type-style('heading-compact-02');
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .inputContainer {
   display: flex;
   flex-flow: row wrap;
-  gap: spacing.$spacing-05;
+  gap: layout.$spacing-05;
   align-items: center;
 }
 
@@ -48,7 +48,7 @@ $openmrs-background-grey: #ededed;
 }
 
 .button {
-  height: 4rem;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -59,12 +59,12 @@ $openmrs-background-grey: #ededed;
   display: flex;
   background-color: $openmrs-background-grey;
   justify-content: center;
-  min-height: spacing.$spacing-09;
+  min-height: layout.$spacing-09;
   height: 100vh;
 }
 
 .tablet {
-  padding: spacing.$spacing-06 spacing.$spacing-05;
+  padding: layout.$spacing-06 layout.$spacing-05;
   background-color: colors.$white;
 }
 
@@ -74,5 +74,5 @@ $openmrs-background-grey: #ededed;
 
 .weekSelect {
   max-inline-size: fit-content;
-  padding-top: spacing.$spacing-03;
+  padding-top: layout.$spacing-03;
 }

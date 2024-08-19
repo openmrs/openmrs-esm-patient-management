@@ -109,3 +109,8 @@ export const endAppointmentModal = getAsyncLifecycle(
   () => import('./appointments/common-components/end-appointment.modal'),
   options,
 );
+
+export const homeAppointmentsTile = getAsyncLifecycle(
+  () => import('./homepage-tile/appointments-tile.component'),
+  options,
+);

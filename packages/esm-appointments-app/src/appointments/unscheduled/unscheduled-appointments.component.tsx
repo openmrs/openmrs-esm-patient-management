@@ -19,7 +19,7 @@ import {
 import { Download } from '@carbon/react/icons';
 import { ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
-import { downloadUnscheduledAppointments } from '../../helpers/excel';
+import { exportUnscheduledAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { getPageSizes, useSearchResults } from '../utils';
 import { type ConfigObject } from '../../config-schema';
@@ -99,7 +99,7 @@ const UnscheduledAppointments: React.FC = () => {
                   size="lg"
                   kind="tertiary"
                   renderIcon={Download}
-                  onClick={() => downloadUnscheduledAppointments(unscheduledAppointments)}>
+                  onClick={() => exportUnscheduledAppointmentsToSpreadsheet(unscheduledAppointments)}>
                   {t('download', 'Download')}
                 </Button>
               </TableToolbarContent>

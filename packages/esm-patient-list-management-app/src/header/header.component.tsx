@@ -36,6 +36,7 @@ const Header: React.FC = () => {
         </div>
         <Button
           className={styles.newListButton}
+          data-openmrs-role="New List"
           kind="ghost"
           iconDescription="Add"
           renderIcon={(props) => <Add {...props} size={16} />}

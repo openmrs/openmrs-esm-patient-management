@@ -1,18 +1,18 @@
-import { Tag } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import WardPatientCard from '../ward-patient-card/ward-patient-card';
+import { Tag } from '@carbon/react';
 import { type WardBedProps } from '../ward-view/ward-bed.component';
+import WardPatientCard from '../ward-patient-card/ward-patient-card.component';
 import styles from './occupied-bed.scss';
 
-const OccupiedBed: React.FC<WardBedProps> = ({ patientInfos, bed }) => {
+const OccupiedBed: React.FC<WardBedProps> = ({ wardPatients, bed }) => {
   return (
     <div className={styles.occupiedBed}>
-      {patientInfos.map(({ patient, visit }, index: number) => {
-        const last = index === patientInfos.length - 1;
+      {wardPatients.map((wardPatient, index: number) => {
+        const last = index === wardPatients.length - 1;
         return (
-          <div key={'occupied-bed-pt-' + patient.uuid}>
-            <WardPatientCard patient={patient} visit={visit} bed={bed} />
+          <div key={'occupied-bed-pt-' + wardPatient.patient.uuid}>
+            <WardPatientCard {...wardPatient} bed={bed} />
             {!last && <BedShareDivider />}
           </div>
         );

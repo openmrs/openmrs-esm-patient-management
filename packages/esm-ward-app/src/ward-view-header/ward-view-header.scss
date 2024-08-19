@@ -1,13 +1,8 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/type';
+@use '@carbon/layout';
 
 .wardViewHeader {
-  margin: spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
   display: flex;
   align-items: center;
-}
-
-.location {
-  @include type.type-style('heading-02');
-  flex-grow: 1;
+  justify-content: space-between;
 }

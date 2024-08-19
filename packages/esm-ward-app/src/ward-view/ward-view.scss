@@ -1,4 +1,4 @@
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
 
 .wardView {
   background-color: #e4e4e4;
@@ -9,30 +9,13 @@
   right: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 spacing.$spacing-05;
-}
-
-.wardViewHeader {
-  margin: spacing.$spacing-05 0;
-  display: flex;
-  align-items: center;
-  justify-content: end;
-}
-
-.wardViewHeaderLocationDisplay {
-  flex: 1;
-}
-
-.wardViewHeaderAdmissionRequestMenuBar {
-  background-color: black;
-  color: white;
-  padding: 4px 0 4px 12px;
+  padding: 0 layout.$spacing-05;
 }
 
 .wardViewMain {
   background-color: #e4e4e4;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   display: grid;
-  gap: spacing.$spacing-05;
-  padding: spacing.$spacing-05;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
 }

@@ -1,22 +1,30 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.defaultQueueTable {
+  margin: layout.$spacing-05;
+}
 
 .container {
-  background-color: $ui-01;
+  border: 1px solid colors.$gray-20;
 }
 
 .headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: layout.$spacing-05;
   background-color: $ui-background;
 }
 
 .headerButtons {
   display: flex;
-  flex-flow: column;
+  justify-content: space-between;
+  .filterSearch {
+    margin-left: layout.$spacing-05;
+  }
 }
 
 .filterContainer {
@@ -25,7 +33,7 @@
   }
 
   :global(.cds--list-box__menu-icon) {
-    height: 1rem;
+    height: layout.$spacing-05;
   }
 
   :global(.cds--dropdown--inline) :global(.cds--list-box__field) {
@@ -38,7 +46,7 @@
   align-items: center;
 
   svg {
-    margin-right: 0.5rem;
+    margin-right: layout.$spacing-03;
   }
 }
 
@@ -52,16 +60,21 @@
 }
 
 .statusTableContainer {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
+  background-color: $ui-01;
+}
+
+.statusTableHeader {
+  padding: layout.$spacing-03 0;
 }
 
 .tableHeader {
-  padding: 8px 0;
+  padding: layout.$spacing-03 0;
 }
 
 .tableContainer {
   background-color: $ui-01;
-  margin: 0 spacing.$spacing-05;
+  // margin: 0 layout.$spacing-05;
   padding: 0;
 
   a {
@@ -78,6 +91,7 @@
 
   .toolbarContainer {
     display: flex;
+    justify-content: space-between;
   }
 
   .toolbarContent {
@@ -109,12 +123,12 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 
   h4:after {
     content: '';
     display: block;
-    width: 2rem;
+    width: layout.$spacing-07;
     padding-top: 3px;
     border-bottom: 0.375rem solid var(--brand-03);
   }
@@ -122,11 +136,11 @@
 
 .expandedActiveVisitRow {
   :global(.cds--tab-content) {
-    padding: 0.5rem 0;
+    padding: layout.$spacing-03 0;
   }
 
   td {
-    padding: 0.5rem;
+    padding: layout.$spacing-03;
 
     > div {
       max-height: max-content !important;
@@ -135,7 +149,7 @@
   }
 
   th[colspan] td[colspan] > div:first-child {
-    padding: 0 1rem;
+    padding: 0 layout.$spacing-05;
   }
 }
 
@@ -144,7 +158,7 @@ html[dir='rtl'] {
   .headerContainer {
     svg {
       margin-left: 0;
-      margin-right: spacing.$spacing-03;
+      margin-right: layout.$spacing-03;
     }
     h4 {
       text-align: right;
@@ -158,10 +172,10 @@ html[dir='rtl'] {
       text-align: right;
       .serviceColor {
         margin-right: 0;
-        margin-left: spacing.$spacing-03;
+        margin-left: layout.$spacing-03;
       }
       button {
-        padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+        padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
         text-align: right;
       }
     }
@@ -169,14 +183,14 @@ html[dir='rtl'] {
 }
 
 .tabList {
-  padding-left: spacing.$spacing-05;
+  padding-left: layout.$spacing-05;
 }
 
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
-  margin: 0 spacing.$spacing-05;
+  padding: layout.$spacing-07 0;
+  // margin: 0 layout.$spacing-05;
 }
 
 .tile {

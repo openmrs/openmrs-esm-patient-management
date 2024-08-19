@@ -53,7 +53,7 @@ export function useAllAppointmentsByDate() {
   return {
     totalProviders: providersCount ? providersCount : 0,
     isLoading,
-    isError: error,
+    error,
     isValidating,
     mutate,
   };

@@ -1,6 +1,12 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.patientSearchContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .patientBannerContainer {
   display: flex;
@@ -16,14 +22,14 @@
 }
 
 .patientPhoto {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .backButton {
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: spacing.$spacing-03 0;
+  margin: layout.$spacing-03 0;
   padding: 0;
   @include type.type-style('body-compact-01');
 
@@ -32,8 +38,8 @@
 
     svg {
       order: 1;
-      margin-right: spacing.$spacing-03;
-      margin-left: 0rem !important;
+      margin-right: layout.$spacing-03;
+      margin-left: 0 !important;
     }
 
     span {

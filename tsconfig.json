@@ -1,29 +1,30 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "module": "esnext",
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "jsx": "react",
-    "skipLibCheck": true,
-    "moduleResolution": "node",
     "lib": [
       "dom",
-      "es5",
-      "scripthost",
-      "es2015",
       "es2015.promise",
+      "es2015",
       "es2016.array.include",
       "es2018",
       "es2020",
-      "es2021"
+      "es2021",
+      "es2022",
+      "es5",
+      "scripthost",
     ],
-    "resolveJsonModule": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "noEmit": true,
-    "target": "esnext",
     "paths": {
       "@openmrs/*": ["./node_modules/@openmrs/*"],
       "__mocks__": ["./__mocks__"],
       "tools": ["./tools"],
-    }
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "esnext",
   }
 }

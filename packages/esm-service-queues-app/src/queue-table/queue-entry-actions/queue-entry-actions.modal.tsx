@@ -1,3 +1,5 @@
+import React, { useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
@@ -18,16 +20,14 @@ import {
   TimePicker,
   TimePickerSelect,
 } from '@carbon/react';
-import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
-import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
 import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
-import styles from './queue-entry-actons-modal.scss';
+import styles from './queue-entry-actions-modal.scss';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -172,15 +172,35 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       });
   };
 
-  const isTimeInvalid = useMemo(() => {
+  // non-null if the selected date+time is invalid
+  const timeInvalidMessage = useMemo(() => {
     const now = new Date();
     const startAtDate = new Date(formState.transitionDate);
     const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
     startAtDate.setHours(hour, minute, 0, 0);
-    return startAtDate > now;
-  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat]);
 
-  const selectedPriorityIndex = priorities.findIndex((p) => p.uuid == formState.selectedPriority);
+    const previousQueueEntryStartTimeStr = queueEntry.previousQueueEntry?.startedAt;
+    const previousQueueEntryStartTime = previousQueueEntryStartTimeStr
+      ? new Date(previousQueueEntryStartTimeStr)
+      : null;
+
+    if (startAtDate > now) {
+      return t('timeCannotBeInFuture', 'Time cannot be in the future');
+    }
+    if (startAtDate <= previousQueueEntryStartTime) {
+      return t(
+        'timeCannotBePriorToPreviousQueueEntry',
+        'Time cannot be before start of previous queue entry: {{time}}',
+        {
+          time: previousQueueEntryStartTime.toLocaleString(),
+          interpolation: { escapeValue: false },
+        },
+      );
+    }
+    return null;
+  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat, t]);
+
+  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
 
   return (
     <>
@@ -329,8 +349,8 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   onChange={(event) => setTransitionTime(event.target.value)}
                   pattern={time12HourFormatRegexPattern}
                   value={formState.transitionTime}
-                  invalid={isTimeInvalid}
-                  invalidText={t('timeCannotBeInFuture', 'Time cannot be in the future')}
+                  invalid={timeInvalidMessage != null}
+                  invalidText={timeInvalidMessage}
                   disabled={!formState.modifyDefaultTransitionDateTime}>
                   <TimePickerSelect
                     id="visitStartTimeSelect"

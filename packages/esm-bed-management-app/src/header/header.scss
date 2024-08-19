@@ -1,0 +1,72 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.header {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+  height: layout.$spacing-12;
+  background-color: colors.$white-0;
+  display: flex;
+  padding-left: layout.$spacing-03;
+  justify-content: space-between;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.left-justified-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+
+.right-justified-items {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+  margin: layout.$spacing-03;
+  padding-top: layout.$spacing-04;
+}
+
+.page-name {
+  white-space: nowrap;
+  @include type.type-style('heading-04');
+}
+
+.page-labels {
+  margin: layout.$spacing-05;
+}
+
+.middot {
+  margin: 0 layout.$spacing-03;
+}
+
+.date-and-location {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: layout.$spacing-05;
+}
+
+.value {
+  margin-left: layout.$spacing-02;
+}
+
+.middot {
+  margin: 0 layout.$spacing-03;
+}
+
+.view {
+  @include type.type-style('label-01');
+}
+
+svg.iconOverrides {
+  width: 72 !important;
+  height: 72 !important;
+  fill: var(--brand-03);
+}
+
+.svgContainer svg {
+  width: 4.5rem;
+  height: 4.5rem;
+  fill: var(--brand-03);
+}

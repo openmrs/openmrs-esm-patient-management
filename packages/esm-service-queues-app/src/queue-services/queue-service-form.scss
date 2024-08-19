@@ -1,16 +1,16 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .heading {
   @include type.type-style('heading-compact-01');
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .warningContainer {
   background-color: $carbon--red-50;
-  padding: spacing.$spacing-04;
-  margin: spacing.$spacing-03 0 spacing.$spacing-03;
+  padding: layout.$spacing-04;
+  margin: layout.$spacing-03 0 layout.$spacing-03;
   display: flex;
   justify-content: space-between;
   .warning {
@@ -23,20 +23,20 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: var(--desktop-workspace-window-height);
+  height: 100%;
 }
 
 .grid {
-  margin: 0 spacing.$spacing-05;
-  padding: 0rem;
+  margin: 0 layout.$spacing-05;
+  padding: 0;
 }
 
 .input {
-  margin-top: spacing.$spacing-04;
+  margin-top: layout.$spacing-04;
 }
 
 .button {
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -44,18 +44,18 @@
 }
 
 .buttonSet {
-  padding: 0rem;
-  margin-top: spacing.$spacing-05;
+  padding: 0;
+  margin-top: layout.$spacing-05;
 }
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .form {
-    height: var(--tablet-workspace-window-height);
+    height: 100%;
   }
 
   .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
+    padding: layout.$spacing-06 layout.$spacing-05;
     background-color: $ui-02;
   }
 }

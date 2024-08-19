@@ -1,8 +1,11 @@
 import React from 'react';
+import { type Bed } from '../../types';
 import styles from '../ward-patient-card.scss';
-import { type WardPatientCardElement } from '../../types';
 
-const WardPatientBedNumber: WardPatientCardElement = ({ bed }) => {
+const WardPatientBedNumber: React.FC<{ bed: Bed }> = ({ bed }) => {
+  if (!bed) {
+    return <></>;
+  }
   return (
     <div className={styles.bedNumberBox}>
       <span className={styles.wardPatientBedNumber}>{bed.bedNumber}</span>

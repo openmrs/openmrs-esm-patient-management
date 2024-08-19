@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .searchResultsContainer {
   width: 100%;
@@ -13,7 +13,7 @@
 
 :global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
   padding: 0;
-  top: spacing.$spacing-09;
+  top: layout.$spacing-09;
 }
 
 .searchResults {
@@ -22,7 +22,7 @@
 }
 
 .loadingIcon {
-  padding: spacing.$spacing-05 0;
+  padding: layout.$spacing-05 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,8 +36,8 @@
 .resultsText {
   @include type.type-style('label-01');
   color: $text-02;
-  line-height: spacing.$spacing-05;
-  margin: spacing.$spacing-03 spacing.$spacing-05;
+  line-height: layout.$spacing-05;
+  margin: layout.$spacing-03 layout.$spacing-05;
 }
 
 .helperText {
@@ -48,14 +48,14 @@
 .emptyResultText {
   @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   margin-bottom: 0.313rem;
 }
 
 .actionText {
   @include type.type-style('body-01');
   color: $text-02;
-  margin: 0.5rem auto 0;
+  margin: layout.$spacing-03 auto 0;
   max-width: 13.75rem;
   text-align: center;
 }
@@ -63,23 +63,23 @@
 .pagination {
   display: flex;
   justify-content: space-evenly;
-  padding: 4.688rem 0 spacing.$spacing-06;
+  padding: 4.688rem 0 layout.$spacing-06;
 }
 
 .emptySearchResultsTile {
   text-align: center;
   margin: 0;
-  padding: spacing.$spacing-08 0;
+  padding: layout.$spacing-08 0;
 }
 
 .errorMessage {
   @include type.type-style('heading-compact-02');
   margin-top: 2.25rem;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
 }
 
 .errorCopy {
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   @include type.type-style('body-01');
   color: $text-02;
 }

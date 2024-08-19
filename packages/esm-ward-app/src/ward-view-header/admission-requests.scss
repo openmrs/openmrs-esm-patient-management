@@ -1,0 +1,37 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.admissionRequestsContainer {
+  background-color: $color-gray-70;
+  display: flex;
+  align-items: center;
+  padding: layout.$spacing-02 0 layout.$spacing-02 layout.$spacing-04;
+  background-color: #393939;
+
+  & > button {
+    color: #78a9ff;
+
+    svg {
+      fill: #78a9ff !important;
+    }
+  }
+
+  & > button:hover {
+    color: #78a9ff;
+  }
+}
+
+.movementIcon {
+  padding: layout.$spacing-02;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: $color-blue-60-2;
+  margin-right: layout.$spacing-03;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $ui-02;
+  margin-right: layout.$spacing-03;
+}

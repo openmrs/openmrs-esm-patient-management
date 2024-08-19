@@ -95,7 +95,7 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
   return (
-    <div className={styles.results}>
+    <div className={styles.results} data-openmrs-role="Search Results">
       {searchResults.map((patient, indx) => (
         <PatientBanner key={indx} patientUuid={patient.uuid} patient={patient} />
       ))}

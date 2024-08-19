@@ -40,7 +40,7 @@ describe('the select input', () => {
       </Formik>,
     );
 
-    await expect(screen.findByRole('combobox'));
+    await screen.findByRole('combobox');
 
     const selectInput = screen.getByRole('combobox', { name: 'Select (optional)' }) as HTMLSelectElement;
     expect(selectInput.labels).toHaveLength(1);

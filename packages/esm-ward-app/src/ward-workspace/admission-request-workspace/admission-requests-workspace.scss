@@ -1,0 +1,12 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.admissionRequestsWorkspace {
+  padding: layout.$spacing-04;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: layout.$spacing-05;
+}
+.content {
+  padding: layout.$spacing-05;
+}

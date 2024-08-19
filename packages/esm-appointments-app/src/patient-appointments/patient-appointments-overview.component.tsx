@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePatient, useLayoutType, isDesktop, WorkspaceOverlay } from '@openmrs/esm-framework';
+import { usePatient, useLayoutType, isDesktop, WorkspaceContainer } from '@openmrs/esm-framework';
 import PatientAppointmentsBase from './patient-appointments-base.component';
 import { useParams } from 'react-router-dom';
 import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
@@ -26,7 +26,7 @@ const PatientAppointmentsOverview: React.FC = () => {
       <div className={styles.patientAppointmentsOverview}>
         <PatientAppointmentsHeader patient={response.patient} />
         <PatientAppointmentsBase patientUuid={response.patient.id} />
-        <WorkspaceOverlay contextKey={`patient/${params.patientUuid}`} />
+        <WorkspaceContainer overlay contextKey={`patient/${params.patientUuid}`} />
       </div>
     </PatientAppointmentContext.Provider>
   );

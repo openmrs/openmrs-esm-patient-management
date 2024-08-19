@@ -1,17 +1,17 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .section {
-  margin: spacing.$spacing-03;
+  margin: layout.$spacing-03;
 }
 
 .sectionTitle {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: spacing.$spacing-04;
+  margin-bottom: layout.$spacing-04;
 }
 
 .checkbox {
-  padding-top: spacing.$spacing-04;
+  padding-top: layout.$spacing-04;
 }

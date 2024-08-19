@@ -2,13 +2,11 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { showModal } from '@openmrs/esm-framework';
+import { mockPatient } from '__mocks__';
 import AddPatientToPatientListMenuItem from './add-patient-to-patient-list-menu-item.component';
 
-const mockedShowModal = showModal as jest.Mock;
-
-jest.mock('@openmrs/esm-framework');
-
-const patientUuid = '6baa7963-68ea-497e-b258-6fb82382bd07';
+const patientUuid = mockPatient.uuid;
+const mockShowModal = jest.mocked(showModal);
 
 describe('AddPatientToPatientListMenuItem', () => {
   it('renders the button with the correct title', () => {
@@ -28,6 +26,6 @@ describe('AddPatientToPatientListMenuItem', () => {
 
     await user.click(button);
 
-    expect(mockedShowModal).toHaveBeenCalledWith('add-patient-to-patient-list-modal', expect.any(Object));
+    expect(mockShowModal).toHaveBeenCalledWith('add-patient-to-patient-list-modal', expect.any(Object));
   });
 });

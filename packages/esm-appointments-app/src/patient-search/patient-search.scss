@@ -1,23 +1,24 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .padded {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
-[data-extension-id='patient-search-bar'] {
-  & > div {
-    width: 100%;
+.searchBarWrapper {
+  [data-extension-id='patient-search-bar'] {
+    & > div {
+      width: 100%;
 
-    & input {
-      background-color: $ui-02;
-      border-bottom: none;
-      min-height: spacing.$spacing-09;
-    }
+      & input {
+        background-color: $ui-02;
+        border-bottom: none;
+        min-height: layout.$spacing-09;
+      }
 
-    & button {
-      height: spacing.$spacing-09;
+      & button {
+        height: layout.$spacing-09;
+      }
     }
   }
 }

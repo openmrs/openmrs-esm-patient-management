@@ -1,15 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { isDesktop } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, isDesktop, useConfig } from '@openmrs/esm-framework';
+import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchPageComponent from './patient-search-page.component';
 
-const mockIsDesktop = isDesktop as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  isDesktop: jest.fn(),
-  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
-}));
+const mockIsDesktop = jest.mocked(isDesktop);
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -25,8 +21,15 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe('PatientSearchPageComponent', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      search: {
+        disableTabletSearchOnKeyUp: false,
+        patientResultUrl: configSchema.search.patientResultUrl._default,
+        showRecentlySearchedPatients: false,
+      },
+    });
   });
 
   it('should render advanced search component on desktop layout', () => {
@@ -42,7 +45,6 @@ describe('PatientSearchPageComponent', () => {
 
   it('should render patient search overlay on tablet layout', () => {
     mockIsDesktop.mockReturnValue(false);
-
     render(<PatientSearchPageComponent />);
 
     const searchBtn = screen.getByRole('button', { name: 'Search' });

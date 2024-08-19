@@ -1,7 +1,13 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
 .layer {
   height: 100%;
 }
 
 .menuItem {
   max-width: none;
+}
+
+.text02 {
+  color: $text-02;
 }
