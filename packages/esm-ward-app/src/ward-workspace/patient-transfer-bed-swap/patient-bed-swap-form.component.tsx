@@ -13,13 +13,13 @@ import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import useWardLocation from '../../hooks/useWardLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import {
-  Form,
-  ButtonSet,
   Button,
-  RadioButtonGroup,
-  RadioButton,
-  RadioButtonSkeleton,
+  ButtonSet,
+  Form,
   InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
+  RadioButtonSkeleton,
 } from '@carbon/react';
 
 export default function PatientBedSwapForm({
@@ -131,7 +131,16 @@ export default function PatientBedSwapForm({
           setIsSubmitting(false);
         });
     },
-    [setShowErrorNotifications, patient, emrConfiguration, currentProvider, location, beds],
+    [
+      setShowErrorNotifications,
+      patient,
+      emrConfiguration,
+      currentProvider,
+      location,
+      beds,
+      mutateAdmissionLocation,
+      mutateInpatientRequest,
+    ],
   );
 
   const onError = useCallback(() => {
