@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
@@ -31,29 +30,28 @@ test('Register a new patient', async ({ page, api }) => {
     await patientRegistrationPage.waitUntilTheFormIsLoaded();
   });
 
-  await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
+  await test.step('And then I fill the registration form and then click the `Submit` button', async () => {
     await patientRegistrationPage.fillPatientRegistrationForm(formValues);
   });
 
   await test.step("Then I should be redirected to the new patient's chart page and a new patient record should be created from the information captured in the form", async () => {
-    await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$'));
-    const patientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? null;
-    expect(patientUuid).not.toBeNull();
-
-    const patient = await getPatient(api, patientUuid);
-    const { person } = patient;
-    const { givenName, middleName, familyName, sex } = formValues;
-
-    expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
-    expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
-    expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(
-      `${formValues.birthdate.day}/${formValues.birthdate.month}/${formValues.birthdate.year}`,
-    );
-    expect(person.preferredAddress.address1).toBe(formValues.address1);
-    expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
-    expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
-    expect(person.preferredAddress.country).toBe(formValues.country);
-    expect(person.attributes[0].display).toBe(formValues.phone);
+    const patientChartUrlRegex = new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$');
+    await page.waitForURL(patientChartUrlRegex);
+    await expect(page).toHaveURL(patientChartUrlRegex);
+    await expect(page.getByText(/Johnny Donny Ronny/i)).toBeVisible();
+    await expect(page.getByText(/male/i)).toBeVisible();
+    await expect(page.getByText(/4 yrs, 6 mths/i)).toBeVisible();
+    await expect(page.getByText(/01 — Feb — 2020/i)).toBeVisible();
+    await expect(page.getByText(/OpenMRS ID/i)).toBeVisible();
+    await page.getByRole('button', { name: /show details/i }).click();
+    await expect(page.getByRole('button', { name: /hide details/i })).toBeVisible();
+    await expect(page.getByText(/^address$/i)).toBeVisible();
+    await expect(page.getByText(/address line 1: bom jesus street/i)).toBeVisible();
+    await expect(page.getByText(/city: recife/i)).toBeVisible();
+    await expect(page.getByText(/state: pernambuco/i)).toBeVisible();
+    await expect(page.getByText(/country: brazil/i)).toBeVisible();
+    await expect(page.getByText(/contact details/i)).toBeVisible();
+    await expect(page.getByText(/telephone number: 5555551234/i)).toBeVisible();
   });
 });
 
