@@ -45,6 +45,7 @@ test('Register a new patient', async ({ page }) => {
   });
 
   await test.step("And I should the newly registered patient's details displayed in the patient banner", async () => {
+    await page.getByRole('banner', { name: /patient banner/i }).waitFor({ timeout: 10000 });
     await expect(page.getByRole('banner', { name: /patient banner/i })).toBeVisible();
     await expect(page.getByText(/johnny donny ronny/i)).toBeVisible();
     await expect(page.getByText(/male/i)).toBeVisible();
