@@ -51,6 +51,7 @@ const WardViewMain = () => {
     loadMore: loadMoreInpatientAdmissions,
   } = useInpatientAdmission();
   const { t } = useTranslation();
+
   const inpatientAdmissionsByPatientUuid = useMemo(() => {
     const map = new Map<string, InpatientAdmission>();
     for (const inpatientAdmission of inpatientAdmissions ?? []) {
@@ -59,6 +60,7 @@ const WardViewMain = () => {
     return map;
   }, [inpatientAdmissions]);
 
+<<<<<<< HEAD
   const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
   useEffect(
     function scrollToLoadMore() {
@@ -73,6 +75,123 @@ const WardViewMain = () => {
           });
         },
         { threshold: 1 },
+=======
+  const allPatientsByPatientUuid = useMemo(() => {
+    const map = new Map<string, Patient>();
+    for(const inpatientAdmission of inpatientAdmissionsByPatientUuid.values()) {
+      map.set(inpatientAdmission.patient.uuid, inpatientAdmission.patient);
+    }
+    for(const bedLayout of admissionLocation?.bedLayouts ?? []) {
+      for(const patient of bedLayout.patients) {
+        map.set(patient.uuid, patient);
+      }
+    }
+
+    return map;
+  }, [admissionLocation, inpatientAdmissions]);
+  useDefineAppContext('ward', { allPatientsByPatientUuid });
+
+  if (admissionLocation != null || inpatientAdmissions != null) {
+    const bedLayouts = admissionLocation && filterBeds(admissionLocation);
+    // iterate over all beds
+    const wardBeds = bedLayouts?.map((bedLayout) => {
+      const { patients } = bedLayout;
+      const bed = bedLayoutToBed(bedLayout);
+      const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
+        const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
+        if (inpatientAdmission) {
+          const { patient, visit, currentInpatientRequest } = inpatientAdmission;
+          return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
+        } else {
+          // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
+          return {
+            patient: patient,
+            visit: null,
+            bed,
+            inpatientAdmission: null, // populate after BED-13
+            inpatientRequest: null,
+          };
+        }
+      });
+      return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
+    });
+
+    const patientsInBedsUuids = bedLayouts?.flatMap((bedLayout) => bedLayout.patients.map((patient) => patient.uuid));
+    const wardUnassignedPatients =
+      inpatientAdmissions &&
+      inpatientAdmissions
+        .filter(
+          (inpatientAdmission) =>
+            !patientsInBedsUuids || !patientsInBedsUuids.includes(inpatientAdmission.patient.uuid),
+        )
+        .map((inpatientAdmission) => {
+          return (
+            <UnassignedPatient
+              wardPatient={{
+                patient: inpatientAdmission.patient,
+                visit: inpatientAdmission.visit,
+                bed: null,
+                inpatientAdmission,
+                inpatientRequest: null,
+              }}
+              key={inpatientAdmission.patient.uuid}
+            />
+          );
+        });
+
+    return (
+      <>
+        {wardBeds}
+        {bedLayouts?.length == 0 && (
+          <InlineNotification
+            kind="warning"
+            lowContrast={true}
+            title={t('noBedsConfigured', 'No beds configured for this location')}
+          />
+        )}
+        {wardUnassignedPatients}
+      </>
+    );
+  } else if (isLoadingLocation || isLoadingPatients) {
+    return <EmptyBeds />;
+  } else if (errorLoadingLocation) {
+    return (
+      <InlineNotification
+        kind="error"
+        lowContrast={true}
+        title={t('errorLoadingWardLocation', 'Error loading ward location')}
+        subtitle={
+          errorLoadingLocation?.message ??
+          t('invalidWardLocation', 'Invalid ward location: {{location}}', { location: location.display })
+        }
+      />
+    );
+  } else {
+    return (
+      <InlineNotification
+        kind="error"
+        lowContrast={true}
+        title={t('errorLoadingPatients', 'Error loading admitted patients')}
+        subtitle={errorLoadingPatients?.message}
+      />
+    );
+  }
+};
+
+// display to use if not using bed management
+const WardViewWithoutBedManagement = () => {
+  const { inpatientAdmissions, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
+  const { t } = useTranslation();
+
+  if (inpatientAdmissions) {
+    const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
+      const { patient, visit } = inpatientAdmission;
+      return (
+        <UnassignedPatient
+          wardPatient={{ patient, visit, bed: null, inpatientAdmission, inpatientRequest: null }}
+          key={inpatientAdmission.patient.uuid}
+        />
+>>>>>>> 96acf200 (mother child stash)
       );
 
       if (scrollToLoadMoreTrigger.current) {

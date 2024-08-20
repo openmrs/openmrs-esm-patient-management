@@ -139,6 +139,16 @@ export interface InpatientAdmission {
   // the current in patient request
   currentInpatientRequest: InpatientRequest;
 }
+export interface WardAppContext {
+  allPatientsByPatientUuid: Map<string, Patient>;
+}
+
+export interface MotherAndChild {
+  mother: Patient;
+  child: Patient;
+  motherAdmission: InpatientAdmission;
+  childAdmission: InpatientAdmission;
+}
 
 // TODO: Move these types to esm-core
 export interface Observation extends OpenmrsResourceStrict {
