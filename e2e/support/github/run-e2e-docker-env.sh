@@ -20,7 +20,7 @@ do
   # run yarn pack for our app and add it to the working directory
   yarn workspace "$app" pack -o "$working_dir/$app_name.tgz" >/dev/null;
 done;
-echo "Created packed app archives" 
+echo "Created packed app archives"
 
 echo "Creating dynamic spa-assemble-config.json..."
 # dynamically assemble our list of frontend modules, prepending the login app and
@@ -29,7 +29,12 @@ echo "Creating dynamic spa-assemble-config.json..."
 jq -n \
   --arg apps "$apps" \
   --arg app_names "$(echo ${app_names[@]})" \
-  '{"@openmrs/esm-primary-navigation-app": "next", "@openmrs/esm-home-app": "next", "@openmrs/esm-patient-chart-app": "next"} + (
+  '{
+    "@openmrs/esm-primary-navigation-app": "next",
+    "@openmrs/esm-home-app": "next",
+    "@openmrs/esm-patient-chart-app": "next",
+    "@openmrs/esm-patient-banner-app": "next"
+  } + (
     ($apps | split("\n")) as $apps | ($app_names | split(" ") | map("/app/" + .)) as $app_files
     | [$apps, $app_files]
     | transpose
