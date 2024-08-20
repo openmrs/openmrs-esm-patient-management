@@ -126,7 +126,8 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
                 />
               </div>
               <div className={styles.demographics}>
-                {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
+                {getGender(patient.gender)} <span className={styles.middot}>&middot;</span>{' '}
+                {patient?.birthDate && age(patient.birthDate)}
                 <span className={styles.middot}>&middot;</span>
                 {patientIdentifiers.map((identifier) => (
                   <IdentifierTag key={identifier.uuid} identifier={identifier} />
