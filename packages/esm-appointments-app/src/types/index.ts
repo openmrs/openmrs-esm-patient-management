@@ -27,7 +27,6 @@ export enum AppointmentKind {
   WALKIN = 'WalkIn',
   VIRTUAL = 'Virtual',
 }
-
 // TODO: remove interface elements that aren't actually present on the Appointment object returned from the Appointment API
 export interface Appointment {
   appointmentKind: AppointmentKind;

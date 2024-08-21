@@ -25,7 +25,7 @@ interface WardPatientCodedObsTagsProps {
  * @returns
  */
 const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ config, patient, visit }) => {
-  const { conceptUuid, summaryLabel, summaryLabelColor, summaryLabelI18nModule } = config;
+  const { conceptUuid, summaryLabel, summaryLabelColor } = config;
   const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
   const { t } = useTranslation();
   const { data: conceptToTagColorMap } = useConceptToTagColorMap(config.tags);
@@ -38,10 +38,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
       return matchVisit || visit == null; // TODO: remove visit == null hack when server API supports returning visit
     });
 
-    const summaryLabelToDisplay =
-      summaryLabel != null
-        ? translateFrom(summaryLabelI18nModule ?? moduleName, summaryLabel)
-        : obsToDisplay?.[0]?.concept?.display;
+    const summaryLabelToDisplay = summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;
 
     const obsNodes = obsToDisplay?.map((o) => {
       const { display, uuid } = o.value as OpenmrsResource;

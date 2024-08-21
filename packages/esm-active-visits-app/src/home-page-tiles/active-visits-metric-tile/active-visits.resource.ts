@@ -21,7 +21,7 @@ export default function useActiveVisits() {
   const { data, error, isLoading } = useSWR<{ data: { totalCount: number } }>(getUrl, openmrsFetch);
 
   return {
-    count: data?.data.totalCount,
+    count: data?.data?.totalCount,
     error,
     isLoading,
   };

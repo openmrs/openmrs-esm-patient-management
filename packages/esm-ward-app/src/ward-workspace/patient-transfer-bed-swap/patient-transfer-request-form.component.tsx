@@ -12,8 +12,8 @@ import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
 import type { ObsPayload, WardPatientWorkspaceProps } from '../../types';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
-import { Form, ButtonSet, Button, TextArea, InlineNotification, RadioButtonGroup, RadioButton } from '@carbon/react';
 import classNames from 'classnames';
+import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,
@@ -103,7 +103,7 @@ export default function PatientTransferForm({
       }
 
       createEncounter({
-        patient: patient.uuid,
+        patient: patient?.uuid,
         encounterType: emrConfiguration.visitNoteEncounterType.uuid,
         location: location.uuid,
         encounterProviders: [
@@ -142,7 +142,7 @@ export default function PatientTransferForm({
       currentProvider,
       location,
       emrConfiguration,
-      patient.uuid,
+      patient?.uuid,
       dispositionsWithTypeTransfer,
       mutateAdmissionLocation,
       mutateInpatientRequest,
@@ -232,7 +232,7 @@ export default function PatientTransferForm({
         <Button
           type="submit"
           size="xl"
-          disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration}>
+          disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !patient}>
           {t('save', 'Save')}
         </Button>
       </ButtonSet>
