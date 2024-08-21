@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Column, Dropdown, DropdownSkeleton, Form, InlineNotification, Row } from '@carbon/react';
 import { showSnackbar, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout, DispositionType } from '../../types';
+import type { BedLayout } from '../../types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
@@ -157,7 +157,17 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
           setIsSubmitting(false);
         });
     },
-    [beds, patient, emrConfiguration, location, closeWorkspaceWithSavedChanges, dispositionType, currentProvider],
+    [
+      beds,
+      patient,
+      emrConfiguration,
+      location,
+      closeWorkspaceWithSavedChanges,
+      dispositionType,
+      currentProvider,
+      mutateAdmissionLocation,
+      mutateInpatientRequest,
+    ],
   );
 
   const onError = useCallback((values) => {
