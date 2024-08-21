@@ -48,8 +48,8 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
     })
       .then((response) => {
         if (response?.ok) {
-          if (wardPatient?.bed.id) {
-            return removePatientFromBed(wardPatient?.bed.id, wardPatient?.patient?.uuid);
+          if (wardPatient?.bed?.id) {
+            return removePatientFromBed(wardPatient.bed.id, wardPatient?.patient?.uuid);
           }
           return response;
         }
@@ -57,7 +57,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
       .then((response) => {
         if (response?.ok) {
           showSnackbar({
-            title: t('patientTransferRequestCreated', 'Patient was discharged'),
+            title: t('patientWasDischarged', 'Patient was discharged'),
             kind: 'success',
           });
           closeWorkspaceWithSavedChanges();
@@ -111,7 +111,9 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
             size="sm"
             kind="ghost"
             renderIcon={(props) => <Exit size={16} {...props} />}
-            disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient}
+            disabled={
+              isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient?.patient
+            }
             onClick={submitDischarge}>
             {t('proceedWithPatientDischarge', 'Proceed with patient discharge')}
           </Button>

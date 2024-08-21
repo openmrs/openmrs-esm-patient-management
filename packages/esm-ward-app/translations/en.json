@@ -48,6 +48,7 @@
   "patientNoteSaveError": "Error saving patient note",
   "patientNotesDidntLoad": "Patient notes didn't load",
   "patientTransferRequestCreated": "Patient transfer request created",
+  "patientWasDischarged": "Patient was discharged",
   "pleaseSelectBed": "Please select a bed",
   "pleaseSelectTransferLocation": "Please select transfer location",
   "pleaseSelectTransferType": "Please select transfer type",
