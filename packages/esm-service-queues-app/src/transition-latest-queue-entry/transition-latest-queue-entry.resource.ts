@@ -1,7 +1,14 @@
-import { openmrsFetch, type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  type OpenmrsResource,
+  type Patient,
+  type Visit,
+} from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { type QueueEntry } from '../types';
+import { FetcherResponse } from 'swr/_internal';
 
 export function useLatestQueueEntry(patientUuid: string) {
   const customRepresentation =
@@ -9,20 +16,10 @@ export function useLatestQueueEntry(patientUuid: string) {
 
   const encodedRepresentation = encodeURIComponent(customRepresentation);
   const url = `/ws/rest/v1/queue-entry?v=${encodedRepresentation}&patient=${patientUuid}&isEnded=false`;
-
-  const fetcher = async (url: string) => {
-    const response = await openmrsFetch(url);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    return data;
-  };
-
-  const { data, error, isLoading, mutate } = useSWR<{ results: QueueEntry[] }>(url, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: QueueEntry[] }>>(url, openmrsFetch);
 
   const queueEntry =
-    data?.results.reduce((latestEntry, currentEntry) => {
+    data?.data?.results?.reduce((latestEntry, currentEntry) => {
       if (!latestEntry || new Date(currentEntry.startedAt) > new Date(latestEntry.startedAt)) {
         return currentEntry;
       }
