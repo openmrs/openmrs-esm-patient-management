@@ -6,7 +6,7 @@ import styles from './patient-discharge.scss';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import type { WardPatientWorkspaceProps } from '../../types';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import { createEncounter } from '../../ward.resource';
+import { createEncounter, removePatientFromBed } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
@@ -46,14 +46,24 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
       ],
       obs: [],
     })
-      .then(() => {
-        showSnackbar({
-          title: t('patientTransferRequestCreated', 'Patient was discharged'),
-          kind: 'success',
-        });
-        closeWorkspaceWithSavedChanges();
-        mutateAdmissionLocation();
-        mutateInpatientRequest();
+      .then((response) => {
+        if (response?.ok) {
+          if (wardPatient?.bed.id) {
+            return removePatientFromBed(wardPatient?.bed.id, wardPatient?.patient?.uuid);
+          }
+          return response;
+        }
+      })
+      .then((response) => {
+        if (response?.ok) {
+          showSnackbar({
+            title: t('patientTransferRequestCreated', 'Patient was discharged'),
+            kind: 'success',
+          });
+          closeWorkspaceWithSavedChanges();
+          mutateAdmissionLocation();
+          mutateInpatientRequest();
+        }
       })
       .catch((err: Error) => {
         showSnackbar({
@@ -68,6 +78,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
     location,
     emrConfiguration,
     wardPatient?.patient?.uuid,
+    wardPatient?.bed?.uuid,
     mutateAdmissionLocation,
     mutateInpatientRequest,
   ]);
@@ -100,9 +111,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
             size="sm"
             kind="ghost"
             renderIcon={(props) => <Exit size={16} {...props} />}
-            disabled={
-              isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient?.patient
-            }
+            disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient}
             onClick={submitDischarge}>
             {t('proceedWithPatientDischarge', 'Proceed with patient discharge')}
           </Button>
