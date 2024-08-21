@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ExtensionSlot, showSnackbar, useFeatureFlag, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, showSnackbar, useSession } from '@openmrs/esm-framework';
 import { Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-discharge.scss';
@@ -12,19 +12,10 @@ import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import { Exit } from '@carbon/react/icons';
 
-const DischargeTypes = {
-  MEDICAL: 'medical',
-  AGAINST_ADVICE: 'against-advice',
-  ABSCONDED: 'absconded',
-} as const;
-
-type DischargeTypeValues = (typeof DischargeTypes)[keyof typeof DischargeTypes];
-
 export default function PatientDischargeWorkspace(props: WardPatientWorkspaceProps) {
   const { wardPatient, closeWorkspaceWithSavedChanges } = props;
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
