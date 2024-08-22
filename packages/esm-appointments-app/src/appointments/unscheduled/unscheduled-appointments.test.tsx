@@ -5,10 +5,10 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { getByTextWithMarkup } from 'tools';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
-import { downloadUnscheduledAppointments } from '../../helpers/excel';
+import { exportUnscheduledAppointmentsToSpreadsheet } from '../../helpers/excel';
 import UnscheduledAppointments from './unscheduled-appointments.component';
 
-const mockDownloadAppointmentsAsExcel = jest.mocked(downloadUnscheduledAppointments);
+const mockExportUnscheduledAppointmentsToSpreadsheet = jest.mocked(exportUnscheduledAppointmentsToSpreadsheet);
 const mockUseUnscheduledAppointments = jest.mocked(useUnscheduledAppointments);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
@@ -113,7 +113,7 @@ describe('UnscheduledAppointments', () => {
     const downloadButton = await screen.findByText('Download');
     expect(downloadButton).toBeInTheDocument();
     await user.click(downloadButton);
-    expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(mockUnscheduledAppointments);
+    expect(mockExportUnscheduledAppointmentsToSpreadsheet).toHaveBeenCalledWith(mockUnscheduledAppointments);
   });
 
   it('renders a message if there are no unscheduled appointments', async () => {

@@ -1,23 +1,13 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import type { Encounter } from './types';
+import type { Encounter, EncounterPayload } from './types';
 
-export function createEncounter(
-  patientUuid: string,
-  encounterTypeUuid: string,
-  encounterLocation: string,
-  encounterDetails: object = {},
-) {
+export function createEncounter(encounterPayload: EncounterPayload) {
   return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: {
-      ...encounterDetails,
-      patient: patientUuid,
-      encounterType: encounterTypeUuid,
-      location: encounterLocation,
-    },
+    body: encounterPayload,
   });
 }
 
@@ -31,5 +21,11 @@ export function assignPatientToBed(bedUuid: number, patientUuid: string, encount
       patientUuid,
       encounterUuid,
     },
+  });
+}
+
+export function removePatientFromBed(bedId: number, patientUuid: string) {
+  return openmrsFetch(`${restBaseUrl}/beds/${bedId}?patientUuid=${patientUuid}`, {
+    method: 'DELETE',
   });
 }

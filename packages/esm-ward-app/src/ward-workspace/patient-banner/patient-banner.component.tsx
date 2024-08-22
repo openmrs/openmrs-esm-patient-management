@@ -6,13 +6,12 @@ import styles from './style.scss';
 import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-patient-bed-number';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
 
-const WardPatientWorkspaceBanner = (props: WardPatient) => {
+const WardPatientWorkspaceBanner = (wardPatient: WardPatient) => {
   const { headerRowElements } = useCurrentWardCardConfig();
-  const { patient, bed, visit, firstAdmissionOrTransferEncounter, encounterAssigningToCurrentInpatientLocation } =
-    props;
+  const { patient, bed } = wardPatient;
 
-  if (!(patient && visit)) {
-    console.warn('Patient details and visit details were not received by the workspace');
+  if (!patient) {
+    console.warn('Patient details were not received by the ward workspace');
     return null;
   }
 
@@ -21,14 +20,7 @@ const WardPatientWorkspaceBanner = (props: WardPatient) => {
       {bed ? <WardPatientBedNumber bed={bed} /> : null}
       <WardPatientName patient={patient} />
       {headerRowElements.map((elementId, i) => (
-        <WardPatientCardElement
-          key={`ward-card-${patient.uuid}-header-${i}`}
-          elementId={elementId}
-          patient={patient}
-          visit={visit}
-          firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter}
-          encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
-        />
+        <WardPatientCardElement key={`ward-card-${patient.uuid}-header-${i}`} elementId={elementId} {...wardPatient} />
       ))}
     </div>
   );

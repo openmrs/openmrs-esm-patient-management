@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .visitContainer {
   background-color: $ui-background;
@@ -30,5 +30,5 @@
 }
 
 .wrapper {
-  margin: spacing.$spacing-03;
+  margin: layout.$spacing-03;
 }

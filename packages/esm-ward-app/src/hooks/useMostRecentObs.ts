@@ -16,10 +16,10 @@ export function useMostRecentObs(criteria?: ObsSearchCriteria, representation = 
 
   const apiUrl = `${restBaseUrl}/obs?${params}`;
 
-  const { data, ...rest } = useSWR<{ data: { results: Array<Observation>; totalCount: number; links: Array<Link> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const { data, ...rest } = useSWR<
+    { data: { results: Array<Observation>; totalCount: number; links: Array<Link> } },
+    Error
+  >(apiUrl, openmrsFetch);
 
   const obs = data?.data?.results?.[0];
 

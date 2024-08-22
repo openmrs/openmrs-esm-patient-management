@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../../patient-registration.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .labelText {
   @include type.type-style('label-01');
@@ -11,7 +11,7 @@
 }
 
 .searchBox {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .relationshipHeader {

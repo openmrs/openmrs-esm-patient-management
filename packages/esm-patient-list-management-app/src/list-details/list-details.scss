@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../style.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   display: flex;
@@ -13,7 +13,7 @@
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid $ui-03;
-  padding: spacing.$spacing-04 spacing.$spacing-05;
+  padding: layout.$spacing-04 layout.$spacing-05;
   padding-right: 0;
   background-color: $ui-01;
 }
@@ -21,11 +21,11 @@
 .overflowMenu {
   display: flex;
   align-items: flex-start;
-  margin-top: spacing.$spacing-04;
+  margin-top: layout.$spacing-04;
 }
 
 .marginTop {
-  margin-top: spacing.$spacing-03;
+  margin-top: layout.$spacing-03;
 }
 
 .menuItem {
@@ -38,10 +38,30 @@
 }
 
 .tableContainer {
-  padding: 0 spacing.$spacing-05 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05 layout.$spacing-05;
   height: calc(100vh - 11rem);
 }
 
 .menuItem {
   max-width: none;
+}
+
+.productiveHeading03 {
+  @include type.type-style('heading-03');
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
+}
+
+.text02 {
+  color: $text-02;
+}
+
+.label01 {
+  @include type.type-style('label-01');
 }

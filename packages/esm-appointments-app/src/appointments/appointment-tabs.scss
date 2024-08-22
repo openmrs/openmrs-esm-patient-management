@@ -1,10 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
-@import '../root.scss';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .appointmentList {
-  margin: 1rem;
+  margin: layout.$spacing-05;
 
   & > div {
     background-color: $ui-02;
@@ -30,19 +29,19 @@
 
 .tabPanel {
   padding: 0;
-  margin: 1rem;
+  margin: layout.$spacing-05;
 }
 
 .calendarButton {
   float: right;
   position: absolute;
   right: 0;
-  height: spacing.$spacing-09;
+  height: layout.$spacing-09;
   min-height: 0;
 }
 
 .downloadButton {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   & > button {
     border: 1px solid colors.$blue-60;
   }

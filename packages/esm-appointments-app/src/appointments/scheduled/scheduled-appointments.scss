@@ -1,4 +1,6 @@
+@use '@carbon/layout';
+
 .switcher {
-  margin: 1rem 0;
+  margin: layout.$spacing-05 0;
   max-width: 70%;
 }

@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import type { Appointment, AppointmentKind, AppointmentStatus } from '../../types';
-import { downloadAppointmentsAsExcel } from '../../helpers/excel';
+import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { getByTextWithMarkup } from 'tools';
 import AppointmentsTable from './appointments-table.component';
 
@@ -61,7 +61,7 @@ const mockAppointments = [
   },
 ] as unknown as Array<Appointment>;
 
-const mockDownloadAppointmentsAsExcel = jest.mocked(downloadAppointmentsAsExcel);
+const mockExportAppointmentsToSpreadsheet = jest.mocked(exportAppointmentsToSpreadsheet);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../../helpers/excel');
@@ -122,7 +122,7 @@ describe('AppointmentsTable', () => {
     const downloadButton = screen.getByRole('button', { name: /download/i });
     await user.click(downloadButton);
     expect(downloadButton).toBeInTheDocument();
-    expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(mockAppointments, expect.anything());
+    expect(mockExportAppointmentsToSpreadsheet).toHaveBeenCalledWith(mockAppointments, expect.anything());
   });
 });
 

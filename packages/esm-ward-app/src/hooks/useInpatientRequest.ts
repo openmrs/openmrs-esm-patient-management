@@ -11,7 +11,8 @@ const defaultRep =
     'dispositionType,' +
     'disposition,' +
     'dispositionEncounter:full,' +
-    'patient:default,' +
+    'patient:(uuid,identifiers,voided,' +
+      'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)),' + 
     'dispositionObsGroup,' +
     'visit)';
 

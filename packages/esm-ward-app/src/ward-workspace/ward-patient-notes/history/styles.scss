@@ -1,10 +1,9 @@
 @use '@carbon/layout';
-@use '@carbon/colors';
-@import '@carbon/styles/scss/type';
-@import '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .notesContainer {
   margin: layout.$spacing-04;
+  padding-bottom: layout.$spacing-04;
 }
 
 .notesContainerHeader {

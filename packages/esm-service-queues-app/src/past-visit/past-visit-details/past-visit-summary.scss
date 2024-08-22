@@ -1,9 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .medicationContainer {
-  margin-bottom: spacing.$spacing-06;
+  margin-bottom: layout.$spacing-06;
 }
 
 .medicationRecord {
@@ -28,7 +28,7 @@
 
 .dosage {
   @include type.type-style('heading-compact-01');
-  margin-left: spacing.$spacing-03;
+  margin-left: layout.$spacing-03;
 }
 
 .date {
@@ -39,13 +39,13 @@
 .metadata {
   @include type.type-style('label-01');
   color: $text-02;
-  margin: spacing.$spacing-02 0;
+  margin: layout.$spacing-02 0;
 }
 
 .label01 {
   @include type.type-style('label-01');
   color: $text-02;
-  margin: spacing.$spacing-02 0;
+  margin: layout.$spacing-02 0;
 }
 
 .notesSubHeading {
@@ -54,5 +54,5 @@
 }
 
 .notesContainer {
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }

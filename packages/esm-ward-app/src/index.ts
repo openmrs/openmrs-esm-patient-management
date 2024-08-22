@@ -7,12 +7,11 @@ import {
   registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import rootComponent from './root.component';
+import { admissionRequestNoteRowConfigSchema } from './config-schema-admission-request-note';
+import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-colored-obs-tags';
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
-import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-colored-obs-tags';
-import WardPatientActionButton from './ward-patient-workspace/ward-patient-action-button.extension';
-import ColoredObsTagsCardRowExtension from './ward-patient-card/colored-obs-tags-card-row/colored-obs-tags-card-row.extension';
+import rootComponent from './root.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -38,7 +37,7 @@ export const admitPatientFormWorkspace = getAsyncLifecycle(
 
 // Title for this workspace is set dynamically
 export const wardPatientWorkspace = getAsyncLifecycle(
-  () => import('./ward-patient-workspace/ward-patient.workspace'),
+  () => import('./ward-workspace/patient-details/ward-patient.workspace'),
   options,
 );
 
@@ -49,7 +48,7 @@ export const wardPatientNotesWorkspace = getAsyncLifecycle(
 );
 
 export const wardPatientActionButtonExtension = getAsyncLifecycle(
-  () => import('./ward-patient-workspace/ward-patient-action-button.extension'),
+  () => import('./ward-workspace/patient-details/ward-patient-action-button.extension'),
   options,
 );
 
@@ -58,12 +57,44 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
-export const coloredObsTagCardRowExtension = getSyncLifecycle(ColoredObsTagsCardRowExtension, options);
+export const coloredObsTagCardRowExtension = getAsyncLifecycle(
+  () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
+  options,
+);
+
+export const admissionRequestNoteRowExtension = getAsyncLifecycle(
+  () => import('./ward-patient-card/card-rows/admission-request-note.extension'),
+  options,
+);
+
+// t('transfers', 'Transfers')
+export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-transfer-bed-swap/patient-transfer-swap.workspace'),
+  options,
+);
+
+// t('discharge', 'Discharge')
+export const patientDischargeWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-discharge/patient-discharge.workspace'),
+  options,
+);
+
+export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/transfer-workspace-siderail.component'),
+  options,
+);
+
+export const patientDischargeWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/discharge-workspace-siderail.component'),
+  options,
+);
 
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
   defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
+  defineExtensionConfigSchema('admission-request-note-card-row', admissionRequestNoteRowConfigSchema);
+
   registerFeatureFlag(
     'bedmanagement-module',
     'Bed Management Module',

@@ -1,7 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wardPatientCard {
   @include type.type-style('body-compact-01');
@@ -10,7 +10,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: spacing.$spacing-02;
+  gap: layout.$spacing-02;
   background-color: $ui-02;
 
   position: relative; // this allows positioning the button correctly
@@ -58,7 +58,7 @@
 
 .wardPatientCardRow {
   width: 100%;
-  padding: spacing.$spacing-04;
+  padding: layout.$spacing-04;
 }
 
 .wardPatientCardRow:empty {
@@ -79,6 +79,21 @@
   flex-wrap: wrap;
 }
 
+.wardPatientCardPendingItemsRow {
+  @extend .wardPatientCardRow;
+  display: flex;
+  align-items: center;
+  flex-flow: row;
+  color: $ui-02;
+  background-color: colors.$gray-80;
+}
+
+.wardPatientCardDispositionTypeContainer {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
 .wardPatientName {
   @include type.type-style('heading-compact-02');
   color: $text-02;
@@ -93,9 +108,9 @@
   border-radius: 50%;
   color: $ui-02;
   background-color: $color-blue-60-2;
-  padding: spacing.$spacing-04;
-  width: spacing.$spacing-04;
-  height: spacing.$spacing-04;
+  padding: layout.$spacing-04;
+  width: layout.$spacing-04;
+  height: layout.$spacing-04;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -112,16 +127,25 @@
   align-items: center;
 }
 
+.movementIcon {
+  padding: layout.$spacing-02;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: $color-blue-60-2;
+  margin-left: layout.$spacing-03;
+  margin-right: layout.$spacing-02;
+}
+
 .wardPatientAddress {
   @extend .dotSeparatedChildren;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: spacing.$spacing-02;
+  gap: layout.$spacing-02;
 }
 
 .wardPatientObsLabel {
-  padding-right: spacing.$spacing-02;
+  padding-right: layout.$spacing-02;
 }
 
 .dotSeparatedChildren {
@@ -131,7 +155,7 @@
 
     &::before {
       content: '·';
-      padding: 0 spacing.$spacing-02;
+      padding: 0 layout.$spacing-02;
     }
   }
 }

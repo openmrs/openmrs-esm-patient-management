@@ -1,11 +1,11 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '../style.scss';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .patientListHeader {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  height: spacing.$spacing-12;
+  height: layout.$spacing-12;
   display: flex;
   justify-content: space-between;
 }
@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   color: $text-02;
-  padding: 1rem 0;
+  padding: layout.$spacing-05 0;
   justify-content: space-between;
 }
 
@@ -29,10 +29,10 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 1rem;
+  margin-right: layout.$spacing-05;
 
   svg {
-    margin-right: 0.5rem;
+    margin-right: layout.$spacing-03;
   }
 }
 
@@ -42,7 +42,7 @@
 
 .pageLabels {
   p:first-of-type {
-    margin-bottom: 0.25rem;
+    margin-bottom: layout.$spacing-02;
   }
 }
 

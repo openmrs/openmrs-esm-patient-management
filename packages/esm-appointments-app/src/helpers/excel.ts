@@ -1,21 +1,37 @@
-import { formatDate } from '@openmrs/esm-framework';
 import * as XLSX from 'xlsx';
+import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
+import { type ConfigObject } from '../config-schema';
+import { moduleName } from '../constants';
 
 /**
- * Downloads the provided appointments as an Excel file.
- * @param {Array<Appointment>} appointments - The list of appointments to download.
+ * Exports the provided appointments as an Excel spreadsheet.
+ * @param {Array<Appointment>} appointments - The list of appointments to export.
  * @param {string} [fileName] - The name of the downloaded file
  */
-export function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
-  const appointmentsJSON = appointments?.map((appointment: Appointment) => ({
-    'Patient name': appointment.patient.name,
-    Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
-    Age: appointment.patient.age,
-    Identifier: appointment.patient.identifier ?? '--',
-    'Appointment type': appointment.service?.name,
-    Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-  }));
+export async function exportAppointmentsToSpreadsheet(appointments: Array<Appointment>, fileName = 'Appointments') {
+  const config = await getConfig<ConfigObject>(moduleName);
+  const includePhoneNumbers = config.includePhoneNumberInExcelSpreadsheet ?? false;
+
+  const appointmentsJSON = await Promise.all(
+    appointments.map(async (appointment: Appointment) => {
+      const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
+      const phoneNumber =
+        includePhoneNumbers && patientInfo?.telecom
+          ? patientInfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
+          : '';
+
+      return {
+        'Patient name': appointment.patient.name,
+        Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
+        Age: appointment.patient.age,
+        Identifier: appointment.patient.identifier ?? '--',
+        'Appointment type': appointment.service?.name,
+        Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
+        ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
+      };
+    }),
+  );
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
@@ -23,11 +39,11 @@ export function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fi
 }
 
 /**
-Downloads unscheduled appointments as an Excel file.
-@param {Array<Object>} unscheduledAppointments - The list of unscheduled appointments to download.
+Exports unscheduled appointments as an Excel spreadsheet.
+@param {Array<Object>} unscheduledAppointments - The list of unscheduled appointments to export.
 @param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
 */
-export function downloadUnscheduledAppointments(
+export function exportUnscheduledAppointmentsToSpreadsheet(
   unscheduledAppointments: Array<any>,
   fileName = `Unscheduled appointments ${formatDate(new Date(), { year: true, time: true })}`,
 ) {

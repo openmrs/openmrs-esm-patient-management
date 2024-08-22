@@ -1,8 +1,6 @@
-@use '@carbon/colors';
 @use '@carbon/type';
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
-@import '../../root.scss';
 
 .form {
   display: flex;
@@ -16,7 +14,7 @@
 }
 
 .formError {
-  margin: -1rem -1rem 1rem -1rem;
+  margin: (-(layout.$spacing-05)) (-(layout.$spacing-05)) layout.$spacing-05 (-(layout.$spacing-05));
 }
 
 .buttonSet button {
@@ -24,10 +22,14 @@
   width: 50% !important;
 }
 
-.BedSelectionDropdown {
+.bedSelectionDropdown {
   margin-top: layout.$spacing-03;
 }
 
 .errorNotifications {
   margin-top: layout.$spacing-05;
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
 }

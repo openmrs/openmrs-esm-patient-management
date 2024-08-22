@@ -1,35 +1,17 @@
-import React, { useMemo } from 'react';
-import { type Bed, type Encounter } from '../types';
-import { WardPatientCardElement } from './ward-patient-card-element.component';
-import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
-import styles from './ward-patient-card.scss';
-import { ExtensionSlot, getPatientName, launchWorkspace, type Patient, type Visit } from '@openmrs/esm-framework';
-import WardPatientName from './row-elements/ward-patient-name';
-import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
+import { ExtensionSlot, getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/types';
+import React from 'react';
+import { Hourglass } from '@carbon/react/icons';
+import { useCurrentWardCardConfig } from '../hooks/useCurrentWardCardConfig';
+import { type WardPatientCard, type WardPatientWorkspaceProps } from '../types';
+import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
+import WardPatientName from './row-elements/ward-patient-name';
+import { WardPatientCardElement } from './ward-patient-card-element.component';
+import styles from './ward-patient-card.scss';
+import WardPatientPendingTransfer from './row-elements/ward-patient-pending-transfer';
 
-export interface WardPatientCardProps {
-  patient: Patient;
-  visit: Visit;
-  bed?: Bed;
-  admitted: boolean;
-  encounterAssigningToCurrentInpatientLocation: Encounter;
-  firstAdmissionOrTransferEncounter: Encounter;
-}
-
-export interface WardPatientCardExtensionProps extends WardPatientCardProps {
-  patientUuid: string;
-}
-
-const WardPatientCard: React.FC<WardPatientCardProps> = ({
-  patient,
-  visit,
-  bed,
-  admitted,
-  firstAdmissionOrTransferEncounter,
-  encounterAssigningToCurrentInpatientLocation,
-}) => {
+const WardPatientCard: WardPatientCard = (wardPatient) => {
+  const { patient, bed } = wardPatient;
   const { id, headerRowElements, footerRowElements } = useCurrentWardCardConfig();
 
   const headerExtensionSlotName =
@@ -37,14 +19,6 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
   const rowsExtensionSlotName = id == 'default' ? 'ward-patient-card-slot' : `ward-patient-card-${id}-slot`;
   const footerExtensionSlotName =
     id == 'default' ? 'ward-patient-card-footer-slot' : `ward-patient-card-footer-${id}-slot`;
-
-  const extensionSlotState = useMemo(() => {
-    return {
-      patient,
-      visit,
-      bed,
-    };
-  }, [patient, visit, bed]);
 
   return (
     <div className={styles.wardPatientCard}>
@@ -55,17 +29,20 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
           <WardPatientCardElement
             key={`ward-card-${patient.uuid}-header-${i}`}
             elementId={elementId}
-            patient={patient}
-            visit={visit}
-            firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter}
-            encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
+            {...wardPatient}
           />
         ))}
-        <ExtensionSlot name={headerExtensionSlotName} state={extensionSlotState} />
+        <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
+      {wardPatient?.inpatientRequest ? (
+        <div className={styles.wardPatientCardPendingItemsRow}>
+          <Hourglass className={styles.hourGlassIcon} size="16" />:
+          <WardPatientPendingTransfer wardPatient={wardPatient} />
+        </div>
+      ) : null}
       <ExtensionSlot
         name={rowsExtensionSlotName}
-        state={extensionSlotState}
+        state={wardPatient}
         className={classNames(styles.wardPatientCardRow, styles.wardPatientCardExtensionSlot)}
       />
       <div className={styles.wardPatientCardRow}>
@@ -73,25 +50,16 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({
           <WardPatientCardElement
             key={`ward-card-${patient.uuid}-footer-${i}`}
             elementId={elementId}
-            patient={patient}
-            visit={visit}
-            firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter}
-            encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
+            {...wardPatient}
           />
         ))}
-        <ExtensionSlot name={footerExtensionSlotName} state={extensionSlotState} />
+        <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
       </div>
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
           launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
-            patientUuid: patient.uuid,
-            patient,
-            visit,
-            bed,
-            admitted,
-            firstAdmissionOrTransferEncounter,
-            encounterAssigningToCurrentInpatientLocation,
+            wardPatient,
           });
         }}>
         {/* Name will not be displayed; just there for a11y */}

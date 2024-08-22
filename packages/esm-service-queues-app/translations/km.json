@@ -275,6 +275,7 @@
   "ticketNumber": "Ticket number",
   "time": "ពេលវេលា",
   "timeCannotBeInFuture": "Time cannot be in the future",
+  "timeCannotBePriorToPreviousQueueEntry": "Time cannot be before start of previous queue entry: {{time}}",
   "timeOfTransition": "Time of transition",
   "tirageNotYetCompleted": "កន្លែងបែងចែកជំងឺដំបូងb មិនទាន់បានបញ្ចប់នៅឡើយ",
   "today": "ថ្ងៃនេះ",

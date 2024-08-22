@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { WorkspaceContainer, useFeatureFlag } from '@openmrs/esm-framework';
+import { useFeatureFlag, WorkspaceContainer } from '@openmrs/esm-framework';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
@@ -58,18 +58,19 @@ const WardViewWithBedManagement = () => {
     const wardBeds = bedLayouts?.map((bedLayout) => {
       const { patients } = bedLayout;
       const bed = bedLayoutToBed(bedLayout);
-      const wardPatients: WardPatient[] = patients.map((patient) => {
+      const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
         const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
         if (inpatientAdmission) {
-          return { ...inpatientAdmission, admitted: true };
+          const { patient, visit, currentInpatientRequest } = inpatientAdmission;
+          return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
         } else {
           // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
           return {
             patient: patient,
             visit: null,
-            admitted: false,
-            encounterAssigningToCurrentInpatientLocation: null, // populate after BED-13
-            firstAdmissionOrTransferEncounter: null,
+            bed,
+            inpatientAdmission: null, // populate after BED-13
+            inpatientRequest: null,
           };
         }
       });
@@ -90,9 +91,9 @@ const WardViewWithBedManagement = () => {
               wardPatient={{
                 patient: inpatientAdmission.patient,
                 visit: inpatientAdmission.visit,
-                admitted: true,
-                encounterAssigningToCurrentInpatientLocation: null,
-                firstAdmissionOrTransferEncounter: inpatientAdmission.firstAdmissionOrTransferEncounter,
+                bed: null,
+                inpatientAdmission,
+                inpatientRequest: null,
               }}
               key={inpatientAdmission.patient.uuid}
             />
@@ -145,9 +146,10 @@ const WardViewWithoutBedManagement = () => {
 
   if (inpatientAdmissions) {
     const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
+      const { patient, visit } = inpatientAdmission;
       return (
         <UnassignedPatient
-          wardPatient={{ ...inpatientAdmission, admitted: true }}
+          wardPatient={{ patient, visit, bed: null, inpatientAdmission, inpatientRequest: null }}
           key={inpatientAdmission.patient.uuid}
         />
       );

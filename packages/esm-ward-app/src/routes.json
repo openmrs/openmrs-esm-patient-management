@@ -44,6 +44,21 @@
       "component": "coloredObsTagCardRowExtension",
       "name": "colored-obs-tags-card-row",
       "slot": "ward-patient-card-slot"
+    },
+    {
+      "name": "transfer-swap-patient-siderail-button",
+      "slot": "action-menu-ward-patient-items-slot",
+      "component": "patientTransferAndSwapWorkspaceSiderailIcon"
+    },
+    {
+      "name": "patient-discharge-siderail-button",
+      "slot": "action-menu-ward-patient-items-slot",
+      "component": "patientDischargeWorkspaceSideRailIcon"
+    },
+    {
+      "component": "admissionRequestNoteRowExtension",
+      "name": "admission-request-note-card-row",
+      "slot": "ward-patient-card-slot"
     }
   ],
   "workspaces": [
@@ -73,6 +88,22 @@
       "type": "ward",
       "title": "Ward Patient",
       "width": "extra-wide",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "patient-transfer-swap-workspace",
+      "component": "patientTransferAndSwapWorkspace",
+      "title": "transfers",
+      "type": "transfer-swap-bed-form",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "patient-discharge-workspace",
+      "component": "patientDischargeWorkspace",
+      "title": "discharge",
+      "type": "ward-patient-discharge",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"
     }

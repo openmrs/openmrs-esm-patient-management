@@ -1,24 +1,14 @@
 import React from 'react';
-import styles from './admission-request-card.scss';
-import type { InpatientRequest } from '../../types';
-import AdmissionRequestCardHeader from './admission-request-card-header.component';
+import type { WardPatientCard } from '../../types';
 import AdmissionRequestCardActions from './admission-request-card-actions.component';
+import AdmissionRequestCardHeader from './admission-request-card-header.component';
+import styles from './admission-request-card.scss';
 
-interface AdmissionRequestCardProps extends InpatientRequest {}
-
-const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({
-  patient,
-  dispositionEncounter,
-  dispositionType,
-}) => {
+const AdmissionRequestCard: WardPatientCard = (wardPatient) => {
   return (
     <div className={styles.admissionRequestCard}>
-      <AdmissionRequestCardHeader patient={patient} dispositionEncounter={dispositionEncounter} />
-      <AdmissionRequestCardActions
-        patient={patient}
-        dispositionType={dispositionType}
-        dispositionEncounter={dispositionEncounter}
-      />
+      <AdmissionRequestCardHeader {...wardPatient} />
+      <AdmissionRequestCardActions {...wardPatient} />
     </div>
   );
 };

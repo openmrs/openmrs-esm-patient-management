@@ -1,20 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { showSnackbar, useFeatureFlag } from '@openmrs/esm-framework';
-import styles from './admit-patient-form.scss';
-import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
-import useWardLocation from '../../hooks/useWardLocation';
-import { useTranslation } from 'react-i18next';
-import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout, DispositionType } from '../../types';
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, Row, Column, DropdownSkeleton, Dropdown, ButtonSet, Button } from '@carbon/react';
-import { InlineNotification } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { Button, ButtonSet, Column, Dropdown, DropdownSkeleton, Form, InlineNotification, Row } from '@carbon/react';
+import { showSnackbar, useFeatureFlag, useSession } from '@openmrs/esm-framework';
+import { filterBeds } from '../../ward-view/ward-view.resource';
+import type { BedLayout } from '../../types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
+import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import useWardLocation from '../../hooks/useWardLocation';
 import type { AdmitPatientFormWorkspaceProps } from './types';
+import styles from './admit-patient-form.scss';
 
 const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   patient,
@@ -25,6 +24,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
 }) => {
   const { t } = useTranslation();
   const { location } = useWardLocation();
+  const { currentProvider } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
@@ -70,15 +70,23 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
       setShowErrorNotifications(false);
       setIsSubmitting(true);
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
-      createEncounter(
-        patient.uuid,
-        dispositionType === 'ADMIT'
-          ? emrConfiguration.admissionEncounterType.uuid
-          : dispositionType === 'TRANSFER'
-            ? emrConfiguration.transferWithinHospitalEncounterType.uuid
-            : null,
-        location?.uuid,
-      )
+      createEncounter({
+        patient: patient.uuid,
+        encounterType:
+          dispositionType === 'ADMIT'
+            ? emrConfiguration.admissionEncounterType.uuid
+            : dispositionType === 'TRANSFER'
+              ? emrConfiguration.transferWithinHospitalEncounterType.uuid
+              : null,
+        location: location?.uuid,
+        encounterProviders: [
+          {
+            provider: currentProvider?.uuid,
+            encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
+          },
+        ],
+        obs: [],
+      })
         .then(
           async (response) => {
             if (response.ok) {
@@ -149,7 +157,17 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
           setIsSubmitting(false);
         });
     },
-    [beds, patient, emrConfiguration, location, closeWorkspaceWithSavedChanges, dispositionType],
+    [
+      beds,
+      patient,
+      emrConfiguration,
+      location,
+      closeWorkspaceWithSavedChanges,
+      dispositionType,
+      currentProvider,
+      mutateAdmissionLocation,
+      mutateInpatientRequest,
+    ],
   );
 
   const onError = useCallback((values) => {
@@ -177,7 +195,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
         <Row>
           <Column>
             <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
-            <div className={styles.BedSelectionDropdown}>
+            <div className={styles.bedSelectionDropdown}>
               {isBedManagementModuleInstalled ? (
                 isLoading ? (
                   <DropdownSkeleton />

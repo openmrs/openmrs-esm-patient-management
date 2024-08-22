@@ -1,5 +1,6 @@
 import type {
   Concept,
+  DefaultWorkspaceProps,
   Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
@@ -9,18 +10,40 @@ import type {
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
-export type WardPatientCardRow = React.FC<WardPatient>;
-export type WardPatientCardElement = React.FC<WardPatient>;
+export type WardPatientCard = React.FC<WardPatient>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
+  /**
+   * The patient and their current visit. These values are taken either
+   * from either the inpatientAdmission object, the inpatientRequest object
+   * or the admissionLocation object (which contains the bed)
+   */
   patient: Patient;
   visit: Visit;
-  bed?: Bed;
-  admitted: boolean;
-  encounterAssigningToCurrentInpatientLocation: Encounter;
-  firstAdmissionOrTransferEncounter: Encounter;
+
+  /**
+   * the bed assigned to the patient. This object is only set if the patient
+   * has a bed assigned
+   */
+  bed: Bed;
+
+  /**
+   * The admission detail. This object is only set if the patient has been
+   * admitted to the ward
+   */
+  inpatientAdmission: InpatientAdmission;
+
+  /**
+   * The admission request. The object is only set if the patient has a
+   * pending admission / transfer request.
+   */
+  inpatientRequest: InpatientRequest;
 };
+
+export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
+  wardPatient: WardPatient;
+}
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -112,6 +135,9 @@ export interface InpatientAdmission {
   // the first encounter of the visit that is of encounterType "Admission" or "Transfer",
   // regardless of the admission location
   firstAdmissionOrTransferEncounter: Encounter;
+
+  // the current in patient request
+  currentInpatientRequest: InpatientRequest;
 }
 
 // TODO: Move these types to esm-core
@@ -176,10 +202,7 @@ export interface EncounterPayload {
 }
 
 export interface ObsPayload {
-  concept: Concept;
+  concept: Concept | string;
   value?: string;
-  groupMembers?: Array<{
-    concept: Concept;
-    value: string;
-  }>;
+  groupMembers?: Array<ObsPayload>;
 }
