@@ -32,8 +32,7 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit 
       })
       ?.slice(0, limit == 0 ? Number.MAX_VALUE : limit);
 
-    const labelToDisplay =
-      label != null ? t(label) : obsToDisplay?.[0]?.concept?.display;
+    const labelToDisplay = label != null ? t(label) : obsToDisplay?.[0]?.concept?.display;
 
     const obsNodes = obsToDisplay?.map((o) => {
       const { value } = o;

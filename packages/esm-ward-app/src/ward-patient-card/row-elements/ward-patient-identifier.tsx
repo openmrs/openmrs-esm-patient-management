@@ -40,8 +40,7 @@ const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ config: c
   );
   patientIdentifiers.sort(identifierCompareFunction);
   const patientIdentifier = patientIdentifiers[0];
-  const labelToDisplay =
-    label != null ? t(label) : patientIdentifier?.identifierType?.name;
+  const labelToDisplay = label != null ? t(label) : patientIdentifier?.identifierType?.name;
   return (
     <div>
       {labelToDisplay ? <Tag>{t('identifierTypelabel', '{{label}}:', { label: labelToDisplay })}</Tag> : <></>}

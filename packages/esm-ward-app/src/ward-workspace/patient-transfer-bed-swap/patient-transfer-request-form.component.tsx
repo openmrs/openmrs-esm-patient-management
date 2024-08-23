@@ -12,6 +12,7 @@ import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
 import type { ObsPayload, WardPatientWorkspaceProps } from '../../types';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import classNames from 'classnames';
 import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
 
 export default function PatientTransferForm({
@@ -154,7 +155,9 @@ export default function PatientTransferForm({
   }, []);
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)} className={styles.formContainer}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      className={classNames(styles.formContainer, styles.workspaceContent)}>
       <div>
         {errorFetchingEmrConfiguration && (
           <div className={styles.formError}>
