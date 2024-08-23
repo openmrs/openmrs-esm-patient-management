@@ -51,6 +51,11 @@
       "component": "patientTransferAndSwapWorkspaceSiderailIcon"
     },
     {
+      "name": "patient-discharge-siderail-button",
+      "slot": "action-menu-ward-patient-items-slot",
+      "component": "patientDischargeWorkspaceSideRailIcon"
+    },
+    {
       "component": "admissionRequestNoteRowExtension",
       "name": "admission-request-note-card-row",
       "slot": "ward-patient-card-slot"
@@ -99,6 +104,14 @@
       "component": "patientTransferRequestWorkspace",
       "title": "transferRequest",
       "type": "transfer-request-form"
+    },
+    {
+      "name": "patient-discharge-workspace",
+      "component": "patientDischargeWorkspace",
+      "title": "discharge",
+      "type": "ward-patient-discharge",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
     }
   ]
 }

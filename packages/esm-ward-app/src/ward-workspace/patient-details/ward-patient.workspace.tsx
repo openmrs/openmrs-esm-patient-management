@@ -1,9 +1,9 @@
 import { age, attach, ExtensionSlot, type Patient } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
-import { type WardPatientWorkspaceProps } from '../types';
 import styles from './ward-patient.style.scss';
 import { useTranslation } from 'react-i18next';
-import { getGender } from '../ward-patient-card/row-elements/ward-patient-gender.component';
+import { type WardPatientWorkspaceProps } from '../../types';
+import { getGender } from '../../ward-patient-card/row-elements/ward-patient-gender.component';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 

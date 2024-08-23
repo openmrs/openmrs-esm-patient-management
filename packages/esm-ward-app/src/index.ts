@@ -37,7 +37,7 @@ export const admitPatientFormWorkspace = getAsyncLifecycle(
 
 // Title for this workspace is set dynamically
 export const wardPatientWorkspace = getAsyncLifecycle(
-  () => import('./ward-patient-workspace/ward-patient.workspace'),
+  () => import('./ward-workspace/patient-details/ward-patient.workspace'),
   options,
 );
 
@@ -48,7 +48,7 @@ export const wardPatientNotesWorkspace = getAsyncLifecycle(
 );
 
 export const wardPatientActionButtonExtension = getAsyncLifecycle(
-  () => import('./ward-patient-workspace/ward-patient-action-button.extension'),
+  () => import('./ward-workspace/patient-details/ward-patient-action-button.extension'),
   options,
 );
 
@@ -73,6 +73,12 @@ export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
   options,
 );
 
+// t('discharge', 'Discharge')
+export const patientDischargeWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-discharge/patient-discharge.workspace'),
+  options,
+);
+
 export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
   () => import('./action-menu-buttons/transfer-workspace-siderail.component'),
   options,
@@ -81,6 +87,11 @@ export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
 // t('transferRequest', 'Transfer request')
 export const patientTransferRequestWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/patient-transfer-request-workspace/patient-transfer-request.workspace'),
+  options,
+);
+
+export const patientDischargeWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/discharge-workspace-siderail.component'),
   options,
 );
 
