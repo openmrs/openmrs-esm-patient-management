@@ -1,21 +1,26 @@
 import React from 'react';
 import styles from './ward-metrics.scss';
 import { useBeds } from '../hooks/useBeds';
-import { useParams } from 'react-router-dom';
-import { showNotification } from '@openmrs/esm-framework';
+import { showNotification, useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { getWardMetrics } from '../ward-view/ward-view.resource';
 import WardMetric from './ward-metric.component';
+import type { WardPatientGroupDetails } from '../types';
+import useWardLocation from '../hooks/useWardLocation';
 
 const wardMetrics = [
   { name: 'Patients', key: 'patients' },
   { name: 'Free beds', key: 'freeBeds' },
   { name: 'Capacity', key: 'capacity' },
 ];
+
 const WardMetrics = () => {
-  const { locationUuid: locationUuidFromUrl } = useParams();
-  const { beds, isLoading, error } = useBeds({ locationUuid: locationUuidFromUrl });
+  const { location } = useWardLocation();
+  const { beds, isLoading, error } = useBeds({ locationUuid: location.uuid });
   const { t } = useTranslation();
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
+  const wardPatientGroup = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+
   if (error) {
     showNotification({
       kind: 'error',
@@ -26,16 +31,28 @@ const WardMetrics = () => {
   const wardMetricValues = getWardMetrics(beds);
   return (
     <div className={styles.metricsContainer}>
-      {wardMetrics.map((wardMetric) => (
+      {isBedManagementModuleInstalled ? (
+        wardMetrics.map((wardMetric) => {
+          return (
+            <WardMetric
+              metricName={wardMetric.name}
+              metricValue={wardMetricValues[wardMetric.key]}
+              isLoading={!!isLoading}
+              key={wardMetric.key}
+            />
+          );
+        })
+      ) : (
+        <WardMetric metricName={'Patients'} metricValue={'--'} isLoading={false} key={'patients'} />
+      )}
+      {isBedManagementModuleInstalled && (
         <WardMetric
-          metricName={wardMetric.name}
-          metricValue={wardMetricValues[wardMetric.key]}
-          isLoading={!!isLoading}
-          key={wardMetric.key}
+          metricName="Pending out"
+          metricValue={error ? '--' : wardPatientGroup?.wardPatientPendingCount.toString() ?? '--'}
+          isLoading={!wardPatientGroup}
+          key="pending"
         />
-      ))}
-      {/* TODO: use real time value when the api is ready */}
-      <WardMetric metricName="Pending out" metricValue="10" isLoading={false} />
+      )}
     </div>
   );
 };
