@@ -1,6 +1,5 @@
-import useSWR from 'swr';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type InpatientAdmissionFetchResponse } from '../types';
+import { restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
+import { type InpatientAdmission } from '../types';
 import useWardLocation from './useWardLocation';
 
 export function useInpatientAdmission() {
@@ -15,15 +14,10 @@ export function useInpatientAdmission() {
     'currentInpatientRequest:(dispositionLocation,dispositionType,disposition:(uuid,display),dispositionEncounter:(uuid,display),dispositionObsGroup:(uuid,display),visit:(uuid),patient:(uuid)),' +
     'firstAdmissionOrTransferEncounter:(encounterDatetime),' +
     ')';
-  const { data, ...rest } = useSWR<FetchResponse<InpatientAdmissionFetchResponse>, Error>(
+
+  return useOpenmrsFetchAll<InpatientAdmission>(
     location
       ? `${restBaseUrl}/emrapi/inpatient/admission?currentInpatientLocation=${location.uuid}&v=${customRepresentation}`
       : null,
-    openmrsFetch,
   );
-
-  return {
-    inpatientAdmissions: data?.data?.results,
-    ...rest,
-  };
 }
