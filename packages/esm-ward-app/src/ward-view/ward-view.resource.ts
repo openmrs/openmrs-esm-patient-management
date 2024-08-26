@@ -31,7 +31,7 @@ export function getWardMetrics(beds: Bed[]): WardMetrics {
     freeBeds: '--',
     capacity: '--',
   };
-  if (beds.length == 0) return bedMetrics;
+  if (beds == null || beds.length == 0) return bedMetrics;
   const total = beds.length;
   const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;

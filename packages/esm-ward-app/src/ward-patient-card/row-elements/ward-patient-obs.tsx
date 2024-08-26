@@ -22,7 +22,7 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit 
   if (isLoading) {
     return <SkeletonText />;
   } else {
-    const obsToDisplay = data?.data?.results
+    const obsToDisplay = data
       ?.filter((o) => {
         const matchVisit = !onlyWithinCurrentVisit || o.encounter.visit?.uuid == visit?.uuid;
         return matchVisit;

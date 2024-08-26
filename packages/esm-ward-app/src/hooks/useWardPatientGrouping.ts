@@ -7,7 +7,7 @@ export function useWardPatientGrouping() {
   const admissionLocationResponse = useAdmissionLocation();
   const inpatientAdmissionResponse = useInpatientAdmission();
 
-  const { inpatientAdmissions } = inpatientAdmissionResponse;
+  const { data: inpatientAdmissions } = inpatientAdmissionResponse;
   const { admissionLocation } = admissionLocationResponse;
   const inpatientAdmissionsByPatientUuid = useMemo(() => {
     return getInpatientAdmissionsUuidMap(inpatientAdmissions);
