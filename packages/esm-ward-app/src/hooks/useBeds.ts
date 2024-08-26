@@ -1,4 +1,4 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type Bed, type BedStatus } from '../types/index';
 
@@ -17,10 +17,10 @@ export function useBeds(searchCriteria?: BedSearchCriteria) {
   }
 
   const apiUrl = `${restBaseUrl}/bed?${searchParam}`;
-  const { data, ...rest } = useSWR<{ data: { results: Array<Bed> } }, Error>(apiUrl, openmrsFetch);
+  const { data, ...rest } = useOpenmrsFetchAll<Bed>(apiUrl);
 
   return {
-    beds: data?.data?.results ?? [],
+    beds: data,
     ...rest,
   };
 }

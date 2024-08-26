@@ -84,5 +84,8 @@
     "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
     "*.{css,scss,ts,tsx}": "prettier --cache --write --list-different"
   },
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.2.2",
+  "resolutions": {
+    "@openmrs/esm-react-utils": "portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-react-utils"
+  }
 }
