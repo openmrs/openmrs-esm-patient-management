@@ -9,6 +9,7 @@ import type {
   Visit,
 } from '@openmrs/esm-framework';
 import type React from 'react';
+import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
 
 export type WardPatientCard = React.FC<WardPatient>;
 
@@ -199,6 +200,12 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   retired?: boolean;
 }
 
+export interface WardMetrics {
+  patients: string;
+  freeBeds: string;
+  capacity: string;
+}
+
 export interface EncounterPayload {
   encounterDatetime?: string;
   encounterType: string;
@@ -216,3 +223,5 @@ export interface ObsPayload {
   value?: string;
   groupMembers?: Array<ObsPayload>;
 }
+
+export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;

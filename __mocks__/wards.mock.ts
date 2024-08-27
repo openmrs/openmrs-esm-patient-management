@@ -2,7 +2,7 @@ import { type AdmissionLocationFetchResponse, type BedType } from '../packages/e
 import { mockLocationInpatientWard } from './locations.mock';
 import { mockPatientAlice, mockPatientBrian } from './patient.mock';
 
-const mockBedType: BedType = {
+export const mockBedType: BedType = {
   uuid: '0000-bed-type',
   name: 'mockBedType',
   displayName: 'Mock Bed Type',
