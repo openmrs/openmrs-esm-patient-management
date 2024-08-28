@@ -86,6 +86,9 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
     await page.getByLabel('Duration (minutes)').fill('80');
   });
 
+  await test.step('I set the Date appointment issued', async () => {
+    await page.getByLabel('Date appointment issued').fill('20/08/2024');
+  });
   await test.step('And I change the note', async () => {
     await page
       .getByPlaceholder('Write any additional points here')

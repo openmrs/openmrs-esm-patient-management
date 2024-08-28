@@ -83,9 +83,9 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
 }
 
 function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): QueueTableColumn {
-  const { id, header, headerI18nModule, columnType } = columnDef;
+  const { id, header, columnType } = columnDef;
 
-  const translatedHeader = header ? translateFrom(headerI18nModule ?? '@openmrs/esm-service-queues-app', header) : null;
+  const translatedHeader = header ? t(header) : null;
 
   switch (columnType ?? id) {
     case 'patient-name': {

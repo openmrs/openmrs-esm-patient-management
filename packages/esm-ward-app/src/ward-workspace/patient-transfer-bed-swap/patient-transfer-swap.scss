@@ -2,6 +2,13 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.flexWrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #393939;
+}
+
 .workspaceContent {
   padding: layout.$spacing-05;
   height: 100%;
@@ -10,8 +17,12 @@
   color: #393939;
 }
 
+.contentSwitcherWrapper {
+  padding: 0 layout.$spacing-05;
+}
+
 .patientWorkspaceBanner {
-  margin: (-(layout.$spacing-05)) (-(layout.$spacing-05)) layout.$spacing-05 (-(layout.$spacing-05));
+  margin-bottom: layout.$spacing-05;
 }
 
 .field {
@@ -26,7 +37,6 @@
 }
 
 .workspaceForm {
-  margin-top: layout.$spacing-05;
   flex: 1;
 }
 

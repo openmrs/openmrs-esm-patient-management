@@ -15,7 +15,7 @@ export interface WardPatientObsProps {
 }
 
 const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit }) => {
-  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label, labelI18nModule: labelModule } = config;
+  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config;
   const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
   const { t } = useTranslation();
 
@@ -32,8 +32,7 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit 
       })
       ?.slice(0, limit == 0 ? Number.MAX_VALUE : limit);
 
-    const labelToDisplay =
-      label != null ? translateFrom(labelModule ?? moduleName, label) : obsToDisplay?.[0]?.concept?.display;
+    const labelToDisplay = label != null ? t(label) : obsToDisplay?.[0]?.concept?.display;
 
     const obsNodes = obsToDisplay?.map((o) => {
       const { value } = o;
