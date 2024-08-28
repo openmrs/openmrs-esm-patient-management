@@ -26,12 +26,6 @@
       "offline": true
     },
     {
-      "component": "cancelPatientEditModal",
-      "name": "cancel-patient-edit-modal",
-      "online": true,
-      "offline": true
-    },
-    {
       "component": "patientPhotoExtension",
       "name": "patient-photo-widget",
       "slot": "patient-photo-slot",
@@ -57,6 +51,12 @@
       "name": "delete-identifier-confirmation-modal",
       "online": true,
       "offline": true
+    }
+  ],
+  "modals": [
+    {
+      "name": "cancel-patient-edit-modal",
+      "component": "cancelPatientEditModal"
     }
   ]
 }
