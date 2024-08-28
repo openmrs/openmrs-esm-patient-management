@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 import DaysOfWeekCard from './days-of-week.component';
 import SelectedDateContext from '../../hooks/selectedDateContext';
 import { omrsDateFormat } from '../../constants';
+import { formatDate } from '@openmrs/esm-framework';
 
-const monthFormat = 'MMMM, YYYY';
 const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 function MonthlyHeader() {
   const { t } = useTranslation();
@@ -22,7 +22,8 @@ function MonthlyHeader() {
           kind="tertiary">
           {t('prev', 'Prev')}
         </Button>
-        <span>{dayjs(selectedDate).format(monthFormat)}</span>
+
+        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
 
         <Button
           size="sm"
