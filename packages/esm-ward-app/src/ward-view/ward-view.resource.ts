@@ -48,6 +48,7 @@ export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmi
   return map;
 }
 
+//catogorize and group patients with bed,without bed and unadmitted patients with bed
 export function createAndGetWardPatientGrouping(
   inpatientAdmissions: InpatientAdmission[],
   admissionLocation: AdmissionLocationFetchResponse,

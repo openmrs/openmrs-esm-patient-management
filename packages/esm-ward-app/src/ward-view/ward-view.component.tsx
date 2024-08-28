@@ -42,7 +42,7 @@ const WardViewMain = () => {
 
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const {
-    bedLayouts = [],
+    bedLayouts,
     wardAdmittedPatientsWithBed = new Map(),
     wardUnassignedPatientsList = [],
   } = wardPatientsGrouping ?? {};

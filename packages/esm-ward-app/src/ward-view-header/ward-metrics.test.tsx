@@ -8,6 +8,7 @@ import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import { mockAdmissionLocation, mockInpatientAdmissions } from '__mocks__';
 import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
 import useWardLocation from '../hooks/useWardLocation';
+import { screen } from '@testing-library/react';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -68,9 +69,9 @@ describe('Ward Metrics', () => {
       invalidLocation: true,
     });
     const bedMetrics = getWardMetrics(mockWardBeds);
-    const { getByText } = renderWithSwr(<WardMetrics />);
+    renderWithSwr(<WardMetrics />);
     for (let [key, value] of Object.entries(bedMetrics)) {
-      expect(getByText(value)).toBeInTheDocument();
+      expect(screen.getByText(value)).toBeInTheDocument();
     }
   });
 });
