@@ -88,14 +88,14 @@
   @extend .wardPatientCardRow;
   display: flex;
   align-items: center;
-  flex-flow: row;
+  flex-flow: row wrap;
   color: $ui-02;
   background-color: colors.$gray-80;
 }
 
 .wardPatientCardDispositionTypeContainer {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row;
   align-items: center;
 }
 

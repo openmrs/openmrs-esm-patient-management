@@ -63,7 +63,7 @@
     {
       "component": "pendingOrdersExtension",
       "name": "ward-patient-pending-orders",
-      "slot": "ward-patient-card-pending-orders-slot"
+      "slot": "ward-patient-card-pending-items-slot"
     }
   ],
   "workspaces": [

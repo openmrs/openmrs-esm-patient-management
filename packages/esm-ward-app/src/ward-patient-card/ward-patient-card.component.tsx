@@ -40,7 +40,7 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         <div className={styles.wardPatientCardPendingItemsRow}>
           <Hourglass className={styles.hourGlassIcon} size="16" />:
           <ExtensionSlot
-            name="ward-patient-card-pending-orders-slot"
+            name="ward-patient-card-pending-items-slot"
             state={wardPatient}
             className={classNames(styles.wardPatientPendingOrdersRow, styles.wardPatientCardExtensionSlot)}
           />
