@@ -181,11 +181,22 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     )
     .refine(
       (formValues) => {
-        const appointmentDate = formValues.appointmentDateTime?.startDate;
-        const dateAppointmentScheduled = formValues.dateAppointmentScheduled;
+        const { appointmentDateTime, dateAppointmentScheduled } = formValues;
+        const startDate = appointmentDateTime?.startDate;
+        if (!startDate || !dateAppointmentScheduled) {
+          return true;
+        }
 
-        if (!appointmentDate || !dateAppointmentScheduled) return true;
-        return dateAppointmentScheduled < appointmentDate;
+        const normalizeDate = (date: Date) => {
+          const normalizedDate = new Date(date);
+          normalizedDate.setHours(0, 0, 0, 0);
+          return normalizedDate;
+        };
+
+        const startDateObj = normalizeDate(startDate);
+        const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
+
+        return scheduledDateObj <= startDateObj;
       },
       {
         path: ['dateAppointmentScheduled'],
