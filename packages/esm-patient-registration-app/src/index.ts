@@ -50,10 +50,7 @@ export const editPatient = getSyncLifecycle(rootComponent, {
 
 export const addPatientLink = getSyncLifecycle(addPatientLinkComponent, options);
 
-export const cancelPatientEditModal = getAsyncLifecycle(
-  () => import('./widgets/cancel-patient-edit.component'),
-  options,
-);
+export const cancelPatientEditModal = getAsyncLifecycle(() => import('./widgets/cancel-patient-edit.modal'), options);
 
 export const patientPhotoExtension = getSyncLifecycle(PatientPhotoExtension, options);
 
