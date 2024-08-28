@@ -68,6 +68,11 @@
   margin-left: layout.$spacing-04;
 }
 
+.wardPatientPendingOrdersRow:empty {
+  display: none;
+  margin-left: layout.$spacing-04;
+}
+
 .wardPatientCardExtensionSlot {
   display: none;
   width: 100%;
@@ -93,7 +98,7 @@
 
 .wardPatientCardDispositionTypeContainer {
   display: flex;
-  flex-flow: row;
+  flex-flow: row nowrap;
   align-items: center;
 }
 

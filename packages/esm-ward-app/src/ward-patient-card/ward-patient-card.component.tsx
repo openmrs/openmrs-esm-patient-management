@@ -1,4 +1,4 @@
-import { ExtensionSlot, getPatientName, launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { Hourglass } from '@carbon/react/icons';
@@ -36,6 +36,22 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
+      {wardPatient?.inpatientRequest || showPendingOrders ? (
+        <div className={styles.wardPatientCardPendingItemsRow}>
+          <Hourglass className={styles.hourGlassIcon} size="16" />:
+          <ExtensionSlot
+            name="ward-patient-card-pending-orders-slot"
+            state={wardPatient}
+            className={classNames(styles.wardPatientPendingOrdersRow, styles.wardPatientCardExtensionSlot)}
+          />
+          {wardPatient?.inpatientRequest ? <WardPatientPendingTransfer wardPatient={wardPatient} /> : null}
+        </div>
+      ) : null}
+      <ExtensionSlot
+        name={rowsExtensionSlotName}
+        state={wardPatient}
+        className={classNames(styles.wardPatientCardRow, styles.wardPatientCardExtensionSlot)}
+      />
       <div className={styles.wardPatientCardRow}>
         {footerRowElements.map((elementId, i) => (
           <WardPatientCardElement
@@ -46,22 +62,6 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
       </div>
-      {wardPatient?.inpatientRequest || showPendingOrders ? (
-        <div className={styles.wardPatientCardPendingItemsRow}>
-          <Hourglass className={styles.hourGlassIcon} size="16" />:
-          <ExtensionSlot
-            name="ward-patient-card-pending-items-slot"
-            state={wardPatient}
-            className={classNames(styles.wardPatientPendingOrdersRow, styles.wardPatientCardExtensionSlot)}
-          />
-          {wardPatient?.inpatientRequest ? <WardPatientPendingTransfer wardPatient={wardPatient} /> : null}
-        </div>
-      ) : null}
-      <ExtensionSlot
-        name={rowsExtensionSlotName}
-        state={wardPatient}
-        className={classNames(styles.wardPatientCardExtensionSlot)}
-      />
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
