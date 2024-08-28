@@ -182,10 +182,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     .refine(
       (formValues) => {
         const { appointmentDateTime, dateAppointmentScheduled } = formValues;
+
         const startDate = appointmentDateTime?.startDate;
-        if (!startDate || !dateAppointmentScheduled) {
-          return true;
-        }
+
+        if (!startDate || !dateAppointmentScheduled) return true;
 
         const normalizeDate = (date: Date) => {
           const normalizedDate = new Date(date);
@@ -206,6 +206,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         ),
       },
     );
+
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
   const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
