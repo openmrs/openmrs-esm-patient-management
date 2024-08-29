@@ -1,11 +1,11 @@
 import {
   type FetchResponse,
-  type OpenmrsResource,
   getSynchronizationItems,
   openmrsFetch,
+  type OpenmrsResource,
+  restBaseUrl,
   useConfig,
   usePatient,
-  restBaseUrl,
 } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
 import { type Dispatch, useEffect, useMemo, useState } from 'react';
@@ -14,12 +14,12 @@ import { v4 } from 'uuid';
 import { type RegistrationConfig } from '../config-schema';
 import { patientRegistration } from '../constants';
 import {
+  type Encounter,
   type FormValues,
+  type PatientIdentifierResponse,
   type PatientRegistration,
   type PatientUuidMapType,
   type PersonAttributeResponse,
-  type PatientIdentifierResponse,
-  type Encounter,
 } from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,
@@ -32,7 +32,9 @@ import { useInitialPatientRelationships } from './section/patient-relationships/
 import dayjs from 'dayjs';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
+  const { freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
+  const { data: deathInfo, isLoading: isLoadingDeathInfo } = useInitialPersonDeathInfo(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
@@ -54,8 +56,11 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     birthdateEstimated: false,
     telephoneNumber: '',
     isDead: false,
-    deathDate: '',
+    deathDate: undefined,
+    deathTime: undefined,
+    deathTimeFormat: 'AM',
     deathCause: '',
+    nonCodedCauseOfDeath: '',
     relationships: [],
     identifiers: {},
     address: {},
@@ -95,6 +100,25 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       }
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+
+  // Set initial patient death info
+  useEffect(() => {
+    if (!isLoadingDeathInfo && deathInfo?.dead) {
+      const deathDatetime = deathInfo.deathDate || null;
+      const deathDate = deathDatetime ? new Date(deathDatetime) : undefined;
+      const time = deathDate ? dayjs(deathDate).format('hh:mm') : undefined;
+      const timeFormat = deathDate ? (dayjs(deathDate).hour() >= 12 ? 'PM' : 'AM') : 'AM';
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        isDead: deathInfo.dead || false,
+        deathDate: deathDate,
+        deathTime: time,
+        deathTimeFormat: timeFormat,
+        deathCause: deathInfo.causeOfDeathNonCoded ? freeTextFieldConceptUuid : deathInfo.causeOfDeath?.uuid,
+        nonCodedCauseOfDeath: deathInfo.causeOfDeathNonCoded,
+      }));
+    }
+  }, [isLoadingDeathInfo, deathInfo, setInitialFormValues]);
 
   // Set initial patient relationships
   useEffect(() => {
@@ -273,6 +297,32 @@ function useInitialPersonAttributes(personUuid: string) {
   const result = useMemo(() => {
     return {
       data: data?.data?.results,
+      isLoading,
+    };
+  }, [data, error]);
+  return result;
+}
+
+interface DeathInfoResults {
+  uuid: string;
+  display: string;
+  causeOfDeath: OpenmrsResource | null;
+  dead: boolean;
+  deathDate: string;
+  causeOfDeathNonCoded: string | null;
+}
+
+function useInitialPersonDeathInfo(personUuid: string) {
+  const { data, error, isLoading } = useSWR<FetchResponse<DeathInfoResults>, Error>(
+    !!personUuid
+      ? `${restBaseUrl}/person/${personUuid}?v=custom:(uuid,display,causeOfDeath,dead,deathDate,causeOfDeathNonCoded)`
+      : null,
+    openmrsFetch,
+  );
+
+  const result = useMemo(() => {
+    return {
+      data: data?.data,
       isLoading,
     };
   }, [data, error]);
