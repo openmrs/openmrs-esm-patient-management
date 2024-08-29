@@ -10,6 +10,11 @@
   width: 100%;
   align-items: center;
   border: 1px solid colors.$gray-20;
+  border-right: none;
+
+  &:last-child {
+    border-right: 1px solid colors.$gray-20;
+  }
 
   & > span {
     font-size: layout.$spacing-05;
