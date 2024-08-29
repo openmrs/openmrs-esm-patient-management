@@ -84,5 +84,8 @@
     "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
     "*.{css,scss,ts,tsx}": "prettier --cache --write --list-different"
   },
+  "resolutions": {
+    "zustand": "4.3.6"
+  },
   "packageManager": "yarn@4.2.2"
 }

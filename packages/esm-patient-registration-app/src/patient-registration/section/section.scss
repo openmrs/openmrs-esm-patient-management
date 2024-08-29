@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
@@ -13,4 +14,8 @@
   @include type.type-style('heading-compact-02');
   color: $ui-04;
   cursor: pointer;
+}
+
+.isDeadFieldContainer {
+  margin-bottom: layout.$spacing-05;
 }

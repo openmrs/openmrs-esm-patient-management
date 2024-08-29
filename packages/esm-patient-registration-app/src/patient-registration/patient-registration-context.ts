@@ -1,7 +1,7 @@
 import { useConfig } from '@openmrs/esm-framework';
 import { createContext, type SetStateAction } from 'react';
 import { type RegistrationConfig } from '../config-schema';
-import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
+import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 
 export interface PatientRegistrationContextProps {
   currentPhoto: string;
@@ -9,11 +9,12 @@ export interface PatientRegistrationContextProps {
   inEditMode: boolean;
   initialFormValues: FormValues;
   isOffline: boolean;
-  setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
-  setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
   setInitialFormValues?: React.Dispatch<SetStateAction<FormValues>>;
   validationSchema: any;
   values: FormValues;
+  setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
+  setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
+  setFieldTouched(field: string, isTouched?: any, shouldValidate?: boolean): void;
 }
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);

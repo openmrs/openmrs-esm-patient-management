@@ -1,23 +1,24 @@
 import {
   type FetchResponse,
-  type Session,
-  type StyleguideConfigObject,
   getConfig,
   openmrsFetch,
   queueSynchronizationItem,
   restBaseUrl,
+  type Session,
+  type StyleguideConfigObject,
+  toOmrsIsoString,
 } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
-  type FormValues,
   type AttributeValue,
-  type PatientUuidMapType,
-  type Patient,
   type CapturePhotoProps,
+  type Encounter,
+  type FormValues,
+  type Patient,
   type PatientIdentifier,
   type PatientRegistration,
+  type PatientUuidMapType,
   type RelationshipValue,
-  type Encounter,
 } from './patient-registration.types';
 import {
   addPatientIdentifier,
@@ -25,14 +26,16 @@ import {
   deletePersonName,
   deleteRelationship,
   generateIdentifier,
+  getDatetime,
+  saveEncounter,
   savePatient,
   savePatientPhoto,
   saveRelationship,
-  updateRelationship,
   updatePatientIdentifier,
-  saveEncounter,
+  updateRelationship,
 } from './patient-registration.resource';
 import { type RegistrationConfig } from '../config-schema';
+import dayjs from 'dayjs';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -62,7 +65,7 @@ export class FormManager {
   ) => {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(isNewPatient, values, patientUuidMap, initialAddressFieldValues, []),
+        FormManager.getPatientToCreate(isNewPatient, values, patientUuidMap, initialAddressFieldValues, [], config),
       ),
       _patientRegistrationData: {
         isNewPatient,
@@ -115,6 +118,7 @@ export class FormManager {
       patientUuidMap,
       initialAddressFieldValues,
       patientIdentifiers,
+      config,
     );
 
     FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
@@ -297,6 +301,7 @@ export class FormManager {
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
+    config?: RegistrationConfig,
   ): Patient {
     let birthdate;
     if (values.birthdate instanceof Date) {
@@ -317,7 +322,7 @@ export class FormManager {
         birthdateEstimated: values.birthdateEstimated,
         attributes: FormManager.getPatientAttributes(isNewPatient, values, patientUuidMap),
         addresses: [values.address],
-        ...FormManager.getPatientDeathInfo(values),
+        ...FormManager.getPatientDeathInfo(values, config),
       },
       identifiers,
     };
@@ -376,12 +381,22 @@ export class FormManager {
     return attributes;
   }
 
-  static getPatientDeathInfo(values: FormValues) {
-    const { isDead, deathDate, deathCause } = values;
+  static getPatientDeathInfo(values: FormValues, config?: RegistrationConfig) {
+    const { isDead, deathDate, deathTime, deathTimeFormat, deathCause, nonCodedCauseOfDeath } = values;
+
+    if (!isDead) {
+      return {
+        dead: false,
+      };
+    }
+    const dateTimeOfDeath = toOmrsIsoString(getDatetime(deathDate, deathTime, deathTimeFormat));
+
     return {
-      dead: isDead,
-      deathDate: isDead ? deathDate : undefined,
-      causeOfDeath: isDead ? deathCause : undefined,
+      dead: true,
+      deathDate: dateTimeOfDeath,
+      ...(deathCause === config?.freeTextFieldConceptUuid
+        ? { causeOfDeathNonCoded: nonCodedCauseOfDeath, causeOfDeath: null }
+        : { causeOfDeath: deathCause, causeOfDeathNonCoded: null }),
     };
   }
 
