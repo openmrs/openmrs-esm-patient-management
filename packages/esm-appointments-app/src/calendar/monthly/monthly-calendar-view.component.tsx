@@ -4,9 +4,9 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { monthDays } from '../../helpers';
 import MonthlyViewWorkload from './monthly-workload-view.component';
-import MonthlyHeader from './monthly-header.module';
-import styles from '../appointments-calendar-view-view.scss';
+import MonthlyHeader from './monthly-header.component';
 import SelectedDateContext from '../../hooks/selectedDateContext';
+import styles from '../appointments-calendar-view-view.scss';
 
 dayjs.extend(isBetween);
 

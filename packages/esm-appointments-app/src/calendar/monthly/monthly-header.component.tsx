@@ -27,13 +27,13 @@ const MonthlyHeader: React.FC = () => {
       <div className={styles.container}>
         <Button
           aria-label={t('previousMonth', 'Previous month')}
-          size="sm"
+          kind="tertiary"
           onClick={handleSelectPrevMonth}
-          kind="tertiary">
+          size="sm">
           {t('prev', 'Prev')}
         </Button>
         <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
-        <Button aria-label={t('nextMonth', 'Next month')} size="sm" onClick={handleSelectNextMonth} kind="tertiary">
+        <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={handleSelectNextMonth} size="sm">
           {t('next', 'Next')}
         </Button>
       </div>
