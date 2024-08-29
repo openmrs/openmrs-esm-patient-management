@@ -1,6 +1,6 @@
 import React from 'react';
 import { InlineNotification } from '@carbon/react';
-import { useAppContext, useDefineAppContext, WorkspaceContainer } from '@openmrs/esm-framework';
+import { ExtensionSlot, openmrsFetch, useAppContext, useDefineAppContext, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import UnassignedPatient from '../beds/unassigned-patient.component';
@@ -11,6 +11,7 @@ import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
 import { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
+import useSWR from 'swr';
 
 const WardView = () => {
   const response = useWardLocation();
@@ -30,6 +31,7 @@ const WardView = () => {
 
   return (
     <div className={styles.wardView}>
+      <ExtensionSlot name={"ward-patient-card-parent-slot"} />
       <WardViewHeader />
       <WardViewMain />
       <WorkspaceContainer overlay contextKey="ward" />
@@ -94,7 +96,7 @@ const WardViewMain = () => {
   return (
     <div className={styles.wardViewMain}>
       {wardBeds}
-      {bedLayouts?.length == 0 && (
+      {bedLayouts && bedLayouts.length == 0 && (
         <InlineNotification
           kind="warning"
           lowContrast={true}

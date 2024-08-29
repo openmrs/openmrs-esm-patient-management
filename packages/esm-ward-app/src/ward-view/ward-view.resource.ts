@@ -1,5 +1,5 @@
 import { type Patient } from '@openmrs/esm-framework';
-import type { AdmissionLocationFetchResponse, Bed, BedLayout, InpatientAdmission, WardMetrics } from '../types';
+import type { AdmissionLocationFetchResponse, Bed, BedLayout, InpatientAdmission, InpatientRequest, WardMetrics } from '../types';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -31,7 +31,7 @@ export function getWardMetrics(beds: Bed[]): WardMetrics {
     freeBeds: '--',
     capacity: '--',
   };
-  if (beds.length == 0) return bedMetrics;
+  if (!beds?.length) return bedMetrics;
   const total = beds.length;
   const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;
@@ -51,17 +51,22 @@ export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmi
 export function createAndGetWardPatientGrouping(
   inpatientAdmissions: InpatientAdmission[],
   admissionLocation: AdmissionLocationFetchResponse,
-  inpatientAdmissionsByPatientUuid: Map<string, InpatientAdmission>,
+  inpatientRequests: InpatientRequest[],
 ) {
+  
+  const inpatientAdmissionsByPatientUuid =  getInpatientAdmissionsUuidMap(inpatientAdmissions);
+
   const wardAdmittedPatientsWithBed = new Map<string, InpatientAdmission>();
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
   const bedLayouts = admissionLocation && filterBeds(admissionLocation);
+  const allWardPatientUuids = new Set<string>();
 
   let wardPatientPendingCount = 0;
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
     patients.map((patient) => {
       const patientAdmittedWithBed = inpatientAdmissionsByPatientUuid.get(patient.uuid);
+      allWardPatientUuids.add(patient.uuid);
       if (patientAdmittedWithBed) {
         wardAdmittedPatientsWithBed.set(patient.uuid, patientAdmittedWithBed);
         //count the pending metric
@@ -74,16 +79,23 @@ export function createAndGetWardPatientGrouping(
   });
   const wardUnassignedPatientsList =
     inpatientAdmissions?.filter((inpatientAdmission) => {
+      allWardPatientUuids.add(inpatientAdmission.patient.uuid);
       return (
         !wardAdmittedPatientsWithBed.has(inpatientAdmission.patient.uuid) &&
         !wardUnadmittedPatientsWithBed.has(inpatientAdmission.patient.uuid)
       );
     }) ?? [];
+
+  for(const inpatientRequest of inpatientRequests){
+    allWardPatientUuids.add(inpatientRequest.patient.uuid);
+  }
+
   return {
     wardAdmittedPatientsWithBed,
     wardUnadmittedPatientsWithBed,
     wardPatientPendingCount,
     bedLayouts,
     wardUnassignedPatientsList,
+    allWardPatientUuids
   };
 }

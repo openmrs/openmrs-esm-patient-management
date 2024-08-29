@@ -18,9 +18,9 @@ const AdmissionRequestNoteRowExtension: WardPatientCard = ({ patient, visit, inp
   // only show if the patient has not been admitted yet
   const admitted = inpatientAdmission != null;
   if (admitted) {
-    return <></>;
+    return <>asdfasdf</>;
   } else {
-    return <WardPatientObs config={config} patient={patient} visit={visit} />;
+    return <>asdf<WardPatientObs config={config} patient={patient} visit={visit} /></>;
   }
 };
 

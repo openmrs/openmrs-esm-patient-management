@@ -12,6 +12,7 @@ import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-col
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
 import rootComponent from './root.component';
+import { motherChildRowConfigSchema } from './config-schema-mother-child-row';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -57,13 +58,23 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
-export const coloredObsTagCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
-  options,
-);
+// export const coloredObsTagCardRowExtension = getAsyncLifecycle(
+//   () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
+//   options,
+// );
 
 export const admissionRequestNoteRowExtension = getAsyncLifecycle(
   () => import('./ward-patient-card/card-rows/admission-request-note.extension'),
+  options,
+);
+
+export const coloredObsTagCardRowExtension = getAsyncLifecycle(
+  () => import('./ward-patient-card/card-rows/mother-child-row.extension'),
+  options,
+);
+
+export const motherChildRowParentExtension = getAsyncLifecycle(
+  () => import('./ward-patient-card/card-rows/mother-child-row.parent-extension'),
   options,
 );
 
@@ -100,6 +111,7 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
   defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
   defineExtensionConfigSchema('admission-request-note-card-row', admissionRequestNoteRowConfigSchema);
+  defineExtensionConfigSchema('mother-child-card-row', motherChildRowConfigSchema);
 
   registerFeatureFlag(
     'bedmanagement-module',

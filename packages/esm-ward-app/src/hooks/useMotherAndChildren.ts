@@ -1,26 +1,43 @@
-// import { type FetchResponse, openmrsFetch, restBaseUrl, useAppContext } from '@openmrs/esm-framework';
-// import type { DispositionType, InpatientRequestFetchResponse, WardAppContext } from '../types';
-// import useSWR from 'swr';
-// import useWardLocation from './useWardLocation';
-// import { useMemo } from 'react';
+import { makeUrl, restBaseUrl, useOpenmrsFetchAll, useOpenmrsInfinite, useOpenmrsPagination } from '@openmrs/esm-framework';
+import { MotherAndChildren } from '../types';
 
-// interface MothersAndChildrenSearchCriteria {
-//   mother?: Array<string>,
-//   child?: Array<string>,
-//   requireMotherHasActiveVisit?: boolean;
-//   requireChildHasActiveVisit?: boolean;
-//   requireChildBornDuringMothersActiveVisit?: boolean;
-// }
+export interface MothersAndChildrenSearchCriteria {
+  mothers?: Array<string>,
+  children?: Array<string>,
+  requireMotherHasActiveVisit?: boolean;
+  requireChildHasActiveVisit?: boolean;
+  requireChildBornDuringMothersActiveVisit?: boolean;
+}
 
-// export function useMotherAndChildren(
-//   criteria: MothersAndChildrenSearchCriteria,
-//   rep: string = "default",
-// ) {
-//   const {allPatientsByPatientUuid} = useAppContext<WardAppContext>('ward');
-//   const patientUuids = Array(allPatientsByPatientUuid.keys()).join(',');
+export function useMotherAndChildren(
+  criteria: MothersAndChildrenSearchCriteria,
+  fetch: boolean = true,
+  rep: string = "default",
+) {
 
-//   patientUuids
-//   useSWR(`${restBaseUrl}/emrapi/maternal/mothersAndChildren`))
+  const url = makeUrlUrl(`${restBaseUrl}/emrapi/maternal/mothersAndChildren`);
+  const {
+    mothers, 
+    children, 
+    requireChildBornDuringMothersActiveVisit, 
+    requireChildHasActiveVisit, 
+    requireMotherHasActiveVisit} = criteria;
 
-//   return results;
-// }
+  for(const m of mothers ?? []) {
+    url.searchParams.append('mother', m);
+  }
+
+  for(const c of children ?? []) {
+    url.searchParams.append('child', c);
+  }
+  
+  url.searchParams.append('requireMotherHasActiveVisit', requireMotherHasActiveVisit?.toString() ?? 'false');
+  url.searchParams.append('requireChildHasActiveVisit', requireChildHasActiveVisit?.toString() ?? 'false');
+  url.searchParams.append('requireChildBornDuringMothersActiveVisit', requireChildBornDuringMothersActiveVisit?.toString() ?? 'false');
+  // url.searchParams.append('v', rep);
+  return useOpenmrsPagination<MotherAndChildren>(fetch? url : null, 50);
+}
+
+function makeUrlUrl(path: string) {
+  return new URL(makeUrl(path), window.location.toString());
+}

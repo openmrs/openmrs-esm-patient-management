@@ -45,6 +45,10 @@ export type WardPatient = {
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
 }
+export interface MotherAndChildrenRelationships {
+  motherByChildUuid: Map<string, Patient>;
+  childrenByMotherUuid: Map<string, Array<Patient>>;
+}
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -222,6 +226,13 @@ export interface ObsPayload {
   concept: Concept | string;
   value?: string;
   groupMembers?: Array<ObsPayload>;
+}
+
+export interface MotherAndChildren {
+  childAdmission: InpatientAdmission;
+  child: Patient;
+  motherAdmission: InpatientAdmission;
+  mother: Patient;
 }
 
 export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
