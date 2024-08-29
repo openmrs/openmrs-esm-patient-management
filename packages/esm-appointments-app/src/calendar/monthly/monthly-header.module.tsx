@@ -1,41 +1,49 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import dayjs from 'dayjs';
-import styles from './monthly-header.module.scss';
-import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
+import { formatDate } from '@openmrs/esm-framework';
+import { omrsDateFormat } from '../../constants';
 import DaysOfWeekCard from './days-of-week.component';
 import SelectedDateContext from '../../hooks/selectedDateContext';
-import { omrsDateFormat } from '../../constants';
-import { formatDate } from '@openmrs/esm-framework';
+import styles from './monthly-header.scss';
 
-const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-function MonthlyHeader() {
+const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
+
+const MonthlyHeader: React.FC = () => {
   const { t } = useTranslation();
   const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
+
+  const handleSelectPrevMonth = useCallback(() => {
+    setSelectedDate(dayjs(selectedDate).subtract(1, 'month').format(omrsDateFormat));
+  }, [selectedDate, setSelectedDate]);
+
+  const handleSelectNextMonth = useCallback(() => {
+    setSelectedDate(dayjs(selectedDate).add(1, 'month').format(omrsDateFormat));
+  }, [selectedDate, setSelectedDate]);
 
   return (
     <>
       <div className={styles.container}>
         <Button
+          aria-label={t('previousMonth', 'Previous month')}
           size="sm"
-          onClick={() => setSelectedDate(dayjs(selectedDate).subtract(1, 'month').format(omrsDateFormat))}
+          onClick={handleSelectPrevMonth}
           kind="tertiary">
           {t('prev', 'Prev')}
         </Button>
-
         <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
-
-        <Button
-          size="sm"
-          onClick={() => setSelectedDate(dayjs(selectedDate).add(1, 'month').format(omrsDateFormat))}
-          kind="tertiary">
+        <Button aria-label={t('nextMonth', 'Next month')} size="sm" onClick={handleSelectNextMonth} kind="tertiary">
           {t('next', 'Next')}
         </Button>
       </div>
       <div className={styles.workLoadCard}>
-        {daysInWeek?.map((day, i) => <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />)}
+        {DAYS_IN_WEEK.map((day) => (
+          <DaysOfWeekCard key={day} dayOfWeek={day} />
+        ))}
       </div>
     </>
   );
-}
+};
+
 export default MonthlyHeader;
