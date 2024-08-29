@@ -20,7 +20,10 @@ const formValues: FormValues = {
   telephoneNumber: '',
   isDead: false,
   deathDate: 'string',
+  deathTime: '',
+  deathTimeFormat: 'AM',
   deathCause: 'string',
+  nonCodedCauseOfDeath: '',
   relationships: [],
   address: {
     address1: '',
