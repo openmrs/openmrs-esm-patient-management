@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { Button, Link, InlineLoading } from '@carbon/react';
+import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Formik, Form, type FormikHelpers } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import {
   createErrorHandler,
+  interpolateUrl,
   showSnackbar,
   useConfig,
-  interpolateUrl,
   usePatient,
   usePatientPhoto,
 } from '@openmrs/esm-framework';
 import { getValidationSchema } from './validation/patient-registration-validation';
-import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
+import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
@@ -132,16 +132,23 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
+  const getDescription = (errors) => {
+    return (
+      <ul style={{ listStyle: 'inside' }}>
+        {Object.keys(errors).map((error, index) => {
+          return <li key={index}>{t(`${error}LabelText`, error)}</li>;
+        })}
+      </ul>
+    );
+  };
+
   const displayErrors = (errors) => {
     if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
-      Object.keys(errors).forEach((error) => {
-        showSnackbar({
-          subtitle: t(`${error}LabelText`, error),
-          title: t('incompleteForm', 'The following field has errors:'),
-          kind: 'warning',
-          isLowContrast: true,
-          timeoutInMs: 5000,
-        });
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'warning',
+        title: t('fieldsWithErrors', 'The following fields have errors:'),
+        subtitle: <>{getDescription(errors)}</>,
       });
     }
   };
@@ -205,6 +212,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   values: props.values,
                   inEditMode,
                   setFieldValue: props.setFieldValue,
+                  setFieldTouched: props.setFieldTouched,
                   setCapturePhotoProps,
                   currentPhoto: photo?.imageSrc,
                   isOffline,
