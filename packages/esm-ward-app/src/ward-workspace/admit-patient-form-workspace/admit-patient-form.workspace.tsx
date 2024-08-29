@@ -4,11 +4,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Column, Dropdown, DropdownSkeleton, Form, InlineNotification, Row } from '@carbon/react';
-import { showSnackbar, useFeatureFlag, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout } from '../../types';
+import type { BedLayout, WardPatientGroupDetails } from '../../types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
-import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
@@ -29,8 +28,9 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const { isLoading, admissionLocation, mutate: mutateAdmissionLocation } = useAdmissionLocation();
-  const beds = useMemo(() => (isLoading ? [] : filterBeds(admissionLocation)), [admissionLocation]);
+  const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGrouping?.admissionLocationResponse ?? {};
+  const beds = isLoading ? [] : wardPatientGrouping?.bedLayouts ?? [];
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const getBedRepresentation = useCallback((bedLayout: BedLayout) => {
     const bedNumber = bedLayout.bedNumber;
@@ -175,6 +175,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
     setIsSubmitting(false);
   }, []);
 
+  if (!wardPatientGrouping) return <></>;
   return (
     <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
       <div className={styles.formContent}>
