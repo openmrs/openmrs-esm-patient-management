@@ -58,23 +58,18 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
-// export const coloredObsTagCardRowExtension = getAsyncLifecycle(
-//   () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
-//   options,
-// );
+export const coloredObsTagCardRowExtension = getAsyncLifecycle(
+  () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
+  options,
+);
 
 export const admissionRequestNoteRowExtension = getAsyncLifecycle(
   () => import('./ward-patient-card/card-rows/admission-request-note.extension'),
   options,
 );
 
-export const coloredObsTagCardRowExtension = getAsyncLifecycle(
+export const motherChildRowExtension = getAsyncLifecycle(
   () => import('./ward-patient-card/card-rows/mother-child-row.extension'),
-  options,
-);
-
-export const motherChildRowParentExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/mother-child-row.parent-extension'),
   options,
 );
 

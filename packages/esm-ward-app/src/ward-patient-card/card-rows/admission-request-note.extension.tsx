@@ -3,6 +3,7 @@ import { type ObsElementDefinition } from '../../config-schema';
 import { type WardPatientCard } from '../../types';
 import WardPatientObs from '../row-elements/ward-patient-obs';
 import { useConfig } from '@openmrs/esm-framework';
+import styles from '../ward-patient-card.scss';
 
 const AdmissionRequestNoteRowExtension: WardPatientCard = ({ patient, visit, inpatientAdmission }) => {
   const { conceptUuid } = useConfig<ObsElementDefinition>();
@@ -18,9 +19,13 @@ const AdmissionRequestNoteRowExtension: WardPatientCard = ({ patient, visit, inp
   // only show if the patient has not been admitted yet
   const admitted = inpatientAdmission != null;
   if (admitted) {
-    return <>asdfasdf</>;
+    return null;
   } else {
-    return <>asdf<WardPatientObs config={config} patient={patient} visit={visit} /></>;
+    return (
+      <div className={styles.wardPatientCardRow}>
+        <WardPatientObs config={config} patient={patient} visit={visit} />
+      </div>
+    );
   }
 };
 

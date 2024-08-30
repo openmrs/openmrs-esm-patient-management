@@ -7,7 +7,7 @@ export const defaultWardPatientCard: WardPatientCardDefinition = {
   appliedTo: null,
 };
 
-export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission'];
+export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission', 'patient-location'];
 
 export const addressFields = [
   'cityVillage',
@@ -199,8 +199,8 @@ export interface ObsElementDefinition {
   label?: string;
 }
 export interface MotherChildRowExtensionDefinition {
-  maternalLocations: Array<string>;
-  childLocations: Array<string>;
+  maternalWardLocations: Array<string>;
+  childrenWardLocations: Array<string>;
 }
 
 export interface IdentifierElementDefinition {

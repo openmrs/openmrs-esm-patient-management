@@ -10,6 +10,7 @@ import WardPatientIdentifier from './row-elements/ward-patient-identifier';
 import WardPatientObs from './row-elements/ward-patient-obs';
 import WardPatientTimeOnWard from './row-elements/ward-patient-time-on-ward';
 import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-since-admission';
+import WardPatientLocation from './row-elements/ward-patient-location';
 
 export interface WardPatientCardElementProps extends WardPatient {
   elementId: string;
@@ -38,6 +39,9 @@ export const WardPatientCardElement: React.FC<WardPatientCardElementProps> = ({
     }
     case 'time-since-admission': {
       return <WardPatientTimeSinceAdmission firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter} />;
+    }
+    case 'patient-location': {
+      return <WardPatientLocation inpatientAdmission={inpatientAdmission} />;
     }
     default: {
       const obsConfig = obsElementDefinitions.find((elementDef) => elementDef.id === elementId);

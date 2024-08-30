@@ -57,7 +57,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
     const obsWithNoTagCount = obsNodes.filter((o) => o == null).length;
     if (obsNodes?.length > 0 || obsWithNoTagCount > 0) {
       return (
-        <div>
+        <div className={styles.wardPatientCardRow}>
           <span className={styles.wardPatientObsLabel}>
             {obsNodes}
             {obsWithNoTagCount > 0 ? (

@@ -1,9 +1,15 @@
-import { makeUrl, restBaseUrl, useOpenmrsFetchAll, useOpenmrsInfinite, useOpenmrsPagination } from '@openmrs/esm-framework';
-import { MotherAndChildren } from '../types';
+import {
+  makeUrl,
+  restBaseUrl,
+  useOpenmrsFetchAll,
+  useOpenmrsInfinite,
+  useOpenmrsPagination,
+} from '@openmrs/esm-framework';
+import { type MotherAndChildren } from '../types';
 
 export interface MothersAndChildrenSearchCriteria {
-  mothers?: Array<string>,
-  children?: Array<string>,
+  mothers?: Array<string>;
+  children?: Array<string>;
   requireMotherHasActiveVisit?: boolean;
   requireChildHasActiveVisit?: boolean;
   requireChildBornDuringMothersActiveVisit?: boolean;
@@ -12,30 +18,33 @@ export interface MothersAndChildrenSearchCriteria {
 export function useMotherAndChildren(
   criteria: MothersAndChildrenSearchCriteria,
   fetch: boolean = true,
-  rep: string = "default",
+  rep: string = null,
 ) {
-
   const url = makeUrlUrl(`${restBaseUrl}/emrapi/maternal/mothersAndChildren`);
   const {
-    mothers, 
-    children, 
-    requireChildBornDuringMothersActiveVisit, 
-    requireChildHasActiveVisit, 
-    requireMotherHasActiveVisit} = criteria;
+    mothers,
+    children,
+    requireChildBornDuringMothersActiveVisit,
+    requireChildHasActiveVisit,
+    requireMotherHasActiveVisit,
+  } = criteria;
 
-  for(const m of mothers ?? []) {
+  for (const m of mothers ?? []) {
     url.searchParams.append('mother', m);
   }
 
-  for(const c of children ?? []) {
+  for (const c of children ?? []) {
     url.searchParams.append('child', c);
   }
-  
+
   url.searchParams.append('requireMotherHasActiveVisit', requireMotherHasActiveVisit?.toString() ?? 'false');
   url.searchParams.append('requireChildHasActiveVisit', requireChildHasActiveVisit?.toString() ?? 'false');
-  url.searchParams.append('requireChildBornDuringMothersActiveVisit', requireChildBornDuringMothersActiveVisit?.toString() ?? 'false');
-  // url.searchParams.append('v', rep);
-  return useOpenmrsPagination<MotherAndChildren>(fetch? url : null, 50);
+  url.searchParams.append(
+    'requireChildBornDuringMothersActiveVisit',
+    requireChildBornDuringMothersActiveVisit?.toString() ?? 'false',
+  );
+  rep && url.searchParams.append('v', rep);
+  return useOpenmrsPagination<MotherAndChildren>(fetch ? url : null, 50);
 }
 
 function makeUrlUrl(path: string) {

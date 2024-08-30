@@ -64,11 +64,6 @@
       "component": "motherChildRowExtension",
       "name": "mother-child-card-row",
       "slot": "ward-patient-card-slot"
-    },
-    {
-      "component": "motherChildRowParentExtension",
-      "name": "mother-child-card-row",
-      "slot": "ward-patient-card-parent-slot"
     }
   ],
   "workspaces": [

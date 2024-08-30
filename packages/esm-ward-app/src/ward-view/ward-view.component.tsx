@@ -1,6 +1,12 @@
 import React from 'react';
 import { InlineNotification } from '@carbon/react';
-import { ExtensionSlot, openmrsFetch, useAppContext, useDefineAppContext, WorkspaceContainer } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  openmrsFetch,
+  useAppContext,
+  useDefineAppContext,
+  WorkspaceContainer,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import UnassignedPatient from '../beds/unassigned-patient.component';
@@ -31,7 +37,6 @@ const WardView = () => {
 
   return (
     <div className={styles.wardView}>
-      <ExtensionSlot name={"ward-patient-card-parent-slot"} />
       <WardViewHeader />
       <WardViewMain />
       <WorkspaceContainer overlay contextKey="ward" />

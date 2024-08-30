@@ -1,81 +1,72 @@
-import { Patient, useAppContext, useConfig, useDefineAppContext } from '@openmrs/esm-framework';
-import React, { useMemo } from 'react';
-import { MotherChildRowExtensionDefinition } from '../../config-schema';
-import { MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
+import { BabyIcon, MotherIcon, useConfig } from '@openmrs/esm-framework';
+import React from 'react';
+import { type MotherChildRowExtensionDefinition } from '../../config-schema';
+import { type MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
 import useWardLocation from '../../hooks/useWardLocation';
-import { MotherAndChildrenRelationships, WardPatientGroupDetails } from '../../types';
+import { type WardPatientCard } from '../../types';
+import WardPatientAge from '../row-elements/ward-patient-age';
+import WardPatientIdentifier from '../row-elements/ward-patient-identifier';
+import WardPatientLocation from '../row-elements/ward-patient-location';
+import WardPatientName from '../row-elements/ward-patient-name';
+import wardPatientCardStyles from '../ward-patient-card.scss';
+import styles from './mother-child-row.scss';
+import classNames from 'classnames';
 
-const MotherChildRowExtension: React.FC<{}> = () => {
-  const { maternalLocations, childLocations } = useConfig<MotherChildRowExtensionDefinition>();
-  const {location} = useWardLocation();
-  const blah = useAppContext<MotherAndChildrenRelationships>('mother-child-row');
-  const {childrenByMotherUuid, motherByChildUuid} = blah;
-  const {allWardPatientUuids, inpatientAdmissionResponse, admissionLocationResponse, inpatientRequestResponse} = useAppContext<WardPatientGroupDetails>('ward-patients-group') ?? {};
+const motherAndChildrenRep =
+  'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
 
-  // const allWardPatientUuidsArray = Array.from(allWardPatientUuids ?? []);
-  
-  // const params : MothersAndChildrenSearchCriteria = {
-  //   mothers: maternalLocations.includes(location.uuid) ? allWardPatientUuidsArray: null,
-  //   children: childLocations.includes(location.uuid) ? allWardPatientUuidsArray: null,
-  //   requireMotherHasActiveVisit: true,
-  //   requireChildHasActiveVisit: true,
-  //   requireChildBornDuringMothersActiveVisit: true,
-  // };
-  
-  // const fetchMotherAndChildren: boolean = !inpatientAdmissionResponse?.isLoading && !admissionLocationResponse?.isLoading && !inpatientRequestResponse?.isLoading;
-  // const motherAndChildren = useMotherAndChildren(params, fetchMotherAndChildren);
-  // const motherAndChildrenRelationships = useMemo(() => {
-  //   const motherByChildUuid = new Map<string, Patient>();
-  //   const childrenByMotherUuid = new Map<string, Array<Patient>>();
+/**
+ * This extension displays the mother or children of the patient in the patient card.
+ *
+ * @param param0
+ * @returns
+ */
+const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
+  const { maternalWardLocations: maternalLocations, childrenWardLocations: childLocations } =
+    useConfig<MotherChildRowExtensionDefinition>();
+  const { location } = useWardLocation();
 
-  //   if(motherAndChildren.data && !motherAndChildren.isLoading) {
-  //     for(const {mother, child} of motherAndChildren.data) {
-  //       motherByChildUuid.set(child.uuid, mother);
-  //       if(!childrenByMotherUuid.has(mother.uuid)) {
-  //         childrenByMotherUuid.set(mother.uuid, []);
-  //       }
-  //       childrenByMotherUuid.get(mother.uuid).push(child);
-  //     }
-  //   }
+  const params: MothersAndChildrenSearchCriteria = {
+    // mothers: [patient.uuid],
+    // children: [patient.uuid],
+    requireMotherHasActiveVisit: true,
+    requireChildHasActiveVisit: true,
+    requireChildBornDuringMothersActiveVisit: true,
+  };
 
-  //   return {motherByChildUuid, childrenByMotherUuid};
-  // }, [motherAndChildren]);
+  const { data } = useMotherAndChildren(params, true, motherAndChildrenRep);
 
-  // useDefineAppContext<MotherAndChildrenRelationships>('mother-child-row', motherAndChildrenRelationships);
+  return (
+    <>
+      {data?.map(({ mother, motherAdmission, child, childAdmission }) => {
+        // patient A is the patient card's patient
+        const patientA = patient;
+        // patient B is either the mother or the child of patient A
+        const isPatientBTheMother = mother.uuid != patientA.uuid;
+        const patientB = isPatientBTheMother ? mother : child;
 
-  return <>mother</>;
+        // we display patient B here
+        const Icon = isPatientBTheMother ? MotherIcon : BabyIcon;
+        const patientBAdmission = isPatientBTheMother ? motherAdmission : childAdmission;
+
+        return (
+          <div
+            key={patientB.uuid}
+            className={classNames(styles.motherOrBabyRow, wardPatientCardStyles.wardPatientCardRow)}>
+            <div className={styles.motherOrBabyIconDiv}>
+              <Icon className={styles.motherOrBabyIcon} size={24} />
+            </div>
+            <div className={wardPatientCardStyles.dotSeparatedChildren}>
+              <WardPatientName patient={patientB} />
+              <WardPatientIdentifier patient={patientB} />
+              <WardPatientAge patient={patientB} />
+              <WardPatientLocation inpatientAdmission={patientBAdmission} />
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
 };
 
 export default MotherChildRowExtension;
-
-
-// import { Patient, useAppContext, useConfig, useDefineAppContext } from '@openmrs/esm-framework';
-// import React, { useMemo } from 'react';
-// import { MotherChildRowExtensionDefinition } from '../../config-schema';
-// import { MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
-// import useWardLocation from '../../hooks/useWardLocation';
-// import { MotherAndChildrenRelationships, WardPatientCard, WardPatientGroupDetails } from '../../types';
-
-
-
-// const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
-  
-//   const { maternalLocations, childLocations } = useConfig<MotherChildRowExtensionDefinition>();
-//   const {location} = useWardLocation();
-//   const {childrenByMotherUuid, motherByChildUuid} = useAppContext<MotherAndChildrenRelationships>('mother-child-row');
-
-//   // const childrenToDisplay = maternalLocations.includes(location.uuid) || true ? childrenByMotherUuid.get(patient.uuid) : null;
-//   // const motherToDisplay = childLocations.includes(location.uuid) || true? motherByChildUuid.get(patient.uuid) : null;
-
-//   return (
-//     <>
-//       mother
-//       {/* {childrenToDisplay?.map(child => (
-//         <p>{child.display}</p>
-//       ))}
-//       {motherToDisplay && <p>{motherToDisplay.display}</p>} */}
-//     </>
-//   )
-// };
-
-// export default MotherChildRowExtension;
