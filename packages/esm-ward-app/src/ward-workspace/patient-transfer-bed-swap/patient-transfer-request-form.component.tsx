@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ResponsiveWrapper, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
 import styles from './patient-transfer-swap.scss';
 import { useTranslation } from 'react-i18next';
-import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +9,7 @@ import LocationSelector from '../../location-selector/location-selector.componen
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { ObsPayload, WardPatientWorkspaceProps } from '../../types';
+import type { ObsPayload, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import classNames from 'classnames';
 import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
@@ -31,7 +30,8 @@ export default function PatientTransferForm({
     () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
     [emrConfiguration],
   );
-  const { mutate: mutateAdmissionLocation } = useAdmissionLocation();
+  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
 
   const zodSchema = useMemo(
@@ -154,6 +154,7 @@ export default function PatientTransferForm({
     setShowErrorNotifications(true);
   }, []);
 
+  if (!wardGroupingDetails) return <></>;
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
