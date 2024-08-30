@@ -6,10 +6,6 @@
   border: 1px solid colors.$gray-20;
   margin: layout.$spacing-06;
 
-  :global(.cds--modal-content) {
-    margin-bottom: unset;
-  }
-
   @media (min-width: 66rem) {
     :global(.cds--modal-container) {
       max-height: 100%;
