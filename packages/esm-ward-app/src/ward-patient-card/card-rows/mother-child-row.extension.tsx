@@ -1,16 +1,17 @@
-import { BabyIcon, MotherIcon, useConfig } from '@openmrs/esm-framework';
+import { InlineNotification } from '@carbon/react';
+import { BabyIcon, MotherIcon } from '@openmrs/esm-framework';
+import classNames from 'classnames';
 import React from 'react';
-import { type MotherChildRowExtensionDefinition } from '../../config-schema';
+import { useTranslation } from 'react-i18next';
 import { type MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
-import useWardLocation from '../../hooks/useWardLocation';
 import { type WardPatientCard } from '../../types';
+import WardPatientSkeletonText from '../row-elements/ward-pateint-skeleton-text';
 import WardPatientAge from '../row-elements/ward-patient-age';
 import WardPatientIdentifier from '../row-elements/ward-patient-identifier';
 import WardPatientLocation from '../row-elements/ward-patient-location';
 import WardPatientName from '../row-elements/ward-patient-name';
 import wardPatientCardStyles from '../ward-patient-card.scss';
 import styles from './mother-child-row.scss';
-import classNames from 'classnames';
 
 const motherAndChildrenRep =
   'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
@@ -22,23 +23,60 @@ const motherAndChildrenRep =
  * @returns
  */
 const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
-  const { maternalWardLocations: maternalLocations, childrenWardLocations: childLocations } =
-    useConfig<MotherChildRowExtensionDefinition>();
-  const { location } = useWardLocation();
+  const { t } = useTranslation();
 
-  const params: MothersAndChildrenSearchCriteria = {
-    // mothers: [patient.uuid],
-    // children: [patient.uuid],
+  const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
+    mothers: [patient.uuid],
     requireMotherHasActiveVisit: true,
     requireChildHasActiveVisit: true,
     requireChildBornDuringMothersActiveVisit: true,
   };
 
-  const { data } = useMotherAndChildren(params, true, motherAndChildrenRep);
+  const getMotherRequestParams: MothersAndChildrenSearchCriteria = {
+    children: [patient.uuid],
+    requireMotherHasActiveVisit: true,
+    requireChildHasActiveVisit: true,
+    requireChildBornDuringMothersActiveVisit: true,
+  };
+
+  const {
+    data: childrenData,
+    isLoading: isLoadingChildrenData,
+    error: childrenDataError,
+  } = useMotherAndChildren(getChildrenRequestParams, true, motherAndChildrenRep);
+  const {
+    data: motherData,
+    isLoading: isLoadingMotherData,
+    error: motherDataError,
+  } = useMotherAndChildren(getMotherRequestParams, true, motherAndChildrenRep);
+
+  if (isLoadingChildrenData || isLoadingMotherData) {
+    return (
+      <div className={wardPatientCardStyles.wardPatientCardRow}>
+        <WardPatientSkeletonText />
+      </div>
+    );
+  } else if (childrenDataError) {
+    return (
+      <InlineNotification
+        kind="warning"
+        lowContrast={true}
+        title={t('errorLoadingChildren', 'Error loading children info')}
+      />
+    );
+  } else if (motherDataError) {
+    return (
+      <InlineNotification
+        kind="warning"
+        lowContrast={true}
+        title={t('errorLoadingChildren', 'Error loading mother info')}
+      />
+    );
+  }
 
   return (
     <>
-      {data?.map(({ mother, motherAdmission, child, childAdmission }) => {
+      {[...childrenData, ...motherData]?.map(({ mother, motherAdmission, child, childAdmission }) => {
         // patient A is the patient card's patient
         const patientA = patient;
         // patient B is either the mother or the child of patient A

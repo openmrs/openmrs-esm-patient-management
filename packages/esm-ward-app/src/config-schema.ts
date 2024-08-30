@@ -198,10 +198,6 @@ export interface ObsElementDefinition {
   limit: number;
   label?: string;
 }
-export interface MotherChildRowExtensionDefinition {
-  maternalWardLocations: Array<string>;
-  childrenWardLocations: Array<string>;
-}
 
 export interface IdentifierElementDefinition {
   id: string;

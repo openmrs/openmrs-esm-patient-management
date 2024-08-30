@@ -6,6 +6,7 @@ import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-exte
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
+import WardPatientSkeletonText from './ward-pateint-skeleton-text';
 
 interface WardPatientCodedObsTagsProps {
   config: ColoredObsTagsCardRowConfigObject;
@@ -30,7 +31,11 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
   const conceptToTagColorMap = useConceptToTagColorMap(config.tags);
 
   if (isLoading) {
-    return <SkeletonText />;
+    return (
+      <div className={styles.wardPatientCardRow}>
+        <WardPatientSkeletonText />
+      </div>
+    );
   } else {
     const obsToDisplay = data?.filter((o) => {
       const matchVisit = o.encounter.visit?.uuid == visit?.uuid;

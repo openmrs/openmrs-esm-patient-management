@@ -48,11 +48,7 @@ const WardViewMain = () => {
   const { location } = useWardLocation();
 
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const {
-    bedLayouts = [],
-    wardAdmittedPatientsWithBed = new Map(),
-    wardUnassignedPatientsList = [],
-  } = wardPatientsGrouping ?? {};
+  const { bedLayouts, wardAdmittedPatientsWithBed, wardUnassignedPatientsList } = wardPatientsGrouping ?? {};
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
     wardPatientsGrouping?.admissionLocationResponse ?? {};
   const { isLoading: isLoadingInpatientAdmissions, error: errorLoadingInpatientAdmissions } =
@@ -65,7 +61,7 @@ const WardViewMain = () => {
     const { patients } = bedLayout;
     const bed = bedLayoutToBed(bedLayout);
     const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
-      const inpatientAdmission = wardAdmittedPatientsWithBed.get(patient.uuid);
+      const inpatientAdmission = wardAdmittedPatientsWithBed?.get(patient.uuid);
       if (inpatientAdmission) {
         const { patient, visit, currentInpatientRequest } = inpatientAdmission;
         return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
@@ -83,7 +79,7 @@ const WardViewMain = () => {
     return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
   });
 
-  const wardUnassignedPatients = wardUnassignedPatientsList.map((inpatientAdmission) => {
+  const wardUnassignedPatients = wardUnassignedPatientsList?.map((inpatientAdmission) => {
     return (
       <UnassignedPatient
         wardPatient={{
@@ -101,7 +97,7 @@ const WardViewMain = () => {
   return (
     <div className={styles.wardViewMain}>
       {wardBeds}
-      {bedLayouts && bedLayouts.length == 0 && (
+      {bedLayouts?.length == 0 && (
         <InlineNotification
           kind="warning"
           lowContrast={true}
