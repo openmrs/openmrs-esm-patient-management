@@ -167,7 +167,9 @@ export interface FormValues {
   birthdate: Date | string;
   birthdateEstimated: boolean;
   deathCause: string;
-  deathDate: string;
+  deathDate: string | Date;
+  deathTime: string;
+  deathTimeFormat: 'AM' | 'PM';
   familyName: string;
   gender: string;
   givenName: string;
@@ -177,6 +179,7 @@ export interface FormValues {
   isDead: boolean;
   middleName: string;
   monthsEstimated: number;
+  nonCodedCauseOfDeath: string;
   obs?: {
     [conceptUuid: string]: string;
   };

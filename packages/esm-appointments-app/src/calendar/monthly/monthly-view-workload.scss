@@ -13,10 +13,6 @@
   text-align: right;
   @include type.type-style('body-compact-02');
 
-  &:nth-child(-n + 7) {
-    border-top: 1px solid colors.$gray-20;
-  }
-
   &:nth-child(7n) {
     border-right: 1px solid colors.$gray-20;
   }
