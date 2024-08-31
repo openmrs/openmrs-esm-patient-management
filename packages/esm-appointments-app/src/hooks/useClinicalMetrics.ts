@@ -45,11 +45,13 @@ export function useAllAppointmentsByDate() {
     openmrsFetch,
   );
 
-  const providersArray = data?.data?.filter(({ providers }) => providers !== null) ?? [];
-  const providersCount = uniqBy(
-    providersArray.map(({ providers }) => providers).flat(),
-    (provider) => provider.uuid,
-  ).length;
+  const providersArray = data?.data?.flatMap(({ providers }) => providers ?? []) ?? [];
+
+  const validProviders = providersArray.filter((provider) => provider.response === 'ACCEPTED');
+
+  const uniqueProviders = uniqBy(validProviders, (provider) => provider.uuid);
+  const providersCount = uniqueProviders.length;
+
   return {
     totalProviders: providersCount ? providersCount : 0,
     isLoading,

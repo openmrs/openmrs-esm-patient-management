@@ -64,8 +64,30 @@
 }
 
 .sexField,
-.dobField {
+.dobField,
+.dodField {
   margin-bottom: layout.$spacing-05;
+
+  span {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: start;
+  }
+}
+
+.nonCodedCauseOfDeath {
+  margin-top: layout.$spacing-04;
+}
+
+.timeOfDeathContainer {
+  display: flex;
+  align-items: center;
+}
+
+.timeOfDeathField {
+  flex: none;
+  margin-left: layout.$spacing-02;
 }
 
 .dobContentSwitcherLabel {

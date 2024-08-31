@@ -1,23 +1,20 @@
-import React from 'react';
 import { InlineNotification } from '@carbon/react';
 import {
-  ExtensionSlot,
-  openmrsFetch,
   useAppContext,
   useDefineAppContext,
-  WorkspaceContainer,
+  WorkspaceContainer
 } from '@openmrs/esm-framework';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import UnassignedPatient from '../beds/unassigned-patient.component';
 import useWardLocation from '../hooks/useWardLocation';
-import { type WardPatientGroupDetails, type WardPatient } from '../types';
+import { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
+import { type WardPatient, type WardPatientGroupDetails } from '../types';
 import WardViewHeader from '../ward-view-header/ward-view-header.component';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
-import { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
-import useSWR from 'swr';
 
 const WardView = () => {
   const response = useWardLocation();
@@ -46,22 +43,54 @@ const WardView = () => {
 
 const WardViewMain = () => {
   const { location } = useWardLocation();
+  const { t } = useTranslation();
 
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { bedLayouts, wardAdmittedPatientsWithBed, wardUnassignedPatientsList } = wardPatientsGrouping ?? {};
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
     wardPatientsGrouping?.admissionLocationResponse ?? {};
-  const { isLoading: isLoadingInpatientAdmissions, error: errorLoadingInpatientAdmissions } =
-    wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
+  const {
+    isLoading: isLoadingInpatientAdmissions, 
+    error: errorLoadingInpatientAdmissions, 
+    hasMore: hasMoreInpatientAdmissions, 
+    loadMore: loadMoreInpatientAdmissions
+  } = wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
 
-  const { t } = useTranslation();
+  const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
+  useEffect(
+    function scrollToLoadMore() {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (hasMoreInpatientAdmissions && !errorLoadingInpatientAdmissions && !isLoadingInpatientAdmissions) {
+                loadMoreInpatientAdmissions();
+              }
+            }
+          });
+        },
+        { threshold: 1 },
+      );
+
+      if (scrollToLoadMoreTrigger.current) {
+        observer.observe(scrollToLoadMoreTrigger.current);
+      }
+      return () => {
+        if (scrollToLoadMoreTrigger.current) {
+          observer.unobserve(scrollToLoadMoreTrigger.current);
+        }
+      };
+    },
+    [scrollToLoadMoreTrigger, hasMoreInpatientAdmissions, errorLoadingInpatientAdmissions, loadMoreInpatientAdmissions],
+  );
 
   if (!wardPatientsGrouping) return <></>;
+
   const wardBeds = bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
     const bed = bedLayoutToBed(bedLayout);
     const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
-      const inpatientAdmission = wardAdmittedPatientsWithBed?.get(patient.uuid);
+      const inpatientAdmission = wardAdmittedPatientsWithBed.get(patient.uuid);
       if (inpatientAdmission) {
         const { patient, visit, currentInpatientRequest } = inpatientAdmission;
         return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
@@ -125,6 +154,7 @@ const WardViewMain = () => {
           subtitle={errorLoadingInpatientAdmissions?.message}
         />
       )}
+      <div ref={scrollToLoadMoreTrigger}></div>
     </div>
   );
 };

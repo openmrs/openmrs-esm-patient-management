@@ -3,11 +3,11 @@ import camelCase from 'lodash-es/camelCase';
 import { parseDate } from '@openmrs/esm-framework';
 import {
   type AddressValidationSchemaType,
+  type Encounter,
   type FormValues,
   type PatientIdentifier,
-  type PatientUuidMapType,
   type PatientIdentifierValue,
-  type Encounter,
+  type PatientUuidMapType,
 } from './patient-registration.types';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
@@ -47,6 +47,7 @@ export function parseAddressTemplateXml(addressTemplate: string) {
     addressValidationSchema,
   };
 }
+
 export function parseAddressTemplateXmlOld(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
   const nameMappings = templateXmlDoc.querySelector('nameMappings').querySelectorAll('property');
@@ -122,11 +123,6 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   result.gender = patient.gender;
   result.birthdate = patient.birthDate ? parseDate(patient.birthDate) : undefined;
   result.telephoneNumber = patient.telecom ? patient.telecom[0].value : '';
-
-  if (patient.deceasedBoolean || patient.deceasedDateTime) {
-    result.isDead = true;
-    result.deathDate = patient.deceasedDateTime ? patient.deceasedDateTime.split('T')[0] : '';
-  }
 
   return {
     ...result,

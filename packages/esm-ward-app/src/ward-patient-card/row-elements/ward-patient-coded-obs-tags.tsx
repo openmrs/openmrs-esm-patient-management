@@ -39,7 +39,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
   } else {
     const obsToDisplay = data?.filter((o) => {
       const matchVisit = o.encounter.visit?.uuid == visit?.uuid;
-      return matchVisit || visit == null; // TODO: remove visit == null hack when server API supports returning visit
+      return matchVisit;
     });
 
     const summaryLabelToDisplay = summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;

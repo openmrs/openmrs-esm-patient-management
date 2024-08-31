@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Formik, Form } from 'formik';
+import { Form, Formik } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
-import { DeathInfoSection } from './death-info-section.component';
 import { type FormValues } from '../../patient-registration.types';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { DeathInfoSection } from './death-info-section.component';
 
 const initialContextValues = {
   currentPhoto: 'data:image/png;base64,1234567890',
@@ -29,7 +29,7 @@ describe('Death info section', () => {
       <PatientRegistrationContext.Provider value={initialContextValues}>
         <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
           <Form>
-            <DeathInfoSection />
+            <DeathInfoSection fields={[]} />
           </Form>
         </Formik>
       </PatientRegistrationContext.Provider>,
@@ -40,16 +40,6 @@ describe('Death info section', () => {
     renderDeathInfoSection(true);
 
     expect(screen.getByRole('region', { name: /death info section/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /death info/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /is dead \(optional\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /date of death \(optional\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /cause of death \(optional\)/i })).toBeInTheDocument();
-  });
-
-  it('has the correct number of inputs if is dead is not checked', async () => {
-    renderDeathInfoSection(false);
-
-    expect(screen.queryByRole('textbox', { name: /date of death \(optional\)/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: /cause of death \(optional\)/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /is dead/i })).toBeInTheDocument();
   });
 });

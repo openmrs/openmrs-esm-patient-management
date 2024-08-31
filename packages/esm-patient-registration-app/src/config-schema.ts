@@ -37,6 +37,10 @@ export interface RegistrationConfig {
   sectionDefinitions: Array<SectionDefinition>;
   fieldDefinitions: Array<FieldDefinition>;
   fieldConfigurations: {
+    causeOfDeath: {
+      conceptUuid: string;
+      required?: boolean;
+    };
     name: {
       displayMiddleName: boolean;
       allowUnidentifiedPatients: boolean;
@@ -78,6 +82,7 @@ export interface RegistrationConfig {
     encounterProviderRoleUuid: string;
     registrationFormUuid: string | null;
   };
+  freeTextFieldConceptUuid: string;
 }
 
 export const builtInSections: Array<SectionDefinition> = [
@@ -87,12 +92,21 @@ export const builtInSections: Array<SectionDefinition> = [
     fields: ['name', 'gender', 'dob', 'id'],
   },
   { id: 'contact', name: 'Contact Details', fields: ['address', 'phone'] },
-  { id: 'death', name: 'Death Info', fields: [] },
+  { id: 'death', name: 'Death Info', fields: ['dateAndTimeOfDeath', 'causeOfDeath'] },
   { id: 'relationships', name: 'Relationships', fields: [] },
 ];
 
 // These fields are handled specially in field.component.tsx
-export const builtInFields = ['name', 'gender', 'dob', 'id', 'address', 'phone'] as const;
+export const builtInFields = [
+  'name',
+  'gender',
+  'dob',
+  'id',
+  'address',
+  'phone',
+  'causeOfDeath',
+  'dateAndTimeOfDeath',
+] as const;
 
 export const esmPatientRegistrationSchema = {
   sections: {
@@ -199,6 +213,14 @@ export const esmPatientRegistrationSchema = {
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
   fieldConfigurations: {
+    causeOfDeath: {
+      conceptUuid: {
+        _type: Type.ConceptUuid,
+        _description: 'The concept UUID to get cause of death answers',
+        _default: '9272a14b-7260-4353-9e5b-5787b5dead9d',
+      },
+      required: { _type: Type.Boolean, _default: false },
+    },
     name: {
       displayMiddleName: { _type: Type.Boolean, _default: true },
       allowUnidentifiedPatients: {
@@ -358,6 +380,10 @@ export const esmPatientRegistrationSchema = {
       _description:
         'The form UUID to associate with the registration encounter. By default no form will be associated.',
     },
+  },
+  freeTextFieldConceptUuid: {
+    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _type: Type.ConceptUuid,
   },
   _validators: [
     validator(

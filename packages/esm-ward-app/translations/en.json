@@ -34,6 +34,8 @@
   "manage": "Manage",
   "nextPage": "Next page",
   "noBedsConfigured": "No beds configured for this location",
+  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}",
+  "errorLoadingBedDetails":"Error Loading Bed Details",
   "noBedsConfiguredForLocation": "No beds configured for {{location}} location",
   "noLocationsFound": "No locations found",
   "note": "Note",
