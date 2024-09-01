@@ -59,6 +59,11 @@
       "component": "admissionRequestNoteRowExtension",
       "name": "admission-request-note-card-row",
       "slot": "ward-patient-card-slot"
+    },
+    {
+      "component": "pendingOrdersExtension",
+      "name": "ward-patient-pending-orders",
+      "slot": "ward-patient-card-pending-items-slot"
     }
   ],
   "workspaces": [
