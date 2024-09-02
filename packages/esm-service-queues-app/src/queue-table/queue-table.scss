@@ -4,7 +4,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .defaultQueueTable {
-  margin: layout.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 .container {
@@ -28,6 +28,10 @@
 }
 
 .filterContainer {
+  label {
+    margin-right: layout.$spacing-03 !important;
+  }
+
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
   }
@@ -74,7 +78,6 @@
 
 .tableContainer {
   background-color: $ui-01;
-  // margin: 0 layout.$spacing-05;
   padding: 0;
 
   a {
@@ -134,7 +137,7 @@
   }
 }
 
-.expandedActiveVisitRow {
+.expandedQueueRow {
   :global(.cds--tab-content) {
     padding: layout.$spacing-03 0;
   }
@@ -187,20 +190,43 @@ html[dir='rtl'] {
 }
 
 .tileContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: layout.$spacing-09;
+  text-align: center;
   background-color: $ui-02;
-  border-top: 1px solid $ui-03;
-  padding: layout.$spacing-07 0;
-  // margin: 0 layout.$spacing-05;
 }
 
 .tile {
   margin: auto;
-  width: fit-content;
+  background-color: $ui-01;
 }
 
-.tileContent {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.spacer {
+  margin: 0 layout.$spacing-03;
+}
+
+.queueTable {
+  tbody tr[data-parent-row] {
+    // Don't show a bottom border on the last row so we don't end up with a double border from the activeVisitContainer
+    &:nth-last-of-type(2) > td {
+      border-bottom: none;
+    }
+  }
 }

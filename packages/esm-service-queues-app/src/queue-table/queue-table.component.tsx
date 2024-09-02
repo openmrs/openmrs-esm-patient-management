@@ -5,6 +5,7 @@ import {
   DataTable,
   DataTableSkeleton,
   InlineLoading,
+  Layer,
   Pagination,
   Table,
   TableBody,
@@ -145,10 +146,12 @@ function QueueTable({
                           </TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && row.isExpanded && (
-                        <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
+                      {ExpandedRow && row.isExpanded ? (
+                        <TableExpandedRow className={styles.expandedQueueRow} colSpan={headers.length + 1}>
                           <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
                         </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                       )}
                     </React.Fragment>
                   );
@@ -158,12 +161,12 @@ function QueueTable({
           </TableContainer>
           {rows.length === 0 && (
             <div className={styles.tileContainer}>
-              <Tile className={styles.tile}>
-                <div className={styles.tileContent}>
+              <Layer>
+                <Tile className={styles.tile}>
                   <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
                   <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                </div>
-              </Tile>
+                </Tile>
+              </Layer>
             </div>
           )}
           {paginated && (
