@@ -24,7 +24,7 @@ const WardMetrics = () => {
   if (error) {
     showNotification({
       kind: 'error',
-      title: t('errorLoadingBedDetails', 'Error Loading Bed Details'),
+      title: t('errorLoadingBedDetails', 'Error loading bed details'),
       description: error.message,
     });
   }

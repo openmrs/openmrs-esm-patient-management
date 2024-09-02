@@ -3,54 +3,12 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .header {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
   background-color: $ui-02;
   border: 1px solid $ui-03;
   border-left: 0px;
   display: flex;
   justify-content: space-between;
-  padding-right: layout.$spacing-05;
-}
-
-.left-justified-items {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.right-justified-items {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  padding-top: layout.$spacing-05;
-}
-
-.page-name {
-  @include type.type-style('heading-04');
-}
-
-.page-labels {
-  p:first-of-type {
-    margin-bottom: layout.$spacing-02;
-  }
-}
-
-.date-and-location {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.value {
-  margin-left: layout.$spacing-02;
-}
-
-.middot {
-  margin: 0 layout.$spacing-03;
-}
-
-.view {
-  @include type.type-style('label-01');
+  padding-right: layout.$spacing-03;
 }
 
 .dropdownContainer {
@@ -58,6 +16,10 @@
   align-items: center;
   justify-content: flex-end;
   margin-top: layout.$spacing-03;
+}
+
+.view {
+  @include type.type-style('label-01');
 }
 
 .dropdown {
