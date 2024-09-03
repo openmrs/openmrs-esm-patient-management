@@ -45,7 +45,9 @@ const PatientWorkspaceTitle: React.FC<WardPatientWorkspaceViewProps> = ({ patien
     <>
       <div>{patient.person.display} &nbsp;</div>
       <div className={styles.headerPatientDetail}>&middot; &nbsp; {getGender(t, patient.person?.gender)}</div>
-      <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
+      {patient.person?.birthdate && (
+        <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
+      )}
     </>
   );
 };
