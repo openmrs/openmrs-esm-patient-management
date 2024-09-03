@@ -30,7 +30,7 @@ const Appointments: React.FC = () => {
   return (
     <SelectedDateContext.Provider value={{ selectedDate, setSelectedDate }}>
       <AppointmentsHeader
-        title={t('home', 'Home')}
+        title={t('appointments', 'Appointments')}
         appointmentServiceType={appointmentServiceType}
         onChange={setAppointmentServiceType}
       />

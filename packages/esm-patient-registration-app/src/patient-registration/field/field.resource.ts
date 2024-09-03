@@ -1,6 +1,7 @@
-import { type FetchResponse, openmrsFetch, showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { type ConceptAnswers, type ConceptResponse } from '../patient-registration.types';
+import { useMemo } from 'react';
 
 export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoading: boolean } {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
@@ -15,10 +16,15 @@ export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoad
       kind: 'error',
     });
   }
-  return { data: data?.data, isLoading };
+  const results = useMemo(() => ({ data: data?.data, isLoading }), [data, isLoading]);
+  return results;
 }
 
-export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAnswers>; isLoading: boolean } {
+export function useConceptAnswers(conceptUuid: string): {
+  data: Array<ConceptAnswers>;
+  isLoading: boolean;
+  error: Error;
+} {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
     shouldFetch ? `${restBaseUrl}/concept/${conceptUuid}` : null,
@@ -31,5 +37,6 @@ export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAns
       kind: 'error',
     });
   }
-  return { data: data?.data?.answers, isLoading };
+  const results = useMemo(() => ({ data: data?.data?.answers, isLoading, error }), [isLoading, error, data]);
+  return results;
 }

@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './patient-transfer-swap.scss';
-import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout, WardPatientWorkspaceProps } from '../../types';
+import type { BedLayout, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
 import useWardLocation from '../../hooks/useWardLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import {
@@ -31,12 +30,12 @@ export default function PatientBedSwapForm({
   const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const { isLoading, admissionLocation } = useAdmissionLocation();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
-  const { mutate: mutateAdmissionLocation } = useAdmissionLocation();
+  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const { isLoading, mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
 
   const zodSchema = useMemo(
@@ -72,7 +71,7 @@ export default function PatientBedSwapForm({
     [t],
   );
 
-  const beds = useMemo(() => (admissionLocation ? filterBeds(admissionLocation) : []), [admissionLocation]);
+  const beds = wardGroupingDetails?.bedLayouts ?? [];
   const bedDetails = useMemo(
     () =>
       beds.map((bed) => {
@@ -148,6 +147,7 @@ export default function PatientBedSwapForm({
     setShowErrorNotifications(true);
   }, []);
 
+  if (!wardGroupingDetails) return <></>;
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}

@@ -14,7 +14,7 @@ import {
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
-import { type RegistrationConfig, esmPatientRegistrationSchema } from '../config-schema';
+import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
 import type { AddressTemplate, Encounter } from './patient-registration.types';
 import { ResourcesContext } from '../offline.resources';
 import { FormManager } from './form-manager';
@@ -166,6 +166,9 @@ let mockOpenmrsConfig: RegistrationConfig = {
         useQuickSearch: true,
         searchAddressByLevel: true,
       },
+    },
+    causeOfDeath: {
+      conceptUuid: 'cause-of-death-concept-uuid',
     },
   },
   links: {
@@ -407,7 +410,7 @@ describe('Updating an existing patient record', () => {
     const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
     const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
     const middleNameInput: HTMLInputElement = screen.getByLabelText(/Middle Name/);
-    const dateOfBirthInput: HTMLInputElement = screen.getByLabelText('Date of Birth');
+    const dateOfBirthInput: HTMLInputElement = screen.getByLabelText(/Date of Birth/i);
     const genderInput: HTMLInputElement = screen.getByLabelText(/Male/);
 
     // assert initial values
@@ -443,7 +446,10 @@ describe('Updating an existing patient record', () => {
         birthdate: new Date('1972-04-04T00:00:00.000Z'),
         birthdateEstimated: false,
         deathCause: '',
-        deathDate: '',
+        nonCodedCauseOfDeath: '',
+        deathDate: undefined,
+        deathTime: undefined,
+        deathTimeFormat: 'AM',
         familyName: 'Smith',
         gender: expect.stringMatching(/male/i),
         givenName: 'Eric',

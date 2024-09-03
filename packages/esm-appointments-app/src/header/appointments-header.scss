@@ -4,71 +4,22 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .header {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  height: layout.$spacing-12;
   background-color: $ui-02;
-  border-bottom: 1px solid $ui-03;
+  border: 1px solid $ui-03;
+  border-left: 0;
   display: flex;
   justify-content: space-between;
-}
-
-.left-justified-items {
-  display: flex;
-  flex-direction: row;
   align-items: center;
+  padding-right: layout.$spacing-03;
 }
 
-.right-justified-items {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  margin: layout.$spacing-03;
-}
-
-.page-name {
-  @include type.type-style('heading-04');
-}
-
-.page-labels {
-  margin: layout.$spacing-05 0;
-
-  p:first-of-type {
-    margin-bottom: layout.$spacing-02;
-  }
-}
-
-.date-and-location {
+.rightJustifiedItems {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   justify-content: flex-end;
-  align-items: center;
-}
-
-.dropdownContainer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: layout.$spacing-02;
-}
-
-.value {
-  margin-left: layout.$spacing-02;
-}
-
-.middot {
   margin: 0 layout.$spacing-03;
-}
-
-.view {
-  @include type.type-style('label-01');
-}
-
-.datePicker {
-  background-color: transparent;
-  width: layout.$spacing-13;
-  border: none;
-  & > input {
-    color: colors.$blue-10;
-  }
+  row-gap: layout.$spacing-01;
 }
 
 .dropdown {

@@ -1,14 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { ExtensionSlot, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
 import { Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-discharge.scss';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
-import type { WardPatientWorkspaceProps } from '../../types';
+import {type WardPatientGroupDetails, type WardPatientWorkspaceProps } from '../../types';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { createEncounter, removePatientFromBed } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
-import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import { Exit } from '@carbon/react/icons';
 
@@ -19,7 +18,8 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
-  const { mutate: mutateAdmissionLocation } = useAdmissionLocation();
+  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientRequest } = useInpatientRequest();
 
   const submitDischarge = useCallback(() => {
@@ -74,6 +74,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
     mutateInpatientRequest,
   ]);
 
+  if (!wardGroupingDetails) return <></>;
   return (
     <div className={styles.workspaceContent}>
       <div className={styles.patientWorkspaceBanner}>

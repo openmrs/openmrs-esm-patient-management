@@ -66,7 +66,7 @@ export interface TextInputProps
    * `true` to use the light version. For use on $ui-01 backgrounds only.
    * Don't use this to make tile background color same as container background color.
    * 'The `light` prop for `TextInput` has ' +
-      'been deprecated in favor of the new `Layer` component. It will be removed in the next major release.'
+   'been deprecated in favor of the new `Layer` component. It will be removed in the next major release.'
    */
   light?: boolean;
 
@@ -145,6 +145,10 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('invalidEmail')
     t('numberInNameDubious')
     t('yearsEstimateRequired')
+    t('deathdayIsRequired', 'Death date is required when the patient is marked as deceased.')
+    t('deathdayInvalidDate', 'Date of death is invalid')
+    t('deathCauseRequired', 'Cause of death is required')
+    t('nonCodedCauseOfDeathRequired', 'Non-coded cause of death is required')
   */
 
   const value = field.value || '';

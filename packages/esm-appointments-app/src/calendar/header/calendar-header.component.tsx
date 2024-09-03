@@ -19,6 +19,7 @@ const CalendarHeader: React.FC = () => {
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.titleContainer}>
         <Button
+          className={styles.backButton}
           kind="ghost"
           onClick={backButtonOnClick}
           renderIcon={ArrowLeft}

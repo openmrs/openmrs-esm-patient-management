@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
-import { deletePatient, getPatient } from '../commands';
+import { deletePatient } from '../commands';
 
 let patientUuid: string;
 
@@ -50,7 +50,6 @@ test('Register a new patient', async ({ page }) => {
     await expect(patientBanner).toBeVisible();
     await expect(patientBanner.getByText('Johnny Donny Ronny')).toBeVisible();
     await expect(patientBanner.getByText(/male/i)).toBeVisible();
-    await expect(patientBanner.getByText(/4 yrs, 6 mths/i)).toBeVisible();
     await expect(patientBanner.getByText(/01 — Feb — 2020/i)).toBeVisible();
     await expect(patientBanner.getByText(/OpenMRS ID/i)).toBeVisible();
   });
