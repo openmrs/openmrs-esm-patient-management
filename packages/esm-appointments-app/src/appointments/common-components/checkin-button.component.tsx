@@ -18,24 +18,29 @@ interface CheckInButtonProps {
 const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid }) => {
   const { checkInButton } = useConfig<ConfigObject>();
   const { t } = useTranslation();
+
+  const shouldShowCheckInButton =
+    checkInButton.showIfActiveVisit ||
+    dayjs(appointment.startDateTime).isAfter(dayjs()) ||
+    dayjs(appointment.startDateTime).isToday();
+
   return (
     <>
-      {checkInButton.enabled &&
-        (dayjs(appointment.startDateTime).isAfter(dayjs()) || dayjs(appointment.startDateTime).isToday()) && (
-          <Button
-            size="sm"
-            kind="tertiary"
-            onClick={() =>
-              checkInButton.customUrl
-                ? navigate({
-                    to: checkInButton.customUrl,
-                    templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
-                  })
-                : launchWorkspace('start-visit-workspace-form', { patientUuid: patientUuid, showPatientHeader: true })
-            }>
-            {t('checkIn', 'Check in')}
-          </Button>
-        )}
+      {checkInButton.enabled && shouldShowCheckInButton && (
+        <Button
+          size="sm"
+          kind="tertiary"
+          onClick={() =>
+            checkInButton.customUrl
+              ? navigate({
+                  to: checkInButton.customUrl,
+                  templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
+                })
+              : launchWorkspace('start-visit-workspace-form', { patientUuid: patientUuid, showPatientHeader: true })
+          }>
+          {t('checkIn', 'Check in')}
+        </Button>
+      )}
     </>
   );
 };
