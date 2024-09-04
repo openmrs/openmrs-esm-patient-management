@@ -19,6 +19,7 @@ export function useWardPatientGrouping() {
     wardPatientPendingCount,
     bedLayouts,
     wardUnassignedPatientsList,
+    totalPatientsCount,
   } = useMemo(() => {
     return createAndGetWardPatientGrouping(inpatientAdmissions, admissionLocation, inpatientAdmissionsByPatientUuid);
   }, [inpatientAdmissionsByPatientUuid, admissionLocation, inpatientAdmissions]);
@@ -31,5 +32,6 @@ export function useWardPatientGrouping() {
     admissionLocationResponse,
     inpatientAdmissionResponse,
     bedLayouts,
+    totalPatientsCount,
   };
 }

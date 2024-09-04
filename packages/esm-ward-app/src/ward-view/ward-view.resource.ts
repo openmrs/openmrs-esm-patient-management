@@ -1,5 +1,12 @@
 import { type Patient } from '@openmrs/esm-framework';
-import type { AdmissionLocationFetchResponse, Bed, BedLayout, InpatientAdmission, WardMetrics } from '../types';
+import type {
+  AdmissionLocationFetchResponse,
+  Bed,
+  BedLayout,
+  InpatientAdmission,
+  WardMetrics,
+  WardPatientGroupDetails,
+} from '../types';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -25,19 +32,23 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
 }
 
 //TODO: This implementation will change when the api is ready
-export function getWardMetrics(beds: Bed[]): WardMetrics {
+export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   const bedMetrics = {
     patients: '--',
     freeBeds: '--',
     capacity: '--',
   };
-  if (beds.length == 0) return bedMetrics;
+  if (beds.length == 0 || !wardPatientGroup) return bedMetrics;
   const total = beds.length;
   const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
-  const capacity = total != 0 ? Math.trunc((patients / total) * 100) : 0;
-  return { patients: patients.toString(), freeBeds: freeBeds.toString(), capacity: capacity.toString() + '%' };
+  const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
+  return {
+    patients: wardPatientGroup.totalPatientsCount.toString(),
+    freeBeds: freeBeds.toString(),
+    capacity: capacity.toString() + '%',
+  };
 }
 
 export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmission[]) {
@@ -86,5 +97,6 @@ export function createAndGetWardPatientGrouping(
     wardPatientPendingCount,
     bedLayouts,
     wardUnassignedPatientsList,
+    totalPatientsCount: wardAdmittedPatientsWithBed.size + wardUnadmittedPatientsWithBed.size,
   };
 }

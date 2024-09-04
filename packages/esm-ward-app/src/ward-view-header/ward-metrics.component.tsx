@@ -28,7 +28,7 @@ const WardMetrics = () => {
       description: error.message,
     });
   }
-  const wardMetricValues = getWardMetrics(beds);
+  const wardMetricValues = getWardMetrics(beds, wardPatientGroup);
   return (
     <div className={styles.metricsContainer}>
       {isBedManagementModuleInstalled ? (
