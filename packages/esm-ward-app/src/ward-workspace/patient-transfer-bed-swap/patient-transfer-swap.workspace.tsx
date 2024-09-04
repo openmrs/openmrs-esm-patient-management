@@ -21,12 +21,12 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
   return (
-    <div className={styles.workspaceContent}>
+    <div className={styles.flexWrapper}>
       <div className={styles.patientWorkspaceBanner}>
         <WardPatientWorkspaceBanner {...props?.wardPatient} />
       </div>
       {isBedManagementModuleInstalled && (
-        <div>
+        <div className={styles.contentSwitcherWrapper}>
           <h2 className={styles.productiveHeading02}>{t('typeOfTransfer', 'Type of transfer')}</h2>
           <div className={styles.contentSwitcher}>
             <ContentSwitcher onChange={({ name }) => setSelectedSection(name)}>

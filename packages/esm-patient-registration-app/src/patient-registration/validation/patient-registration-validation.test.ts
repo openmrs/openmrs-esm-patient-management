@@ -35,6 +35,8 @@ describe('Patient registration validation', () => {
     additionalGivenName: '',
     birthdate: new Date('1990-01-01'),
     birthdateEstimated: false,
+    isDead: false,
+    causeOfDeath: null,
     deathDate: null,
     email: 'john.doe@example.com',
     familyName: 'Doe',
@@ -177,6 +179,6 @@ describe('Patient registration validation', () => {
       deathDate: new Date('2100-01-01'),
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('deathdayNotInTheFuture');
+    expect(validationError.errors).toContain('deathDateInFuture');
   });
 });

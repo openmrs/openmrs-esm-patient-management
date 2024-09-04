@@ -8,10 +8,10 @@ import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-n
 
 const WardPatientWorkspaceBanner = (wardPatient: WardPatient) => {
   const { headerRowElements } = useCurrentWardCardConfig();
-  const { patient, bed, visit } = wardPatient;
+  const { patient, bed } = wardPatient;
 
-  if (!(patient && visit)) {
-    console.warn('Patient details and visit details were not received by the workspace');
+  if (!patient) {
+    console.warn('Patient details were not received by the ward workspace');
     return null;
   }
 

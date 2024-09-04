@@ -176,7 +176,34 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       },
       {
         path: ['appointmentDateTime.recurringPatternEndDate'],
-        message: 'A recurring appointment should have an end date',
+        message: t('recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
+      },
+    )
+    .refine(
+      (formValues) => {
+        const { appointmentDateTime, dateAppointmentScheduled } = formValues;
+
+        const startDate = appointmentDateTime?.startDate;
+
+        if (!startDate || !dateAppointmentScheduled) return true;
+
+        const normalizeDate = (date: Date) => {
+          const normalizedDate = new Date(date);
+          normalizedDate.setHours(0, 0, 0, 0);
+          return normalizedDate;
+        };
+
+        const startDateObj = normalizeDate(startDate);
+        const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
+
+        return scheduledDateObj <= startDateObj;
+      },
+      {
+        path: ['dateAppointmentScheduled'],
+        message: t(
+          'dateAppointmentIssuedCannotBeAfterAppointmentDate',
+          'Date appointment issued cannot be after the appointment date',
+        ),
       },
     );
 
@@ -469,33 +496,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="dateAppointmentScheduled"
-              control={control}
-              render={({ field: { onChange, value, ref }, fieldState }) => (
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
-                  value={value}
-                  maxDate={new Date()}
-                  onChange={([date]) => onChange(date)}
-                  invalid={!!fieldState?.error?.message}
-                  invalidText={fieldState?.error?.message}>
-                  <DatePickerInput
-                    id="dateAppointmentScheduledPickerInput"
-                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
-                    style={{ width: '100%' }}
-                    placeholder={datePickerPlaceHolder}
-                    ref={ref}
-                  />
-                </DatePicker>
-              )}
-            />
-          </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
           <span className={styles.heading}>{t('service', 'Service')}</span>
           <ResponsiveWrapper>
             <Controller
@@ -540,7 +540,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             />
           </ResponsiveWrapper>
         </section>
-
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('appointmentType_title', 'Appointment Type')}</span>
           <ResponsiveWrapper>
@@ -730,7 +729,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       <DatePicker
                         datePickerType="single"
                         dateFormat={datePickerFormat}
-                        value={value.startDate}
+                        value={value?.startDate}
                         onChange={([date]) => {
                           if (date) {
                             onChange({ ...value, startDate: date });
@@ -822,6 +821,36 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       </SelectItem>
                     ))}
                 </Select>
+              )}
+            />
+          </ResponsiveWrapper>
+        </section>
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
+          <ResponsiveWrapper>
+            <Controller
+              name="dateAppointmentScheduled"
+              control={control}
+              render={({ field: { onChange, value, ref }, fieldState }) => (
+                <div style={{ width: '100%' }}>
+                  <DatePicker
+                    datePickerType="single"
+                    dateFormat={datePickerFormat}
+                    value={value}
+                    maxDate={new Date()}
+                    onChange={([date]) => onChange(date)}
+                    invalid={!!fieldState?.error?.message}
+                    invalidText={fieldState?.error?.message}>
+                    <DatePickerInput
+                      id="dateAppointmentScheduledPickerInput"
+                      labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                      style={{ width: '100%' }}
+                      placeholder={datePickerPlaceHolder}
+                      ref={ref}
+                    />
+                  </DatePicker>
+                  {fieldState?.error?.message && <div className={styles.errorMessage}>{fieldState.error.message}</div>}
+                </div>
               )}
             />
           </ResponsiveWrapper>

@@ -58,12 +58,6 @@ export const configSchema: ConfigSchema = {
             "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
           _default: null,
         },
-        labelI18nModule: {
-          _type: Type.String,
-          _description:
-            'Optional. The custom module to use for translation of the label. If not provided, the label will not be translated.',
-          _default: null,
-        },
         orderBy: {
           _type: Type.String,
           _description:
@@ -108,11 +102,6 @@ export const configSchema: ConfigSchema = {
           _type: Type.String,
           _description:
             'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
-          _default: null,
-        },
-        labelI18nModule: {
-          _type: Type.String,
-          _description: 'Optional. The custom module to use for translation of the label',
           _default: null,
         },
       },
@@ -196,9 +185,18 @@ export interface WardConfigObject {
 
 export interface WardPatientCardsConfig {
   obsElementDefinitions: Array<ObsElementDefinition>;
+  pendingOrderTypesDefinitions: Array<PendingOrderTypesDefinition>;
   identifierElementDefinitions: Array<IdentifierElementDefinition>;
   addressElementDefinitions: Array<AddressElementDefinition>;
   cardDefinitions: Array<WardPatientCardDefinition>;
+}
+
+export interface PendingOrderTypesDefinition {
+  enabled: boolean;
+  orderTypes: Array<{
+    label?: string;
+    uuid: string;
+  }>;
 }
 
 export interface ObsElementDefinition {
@@ -208,14 +206,12 @@ export interface ObsElementDefinition {
   orderBy: 'ascending' | 'descending';
   limit: number;
   label?: string;
-  labelI18nModule?: string;
 }
 
 export interface IdentifierElementDefinition {
   id: string;
   identifierTypeUuid: string;
   label?: string;
-  labelI18nModule?: string;
 }
 
 export interface AddressElementDefinition {

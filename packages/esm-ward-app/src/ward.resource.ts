@@ -23,3 +23,9 @@ export function assignPatientToBed(bedUuid: number, patientUuid: string, encount
     },
   });
 }
+
+export function removePatientFromBed(bedId: number, patientUuid: string) {
+  return openmrsFetch(`${restBaseUrl}/beds/${bedId}?patientUuid=${patientUuid}`, {
+    method: 'DELETE',
+  });
+}

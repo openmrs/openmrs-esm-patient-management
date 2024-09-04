@@ -1,9 +1,9 @@
 import { age, attach, ExtensionSlot, type Patient } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
-import { type WardPatientWorkspaceProps } from '../types';
 import styles from './ward-patient.style.scss';
 import { useTranslation } from 'react-i18next';
-import { getGender } from '../ward-patient-card/row-elements/ward-patient-gender.component';
+import { type WardPatientWorkspaceProps } from '../../types';
+import { getGender } from '../../ward-patient-card/row-elements/ward-patient-gender.component';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
@@ -45,7 +45,9 @@ const PatientWorkspaceTitle: React.FC<WardPatientWorkspaceViewProps> = ({ patien
     <>
       <div>{patient.person.display} &nbsp;</div>
       <div className={styles.headerPatientDetail}>&middot; &nbsp; {getGender(t, patient.person?.gender)}</div>
-      <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
+      {patient.person?.birthdate && (
+        <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
+      )}
     </>
   );
 };

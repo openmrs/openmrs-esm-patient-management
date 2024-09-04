@@ -6,7 +6,7 @@ export interface WardPatientAgeProps {
 }
 
 const WardPatientAge: React.FC<WardPatientAgeProps> = ({ patient }) => {
-  return <div>{age(patient.person?.birthdate)}</div>;
+  return patient.person?.birthdate ? <div>{age(patient.person.birthdate)}</div> : null;
 };
 
 export default WardPatientAge;

@@ -33,15 +33,14 @@ const defaultConfig: IdentifierElementDefinition = {
 const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ config: configProp, patient }) => {
   const { t } = useTranslation();
   const config = configProp ?? defaultConfig;
-  const { identifierTypeUuid, labelI18nModule: labelModule, label } = config;
+  const { identifierTypeUuid, label } = config;
   const patientIdentifiers = patient.identifiers.filter(
     (patientIdentifier: PatientIdentifier) =>
       identifierTypeUuid == null || patientIdentifier.identifierType?.uuid === identifierTypeUuid,
   );
   patientIdentifiers.sort(identifierCompareFunction);
   const patientIdentifier = patientIdentifiers[0];
-  const labelToDisplay =
-    label != null ? translateFrom(labelModule ?? moduleName, label) : patientIdentifier?.identifierType?.name;
+  const labelToDisplay = label != null ? t(label) : patientIdentifier?.identifierType?.name;
   return (
     <div>
       {labelToDisplay ? <Tag>{t('identifierTypelabel', '{{label}}:', { label: labelToDisplay })}</Tag> : <></>}

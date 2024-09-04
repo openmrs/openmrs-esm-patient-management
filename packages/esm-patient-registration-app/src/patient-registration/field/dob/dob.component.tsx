@@ -88,7 +88,7 @@ export const DobField: React.FC = () => {
       {(allowEstimatedBirthDate || dobUnknown) && (
         <div className={styles.dobField}>
           <div className={styles.dobContentSwitcherLabel}>
-            <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
+            <span className={styles.label01}>{t('dobToggleLabelText', 'Date of birth known?')}</span>
           </div>
           <ContentSwitcher onChange={onToggle} selectedIndex={dobUnknown ? 1 : 0}>
             <Switch name="known" text={t('yes', 'Yes')} />
@@ -104,7 +104,7 @@ export const DobField: React.FC = () => {
               {...birthdate}
               onChange={onDateChange}
               maxDate={today}
-              labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+              labelText={t('dateOfBirthLabelText', 'Date of birth')}
               isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
               invalidText={t(birthdateMeta.error)}
               value={birthdate.value}

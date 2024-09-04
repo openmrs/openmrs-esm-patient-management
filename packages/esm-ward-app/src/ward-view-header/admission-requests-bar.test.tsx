@@ -33,6 +33,6 @@ describe('Admission Requests Button', () => {
   it('there should be one admission request', () => {
     renderWithSwr(<AdmissionRequestsBar />);
 
-    expect(screen.getByText('1 admission request(s)')).toBeInTheDocument();
+    expect(screen.getByText('1 admission request')).toBeInTheDocument();
   });
 });

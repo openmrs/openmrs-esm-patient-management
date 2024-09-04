@@ -25,7 +25,10 @@ export const dummyFormValues: FormValues = {
   telephoneNumber: '0800001066',
   isDead: false,
   deathDate: '',
+  deathTime: '',
+  deathTimeFormat: 'AM',
   deathCause: '',
+  nonCodedCauseOfDeath: '',
   relationships: [],
   address: {
     address1: 'Bom Jesus Street',

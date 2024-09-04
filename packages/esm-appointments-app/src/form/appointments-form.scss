@@ -76,3 +76,12 @@ $openmrs-background-grey: #ededed;
   max-inline-size: fit-content;
   padding-top: layout.$spacing-03;
 }
+
+.errorMessage {
+  color: red;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: left;
+}

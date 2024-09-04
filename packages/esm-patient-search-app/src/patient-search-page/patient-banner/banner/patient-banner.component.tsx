@@ -86,8 +86,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               />
             </div>
             <div className={styles.demographics}>
-              <span>{getGender(patient.person.gender)}</span> &middot; <span>{age(patient.person.birthdate)}</span>{' '}
-              &middot; <span>{formatDate(parseDate(patient.person.birthdate), { mode: 'wide', time: false })}</span>
+              <span>{getGender(patient.person.gender)}</span>
+              {patient.person.birthdate && (
+                <>
+                  &middot; <span>{age(patient.person.birthdate)}</span> &middot;{' '}
+                  <span>{formatDate(parseDate(patient.person.birthdate), { mode: 'wide', time: false })}</span>
+                </>
+              )}
             </div>
             <div>
               <div className={styles.identifiers}>
