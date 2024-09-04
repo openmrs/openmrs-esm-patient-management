@@ -1,4 +1,4 @@
-import { ExtensionSlot, getPatientName, launchWorkspace } from '@openmrs/esm-framework';
+import { ExtensionSlot, getPatientName, launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { Hourglass } from '@carbon/react/icons';
@@ -9,10 +9,12 @@ import WardPatientName from './row-elements/ward-patient-name';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import styles from './ward-patient-card.scss';
 import WardPatientPendingTransfer from './row-elements/ward-patient-pending-transfer';
+import { type PendingOrderTypesDefinition } from '../config-schema';
 
 const WardPatientCard: WardPatientCard = (wardPatient) => {
   const { patient, bed } = wardPatient;
   const { id, headerRowElements, footerRowElements } = useCurrentWardCardConfig();
+  const { enabled: showPendingOrders } = useConfig<PendingOrderTypesDefinition>();
 
   const headerExtensionSlotName =
     id == 'default' ? 'ward-patient-card-header-slot' : `ward-patient-card-header-${id}-slot`;
@@ -34,10 +36,15 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
-      {wardPatient?.inpatientRequest ? (
+      {wardPatient?.inpatientRequest || showPendingOrders ? (
         <div className={styles.wardPatientCardPendingItemsRow}>
           <Hourglass className={styles.hourGlassIcon} size="16" />:
-          <WardPatientPendingTransfer wardPatient={wardPatient} />
+          <ExtensionSlot
+            name="ward-patient-card-pending-items-slot"
+            state={wardPatient}
+            className={classNames(styles.wardPatientPendingOrdersRow, styles.wardPatientCardExtensionSlot)}
+          />
+          {wardPatient?.inpatientRequest ? <WardPatientPendingTransfer wardPatient={wardPatient} /> : null}
         </div>
       ) : null}
       <ExtensionSlot

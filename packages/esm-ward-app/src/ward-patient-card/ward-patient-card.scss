@@ -65,6 +65,11 @@
   display: none;
 }
 
+.wardPatientPendingOrdersRow:empty {
+  display: none;
+  margin-left: layout.$spacing-04;
+}
+
 .wardPatientCardExtensionSlot {
   display: none;
 
@@ -83,7 +88,7 @@
   @extend .wardPatientCardRow;
   display: flex;
   align-items: center;
-  flex-flow: row;
+  flex-flow: row wrap;
   color: $ui-02;
   background-color: colors.$gray-80;
 }
@@ -132,6 +137,15 @@
   border-radius: 50%;
   fill: $ui-03;
   background-color: $color-blue-60-2;
+  margin-left: layout.$spacing-03;
+  margin-right: layout.$spacing-02;
+}
+
+.chemistryReferenceIcon {
+  padding: layout.$spacing-02;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: #a2191f;
   margin-left: layout.$spacing-03;
   margin-right: layout.$spacing-02;
 }

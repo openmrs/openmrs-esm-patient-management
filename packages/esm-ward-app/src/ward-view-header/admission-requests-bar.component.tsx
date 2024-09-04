@@ -20,7 +20,7 @@ const AdmissionRequestsBar = () => {
     return (
       <InlineNotification
         kind="error"
-        title={t('errorLoadingPatientAdmissionRequests', 'Error Loading patient admission requests')}
+        title={t('errorLoadingPatientAdmissionRequests', 'Error loading patient admission requests')}
       />
     );
   }
@@ -29,7 +29,7 @@ const AdmissionRequestsBar = () => {
     <div className={styles.admissionRequestsContainer}>
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
-        {t('admissionRequestsCount', '{{count}} admission request(s)', {
+        {t('admissionRequestsCount', '{{count}} admission request', {
           count: inpatientRequests.length,
         })}
       </span>
