@@ -19,8 +19,13 @@
   "errorCreatingEncounter": "Failed to admit patient",
   "errorCreatingTransferRequest": "Error creating transfer request",
   "errorDischargingPatient": "Error discharging patient",
+<<<<<<< HEAD
   "errorLoadingBedDetails": "Error loading bed details",
   "errorLoadingPatientAdmissionRequests": "Error loading patient admission requests",
+=======
+  "errorLoadingBedDetails": "Error Loading Bed Details",
+  "errorLoadingPatientAdmissionRequests": "Error Loading patient admission requests",
+>>>>>>> 6dfbe106 (remove orig files)
   "errorLoadingPatients": "Error loading admitted patients",
   "errorLoadingWardLocation": "Error loading ward location",
   "female": "Female",

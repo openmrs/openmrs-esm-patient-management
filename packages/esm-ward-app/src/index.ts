@@ -13,6 +13,7 @@ import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
 import rootComponent from './root.component';
 import { motherChildRowConfigSchema } from './config-schema-mother-child-row';
+import { pendingOrdersExtensionConfigSchema } from './config-schema-pending-orders-extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -73,6 +74,11 @@ export const motherChildRowExtension = getAsyncLifecycle(
   options,
 );
 
+export const pendingOrdersExtension = getAsyncLifecycle(
+  () => import('./ward-patient-card/card-rows/pending-orders.extension'),
+  options,
+);
+
 // t('transfers', 'Transfers')
 export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/patient-transfer-bed-swap/patient-transfer-swap.workspace'),
@@ -107,6 +113,7 @@ export function startupApp() {
   defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
   defineExtensionConfigSchema('admission-request-note-card-row', admissionRequestNoteRowConfigSchema);
   defineExtensionConfigSchema('mother-child-card-row', motherChildRowConfigSchema);
+  defineExtensionConfigSchema('ward-patient-pending-orders', pendingOrdersExtensionConfigSchema);
 
   registerFeatureFlag(
     'bedmanagement-module',

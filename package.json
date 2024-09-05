@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-management",
-  "version": "7.1.0",
+  "version": "8.0.0",
   "private": true,
   "description": "Patient management microfrontend for the OpenMRS 3.x frontend",
   "workspaces": [
@@ -84,8 +84,5 @@
     "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
     "*.{css,scss,ts,tsx}": "prettier --cache --write --list-different"
   },
-  "packageManager": "yarn@4.2.2",
-  "resolutions": {
-    "@openmrs/esm-react-utils": "portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-react-utils"
-  }
+  "packageManager": "yarn@4.2.2"
 }
