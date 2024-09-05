@@ -73,6 +73,12 @@ const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockRetu
 });
 
 jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
+
+const intersectionObserverMock = () => ({
+  observe: () => null,
+});
+window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock);
+
 describe('WardView', () => {
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);

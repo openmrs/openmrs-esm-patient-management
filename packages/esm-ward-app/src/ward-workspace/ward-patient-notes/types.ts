@@ -1,9 +1,5 @@
 import { type Concept, type OpenmrsResource } from '@openmrs/esm-framework';
 
-export interface VisitEncountersFetchResponse {
-  results: Array<RESTPatientNote>;
-}
-
 export interface RESTPatientNote extends OpenmrsResource {
   uuid: string;
   display: string;

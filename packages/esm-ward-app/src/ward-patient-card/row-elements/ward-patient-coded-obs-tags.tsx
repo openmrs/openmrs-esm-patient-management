@@ -1,12 +1,11 @@
 import { SkeletonText, Tag } from '@carbon/react';
-import { type Patient, translateFrom, type Visit, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { moduleName } from '../../constant';
+import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
-import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 
 interface WardPatientCodedObsTagsProps {
   config: ColoredObsTagsCardRowConfigObject;
@@ -28,12 +27,12 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
   const { conceptUuid, summaryLabel, summaryLabelColor } = config;
   const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
   const { t } = useTranslation();
-  const { data: conceptToTagColorMap } = useConceptToTagColorMap(config.tags);
+  const conceptToTagColorMap = useConceptToTagColorMap(config.tags);
 
   if (isLoading) {
     return <SkeletonText />;
   } else {
-    const obsToDisplay = data?.data?.results?.filter((o) => {
+    const obsToDisplay = data?.filter((o) => {
       const matchVisit = o.encounter.visit?.uuid == visit?.uuid;
       return matchVisit || visit == null; // TODO: remove visit == null hack when server API supports returning visit
     });
