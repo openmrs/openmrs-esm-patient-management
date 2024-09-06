@@ -16,7 +16,7 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type Location } from '@openmrs/esm-framework';
+import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedType, BedTypeData } from '../types';
 
 const BedTypeAdministrationSchema = z.object({
@@ -81,8 +81,8 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   return (
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
       <ModalHeader title={headerTitle} />
-      <Form onSubmit={handleSubmit(onSubmit, onError)}>
-        <ModalBody hasScrollingContent>
+      <ModalBody hasScrollingContent>
+        <Form onSubmit={handleSubmit(onSubmit, onError)}>
           <Stack gap={3}>
             <FormGroup legendText={''}>
               <Controller
@@ -149,16 +149,16 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
               />
             )}
           </Stack>
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={() => onModalChange(false)} kind="secondary">
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button disabled={!isDirty} type="submit">
-            <span>{t('save', 'Save')}</span>
-          </Button>
-        </ModalFooter>
-      </Form>
+        </Form>
+      </ModalBody>
+      <ModalFooter>
+        <Button onClick={() => onModalChange(false)} kind="secondary">
+          {getCoreTranslation('cancel', 'Cancel')}
+        </Button>
+        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+          <span>{t('save', 'Save')}</span>
+        </Button>
+      </ModalFooter>
     </ComposedModal>
   );
 };
