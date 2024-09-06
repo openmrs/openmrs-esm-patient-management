@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
-import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
 import WardPatientSkeletonText from './ward-pateint-skeleton-text';
+import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
 
 interface WardPatientCodedObsTagsProps {
   config: ColoredObsTagsCardRowConfigObject;
