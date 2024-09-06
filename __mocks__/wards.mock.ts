@@ -1,4 +1,9 @@
-import { type AdmissionLocationFetchResponse, type BedType } from '../packages/esm-ward-app/src/types';
+import {
+  type InpatientAdmission,
+  type InpatientRequest,
+  type AdmissionLocationFetchResponse,
+  type BedType,
+} from '../packages/esm-ward-app/src/types';
 import { mockLocationInpatientWard } from './locations.mock';
 import { mockPatientAlice, mockPatientBrian } from './patient.mock';
 
@@ -66,9 +71,12 @@ export const mockAdmissionLocation: AdmissionLocationFetchResponse = {
   ],
 };
 
-export const mockInpatientAdmissions = [
+export const mockInpatientAdmissions: InpatientAdmission[] = [
   {
     patient: mockPatientBrian,
     visit: null,
+    encounterAssigningToCurrentInpatientLocation: null,
+    currentInpatientRequest: null,
+    firstAdmissionOrTransferEncounter: null,
   },
 ];

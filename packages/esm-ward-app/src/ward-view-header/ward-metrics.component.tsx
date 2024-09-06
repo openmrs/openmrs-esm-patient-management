@@ -48,7 +48,7 @@ const WardMetrics = () => {
       {isBedManagementModuleInstalled && (
         <WardMetric
           metricName="Pending out"
-          metricValue={error ? '--' : wardPatientGroup?.wardPatientPendingCount.toString() ?? '--'}
+          metricValue={error ? '--' : wardPatientGroup?.wardPatientPendingCount?.toString() ?? '--'}
           isLoading={!wardPatientGroup}
           key="pending"
         />

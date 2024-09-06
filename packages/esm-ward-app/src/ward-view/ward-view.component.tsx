@@ -1,6 +1,10 @@
 import { InlineNotification } from '@carbon/react';
-import { useAppContext, useDefineAppContext, WorkspaceContainer } from '@openmrs/esm-framework';
-import { default as React, useEffect, useRef } from 'react';
+import {
+  useAppContext,
+  useDefineAppContext,
+  WorkspaceContainer
+} from '@openmrs/esm-framework';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import UnassignedPatient from '../beds/unassigned-patient.component';
@@ -39,13 +43,10 @@ const WardView = () => {
 
 const WardViewMain = () => {
   const { location } = useWardLocation();
+  const { t } = useTranslation();
 
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const {
-    bedLayouts,
-    wardAdmittedPatientsWithBed = new Map(),
-    wardUnassignedPatientsList = [],
-  } = wardPatientsGrouping ?? {};
+  const { bedLayouts, wardAdmittedPatientsWithBed, wardUnassignedPatientsList } = wardPatientsGrouping ?? {};
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
     wardPatientsGrouping?.admissionLocationResponse ?? {};
   const {
@@ -54,8 +55,6 @@ const WardViewMain = () => {
     hasMore: hasMoreInpatientAdmissions, 
     loadMore: loadMoreInpatientAdmissions
   } = wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
-
-  const { t } = useTranslation();
 
   const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
   useEffect(
@@ -109,7 +108,7 @@ const WardViewMain = () => {
     return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
   });
 
-  const wardUnassignedPatients = wardUnassignedPatientsList.map((inpatientAdmission) => {
+  const wardUnassignedPatients = wardUnassignedPatientsList?.map((inpatientAdmission) => {
     return (
       <UnassignedPatient
         wardPatient={{
