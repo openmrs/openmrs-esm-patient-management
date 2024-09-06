@@ -23,12 +23,15 @@ mockUseWardLocation.mockReturnValue({
   invalidLocation: false,
 });
 
-const mockInpatientRequestResponse = {
+const mockInpatientRequestResponse: ReturnType<typeof useInpatientRequest> = {
   error: undefined,
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
-  inpatientRequests: [mockInpatientRequest],
+  inpatientRequests: mockInpatientRequest,
+  totalCount: 1,
+  hasMore: false,
+  loadMore: jest.fn(),
 };
 
 jest.mocked(useInpatientRequest).mockReturnValue(mockInpatientRequestResponse);
@@ -43,6 +46,8 @@ const workspaceProps = {
 describe('Admission Requests Workspace', () => {
   it('should render a admission request card', () => {
     renderWithSwr(<AdmissionRequestsWorkspace {...workspaceProps} />);
-    expect(screen.getByText(mockInpatientRequest.patient.person?.preferredName?.display as string)).toBeInTheDocument();
+    expect(
+      screen.getByText(mockInpatientRequest[0].patient.person?.preferredName?.display as string),
+    ).toBeInTheDocument();
   });
 });
