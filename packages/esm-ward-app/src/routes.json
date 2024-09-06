@@ -56,6 +56,11 @@
       "component": "patientDischargeWorkspaceSideRailIcon"
     },
     {
+      "name": "clinical-forms-workspace-siderail-button",
+      "component": "clinicalFormWorkspaceSideRailIcon",
+      "slot": "action-menu-ward-patient-items-slot"
+    },
+    {
       "component": "admissionRequestNoteRowExtension",
       "name": "admission-request-note-card-row",
       "slot": "ward-patient-card-slot"
@@ -120,6 +125,26 @@
       "component": "patientDischargeWorkspace",
       "title": "discharge",
       "type": "ward-patient-discharge",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "ward-patient-clinical-forms-workspace",
+      "component": "patientClinicalFormsWorkspace",
+      "title": "clinicalForms",
+      "type": "ward-patient-clinical-forms",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient",
+      "width": "wider"
+    },
+    {
+      "name": "ward-patient-form-entry-workspace",
+      "title": "clinicalForm",
+      "component": "patientFormEntryWorkspace",
+      "type": "ward-patient-clinical-form",
+      "canMaximize": true,
+      "canHide": true,
+      "width": "wider",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"
     }
