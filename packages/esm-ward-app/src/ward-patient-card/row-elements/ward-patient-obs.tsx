@@ -1,11 +1,11 @@
-import { SkeletonText } from '@carbon/react';
-import { type OpenmrsResource, type Patient, translateFrom, type Visit } from '@openmrs/esm-framework';
+import { SkeletonText, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { Information } from '@carbon/react/icons';
+import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type ObsElementDefinition } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
-import { moduleName } from '../../constant';
 import { obsCustomRepresentation } from './ward-patient-obs.resource';
 
 export interface WardPatientObsProps {
@@ -37,7 +37,19 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit 
     const obsNodes = obsToDisplay?.map((o) => {
       const { value } = o;
       const display: any = (value as OpenmrsResource)?.display ?? o.value;
-      return <span key={o.uuid}> {display} </span>;
+      return (
+        <span key={o.uuid}>
+          {display}
+          <span onClick={(e) => e.stopPropagation()}>
+            <Toggletip className={styles.wardPatientObsIcon} onClick={(e) => e.stopPropagation()}>
+              <ToggletipButton>
+                <Information />
+              </ToggletipButton>
+              <ToggletipContent>{o.encounter?.display}</ToggletipContent>
+            </Toggletip>
+          </span>
+        </span>
+      );
     });
 
     if (obsNodes?.length > 0) {

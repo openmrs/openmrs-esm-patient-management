@@ -19,36 +19,13 @@
 .wardPatientCardButton {
   border: none;
   padding: 0;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 200ms;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 200ms;
-  }
-
-  &:hover::before,
-  &:focus::before {
-    border-color: $interactive-01;
-  }
-
+  &:hover,
   &:focus {
-    outline: none;
-  }
-}
-
-.activeWardPatientCardButton {
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    cursor: pointer;
-    border: 2px solid $interactive-01;
-    transition: border-color 200ms;
+    border-color: $interactive-01;
   }
 }
 
@@ -70,6 +47,7 @@
 
 .wardPatientCardExtensionSlot {
   display: none;
+  width: 100%;
 
   &:has(div:not(:empty)) {
     display: block;
@@ -155,6 +133,10 @@
 
 .wardPatientObsLabel {
   padding-right: layout.$spacing-02;
+}
+
+.wardPatientObsIcon {
+  vertical-align: middle;
 }
 
 .dotSeparatedChildren {
