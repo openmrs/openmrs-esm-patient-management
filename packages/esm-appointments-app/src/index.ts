@@ -21,7 +21,7 @@ import appointmentsDashboardComponent from './appointments.component';
 import homeAppointmentsComponent from './home/home-appointments.component';
 import appointmentsListComponent from './appointments/scheduled/appointments-list.component';
 import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
-import appointementsForm from './form/appointments-form.component';
+import appointmentsFormComponent from './form/appointments-form.component';
 import patientSearch from './patient-search/patient-search.component';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -75,7 +75,7 @@ export const appointmentsList = getSyncLifecycle(appointmentsListComponent, opti
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
 
-export const appointementForm = getSyncLifecycle(appointementsForm, options);
+export const appointmentsForm = getSyncLifecycle(appointmentsFormComponent, options);
 
 export const searchPatient = getSyncLifecycle(patientSearch, options);
 
