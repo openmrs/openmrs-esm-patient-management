@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchButton from './patient-search-button.component';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 const mockedLaunchWorkspace = jest.mocked(launchWorkspace);
@@ -38,8 +39,13 @@ describe('PatientSearchButton', () => {
   it('displays workspace when patient search button is clicked', async () => {
     const user = userEvent.setup();
 
-    render(<PatientSearchButton />);
-
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PatientSearchButton />} />
+        </Routes>
+      </BrowserRouter>,
+    );
     const searchButton = screen.getByLabelText('Search Patient Button');
 
     await user.click(searchButton);
