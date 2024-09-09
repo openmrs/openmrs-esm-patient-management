@@ -1,17 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
-import { Field, useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem, SelectSkeleton, TextInput } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import { useConceptAnswers } from '../field.resource';
 import styles from '../field.scss';
+import { PatientRegistrationContext } from '../../patient-registration-context';
+import { Controller } from 'react-hook-form';
 
 export const CauseOfDeathField: React.FC = () => {
   const { t } = useTranslation();
   const { fieldConfigurations, freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
-  const [deathCause, deathCauseMeta] = useField('deathCause');
+  const { getFieldState, control } = useContext(PatientRegistrationContext);
+  const { error, isTouched } = getFieldState('deathCause');
 
   const conceptUuid = fieldConfigurations?.causeOfDeath?.conceptUuid;
   const required = fieldConfigurations?.causeOfDeath?.required;
@@ -50,15 +52,17 @@ export const CauseOfDeathField: React.FC = () => {
         />
       ) : (
         <>
-          <Field name="deathCause">
-            {({ field, form: { touched, errors }, meta }) => {
-              return (
+          <Controller
+            control={control}
+            name="deathCause"
+            render={({ field, fieldState: { error, isTouched } }) => (
+              <>
                 <Layer>
                   <Select
                     {...field}
                     id="deathCause"
-                    invalid={errors.deathCause && touched.deathCause}
-                    invalidText={errors.deathCause?.message}
+                    invalid={isTouched && error?.message}
+                    invalidText={error?.message}
                     labelText={t('causeOfDeathInputLabel', 'Cause of Death')}
                     name="deathCause"
                     required={required}>
@@ -68,29 +72,31 @@ export const CauseOfDeathField: React.FC = () => {
                     ))}
                   </Select>
                 </Layer>
-              );
-            }}
-          </Field>
-          {deathCause.value === freeTextFieldConceptUuid && (
-            <div className={styles.nonCodedCauseOfDeath}>
-              <Field name="nonCodedCauseOfDeath">
-                {({ field, form: { touched, errors }, meta }) => {
-                  return (
-                    <Layer>
-                      <TextInput
-                        {...field}
-                        id="nonCodedCauseOfDeath"
-                        invalid={errors?.nonCodedCauseOfDeath && touched.nonCodedCauseOfDeath}
-                        invalidText={errors?.nonCodedCauseOfDeath?.message}
-                        labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
-                        placeholder={t('enterNonCodedCauseOfDeath', 'Enter non-coded cause of death')}
-                      />
-                    </Layer>
-                  );
-                }}
-              </Field>
-            </div>
-          )}
+                {field.value === freeTextFieldConceptUuid && (
+                  <div className={styles.nonCodedCauseOfDeath}>
+                    <Controller
+                      control={control}
+                      name="nonCodedCauseOfDeath"
+                      render={({ field, fieldState: { isTouched, error } }) => {
+                        return (
+                          <Layer>
+                            <TextInput
+                              {...field}
+                              id="nonCodedCauseOfDeath"
+                              invalid={isTouched && error?.message}
+                              invalidText={error?.message}
+                              labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
+                              placeholder={t('enterNonCodedCauseOfDeath', 'Enter non-coded cause of death')}
+                            />
+                          </Layer>
+                        );
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          />
         </>
       )}
     </div>

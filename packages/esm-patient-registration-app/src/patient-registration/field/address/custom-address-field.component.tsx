@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
 import styles from '../field.scss';
 import { type FieldDefinition } from '../../../config-schema';
+import type { FormValues } from '../../patient-registration.types';
 
 export interface AddressFieldProps {
   fieldDefinition: FieldDefinition;
@@ -15,18 +16,14 @@ export const AddressField: React.FC<AddressFieldProps> = ({ fieldDefinition }) =
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldDefinition.id}>
-        {({ field, form: { touched, errors }, meta }) => {
-          return (
-            <Input
-              id={fieldDefinition.id}
-              labelText={t(`${fieldDefinition.label}`, `${fieldDefinition.label}`)}
-              required={fieldDefinition?.validation?.required ?? false}
-              {...field}
-            />
-          );
-        }}
-      </Field>
+      return (
+      <Input
+        id={fieldDefinition.id}
+        name={fieldDefinition.id as keyof FormValues}
+        labelText={t(`${fieldDefinition.label}`, `${fieldDefinition.label}`)}
+        required={fieldDefinition?.validation?.required ?? false}
+      />
+      );
     </div>
   );
 };

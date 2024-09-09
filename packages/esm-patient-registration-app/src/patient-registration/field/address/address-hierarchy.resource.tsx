@@ -57,7 +57,7 @@ export function useAddressEntries(fetchResults, searchString) {
  */
 export function useAddressEntryFetchConfig(addressField: string) {
   const { orderedFields, isLoadingFieldOrder } = useOrderedAddressHierarchyLevels();
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setValue } = useContext(PatientRegistrationContext);
   const [, { value: addressValues }] = useField('address');
 
   const index = useMemo(
@@ -87,9 +87,9 @@ export function useAddressEntryFetchConfig(addressField: string) {
       return;
     }
     orderedFields.slice(index + 1).map((fieldName) => {
-      setFieldValue(`address.${fieldName}`, '');
+      setValue(`address.${fieldName}`, '');
     });
-  }, [index, isLoadingFieldOrder, orderedFields, setFieldValue]);
+  }, [index, isLoadingFieldOrder, orderedFields, setValue]);
 
   const results = useMemo(
     () => ({

@@ -1,8 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
 import { useField } from 'formik';
 import ComboInput from '../../input/combo-input/combo-input.component';
+import { PatientRegistrationContext } from '../../patient-registration-context';
+import type { FormValues } from '../../patient-registration.types';
 
 interface AddressComboBoxProps {
   attribute: {
@@ -20,39 +22,37 @@ interface AddressHierarchyLevelsProps {
 
 const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   const { t } = useTranslation();
-  const [field, meta, { setValue }] = useField(`address.${attribute.name}`);
+  const fieldName = `address.${attribute.name}` as keyof FormValues;
+  const { setValue, watch } = useContext(PatientRegistrationContext);
+  const fieldValue = watch(fieldName);
   const { fetchEntriesForField, searchString, updateChildElements } = useAddressEntryFetchConfig(attribute.name);
   const { entries } = useAddressEntries(fetchEntriesForField, searchString);
   const label = t(attribute.label) + (attribute?.required ? '' : ` (${t('optional', 'optional')})`);
 
   const handleInputChange = useCallback(
     (newValue) => {
-      setValue(newValue);
+      setValue(fieldName, newValue);
     },
     [setValue],
   );
 
   const handleSelection = useCallback(
     (selectedItem) => {
-      if (meta.value !== selectedItem) {
-        setValue(selectedItem);
+      if (fieldValue !== selectedItem) {
+        setValue(fieldName, selectedItem);
         updateChildElements();
       }
     },
-    [updateChildElements, meta.value, setValue],
+    [updateChildElements, fieldValue, setValue],
   );
 
   return (
     <ComboInput
       entries={entries}
       handleSelection={handleSelection}
-      name={`address.${attribute.name}`}
-      fieldProps={{
-        ...field,
-        id: attribute.name,
-        labelText: label,
-        required: attribute?.required,
-      }}
+      name={fieldName}
+      required={attribute?.required}
+      labelText={label}
       handleInputChange={handleInputChange}
     />
   );

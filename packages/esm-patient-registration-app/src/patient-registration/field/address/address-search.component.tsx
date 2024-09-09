@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useContext } from 'react';
 import { useAddressHierarchy } from './address-hierarchy.resource';
 import { Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 import styles from './address-search.scss';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 
 interface AddressSearchComponentProps {
   addressLayout: Array<any>;
@@ -12,6 +13,7 @@ interface AddressSearchComponentProps {
 const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ addressLayout }) => {
   const { t } = useTranslation();
   const separator = ' > ';
+  const { control, setValue } = useContext(PatientRegistrationContext);
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const [searchString, setSearchString] = useState<string>('');
@@ -29,8 +31,6 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
     return [...options];
   }, [addresses, searchString]);
 
-  const { setFieldValue } = useFormikContext();
-
   const handleInputChange = (e) => {
     setSearchString(e.target.value);
   };
@@ -39,7 +39,7 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
     if (address) {
       const values = address.split(separator);
       addressLayout.map(({ name }, index) => {
-        setFieldValue(`address.${name}`, values?.[index] ?? '');
+        setValue(`address.${name}`, values?.[index] ?? '');
       });
       setSearchString('');
     }

@@ -9,6 +9,7 @@ import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
+import type { FormValues } from '../../patient-registration.types';
 
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
@@ -47,16 +48,16 @@ export const AddressComponent: React.FC = () => {
     },
   } = config;
 
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setValue } = useContext(PatientRegistrationContext);
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
     if (addressTemplate?.elementDefaults) {
       Object.entries(addressTemplate.elementDefaults).forEach(([name, defaultValue]) => {
-        setFieldValue(`address.${name}`, defaultValue);
+        setValue(`address.${name}`, defaultValue);
       });
     }
-  }, [addressTemplate, setFieldValue]);
+  }, [addressTemplate, setValue]);
 
   const orderedAddressFields = useMemo(() => {
     if (isLoadingFieldOrder || errorFetchingFieldOrder) {
@@ -84,7 +85,7 @@ export const AddressComponent: React.FC = () => {
         {addressLayout.map((attributes, index) => (
           <Input
             key={`combo_input_${index}`}
-            name={`address.${attributes.name}`}
+            name={`address.${attributes.name}` as keyof FormValues}
             labelText={t(attributes.label)}
             id={attributes.name}
             value={selected}
@@ -125,7 +126,7 @@ export const AddressComponent: React.FC = () => {
         orderedAddressFields.map((attributes, index) => (
           <Input
             key={`combo_input_${index}`}
-            name={`address.${attributes.name}`}
+            name={`address.${attributes.name}` as keyof FormValues}
             labelText={t(attributes.label)}
             id={attributes.name}
             value={selected}

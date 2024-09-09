@@ -5,6 +5,8 @@ import { useField } from 'formik';
 import { Field } from '../../field/field.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from './../section.scss';
+import { useFormContext } from 'react-hook-form';
+import { type FormValues } from '../../patient-registration.types';
 
 export interface DeathInfoSectionProps {
   fields: Array<string>;
@@ -12,7 +14,8 @@ export interface DeathInfoSectionProps {
 
 export const DeathInfoSection: React.FC<DeathInfoSectionProps> = ({ fields }) => {
   const { t } = useTranslation();
-  const { values, setFieldValue } = useContext(PatientRegistrationContext);
+  const { watch, setValue } = useFormContext<FormValues>();
+  const isDead = watch('isDead');
   const [deathDate, deathDateMeta] = useField('deathDate');
   const today = new Date();
 
@@ -22,14 +25,14 @@ export const DeathInfoSection: React.FC<DeathInfoSectionProps> = ({ fields }) =>
         <Layer>
           <div className={styles.isDeadFieldContainer}>
             <Checkbox
-              checked={values.isDead}
+              checked={isDead}
               id="isDead"
               labelText={t('isDeadInputLabel', 'Is dead')}
-              onChange={(event, { checked, id }) => setFieldValue(id, checked)}
+              onChange={(event, { checked, id }) => setValue(id, checked)}
             />
           </div>
         </Layer>
-        {values.isDead ? fields.map((field) => <Field key={`death-info-${field}`} name={field} />) : null}
+        {isDead ? fields.map((field) => <Field key={`death-info-${field}`} name={field} />) : null}
       </section>
     </section>
   );

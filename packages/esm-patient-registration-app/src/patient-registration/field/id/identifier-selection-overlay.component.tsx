@@ -12,17 +12,23 @@ import {
 } from '../../input/custom-input/identifier/utils';
 import { initializeIdentifier, setIdentifierSource } from './id-field.component';
 import styles from './identifier-selection.scss';
+import { type UseFormSetValue } from 'react-hook-form';
 
 interface PatientIdentifierOverlayProps {
-  setFieldValue: (string, PatientIdentifierValue) => void;
+  setFieldValue: UseFormSetValue<FormValues>;
   closeOverlay: () => void;
 }
 
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ closeOverlay, setFieldValue }) => {
   const layout = useLayoutType();
   const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline, values, initialFormValues } = useContext(PatientRegistrationContext);
-  const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(values.identifiers);
+  const {
+    isOffline,
+    watch,
+    formState: { defaultValues },
+  } = useContext(PatientRegistrationContext);
+  const identifiers = watch('identifiers');
+  const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(identifiers);
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
@@ -35,8 +41,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
   }, [defaultPatientIdentifierTypes]);
 
   useEffect(() => {
-    setUnsavedIdentifierTypes(values.identifiers);
-  }, [values.identifiers]);
+    setUnsavedIdentifierTypes(identifiers);
+  }, [identifiers]);
 
   const handleSearch = useCallback((event) => setSearchString(event?.target?.value ?? ''), []);
 
@@ -53,9 +59,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
             ...unsavedIdentifierTypes,
             [identifierType.fieldName]: initializeIdentifier(
               identifierType,
-              values.identifiers[identifierType.fieldName] ??
-                initialFormValues.identifiers[identifierType.fieldName] ??
-                {},
+              identifiers[identifierType.fieldName] ?? defaultValues.identifiers[identifierType.fieldName] ?? {},
             ),
           };
         }
@@ -66,7 +70,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
         }
         return unsavedIdentifierTypes;
       }),
-    [initialFormValues.identifiers, values.identifiers],
+    [defaultValues.identifiers, identifiers],
   );
 
   const handleSelectingIdentifierSource = (identifierType: PatientIdentifierType, sourceUuid) =>
@@ -92,7 +96,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
           defaultPatientIdentifierTypesMap[identifierType.uuid] ||
           // De-selecting shouldn't be allowed if the identifier was selected earlier and is present in the form.
           // If the user wants to de-select an identifier-type already present in the form, they'll need to delete the particular identifier from the form itself.
-          values.identifiers[identifierType.fieldName];
+          identifiers[identifierType.fieldName];
         const isDisabledOffline = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
         return (
@@ -149,7 +153,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
       filteredIdentifiers,
       unsavedIdentifierTypes,
       defaultPatientIdentifierTypesMap,
-      values.identifiers,
+      identifiers,
       isOffline,
       handleCheckingIdentifier,
       t,

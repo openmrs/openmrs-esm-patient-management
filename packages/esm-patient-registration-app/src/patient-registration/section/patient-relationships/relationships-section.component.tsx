@@ -18,6 +18,7 @@ import { fetchPerson } from '../../patient-registration.resource';
 import { type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
+import { useFormContext } from 'react-hook-form';
 
 interface RelationshipType {
   display: string;
@@ -39,7 +40,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   remove,
 }) => {
   const { t } = useTranslation();
-  const { setFieldValue } = React.useContext(PatientRegistrationContext);
+  const { setValue } = useFormContext();
   const [isInvalid, setIsInvalid] = useState<boolean>(false);
   const newRelationship = !relationship.uuid;
 
@@ -48,20 +49,20 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
       const { target } = event;
       const field = target.name;
       const value = target.options[target.selectedIndex].value;
-      setFieldValue(field, value);
+      setValue(field, value);
       if (!relationship?.action) {
-        setFieldValue(`relationships[${index}].action`, 'UPDATE');
+        setValue(`relationships[${index}].action`, 'UPDATE');
       }
     },
-    [index, relationship?.action, setFieldValue],
+    [index, relationship?.action, setValue],
   );
 
   const handleSuggestionSelected = useCallback(
     (field: string, selectedSuggestion: string) => {
       setIsInvalid(!selectedSuggestion);
-      setFieldValue(field, selectedSuggestion);
+      setValue(field, selectedSuggestion);
     },
-    [setFieldValue],
+    [setValue],
   );
 
   const searchPerson = async (query: string) => {
@@ -73,17 +74,17 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     if (relationship.action === 'ADD') {
       remove(index);
     } else {
-      setFieldValue(`relationships[${index}].action`, 'DELETE');
+      setValue(`relationships[${index}].action`, 'DELETE');
     }
-  }, [relationship, index, remove, setFieldValue]);
+  }, [relationship, index, remove, setValue]);
 
   const restoreRelationship = useCallback(() => {
-    setFieldValue(`relationships[${index}]`, {
+    setValue(`relationships[${index}]`, {
       ...relationship,
       action: undefined,
       relationshipType: relationship.initialrelationshipTypeValue,
     });
-  }, [index, setFieldValue, relationship]);
+  }, [index, setValue, relationship]);
 
   return relationship.action !== 'DELETE' ? (
     <div className={styles.relationship}>

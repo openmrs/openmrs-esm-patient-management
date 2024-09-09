@@ -21,7 +21,7 @@ function checkNumber(value: string) {
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
+  const { setCapturePhotoProps, currentPhoto, setValue, control } = useContext(PatientRegistrationContext);
   const {
     fieldConfigurations: {
       name: {
@@ -48,7 +48,7 @@ export const NameField = () => {
           imageData: dataUri,
           dateTime: photoDateTime,
         });
-        setFieldTouched('photo', true, false);
+        // setFieldTouched('photo', true, false);
       }
     },
     [setCapturePhotoProps],
@@ -56,17 +56,17 @@ export const NameField = () => {
 
   const toggleNameKnown = (e) => {
     if (e.name === 'known') {
-      setFieldValue('givenName', '');
-      setFieldValue('familyName', '');
+      setValue('givenName', '');
+      setValue('familyName', '');
       setUnknownPatient('false');
     } else {
-      setFieldValue('givenName', defaultUnknownGivenName);
-      setFieldValue('familyName', defaultUnknownFamilyName);
+      setValue('givenName', defaultUnknownGivenName);
+      setValue('familyName', defaultUnknownFamilyName);
       setUnknownPatient('true');
     }
-    setFieldTouched('givenName', true);
-    setFieldTouched('familyName', true);
-    setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
+    // setFieldTouched('givenName', true);
+    // setFieldTouched('familyName', true);
+    // setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
   };
 
   const firstNameField = (

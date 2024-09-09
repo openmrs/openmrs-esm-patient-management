@@ -1,7 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, TextInput } from '@carbon/react';
 import { useField } from 'formik';
+import { Controller, type ControllerRenderProps } from 'react-hook-form';
+import { type FormValues } from '../../../patient-registration.types';
+import { PatientRegistrationContext } from '../../../patient-registration-context';
 
 // FIXME Temporarily imported here
 export interface TextInputProps
@@ -124,12 +127,14 @@ export interface TextInputProps
 }
 
 interface InputProps extends TextInputProps {
-  checkWarning?(value: string): string;
+  checkWarning?(value: string | number): string;
+  name: keyof FormValues;
 }
 
 export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
-  const [field, meta] = useField(props.name);
   const { t } = useTranslation();
+  const { formState, getFieldState, control } = useContext(PatientRegistrationContext);
+  const { error } = getFieldState(props.name);
 
   /*
     Do not remove these comments
@@ -151,8 +156,8 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('nonCodedCauseOfDeathRequired', 'Non-coded cause of death is required')
   */
 
-  const value = field.value || '';
-  const invalidText = meta.error && t(meta.error);
+  const value = props.value || '';
+  const invalidText = error.message && t(error.message);
   const warnText = useMemo(() => {
     if (!invalidText && typeof checkWarning === 'function') {
       const warning = checkWarning(value);
@@ -166,18 +171,24 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
 
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <Layer>
-        <TextInput
-          {...props}
-          {...field}
-          labelText={labelText}
-          invalid={!!(meta.touched && meta.error)}
-          invalidText={invalidText}
-          warn={!!warnText}
-          warnText={warnText}
-          value={value}
-        />
-      </Layer>
+      <Controller
+        control={control}
+        name={props.name}
+        render={({ field, fieldState }) => (
+          <Layer>
+            <TextInput
+              {...props}
+              {...field}
+              labelText={labelText}
+              invalid={!!(fieldState.isTouched && fieldState.error)}
+              invalidText={invalidText}
+              warn={!!warnText}
+              warnText={warnText}
+              value={value}
+            />
+          </Layer>
+        )}
+      />
     </div>
   );
 };
