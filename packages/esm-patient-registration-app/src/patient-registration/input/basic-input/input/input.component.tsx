@@ -1,7 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, TextInput } from '@carbon/react';
-import { useField } from 'formik';
 import { Controller, type ControllerRenderProps } from 'react-hook-form';
 import { type FormValues } from '../../../patient-registration.types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
@@ -157,7 +156,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   */
 
   const value = props.value || '';
-  const invalidText = error.message && t(error.message);
+  const invalidText = error?.message;
   const warnText = useMemo(() => {
     if (!invalidText && typeof checkWarning === 'function') {
       const warning = checkWarning(value);
@@ -174,13 +173,13 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
       <Controller
         control={control}
         name={props.name}
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState: { isTouched, error } }) => (
           <Layer>
             <TextInput
               {...props}
               {...field}
               labelText={labelText}
-              invalid={!!(fieldState.isTouched && fieldState.error)}
+              invalid={!!(isTouched && error?.message)}
               invalidText={invalidText}
               warn={!!warnText}
               warnText={warnText}

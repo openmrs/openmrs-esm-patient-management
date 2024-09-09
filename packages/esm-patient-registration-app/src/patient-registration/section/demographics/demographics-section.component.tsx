@@ -4,22 +4,25 @@ import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Field } from '../../field/field.component';
 import { useFormContext } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export interface DemographicsSectionProps {
   fields: Array<string>;
 }
 
 export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields }) => {
-  const [field, meta] = useField('addNameInLocalLanguage');
-  const { setValue } = useFormContext();
+  const { control, setValue, watch, getFieldState } = usePatientRegistrationContext();
+  const addNameInLocalLanguageFieldName = 'addNameInLocalLanguage';
+  const nameInLocalLanguage = watch(addNameInLocalLanguageFieldName);
+  const isTouched = getFieldState(addNameInLocalLanguageFieldName);
 
   useEffect(() => {
-    if (!field.value && meta.touched) {
+    if (nameInLocalLanguage && isTouched) {
       setValue('additionalGivenName', '');
       setValue('additionalMiddleName', '');
       setValue('additionalFamilyName', '');
     }
-  }, [field.value, meta.touched]);
+  }, [nameInLocalLanguage, isTouched]);
 
   return (
     <section className={styles.formSection} aria-label="Demographics Section">

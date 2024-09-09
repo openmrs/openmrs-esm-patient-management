@@ -1,11 +1,12 @@
 import React, { type ChangeEvent, useCallback, useContext } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
+import { Controller } from 'react-hook-form';
 
 const calcBirthdate = (yearDelta, monthDelta, dateOfBirth) => {
   const { enabled, month, dayOfMonth } = dateOfBirth.useEstimatedDateOfBirth;
@@ -26,12 +27,11 @@ export const DobField: React.FC = () => {
     fieldConfigurations: { dateOfBirth },
   } = useConfig<RegistrationConfig>();
   const allowEstimatedBirthDate = dateOfBirth?.allowEstimatedDateOfBirth;
-  const [{ value: dobUnknown }] = useField('birthdateEstimated');
-  const [birthdate, birthdateMeta] = useField('birthdate');
-  const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
-  const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
-  const { setValue } = useContext(PatientRegistrationContext);
+  const { watch, control, setValue } = usePatientRegistrationContext();
+  const dobUnknown = watch('birthdateEstimated');
   const today = new Date();
+  const monthsEstimated = watch('monthsEstimated');
+  const yearsEstimated = watch('yearsEstimated');
 
   const onToggle = useCallback(
     (e: { name?: string | number }) => {
@@ -58,10 +58,10 @@ export const DobField: React.FC = () => {
 
       if (!isNaN(years) && years < 140 && years >= 0) {
         setValue('yearsEstimated', years);
-        setValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value, dateOfBirth));
+        setValue('birthdate', calcBirthdate(years, monthsEstimated, dateOfBirth));
       }
     },
-    [setValue, dateOfBirth, monthsEstimateMeta.value],
+    [setValue, dateOfBirth, monthsEstimated],
   );
 
   const onEstimatedMonthsChange = useCallback(
@@ -70,22 +70,19 @@ export const DobField: React.FC = () => {
 
       if (!isNaN(months)) {
         setValue('monthsEstimated', months);
-        setValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
+        setValue('birthdate', calcBirthdate(yearsEstimated, months, dateOfBirth));
       }
     },
-    [setValue, dateOfBirth, yearsEstimateMeta.value],
+    [setValue, dateOfBirth, yearsEstimated],
   );
 
   const updateBirthdate = useCallback(() => {
-    const months = +monthsEstimateMeta.value % 12;
-    const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
+    const months = +monthsEstimated % 12;
+    const years = +yearsEstimated + Math.floor(monthsEstimated / 12);
     setValue('yearsEstimated', years);
     setValue('monthsEstimated', months > 0 ? months : undefined);
     setValue('birthdate', calcBirthdate(years, months, dateOfBirth));
-    // setFieldTouched('yearsEstimated', true, false);
-    // setFieldTouched('monthsEstimated', true, false);
-    // setFieldTouched('birthdate', true, false);
-  }, [setValue, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth]);
+  }, [setValue, monthsEstimated, yearsEstimated, dateOfBirth]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
@@ -104,58 +101,62 @@ export const DobField: React.FC = () => {
       <Layer>
         {!dobUnknown ? (
           <div className={styles.dobField}>
-            <OpenmrsDatePicker
-              id="birthdate"
-              {...birthdate}
-              onChange={onDateChange}
-              // onBlur={() => setFieldTouched('birthdate', true, false)}
-              maxDate={today}
-              labelText={t('dateOfBirthLabelText', 'Date of birth')}
-              isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={t(birthdateMeta.error)}
-              value={birthdate.value}
+            <Controller
+              control={control}
+              name="birthdate"
+              render={({ field, fieldState: { isTouched, error } }) => (
+                <OpenmrsDatePicker
+                  id="birthdate"
+                  {...field}
+                  onChange={onDateChange}
+                  maxDate={today}
+                  labelText={t('dateOfBirthLabelText', 'Date of birth')}
+                  isInvalid={!!(isTouched && error?.message)}
+                  invalidText={error?.message}
+                />
+              )}
             />
           </div>
         ) : (
           <div className={styles.grid}>
             <div className={styles.dobField}>
-              <TextInput
-                id="yearsEstimated"
-                type="number"
-                name={yearsEstimated.name}
-                onChange={onEstimatedYearsChange}
-                labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
-                invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
-                invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
-                value={yearsEstimated.value}
-                min={0}
-                required
-                {...yearsEstimated}
-                // onBlur={(e) => {
-                //   yearsEstimated.onBlur(e);
-                //   // setFieldTouched('yearsEstimated', true, false);
-                //   updateBirthdate();
-                // }}
+              <Controller
+                control={control}
+                name="yearsEstimated"
+                render={({ field, fieldState: { isTouched, error } }) => (
+                  <TextInput
+                    {...field}
+                    id="yearsEstimated"
+                    type="number"
+                    onChange={onEstimatedYearsChange}
+                    labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
+                    invalid={Boolean(isTouched && error?.message)}
+                    invalidText={error?.message}
+                    min={0}
+                    required
+                    onBlur={updateBirthdate}
+                  />
+                )}
               />
             </div>
             <div className={styles.dobField}>
-              <TextInput
-                id="monthsEstimated"
-                type="number"
-                name={monthsEstimated.name}
-                onChange={onEstimatedMonthsChange}
-                labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
-                invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-                invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
-                value={monthsEstimated.value}
-                min={0}
-                {...monthsEstimated}
-                required={!yearsEstimateMeta.value}
-                // onBlur={(e) => {
-                //   monthsEstimated.onBlur(e);
-                //   setFieldTouched('monthsEstimated', true, false);
-                //   updateBirthdate();
-                // }}
+              <Controller
+                control={control}
+                name="monthsEstimated"
+                render={({ field, fieldState: { isTouched, error } }) => (
+                  <TextInput
+                    {...field}
+                    id="monthsEstimated"
+                    type="number"
+                    onChange={onEstimatedMonthsChange}
+                    labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
+                    invalid={Boolean(isTouched && error?.message)}
+                    invalidText={error?.message}
+                    min={0}
+                    required={!yearsEstimated}
+                    onBlur={updateBirthdate}
+                  />
+                )}
               />
             </div>
           </div>

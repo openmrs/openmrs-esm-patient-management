@@ -1,7 +1,6 @@
 import React, { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
-import { useField } from 'formik';
 import ComboInput from '../../input/combo-input/combo-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import type { FormValues } from '../../patient-registration.types';
