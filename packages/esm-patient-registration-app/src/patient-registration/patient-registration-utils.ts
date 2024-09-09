@@ -192,10 +192,41 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Arr
   });
 }
 
-export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient) {
+export function getIdentifierFieldValuesFromFhirPatient(
+  patient: fhir.Patient,
+  identifierConfig,
+): { [key: string]: any } {
+  const identifiers: { [key: string]: any } = {};
+
+  patient.identifier.forEach((identifier) => {
+    identifierConfig.forEach((config) => {
+      const identifierConfig = config.identifierTypeSystem === identifier.system ? config : null;
+
+      if (identifierConfig) {
+        const identifierTypeName = identifierConfig.identifierTypeName;
+
+        identifiers[identifierTypeName] = {
+          identifierUuid: null,
+          preferred: identifier.use === 'official',
+          initialValue: identifier.value,
+          identifierValue: identifier.value,
+          identifierTypeUuid: identifierConfig.identifierTypeUuid,
+          identifierName: identifierTypeName,
+          required: false,
+          selectedSource: null,
+          autoGeneration: false,
+        };
+      }
+    });
+  });
+
+  return identifiers;
+}
+
+export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient, phoneUuid) {
   const result = {};
   if (patient.telecom) {
-    result['phone'] = patient.telecom[0].value;
+    result[phoneUuid] = patient.telecom[0].value;
   }
   return result;
 }
