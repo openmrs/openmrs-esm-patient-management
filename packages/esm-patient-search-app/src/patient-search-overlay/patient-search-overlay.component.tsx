@@ -5,6 +5,8 @@ import AdvancedPatientSearchComponent from '../patient-search-page/advanced-pati
 import Overlay from '../ui-components/overlay';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import { type PatientSearchConfig } from '../config-schema';
+import { inferModeFromSearchParams } from '../mpi/utils';
+import { useSearchParams } from 'react-router-dom';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
@@ -26,7 +28,7 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
   const [searchTerm, setSearchTerm] = useState(query);
   const showSearchResults = Boolean(searchTerm?.trim());
   const debouncedSearchTerm = useDebounce(searchTerm);
-
+  const [searchParams] = useSearchParams();
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
   const onSearchTermChange = useCallback((value: string) => {
@@ -42,7 +44,13 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
         onClear={handleClearSearchTerm}
         onSubmit={onSearchTermChange}
       />
-      {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
+      {showSearchResults && (
+        <AdvancedPatientSearchComponent
+          query={debouncedSearchTerm}
+          inTabletOrOverlay
+          searchMode={inferModeFromSearchParams(searchParams)}
+        />
+      )}
     </Overlay>
   );
 };

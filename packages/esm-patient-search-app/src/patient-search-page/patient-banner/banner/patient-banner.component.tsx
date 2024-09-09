@@ -14,18 +14,23 @@ import {
   PatientBannerActionsMenu,
   PatientBannerToggleContactDetailsButton,
   PatientBannerContactDetails,
+  navigate,
+  UserFollowIcon,
 } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
 import styles from './patient-banner.scss';
 import { PatientSearchContext } from '../../../patient-search-context';
+import { Tag } from '@carbon/react';
+import { Button } from '@carbon/react';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
   patientUuid: string;
   hideActionsOverflow?: boolean;
+  isMPIPatient: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow, isMPIPatient }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
@@ -79,6 +84,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
+              {isMPIPatient && (
+                <div>
+                  <Tag className={styles.mpiTag} type="blue">
+                    &#127760; {'MPI'}
+                  </Tag>
+                </div>
+              )}
               <ExtensionSlot
                 name="patient-banner-tags-slot"
                 state={{ patientUuid, patient: fhirPatient }}
@@ -117,7 +129,23 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               isDeceased={patient.person.dead}
             />
           ) : null}
-          {!isDeceased && !currentVisit && (
+          {isMPIPatient && (
+            <div>
+              <Button
+                kind="ghost"
+                renderIcon={UserFollowIcon}
+                iconDescription="Create Patient Record"
+                onClick={() =>
+                  navigate({
+                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${patient.externalId}`,
+                  })
+                }
+                style={{ marginTop: '-0.25rem' }}>
+                {t('createPatientRecord', 'Create Patient Record')}
+              </Button>
+            </div>
+          )}
+          {!isDeceased && !currentVisit && !isMPIPatient && (
             <ExtensionSlot
               name="start-visit-button-slot"
               state={{
