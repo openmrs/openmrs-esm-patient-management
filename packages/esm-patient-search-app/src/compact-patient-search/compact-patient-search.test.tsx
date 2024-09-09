@@ -5,6 +5,7 @@ import { getDefaultsFromConfigSchema, navigate, useConfig, useSession } from '@o
 import { mockSession } from '__mocks__';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import CompactPatientSearchComponent from './compact-patient-search.component';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 const mockUseSession = jest.mocked(useSession);
@@ -17,13 +18,25 @@ describe('CompactPatientSearchComponent', () => {
   });
 
   it('renders a compact search bar', () => {
-    render(<CompactPatientSearchComponent isSearchPage initialSearchTerm="" />);
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<CompactPatientSearchComponent isSearchPage initialSearchTerm="" />} />
+        </Routes>
+      </BrowserRouter>,
+    );
     expect(screen.getByPlaceholderText(/Search for a patient by name or identifier number/i)).toBeInTheDocument();
   });
 
   it('renders search results when search term is not empty', async () => {
     const user = userEvent.setup();
-    render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />} />
+        </Routes>
+      </BrowserRouter>,
+    );
     const searchbox = screen.getByPlaceholderText(/Search for a patient by name or identifier number/i);
     await user.type(searchbox, 'John');
     const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
@@ -38,7 +51,13 @@ describe('CompactPatientSearchComponent', () => {
         disableTabletSearchOnKeyUp: true,
       } as PatientSearchConfig['search'],
     });
-    render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
+    render(
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />} />
+        </Routes>
+      </BrowserRouter>,
+    );
     const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
     expect(searchResultsContainer).toBeInTheDocument();
   });
@@ -46,7 +65,20 @@ describe('CompactPatientSearchComponent', () => {
   it('navigates to the advanced search page with the correct query string when the Search button is clicked', async () => {
     const user = userEvent.setup();
     render(
-      <CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" shouldNavigateToPatientSearchPage />,
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <CompactPatientSearchComponent
+                isSearchPage={false}
+                initialSearchTerm=""
+                shouldNavigateToPatientSearchPage
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>,
     );
     const searchbox = screen.getByRole('searchbox');
     await user.type(searchbox, 'John');
