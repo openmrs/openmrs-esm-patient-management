@@ -82,7 +82,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
       <ModalHeader title={headerTitle} />
       <ModalBody hasScrollingContent>
-        <Form onSubmit={handleSubmit(onSubmit, onError)}>
+        <Form>
           <Stack gap={3}>
             <FormGroup legendText={''}>
               <Controller
