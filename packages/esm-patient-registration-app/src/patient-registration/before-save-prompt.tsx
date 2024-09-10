@@ -49,17 +49,17 @@ const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) =
     }
   }, []);
 
-  useEffect(() => {
-    if (when && typeof target === 'undefined') {
-      window.addEventListener('single-spa:before-routing-event', cancelNavigation);
-      window.addEventListener('beforeunload', cancelUnload);
+  // useEffect(() => {
+  //   if (when && typeof target === 'undefined') {
+  //     window.addEventListener('single-spa:before-routing-event', cancelNavigation);
+  //     window.addEventListener('beforeunload', cancelUnload);
 
-      return () => {
-        window.removeEventListener('beforeunload', cancelUnload);
-        window.removeEventListener('single-spa:before-routing-event', cancelNavigation);
-      };
-    }
-  }, [target, when, cancelUnload, cancelNavigation]);
+  //     return () => {
+  //       window.removeEventListener('beforeunload', cancelUnload);
+  //       window.removeEventListener('single-spa:before-routing-event', cancelNavigation);
+  //     };
+  //   }
+  // }, [target, when, cancelUnload, cancelNavigation]);
 
   useEffect(() => {
     if (typeof target === 'string') {

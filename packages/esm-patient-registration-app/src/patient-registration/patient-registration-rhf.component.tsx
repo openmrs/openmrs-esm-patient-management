@@ -221,25 +221,27 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
           </div>
         </div>
         <div className={styles.infoGrid}>
-          <PatientRegistrationContext.Provider
-            value={{
-              ...methods,
-              identifierTypes: identifierTypes,
-              validationSchema,
-              // values: props.values,
-              inEditMode,
-              // setFieldValue: props.setFieldValue,
-              // setFieldTouched: props.setFieldTouched,
-              setCapturePhotoProps,
-              currentPhoto: photo?.imageSrc,
-              isOffline,
-              // initialFormValues: defaultValues,
-              // setInitialFormValues,
-            }}>
-            {sections.map((section, index) => (
-              <SectionWrapper key={`registration-section-${section.id}`} sectionDefinition={section} index={index} />
-            ))}
-          </PatientRegistrationContext.Provider>
+          <FormProvider {...methods}>
+            <PatientRegistrationContext.Provider
+              value={{
+                ...methods,
+                identifierTypes: identifierTypes,
+                validationSchema,
+                // values: props.values,
+                inEditMode,
+                // setFieldValue: props.setFieldValue,
+                // setFieldTouched: props.setFieldTouched,
+                setCapturePhotoProps,
+                currentPhoto: photo?.imageSrc,
+                isOffline,
+                // initialFormValues: defaultValues,
+                // setInitialFormValues,
+              }}>
+              {sections.map((section, index) => (
+                <SectionWrapper key={`registration-section-${section.id}`} sectionDefinition={section} index={index} />
+              ))}
+            </PatientRegistrationContext.Provider>
+          </FormProvider>
         </div>
       </div>
     </Form>
