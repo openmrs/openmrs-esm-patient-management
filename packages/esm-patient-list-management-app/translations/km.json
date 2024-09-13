@@ -29,7 +29,6 @@
   "errorDeletingList": "Error deleting patient list",
   "errorRemovingPatientFromList": "Failed to remove patient from list",
   "errorUpdatingList": "Error updating list",
-  "home": "ទំព័រដើម",
   "identifier": "អ្នកកំណត់អត្តសញ្ញាណ",
   "items": "ពត៌មានតាមមុខនិមួយៗ",
   "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
