@@ -5,8 +5,8 @@
 .desktopOverlay {
   position: fixed;
   top: layout.$spacing-09;
+  bottom: 0;
   right: 0;
-  height: 100vh;
   width: 26.25rem;
   background-color: $ui-01;
   border-left: 1px solid $text-03;
