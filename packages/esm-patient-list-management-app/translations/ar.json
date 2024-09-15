@@ -29,7 +29,6 @@
   "errorDeletingList": "Error deleting patient list",
   "errorRemovingPatientFromList": "Failed to remove patient from list",
   "errorUpdatingList": "Error updating list",
-  "home": "الرئيسية",
   "identifier": "المعرف",
   "items": "العناصر",
   "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
