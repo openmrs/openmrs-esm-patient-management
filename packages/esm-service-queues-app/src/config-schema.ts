@@ -82,6 +82,10 @@ export const configSchema = {
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
+    systolicBloodPressureUuid: {
+      _type: Type.ConceptUuid,
+      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
     diastolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
       _default: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -111,10 +115,6 @@ export const configSchema = {
     respiratoryRateUuid: {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    systolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     temperatureUuid: {
       _type: Type.ConceptUuid,
