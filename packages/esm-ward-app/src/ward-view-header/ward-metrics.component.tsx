@@ -9,15 +9,15 @@ import type { WardPatientGroupDetails } from '../types';
 import useWardLocation from '../hooks/useWardLocation';
 
 const wardMetrics = [
-  { name: 'Patients', key: 'patients' },
-  { name: 'Free beds', key: 'freeBeds' },
-  { name: 'Capacity', key: 'capacity' },
+  { name: 'patients', key: 'patients',defaultTranslation:"Patients" },
+  { name: 'freeBeds', key: 'freeBeds',defaultTranslation:"Free Beds"},
+  { name: 'capacity', key: 'capacity',defaultTranslation:"Capacity" },
 ];
 
 const WardMetrics = () => {
   const { location } = useWardLocation();
   const { beds, isLoading, error } = useBeds({ locationUuid: location.uuid });
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const wardPatientGroup = useAppContext<WardPatientGroupDetails>('ward-patients-group');
 
@@ -35,19 +35,19 @@ const WardMetrics = () => {
         wardMetrics.map((wardMetric) => {
           return (
             <WardMetric
-              metricName={wardMetric.name}
-              metricValue={wardMetricValues[wardMetric.key]}
+              metricName={t(`metrics.names.${wardMetric.name}`,wardMetric.defaultTranslation)}
+              metricValue={t(`metrics.values.${wardMetric.name}`,wardMetricValues[wardMetric.key],{metricValue:wardMetricValues[wardMetric.key]})}
               isLoading={!!isLoading}
               key={wardMetric.key}
             />
           );
         })
       ) : (
-        <WardMetric metricName={'Patients'} metricValue={'--'} isLoading={false} key={'patients'} />
+        <WardMetric metricName={t(`metrics.names.patients`,"Patients")} metricValue={'--'} isLoading={false} key={'patients'} />
       )}
       {isBedManagementModuleInstalled && (
         <WardMetric
-          metricName="Pending out"
+          metricName={t(`metrics.names.pendingOut`,"Pending Out")}
           metricValue={error ? '--' : wardPatientGroup?.wardPatientPendingCount.toString() ?? '--'}
           isLoading={!wardPatientGroup}
           key="pending"

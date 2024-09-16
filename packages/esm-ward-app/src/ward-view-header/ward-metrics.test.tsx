@@ -14,6 +14,24 @@ import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
 import useWardLocation from '../hooks/useWardLocation';
 import { screen } from '@testing-library/react';
 import { useAppContext } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+const wardMetrics = [
+  { name: 'patients', key: 'patients',defaultTranslation:"Patients" },
+  { name: 'freeBeds', key: 'freeBeds',defaultTranslation:"Free Beds"},
+  { name: 'capacity', key: 'capacity',defaultTranslation:"Capacity" },
+];
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => {
+    return {
+      t: (key:string,defaultStr:string) => defaultStr,
+      i18n: {
+        dir:()=>"ltr",
+        changeLanguage: () => new Promise(() => {}),
+      },
+    };
+  },
+ }));
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -83,7 +101,9 @@ describe('Ward Metrics', () => {
     const bedMetrics = getWardMetrics(mockWardBeds, mockWardPatientGroupDetails);
     renderWithSwr(<WardMetrics />);
     for (let [key, value] of Object.entries(bedMetrics)) {
-      expect(screen.getByText(value)).toBeInTheDocument();
+      const fieldName=wardMetrics.find((metric)=>metric.name==key)?.defaultTranslation;
+      expect(screen.getByText(fieldName)).toBeInTheDocument();
     }
+  
   });
 });

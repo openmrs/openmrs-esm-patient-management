@@ -75,5 +75,16 @@
   "unknown": "Unknown",
   "visitNoteSaved": "Patient note saved",
   "wardClinicalNotePlaceholder": "Write any notes here",
-  "wards": "Wards"
+  "wards": "Wards",
+  "metrics":{
+    "names":{
+      "patients":"Patients",
+      "freeBeds":"Free Beds",
+      "capacity":"Capacity",
+      "pendingOut":"Pending Out"
+    },
+    "values":{
+       "capacity":"{{ metricValue }} %"
+    }
+  }
 }
