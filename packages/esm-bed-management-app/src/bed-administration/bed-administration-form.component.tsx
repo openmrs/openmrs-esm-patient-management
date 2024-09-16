@@ -21,7 +21,7 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type Location } from '@openmrs/esm-framework';
+import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedType, BedFormData } from '../types';
 import { type BedAdministrationData } from './bed-administration-types';
 
@@ -119,7 +119,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
       <ModalHeader title={headerTitle} />
       <ModalBody hasScrollingContent>
-        <Form onSubmit={handleSubmit(onSubmit, onError)}>
+        <Form>
           <Stack gap={3}>
             <FormGroup legendText={''}>
               <Controller
@@ -279,7 +279,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
       </ModalBody>
       <ModalFooter>
         <Button onClick={() => onModalChange(false)} kind="secondary">
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>

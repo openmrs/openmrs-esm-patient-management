@@ -1,12 +1,11 @@
 import { ExtensionSlot, formatDatetime, getLocale } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
-import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
-import styles from './admission-request-card.scss';
-import type WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
 import { useCurrentWardCardConfig } from '../../hooks/useCurrentWardCardConfig';
-import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
+import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
+import type WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
+import styles from './admission-request-card.scss';
 
 const AdmissionRequestCardHeader: WardPatientCard = (wardPatient) => {
   const { inpatientRequest } = wardPatient;
@@ -42,7 +41,7 @@ const AdmissionRequestCardHeader: WardPatientCard = (wardPatient) => {
       <ExtensionSlot
         name={rowsExtensionSlotName}
         state={extensionSlotState}
-        className={styles.admissionRequestCardRow}
+        className={styles.admissionRequestCardExtensionSlot}
       />
     </div>
   );

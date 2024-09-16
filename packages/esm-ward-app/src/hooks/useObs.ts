@@ -1,6 +1,5 @@
-import useSWR from 'swr';
+import { restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type Observation } from '../types';
-import { type Link, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 interface ObsSearchCriteria {
   patient: string;
@@ -14,8 +13,5 @@ export function useObs(criteria?: ObsSearchCriteria, representation = 'default')
   });
 
   const apiUrl = `${restBaseUrl}/obs?${params}`;
-  return useSWR<{ data: { results: Array<Observation>; totalCount: number; links: Array<Link> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  return useOpenmrsFetchAll<Observation>(apiUrl);
 }

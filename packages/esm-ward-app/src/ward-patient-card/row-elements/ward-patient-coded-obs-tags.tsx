@@ -1,12 +1,12 @@
-import { SkeletonText, Tag } from '@carbon/react';
-import { type Patient, translateFrom, type Visit, type OpenmrsResource } from '@openmrs/esm-framework';
+import { Tag } from '@carbon/react';
+import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { moduleName } from '../../constant';
+import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
+import WardPatientSkeletonText from './ward-pateint-skeleton-text';
 import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
-import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 
 interface WardPatientCodedObsTagsProps {
   config: ColoredObsTagsCardRowConfigObject;
@@ -28,14 +28,18 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
   const { conceptUuid, summaryLabel, summaryLabelColor } = config;
   const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
   const { t } = useTranslation();
-  const { data: conceptToTagColorMap } = useConceptToTagColorMap(config.tags);
+  const conceptToTagColorMap = useConceptToTagColorMap(config.tags);
 
   if (isLoading) {
-    return <SkeletonText />;
+    return (
+      <div className={styles.wardPatientCardRow}>
+        <WardPatientSkeletonText />
+      </div>
+    );
   } else {
-    const obsToDisplay = data?.data?.results?.filter((o) => {
+    const obsToDisplay = data?.filter((o) => {
       const matchVisit = o.encounter.visit?.uuid == visit?.uuid;
-      return matchVisit || visit == null; // TODO: remove visit == null hack when server API supports returning visit
+      return matchVisit;
     });
 
     const summaryLabelToDisplay = summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;
@@ -58,7 +62,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
     const obsWithNoTagCount = obsNodes.filter((o) => o == null).length;
     if (obsNodes?.length > 0 || obsWithNoTagCount > 0) {
       return (
-        <div>
+        <div className={styles.wardPatientCardRow}>
           <span className={styles.wardPatientObsLabel}>
             {obsNodes}
             {obsWithNoTagCount > 0 ? (

@@ -1,6 +1,6 @@
 /** At present, this entire mock is boilerplate. */
 import 'react';
-import 'react-i18next';
+const reactI18next = require('react-i18next');
 
 const hasChildren = (node) => node && (node.children || (node.props && node.props.children));
 
@@ -31,7 +31,16 @@ const renderNodes = (reactNodes) => {
 };
 
 const useMock = [(k) => k, {}];
-useMock.t = (k, o) => (o && o.defaultValue) || (typeof o === 'string' ? o : k);
+useMock.t = (key, defaultValue, options = {}) => {
+  let translatedString = defaultValue;
+  Object.keys(options).forEach((key) => {
+    if (key != 'interpolation') {
+      translatedString = defaultValue.replace(`{{${key}}}`, `${options[key]}`);
+    }
+  });
+
+  return translatedString ?? key;
+};
 useMock.i18n = {};
 
 module.exports = {

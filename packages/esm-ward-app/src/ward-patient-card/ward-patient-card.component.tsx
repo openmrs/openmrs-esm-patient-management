@@ -50,7 +50,7 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
       <ExtensionSlot
         name={rowsExtensionSlotName}
         state={wardPatient}
-        className={classNames(styles.wardPatientCardRow, styles.wardPatientCardExtensionSlot)}
+        className={classNames(styles.wardPatientCardExtensionSlot)}
       />
       <div className={styles.wardPatientCardRow}>
         {footerRowElements.map((elementId, i) => (

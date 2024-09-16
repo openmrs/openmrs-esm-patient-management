@@ -29,7 +29,6 @@
   "errorDeletingList": "שגיאה במחיקת רשימת המטופלים",
   "errorRemovingPatientFromList": "נכשל להסיר מטופל מהרשימה",
   "errorUpdatingList": "שגיאה בעדכון רשימה",
-  "home": "בית",
   "identifier": "מזהה",
   "items": "פריטים",
   "itemsDisplayed": "{{numberOfItemsDisplayed}} items",

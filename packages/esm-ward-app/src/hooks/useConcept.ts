@@ -1,11 +1,10 @@
-import { type Concept, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import useSWRImmutable from 'swr/immutable';
+import { type Concept, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 
 export function useConcepts(uuids: string[], rep = 'default') {
   const apiUrl = `${restBaseUrl}/concept?references=${uuids.join()}&v=${rep}`;
-  const { data, ...rest } = useSWRImmutable<{ data: { results: Array<Concept> } }, Error>(apiUrl, openmrsFetch);
+  const { data, ...rest } = useOpenmrsFetchAll<Concept>(apiUrl, { immutable: true });
   return {
-    concepts: data?.data?.results,
+    concepts: data,
     ...rest,
   };
 }

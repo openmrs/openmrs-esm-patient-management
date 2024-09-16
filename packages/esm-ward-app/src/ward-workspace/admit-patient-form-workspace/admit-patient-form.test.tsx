@@ -41,13 +41,11 @@ jest.mock('../../hooks/useInpatientAdmission', () => ({
   useInpatientAdmission: jest.fn(),
 }));
 
-const inpatientAdmissionsUuidMap = getInpatientAdmissionsUuidMap(mockInpatientAdmissions);
-
 const mockedUseInpatientRequest = jest.mocked(useInpatientRequest);
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 const mockedUseWardLocation = jest.mocked(useWardLocation);
 const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockedUseAdmissionLocation = jest.mocked(useAdmissionLocation).mockReturnValue({
+const mockedUseAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockReturnValue({
   isLoading: false,
   isValidating: false,
   admissionLocation: mockAdmissionLocation,
@@ -57,18 +55,35 @@ const mockedUseAdmissionLocation = jest.mocked(useAdmissionLocation).mockReturnV
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseSession = jest.mocked(useSession);
-const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockReturnValue({
+const mockedInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockReturnValue({
   error: undefined,
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
-  inpatientAdmissions: mockInpatientAdmissions,
+  data: mockInpatientAdmissions,
+  totalCount: 1,
+  hasMore: false,
+  loadMore: jest.fn(),
 });
+
+const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturnValue({
+  inpatientRequests: mockInpatientRequest,
+  hasMore: false,
+  loadMore: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  error: undefined,
+  mutate: jest.fn(),
+  totalCount: 1,
+});
+
 const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockReturnValue({
-  admissionLocationResponse: mockedUseAdmissionLocation(),
-  inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, inpatientAdmissionsUuidMap),
+  admissionLocationResponse: mockedUseAdmissionLocationResponse(),
+  inpatientAdmissionResponse: mockedInpatientAdmissionResponse(),
+  inpatientRequestResponse: mockInpatientRequestResponse(),
+  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest),
 });
+
 jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
 
 const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
@@ -78,6 +93,9 @@ const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
   dispositionType: 'ADMIT',
+  setCancelTitle: jest.fn(),
+  setCancelMessage: jest.fn(),
+  setCancelConfirmText: jest.fn(),
 };
 
 function renderAdmissionForm(dispositionType: DispositionType = 'ADMIT') {
@@ -121,9 +139,12 @@ describe('Testing AdmitPatientForm', () => {
     mockedUseInpatientRequest.mockReturnValue({
       mutate: mockedMutateInpatientRequest,
       error: undefined,
-      inpatientRequests: [mockInpatientRequest],
+      inpatientRequests: mockInpatientRequest,
       isLoading: false,
       isValidating: false,
+      totalCount: 1,
+      hasMore: false,
+      loadMore: jest.fn(),
     });
     mockedUseWardLocation.mockReturnValue({
       location: mockLocationInpatientWard,
@@ -185,10 +206,9 @@ describe('Testing AdmitPatientForm', () => {
   it('should render admit patient form if bed management module is present, but no beds are configured', () => {
     mockedUseFeatureFlag.mockReturnValue(true);
     const replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
-    // @ts-i
     renderAdmissionForm();
     expect(screen.getByText('Select a bed')).toBeInTheDocument();
-    expect(screen.getByText('No beds configured for Inpatient Ward location')).toBeInTheDocument();
+    expect(screen.getByText(/No beds configured/i)).toBeInTheDocument();
     replacedProperty.restore();
   });
 
