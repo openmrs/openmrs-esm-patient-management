@@ -10,7 +10,7 @@ interface WardMetricProps {
 }
 const WardMetric: React.FC<WardMetricProps> = ({ metricName, metricValue, isLoading }) => {
   const { i18n } = useTranslation();
-   const dir=i18n.dir();
+   const dir=i18n.dir?i18n.dir():"ltr";
    const field1=dir=="ltr"?metricName:metricValue;
    const field2=dir=="ltr"?metricValue:metricName;
   return (
