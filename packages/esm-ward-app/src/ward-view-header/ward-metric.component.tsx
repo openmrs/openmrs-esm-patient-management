@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './ward-metric.scss';
 import { SkeletonPlaceholder } from '@carbon/react';
 import {useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 
 interface WardMetricProps {
   metricName: string;
@@ -10,17 +11,17 @@ interface WardMetricProps {
 }
 const WardMetric: React.FC<WardMetricProps> = ({ metricName, metricValue, isLoading }) => {
   const { i18n } = useTranslation();
-   const dir=i18n.dir?i18n.dir():"ltr";
-   const field1=dir=="ltr"?metricName:metricValue;
-   const field2=dir=="ltr"?metricValue:metricName;
+   const isLtr=i18n.dir()=="ltr";
+   const field1=isLtr?metricName:metricValue;
+   const field2=isLtr?metricValue:metricName;
   return (
     <div className={styles.metric}>
-      <span>{dir}</span>
-      <span className={styles.metricName}>{field1}</span>
+     <span className={
+        classNames({[styles.metricName]:isLtr,[styles.metricValue]:!isLtr})}>{field1}</span>
       {isLoading ? (
         <SkeletonPlaceholder className={styles.skeleton} />
       ) : (
-        <span className={styles.metricValue}>{field2}</span>
+        <span className={classNames({[styles.metricValue]:isLtr,[styles.metricName]:!isLtr})}>{field2}</span>
       )}
     </div>
   );

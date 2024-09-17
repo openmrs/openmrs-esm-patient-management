@@ -40,7 +40,9 @@ useMock.t = (key, defaultValue, options = {}) => {
 
   return translatedString ?? key;
 };
-useMock.i18n = {};
+useMock.i18n = {
+  dir:()=>"ltr"
+};
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop
