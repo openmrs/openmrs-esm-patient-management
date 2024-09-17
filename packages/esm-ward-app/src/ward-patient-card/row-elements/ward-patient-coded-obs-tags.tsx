@@ -1,15 +1,13 @@
-import { Tag, Tooltip, ToggletipButton } from '@carbon/react';
-import { isDesktop, type OpenmrsResource, type Patient, useLayoutType, type Visit } from '@openmrs/esm-framework';
+import { Tag } from '@carbon/react';
+import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import WardPatientSkeletonText from './ward-pateint-skeleton-text';
-import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
-import { Toggletip } from '@carbon/react';
-import { ToggletipContent } from '@carbon/react';
-import { Information } from '@carbon/react/icons';
+import { getObsEncounterString, obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
+import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
 
 interface WardPatientCodedObsTagsProps {
   config: ColoredObsTagsCardRowConfigObject;
@@ -57,22 +55,16 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
         const color = conceptToTagColorMap?.get(uuid);
         if (color) {
           return (
-            <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
-              {display}
-              <span onClick={(e) => e.stopPropagation()}>
-                <Toggletip className={styles.wardPatientObsIcon}>
-                  <ToggletipButton>
-                    <Information />
-                  </ToggletipButton>
-                  <ToggletipContent>{o.encounter?.display}</ToggletipContent>
-                </Toggletip>
-              </span>
-            </Tag>
+            <WardPatientResponsiveTooltip tooltipContent={getObsEncounterString(o, t)}>
+              <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
+                {display}
+              </Tag>
+            </WardPatientResponsiveTooltip>
           );
         } else {
           summaryTagTooltipText.push(
             <div key={uuid}>
-              {display} ({o.encounter.display})
+              {display} ({getObsEncounterString(o, t)})
             </div>,
           );
           return null;
@@ -86,20 +78,14 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
           <span className={styles.wardPatientObsLabel}>
             {coloredOpsTags}
             {summaryTagTooltipText.length > 0 ? (
-              <Tag type={summaryLabelColor}>
-                {t('countItems', '{{count}} {{item}}', {
-                  count: summaryTagTooltipText.length,
-                  item: summaryLabelToDisplay,
-                })}
-                <span onClick={(e) => e.stopPropagation()}>
-                  <Toggletip className={styles.wardPatientObsIcon}>
-                    <ToggletipButton>
-                      <Information />
-                    </ToggletipButton>
-                    <ToggletipContent>{summaryTagTooltipText}</ToggletipContent>
-                  </Toggletip>
-                </span>
-              </Tag>
+              <WardPatientResponsiveTooltip tooltipContent={summaryTagTooltipText}>
+                <Tag type={summaryLabelColor}>
+                  {t('countItems', '{{count}} {{item}}', {
+                    count: summaryTagTooltipText.length,
+                    item: summaryLabelToDisplay,
+                  })}
+                </Tag>
+              </WardPatientResponsiveTooltip>
             ) : null}
           </span>
         </div>

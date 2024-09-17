@@ -1,4 +1,4 @@
-import { makeUrl, restBaseUrl, useOpenmrsFetchAll, useOpenmrsPagination } from '@openmrs/esm-framework';
+import { makeUrl, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type MotherAndChildren } from '../types';
 
 export interface MothersAndChildrenSearchCriteria {

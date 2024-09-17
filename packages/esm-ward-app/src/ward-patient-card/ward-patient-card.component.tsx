@@ -23,13 +23,7 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
     id == 'default' ? 'ward-patient-card-footer-slot' : `ward-patient-card-footer-${id}-slot`;
 
   return (
-    <div
-      className={classNames(styles.wardPatientCard, styles.wardPatientCardButton)}
-      onClick={() =>
-        launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
-          wardPatient,
-        })
-      }>
+    <div className={styles.wardPatientCard}>
       <div className={classNames(styles.wardPatientCardRow, styles.wardPatientCardHeader)}>
         {bed ? <WardPatientBedNumber bed={bed} /> : null}
         <WardPatientName patient={patient} />
@@ -68,6 +62,16 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
       </div>
+      <button
+        className={styles.wardPatientCardButton}
+        onClick={() => {
+          launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
+            wardPatient,
+          });
+        }}>
+        {/* Name will not be displayed; just there for a11y */}
+        {getPatientName(patient.person)}
+      </button>
     </div>
   );
 };

@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { type ObsElementDefinition } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
-import { obsCustomRepresentation } from './ward-patient-obs.resource';
+import { getObsEncounterString, obsCustomRepresentation } from './ward-patient-obs.resource';
+import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
 
 export interface WardPatientObsProps {
   config: ObsElementDefinition;
@@ -37,18 +38,12 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit 
     const obsNodes = obsToDisplay?.map((o) => {
       const { value } = o;
       const display: any = (value as OpenmrsResource)?.display ?? o.value;
+
+      const tooltipContent = getObsEncounterString(o, t);
       return (
-        <span key={o.uuid}>
-          {display}
-          <span onClick={(e) => e.stopPropagation()}>
-            <Toggletip className={styles.wardPatientObsIcon} onClick={(e) => e.stopPropagation()}>
-              <ToggletipButton>
-                <Information />
-              </ToggletipButton>
-              <ToggletipContent>{o.encounter?.display}</ToggletipContent>
-            </Toggletip>
-          </span>
-        </span>
+        <WardPatientResponsiveTooltip key={o.uuid} tooltipContent={tooltipContent}>
+          <span title={tooltipContent}>{display} </span>
+        </WardPatientResponsiveTooltip>
       );
     });
 
