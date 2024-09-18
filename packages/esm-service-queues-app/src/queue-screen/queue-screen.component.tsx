@@ -10,12 +10,10 @@ import { ErrorState } from '@openmrs/esm-framework';
 interface QueueScreenProps {}
 
 const QueueScreen: React.FC<QueueScreenProps> = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activeTickets, isLoading, error, mutate } = useActiveTickets();
-  const speaker = window.speechSynthesis;
   const [isSpeaking, setIsSpeaking] = useState(false);
   const selectedLocation = useSelectedQueueLocationUuid();
-  const locationFilteredTickets = activeTickets;
 
   const rowData = useMemo(
     () =>
@@ -27,12 +25,14 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
       })),
     [activeTickets],
   );
+
   const readTicket = useCallback(
     (queue) => {
       if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+
         const message = new SpeechSynthesisUtterance();
         const [prefix, suffix] = queue.ticketNumber.split('-');
-        // const utterance = `Ticket Number: ${prefix.split('')}, - ${suffix.split('')}, Please Proceed To Room, ${queue.room}`;
         const utterance = t(
           'ticketAnnouncement',
           'Ticket number: {{prefix}}, - {{suffix}}, please proceed to room {{room}}',
@@ -45,18 +45,21 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
         message.rate = 1;
         message.pitch = 1;
         message.text = utterance;
+        message.lang = i18n.language;
+
         return new Promise<void>((resolve) => {
           message.onend = () => resolve();
-          speaker.speak(message);
+          window.speechSynthesis.speak(message);
         });
       }
       return Promise.resolve();
     },
-    [speaker],
+    [i18n.language, t],
   );
 
   useEffect(() => {
-    const ticketsToCallOut = locationFilteredTickets.filter((item) => item.status.toLowerCase() === 'calling');
+    const ticketsToCallOut = activeTickets.filter((item) => item.status.toLowerCase() === 'calling');
+
     if (ticketsToCallOut.length > 0 && !isSpeaking) {
       setIsSpeaking(true);
       const readTickets = async () => {
@@ -64,17 +67,12 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
           await readTicket(ticket);
         }
         setIsSpeaking(false);
-        if (typeof mutate === 'function') {
-          mutate();
-        }
         mutate?.();
       };
 
       readTickets();
     }
-
-    return () => {};
-  }, [locationFilteredTickets, isSpeaking]);
+  }, [activeTickets, isSpeaking, readTicket, mutate]);
 
   if (isLoading) {
     return <DataTableSkeleton row={5} className={styles.queueScreen} role="progressbar" />;
@@ -83,6 +81,7 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
   if (error) {
     return <ErrorState error={error} headerTitle={t('queueScreenError', 'Queue screen error')} />;
   }
+
   return (
     <div>
       <PatientQueueHeader title={t('queueScreen', 'Queue screen')} showLocationDropdown />
