@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DataTableSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useActiveTickets } from './useActiveTickets';
@@ -17,12 +17,16 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
   const selectedLocation = useSelectedQueueLocationUuid();
   const locationFilteredTickets = activeTickets;
 
-  const rowData = locationFilteredTickets.map((ticket, index) => ({
-    id: `${index}`,
-    room: ticket.room,
-    ticketNumber: ticket.ticketNumber,
-    status: ticket.status,
-  }));
+  const rowData = useMemo(
+    () =>
+      activeTickets.map((ticket, index) => ({
+        id: `${index}`,
+        room: ticket.room,
+        ticketNumber: ticket.ticketNumber,
+        status: ticket.status,
+      })),
+    [activeTickets],
+  );
   const readTicket = useCallback(
     (queue) => {
       if ('speechSynthesis' in window) {
