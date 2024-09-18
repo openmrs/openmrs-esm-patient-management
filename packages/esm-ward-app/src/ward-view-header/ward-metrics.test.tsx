@@ -9,29 +9,19 @@ import {
   getWardMetrics,
 } from '../ward-view/ward-view.resource';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import { mockAdmissionLocation, mockInpatientAdmissions } from '__mocks__';
+import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequest } from '__mocks__';
 import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
 import useWardLocation from '../hooks/useWardLocation';
 import { screen } from '@testing-library/react';
 import { useAppContext } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
+
 const wardMetrics = [
   { name: 'patients', key: 'patients',defaultTranslation:"Patients" },
   { name: 'freeBeds', key: 'freeBeds',defaultTranslation:"Free Beds"},
   { name: 'capacity', key: 'capacity',defaultTranslation:"Capacity" },
 ];
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => {
-    return {
-      t: (key:string,defaultStr:string) => defaultStr,
-      i18n: {
-        dir:()=>"ltr",
-        changeLanguage: () => new Promise(() => {}),
-      },
-    };
-  },
- }));
+
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -60,6 +50,10 @@ jest.mock('../hooks/useInpatientAdmission', () => ({
   useInpatientAdmission: jest.fn(),
 }));
 
+jest.mock("../hooks/useInpatientRequest",()=>({
+  useInpatientRequest:jest.fn()
+}))
+
 jest.mocked(useBeds).mockReturnValue({
   error: undefined,
   mutate: jest.fn(),
@@ -83,11 +77,12 @@ const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockRe
   inpatientAdmissions: mockInpatientAdmissions,
 });
 
+
 const inpatientAdmissionsUuidMap = getInpatientAdmissionsUuidMap(mockInpatientAdmissions);
 const mockWardPatientGroupDetails = {
   admissionLocationResponse: mockAdmissionLocationResponse(),
   inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, inpatientAdmissionsUuidMap),
+  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest),
 };
 jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails);
 describe('Ward Metrics', () => {

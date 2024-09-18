@@ -36,9 +36,10 @@ export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDe
   const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
-  const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
+  let isDataLoading=wardPatientGroup?.isDataLoading ?? true;
+  const capacity = total != 0 && !isDataLoading? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
   return {
-    patients: wardPatientGroup.totalPatientsCount.toString(),
+    patients:!isDataLoading?wardPatientGroup.totalPatientsCount.toString():"--",
     freeBeds: freeBeds.toString(),
     capacity: capacity.toString(),
   };
@@ -66,7 +67,6 @@ export function createAndGetWardPatientGrouping(
   const allWardPatientUuids = new Set<string>();
 
   let wardPatientPendingCount = 0;
-  const totalPatientsUuidSet=new Set<string>();
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
     patients.map((patient) => {
@@ -92,6 +92,9 @@ export function createAndGetWardPatientGrouping(
       );
     }) ?? [];
 
+    //excluding inpatientRequests
+  const totalPatientsCount=allWardPatientUuids.size;
+
   for(const inpatientRequest of inpatientRequests){
     allWardPatientUuids.add(inpatientRequest.patient.uuid);
   }
@@ -102,6 +105,7 @@ export function createAndGetWardPatientGrouping(
     wardPatientPendingCount,
     bedLayouts,
     wardUnassignedPatientsList,
-    allWardPatientUuids
+    allWardPatientUuids,
+    totalPatientsCount
   };
 }

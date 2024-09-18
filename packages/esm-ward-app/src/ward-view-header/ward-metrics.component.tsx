@@ -20,7 +20,7 @@ const WardMetrics = () => {
   const {t} = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const wardPatientGroup = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-
+  const isMetricsDataLoading=wardPatientGroup?.isDataLoading ?? true;
   if (error) {
     showNotification({
       kind: 'error',
@@ -37,7 +37,7 @@ const WardMetrics = () => {
             <WardMetric
               metricName={t(`metrics.names.${wardMetric.name}`,wardMetric.defaultTranslation)}
               metricValue={t(`metrics.values.${wardMetric.name}`,wardMetricValues[wardMetric.key],{metricValue:wardMetricValues[wardMetric.key]})}
-              isLoading={!!isLoading}
+              isLoading={!!isLoading || isMetricsDataLoading}
               key={wardMetric.key}
             />
           );
@@ -48,8 +48,8 @@ const WardMetrics = () => {
       {isBedManagementModuleInstalled && (
         <WardMetric
           metricName={t(`metrics.names.pendingOut`,"Pending Out")}
-          metricValue={error ? '--' : wardPatientGroup?.wardPatientPendingCount.toString() ?? '--'}
-          isLoading={!wardPatientGroup}
+          metricValue={error ? '--' : wardPatientGroup?.wardPatientPendingCount?.toString() ?? '--'}
+          isLoading={isMetricsDataLoading}
           key="pending"
         />
       )}
