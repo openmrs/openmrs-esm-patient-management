@@ -136,17 +136,6 @@
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient",
       "width": "wider"
-    },
-    {
-      "name": "ward-patient-form-entry-workspace",
-      "title": "clinicalForm",
-      "component": "patientFormEntryWorkspace",
-      "type": "ward-patient-clinical-form",
-      "canMaximize": true,
-      "canHide": true,
-      "width": "wider",
-      "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient"
     }
   ]
 }

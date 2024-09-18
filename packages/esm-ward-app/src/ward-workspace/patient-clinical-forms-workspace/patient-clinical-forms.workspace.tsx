@@ -9,7 +9,9 @@ const WardPatientClinicalFormsWorkspace: React.FC<WardPatientWorkspaceProps> = (
   const clinicalFormsExtensionState = useMemo(
     () => ({
       patientUuid,
+      clinicalFormsWorkspaceName: 'ward-patient-clinical-forms-workspace',
       formEntryWorkspaceName: 'ward-patient-form-entry-workspace',
+      htmlFormEntryWorkspaceName: 'ward-patient-html-form-entry-workspace',
       ...restWorkspaceProps,
     }),
     [patientUuid, restWorkspaceProps],

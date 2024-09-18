@@ -112,11 +112,6 @@ export const patientClinicalFormsWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const patientFormEntryWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/patient-clinical-forms-workspace/patient-form-entry.workspace'),
-  options,
-);
-
 export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
   () => import('./action-menu-buttons/clinical-forms-workspace-siderail.component'),
   options,
