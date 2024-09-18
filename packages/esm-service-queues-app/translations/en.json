@@ -271,6 +271,7 @@
   "submitting": "Submitting...",
   "success": "Success",
   "temperature": "Temperature",
+  "ticketAnnouncement": "Ticket number: {{prefix}}, - {{suffix}}, please proceed to room {{room}}",
   "ticketNumber": "Ticket Number",
   "time": "Time",
   "timeCannotBeInFuture": "Time cannot be in the future",

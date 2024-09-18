@@ -5,6 +5,7 @@ import { useActiveTickets } from './useActiveTickets';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 import { useSelectedQueueLocationUuid } from '../helpers/helpers';
+import { ErrorState } from '@openmrs/esm-framework';
 
 interface QueueScreenProps {}
 
@@ -62,6 +63,7 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
         if (typeof mutate === 'function') {
           mutate();
         }
+        mutate?.();
       };
 
       readTickets();
@@ -75,9 +77,8 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
   }
 
   if (error) {
-    return <div>Error</div>;
+    return <ErrorState error={error} headerTitle={t('queueScreenError', 'Queue screen error')} />;
   }
-
   return (
     <div>
       <PatientQueueHeader title={t('queueScreen', 'Queue screen')} showLocationDropdown />
