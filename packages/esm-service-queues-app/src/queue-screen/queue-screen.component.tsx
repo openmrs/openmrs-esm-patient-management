@@ -46,11 +46,11 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
   }
 
   useEffect(() => {
-    const readableTickets = locationFilteredTickets.filter((item) => item.status == 'calling');
-    if (readableTickets.length > 0 && !isSpeaking) {
+    const ticketsToCallOut = locationFilteredTickets.filter((item) => item.status == 'calling');
+    if (ticketsToCallOut.length > 0 && !isSpeaking) {
       setIsSpeaking(true);
       const readTickets = async () => {
-        for (const ticket of readableTickets) {
+        for (const ticket of ticketsToCallOut) {
           await readTicket(ticket, speaker);
         }
         setIsSpeaking(false);
