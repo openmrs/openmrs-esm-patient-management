@@ -132,7 +132,7 @@ interface InputProps extends TextInputProps {
 
 export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   const { t } = useTranslation();
-  const { formState, getFieldState, control } = useContext(PatientRegistrationContext);
+  const { getFieldState, control, watch } = useContext(PatientRegistrationContext);
   const { error } = getFieldState(props.name);
 
   /*
@@ -155,7 +155,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('nonCodedCauseOfDeathRequired', 'Non-coded cause of death is required')
   */
 
-  const value = props.value || '';
+  const value = watch(props.name) as string;
   const invalidText = error?.message;
   const warnText = useMemo(() => {
     if (!invalidText && typeof checkWarning === 'function') {
@@ -183,7 +183,6 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
               invalidText={invalidText}
               warn={!!warnText}
               warnText={warnText}
-              value={value}
             />
           </Layer>
         )}

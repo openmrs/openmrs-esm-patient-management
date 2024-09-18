@@ -69,7 +69,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       .filter((s) => s);
   }, [config.sections, config.sectionDefinitions]);
 
-  const zodSchema = useZodSchema();
+  const { zodSchema } = useZodSchema();
 
   const methods = useForm<FormValues>({
     defaultValues: initialFormValues,
@@ -84,12 +84,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     getValues,
     reset,
   } = methods;
-
-  useEffect(() => {
-    reset(initialFormValues, {
-      keepDirtyValues: true,
-    });
-  }, [initialFormValues]);
 
   const onFormSubmit = async (values: FormValues) => {
     const abortController = new AbortController();
