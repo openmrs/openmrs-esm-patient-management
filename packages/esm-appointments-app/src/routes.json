@@ -117,7 +117,7 @@
     },
     {
       "name": "edit-appointments-form",
-      "component": "appointementForm",
+      "component": "appointmentsForm",
       "meta": {
         "title":{
           "key":"editAppointment",
@@ -131,7 +131,7 @@
    },
     {
       "name": "create-appointment",
-      "component": "appointementForm",
+      "component": "appointmentsForm",
       "meta": {
         "title": {
           "key":"appointmentForm",
@@ -141,7 +141,7 @@
     },
     {
       "name": "add-appointment",
-      "component": "appointementForm",
+      "component": "appointmentsForm",
       "meta": {
         "title": {
           "key": "createNewAppointment",

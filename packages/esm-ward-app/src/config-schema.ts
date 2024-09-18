@@ -7,7 +7,7 @@ export const defaultWardPatientCard: WardPatientCardDefinition = {
   appliedTo: null,
 };
 
-export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission'];
+export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission', 'patient-location'];
 
 export const addressFields = [
   'cityVillage',

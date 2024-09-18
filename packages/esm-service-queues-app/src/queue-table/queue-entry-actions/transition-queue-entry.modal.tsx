@@ -8,16 +8,21 @@ import { convertTime12to24 } from '../../helpers/time-helpers';
 interface TransitionQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
+  modalTitle?: string;
 }
 
-const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({
+  queueEntry,
+  closeModal,
+  modalTitle,
+}) => {
   const { t } = useTranslation();
   return (
     <QueueEntryActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('transitionPatient', 'Transition patient'),
+        modalTitle: modalTitle || t('transitionPatient', 'Transition patient'),
         modalInstruction: t(
           'transitionPatientStatusOrQueue',
           'Select a new status or queue for patient to transition to.',

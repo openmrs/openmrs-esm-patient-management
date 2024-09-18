@@ -10,7 +10,7 @@ on:
 
 env:
   TURBO_API: 'http://127.0.0.1:9080'
-  TURBO_TOKEN: ${{ secrets.TURBO_SERVER_TOKEN }}
+  TURBO_TOKEN: 'turbo-token'
   TURBO_TEAM: ${{ github.repository_owner }}
 
 jobs:
@@ -18,55 +18,67 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout repo
+      - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
-      - name: Copy test environment variables
+      - name: 📋 Copy test environment variables
         run: cp example.env .env
 
-      - name: Setup node
+      - name: 🛠️ Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "18"
 
-      - name: Cache dependencies
-        id: cache
+      - name: 💾 Cache dependencies
+        id: cache-dependencies
         uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: 📦 Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - name: Setup local cache server for Turborepo
+      - name: 🔍 Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(grep '@playwright/test@' yarn.lock | sed -n 's/.*npm:\([^":]*\).*/\1/p' | head -n 1)" >> $GITHUB_ENV
+
+      - name: 💾 Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: 🎭 Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: 🚀 Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
-
-      - name: Build apps
+      - name: 🏗️ Build apps
         run: yarn turbo run build --color --concurrency=5
 
-      - name: Run dev server
+      - name: 🖥️ Run dev server
         run: bash e2e/support/github/run-e2e-docker-env.sh
 
-      - name: Wait for OpenMRS instance to start
+      - name: ⏳ Wait for OpenMRS instance to start
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8080/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
-      - name: Run E2E tests
+      - name: 🧪 Run E2E tests
         run: yarn playwright test
 
-      - name: Stop dev server
+      - name: 🛑 Stop dev server
         if: '!cancelled()'
         run: docker stop $(docker ps -a -q)
 
-      - name: Upload Report
+      - name: 📤 Upload Report
         uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -280,6 +280,7 @@
   "today": "Today",
   "totalPatients": "Total Patients",
   "transition": "Transition",
+  "TransitionLatestQueueEntry": "Transition patient to latest queue",
   "transitionPatient": "Transition patient",
   "transitionPatientStatusOrQueue": "Select a new status or queue for patient to transition to.",
   "triageForm": "Triage form",

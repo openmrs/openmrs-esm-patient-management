@@ -1,22 +1,23 @@
-import React from 'react';
-import { screen } from '@testing-library/react';
 import {
   type ConfigSchema,
   getDefaultsFromConfigSchema,
-  useConfig,
-  useFeatureFlag,
   useAppContext,
+  useConfig,
+  useFeatureFlag
 } from '@openmrs/esm-framework';
+import { screen } from '@testing-library/react';
+import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequest } from '__mocks__';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { mockAdmissionLocation, mockInpatientAdmissions } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
-import { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
+import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import useWardLocation from '../hooks/useWardLocation';
+import { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
 import WardView from './ward-view.component';
-import { getInpatientAdmissionsUuidMap, createAndGetWardPatientGrouping } from './ward-view.resource';
+import { createAndGetWardPatientGrouping } from './ward-view.resource';
 
 jest.mocked(useConfig).mockReturnValue({
   ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
@@ -47,6 +48,9 @@ jest.mock('../hooks/useAdmissionLocation', () => ({
 jest.mock('../hooks/useInpatientAdmission', () => ({
   useInpatientAdmission: jest.fn(),
 }));
+jest.mock('../hooks/useInpatientRequest', () => ({
+  useInpatientRequest: jest.fn(),
+}));
 jest.mock('../hooks/useWardPatientGrouping', () => ({
   useWardPatientGrouping: jest.fn(),
 }));
@@ -58,21 +62,41 @@ const mockAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockRetu
   admissionLocation: mockAdmissionLocation,
 });
 const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockReturnValue({
-  error: undefined,
-  mutate: jest.fn(),
+  data: mockInpatientAdmissions,
+  hasMore: false,
+  loadMore: jest.fn(),
   isValidating: false,
   isLoading: false,
-  inpatientAdmissions: mockInpatientAdmissions,
+  error: undefined,
+  mutate: jest.fn(),
+  totalCount: 1
 });
 
-const inpatientAdmissionsUuidMap = getInpatientAdmissionsUuidMap(mockInpatientAdmissions);
+const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturnValue({
+  inpatientRequests: mockInpatientRequest,
+  hasMore: false,
+  loadMore: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  error: undefined,
+  mutate: jest.fn(),
+  totalCount: 1
+})
+
 const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockReturnValue({
   admissionLocationResponse: mockAdmissionLocationResponse(),
   inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, inpatientAdmissionsUuidMap),
+  inpatientRequestResponse: mockInpatientRequestResponse(),
+  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest), 
 });
 
 jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
+
+const intersectionObserverMock = () => ({
+  observe: () => null,
+});
+window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock);
+
 describe('WardView', () => {
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);

@@ -25,10 +25,14 @@
   }
 }
 
-.admissionRequestCardRow {
-  padding: layout.$spacing-05;
-  margin: layout.$spacing-03;
-  background-color: white;
+.admissionRequestCardExtensionSlot {
+  display: none;
+
+  &:has(div:not(:empty)) {
+    display: block;  
+    margin: layout.$spacing-03 0;
+    background-color: white;
+  }
 }
 
 .admissionEncounterDetails {

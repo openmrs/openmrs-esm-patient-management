@@ -1,12 +1,5 @@
 import { type Patient } from '@openmrs/esm-framework';
-import type {
-  AdmissionLocationFetchResponse,
-  Bed,
-  BedLayout,
-  InpatientAdmission,
-  WardMetrics,
-  WardPatientGroupDetails,
-} from '../types';
+import type { AdmissionLocationFetchResponse, Bed, BedLayout, InpatientAdmission, InpatientRequest, WardMetrics, WardPatientGroupDetails } from '../types';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -38,7 +31,7 @@ export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDe
     freeBeds: '--',
     capacity: '--',
   };
-  if (beds.length == 0 || !wardPatientGroup) return bedMetrics;
+  if (beds == null || beds.length == 0) return bedMetrics;
   const total = beds.length;
   const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;
@@ -59,15 +52,18 @@ export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmi
   return map;
 }
 
-//catogorize and group patients with bed,without bed and unadmitted patients with bed
 export function createAndGetWardPatientGrouping(
   inpatientAdmissions: InpatientAdmission[],
   admissionLocation: AdmissionLocationFetchResponse,
-  inpatientAdmissionsByPatientUuid: Map<string, InpatientAdmission>,
+  inpatientRequests: InpatientRequest[],
 ) {
+  
+  const inpatientAdmissionsByPatientUuid =  getInpatientAdmissionsUuidMap(inpatientAdmissions);
+
   const wardAdmittedPatientsWithBed = new Map<string, InpatientAdmission>();
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
   const bedLayouts = admissionLocation && filterBeds(admissionLocation);
+  const allWardPatientUuids = new Set<string>();
 
   let wardPatientPendingCount = 0;
   const totalPatientsUuidSet=new Set<string>();
@@ -75,7 +71,7 @@ export function createAndGetWardPatientGrouping(
     const { patients } = bedLayout;
     patients.map((patient) => {
       const patientAdmittedWithBed = inpatientAdmissionsByPatientUuid.get(patient.uuid);
-      totalPatientsUuidSet.add(patient.uuid);
+      allWardPatientUuids.add(patient.uuid);
       if (patientAdmittedWithBed) {
         wardAdmittedPatientsWithBed.set(patient.uuid, patientAdmittedWithBed);
         //count the pending metric
@@ -89,18 +85,23 @@ export function createAndGetWardPatientGrouping(
   
   const wardUnassignedPatientsList =
     inpatientAdmissions?.filter((inpatientAdmission) => {
-      totalPatientsUuidSet.add(inpatientAdmission.patient.uuid)
+      allWardPatientUuids.add(inpatientAdmission.patient.uuid);
       return (
         !wardAdmittedPatientsWithBed.has(inpatientAdmission.patient.uuid) &&
         !wardUnadmittedPatientsWithBed.has(inpatientAdmission.patient.uuid)
       );
     }) ?? [];
+
+  for(const inpatientRequest of inpatientRequests){
+    allWardPatientUuids.add(inpatientRequest.patient.uuid);
+  }
+
   return {
     wardAdmittedPatientsWithBed,
     wardUnadmittedPatientsWithBed,
     wardPatientPendingCount,
     bedLayouts,
     wardUnassignedPatientsList,
-    totalPatientsCount: totalPatientsUuidSet.size,
+    allWardPatientUuids
   };
 }
