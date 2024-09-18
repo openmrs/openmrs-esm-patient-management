@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DataTableSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useActiveTickets } from './useActiveTickets';
@@ -22,36 +22,41 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
     ticketNumber: ticket.ticketNumber,
     status: ticket.status,
   }));
-
-  function readTicket(queue, speaker) {
-    if ('speechSynthesis' in window) {
-      const message = new SpeechSynthesisUtterance();
-      const utterance =
-        'Ticket Number: ' +
-        queue.ticketNumber.split('-')[0].split('') +
-        ', - ' +
-        queue.ticketNumber.split('-')[1].split('') +
-        ', Please Proceed To Room, ' +
-        queue.room;
-      message.rate = 1;
-      message.pitch = 1;
-      message.text = utterance;
-      return new Promise((resolve) => {
-        message.onend = resolve;
-        speaker.speak(message);
-      });
-    } else {
+  const readTicket = useCallback(
+    (queue) => {
+      if ('speechSynthesis' in window) {
+        const message = new SpeechSynthesisUtterance();
+        const [prefix, suffix] = queue.ticketNumber.split('-');
+        // const utterance = `Ticket Number: ${prefix.split('')}, - ${suffix.split('')}, Please Proceed To Room, ${queue.room}`;
+        const utterance = t(
+          'ticketAnnouncement',
+          'Ticket number: {{prefix}}, - {{suffix}}, please proceed to room {{room}}',
+          {
+            prefix: prefix.split(''),
+            suffix: suffix.split(''),
+            room: queue.room,
+          },
+        );
+        message.rate = 1;
+        message.pitch = 1;
+        message.text = utterance;
+        return new Promise<void>((resolve) => {
+          message.onend = () => resolve();
+          speaker.speak(message);
+        });
+      }
       return Promise.resolve();
-    }
-  }
+    },
+    [speaker],
+  );
 
   useEffect(() => {
-    const ticketsToCallOut = locationFilteredTickets.filter((item) => item.status == 'calling');
+    const ticketsToCallOut = locationFilteredTickets.filter((item) => item.status.toLowerCase() === 'calling');
     if (ticketsToCallOut.length > 0 && !isSpeaking) {
       setIsSpeaking(true);
       const readTickets = async () => {
         for (const ticket of ticketsToCallOut) {
-          await readTicket(ticket, speaker);
+          await readTicket(ticket);
         }
         setIsSpeaking(false);
         if (typeof mutate === 'function') {
