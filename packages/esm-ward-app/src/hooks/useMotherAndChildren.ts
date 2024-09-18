@@ -1,10 +1,4 @@
-import {
-  makeUrl,
-  restBaseUrl,
-  useOpenmrsFetchAll,
-  useOpenmrsInfinite,
-  useOpenmrsPagination,
-} from '@openmrs/esm-framework';
+import { makeUrl, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type MotherAndChildren } from '../types';
 
 export interface MothersAndChildrenSearchCriteria {
@@ -44,7 +38,7 @@ export function useMotherAndChildren(
     requireChildBornDuringMothersActiveVisit?.toString() ?? 'false',
   );
   rep && url.searchParams.append('v', rep);
-  return useOpenmrsPagination<MotherAndChildren>(fetch ? url : null, 50);
+  return useOpenmrsFetchAll<MotherAndChildren>(fetch ? url : null);
 }
 
 function makeUrlUrl(path: string) {
