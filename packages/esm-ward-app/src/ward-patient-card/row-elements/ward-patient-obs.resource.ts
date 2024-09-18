@@ -1,11 +1,13 @@
 import { restBaseUrl, useOpenmrsFetchAll, type Concept } from '@openmrs/esm-framework';
 import { type TagConfigObject } from '../../config-schema-extension-colored-obs-tags';
+import { type Observation } from '../../types';
+import { type TFunction } from 'i18next';
 
 // prettier-ignore
 export const obsCustomRepresentation = 
   'custom:(uuid,display,obsDatetime,value,' + 
     'concept:(uuid,display),' + 
-    'encounter:(uuid,display,' + 
+    'encounter:(uuid,display,encounterType,encounterDatetime,' + 
       'visit:(uuid,display)))';
 
 //  get the setMembers of a concept set
@@ -43,4 +45,12 @@ export function useConceptToTagColorMap(tags: Array<TagConfigObject>) {
   }
 
   return conceptToTagColorMap;
+}
+
+export function getObsEncounterString(obs: Observation, t: TFunction) {
+  return t('encounterDisplay', '{{encounterType}} {{encounterDate}}', {
+    encounterType: obs.encounter.encounterType.display,
+    encounterDate: new Date(obs.encounter.encounterDatetime).toLocaleDateString(),
+    interpolation: { escapeValue: false },
+  });
 }

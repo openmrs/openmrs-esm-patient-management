@@ -52,7 +52,7 @@ const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
 
   if (isLoadingChildrenData || isLoadingMotherData) {
     return (
-      <div className={wardPatientCardStyles.wardPatientCardRow}>
+      <div className={classNames(styles.motherOrBabyRow, wardPatientCardStyles.wardPatientCardRow)}>
         <WardPatientSkeletonText />
       </div>
     );
