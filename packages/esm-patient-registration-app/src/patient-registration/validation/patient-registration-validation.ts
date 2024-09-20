@@ -33,6 +33,10 @@ export function getValidationSchema(config: RegistrationConfig) {
       then: Yup.date()
         .required(t('birthdayRequired', 'Birthday is required'))
         .max(Date(), t('birthdayNotInTheFuture', 'Birthday cannot be in future'))
+        .min(
+          dayjs().subtract(140, 'years').toDate(),
+          t('birthdayNotOver140YearsAgo', 'Birthday cannot be more than 140 years ago'),
+        )
         .nullable(),
       otherwise: Yup.date().nullable(),
     }),
@@ -40,7 +44,8 @@ export function getValidationSchema(config: RegistrationConfig) {
       is: true,
       then: Yup.number()
         .required(t('yearsEstimateRequired', 'Estimated years required'))
-        .min(0, t('negativeYears', 'Estimated years cannot be negative')),
+        .min(0, t('negativeYears', 'Estimated years cannot be negative'))
+        .max(140, t('nonsensicalYears', 'Estimated years cannot be more than 140')),
       otherwise: Yup.number().nullable(),
     }),
     monthsEstimated: Yup.number().min(0, t('negativeMonths', 'Estimated months cannot be negative')),
