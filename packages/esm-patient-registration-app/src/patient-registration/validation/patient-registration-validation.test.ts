@@ -1,6 +1,7 @@
 import { getConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../config-schema';
 import { getValidationSchema } from './patient-registration-validation';
+import dayjs from 'dayjs';
 
 const mockGetConfig = jest.mocked(getConfig);
 
@@ -144,13 +145,22 @@ describe('Patient registration validation', () => {
     expect(validationError).toBeFalsy();
   });
 
-  it('should throw error when date of birth is a future date', async () => {
+  it('should throw an error when date of birth is a future date', async () => {
     const invalidFormValues = {
       ...validFormValues,
       birthdate: new Date('2100-01-01'),
     };
     const validationError = await validateFormValues(invalidFormValues);
     expect(validationError.errors).toContain('birthdayNotInTheFuture');
+  });
+
+  it('should throw an error when date of birth is more than 140 years ago', async () => {
+    const invalidFormValues = {
+      ...validFormValues,
+      birthdate: dayjs().subtract(141, 'years').toDate(),
+    };
+    const validationError = await validateFormValues(invalidFormValues);
+    expect(validationError.errors).toContain('birthdayNotOver140YearsAgo');
   });
 
   it('should require yearsEstimated when birthdateEstimated is true', async () => {
@@ -162,7 +172,7 @@ describe('Patient registration validation', () => {
     expect(validationError.errors).toContain('yearsEstimateRequired');
   });
 
-  it('should throw error when monthEstimated is negative', async () => {
+  it('should throw an error when monthEstimated is negative', async () => {
     const invalidFormValues = {
       ...validFormValues,
       birthdateEstimated: true,
@@ -173,7 +183,17 @@ describe('Patient registration validation', () => {
     expect(validationError.errors).toContain('negativeMonths');
   });
 
-  it('should throw error when deathDate is in future', async () => {
+  it('should throw an error when yearsEstimated is more than 140', async () => {
+    const invalidFormValues = {
+      ...validFormValues,
+      birthdateEstimated: true,
+      yearsEstimated: 141,
+    };
+    const validationError = await validateFormValues(invalidFormValues);
+    expect(validationError.errors).toContain('nonsensicalYears');
+  });
+
+  it('should throw an error when deathDate is in future', async () => {
     const invalidFormValues = {
       ...validFormValues,
       deathDate: new Date('2100-01-01'),
