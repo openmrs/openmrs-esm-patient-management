@@ -1,12 +1,13 @@
 import { Tag } from '@carbon/react';
 import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import WardPatientSkeletonText from './ward-pateint-skeleton-text';
-import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
+import { getObsEncounterString, obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
+import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
 
 interface WardPatientCodedObsTagsProps {
   config: ColoredObsTagsCardRowConfigObject;
@@ -44,31 +45,47 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ confi
 
     const summaryLabelToDisplay = summaryLabel != null ? t(summaryLabel) : obsToDisplay?.[0]?.concept?.display;
 
-    const obsNodes = obsToDisplay?.map((o) => {
-      const { display, uuid } = o.value as OpenmrsResource;
+    // for each obs configured to be displayed with a color, we create a tag for it
+    // for other obs not configured, we create a single summary tag for all of them.
+    const summaryTagTooltipText: ReactNode[] = [];
+    const coloredOpsTags = obsToDisplay
+      ?.map((o) => {
+        const { display, uuid } = o.value as OpenmrsResource;
 
-      const color = conceptToTagColorMap?.get(uuid);
-      if (color) {
-        return (
-          <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
-            {display}
-          </Tag>
-        );
-      } else {
-        return null;
-      }
-    });
+        const color = conceptToTagColorMap?.get(uuid);
+        if (color) {
+          return (
+            <WardPatientResponsiveTooltip tooltipContent={getObsEncounterString(o, t)}>
+              <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
+                {display}
+              </Tag>
+            </WardPatientResponsiveTooltip>
+          );
+        } else {
+          summaryTagTooltipText.push(
+            <div key={uuid}>
+              {display} ({getObsEncounterString(o, t)})
+            </div>,
+          );
+          return null;
+        }
+      })
+      .filter((o) => o != null);
 
-    const obsWithNoTagCount = obsNodes.filter((o) => o == null).length;
-    if (obsNodes?.length > 0 || obsWithNoTagCount > 0) {
+    if (coloredOpsTags?.length > 0 || summaryTagTooltipText.length > 0) {
       return (
         <div className={styles.wardPatientCardRow}>
           <span className={styles.wardPatientObsLabel}>
-            {obsNodes}
-            {obsWithNoTagCount > 0 ? (
-              <Tag type={summaryLabelColor}>
-                {t('countItems', '{{count}} {{item}}', { count: obsWithNoTagCount, item: summaryLabelToDisplay })}
-              </Tag>
+            {coloredOpsTags}
+            {summaryTagTooltipText.length > 0 ? (
+              <WardPatientResponsiveTooltip tooltipContent={summaryTagTooltipText}>
+                <Tag type={summaryLabelColor}>
+                  {t('countItems', '{{count}} {{item}}', {
+                    count: summaryTagTooltipText.length,
+                    item: summaryLabelToDisplay,
+                  })}
+                </Tag>
+              </WardPatientResponsiveTooltip>
             ) : null}
           </span>
         </div>
