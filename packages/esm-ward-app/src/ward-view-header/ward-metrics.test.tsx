@@ -16,12 +16,10 @@ import { screen } from '@testing-library/react';
 import { useAppContext } from '@openmrs/esm-framework';
 
 const wardMetrics = [
-  { name: 'patients', key: 'patients',defaultTranslation:"Patients" },
-  { name: 'freeBeds', key: 'freeBeds',defaultTranslation:"Free Beds"},
-  { name: 'capacity', key: 'capacity',defaultTranslation:"Capacity" },
+  { name: 'patients', key: 'patients', defaultTranslation: 'Patients' },
+  { name: 'freeBeds', key: 'freeBeds', defaultTranslation: 'Free beds' },
+  { name: 'capacity', key: 'capacity', defaultTranslation: 'Capacity' },
 ];
-
-
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -50,9 +48,9 @@ jest.mock('../hooks/useInpatientAdmission', () => ({
   useInpatientAdmission: jest.fn(),
 }));
 
-jest.mock("../hooks/useInpatientRequest",()=>({
-  useInpatientRequest:jest.fn()
-}))
+jest.mock('../hooks/useInpatientRequest', () => ({
+  useInpatientRequest: jest.fn(),
+}));
 
 jest.mocked(useBeds).mockReturnValue({
   error: undefined,
@@ -77,7 +75,6 @@ const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockRe
   inpatientAdmissions: mockInpatientAdmissions,
 });
 
-
 const inpatientAdmissionsUuidMap = getInpatientAdmissionsUuidMap(mockInpatientAdmissions);
 const mockWardPatientGroupDetails = {
   admissionLocationResponse: mockAdmissionLocationResponse(),
@@ -96,9 +93,8 @@ describe('Ward Metrics', () => {
     const bedMetrics = getWardMetrics(mockWardBeds, mockWardPatientGroupDetails);
     renderWithSwr(<WardMetrics />);
     for (let [key, value] of Object.entries(bedMetrics)) {
-      const fieldName=wardMetrics.find((metric)=>metric.name==key)?.defaultTranslation;
+      const fieldName = wardMetrics.find((metric) => metric.name == key)?.defaultTranslation;
       expect(screen.getByText(fieldName)).toBeInTheDocument();
     }
-  
   });
 });

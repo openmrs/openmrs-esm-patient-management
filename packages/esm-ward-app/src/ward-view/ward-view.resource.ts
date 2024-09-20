@@ -1,5 +1,14 @@
 import { type Patient } from '@openmrs/esm-framework';
-import type { AdmissionLocationFetchResponse, Bed, BedLayout, InpatientAdmission, InpatientRequest, WardMetrics, WardPatientGroupDetails } from '../types';
+import type {
+  AdmissionLocationFetchResponse,
+  Bed,
+  BedLayout,
+  InpatientAdmission,
+  InpatientRequest,
+  WardMetrics,
+  WardPatientGroupDetails,
+} from '../types';
+import type { TFunction } from 'i18next';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -36,10 +45,9 @@ export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDe
   const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
-  let isDataLoading=wardPatientGroup?.isDataLoading ?? true;
-  const capacity = total != 0 && !isDataLoading? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
+  const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
   return {
-    patients:!isDataLoading?wardPatientGroup.totalPatientsCount.toString():"--",
+    patients: wardPatientGroup?.totalPatientsCount.toString() ?? '--',
     freeBeds: freeBeds.toString(),
     capacity: capacity.toString(),
   };
@@ -58,8 +66,7 @@ export function createAndGetWardPatientGrouping(
   admissionLocation: AdmissionLocationFetchResponse,
   inpatientRequests: InpatientRequest[],
 ) {
-  
-  const inpatientAdmissionsByPatientUuid =  getInpatientAdmissionsUuidMap(inpatientAdmissions);
+  const inpatientAdmissionsByPatientUuid = getInpatientAdmissionsUuidMap(inpatientAdmissions);
 
   const wardAdmittedPatientsWithBed = new Map<string, InpatientAdmission>();
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
@@ -82,7 +89,7 @@ export function createAndGetWardPatientGrouping(
       }
     });
   });
-  
+
   const wardUnassignedPatientsList =
     inpatientAdmissions?.filter((inpatientAdmission) => {
       allWardPatientUuids.add(inpatientAdmission.patient.uuid);
@@ -92,10 +99,10 @@ export function createAndGetWardPatientGrouping(
       );
     }) ?? [];
 
-    //excluding inpatientRequests
-  const totalPatientsCount=allWardPatientUuids.size;
+  //excluding inpatientRequests
+  const totalPatientsCount = allWardPatientUuids.size;
 
-  for(const inpatientRequest of inpatientRequests){
+  for (const inpatientRequest of inpatientRequests ?? []) {
     allWardPatientUuids.add(inpatientRequest.patient.uuid);
   }
 
@@ -106,6 +113,32 @@ export function createAndGetWardPatientGrouping(
     bedLayouts,
     wardUnassignedPatientsList,
     allWardPatientUuids,
-    totalPatientsCount
+    totalPatientsCount,
   };
+}
+
+export function getWardMetricNameTranslation(name: string, t: TFunction) {
+  switch (name) {
+    case 'patients':
+      return t('patients', 'Patients');
+    case 'freeBeds':
+      return t('freeBeds', 'Free beds');
+    case 'capacity':
+      return t('capacity', 'Capacity');
+    case 'pendingOut':
+      return t('pendingOut', 'Pending out');
+  }
+}
+
+export function getWardMetricValueTranslation(name: string, t: TFunction, value: string) {
+  switch (name) {
+    case 'patients':
+      return t('patientsMetricValue', '{{ metricValue }}', { metricValue: value });
+    case 'freeBeds':
+      return t('freeBedsMetricValue', '{{ metricValue }}', { metricValue: value });
+    case 'capacity':
+      return t('capacityMetricValue', '{{ metricValue }} %', { metricValue: value });
+    case 'pendingOut':
+      return t('pendingOutMetricValue', '{{ metricValue }}', { metricValue: value });
+  }
 }
