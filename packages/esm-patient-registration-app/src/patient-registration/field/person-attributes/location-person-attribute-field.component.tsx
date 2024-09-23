@@ -43,17 +43,20 @@ export function LocationPersonAttributeField({
     return null;
   }, [locationOptions, meta.value]);
 
+  // Callback for when updating the combobox input
   const onInputChange = useCallback(
     (value: string | null) => {
       if (value) {
+        // If the value exists in the locationOptions (i.e. a label matches the input), exit the function
         if (locationOptions.find(({ label }) => label === value)) return;
+        // If the input is a new value, set the search query
         setSearchQuery(value);
+        // Clear the current selected value since the input doesn't match any existing options
         setValue(null);
       }
     },
     [locationOptions, setValue],
   );
-
   const handleSelect = useCallback(
     ({ selectedItem }) => {
       if (selectedItem) {
