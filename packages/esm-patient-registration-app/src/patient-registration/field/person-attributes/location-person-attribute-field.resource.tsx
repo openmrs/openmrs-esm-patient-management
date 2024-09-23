@@ -3,13 +3,13 @@ import { type FetchResponse, fhirBaseUrl, openmrsFetch, useDebounce } from '@ope
 import { type LocationEntry, type LocationResponse } from '@openmrs/esm-service-queues-app/src/types';
 import useSWR from 'swr';
 
-interface IUseLocations {
+interface UseLocationsResult {
   locations: Array<LocationEntry>;
   isLoading: boolean;
   loadingNewData: boolean;
 }
 
-export function useLocations(locationTag: string | null, searchQuery: string = ''): IUseLocations {
+export function useLocations(locationTag: string | null, searchQuery: string = ''): UseLocationsResult {
   const debouncedSearchQuery = useDebounce(searchQuery);
 
   const constructUrl = useMemo(() => {
