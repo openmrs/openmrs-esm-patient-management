@@ -187,8 +187,7 @@ export const esmPatientRegistrationSchema = {
       locationTag: {
         _type: Type.String,
         _default: null,
-        _description:
-          'For locations questions only. A concept which has the possible responses either as answers or as set members.',
+        _description: 'For locations questions only. A tag used to filter and categorize locations.',
       },
       answerConceptSetUuid: {
         _type: Type.ConceptUuid,
