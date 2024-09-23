@@ -1,11 +1,12 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useField } from 'formik';
+import { Field, useField } from 'formik';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import styles from './../field.scss';
 import { useLocations } from './location-person-attribute-field.resource';
 import { ComboBox, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+
 export interface LocationPersonAttributeFieldProps {
   id: string;
   personAttributeType: PersonAttributeTypeResponse;
@@ -23,19 +24,24 @@ export function LocationPersonAttributeField({
   required,
 }: LocationPersonAttributeFieldProps) {
   const { t } = useTranslation();
+  const fieldName = `attributes.${personAttributeType.uuid}`;
   const [field, meta, { setValue }] = useField(`attributes.${personAttributeType.uuid}`);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const { locations } = useLocations(locationTag || null, 5, searchQuery);
+  const { locations } = useLocations(locationTag || null, searchQuery);
 
   const locationOptions = useMemo(() => {
     return locations.map(({ resource: { id, name } }) => ({ value: id, label: name }));
   }, [locations]);
 
-  useEffect(() => {
-    if (meta?.value?.uuid) {
-      setValue(meta.value.uuid);
+  const selectedItem = useMemo(() => {
+    if (typeof meta.value === 'string') {
+      return locationOptions.find(({ value }) => value === meta.value) || null;
     }
-  }, [meta, setValue]);
+    if (typeof meta.value === 'object' && meta.value) {
+      return locationOptions.find(({ value }) => value === meta.value.uuid) || null;
+    }
+    return null;
+  }, [locationOptions, meta.value]);
 
   const onInputChange = useCallback(
     (value: string | null) => {
@@ -60,16 +66,24 @@ export function LocationPersonAttributeField({
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Layer>
-        <ComboBox
-          titleText={label}
-          items={locationOptions}
-          id={id}
-          placeholder={t('searchLocationPersonAttribute', 'Search location')}
-          onInputChange={onInputChange}
-          required={required}
-          onChange={handleSelect}
-          selectedItem={locationOptions.find(({ value }) => value === field.value) || null}
-        />
+        <Field name={fieldName}>
+          {({ field, form: { touched, errors } }) => {
+            return (
+              <ComboBox
+                id={id}
+                name={`person-attribute-${personAttributeType.uuid}`}
+                titleText={label}
+                items={locationOptions}
+                placeholder={t('searchLocationPersonAttribute', 'Search location')}
+                onInputChange={onInputChange}
+                required={required}
+                onChange={handleSelect}
+                selectedItem={selectedItem}
+                invalid={errors[fieldName] && touched[fieldName]}
+              />
+            );
+          }}
+        </Field>
       </Layer>
     </div>
   );
