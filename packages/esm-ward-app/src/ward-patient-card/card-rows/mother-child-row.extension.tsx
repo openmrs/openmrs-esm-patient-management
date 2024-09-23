@@ -94,7 +94,7 @@ const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
             <div className={styles.motherOrBabyIconDiv}>
               <Icon className={styles.motherOrBabyIcon} size={24} />
             </div>
-            <div className={wardPatientCardStyles.dotSeparatedChildren}>
+            <div className={classNames(styles.motherOrBabyRowElementsDev, wardPatientCardStyles.dotSeparatedChildren)}>
               <WardPatientName patient={patientB} />
               <WardPatientIdentifier patient={patientB} />
               <WardPatientAge patient={patientB} />
