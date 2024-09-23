@@ -185,18 +185,20 @@ export interface WardConfigObject {
 
 export interface WardPatientCardsConfig {
   obsElementDefinitions: Array<ObsElementDefinition>;
-  pendingOrderTypesDefinitions: Array<PendingOrderTypesDefinition>;
+  pendingItemsDefinitions: Array<PendingItemsDefinition>;
   identifierElementDefinitions: Array<IdentifierElementDefinition>;
   addressElementDefinitions: Array<AddressElementDefinition>;
   cardDefinitions: Array<WardPatientCardDefinition>;
 }
 
-export interface PendingOrderTypesDefinition {
-  enabled: boolean;
-  orderTypes: Array<{
-    label?: string;
-    uuid: string;
-  }>;
+export interface PendingItemsDefinition {
+  showPendingItems: boolean;
+  orders: {
+    orderTypes: Array<{
+      label?: string;
+      uuid: string;
+    }>;
+  };
 }
 
 export interface ObsElementDefinition {
