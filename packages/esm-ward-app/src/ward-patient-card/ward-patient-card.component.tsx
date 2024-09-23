@@ -36,6 +36,16 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
+      <div className={styles.wardPatientCardRow}>
+        {footerRowElements.map((elementId, i) => (
+          <WardPatientCardElement
+            key={`ward-card-${patient.uuid}-footer-${i}`}
+            elementId={elementId}
+            {...wardPatient}
+          />
+        ))}
+        <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
+      </div>
       {wardPatient?.inpatientRequest || showPendingOrders ? (
         <div className={styles.wardPatientCardPendingItemsRow}>
           <Hourglass className={styles.hourGlassIcon} size="16" />:
@@ -52,16 +62,6 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         state={wardPatient}
         className={classNames(styles.wardPatientCardExtensionSlot)}
       />
-      <div className={styles.wardPatientCardRow}>
-        {footerRowElements.map((elementId, i) => (
-          <WardPatientCardElement
-            key={`ward-card-${patient.uuid}-footer-${i}`}
-            elementId={elementId}
-            {...wardPatient}
-          />
-        ))}
-        <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
-      </div>
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
