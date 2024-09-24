@@ -32,6 +32,18 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
         ))}
         <ExtensionSlot name={headerExtensionSlotName} state={wardPatient} />
       </div>
+      {footerRowElements.length > 0 && (
+        <div className={styles.wardPatientCardRow}>
+          {footerRowElements.map((elementId, i) => (
+            <WardPatientCardElement
+              key={`ward-card-${patient.uuid}-footer-${i}`}
+              elementId={elementId}
+              {...wardPatient}
+            />
+          ))}
+          <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
+        </div>
+      )}
       <ExtensionSlot
         name="ward-patient-card-pending-items-slot"
         state={wardPatient}
@@ -40,18 +52,8 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
       <ExtensionSlot
         name={rowsExtensionSlotName}
         state={wardPatient}
-        className={classNames(styles.wardPatientCardRow, styles.wardPatientCardExtensionSlot)}
+        className={classNames(styles.wardPatientCardExtensionSlot)}
       />
-      <div className={styles.wardPatientCardRow}>
-        {footerRowElements.map((elementId, i) => (
-          <WardPatientCardElement
-            key={`ward-card-${patient.uuid}-footer-${i}`}
-            elementId={elementId}
-            {...wardPatient}
-          />
-        ))}
-        <ExtensionSlot name={footerExtensionSlotName} state={wardPatient} />
-      </div>
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
