@@ -97,6 +97,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
                 if (bed) {
                   return removePatientFromBed(bed.bedId, patient.uuid);
                 }
+                return response;
               }
             }
           },
