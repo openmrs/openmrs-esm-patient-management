@@ -9,6 +9,7 @@ import {
   type PatientIdentifierValue,
   type PatientUuidMapType,
 } from './patient-registration.types';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
@@ -192,22 +193,29 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Arr
   });
 }
 
-export function getIdentifierFieldValuesFromFhirPatient(
+export async function getIdentifierFieldValuesFromFhirPatient(
   patient: fhir.Patient,
   identifierConfig,
-): { [key: string]: any } {
-  const identifiers: { [key: string]: any } = {};
+): Promise<{ [identifierFieldName: string]: PatientIdentifierValue }> {
+  const identifiers: FormValues['identifiers'] = {};
 
-  patient.identifier.forEach((identifier) => {
-    identifierConfig.forEach((config) => {
+  for (const identifier of patient.identifier) {
+    for (const config of identifierConfig) {
       const identifierConfig = config.identifierTypeSystem === identifier.system ? config : null;
 
       if (identifierConfig) {
-        const identifierTypeName = identifierConfig.identifierTypeName;
+        let identifierTypeName;
+
+        const url = `${restBaseUrl}/patientidentifiertype/${identifierConfig.identifierTypeUuid}`;
+        await openmrsFetch(url).then((response) => {
+          if (response.status == 200 && response.data) {
+            identifierTypeName = response.data.name;
+          }
+        });
 
         identifiers[identifierTypeName] = {
           identifierUuid: null,
-          preferred: identifier.use === 'official',
+          preferred: false, // consider identifier.use === 'official' ?? by default autogen is preferred
           initialValue: identifier.value,
           identifierValue: identifier.value,
           identifierTypeUuid: identifierConfig.identifierTypeUuid,
@@ -217,8 +225,8 @@ export function getIdentifierFieldValuesFromFhirPatient(
           autoGeneration: false,
         };
       }
-    });
-  });
+    }
+  }
 
   return identifiers;
 }
