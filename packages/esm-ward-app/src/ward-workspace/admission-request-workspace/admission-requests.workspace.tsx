@@ -9,6 +9,8 @@ import { type InpatientRequest } from '../../types';
 
 interface AdmissionRequestsWorkspaceProps {}
 const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = () => {
+  // note: useAppContext() does not work here for some reason, so we call `useInpatientRequest`
+  // directly. See: https://openmrs.atlassian.net/browse/O3-4020
   const {
     inpatientRequests,
     isLoading: isLoadingInpatientRequests,
