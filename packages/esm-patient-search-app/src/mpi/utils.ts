@@ -1,21 +1,22 @@
-import capitalize from 'lodash-es/capitalize';
-
+import { capitalize } from 'lodash-es';
+import { type SearchedPatient } from '../types';
 export function inferModeFromSearchParams(searchParams: URLSearchParams) {
-  return searchParams?.get('mode')?.toLowerCase() == 'external' ? 'external' : 'internal';
+  return searchParams.get('mode')?.toLowerCase() === 'external' ? 'external' : 'internal';
 }
 
-export function mapToOpenMRSPatient(fhirPatients: any): any {
-  if (fhirPatients.total < 1) {
-    return null;
+export function mapToOpenMRSPatient(fhirPatients: Array<any>): Array<SearchedPatient> {
+  if (fhirPatients[0].total < 1) {
+    return [];
   }
-  const pts = [];
+  //Consider patient // https://github.com/openmrs/openmrs-esm-core/blob/main/packages/framework/esm-api/src/types/patient-resource.ts
+  const pts: Array<SearchedPatient> = [];
 
   fhirPatients[0].entry.forEach((pt, index) => {
     let fhirPatient = pt.resource;
     pts.push({
       externalId: fhirPatient.id,
       uuid: null,
-      identifiers: {},
+      identifiers: null,
       person: {
         addresses: fhirPatient?.address?.map((address) => ({
           cityVillage: address.city,
@@ -28,7 +29,7 @@ export function mapToOpenMRSPatient(fhirPatients: any): any {
         age: null,
         birthdate: fhirPatient.birthDate,
         gender: capitalize(fhirPatient.gender),
-        death: !fhirPatient.active,
+        dead: !fhirPatient.active,
         deathDate: '',
         personName: {
           display: `${fhirPatient.name[0].family} ${fhirPatient.name[0].given[0]}`,
