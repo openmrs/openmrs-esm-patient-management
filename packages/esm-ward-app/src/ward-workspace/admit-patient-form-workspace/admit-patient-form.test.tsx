@@ -322,7 +322,6 @@ describe('Testing AdmitPatientForm', () => {
   });
 
   it('should admit patient if no beds are configured', async () => {
-    const replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
     // @ts-ignore - we only need these two keys for now
     mockedOpenmrsFetch.mockResolvedValue({
       ok: true,
@@ -335,7 +334,7 @@ describe('Testing AdmitPatientForm', () => {
     const admitButton = screen.getByRole('button', { name: 'Admit' });
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(1);
+    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(2);
     expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/encounter', {
       method: 'POST',
       headers: {
@@ -354,11 +353,13 @@ describe('Testing AdmitPatientForm', () => {
         ],
       },
     });
+    expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/beds/1?patientUuid=${mockPatientAlice.uuid}`, {
+      method: 'DELETE',
+    });
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: 'Patient admitted successfully to Inpatient Ward',
       title: 'Patient admitted successfully',
     });
-    replacedProperty.restore();
   });
 });
