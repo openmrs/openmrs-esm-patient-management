@@ -1,9 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import {
-  useAppContext,
-  useDefineAppContext,
-  WorkspaceContainer
-} from '@openmrs/esm-framework';
+import { useAppContext, useDefineAppContext, useFeatureFlag, WorkspaceContainer } from '@openmrs/esm-framework';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
@@ -50,11 +46,12 @@ const WardViewMain = () => {
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
     wardPatientsGrouping?.admissionLocationResponse ?? {};
   const {
-    isLoading: isLoadingInpatientAdmissions, 
-    error: errorLoadingInpatientAdmissions, 
-    hasMore: hasMoreInpatientAdmissions, 
-    loadMore: loadMoreInpatientAdmissions
+    isLoading: isLoadingInpatientAdmissions,
+    error: errorLoadingInpatientAdmissions,
+    hasMore: hasMoreInpatientAdmissions,
+    loadMore: loadMoreInpatientAdmissions,
   } = wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
   const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
   useEffect(
@@ -126,7 +123,7 @@ const WardViewMain = () => {
   return (
     <div className={styles.wardViewMain}>
       {wardBeds}
-      {bedLayouts?.length == 0 && (
+      {bedLayouts?.length == 0 && isBedManagementModuleInstalled && (
         <InlineNotification
           kind="warning"
           lowContrast={true}
