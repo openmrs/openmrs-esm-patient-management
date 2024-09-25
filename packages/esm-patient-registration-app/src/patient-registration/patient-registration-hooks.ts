@@ -41,12 +41,12 @@ interface DeathInfoResults {
   causeOfDeathNonCoded: string | null;
 }
 import dayjs from 'dayjs';
-import { useMPIPatient } from './mpi/use-mpi-patient';
+import { useMpiPatient } from './mpi/mpi-patient.resource';
 
 export function useInitialFormValues(patientUuid: string, isLocal: boolean): [FormValues, Dispatch<FormValues>] {
   const { freeTextFieldConceptUuid, fieldConfigurations } = useConfig<RegistrationConfig>();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(isLocal ? patientUuid : null);
-  const { isLoading: isLoadingMpiPatient, patient: mpiPatient } = useMPIPatient(!isLocal ? patientUuid : null);
+  const { isLoading: isLoadingMpiPatient, patient: mpiPatient } = useMpiPatient(!isLocal ? patientUuid : null);
   const { data: deathInfo, isLoading: isLoadingDeathInfo } = useInitialPersonDeathInfo(isLocal ? patientUuid : null);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(isLocal ? patientUuid : null);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(
@@ -119,20 +119,29 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
   }, [initialFormValues, isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   useEffect(() => {
-    if (mpiPatient) {
-      const values = {
-        ...initialFormValues,
-        ...getFormValuesFromFhirPatient(mpiPatient),
-        address: getAddressFieldValuesFromFhirPatient(mpiPatient),
-        identifiers: getIdentifierFieldValuesFromFhirPatient(mpiPatient, fieldConfigurations.identifier),
-        attributes: getPhonePersonAttributeValueFromFhirPatient(
-          mpiPatient,
-          fieldConfigurations.phone.personAttributeUuid,
-        ),
-      };
+    const fetchValues = async () => {
+      if (mpiPatient) {
+        const identifiers = await getIdentifierFieldValuesFromFhirPatient(
+          mpiPatient.data,
+          fieldConfigurations.identifier,
+        );
 
-      setInitialFormValues(values);
-    }
+        const values = {
+          ...initialFormValues,
+          ...getFormValuesFromFhirPatient(mpiPatient.data),
+          address: getAddressFieldValuesFromFhirPatient(mpiPatient.data),
+          identifiers,
+          attributes: getPhonePersonAttributeValueFromFhirPatient(
+            mpiPatient.data,
+            fieldConfigurations.phone.personAttributeUuid,
+          ),
+        };
+
+        setInitialFormValues(values);
+      }
+    };
+
+    fetchValues();
   }, [mpiPatient, isLoadingMpiPatient]);
 
   // Set initial patient death info

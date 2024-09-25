@@ -41,6 +41,7 @@
   "searchResultsCount_other": "{{count}} search results",
   "selectOption": "Select an option",
   "sex": "Sex",
+  "trySearchFromClientRegistry": "You can try searching using the patient's unique ID number or search the external MPI",
   "trySearchWithPatientUniqueID": "Try to search again using the patient's unique ID number",
   "unknown": "Unknown",
   "unsupportedAttributeFormat": "Unsupported attribute format: {{format}}",
