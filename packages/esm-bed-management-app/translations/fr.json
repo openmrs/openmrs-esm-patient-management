@@ -43,7 +43,7 @@
   "pleaseFillField": "",
   "required": "Requis",
   "save": "Enregistrer",
-  "saveSuccessMessage": "was saved successfully.",
+  "saveSuccessMessage": "a été enregistré avec succès.",
   "selectBedLocation": "Sélectionner un emplacement de lit",
   "viewBeds": "Voir lits",
   "wardAllocation": "Ward Allocation",
