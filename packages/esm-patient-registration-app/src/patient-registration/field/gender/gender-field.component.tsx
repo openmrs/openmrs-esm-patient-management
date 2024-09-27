@@ -11,11 +11,12 @@ export const GenderField: React.FC = () => {
   const { fieldConfigurations } = useConfig<RegistrationConfig>();
   const { t } = useTranslation();
   const [field, meta] = useField('gender');
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
   const fieldConfigs = fieldConfigurations?.gender;
 
   const setGender = (gender: string) => {
     setFieldValue('gender', gender);
+    setFieldTouched('gender', true, false);
   };
   /**
    * DO NOT REMOVE THIS COMMENT HERE, ADDS TRANSLATION FOR SEX OPTIONS

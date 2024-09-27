@@ -30,7 +30,7 @@ export const DobField: React.FC = () => {
   const [birthdate, birthdateMeta] = useField('birthdate');
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
   const today = new Date();
 
   const onToggle = useCallback(
@@ -39,6 +39,7 @@ export const DobField: React.FC = () => {
       setFieldValue('birthdate', '');
       setFieldValue('yearsEstimated', 0);
       setFieldValue('monthsEstimated', '');
+      setFieldTouched('birthdateEstimated', true, false);
     },
     [setFieldValue],
   );
@@ -46,8 +47,9 @@ export const DobField: React.FC = () => {
   const onDateChange = useCallback(
     (birthdate: Date) => {
       setFieldValue('birthdate', birthdate);
+      setFieldTouched('birthdate', true, false);
     },
-    [setFieldValue],
+    [setFieldValue, setFieldTouched],
   );
 
   const onEstimatedYearsChange = useCallback(
@@ -80,7 +82,10 @@ export const DobField: React.FC = () => {
     setFieldValue('yearsEstimated', years);
     setFieldValue('monthsEstimated', months > 0 ? months : '');
     setFieldValue('birthdate', calcBirthdate(years, months, dateOfBirth));
-  }, [setFieldValue, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth]);
+    setFieldTouched('yearsEstimated', true, false);
+    setFieldTouched('monthsEstimated', true, false);
+    setFieldTouched('birthdate', true, false);
+  }, [setFieldValue, setFieldTouched, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
@@ -103,6 +108,7 @@ export const DobField: React.FC = () => {
               id="birthdate"
               {...birthdate}
               onChange={onDateChange}
+              onBlur={() => setFieldTouched('birthdate', true, false)}
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of birth')}
               isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
@@ -125,7 +131,11 @@ export const DobField: React.FC = () => {
                 min={0}
                 required
                 {...yearsEstimated}
-                onBlur={updateBirthdate}
+                onBlur={(e) => {
+                  yearsEstimated.onBlur(e);
+                  setFieldTouched('yearsEstimated', true, false);
+                  updateBirthdate();
+                }}
               />
             </div>
             <div className={styles.dobField}>
@@ -141,7 +151,11 @@ export const DobField: React.FC = () => {
                 min={0}
                 {...monthsEstimated}
                 required={!yearsEstimateMeta.value}
-                onBlur={updateBirthdate}
+                onBlur={(e) => {
+                  monthsEstimated.onBlur(e);
+                  setFieldTouched('monthsEstimated', true, false);
+                  updateBirthdate();
+                }}
               />
             </div>
           </div>

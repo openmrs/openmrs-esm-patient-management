@@ -45,18 +45,16 @@
       "slot": "patient-search-actions-slot",
       "online": true,
       "offline": true
-    },
-    {
-      "component": "deleteIdentifierConfirmationModal",
-      "name": "delete-identifier-confirmation-modal",
-      "online": true,
-      "offline": true
     }
   ],
   "modals": [
     {
       "name": "cancel-patient-edit-modal",
       "component": "cancelPatientEditModal"
+    },
+    {
+      "name": "delete-identifier-confirmation-modal",
+      "component": "deleteIdentifierConfirmationModal"
     }
   ]
 }

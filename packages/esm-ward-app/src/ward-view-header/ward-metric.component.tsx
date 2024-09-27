@@ -8,9 +8,10 @@ interface WardMetricProps {
   isLoading: boolean;
 }
 const WardMetric: React.FC<WardMetricProps> = ({ metricName, metricValue, isLoading }) => {
+ 
   return (
     <div className={styles.metric}>
-      <span className={styles.metricName}>{metricName}</span>
+     <span className={styles.metricName}>{metricName}</span>
       {isLoading ? (
         <SkeletonPlaceholder className={styles.skeleton} />
       ) : (

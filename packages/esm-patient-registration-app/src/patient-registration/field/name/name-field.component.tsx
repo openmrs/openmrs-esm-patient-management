@@ -21,7 +21,7 @@ function checkNumber(value: string) {
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
+  const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
   const {
     fieldConfigurations: {
       name: {
@@ -48,6 +48,7 @@ export const NameField = () => {
           imageData: dataUri,
           dateTime: photoDateTime,
         });
+        setFieldTouched('photo', true, false);
       }
     },
     [setCapturePhotoProps],
@@ -63,6 +64,9 @@ export const NameField = () => {
       setFieldValue('familyName', defaultUnknownFamilyName);
       setUnknownPatient('true');
     }
+    setFieldTouched('givenName', true);
+    setFieldTouched('familyName', true);
+    setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
   };
 
   const firstNameField = (
