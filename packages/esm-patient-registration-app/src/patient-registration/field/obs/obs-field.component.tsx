@@ -3,13 +3,15 @@ import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
-import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, translateFrom, useConfig } from '@openmrs/esm-framework';
 import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from './../field.scss';
+import dayjs from 'dayjs';
+import { moduleName } from '../../../constants';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -163,33 +165,39 @@ interface DateObsFieldProps {
   maxDate?: string;
 }
 
-const evaluateConfigDate = (dateString: string): Date | string | null => {
+const evaluateConfigDate = (dateString: string, dateType: string): Date | null => {
   if (!dateString) {
     return null;
   }
-
   if (dateString === 'today') {
-    return new Date();
+    return dayjs(new Date()).toDate();
   }
 
-  const date = new Date(dateString);
-  if (!isNaN(date.getTime())) {
-    return date;
+  const parsedDate = dayjs(dateString);
+  if (!parsedDate.isValid()) {
+    throw new Error(
+      translateFrom(moduleName, 'invalidObsDateErrorMessage', `The ${dateType} date value provided is invalid!`),
+    );
   }
 
-  return 'Invalid min or max date!';
+  return parsedDate.toDate();
 };
 
 function DateObsField({ concept, label, required, maxDate, minDate }: DateObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
   const { setFieldValue } = useContext(PatientRegistrationContext);
+  let evaluatedMinDate = null;
+  let evaluatedMaxDate = null;
+  let configDateError = '';
 
-  const evaluatedMinDate = evaluateConfigDate(minDate);
-  const evaluatedMaxDate = evaluateConfigDate(maxDate);
-  const configDateError =
-    (typeof evaluatedMinDate === 'string' && evaluatedMinDate) ||
-    (typeof evaluatedMaxDate === 'string' && evaluatedMaxDate);
+  try {
+    evaluatedMinDate = evaluateConfigDate(minDate, 'Min');
+    evaluatedMaxDate = evaluateConfigDate(maxDate, 'Max');
+  } catch (error) {
+    configDateError = error.message;
+    console.error(configDateError);
+  }
 
   const onDateChange = (date: Date) => {
     setFieldValue(fieldName, date);
@@ -208,11 +216,11 @@ function DateObsField({ concept, label, required, maxDate, minDate }: DateObsFie
                   isRequired={required}
                   onChange={onDateChange}
                   labelText={label ?? concept.display}
-                  isInvalid={errors[fieldName] && touched[fieldName]}
-                  invalidText={t(meta.error)}
+                  isInvalid={(errors[fieldName] && touched[fieldName]) || configDateError}
+                  invalidText={t(meta.error) || configDateError}
                   value={field.value}
-                  minDate={typeof evaluatedMinDate !== 'string' && evaluatedMinDate}
-                  maxDate={typeof evaluatedMaxDate !== 'string' && evaluatedMaxDate}
+                  minDate={evaluatedMinDate}
+                  maxDate={evaluatedMaxDate}
                 />
               </>
             );
