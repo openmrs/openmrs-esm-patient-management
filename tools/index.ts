@@ -1,6 +1,7 @@
 export {
   getByTextWithMarkup,
   mockPatient,
+  mockOpenMRSIdentificationNumberIdType,
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,
