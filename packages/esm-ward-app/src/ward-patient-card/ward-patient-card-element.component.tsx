@@ -11,6 +11,7 @@ import WardPatientObs from './row-elements/ward-patient-obs';
 import WardPatientTimeOnWard from './row-elements/ward-patient-time-on-ward';
 import WardPatientTimeSinceAdmission from './row-elements/ward-patient-time-since-admission';
 import WardPatientLocation from './row-elements/ward-patient-location';
+import { moduleName } from '../constant';
 
 export interface WardPatientCardElementProps extends WardPatient {
   elementId: string;
@@ -23,7 +24,7 @@ export const WardPatientCardElement: React.FC<WardPatientCardElementProps> = ({
   inpatientAdmission,
 }) => {
   const { obsElementDefinitions, identifierElementDefinitions, addressElementDefinitions } =
-    useConfig<WardConfigObject>().wardPatientCards;
+    useConfig<WardConfigObject>({ externalModuleName: moduleName }).wardPatientCards;
   const { t } = useTranslation();
   const { encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
 

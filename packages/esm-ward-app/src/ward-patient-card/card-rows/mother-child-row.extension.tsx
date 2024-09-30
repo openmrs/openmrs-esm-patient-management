@@ -1,5 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import { BabyIcon, MotherIcon } from '@openmrs/esm-framework';
+import { BabyIcon, MotherIcon, useConfig } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import WardPatientLocation from '../row-elements/ward-patient-location';
 import WardPatientName from '../row-elements/ward-patient-name';
 import wardPatientCardStyles from '../ward-patient-card.scss';
 import styles from './mother-child-row.scss';
+import { WardPatientCardElement } from '../ward-patient-card-element.component';
 
 const motherAndChildrenRep =
   'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
@@ -22,8 +23,11 @@ const motherAndChildrenRep =
  * @param param0
  * @returns
  */
-const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
+const MotherChildRowExtension: WardPatientCard = (wardPatient) => {
   const { t } = useTranslation();
+  const config = useConfig<{ rowElements: Array<string> }>();
+  const { rowElements } = config;
+  const { patient } = wardPatient;
 
   const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
     mothers: [patient.uuid],
@@ -96,9 +100,17 @@ const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
             </div>
             <div className={classNames(styles.motherOrBabyRowElementsDiv, wardPatientCardStyles.dotSeparatedChildren)}>
               <WardPatientName patient={patientB} />
-              <WardPatientIdentifier patient={patientB} />
-              <WardPatientAge patient={patientB} />
-              <WardPatientLocation inpatientAdmission={patientBAdmission} />
+              {rowElements?.map((elementId, i) => (
+                <WardPatientCardElement
+                  key={`ward-card-${patient.uuid}-mother-child-row-${i}`}
+                  elementId={elementId}
+                  patient={patientB}
+                  visit={patientBAdmission.visit}
+                  inpatientAdmission={patientBAdmission}
+                  inpatientRequest={null}
+                  bed={null}
+                />
+              ))}
             </div>
           </div>
         );

@@ -1,26 +1,11 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const motherChildRowConfigSchema = {
-  maternalLocations: {
+  rowElements: {
     _type: Type.Array,
-    _description: 'Defines obs display elements that can be included in the card header or footer.',
-    _default: [],
+    _description: `IDs of patient card elements to appear in the mother child row. These can be built-in, or custom ones can be defined in patientCardElementDefinitions.`,
     _elements: {
-      id: {
-        _type: Type.UUID,
-        _description: 'The unique identifier for this ward location',
-      },
-    }
+      _type: Type.String,
+    },
   },
-  childLocations: {
-    _type: Type.Array,
-    _description: 'Defines obs display elements that can be included in the card header or footer.',
-    _default: [],
-    _elements: {
-      id: {
-        _type: Type.UUID,
-        _description: 'The unique identifier for this ward location',
-      },
-    }
-  }
 };

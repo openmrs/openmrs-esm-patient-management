@@ -3187,9 +3187,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-styleguide@npm:5.8.2-pre.2301":
-  version: 5.8.2-pre.2301
-  resolution: "@openmrs/esm-styleguide@npm:5.8.2-pre.2301"
+"@openmrs/esm-styleguide@portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-styleguide::locator=%40openmrs%2Fesm-patient-management%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-styleguide@portal:/home/cbho/workspace/openmrs-esm-core/packages/framework/esm-styleguide::locator=%40openmrs%2Fesm-patient-management%40workspace%3A."
   dependencies:
     "@carbon/charts": "npm:^1.12.0"
     "@carbon/react": "npm:~1.37.0"
@@ -3213,9 +3213,8 @@ __metadata:
     react-dom: 18.x
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: 10/98fdfd406d450672113cc148a15e9f43643f55afd7d13a0d1e5be6de83f595b8c151efe99f0594b87b80da016a097e4cf11e3bc32a67e6262030ba9f081da3a0
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@openmrs/esm-translations@npm:5.8.2-pre.2301":
   version: 5.8.2-pre.2301

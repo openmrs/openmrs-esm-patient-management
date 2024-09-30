@@ -92,16 +92,10 @@ export const configSchema: ConfigSchema = {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
         },
-        identifierTypeUuid: {
-          _type: Type.UUID,
+        showIdentifierLabel: {
+          _type: Type.Boolean,
           _description:
-            'The UUID of the identifier type to display. If not provided, defaults to the preferred identifier.',
-          _default: null,
-        },
-        label: {
-          _type: Type.String,
-          _description:
-            'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
+            'If true, the identifier type (eg: "OpenMRS ID") is shown along with the identifier itself. Defaults to false',
           _default: null,
         },
       },
@@ -212,8 +206,7 @@ export interface ObsElementDefinition {
 
 export interface IdentifierElementDefinition {
   id: string;
-  identifierTypeUuid: string;
-  label?: string;
+  showIdentifierLabel: boolean;
 }
 
 export interface AddressElementDefinition {
