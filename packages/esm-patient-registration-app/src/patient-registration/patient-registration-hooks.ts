@@ -120,7 +120,7 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
 
   useEffect(() => {
     const fetchValues = async () => {
-      if (mpiPatient) {
+      if (mpiPatient?.data?.identifier) {
         const identifiers = await getIdentifierFieldValuesFromFhirPatient(
           mpiPatient.data,
           fieldConfigurations.identifier,
