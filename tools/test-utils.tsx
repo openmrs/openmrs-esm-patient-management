@@ -48,6 +48,33 @@ function getByTextWithMarkup(text: RegExp | string) {
   }
 }
 
+const mockOpenMRSIdentificationNumberIdType = {
+  uuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+  display: 'OpenMRS Identification Number',
+  name: 'OpenMRS Identification Number',
+  description: 'Unique number used in OpenMRS',
+  format: '',
+  formatDescription: null,
+  required: false,
+  validator: 'org.openmrs.patient.impl.LuhnIdentifierValidator',
+  locationBehavior: null,
+  uniquenessBehavior: null,
+  retired: false,
+  links: [
+    {
+      rel: 'self',
+      uri: 'http://localhost/openmrs/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+      resourceAlias: 'patientidentifiertype',
+    },
+    {
+      rel: 'full',
+      uri: 'http://localhost/openmrs/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f?v=full',
+      resourceAlias: 'patientidentifiertype',
+    },
+  ],
+  resourceVersion: '2.0',
+};
+
 const mockPatient = {
   resourceType: 'Patient',
   id: '8673ee4f-e2ab-4077-ba55-4980f408773e',
@@ -73,6 +100,12 @@ const mockPatient = {
       use: 'usual',
       system: 'OpenMRS ID',
       value: '100GEJ',
+    },
+    {
+      id: '2f0ad7a1-430f-4397-b571-59ea654a52db',
+      use: 'official',
+      system: 'MPI OpenMRS ID',
+      value: '100GEG',
     },
   ],
   active: true,
@@ -121,6 +154,7 @@ const patientChartBasePath = `/patient/${mockPatient.id}/chart`;
 export {
   getByTextWithMarkup,
   mockPatient,
+  mockOpenMRSIdentificationNumberIdType,
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,
