@@ -117,7 +117,13 @@ export function startupApp() {
 
   registerFeatureFlag(
     'bedmanagement-module',
-    'Bed Management Module',
+    'Bed management module',
     'Enables features related to bed management / assignment. Requires the backend bed management module to be installed.',
+  );
+
+  registerFeatureFlag(
+    'ward-view-vertical-tiling',
+    'Ward view vertical tiling',
+    'Enable tiling of bed cards vertically in the ward view.',
   );
 }
