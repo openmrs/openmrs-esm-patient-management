@@ -1,9 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import {
-  useAppContext,
-  useDefineAppContext,
-  WorkspaceContainer
-} from '@openmrs/esm-framework';
+import { useAppContext, useDefineAppContext, useFeatureFlag, WorkspaceContainer } from '@openmrs/esm-framework';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
@@ -15,6 +11,7 @@ import WardViewHeader from '../ward-view-header/ward-view-header.component';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
+import classNames from 'classnames';
 
 const WardView = () => {
   const response = useWardLocation();
@@ -23,6 +20,7 @@ const WardView = () => {
 
   const wardPatientsGroupDetails = useWardPatientGrouping();
   useDefineAppContext<WardPatientGroupDetails>('ward-patients-group', wardPatientsGroupDetails);
+  const isVertical = useFeatureFlag('ward-view-vertical-tiling');
 
   if (isLoadingLocation) {
     return <></>;
@@ -33,27 +31,30 @@ const WardView = () => {
   }
 
   return (
-    <div className={styles.wardView}>
-      <WardViewHeader />
-      <WardViewMain />
+    <>
+      <div className={classNames(styles.wardView, { [styles.verticalTiling]: isVertical })}>
+        <WardViewHeader />
+        <WardViewMain />
+      </div>
       <WorkspaceContainer overlay contextKey="ward" />
-    </div>
+    </>
   );
 };
 
 const WardViewMain = () => {
   const { location } = useWardLocation();
   const { t } = useTranslation();
+  const isVertical = useFeatureFlag('ward-view-vertical-tiling');
 
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { bedLayouts, wardAdmittedPatientsWithBed, wardUnassignedPatientsList } = wardPatientsGrouping ?? {};
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
     wardPatientsGrouping?.admissionLocationResponse ?? {};
   const {
-    isLoading: isLoadingInpatientAdmissions, 
-    error: errorLoadingInpatientAdmissions, 
-    hasMore: hasMoreInpatientAdmissions, 
-    loadMore: loadMoreInpatientAdmissions
+    isLoading: isLoadingInpatientAdmissions,
+    error: errorLoadingInpatientAdmissions,
+    hasMore: hasMoreInpatientAdmissions,
+    loadMore: loadMoreInpatientAdmissions,
   } = wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
 
   const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
@@ -124,7 +125,7 @@ const WardViewMain = () => {
   });
 
   return (
-    <div className={styles.wardViewMain}>
+    <div className={classNames(styles.wardViewMain, { [styles.verticalTiling]: isVertical })}>
       {wardBeds}
       {bedLayouts?.length == 0 && (
         <InlineNotification

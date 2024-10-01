@@ -71,8 +71,8 @@
       "slot": "ward-patient-card-slot"
     },
     {
-      "component": "pendingOrdersExtension",
-      "name": "ward-patient-pending-orders",
+      "component": "pendingItemsCardRowExtension",
+      "name": "ward-patient-pending-items-card-row",
       "slot": "ward-patient-card-pending-items-slot"
     }
   ],

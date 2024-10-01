@@ -14,13 +14,8 @@ export function useWardPatientGrouping() {
   const { inpatientRequests } = inpatientRequestResponse;
 
   const groupings = useMemo(() => {
-    if(!admissionLocationResponse.isLoading && !inpatientAdmissionResponse.isLoading && !inpatientRequestResponse.isLoading) {
-      return createAndGetWardPatientGrouping(inpatientAdmissions, admissionLocation, inpatientRequests);
-    } else {
-      return {};
-    }
-  }, [admissionLocation, inpatientAdmissions]) as ReturnType<typeof createAndGetWardPatientGrouping>;
-
+    return { ...createAndGetWardPatientGrouping(inpatientAdmissions, admissionLocation, inpatientRequests) };
+  }, [admissionLocation, inpatientAdmissions, inpatientRequests]) as ReturnType<typeof createAndGetWardPatientGrouping>;
   return {
     ...groupings,
     admissionLocationResponse,

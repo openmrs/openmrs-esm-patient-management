@@ -1,15 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
-import styles from './delete-identifier-confirmation.scss';
+import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
 
 interface DeleteIdentifierConfirmationModalProps {
+  closeModal: () => void;
   deleteIdentifier: (x: boolean) => void;
   identifierName: string;
   identifierValue: string;
 }
 
 const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationModalProps> = ({
+  closeModal,
   deleteIdentifier,
   identifierName,
   identifierValue,
@@ -17,24 +18,30 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
   const { t } = useTranslation();
 
   return (
-    <div className={styles.modalContent}>
-      <h1 className={styles.productiveHeading}>{t('deleteIdentifierModalHeading', 'Remove identifier?')}</h1>
-      <h3 className={styles.modalSubtitle}>
-        {identifierName}
-        {t('deleteIdentifierModalText', ' has a value of ')} {identifierValue}
-      </h3>
-      <p className={styles.modalBody}>
-        {t('confirmIdentifierDeletionText', 'Are you sure you want to remove this identifier?')}
-      </p>
-      <div className={styles.buttonSet}>
+    <>
+      <ModalHeader
+        closeModal={closeModal}
+        title={t('deleteIdentifierModalHeading', 'Delete identifier?')}></ModalHeader>
+      <ModalBody>
+        <p>
+          {identifierName && identifierValue && (
+            <span>
+              <strong>{identifierName}</strong>
+              {t('deleteIdentifierModalText', ' has a value of ')} <strong>{identifierValue}</strong>.{' '}
+            </span>
+          )}
+          {t('confirmIdentifierDeletionText', 'Are you sure you want to delete this identifier?')}
+        </p>
+      </ModalBody>
+      <ModalFooter>
         <Button kind="secondary" size="lg" onClick={() => deleteIdentifier(false)}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" size="lg" onClick={() => deleteIdentifier(true)}>
-          {t('removeIdentifierButton', 'Remove Identifier')}
+          {t('removeIdentifierButton', 'Remove identifier')}
         </Button>
-      </div>
-    </div>
+      </ModalFooter>
+    </>
   );
 };
 
