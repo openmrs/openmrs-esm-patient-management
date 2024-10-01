@@ -39,7 +39,7 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-describe('Queue entry details', () => {
+describe('ChangeStatusDialog', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
@@ -62,13 +62,13 @@ describe('Queue entry details', () => {
     expect(screen.getByText(/queue service/i)).toBeInTheDocument();
     expect(screen.getByText(/queue priority/i)).toBeInTheDocument();
 
-    // user selects a service
-    const queueServiceTypes = screen.getByRole('combobox', { name: /select a service/i });
-    await user.selectOptions(queueServiceTypes, '176052c7-5fd4-4b33-89cc-7bae6848c65a');
-
     // user selects queue location
     const queueLocation = screen.getByRole('combobox', { name: /Select a queue location/i });
     await user.selectOptions(queueLocation, 'some-uuid1');
+
+    // user selects a service
+    const queueServiceTypes = screen.getByRole('combobox', { name: /select a service/i });
+    await user.selectOptions(queueServiceTypes, '176052c7-5fd4-4b33-89cc-7bae6848c65a');
 
     // user selects queue status
     const queueStatus = screen.getByRole('radio', { name: /Waiting/i });

@@ -1,31 +1,32 @@
 import React, { useMemo } from 'react';
 import {
   Button,
+  ContentSwitcher,
+  Form,
+  InlineLoading,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Form,
-  ContentSwitcher,
-  Switch,
-  Select,
-  SelectItem,
-  InlineNotification,
   RadioButton,
   RadioButtonGroup,
-  InlineLoading,
+  Select,
+  SelectItem,
+  Stack,
+  Switch,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { type MappedQueueEntry } from '../types';
-import { updateQueueEntry } from './active-visits-table.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import styles from './change-status-dialog.scss';
-import { useQueues } from '../hooks/useQueues';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type MappedQueueEntry } from '../types';
 import { type ConfigObject } from '../config-schema';
+import { useQueues } from '../hooks/useQueues';
+import { updateQueueEntry } from './active-visits-table.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import styles from './change-status-dialog.scss';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;
@@ -41,9 +42,9 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
     () =>
       z.object({
         location: z.string({ required_error: t('queueLocationRequired', 'Queue location is required') }),
+        priority: z.string({ required_error: t('priorityIsRequired', 'Priority is required') }),
         service: z.string({ required_error: t('serviceIsRequired', 'Service is required') }),
         status: z.string({ required_error: t('statusIsRequired', 'Status is required') }),
-        priority: z.string({ required_error: t('priorityIsRequired', 'Priority is required') }),
       }),
     [],
   );
@@ -82,18 +83,16 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       endDate,
       sortWeight,
     ).then(
-      ({ status }) => {
-        if (status === 201) {
-          showSnackbar({
-            isLowContrast: true,
-            title: t('updateEntry', 'Update entry'),
-            kind: 'success',
-            subtitle: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
-          });
-          closeModal();
-          mutateQueueEntries();
-          navigate({ to: `${window.spaBase}/home/service-queues` });
-        }
+      () => {
+        showSnackbar({
+          isLowContrast: true,
+          title: t('updateEntry', 'Update entry'),
+          kind: 'success',
+          subtitle: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
+        });
+        closeModal();
+        mutateQueueEntries();
+        navigate({ to: `${window.spaBase}/home/service-queues` });
       },
       (error) => {
         showSnackbar({
@@ -121,127 +120,131 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
           <ModalBody>
             <div className={styles.modalBody}>
               <h5>
-                {queueEntry.name} &nbsp; · &nbsp;{queueEntry.patientSex} &nbsp; · &nbsp;{queueEntry.patientAge}&nbsp;
-                {t('years', 'Years')}
+                {t('patientInfo', '{{name}}{{sexInfo}}{{ageInfo}}', {
+                  name: queueEntry.name,
+                  sexInfo: queueEntry.patientSex ? ` · ${queueEntry.patientSex} · ` : '',
+                  ageInfo: queueEntry.patientAge ? `${queueEntry.patientAge} ${t('years', 'Years')}` : '',
+                })}
               </h5>
             </div>
-            <section>
-              <Controller
-                name="location"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    labelText={t('selectQueueLocation', 'Select a queue location')}
-                    id="location"
-                    invalid={!!errors.location}
-                    invalidText={errors.location?.message}
-                    value={value}
-                    onChange={(event) => {
-                      onChange(event.target.value);
-                    }}>
-                    {!getValues()?.location && (
-                      <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                    )}
-                    {queueLocations?.length > 0 &&
-                      queueLocations.map((location) => (
-                        <SelectItem key={location.id} text={location.name} value={location.id}>
-                          {location.name}
-                        </SelectItem>
-                      ))}
-                  </Select>
-                )}
-              />
-            </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
-              <Controller
-                name="service"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    labelText={t('selectService', 'Select a service')}
-                    id="service"
-                    invalid={!!errors.service}
-                    invalidText={errors.service?.message}
-                    value={value}
-                    onChange={(event) => onChange(event.target.value)}>
-                    {!getValues()?.service && <SelectItem text={t('selectService', 'Select a service')} value="" />}
-                    {queues?.length > 0 &&
-                      queues.map((service) => (
-                        <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                          {service.display}
-                        </SelectItem>
-                      ))}
-                  </Select>
-                )}
-              />
-            </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
-              {!allowedStatuses?.length ? (
-                <InlineNotification
-                  className={styles.inlineNotification}
-                  kind={'error'}
-                  lowContrast
-                  subtitle={t('configureStatus', 'Please configure status to continue.')}
-                  title={t('noStatusConfigured', 'No status configured')}
-                />
-              ) : (
+            <Stack gap={4}>
+              <section>
+                <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
                 <Controller
-                  name="status"
+                  name="location"
                   control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <RadioButtonGroup
-                      className={styles.radioButtonWrapper}
-                      name="status"
-                      invalid={!!errors.status}
-                      invalidText={errors.status?.message}
-                      defaultSelected={value}
-                      onChange={(uuid) => {
-                        onChange(uuid);
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      labelText={t('selectQueueLocation', 'Select a queue location')}
+                      id="location"
+                      invalid={!!errors.location}
+                      invalidText={errors.location?.message}
+                      value={value}
+                      onChange={(event) => {
+                        onChange(event.target.value);
                       }}>
-                      {allowedStatuses?.length > 0 &&
-                        allowedStatuses.map(({ uuid, display }) => (
-                          <RadioButton key={uuid} labelText={display} value={uuid} />
+                      {!getValues()?.location && (
+                        <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+                      )}
+                      {queueLocations?.length > 0 &&
+                        queueLocations.map((location) => (
+                          <SelectItem key={location.id} text={location.name} value={location.id}>
+                            {location.name}
+                          </SelectItem>
                         ))}
-                    </RadioButtonGroup>
+                    </Select>
                   )}
                 />
-              )}
-            </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
-              <Controller
-                control={control}
-                name="priority"
-                render={({ field: { onChange } }) => (
-                  <>
-                    <ContentSwitcher
-                      size="sm"
-                      selectedIndex={1}
-                      onChange={(event) => {
-                        onChange(event.name as any);
-                      }}>
-                      {allowedPriorities?.length > 0 ? (
-                        allowedPriorities.map(({ uuid, display }) => {
-                          return <Switch name={uuid} text={display} key={uuid} value={uuid} />;
-                        })
-                      ) : (
-                        <Switch
-                          name={t('noPriorityFound', 'No priority found')}
-                          text={t('noPriorityFound', 'No priority found')}
-                          value={null}
-                        />
-                      )}
-                    </ContentSwitcher>
-                    {errors.priority && <div className={styles.error}>{errors.priority.message}</div>}
-                  </>
+              </section>
+              <section className={styles.section}>
+                <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
+                <Controller
+                  name="service"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      labelText={t('selectService', 'Select a service')}
+                      id="service"
+                      invalid={!!errors.service}
+                      invalidText={errors.service?.message}
+                      value={value}
+                      onChange={(event) => onChange(event.target.value)}>
+                      {!getValues()?.service && <SelectItem text={t('selectService', 'Select a service')} value="" />}
+                      {queues?.length > 0 &&
+                        queues.map((service) => (
+                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                            {service.display}
+                          </SelectItem>
+                        ))}
+                    </Select>
+                  )}
+                />
+              </section>
+              <section className={styles.section}>
+                <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
+                {!allowedStatuses?.length ? (
+                  <InlineNotification
+                    className={styles.inlineNotification}
+                    kind={'error'}
+                    lowContrast
+                    subtitle={t('configureStatus', 'Please configure status to continue.')}
+                    title={t('noStatusConfigured', 'No status configured')}
+                  />
+                ) : (
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <RadioButtonGroup
+                        className={styles.radioButtonWrapper}
+                        id="status"
+                        name="status"
+                        invalid={!!errors.status}
+                        invalidText={errors.status?.message}
+                        defaultSelected={value}
+                        onChange={(uuid) => {
+                          onChange(uuid);
+                        }}>
+                        {allowedStatuses?.length > 0 &&
+                          allowedStatuses.map(({ uuid, display }) => (
+                            <RadioButton key={uuid} labelText={display} value={uuid} />
+                          ))}
+                      </RadioButtonGroup>
+                    )}
+                  />
                 )}
-              />
-            </section>
+              </section>
+              <section className={styles.section}>
+                <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
+                <Controller
+                  control={control}
+                  name="priority"
+                  render={({ field: { onChange } }) => (
+                    <>
+                      <ContentSwitcher
+                        size="sm"
+                        selectedIndex={1}
+                        onChange={(event) => {
+                          onChange(event.name as any);
+                        }}>
+                        {allowedPriorities?.length > 0 ? (
+                          allowedPriorities.map(({ uuid, display }) => {
+                            return <Switch name={uuid} text={display} key={uuid} value={uuid} />;
+                          })
+                        ) : (
+                          <Switch
+                            name={t('noPriorityFound', 'No priority found')}
+                            text={t('noPriorityFound', 'No priority found')}
+                            value={null}
+                          />
+                        )}
+                      </ContentSwitcher>
+                      {errors.priority && <div className={styles.error}>{errors.priority.message}</div>}
+                    </>
+                  )}
+                />
+              </section>
+            </Stack>
           </ModalBody>
           <ModalFooter>
             <Button kind="secondary" onClick={closeModal}>

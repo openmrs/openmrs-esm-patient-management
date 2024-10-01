@@ -161,7 +161,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       onSubmit={onFormSubmit}>
       {(props) => (
         <Form className={styles.form}>
-          <BeforeSavePrompt when={props.dirty} redirect={target} />
+          <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
           <div className={styles.formContainer}>
             <div>
               <div className={styles.stickyColumn}>
