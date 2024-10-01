@@ -1,17 +1,18 @@
 import React, { useContext } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
-import styles from './calendar-header.scss';
 import SelectedDateContext from '../../hooks/selectedDateContext';
-import dayjs from 'dayjs';
+import styles from './calendar-header.scss';
 
 const CalendarHeader: React.FC = () => {
   const { t } = useTranslation();
   const { selectedDate } = useContext(SelectedDateContext);
-  const backButtonOnClick = () => {
+
+  const handleClick = () => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });
   };
 
@@ -20,10 +21,10 @@ const CalendarHeader: React.FC = () => {
       <div className={styles.titleContainer}>
         <Button
           className={styles.backButton}
-          kind="ghost"
-          onClick={backButtonOnClick}
-          renderIcon={ArrowLeft}
           iconDescription={t('back', 'Back')}
+          kind="ghost"
+          onClick={handleClick}
+          renderIcon={ArrowLeft}
           size="lg">
           <span>{t('back', 'Back')}</span>
         </Button>

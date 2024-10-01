@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ChemistryReference } from '@carbon/react/icons';
 import styles from '../ward-patient-card.scss';
 import { useTranslation } from 'react-i18next';
@@ -9,15 +9,27 @@ export interface WardPatientPendingOrderProps {
   wardPatient: WardPatient;
   orderUuid: string;
   label: string;
+  onOrderCount: (count: number) => void; // New prop for notifying parent
 }
 
-export const WardPatientPendingOrder: React.FC<WardPatientPendingOrderProps> = ({ wardPatient, orderUuid, label }) => {
+export const WardPatientPendingOrder: React.FC<WardPatientPendingOrderProps> = ({
+  wardPatient,
+  orderUuid,
+  label,
+  onOrderCount,
+}) => {
   const { t } = useTranslation();
   const { count, isLoading } = usePatientPendingOrders(
     wardPatient?.patient?.uuid,
     orderUuid,
     wardPatient?.visit?.startDatetime.split('T')[0],
   );
+
+  useEffect(() => {
+    if (!isLoading) {
+      onOrderCount(count); // Notify parent when count is available
+    }
+  }, [count, isLoading, onOrderCount]);
 
   if (isLoading || !count || count == 0) {
     return null;

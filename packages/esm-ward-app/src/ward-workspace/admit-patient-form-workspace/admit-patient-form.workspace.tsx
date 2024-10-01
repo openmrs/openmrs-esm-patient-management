@@ -1,18 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Column, Dropdown, DropdownSkeleton, Form, InlineNotification, Row } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
-import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout, WardPatientGroupDetails } from '../../types';
-import { assignPatientToBed, createEncounter } from '../../ward.resource';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { AdmitPatientFormWorkspaceProps } from './types';
+import type { BedLayout, WardPatientGroupDetails } from '../../types';
+import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
 import styles from './admit-patient-form.scss';
+import type { AdmitPatientFormWorkspaceProps } from './types';
 
 const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   patient,
@@ -25,11 +23,11 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const { location } = useWardLocation();
   const { currentProvider } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutate: mutateInpatientRequest } = useInpatientRequest();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGrouping?.admissionLocationResponse ?? {};
+  const { mutate: mutateInpatientRequest } = wardPatientGrouping?.inpatientRequestResponse ?? {};
   const beds = isLoading ? [] : wardPatientGrouping?.bedLayouts ?? [];
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const getBedRepresentation = useCallback((bedLayout: BedLayout) => {
@@ -92,8 +90,15 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
             if (response.ok) {
               if (bedSelected) {
                 return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
+              } else {
+                const bed = wardPatientGrouping.bedLayouts.find((bedLayout) =>
+                  bedLayout.patients.some((p) => p.uuid == patient.uuid),
+                );
+                if (bed) {
+                  return removePatientFromBed(bed.bedId, patient.uuid);
+                }
+                return response;
               }
-              return response;
             }
           },
           (err: Error) => {
