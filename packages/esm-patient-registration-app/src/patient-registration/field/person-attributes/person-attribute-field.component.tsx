@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { InlineNotification, TextInputSkeleton, SkeletonText } from '@carbon/react';
+import { InlineNotification, TextInputSkeleton } from '@carbon/react';
 import { type FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
@@ -49,6 +49,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             locationTag={fieldDefinition.locationTag}
             label={fieldDefinition.label}
             id={fieldDefinition?.id}
+            required={fieldDefinition.validation?.required ?? false}
           />
         );
       default:
