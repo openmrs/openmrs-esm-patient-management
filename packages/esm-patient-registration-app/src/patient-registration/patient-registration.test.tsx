@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter as Router, useParams, useLocation } from 'react-router-dom';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -271,6 +271,12 @@ describe('Registering a new patient', () => {
       patient: { data: null },
       error: undefined,
     });
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: null,
+      patientUuid: null,
+      error: null,
+    });
     (useLocation as jest.Mock).mockReturnValue({
       pathname: 'openmrs/spa/patient-registration',
       state: undefined,
@@ -419,7 +425,11 @@ describe('Updating an existing patient record', () => {
     const mockUseParams = useParams as jest.Mock;
 
     mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
-
+    mockUseMpiPatient.mockReturnValue({
+      isLoading: false,
+      patient: { data: null },
+      error: undefined,
+    });
     mockUsePatient.mockReturnValue({
       isLoading: false,
       patient: mockPatient,
@@ -505,14 +515,14 @@ describe('Import an MPI patient record', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(mockOpenmrsConfig);
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
-
-    (useLocation as jest.Mock).mockReturnValue({
-      pathname: 'openmrs/spa/patient-registration?sourceRecord=55',
-      state: undefined,
-      key: '',
-      search: '',
-      hash: '',
-    });
+    (useParams as jest.Mock).mockReturnValue({ patientUuid: undefined }),
+      (useLocation as jest.Mock).mockReturnValue({
+        pathname: 'openmrs/spa/patient-registration',
+        state: undefined,
+        key: '',
+        search: '?sourceRecord=55',
+        hash: '',
+      });
   });
 
   it('fills patient demographics from MPI patient', async () => {
@@ -536,7 +546,10 @@ describe('Import an MPI patient record', () => {
     const mockResponse = { status: 200, data: mockOpenMRSIdentificationNumberIdType };
     mockOpenmrsFetch.mockResolvedValue(mockResponse);
 
-    render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatient} />, { wrapper: Wrapper });
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatient} />, { wrapper: Wrapper });
+    });
     expect(mockOpenmrsFetch.mock.calls[0][0]).toEqual(
       `/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f`,
     );
@@ -564,7 +577,7 @@ describe('Import an MPI patient record', () => {
     await user.click(screen.getByText(/Register patient/i));
 
     expect(mockSavePatient).toHaveBeenCalledWith(
-      false,
+      true,
       {
         '0': {
           oldIdentificationNumber: '100732HE',
@@ -580,6 +593,7 @@ describe('Import an MPI patient record', () => {
         additionalGivenName: '',
         additionalMiddleName: '',
         address: {},
+        attributes: {},
         birthdate: new Date('1972-04-04T00:00:00.000Z'),
         birthdateEstimated: false,
         deathCause: '',
@@ -590,7 +604,19 @@ describe('Import an MPI patient record', () => {
         familyName: 'Smith',
         gender: expect.stringMatching(/male/i),
         givenName: 'Eric',
-        identifiers: {},
+        identifiers: {
+          'OpenMRS Identification Number': {
+            identifierUuid: null,
+            preferred: false,
+            initialValue: '100GEG',
+            identifierValue: '100GEG',
+            identifierTypeUuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+            identifierName: 'OpenMRS Identification Number',
+            required: false,
+            selectedSource: null,
+            autoGeneration: false,
+          },
+        },
         isDead: false,
         middleName: 'Johnson',
         monthsEstimated: 0,
