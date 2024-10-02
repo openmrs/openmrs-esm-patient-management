@@ -154,8 +154,8 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _description: "How this field's data will be stored—a person attribute, an obs or an address.",
-        _validators: [validators.oneOf(['person attribute', 'obs', 'address'])],
+        _description: "How this field's data will be stored—a person attribute or an obs.",
+        _validators: [validators.oneOf(['person attribute', 'obs'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -187,7 +187,8 @@ export const esmPatientRegistrationSchema = {
       locationTag: {
         _type: Type.String,
         _default: null,
-        _description: 'For locations questions only. A tag used to filter and categorize locations.',
+        _description:
+          'Only for fields with "person attribute" type `org.openmrs.Location`. This filters the list of location options in the dropdown based on their location tag. By default, all locations are shown.',
       },
       answerConceptSetUuid: {
         _type: Type.ConceptUuid,
