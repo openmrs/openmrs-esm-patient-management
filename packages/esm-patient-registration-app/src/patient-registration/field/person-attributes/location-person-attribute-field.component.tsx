@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 export interface LocationPersonAttributeFieldProps {
   id: string;
   personAttributeType: PersonAttributeTypeResponse;
-  validationRegex?: string;
   label?: string;
   locationTag: string;
   required?: boolean;
@@ -44,7 +43,7 @@ export function LocationPersonAttributeField({
   }, [locationOptions, meta.value]);
 
   // Callback for when updating the combobox input
-  const onInputChange = useCallback(
+  const handleInputChange = useCallback(
     (value: string | null) => {
       if (value) {
         // If the value exists in the locationOptions (i.e. a label matches the input), exit the function
@@ -78,7 +77,7 @@ export function LocationPersonAttributeField({
                 titleText={label}
                 items={locationOptions}
                 placeholder={t('searchLocationPersonAttribute', 'Search location')}
-                onInputChange={onInputChange}
+                onInputChange={handleInputChange}
                 required={required}
                 onChange={handleSelect}
                 selectedItem={selectedItem}
