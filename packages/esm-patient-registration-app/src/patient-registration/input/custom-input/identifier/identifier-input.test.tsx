@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/no-node-access */
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import React from 'react';
 import { ResourcesContext, type Resources } from '../../../../offline.resources';
 import {
   PatientRegistrationContext,
@@ -9,6 +9,7 @@ import {
 } from '../../../patient-registration-context';
 import type { AddressTemplate, FormValues, PatientIdentifierValue } from '../../../patient-registration.types';
 import IdentifierInput from './identifier-input.component';
+import userEvent from '@testing-library/user-event';
 
 const predefinedAddressTemplate = {
   uuid: 'test-address-template-uuid',
@@ -72,7 +73,7 @@ describe('identifier input', () => {
   const openmrsID = {
     identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
     initialValue: '',
-    identifierValue: null,
+    identifierValue: '',
     identifierName: 'OpenMRS ID',
     selectedSource: {
       uuid: '01af8526-cea4-4175-aa90-340acb411771',
