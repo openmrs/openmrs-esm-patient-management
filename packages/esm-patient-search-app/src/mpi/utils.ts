@@ -1,5 +1,6 @@
 import { capitalize } from 'lodash-es';
 import { type SearchedPatient } from '../types';
+import { getCoreTranslation } from '@openmrs/esm-framework';
 export function inferModeFromSearchParams(searchParams: URLSearchParams) {
   return searchParams.get('mode')?.toLowerCase() === 'external' ? 'external' : 'internal';
 }
@@ -28,11 +29,13 @@ export function mapToOpenMRSPatient(fhirPatients: Array<any>): Array<SearchedPat
         })),
         age: null,
         birthdate: fhirPatient.birthDate,
-        gender: capitalize(fhirPatient.gender),
-        dead: !fhirPatient.active,
-        deathDate: '',
+        gender: getCoreTranslation(fhirPatient.gender),
+        dead: fhirPatient.deceasedBoolean,
+        deathDate: fhirPatient.deceasedDateTime,
         personName: {
-          display: `${fhirPatient.name[0].family} ${fhirPatient.name[0].given[0]}`,
+          display: fhirPatient.name[0].text
+            ? fhirPatient.name[0].text
+            : `${fhirPatient.name[0].family} ${fhirPatient.name[0].given[0]}`,
           givenName: fhirPatient.name[0].given[0],
           familyName: fhirPatient.name[0].family,
           middleName: fhirPatient.name[0].given[1],
