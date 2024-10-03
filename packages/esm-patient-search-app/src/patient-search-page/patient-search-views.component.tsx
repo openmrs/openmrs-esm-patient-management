@@ -100,7 +100,7 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
               <p>
                 {t(
                   'trySearchFromClientRegistry',
-                  "You can try searching using the patient's unique ID number or search the external MPI",
+                  "Try searching using the patient's unique ID number or search the external registry",
                 )}
               </p>
             </div>
@@ -108,10 +108,9 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
               kind="ghost"
               renderIcon={'Search'}
               onClick={(e) => {
-                e.preventDefault();
                 doMPISearch(searchTerm);
               }}>
-              {`${t('search', 'Search')} ${'MPIs'}`}
+              {`${t('search', 'Search')} ${'External Registry'}`}
             </Button>
           </>
         )}
