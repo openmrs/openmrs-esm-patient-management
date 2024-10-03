@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchButton from './patient-search-button.component';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
@@ -39,11 +39,11 @@ describe('PatientSearchButton', () => {
     const user = userEvent.setup();
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <Routes>
           <Route path="/" element={<PatientSearchButton />} />
         </Routes>
-      </BrowserRouter>,
+      </MemoryRouter>,
     );
     const searchButton = screen.getByLabelText('Search Patient Button');
 
