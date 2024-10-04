@@ -56,6 +56,7 @@ const WardViewMain = () => {
     hasMore: hasMoreInpatientAdmissions,
     loadMore: loadMoreInpatientAdmissions,
   } = wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
   const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
   useEffect(
@@ -127,7 +128,7 @@ const WardViewMain = () => {
   return (
     <div className={classNames(styles.wardViewMain, { [styles.verticalTiling]: isVertical })}>
       {wardBeds}
-      {bedLayouts?.length == 0 && (
+      {bedLayouts?.length == 0 && isBedManagementModuleInstalled && (
         <InlineNotification
           kind="warning"
           lowContrast={true}

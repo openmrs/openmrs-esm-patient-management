@@ -3,21 +3,16 @@ import {
   getDefaultsFromConfigSchema,
   useAppContext,
   useConfig,
-  useFeatureFlag
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
-import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequest } from '__mocks__';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { renderWithSwr } from 'tools';
+import { mockWardPatientGroupDetails } from '../../mock';
 import { configSchema } from '../config-schema';
-import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import useWardLocation from '../hooks/useWardLocation';
-import { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
 import WardView from './ward-view.component';
-import { createAndGetWardPatientGrouping } from './ward-view.resource';
 
 jest.mocked(useConfig).mockReturnValue({
   ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
@@ -42,54 +37,6 @@ jest.mock('react-router-dom', () => ({
 }));
 const mockUseParams = useParams as jest.Mock;
 
-jest.mock('../hooks/useAdmissionLocation', () => ({
-  useAdmissionLocation: jest.fn(),
-}));
-jest.mock('../hooks/useInpatientAdmission', () => ({
-  useInpatientAdmission: jest.fn(),
-}));
-jest.mock('../hooks/useInpatientRequest', () => ({
-  useInpatientRequest: jest.fn(),
-}));
-jest.mock('../hooks/useWardPatientGrouping', () => ({
-  useWardPatientGrouping: jest.fn(),
-}));
-const mockAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockReturnValue({
-  error: undefined,
-  mutate: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  admissionLocation: mockAdmissionLocation,
-});
-const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockReturnValue({
-  data: mockInpatientAdmissions,
-  hasMore: false,
-  loadMore: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  error: undefined,
-  mutate: jest.fn(),
-  totalCount: 1
-});
-
-const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturnValue({
-  inpatientRequests: mockInpatientRequest,
-  hasMore: false,
-  loadMore: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  error: undefined,
-  mutate: jest.fn(),
-  totalCount: 1
-})
-
-const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockReturnValue({
-  admissionLocationResponse: mockAdmissionLocationResponse(),
-  inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
-  inpatientRequestResponse: mockInpatientRequestResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest), 
-});
-
 jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
 
 const intersectionObserverMock = () => ({
@@ -98,6 +45,8 @@ const intersectionObserverMock = () => ({
 window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock);
 
 describe('WardView', () => {
+  let replacedProperty: jest.ReplaceProperty<any> | null = null;
+
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);
     const header = screen.getByRole('heading', { name: 'mock location' });
@@ -145,38 +94,29 @@ describe('WardView', () => {
     expect(invalidText).toBeInTheDocument();
   });
 
-  it('screen should render warning if backend module installed and no beds configured', () => {
+  it('should render warning if backend module installed and no beds configured', () => {
     // override the default response so that no beds are returned
-    jest.mocked(useAdmissionLocation).mockReturnValue({
-      error: undefined,
-      mutate: jest.fn(),
-      isValidating: false,
-      isLoading: false,
-      admissionLocation: { ...mockAdmissionLocation, bedLayouts: [] },
-    });
-    const replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
+    replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
 
-    mockUseFeatureFlag.mockReturnValueOnce(true);
+    mockUseFeatureFlag.mockReturnValue(true);
 
     renderWithSwr(<WardView />);
     const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
     expect(noBedsConfiguredForThisLocation).toBeInTheDocument();
-    replacedProperty.restore();
   });
 
-  it('screen not should render warning if backend module installed and no beds configured', () => {
+  it('should not render warning if backend module installed and no beds configured', () => {
     // override the default response so that no beds are returned
-    jest.mocked(useAdmissionLocation).mockReturnValue({
-      error: undefined,
-      mutate: jest.fn(),
-      isValidating: false,
-      isLoading: false,
-      admissionLocation: { ...mockAdmissionLocation, bedLayouts: [] },
-    });
-    mockUseFeatureFlag.mockReturnValueOnce(false);
+    replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
+    mockUseFeatureFlag.mockReturnValue(false);
 
     renderWithSwr(<WardView />);
     const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
     expect(noBedsConfiguredForThisLocation).not.toBeInTheDocument();
+  });
+
+  afterEach(() => {
+    replacedProperty?.restore();
+    replacedProperty = null;
   });
 });

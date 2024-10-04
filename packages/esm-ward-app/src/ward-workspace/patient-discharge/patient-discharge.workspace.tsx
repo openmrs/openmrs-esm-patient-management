@@ -1,15 +1,14 @@
-import React, { useCallback, useState } from 'react';
-import { ExtensionSlot, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
 import { Button, ButtonSet, InlineNotification } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import styles from './patient-discharge.scss';
-import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
-import {type WardPatientGroupDetails, type WardPatientWorkspaceProps } from '../../types';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import { createEncounter, removePatientFromBed } from '../../ward.resource';
-import useWardLocation from '../../hooks/useWardLocation';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import { Exit } from '@carbon/react/icons';
+import { ExtensionSlot, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
+import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import useWardLocation from '../../hooks/useWardLocation';
+import { type WardPatientGroupDetails, type WardPatientWorkspaceProps } from '../../types';
+import { createEncounter, removePatientFromBed } from '../../ward.resource';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import styles from './patient-discharge.scss';
 
 export default function PatientDischargeWorkspace(props: WardPatientWorkspaceProps) {
   const { wardPatient, closeWorkspaceWithSavedChanges } = props;
@@ -20,7 +19,8 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = useInpatientRequest();
+  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
+  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
 
   const submitDischarge = useCallback(() => {
     setIsSubmitting(true);
@@ -51,9 +51,6 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
             title: t('patientWasDischarged', 'Patient was discharged'),
             kind: 'success',
           });
-          closeWorkspaceWithSavedChanges();
-          mutateAdmissionLocation();
-          mutateInpatientRequest();
         }
       })
       .catch((err: Error) => {
@@ -63,7 +60,13 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
           kind: 'error',
         });
       })
-      .finally(() => setIsSubmitting(false));
+      .finally(() => {
+        setIsSubmitting(false);
+        closeWorkspaceWithSavedChanges();
+        mutateAdmissionLocation();
+        mutateInpatientRequest();
+        mutateInpatientAdmission();
+      });
   }, [
     currentProvider,
     location,
@@ -72,6 +75,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
     wardPatient?.bed?.uuid,
     mutateAdmissionLocation,
     mutateInpatientRequest,
+    mutateInpatientAdmission,
   ]);
 
   if (!wardGroupingDetails) return <></>;
