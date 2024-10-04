@@ -1,25 +1,17 @@
-import React from 'react';
+import { openmrsFetch, showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { mockAdmissionLocation, mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
 import { renderWithSwr } from '../../../../../tools';
-import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
-import {
-  mockAdmissionLocation,
-  mockInpatientAdmissions,
-  mockInpatientRequest,
-  mockLocationInpatientWard,
-  mockPatientAlice,
-} from '../../../../../__mocks__';
-import type { DispositionType } from '../../types';
-import type { AdmitPatientFormWorkspaceProps } from './types';
+import { mockWardPatientGroupDetails } from '../../../mock';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
-import { openmrsFetch, provide, showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import useWardLocation from '../../hooks/useWardLocation';
 import { useInpatientRequest } from '../../hooks/useInpatientRequest';
-import { useWardPatientGrouping } from '../../hooks/useWardPatientGrouping';
-import { getInpatientAdmissionsUuidMap, createAndGetWardPatientGrouping } from '../../ward-view/ward-view.resource';
-import { useInpatientAdmission } from '../../hooks/useInpatientAdmission';
+import useWardLocation from '../../hooks/useWardLocation';
+import type { DispositionType } from '../../types';
+import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
+import type { AdmitPatientFormWorkspaceProps } from './types';
 
 jest.mock('../../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
@@ -41,48 +33,12 @@ jest.mock('../../hooks/useInpatientAdmission', () => ({
   useInpatientAdmission: jest.fn(),
 }));
 
-const mockedUseInpatientRequest = jest.mocked(useInpatientRequest);
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 const mockedUseWardLocation = jest.mocked(useWardLocation);
 const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockedUseAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockReturnValue({
-  isLoading: false,
-  isValidating: false,
-  admissionLocation: mockAdmissionLocation,
-  mutate: jest.fn(),
-  error: undefined,
-});
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseSession = jest.mocked(useSession);
-const mockedInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockReturnValue({
-  error: undefined,
-  mutate: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  data: mockInpatientAdmissions,
-  totalCount: 1,
-  hasMore: false,
-  loadMore: jest.fn(),
-});
-
-const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturnValue({
-  inpatientRequests: mockInpatientRequest,
-  hasMore: false,
-  loadMore: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  error: undefined,
-  mutate: jest.fn(),
-  totalCount: 1,
-});
-
-const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockReturnValue({
-  admissionLocationResponse: mockedUseAdmissionLocationResponse(),
-  inpatientAdmissionResponse: mockedInpatientAdmissionResponse(),
-  inpatientRequestResponse: mockInpatientRequestResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest),
-});
 
 jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
 
@@ -101,8 +57,6 @@ const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
 function renderAdmissionForm(dispositionType: DispositionType = 'ADMIT') {
   renderWithSwr(<AdmitPatientFormWorkspace {...{ ...mockWorkspaceProps, dispositionType }} />);
 }
-
-const mockedMutateInpatientRequest = jest.fn();
 
 describe('Testing AdmitPatientForm', () => {
   beforeEach(() => {
@@ -135,16 +89,6 @@ describe('Testing AdmitPatientForm', () => {
         },
       },
       mutateEmrConfiguration: jest.fn(),
-    });
-    mockedUseInpatientRequest.mockReturnValue({
-      mutate: mockedMutateInpatientRequest,
-      error: undefined,
-      inpatientRequests: mockInpatientRequest,
-      isLoading: false,
-      isValidating: false,
-      totalCount: 1,
-      hasMore: false,
-      loadMore: jest.fn(),
     });
     mockedUseWardLocation.mockReturnValue({
       location: mockLocationInpatientWard,
@@ -322,7 +266,6 @@ describe('Testing AdmitPatientForm', () => {
   });
 
   it('should admit patient if no beds are configured', async () => {
-    const replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
     // @ts-ignore - we only need these two keys for now
     mockedOpenmrsFetch.mockResolvedValue({
       ok: true,
@@ -335,7 +278,7 @@ describe('Testing AdmitPatientForm', () => {
     const admitButton = screen.getByRole('button', { name: 'Admit' });
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(1);
+    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(2);
     expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/encounter', {
       method: 'POST',
       headers: {
@@ -354,11 +297,13 @@ describe('Testing AdmitPatientForm', () => {
         ],
       },
     });
+    expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/beds/1?patientUuid=${mockPatientAlice.uuid}`, {
+      method: 'DELETE',
+    });
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: 'Patient admitted successfully to Inpatient Ward',
       title: 'Patient admitted successfully',
     });
-    replacedProperty.restore();
   });
 });

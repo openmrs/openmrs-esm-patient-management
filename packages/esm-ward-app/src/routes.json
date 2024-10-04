@@ -56,6 +56,11 @@
       "component": "patientDischargeWorkspaceSideRailIcon"
     },
     {
+      "name": "clinical-forms-workspace-siderail-button",
+      "component": "clinicalFormWorkspaceSideRailIcon",
+      "slot": "action-menu-ward-patient-items-slot"
+    },
+    {
       "component": "admissionRequestNoteRowExtension",
       "name": "admission-request-note-card-row",
       "slot": "ward-patient-card-slot"
@@ -66,8 +71,8 @@
       "slot": "ward-patient-card-slot"
     },
     {
-      "component": "pendingOrdersExtension",
-      "name": "ward-patient-pending-orders",
+      "component": "pendingItemsCardRowExtension",
+      "name": "ward-patient-pending-items-card-row",
       "slot": "ward-patient-card-pending-items-slot"
     }
   ],
@@ -122,6 +127,15 @@
       "type": "ward-patient-discharge",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "ward-patient-clinical-forms-workspace",
+      "component": "patientClinicalFormsWorkspace",
+      "title": "clinicalForms",
+      "type": "ward-patient-clinical-forms",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient",
+      "width": "wider"
     }
   ]
 }

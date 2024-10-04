@@ -90,3 +90,6 @@ results.xml
 moduleName
 
 .env
+
+# vim
+.swp

@@ -1,14 +1,13 @@
 import React, { useContext } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import { launchWorkspace } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { ExtensionSlot, isDesktop, navigate, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, launchWorkspace, navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../constants';
-import styles from './metrics-header.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import styles from './metrics-header.scss';
 
 dayjs.extend(isToday);
 
@@ -39,7 +38,7 @@ const MetricsHeader: React.FC = () => {
           onClick={() =>
             navigate({ to: `${spaHomePage}/appointments/calendar/${dayjs(selectedDate).format('YYYY-MM-DD')}` })
           }>
-          {t('appointmentsCalendar', 'Appointments Calendar')}
+          {t('appointmentsCalendar', 'Appointments calendar')}
         </Button>
         <ExtensionSlot
           name="patient-search-button-slot"

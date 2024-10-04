@@ -12,6 +12,7 @@ jest.mock('react', () => ({
   ...(jest.requireActual('react') as any),
   useContext: jest.fn(() => ({
     setFieldValue: jest.fn(),
+    setFieldTouched: jest.fn(),
   })),
 }));
 
