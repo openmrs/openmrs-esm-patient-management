@@ -1,5 +1,4 @@
-import { SkeletonText, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { Information } from '@carbon/react/icons';
+import { SkeletonText } from '@carbon/react';
 import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

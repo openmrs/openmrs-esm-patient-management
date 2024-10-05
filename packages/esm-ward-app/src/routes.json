@@ -74,6 +74,11 @@
       "component": "pendingItemsCardRowExtension",
       "name": "ward-patient-pending-items-card-row",
       "slot": "ward-patient-card-pending-items-slot"
+    },
+    {
+      "component": "defaultWardView",
+      "name": "default-ward-view",
+      "slot": "default-ward-view-slot"
     }
   ],
   "workspaces": [

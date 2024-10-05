@@ -3,6 +3,10 @@ import React from 'react';
 import { type WardPatientGroupDetails } from '../../types';
 import DefaultWardPatientCard from '../../ward-patient-card/default-ward/default-ward-patient-card.component';
 
+/**
+ * Renders a list of patients in the ward that are admitted but not assigned a bed
+ * @returns
+ */
 function DefaultWardUnassignedPatients() {
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { wardUnassignedPatientsList } = wardPatientsGrouping ?? {};

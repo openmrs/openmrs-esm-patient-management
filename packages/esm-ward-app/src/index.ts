@@ -117,6 +117,11 @@ export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
+export const defaultWardView = getAsyncLifecycle(
+  () => import('./ward-view/default-ward/default-ward-view.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);

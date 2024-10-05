@@ -1,12 +1,16 @@
 import { Button, InlineNotification } from '@carbon/react';
 import { Movement } from '@carbon/react/icons';
 import { ArrowRightIcon, isDesktop, launchWorkspace, useAppContext, useLayoutType } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type WardPatientGroupDetails } from '../types';
 import styles from './admission-requests.scss';
 
-const AdmissionRequestsBar = () => {
+interface AdmissionRequestsBarProps {
+  wardPendingPatients: ReactNode;
+}
+
+const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPendingPatients }) => {
   const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { inpatientRequests, isLoading, error } = wardPatientGrouping?.inpatientRequestResponse ?? {};
   const { t } = useTranslation();
@@ -35,7 +39,7 @@ const AdmissionRequestsBar = () => {
         })}
       </span>
       <Button
-        onClick={() => launchWorkspace('admission-requests-workspace')}
+        onClick={() => launchWorkspace('admission-requests-workspace', { wardPendingPatients })}
         renderIcon={ArrowRightIcon}
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}>
