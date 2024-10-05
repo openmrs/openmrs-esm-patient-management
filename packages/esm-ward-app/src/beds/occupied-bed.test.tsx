@@ -10,7 +10,7 @@ import {
 } from '../../../../__mocks__';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import useWardLocation from '../hooks/useWardLocation';
-import OccupiedBed from './occupied-bed.component';
+import OccupiedBed from './default-ward/default-ward-occupied-bed.component';
 
 const defaultConfig: WardConfigObject = getDefaultsFromConfigSchema(configSchema);
 

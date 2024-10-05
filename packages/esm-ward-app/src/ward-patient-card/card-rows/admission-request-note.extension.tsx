@@ -1,11 +1,11 @@
 import React from 'react';
 import { type ObsElementDefinition } from '../../config-schema';
-import { type WardPatientCard } from '../../types';
+import { type WardPatientCardType } from '../../types';
 import WardPatientObs from '../row-elements/ward-patient-obs';
 import { useConfig } from '@openmrs/esm-framework';
 import styles from '../ward-patient-card.scss';
 
-const AdmissionRequestNoteRowExtension: WardPatientCard = ({ patient, visit, inpatientAdmission }) => {
+const AdmissionRequestNoteRowExtension: WardPatientCardType = ({ patient, visit, inpatientAdmission }) => {
   const { conceptUuid } = useConfig<ObsElementDefinition>();
   const config: ObsElementDefinition = {
     conceptUuid,

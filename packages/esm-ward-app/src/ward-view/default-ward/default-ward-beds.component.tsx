@@ -1,0 +1,36 @@
+import { useAppContext } from '@openmrs/esm-framework';
+import React from 'react';
+import { type WardPatient, type WardPatientGroupDetails } from '../../types';
+import DefaultWardBed from '../../beds/default-ward/default-ward-bed.component';
+import { bedLayoutToBed } from '../ward-view.resource';
+
+function DefaultWardBeds() {
+  const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientsGrouping ?? {};
+
+  const wardBeds = bedLayouts?.map((bedLayout) => {
+    const { patients } = bedLayout;
+    const bed = bedLayoutToBed(bedLayout);
+    const wardPatients: WardPatient[] = patients.map((patient): WardPatient => {
+      const inpatientAdmission = wardAdmittedPatientsWithBed?.get(patient.uuid);
+      if (inpatientAdmission) {
+        const { patient, visit, currentInpatientRequest } = inpatientAdmission;
+        return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
+      } else {
+        // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
+        return {
+          patient: patient,
+          visit: null,
+          bed,
+          inpatientAdmission: null, // populate after BED-13
+          inpatientRequest: null,
+        };
+      }
+    });
+    return <DefaultWardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
+  });
+
+  return <>{wardBeds}</>;
+}
+
+export default DefaultWardBeds;

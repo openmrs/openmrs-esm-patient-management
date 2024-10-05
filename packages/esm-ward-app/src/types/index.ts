@@ -10,8 +10,15 @@ import type {
 } from '@openmrs/esm-framework';
 import type React from 'react';
 import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
+import { type ReactNode } from 'react';
 
-export type WardPatientCard = React.FC<WardPatient>;
+export type WardPatientCardType = React.FC<WardPatient>;
+
+export type GenericWardPatientCardType = React.FC<{
+  header: ReactNode;
+  rows?: ReactNode[];
+  wardPatient: WardPatient;
+}>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {

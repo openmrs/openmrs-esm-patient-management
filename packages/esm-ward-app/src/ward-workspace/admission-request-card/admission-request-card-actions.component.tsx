@@ -2,11 +2,11 @@ import { Button } from '@carbon/react';
 import { ArrowRightIcon, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { WardPatientWorkspaceProps, WardPatientCard } from '../../types';
+import type { WardPatientWorkspaceProps, WardPatientCardType } from '../../types';
 import type { AdmitPatientFormWorkspaceProps } from '../admit-patient-form-workspace/types';
 import styles from './admission-request-card.scss';
 
-const AdmissionRequestCardActions: WardPatientCard = (wardPatient) => {
+const AdmissionRequestCardActions: WardPatientCardType = (wardPatient) => {
   const { patient, inpatientRequest } = wardPatient;
   const { dispositionType } = inpatientRequest;
   const { t } = useTranslation();

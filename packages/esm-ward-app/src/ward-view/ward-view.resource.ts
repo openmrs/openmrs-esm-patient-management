@@ -56,7 +56,10 @@ export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDe
 export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmission[]) {
   const map = new Map<string, InpatientAdmission>();
   for (const inpatientAdmission of inpatientAdmissions ?? []) {
-    map.set(inpatientAdmission.patient.uuid, inpatientAdmission);
+    if (inpatientAdmission) {
+      // TODO: why undefined sometimes?
+      map.set(inpatientAdmission.patient.uuid, inpatientAdmission);
+    }
   }
   return map;
 }

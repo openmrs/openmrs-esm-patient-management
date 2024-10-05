@@ -75,7 +75,7 @@ export const motherChildRowExtension = getAsyncLifecycle(
 );
 
 export const pendingItemsCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/pending-items-car-row.extension'),
+  () => import('./ward-patient-card/card-rows/pending-items-card-row.extension'),
   options,
 );
 

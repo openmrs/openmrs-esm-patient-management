@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import React from 'react';
 import { useCurrentWardCardConfig } from '../../hooks/useCurrentWardCardConfig';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
-import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
-import type WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
 import styles from './admission-request-card.scss';
+import { type WardPatientCardType } from '../../types';
+import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
 
-const AdmissionRequestCardHeader: WardPatientCard = (wardPatient) => {
+const AdmissionRequestCardHeader: WardPatientCardType = (wardPatient) => {
   const { inpatientRequest } = wardPatient;
   const { dispositionEncounter } = inpatientRequest;
   const { id, headerRowElements } = useCurrentWardCardConfig();

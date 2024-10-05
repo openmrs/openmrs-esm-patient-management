@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { type WardPatientCard } from '../../types';
+import { type WardPatientCardType } from '../../types';
 import { Hourglass } from '@carbon/react/icons';
 
 import { useConfig } from '@openmrs/esm-framework';
@@ -8,7 +8,7 @@ import { WardPatientPendingOrder } from '../row-elements/ward-patient-pending-or
 import styles from '../ward-patient-card.scss';
 import WardPatientPendingTransfer from '../row-elements/ward-patient-pending-transfer';
 
-const PendingItemsCarRowExtension: WardPatientCard = (wardPatient) => {
+const PendingItemsCardRowExtension: WardPatientCardType = (wardPatient) => {
   const { orders, showPendingItems } = useConfig<PendingItemsDefinition>();
   const [hasPendingOrders, setHasPendingOrders] = React.useState(false);
 
@@ -47,4 +47,4 @@ const PendingItemsCarRowExtension: WardPatientCard = (wardPatient) => {
   );
 };
 
-export default PendingItemsCarRowExtension;
+export default PendingItemsCardRowExtension;

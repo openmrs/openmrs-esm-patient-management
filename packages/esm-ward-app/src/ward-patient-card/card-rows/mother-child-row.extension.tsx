@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
-import { type WardPatientCard } from '../../types';
+import { type WardPatientCardType } from '../../types';
 import WardPatientSkeletonText from '../row-elements/ward-pateint-skeleton-text';
 import WardPatientAge from '../row-elements/ward-patient-age';
 import WardPatientIdentifier from '../row-elements/ward-patient-identifier';
@@ -22,7 +22,7 @@ const motherAndChildrenRep =
  * @param param0
  * @returns
  */
-const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
+const MotherChildRowExtension: WardPatientCardType = ({ patient }) => {
   const { t } = useTranslation();
 
   const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
@@ -76,7 +76,7 @@ const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
 
   return (
     <>
-      {[...childrenData, ...motherData]?.map(({ mother, motherAdmission, child, childAdmission }) => {
+      {/* {[...childrenData, ...motherData]?.map(({ mother, motherAdmission, child, childAdmission }) => {
         // patient A is the patient card's patient
         const patientA = patient;
         // patient B is either the mother or the child of patient A
@@ -102,7 +102,7 @@ const MotherChildRowExtension: WardPatientCard = ({ patient }) => {
             </div>
           </div>
         );
-      })}
+      })} */}
     </>
   );
 };
