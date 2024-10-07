@@ -16,12 +16,11 @@ const wardMetrics = [{ name: 'patients' }, { name: 'freeBeds' }, { name: 'capaci
 
 const WardMetrics = () => {
   const { location } = useWardLocation();
+  const { beds, isLoading, error } = useBeds({ locationUuid: location.uuid });
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const wardPatientGroup = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse, bedLayouts } =
-    wardPatientGroup || {};
-  const { isLoading, error } = admissionLocationResponse ?? {};
+  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse } = wardPatientGroup || {};
   const isDataLoading =
     admissionLocationResponse?.isLoading ||
     inpatientAdmissionResponse?.isLoading ||
@@ -35,8 +34,7 @@ const WardMetrics = () => {
       description: error.message,
     });
   }
-
-  const wardMetricValues = getWardMetrics(bedLayouts, wardPatientGroup);
+  const wardMetricValues = getWardMetrics(beds, wardPatientGroup);
   return (
     <div className={styles.metricsContainer}>
       {isBedManagementModuleInstalled ? (

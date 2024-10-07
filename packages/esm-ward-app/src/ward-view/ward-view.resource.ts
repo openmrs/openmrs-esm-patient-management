@@ -30,20 +30,19 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
   const bedLayouts = admissionLocation.bedLayouts
     .filter((bl) => bl.bedId)
     .sort((bedA, bedB) => collator.compare(bedA.bedNumber, bedB.bedNumber));
-
   return bedLayouts;
 }
 
 //TODO: This implementation will change when the api is ready
-export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
+export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   const bedMetrics = {
     patients: '--',
     freeBeds: '--',
     capacity: '--',
   };
-  if (bedLayouts == null || bedLayouts.length == 0) return bedMetrics;
-  const total = bedLayouts.length;
-  const occupiedBeds = bedLayouts.filter((bed) => bed.patients.length);
+  if (beds == null || beds.length == 0) return bedMetrics;
+  const total = beds.length;
+  const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
   const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
@@ -73,6 +72,7 @@ export function createAndGetWardPatientGrouping(
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
   const bedLayouts = admissionLocation && filterBeds(admissionLocation);
   const allWardPatientUuids = new Set<string>();
+
   let wardPatientPendingCount = 0;
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;

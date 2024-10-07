@@ -1,6 +1,8 @@
 import React from 'react';
 import WardMetrics from './ward-metrics.component';
 import { renderWithSwr } from '../../../../tools/test-utils';
+import { useBeds } from '../hooks/useBeds';
+import { mockWardBeds } from '../../../../__mocks__/wardBeds.mock';
 import {
   createAndGetWardPatientGrouping,
   getInpatientAdmissionsUuidMap,
@@ -12,6 +14,7 @@ import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
 import useWardLocation from '../hooks/useWardLocation';
 import { screen } from '@testing-library/react';
 import { useAppContext } from '@openmrs/esm-framework';
+import { mockWardPatientGroupDetails } from '../../mock';
 
 const wardMetrics = [
   { name: 'patients', key: 'patients', defaultTranslation: 'Patients' },
@@ -33,59 +36,29 @@ jest.mock('../hooks/useWardLocation', () =>
   }),
 );
 
-const mockUseWardLocation = jest.mocked(useWardLocation);
-
 jest.mock('../hooks/useBeds', () => ({
   useBeds: jest.fn(),
 }));
 
-jest.mock('../hooks/useAdmissionLocation', () => ({
-  useAdmissionLocation: jest.fn(),
-}));
-jest.mock('../hooks/useInpatientAdmission', () => ({
-  useInpatientAdmission: jest.fn(),
-}));
-
-jest.mock('../hooks/useInpatientRequest', () => ({
-  useInpatientRequest: jest.fn(),
-}));
-
-const mockAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockReturnValue({
+jest.mocked(useBeds).mockReturnValue({
   error: undefined,
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
-  admissionLocation: mockAdmissionLocation,
-});
-const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockReturnValue({
-  error: undefined,
-  mutate: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  inpatientAdmissions: mockInpatientAdmissions,
+  beds: mockWardBeds,
+  totalCount: mockWardBeds.length,
+  hasMore: false,
+  loadMore: jest.fn(),
 });
 
-const inpatientAdmissionsUuidMap = getInpatientAdmissionsUuidMap(mockInpatientAdmissions);
-const mockWardPatientGroupDetails = {
-  admissionLocationResponse: mockAdmissionLocationResponse(),
-  inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest),
-};
-jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails);
+jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
 describe('Ward Metrics', () => {
   it('Should display metrics of in the ward ', () => {
-    mockUseWardLocation.mockReturnValueOnce({
-      location: null,
-      isLoadingLocation: false,
-      errorFetchingLocation: null,
-      invalidLocation: true,
-    });
-    const { bedLayouts } = mockWardPatientGroupDetails;
-    const bedMetrics = getWardMetrics(bedLayouts, mockWardPatientGroupDetails);
+    const bedMetrics = getWardMetrics(mockWardBeds, mockWardPatientGroupDetails());
     renderWithSwr(<WardMetrics />);
     for (let [key, value] of Object.entries(bedMetrics)) {
       const fieldName = wardMetrics.find((metric) => metric.name == key)?.defaultTranslation;
-      expect(screen.getByText(fieldName)).toBeInTheDocument();
+      expect(screen.getByText(fieldName!)).toBeInTheDocument();
     }
   });
 });

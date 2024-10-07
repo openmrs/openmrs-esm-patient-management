@@ -12,6 +12,7 @@
   "capacity": "Capacity",
   "capacityMetricValue": "{{ metricValue }} %",
   "chooseAnOption": "Choose an option",
+  "clinicalForms": "Clinical forms",
   "clinicalNoteLabel": "Write your notes",
   "discharge": "Discharge",
   "empty": "Empty",

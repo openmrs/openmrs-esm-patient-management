@@ -24,13 +24,15 @@
       "component": "listDetailsTable"
     },
     {
-      "name": "add-patient-to-patient-list-modal",
-      "component": "addPatientToListModal"
-    },
-    {
       "name": "add-patient-to-patient-list-button",
       "slot": "patient-actions-slot",
       "component": "addPatientToPatientListMenuItem"
+    }
+  ],
+  "modals": [
+    {
+      "name": "add-patient-to-patient-list-modal",
+      "component": "addPatientToListModal"
     }
   ]
 }

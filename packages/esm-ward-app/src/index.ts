@@ -107,6 +107,16 @@ export const patientDischargeWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
+export const patientClinicalFormsWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-clinical-forms-workspace/patient-clinical-forms.workspace'),
+  options,
+);
+
+export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/clinical-forms-workspace-siderail.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
