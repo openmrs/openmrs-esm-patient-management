@@ -26,6 +26,10 @@ describe('AddPatientToPatientListMenuItem', () => {
 
     await user.click(button);
 
-    expect(mockShowModal).toHaveBeenCalledWith('add-patient-to-patient-list-modal', expect.any(Object));
+    expect(mockShowModal).toHaveBeenCalledWith('add-patient-to-patient-list-modal', {
+      closeModal: expect.any(Function),
+      size: 'sm',
+      patientUuid: mockPatient.uuid,
+    });
   });
 });

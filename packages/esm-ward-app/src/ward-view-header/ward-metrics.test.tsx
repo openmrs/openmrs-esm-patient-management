@@ -33,8 +33,6 @@ jest.mock('../hooks/useWardLocation', () =>
   }),
 );
 
-const mockUseWardLocation = jest.mocked(useWardLocation);
-
 jest.mock('../hooks/useBeds', () => ({
   useBeds: jest.fn(),
 }));
@@ -49,6 +47,8 @@ jest.mock('../hooks/useInpatientAdmission', () => ({
 jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
+
+const mockUseWardLocation = jest.mocked(useWardLocation);
 
 const mockAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockReturnValue({
   error: undefined,
@@ -85,7 +85,7 @@ describe('Ward Metrics', () => {
     renderWithSwr(<WardMetrics />);
     for (let [key, value] of Object.entries(bedMetrics)) {
       const fieldName = wardMetrics.find((metric) => metric.name == key)?.defaultTranslation;
-      expect(screen.getByText(fieldName)).toBeInTheDocument();
+      expect(screen.getByText(fieldName!)).toBeInTheDocument();
     }
   });
 });
