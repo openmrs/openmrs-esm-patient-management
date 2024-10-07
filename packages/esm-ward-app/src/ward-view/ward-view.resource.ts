@@ -43,7 +43,7 @@ export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPa
   };
   if (bedLayouts == null || bedLayouts.length == 0) return bedMetrics;
   const total = bedLayouts.length;
-  const occupiedBeds = bedLayouts.filter((bed) => bed.patients.length);
+  const occupiedBeds = bedLayouts.filter((bed) => bed.patients.length>0);
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
   const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
