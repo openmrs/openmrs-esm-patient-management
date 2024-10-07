@@ -14,12 +14,12 @@ interface PatientNotesHistoryProps {
 
 const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
 
   const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
     patientUuid,
     visitUuid,
-    emrConfiguration?.visitNoteEncounterType?.uuid,
+    emrConfiguration?.inpatientNoteEncounterType?.uuid,
     emrConfiguration?.consultFreeTextCommentsConcept.uuid,
   );
 
