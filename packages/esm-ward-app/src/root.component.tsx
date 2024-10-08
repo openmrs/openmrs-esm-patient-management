@@ -7,7 +7,8 @@ const Root: React.FC = () => {
   const wardViewBasename = window.getOpenmrsSpaBase() + 'home/ward';
   const { wardViewSlotName } = useConfig();
 
-  const wardView = <ExtensionSlot name={wardViewSlotName ?? 'default-ward-view-slot'} />;
+  // TODO
+  const wardView = <ExtensionSlot name={wardViewSlotName ?? 'maternal-ward-view-slot'} />;
 
   return (
     <main>

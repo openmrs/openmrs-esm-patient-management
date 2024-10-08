@@ -2,8 +2,8 @@ import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
 export const defaultWardPatientCard: WardPatientCardDefinition = {
   id: 'default',
-  headerRowElements: ['patient-age', 'patient-address', 'patient-identifier'],
-  footerRowElements: [],
+  // headerRowElements: ['patient-age', 'patient-address', 'patient-identifier'],
+  // footerRowElements: [],
   appliedTo: null,
 };
 
@@ -223,12 +223,33 @@ export interface AddressElementDefinition {
 
 export interface WardPatientCardDefinition {
   id: string;
-  headerRowElements: Array<string>;
-  footerRowElements: Array<string>;
   appliedTo?: Array<{
     /**
      * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
      */
     location: string;
   }>;
+}
+
+interface NewConfig {
+  elements: {
+    obs: [
+
+    ],
+    pendingItems: [
+
+    ],
+    patientIdentifier: [
+
+    ],
+    patientAddress: [
+
+    ],
+    admissionRequestNote: [
+
+    ],
+    obsTags: [
+      
+    ]
+  }
 }

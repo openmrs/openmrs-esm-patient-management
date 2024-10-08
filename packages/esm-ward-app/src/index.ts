@@ -122,6 +122,11 @@ export const defaultWardView = getAsyncLifecycle(
   options,
 );
 
+export const maternalWardView = getAsyncLifecycle(
+  () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);

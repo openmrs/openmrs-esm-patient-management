@@ -2,15 +2,14 @@ import { ExtensionSlot, formatDatetime, getLocale } from '@openmrs/esm-framework
 import classNames from 'classnames';
 import React from 'react';
 import { useCurrentWardCardConfig } from '../../hooks/useCurrentWardCardConfig';
+import { type WardPatientCardType } from '../../types';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
 import styles from './admission-request-card.scss';
-import { type WardPatientCardType } from '../../types';
-import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
 
 const AdmissionRequestCardHeader: WardPatientCardType = (wardPatient) => {
   const { inpatientRequest } = wardPatient;
   const { dispositionEncounter } = inpatientRequest;
-  const { id, headerRowElements } = useCurrentWardCardConfig();
+  const { id } = useCurrentWardCardConfig();
   const { patient } = wardPatient;
   const extensionSlotState = wardPatient;
 
@@ -20,13 +19,6 @@ const AdmissionRequestCardHeader: WardPatientCardType = (wardPatient) => {
     <div className={styles.admissionRequestCardHeaderContainer}>
       <div className={styles.admissionRequestCardHeader}>
         <WardPatientName patient={patient} />
-        {headerRowElements.map((elementId, i) => (
-          <WardPatientCardElement
-            key={`ward-card-${patient.uuid}-header-${i}`}
-            elementId={elementId}
-            {...wardPatient}
-          />
-        ))}
       </div>
       <div className={classNames(styles.admissionRequestCardHeader, styles.admissionEncounterDetails)}>
         <div>

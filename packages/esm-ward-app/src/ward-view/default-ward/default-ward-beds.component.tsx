@@ -1,8 +1,9 @@
 import { useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
+import WardBed from '../../beds/ward-bed.component';
 import { type WardPatient, type WardPatientGroupDetails } from '../../types';
-import DefaultWardBed from '../../beds/default-ward/default-ward-bed.component';
 import { bedLayoutToBed } from '../ward-view.resource';
+import DefaultWardPatientCard from './default-ward-patient-card.component';
 
 function DefaultWardBeds() {
   const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
@@ -27,7 +28,12 @@ function DefaultWardBeds() {
         };
       }
     });
-    return <DefaultWardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
+    const patientCards = wardPatients.map(wardPatient => (
+      <DefaultWardPatientCard 
+        key={wardPatient.patient.uuid}
+        {...wardPatient} />
+    ));
+    return <WardBed key={bed.uuid} bed={bed} patientCards={patientCards} />;
   });
 
   return <>{wardBeds}</>;

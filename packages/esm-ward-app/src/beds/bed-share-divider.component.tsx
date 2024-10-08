@@ -1,7 +1,7 @@
 import { Tag } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './occupied-bed.scss';
+import styles from './ward-bed.scss';
 
 const BedShareDivider = () => {
   const { t } = useTranslation();

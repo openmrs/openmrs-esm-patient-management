@@ -7,7 +7,7 @@ import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-pati
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
 
 const WardPatientWorkspaceBanner = (wardPatient: WardPatient) => {
-  const { headerRowElements } = useCurrentWardCardConfig();
+  const {  } = useCurrentWardCardConfig();
   const { patient, bed } = wardPatient;
 
   if (!patient) {
@@ -19,9 +19,10 @@ const WardPatientWorkspaceBanner = (wardPatient: WardPatient) => {
     <div className={styles.patientBanner}>
       {bed ? <WardPatientBedNumber bed={bed} /> : null}
       <WardPatientName patient={patient} />
-      {headerRowElements.map((elementId, i) => (
+      {/* TODO */}
+      {/* {headerRowElements.map((elementId, i) => (
         <WardPatientCardElement key={`ward-card-${patient.uuid}-header-${i}`} elementId={elementId} {...wardPatient} />
-      ))}
+      ))} */}
     </div>
   );
 };

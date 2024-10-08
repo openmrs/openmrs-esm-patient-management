@@ -76,7 +76,7 @@ const MotherChildRowExtension: WardPatientCardType = ({ patient }) => {
 
   return (
     <>
-      {/* {[...childrenData, ...motherData]?.map(({ mother, motherAdmission, child, childAdmission }) => {
+      {[...childrenData, ...motherData]?.map(({ mother, motherAdmission, child, childAdmission }) => {
         // patient A is the patient card's patient
         const patientA = patient;
         // patient B is either the mother or the child of patient A
@@ -102,7 +102,7 @@ const MotherChildRowExtension: WardPatientCardType = ({ patient }) => {
             </div>
           </div>
         );
-      })} */}
+      })}
     </>
   );
 };
