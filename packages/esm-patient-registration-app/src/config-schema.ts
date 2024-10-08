@@ -65,6 +65,9 @@ export interface RegistrationConfig {
         month: number;
       };
     };
+    id: {
+      allowAutoGenerationManualEntry: boolean;
+    };
     phone: {
       personAttributeUuid: string;
       validation?: {
@@ -330,6 +333,13 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
         },
+      },
+    },
+    id: {
+      allowAutoGenerationManualEntry: {
+        _type: Type.Boolean,
+        _default: false,
+        _description: 'Allow manual entry of auto-generated identifiers values',
       },
     },
     phone: {
