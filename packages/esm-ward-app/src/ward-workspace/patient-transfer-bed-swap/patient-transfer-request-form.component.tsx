@@ -65,7 +65,6 @@ export default function PatientTransferForm({
     formState: { errors, isDirty },
     control,
     handleSubmit,
-    getValues,
     setValue,
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema), defaultValues: formDefaultValues });
 
@@ -104,7 +103,7 @@ export default function PatientTransferForm({
 
       createEncounter({
         patient: patient?.uuid,
-        encounterType: emrConfiguration.visitNoteEncounterType.uuid,
+        encounterType: emrConfiguration.transferRequestEncounterType.uuid,
         location: location.uuid,
         encounterProviders: [
           {
