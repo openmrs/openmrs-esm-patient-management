@@ -1,7 +1,7 @@
 import { useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
 import WardBed from '../../beds/ward-bed.component';
-import { MotherAndChild, type WardPatient, type WardPatientGroupDetails } from '../../types';
+import { MotherAndChild, type WardPatient, type WardViewContext } from '../../types';
 import { bedLayoutToBed } from '../ward-view.resource';
 import MaternalWardPatientCard from './maternal-ward-patient-card.component';
 
@@ -10,8 +10,8 @@ interface MaternalWardBedsProps {
 }
 
 const MaternalWardBeds : React.FC<MaternalWardBedsProps> = ({motherChildrenRelationshipsByPatient}) => {
-  const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientsGrouping ?? {};
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {
     const { patients: patientsInCurrentBed } = bedLayout;

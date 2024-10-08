@@ -1,6 +1,6 @@
 import { useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
-import { type WardPatientGroupDetails } from '../../types';
+import { type WardViewContext } from '../../types';
 import DefaultWardPatientCard from './default-ward-patient-card.component';
 
 /**
@@ -8,8 +8,8 @@ import DefaultWardPatientCard from './default-ward-patient-card.component';
  * @returns
  */
 function DefaultWardUnassignedPatients() {
-  const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { wardUnassignedPatientsList } = wardPatientsGrouping ?? {};
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const { wardUnassignedPatientsList } = wardPatientGroupDetails ?? {};
 
   const wardUnassignedPatients = wardUnassignedPatientsList?.map((inpatientAdmission) => {
     return (

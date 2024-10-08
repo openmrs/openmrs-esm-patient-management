@@ -9,7 +9,7 @@ import {
   getWardMetricValueTranslation,
 } from '../ward-view/ward-view.resource';
 import WardMetric from './ward-metric.component';
-import type { WardPatientGroupDetails } from '../types';
+import type { WardViewContext } from '../types';
 import useWardLocation from '../hooks/useWardLocation';
 
 const wardMetrics = [{ name: 'patients' }, { name: 'freeBeds' }, { name: 'capacity' }];
@@ -19,13 +19,13 @@ const WardMetrics = () => {
   const { beds, isLoading, error } = useBeds({ locationUuid: location.uuid });
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
-  const wardPatientGroup = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse } = wardPatientGroup || {};
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse } = wardPatientGroupDetails || {};
   const isDataLoading =
     admissionLocationResponse?.isLoading ||
     inpatientAdmissionResponse?.isLoading ||
     inpatientRequestResponse?.isLoading;
-  if (!wardPatientGroup) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
 
   if (error) {
     showNotification({
@@ -34,7 +34,7 @@ const WardMetrics = () => {
       description: error.message,
     });
   }
-  const wardMetricValues = getWardMetrics(beds, wardPatientGroup);
+  const wardMetricValues = getWardMetrics(beds, wardPatientGroupDetails);
   return (
     <div className={styles.metricsContainer}>
       {isBedManagementModuleInstalled ? (
@@ -62,7 +62,7 @@ const WardMetrics = () => {
           metricValue={
             error
               ? '--'
-              : getWardMetricValueTranslation('pendingOut', t, wardPatientGroup?.wardPatientPendingCount?.toString())
+              : getWardMetricValueTranslation('pendingOut', t, wardPatientGroupDetails?.wardPatientPendingCount?.toString())
           }
           isLoading={!!isDataLoading}
           key="pending"

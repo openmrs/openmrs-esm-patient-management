@@ -147,9 +147,6 @@ export interface InpatientAdmission {
   // the current in patient request
   currentInpatientRequest: InpatientRequest;
 }
-export interface WardAppContext {
-  allPatientsByPatientUuid: Map<string, Patient>;
-}
 
 export interface MotherAndChild {
   mother: Patient;
@@ -232,3 +229,7 @@ export interface ObsPayload {
 }
 
 export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
+export interface WardViewContext {
+  wardPatientGroupDetails: WardPatientGroupDetails;
+  elementConfigById: Map<string, any>;
+} 

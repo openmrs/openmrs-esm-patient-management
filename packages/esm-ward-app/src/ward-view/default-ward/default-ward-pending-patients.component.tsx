@@ -1,13 +1,13 @@
 import { ErrorState, useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type InpatientRequest, type WardPatientGroupDetails } from '../../types';
+import { WardViewContext, type InpatientRequest } from '../../types';
 import AdmissionRequestCard from '../../ward-workspace/admission-request-card/admission-request-card.component';
 
 function DefaultWardPendingPatients() {
-  const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
   const { t } = useTranslation();
-  const { inpatientRequestResponse } = wardPatientsGrouping ?? {};
+  const { inpatientRequestResponse } = wardPatientGroupDetails ?? {};
   const {
     inpatientRequests,
     isLoading: isLoadingInpatientRequests,

@@ -23,7 +23,8 @@ const AdmissionRequestNoteRowExtension: WardPatientCardType = ({ patient, visit,
   } else {
     return (
       <div className={styles.wardPatientCardRow}>
-        <WardPatientObs config={config} patient={patient} visit={visit} />
+        {/* TODO */}
+        {/* <WardPatientObs config={config} patient={patient} visit={visit} /> */}
       </div>
     );
   }

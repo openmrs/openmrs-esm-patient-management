@@ -181,6 +181,22 @@ export const configSchema: ConfigSchema = {
 
 export interface WardConfigObject {
   wardPatientCards: WardPatientCardsConfig;
+  
+  patientCardElements: {
+    obs: Array<ObsElementDefinition>,
+    pendingItems: [
+
+    ],
+    patientIdentifier: Array<IdentifierElementDefinition>,
+    patientAddress: Array<AddressElementDefinition>,
+    admissionRequestNote: [
+
+    ],
+    coloredObsTags: [
+
+    ],
+    motherChild: []
+  },
 }
 
 export interface WardPatientCardsConfig {
@@ -232,24 +248,5 @@ export interface WardPatientCardDefinition {
 }
 
 interface NewConfig {
-  elements: {
-    obs: [
-
-    ],
-    pendingItems: [
-
-    ],
-    patientIdentifier: [
-
-    ],
-    patientAddress: [
-
-    ],
-    admissionRequestNote: [
-
-    ],
-    obsTags: [
-      
-    ]
-  }
+  patientCards: Array<WardPatientCardDefinition>
 }

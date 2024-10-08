@@ -3,7 +3,7 @@ import { Movement } from '@carbon/react/icons';
 import { ArrowRightIcon, isDesktop, launchWorkspace, useAppContext, useLayoutType } from '@openmrs/esm-framework';
 import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type WardPatientGroupDetails } from '../types';
+import { type WardViewContext } from '../types';
 import styles from './admission-requests.scss';
 
 interface AdmissionRequestsBarProps {
@@ -11,8 +11,8 @@ interface AdmissionRequestsBarProps {
 }
 
 const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPendingPatients }) => {
-  const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { inpatientRequests, isLoading, error } = wardPatientGrouping?.inpatientRequestResponse ?? {};
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const { inpatientRequests, isLoading, error } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
   const { t } = useTranslation();
   const layout = useLayoutType();
 

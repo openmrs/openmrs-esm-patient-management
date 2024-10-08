@@ -5,7 +5,7 @@ import React, { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import useWardLocation from '../hooks/useWardLocation';
-import { type WardPatientGroupDetails } from '../types';
+import { type WardViewContext } from '../types';
 import WardViewHeader from '../ward-view-header/ward-view-header.component';
 import styles from './ward-view.scss';
 
@@ -46,16 +46,16 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
   const { t } = useTranslation();
   const isVertical = useFeatureFlag('ward-view-vertical-tiling');
 
-  const wardPatientsGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { bedLayouts } = wardPatientsGrouping ?? {};
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const { bedLayouts } = wardPatientGroupDetails ?? {};
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
-    wardPatientsGrouping?.admissionLocationResponse ?? {};
+  wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const {
     isLoading: isLoadingInpatientAdmissions,
     error: errorLoadingInpatientAdmissions,
     hasMore: hasMoreInpatientAdmissions,
     loadMore: loadMoreInpatientAdmissions,
-  } = wardPatientsGrouping?.inpatientAdmissionResponse ?? {};
+  } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
   const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
@@ -86,7 +86,7 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
     [scrollToLoadMoreTrigger, hasMoreInpatientAdmissions, errorLoadingInpatientAdmissions, loadMoreInpatientAdmissions],
   );
 
-  if (!wardPatientsGrouping) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
 
   return (
     <div className={classNames(styles.wardViewMain, { [styles.verticalTiling]: isVertical })}>

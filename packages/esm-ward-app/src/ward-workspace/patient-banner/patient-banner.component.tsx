@@ -1,6 +1,5 @@
 import React from 'react';
 import type { WardPatient } from '../../types';
-import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
 import { useCurrentWardCardConfig } from '../../hooks/useCurrentWardCardConfig';
 import styles from './style.scss';
 import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-patient-bed-number';

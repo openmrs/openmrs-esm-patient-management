@@ -7,14 +7,16 @@ import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import { getObsEncounterString, obsCustomRepresentation } from './ward-patient-obs.resource';
 import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 export interface WardPatientObsProps {
-  config: ObsElementDefinition;
+  id: string;
   patient: Patient;
   visit: Visit;
 }
 
-const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit }) => {
+const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, patient, visit }) => {
+  const config : ObsElementDefinition = useElementConfig("obs", id);
   const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config;
   const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
   const { t } = useTranslation();

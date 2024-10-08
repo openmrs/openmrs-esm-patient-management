@@ -1,4 +1,4 @@
-import { type Patient } from '@openmrs/esm-framework';
+import { useConfig, type Patient } from '@openmrs/esm-framework';
 import type {
   AdmissionLocationFetchResponse,
   Bed,
@@ -9,6 +9,7 @@ import type {
   WardPatientGroupDetails,
 } from '../types';
 import type { TFunction } from 'i18next';
+import { ObsElementDefinition, WardConfigObject } from '../config-schema';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -144,4 +145,15 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
     case 'pendingOut':
       return t('pendingOutMetricValue', '{{ metricValue }}', { metricValue: value });
   }
+}
+
+export function useElementConfig(elementType: "obs", id: string): ObsElementDefinition;
+export function useElementConfig(elementType, id: string) : ObsElementDefinition{
+  const config = useConfig<WardConfigObject>();
+  switch(elementType) {
+    case "obs" : {
+      return config?.patientCardElements?.obs?.find((elementConfig) => elementConfig.id == id);
+    }
+  }
+  return null;
 }

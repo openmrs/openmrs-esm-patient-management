@@ -9,7 +9,7 @@ import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import LocationSelector from '../../location-selector/location-selector.component';
-import type { ObsPayload, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
+import type { ObsPayload, WardViewContext, WardPatientWorkspaceProps } from '../../types';
 import { createEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
 
@@ -29,10 +29,10 @@ export default function PatientTransferForm({
     () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
     [emrConfiguration],
   );
-  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
-  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context');
+  const { mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
+  const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
+  const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
 
   const zodSchema = useMemo(
     () =>
@@ -158,7 +158,7 @@ export default function PatientTransferForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardGroupingDetails) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
