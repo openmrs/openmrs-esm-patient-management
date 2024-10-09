@@ -9,7 +9,15 @@ import type {
   WardPatientGroupDetails,
 } from '../types';
 import type { TFunction } from 'i18next';
-import { AddressElementDefinition, ColoredObsTagConfigObject, ColoredObsTagsRowDefinition, IdentifierElementDefinition, ObsElementDefinition, WardConfigObject, WardDefinition } from '../config-schema';
+import {
+  type AddressElementDefinition,
+  ColoredObsTagConfigObject,
+  type ColoredObsTagsRowDefinition,
+  type IdentifierElementDefinition,
+  type ObsElementDefinition,
+  type WardConfigObject,
+  type WardDefinition,
+} from '../config-schema';
 import { useMemo } from 'react';
 
 // the server side has 2 slightly incompatible types for Bed
@@ -32,19 +40,20 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
   const bedLayouts = admissionLocation.bedLayouts
     .filter((bl) => bl.bedId)
     .sort((bedA, bedB) => collator.compare(bedA.bedNumber, bedB.bedNumber));
+
   return bedLayouts;
 }
 
 //TODO: This implementation will change when the api is ready
-export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
+export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   const bedMetrics = {
     patients: '--',
     freeBeds: '--',
     capacity: '--',
   };
-  if (beds == null || beds.length == 0) return bedMetrics;
-  const total = beds.length;
-  const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
+  if (bedLayouts == null || bedLayouts.length == 0) return bedMetrics;
+  const total = bedLayouts.length;
+  const occupiedBeds = bedLayouts.filter((bed) => bed.patients.length > 0);
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
   const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
@@ -77,7 +86,6 @@ export function createAndGetWardPatientGrouping(
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
   const bedLayouts = admissionLocation && filterBeds(admissionLocation);
   const allWardPatientUuids = new Set<string>();
-
   let wardPatientPendingCount = 0;
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
@@ -109,7 +117,7 @@ export function createAndGetWardPatientGrouping(
 
   for (const inpatientRequest of inpatientRequests ?? []) {
     // TODO: inpatientRequest is undefined sometimes, why?
-    if(inpatientRequest) {
+    if (inpatientRequest) {
       allWardPatientUuids.add(inpatientRequest.patient.uuid);
     }
   }
@@ -151,16 +159,16 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
   }
 }
 
-export function useElementConfig(elementType: "obs", id: string): ObsElementDefinition;
-export function useElementConfig(elementType: "patientIdentifier", id: string): IdentifierElementDefinition;
-export function useElementConfig(elementType: "patientAddress", id: string): AddressElementDefinition;
-export function useElementConfig(elementType: "coloredObsTags", id: string): ColoredObsTagsRowDefinition;
-export function useElementConfig(elementType, id: string) : object {
+export function useElementConfig(elementType: 'obs', id: string): ObsElementDefinition;
+export function useElementConfig(elementType: 'patientIdentifier', id: string): IdentifierElementDefinition;
+export function useElementConfig(elementType: 'patientAddress', id: string): AddressElementDefinition;
+export function useElementConfig(elementType: 'coloredObsTags', id: string): ColoredObsTagsRowDefinition;
+export function useElementConfig(elementType, id: string): object {
   const config = useConfig<WardConfigObject>();
   return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig.id == id);
 }
 
-export function useWardConfig(locationUuid: string) : WardDefinition {
+export function useWardConfig(locationUuid: string): WardDefinition {
   const { wards } = useConfig<WardConfigObject>();
 
   const currentWardConfig = useMemo(() => {
@@ -179,7 +187,7 @@ export function useWardConfig(locationUuid: string) : WardDefinition {
     console.warn(
       'No ward card configuration has `appliedTo` criteria that matches the current location. Using the default configuration.',
     );
-    return {id: "default-ward"};
+    return { id: 'default-ward' };
   }
 
   return currentWardConfig;

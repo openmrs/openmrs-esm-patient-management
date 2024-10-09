@@ -1,11 +1,12 @@
 import { getPatientName, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
-import { WardViewContext, type GenericWardPatientCardType, type WardPatientWorkspaceProps } from '../types';
+import { type WardViewContext, type GenericWardPatientCardType, type WardPatientWorkspaceProps } from '../types';
 import styles from './ward-patient-card.scss';
+import { launchPatientWorkspace, setPatientWorkspaceProps } from './ward-patient-resource';
 
 const WardPatientCard: GenericWardPatientCardType = ({ header, rows, wardPatient }) => {
   const { patient } = wardPatient;
-  const {WardPatientHeader} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { WardPatientHeader } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   return (
     <div className={styles.wardPatientCard}>
@@ -14,10 +15,11 @@ const WardPatientCard: GenericWardPatientCardType = ({ header, rows, wardPatient
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
-          launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
+          setPatientWorkspaceProps({
             wardPatient,
             WardPatientHeader,
           });
+          launchPatientWorkspace();
         }}>
         {/* Name will not be displayed; just there for a11y */}
         {getPatientName(patient.person)}

@@ -1,26 +1,24 @@
-import React from 'react';
-import styles from './ward-metrics.scss';
-import { useBeds } from '../hooks/useBeds';
 import { showNotification, useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { WardViewContext } from '../types';
 import {
   getWardMetricNameTranslation,
   getWardMetrics,
   getWardMetricValueTranslation,
 } from '../ward-view/ward-view.resource';
 import WardMetric from './ward-metric.component';
-import type { WardViewContext } from '../types';
-import useWardLocation from '../hooks/useWardLocation';
+import styles from './ward-metrics.scss';
 
 const wardMetrics = [{ name: 'patients' }, { name: 'freeBeds' }, { name: 'capacity' }];
 
 const WardMetrics = () => {
-  const { location } = useWardLocation();
-  const { beds, isLoading, error } = useBeds({ locationUuid: location.uuid });
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse } = wardPatientGroupDetails || {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse, bedLayouts } =
+    wardPatientGroupDetails || {};
+  const { isLoading, error } = admissionLocationResponse ?? {};
   const isDataLoading =
     admissionLocationResponse?.isLoading ||
     inpatientAdmissionResponse?.isLoading ||
@@ -34,7 +32,8 @@ const WardMetrics = () => {
       description: error.message,
     });
   }
-  const wardMetricValues = getWardMetrics(beds, wardPatientGroupDetails);
+
+  const wardMetricValues = getWardMetrics(bedLayouts, wardPatientGroupDetails);
   return (
     <div className={styles.metricsContainer}>
       {isBedManagementModuleInstalled ? (
@@ -62,7 +61,11 @@ const WardMetrics = () => {
           metricValue={
             error
               ? '--'
-              : getWardMetricValueTranslation('pendingOut', t, wardPatientGroupDetails?.wardPatientPendingCount?.toString())
+              : getWardMetricValueTranslation(
+                  'pendingOut',
+                  t,
+                  wardPatientGroupDetails?.wardPatientPendingCount?.toString(),
+                )
           }
           isLoading={!!isDataLoading}
           key="pending"
