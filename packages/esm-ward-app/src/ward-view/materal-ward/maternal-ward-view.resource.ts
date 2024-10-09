@@ -1,13 +1,11 @@
-import { useMemo } from "react";
-import { MothersAndChildrenSearchCriteria, useMotherAndChildren } from "../../hooks/useMotherAndChildren";
-import { MotherAndChild } from "../../types";
+import { useMemo } from 'react';
+import { type MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
+import { type MotherAndChild } from '../../types';
 
 const motherAndChildrenRep =
   'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
 
-
-export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: string[]) {
-  
+export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: string[], fetch: boolean) {
   const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
     mothers: allWardPatientUuids,
     requireMotherHasActiveVisit: true,
@@ -26,21 +24,21 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
     data: childrenData,
     isLoading: isLoadingChildrenData,
     error: childrenDataError,
-  } = useMotherAndChildren(getChildrenRequestParams, allWardPatientUuids != null, motherAndChildrenRep);
+  } = useMotherAndChildren(getChildrenRequestParams, fetch && allWardPatientUuids.length > 0, motherAndChildrenRep);
   const {
     data: motherData,
     isLoading: isLoadingMotherData,
     error: motherDataError,
-  } = useMotherAndChildren(getMotherRequestParams, allWardPatientUuids != null, motherAndChildrenRep);
+  } = useMotherAndChildren(getMotherRequestParams, fetch && allWardPatientUuids.length > 0, motherAndChildrenRep);
 
   const motherChildrenRelationshipsByPatient = useMemo(() => {
-    if(!isLoadingChildrenData && !isLoadingMotherData) {
+    if (childrenData != null && motherData != null) {
       const map = new Map<string, MotherAndChild[]>();
-      for(const data of [...childrenData, ...motherData]) {
-        if(!map.has(data.child.uuid)) {
+      for (const data of [...childrenData, ...motherData]) {
+        if (!map.has(data.child.uuid)) {
           map.set(data.child.uuid, []);
         }
-        if(!map.has(data.mother.uuid)) {
+        if (!map.has(data.mother.uuid)) {
           map.set(data.mother.uuid, []);
         }
         map.get(data.child.uuid).push(data);
@@ -50,7 +48,7 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
     } else {
       return null;
     }
-  }, []);
+  }, [childrenData, motherData]);
 
   return motherChildrenRelationshipsByPatient;
 }

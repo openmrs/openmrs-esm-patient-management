@@ -33,7 +33,6 @@
   "freeBeds": "Free beds",
   "freeBedsMetricValue": "{{ metricValue }}",
   "inpatientNotesWorkspaceTitle": "In-patient notes",
-  "invalidElementIdCopy": "The configuration provided is invalid. It contains the following unknown element ID:",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "male": "Male",

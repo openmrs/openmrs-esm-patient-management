@@ -233,4 +233,8 @@ export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
 export interface WardViewContext {
   wardPatientGroupDetails: WardPatientGroupDetails;
   WardPatientHeader: React.FC<WardPatient>;
-} 
+}
+
+export interface MaternalWardViewContext {
+  motherChildrenRelationshipsByPatient: Map<string, MotherAndChild[]>;
+}
