@@ -11,7 +11,7 @@ interface AdmissionRequestsBarProps {
 }
 
 const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPendingPatients }) => {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { inpatientRequests, isLoading, error } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
   const { t } = useTranslation();
   const layout = useLayoutType();

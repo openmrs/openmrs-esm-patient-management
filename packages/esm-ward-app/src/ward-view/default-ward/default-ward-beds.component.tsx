@@ -6,7 +6,7 @@ import { bedLayoutToBed } from '../ward-view.resource';
 import DefaultWardPatientCard from './default-ward-patient-card.component';
 
 function DefaultWardBeds() {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {

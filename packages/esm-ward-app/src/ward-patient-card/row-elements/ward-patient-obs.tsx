@@ -17,8 +17,8 @@ export interface WardPatientObsProps {
 
 const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, patient, visit }) => {
   const config : ObsElementDefinition = useElementConfig("obs", id);
-  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config;
-  const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
+  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config ?? {};
+  const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, conceptUuid != null, obsCustomRepresentation);
   const { t } = useTranslation();
 
   if (isLoading) {

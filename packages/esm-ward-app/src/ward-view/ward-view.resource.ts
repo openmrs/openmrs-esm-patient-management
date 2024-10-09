@@ -9,7 +9,8 @@ import type {
   WardPatientGroupDetails,
 } from '../types';
 import type { TFunction } from 'i18next';
-import { ObsElementDefinition, WardConfigObject } from '../config-schema';
+import { AddressElementDefinition, ColoredObsTagConfigObject, ColoredObsTagsRowDefinition, IdentifierElementDefinition, ObsElementDefinition, WardConfigObject, WardDefinition } from '../config-schema';
+import { useMemo } from 'react';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -107,7 +108,10 @@ export function createAndGetWardPatientGrouping(
   const totalPatientsCount = allWardPatientUuids.size;
 
   for (const inpatientRequest of inpatientRequests ?? []) {
-    allWardPatientUuids.add(inpatientRequest.patient.uuid);
+    // TODO: inpatientRequest is undefined sometimes, why?
+    if(inpatientRequest) {
+      allWardPatientUuids.add(inpatientRequest.patient.uuid);
+    }
   }
 
   return {
@@ -148,12 +152,35 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
 }
 
 export function useElementConfig(elementType: "obs", id: string): ObsElementDefinition;
-export function useElementConfig(elementType, id: string) : ObsElementDefinition{
+export function useElementConfig(elementType: "patientIdentifier", id: string): IdentifierElementDefinition;
+export function useElementConfig(elementType: "patientAddress", id: string): AddressElementDefinition;
+export function useElementConfig(elementType: "coloredObsTags", id: string): ColoredObsTagsRowDefinition;
+export function useElementConfig(elementType, id: string) : object {
   const config = useConfig<WardConfigObject>();
-  switch(elementType) {
-    case "obs" : {
-      return config?.patientCardElements?.obs?.find((elementConfig) => elementConfig.id == id);
-    }
+  return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig.id == id);
+}
+
+export function useWardConfig(locationUuid: string) : WardDefinition {
+  const { wards } = useConfig<WardConfigObject>();
+
+  const currentWardConfig = useMemo(() => {
+    const cardDefinition = wards?.find((wardDef) => {
+      return (
+        wardDef.appliedTo == null ||
+        wardDef.appliedTo?.length == 0 ||
+        wardDef.appliedTo.some((criteria) => criteria.location == locationUuid)
+      );
+    });
+
+    return cardDefinition;
+  }, [wards, locationUuid]);
+
+  if (!currentWardConfig) {
+    console.warn(
+      'No ward card configuration has `appliedTo` criteria that matches the current location. Using the default configuration.',
+    );
+    return {id: "default-ward"};
   }
-  return null;
+
+  return currentWardConfig;
 }

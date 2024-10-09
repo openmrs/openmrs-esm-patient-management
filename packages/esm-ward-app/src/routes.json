@@ -77,13 +77,13 @@
     },
     {
       "component": "defaultWardView",
-      "name": "default-ward-view",
-      "slot": "default-ward-view-slot"
+      "name": "default-ward",
+      "slot": "default-ward"
     },
     {
       "component": "maternalWardView",
-      "name": "maternal-ward-view",
-      "slot": "maternal-ward-view-slot"
+      "name": "maternal-ward",
+      "slot": "maternal-ward"
     }
   ],
   "workspaces": [

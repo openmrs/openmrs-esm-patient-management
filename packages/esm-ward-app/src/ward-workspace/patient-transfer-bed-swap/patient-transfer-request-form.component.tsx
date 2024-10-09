@@ -29,7 +29,7 @@ export default function PatientTransferForm({
     () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
     [emrConfiguration],
   );
-  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context');
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
   const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};

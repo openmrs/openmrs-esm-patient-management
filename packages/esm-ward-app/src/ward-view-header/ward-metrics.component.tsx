@@ -19,7 +19,7 @@ const WardMetrics = () => {
   const { beds, isLoading, error } = useBeds({ locationUuid: location.uuid });
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse } = wardPatientGroupDetails || {};
   const isDataLoading =
     admissionLocationResponse?.isLoading ||

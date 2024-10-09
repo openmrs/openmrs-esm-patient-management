@@ -17,7 +17,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
   const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};

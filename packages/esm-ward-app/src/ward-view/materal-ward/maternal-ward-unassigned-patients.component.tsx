@@ -8,7 +8,7 @@ import MaternalWardPatientCard from './maternal-ward-patient-card.component';
  * @returns
  */
 function MaternalWardUnassignedPatients() {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { wardUnassignedPatientsList } = wardPatientGroupDetails ?? {};
 
   const wardUnassignedPatients = wardUnassignedPatientsList?.map((inpatientAdmission) => {

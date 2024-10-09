@@ -59,11 +59,6 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
-export const coloredObsTagCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
-  options,
-);
-
 export const admissionRequestNoteRowExtension = getAsyncLifecycle(
   () => import('./ward-patient-card/card-rows/admission-request-note.extension'),
   options,

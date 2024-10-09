@@ -13,7 +13,7 @@ export const obsCustomRepresentation =
 //  get the setMembers of a concept set
 const conceptSetCustomRepresentation = 'custom:(uuid,setMembers:(uuid))';
 
-export function useConceptToTagColorMap(tags: Array<TagConfigObject>) {
+export function useConceptToTagColorMap(tags: Array<TagConfigObject> = []) {
   // The TacConfigObject allows us to specify the mapping of
   // concept sets to colors. However, we also need to build a map of
   // concepts to colors. This function does that.

@@ -1,26 +1,19 @@
 import { InlineNotification } from '@carbon/react';
-import { useAppContext, useFeatureFlag, WorkspaceContainer } from '@openmrs/esm-framework';
+import { ExtensionSlot, useFeatureFlag } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import React, { useEffect, useRef, type ReactNode } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import useWardLocation from '../hooks/useWardLocation';
-import { type WardViewContext } from '../types';
-import WardViewHeader from '../ward-view-header/ward-view-header.component';
+import { useWardConfig } from './ward-view.resource';
 import styles from './ward-view.scss';
 
-interface WardViewProps {
-  wardBeds: ReactNode;
-  wardUnassignedPatients: ReactNode;
-  wardPendingPatients: ReactNode;
-}
-
-const WardView: React.FC<WardViewProps> = ({ wardBeds, wardPendingPatients, wardUnassignedPatients }) => {
+const WardView: React.FC<{}> = () => {
   const response = useWardLocation();
-  const { isLoadingLocation, invalidLocation } = response;
+  const { isLoadingLocation, invalidLocation, location: {uuid: locationUuid} } = response;
   const { t } = useTranslation();
 
   const isVertical = useFeatureFlag('ward-view-vertical-tiling');
+  const wardConfig = useWardConfig(locationUuid);
 
   if (isLoadingLocation) {
     return <></>;
@@ -30,109 +23,12 @@ const WardView: React.FC<WardViewProps> = ({ wardBeds, wardPendingPatients, ward
     return <InlineNotification kind="error" title={t('invalidLocationSpecified', 'Invalid location specified')} />;
   }
 
+  const wardId = wardConfig.id;
+
   return (
-    <>
       <div className={classNames(styles.wardView, { [styles.verticalTiling]: isVertical })}>
-        <WardViewHeader {...{ wardPendingPatients }} />
-        <Ward {...{ wardBeds, wardUnassignedPatients }} />
+        <ExtensionSlot name={wardId} />
       </div>
-      <WorkspaceContainer overlay contextKey="ward" />
-    </>
-  );
-};
-
-const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardUnassignedPatients: ReactNode }) => {
-  const { location } = useWardLocation();
-  const { t } = useTranslation();
-  const isVertical = useFeatureFlag('ward-view-vertical-tiling');
-
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
-  const { bedLayouts } = wardPatientGroupDetails ?? {};
-  const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
-  wardPatientGroupDetails?.admissionLocationResponse ?? {};
-  const {
-    isLoading: isLoadingInpatientAdmissions,
-    error: errorLoadingInpatientAdmissions,
-    hasMore: hasMoreInpatientAdmissions,
-    loadMore: loadMoreInpatientAdmissions,
-  } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
-  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
-
-  const scrollToLoadMoreTrigger = useRef<HTMLDivElement>(null);
-  useEffect(
-    function scrollToLoadMore() {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              if (hasMoreInpatientAdmissions && !errorLoadingInpatientAdmissions && !isLoadingInpatientAdmissions) {
-                loadMoreInpatientAdmissions();
-              }
-            }
-          });
-        },
-        { threshold: 1 },
-      );
-
-      if (scrollToLoadMoreTrigger.current) {
-        observer.observe(scrollToLoadMoreTrigger.current);
-      }
-      return () => {
-        if (scrollToLoadMoreTrigger.current) {
-          observer.unobserve(scrollToLoadMoreTrigger.current);
-        }
-      };
-    },
-    [scrollToLoadMoreTrigger, hasMoreInpatientAdmissions, errorLoadingInpatientAdmissions, loadMoreInpatientAdmissions],
-  );
-
-  if (!wardPatientGroupDetails) return <></>;
-
-  return (
-    <div className={classNames(styles.wardViewMain, { [styles.verticalTiling]: isVertical })}>
-      {wardBeds}
-      {bedLayouts?.length == 0 && isBedManagementModuleInstalled && (
-        <InlineNotification
-          kind="warning"
-          lowContrast={true}
-          title={t('noBedsConfigured', 'No beds configured for this location')}
-        />
-      )}
-      {wardUnassignedPatients}
-      {(isLoadingAdmissionLocation || isLoadingInpatientAdmissions) && <EmptyBeds />}
-      {errorLoadingAdmissionLocation && (
-        <InlineNotification
-          kind="error"
-          lowContrast={true}
-          title={t('errorLoadingWardLocation', 'Error loading ward location')}
-          subtitle={
-            errorLoadingAdmissionLocation?.message ??
-            t('invalidWardLocation', 'Invalid ward location: {{location}}', { location: location.display })
-          }
-        />
-      )}
-      {errorLoadingInpatientAdmissions && (
-        <InlineNotification
-          kind="error"
-          lowContrast={true}
-          title={t('errorLoadingPatients', 'Error loading admitted patients')}
-          subtitle={errorLoadingInpatientAdmissions?.message}
-        />
-      )}
-      <div ref={scrollToLoadMoreTrigger}></div>
-    </div>
-  );
-};
-
-const EmptyBeds = () => {
-  return (
-    <>
-      {Array(20)
-        .fill(0)
-        .map((_, i) => (
-          <EmptyBedSkeleton key={i} />
-        ))}
-    </>
   );
 };
 

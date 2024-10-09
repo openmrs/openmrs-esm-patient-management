@@ -8,7 +8,7 @@ import DefaultWardPatientCard from './default-ward-patient-card.component';
  * @returns
  */
 function DefaultWardUnassignedPatients() {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { wardUnassignedPatientsList } = wardPatientGroupDetails ?? {};
 
   const wardUnassignedPatients = wardUnassignedPatientsList?.map((inpatientAdmission) => {

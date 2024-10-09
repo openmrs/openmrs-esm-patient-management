@@ -51,6 +51,7 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
+  WardPatientHeader: React.FC<WardPatient>;
 }
 
 // server-side types defined in openmrs-module-bedmanagement:
@@ -231,5 +232,5 @@ export interface ObsPayload {
 export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
 export interface WardViewContext {
   wardPatientGroupDetails: WardPatientGroupDetails;
-  elementConfigById: Map<string, any>;
+  WardPatientHeader: React.FC<WardPatient>;
 } 

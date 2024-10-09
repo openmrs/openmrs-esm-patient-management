@@ -1,18 +1,20 @@
-import { useConfig, useDefineAppContext } from '@openmrs/esm-framework';
+import { useDefineAppContext } from '@openmrs/esm-framework';
 import React from 'react';
-import { WardConfigObject } from '../../config-schema';
 import { useWardPatientGrouping } from '../../hooks/useWardPatientGrouping';
 import { WardViewContext } from '../../types';
-import WardView from '../ward-view.component';
+import WardViewHeader from '../../ward-view-header/ward-view-header.component';
+import Ward from '../ward.component';
 import MaternalWardBeds from './maternal-ward-beds.component';
+import MaternalWardPatientCardHeader from './maternal-ward-patient-card-header.component';
 import MaternalWardUnassignedPatients from './maternal-ward-unassigned-patients.component';
 import { useMotherChildrenRelationshipsByPatient } from './maternal-ward-view.resource';
+import DefaultWardPendingPatients from '../default-ward/default-ward-pending-patients.component';
 
 const MaternalWardView = () => {
   const wardPatientGroupDetails = useWardPatientGrouping();
   useDefineAppContext<WardViewContext>('ward-view-context', {
     wardPatientGroupDetails,
-    elementConfigById: null
+    WardPatientHeader: MaternalWardPatientCardHeader
   });
 
   const allWardPatientUuids = wardPatientGroupDetails.allWardPatientUuids ? Array.from(wardPatientGroupDetails.allWardPatientUuids) : null;
@@ -21,9 +23,14 @@ const MaternalWardView = () => {
 
   const wardBeds = <MaternalWardBeds {...{motherChildrenRelationshipsByPatient}} />;
   const wardUnassignedPatients = <MaternalWardUnassignedPatients />;
-  const wardPendingPatients = null; // <DefaultWardPendingPatients />;
-
-  return <WardView {...{ wardBeds, wardUnassignedPatients, wardPendingPatients }} />;
+  const wardPendingPatients = <DefaultWardPendingPatients />;
+  
+  return (
+    <>
+      <WardViewHeader {...{ wardPendingPatients }} />
+      <Ward {...{ wardBeds, wardUnassignedPatients }} />
+    </>
+  );
 };
 
 export default MaternalWardView;

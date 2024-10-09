@@ -10,7 +10,7 @@ interface MaternalWardBedsProps {
 }
 
 const MaternalWardBeds : React.FC<MaternalWardBedsProps> = ({motherChildrenRelationshipsByPatient}) => {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context');
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {

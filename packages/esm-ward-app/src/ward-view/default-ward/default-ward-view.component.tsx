@@ -1,24 +1,31 @@
-import React from 'react';
-import DefaultWardBeds from './default-ward-beds.component';
-import DefaultWardUnassignedPatients from './default-ward-unassigned-patients.component';
 import { useDefineAppContext } from '@openmrs/esm-framework';
+import React from 'react';
 import { useWardPatientGrouping } from '../../hooks/useWardPatientGrouping';
 import { type WardViewContext } from '../../types';
-import WardView from '../ward-view.component';
+import WardViewHeader from '../../ward-view-header/ward-view-header.component';
+import Ward from '../ward.component';
+import DefaultWardBeds from './default-ward-beds.component';
 import DefaultWardPendingPatients from './default-ward-pending-patients.component';
+import DefaultWardUnassignedPatients from './default-ward-unassigned-patients.component';
+import DefaultWardPatientCardHeader from './default-ward-patient-card-header.component';
 
 const DefaultWardView = () => {
   const wardPatientGroupDetails = useWardPatientGrouping();
   useDefineAppContext<WardViewContext>('ward-view-context', {
     wardPatientGroupDetails,
-    elementConfigById: null
+    WardPatientHeader: DefaultWardPatientCardHeader
   });
 
   const wardBeds = <DefaultWardBeds />;
   const wardUnassignedPatients = <DefaultWardUnassignedPatients />;
   const wardPendingPatients = <DefaultWardPendingPatients />;
 
-  return <WardView {...{ wardBeds, wardUnassignedPatients, wardPendingPatients }} />;
+  return (
+    <>
+      <WardViewHeader {...{ wardPendingPatients }} />
+      <Ward {...{ wardBeds, wardUnassignedPatients }} />
+    </>
+  );
 };
 
 export default DefaultWardView;
