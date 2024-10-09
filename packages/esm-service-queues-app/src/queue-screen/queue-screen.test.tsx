@@ -26,7 +26,7 @@ describe('QueueScreen component', () => {
       mutate: jest.fn(),
     });
     render(<QueueScreen />);
-    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText(/Error State/i)).toBeInTheDocument();
   });
 
   test('renders table with active tickets when data is loaded', () => {
