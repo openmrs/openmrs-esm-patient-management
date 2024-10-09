@@ -44,7 +44,6 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
   return bedLayouts;
 }
 
-//TODO: This implementation will change when the api is ready
 export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   const bedMetrics = {
     patients: '--',
@@ -67,8 +66,8 @@ export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPa
 export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmission[]) {
   const map = new Map<string, InpatientAdmission>();
   for (const inpatientAdmission of inpatientAdmissions ?? []) {
+    // TODO: inpatientAdmission is undefined sometimes, why?
     if (inpatientAdmission) {
-      // TODO: why undefined sometimes?
       map.set(inpatientAdmission.patient.uuid, inpatientAdmission);
     }
   }

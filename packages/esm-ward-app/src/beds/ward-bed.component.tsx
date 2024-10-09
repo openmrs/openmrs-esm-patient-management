@@ -17,18 +17,21 @@ const WardBed: React.FC<WardBedProps> = ({ bed, patientCards }) => {
 };
 
 const OccupiedBed: React.FC<WardBedProps> = ({ patientCards }) => {
-  // TODO key
+
+  // interlace patient card with bed dividers between each of them
+  const patientCardsWithDividers = patientCards.flatMap(
+    (patientCard, index) => {
+      if(index == 0) {
+        return [patientCard];
+      } else {
+        return [<BedShareDivider key={'divider-' + index} />, patientCard]
+      }
+    }
+  );
+
   return (
     <div className={styles.occupiedBed}>
-      {patientCards.map((patientCard, index: number) => {
-        const last = index === patientCards.length - 1;
-        return (
-          <div key={'occupied-bed-pt-' + index}>
-            {patientCard}
-            {!last && <BedShareDivider />}
-          </div>
-        );
-      })}
+      {patientCardsWithDividers}
     </div>
   );
 };
