@@ -22,6 +22,8 @@
   "emptyText": "Empty",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
   "errorAssigningBedToPatient": "Error assigning bed to patient",
+  "errorConfiguringPatientCard": "Error configuring patient card",
+  "errorConfiguringPatientCardMessage": "Unable to find configuration for {{elementType}}, id: {{id}}",
   "errorCreatingEncounter": "Failed to admit patient",
   "errorCreatingTransferRequest": "Error creating transfer request",
   "errorDischargingPatient": "Error discharging patient",

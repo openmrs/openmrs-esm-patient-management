@@ -74,30 +74,45 @@ export const configSchema: ConfigSchema = {
       },
     },
     pendingItems: {
-      orders: {
-        orderTypes: {
-          _type: Type.Array,
-          _description: 'Configures pending orders and transfers to display.',
-          _default: [{ label: 'Labs', uuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e' }],
-          _elements: {
-            uuid: {
-              _type: Type.UUID,
-              _description: 'Identifies the order type.',
-            },
-            label: {
-              _type: Type.String,
-              _description:
-                "The label or i18n key to the translated label to display. If not provided, defaults to 'Orders'",
-              _default: null,
+      _type: Type.Array,
+      _description: 'Configures pending orders and transfers to display.',
+      _default: [
+        {
+          id: 'pending-items',
+          orders: {
+            orderTypes: [{ label: 'Labs', uuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e' }],
+          },
+          showPendingItems: true,
+        },
+      ],
+      _elements: {
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for this patient card element',
+        },
+        orders: {
+          orderTypes: {
+            _type: Type.Array,
+            _description: 'Configures pending orders and transfers to display.',
+            _elements: {
+              uuid: {
+                _type: Type.UUID,
+                _description: 'Identifies the order type.',
+              },
+              label: {
+                _type: Type.String,
+                _description:
+                  "The label or i18n key to the translated label to display. If not provided, defaults to 'Orders'",
+                _default: null,
+              },
             },
           },
         },
-      },
-      showPendingItems: {
-        _type: Type.Boolean,
-        _description:
-          'Optional. If true, pending items (e.g., number of pending orders) will be displayed on the patient card.',
-        _default: true,
+        showPendingItems: {
+          _type: Type.Boolean,
+          _description:
+            'Optional. If true, pending items (e.g., number of pending orders) will be displayed on the patient card.',
+        },
       },
     },
     patientIdentifier: {
@@ -158,7 +173,7 @@ export const configSchema: ConfigSchema = {
       _description: 'Configures admission request notes to display.',
       _default: [
         {
-          id: 'admission-note',
+          id: 'admission-request-note',
           conceptUuid: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         },
       ],

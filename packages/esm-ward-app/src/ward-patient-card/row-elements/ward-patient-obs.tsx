@@ -60,7 +60,7 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, configOverride, pat
           <span className={styles.wardPatientObsLabel}>
             {labelToDisplay ? t('labelColon', '{{label}}:', { label: labelToDisplay }) : ''}
           </span>
-          {obsNodes}
+          <div className={styles.dotSeparatedChildren}>{obsNodes}</div>
         </div>
       );
     } else {

@@ -1,12 +1,14 @@
 import { ErrorState, useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type WardViewContext, type InpatientRequest } from '../../types';
-import AdmissionRequestCard from '../../ward-workspace/admission-request-card/admission-request-card.component';
-import WardPatientSkeletonText from '../../ward-patient-card/row-elements/ward-patient-skeleton-text';
+import { type InpatientRequest, type WardViewContext } from '../../types';
 import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
+import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
+import MotherChildRowExtension from '../../ward-patient-card/card-rows/mother-child-row.component';
+import WardPatientSkeletonText from '../../ward-patient-card/row-elements/ward-patient-skeleton-text';
+import AdmissionRequestCard from '../../ward-workspace/admission-request-card/admission-request-card.component';
 
-function DefaultWardPendingPatients() {
+function MaternalWardPendingPatients() {
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { t } = useTranslation();
   const { inpatientRequestResponse } = wardPatientGroupDetails ?? {};
@@ -32,15 +34,9 @@ function DefaultWardPendingPatients() {
         };
 
         return (
-          <AdmissionRequestCard
-            key={`admission-request-card-${i}`}
-            wardPatient={{
-              patient: request.patient,
-              visit: request.visit,
-              bed: null,
-              inpatientRequest: request,
-              inpatientAdmission: null,
-            }}>
+          <AdmissionRequestCard key={`admission-request-card-${i}`} wardPatient={wardPatient}>
+            <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
+            <MotherChildRowExtension {...wardPatient} />
             <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
           </AdmissionRequestCard>
         );
@@ -49,4 +45,4 @@ function DefaultWardPendingPatients() {
   );
 }
 
-export default DefaultWardPendingPatients;
+export default MaternalWardPendingPatients;

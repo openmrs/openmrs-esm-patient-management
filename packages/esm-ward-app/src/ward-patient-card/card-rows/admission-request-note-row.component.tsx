@@ -1,10 +1,9 @@
-import { useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { type ObsElementConfig } from '../../config-schema';
 import { type WardPatient } from '../../types';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 import WardPatientObs from '../row-elements/ward-patient-obs';
 import styles from '../ward-patient-card.scss';
-import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 interface AdmissionRequestNoteRowProps {
   wardPatient: WardPatient;
@@ -13,7 +12,7 @@ interface AdmissionRequestNoteRowProps {
 
 const AdmissionRequestNoteRow: React.FC<AdmissionRequestNoteRowProps> = ({ id, wardPatient }) => {
   const { patient, visit, inpatientAdmission } = wardPatient;
-  const { conceptUuid } = useElementConfig('admissionRequestNote', id);
+  const { conceptUuid } = useElementConfig('admissionRequestNote', id) ?? {};
   const config: ObsElementConfig = {
     conceptUuid,
     limit: 0,

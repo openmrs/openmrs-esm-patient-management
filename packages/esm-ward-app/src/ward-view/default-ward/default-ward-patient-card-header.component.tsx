@@ -7,9 +7,10 @@ import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-n
 import WardPatientTimeOnWard from '../../ward-patient-card/row-elements/ward-patient-time-on-ward';
 import WardPatientTimeSinceAdmission from '../../ward-patient-card/row-elements/ward-patient-time-since-admission';
 import styles from '../../ward-patient-card/ward-patient-card.scss';
-import { WardPatientCardType } from '../../types';
+import { type WardPatientCardType } from '../../types';
+import WardPatientGender from '../../ward-patient-card/row-elements/ward-patient-gender.component';
 
-const DefaultWardPatientCardHeader : WardPatientCardType = (wardPatient) => {
+const DefaultWardPatientCardHeader: WardPatientCardType = (wardPatient) => {
   const { patient, bed, inpatientAdmission } = wardPatient;
   const { encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
 
@@ -18,6 +19,7 @@ const DefaultWardPatientCardHeader : WardPatientCardType = (wardPatient) => {
       {bed ? <WardPatientBedNumber bed={bed} /> : null}
       <WardPatientName patient={patient} />
       <WardPatientIdentifier patient={patient} />
+      <WardPatientGender patient={patient} />
       <WardPatientAge patient={patient} />
       <WardPatientTimeSinceAdmission firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter} />
       <WardPatientTimeOnWard
@@ -25,6 +27,6 @@ const DefaultWardPatientCardHeader : WardPatientCardType = (wardPatient) => {
       />
     </div>
   );
-}
+};
 
 export default DefaultWardPatientCardHeader;

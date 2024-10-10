@@ -27,7 +27,6 @@ const MaternalWardPatientCard: WardPatientCardType = (wardPatient) => {
       <PendingItemsRow id={'pending-items'} wardPatient={wardPatient} />
       <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
       <MotherChildRowExtension {...wardPatient} />
-      <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
     </WardPatientCard>
   );
 

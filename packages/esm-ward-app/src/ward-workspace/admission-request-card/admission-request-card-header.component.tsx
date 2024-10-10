@@ -1,18 +1,25 @@
-import { formatDatetime, getLocale, useAppContext } from '@openmrs/esm-framework';
+import { formatDatetime, getLocale } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
-import { WardViewContext, type WardPatientCardType } from '../../types';
+import { type WardPatientCardType } from '../../types';
+import WardPatientAge from '../../ward-patient-card/row-elements/ward-patient-age';
+import WardPatientGender from '../../ward-patient-card/row-elements/ward-patient-gender.component';
+import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier';
+import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
 import styles from './admission-request-card.scss';
 
 const AdmissionRequestCardHeader: WardPatientCardType = (wardPatient) => {
   const { inpatientRequest } = wardPatient;
   const { dispositionEncounter } = inpatientRequest;
-  const {WardPatientHeader} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { patient } = wardPatient;
 
   return (
     <div className={styles.admissionRequestCardHeaderContainer}>
       <div className={styles.admissionRequestCardHeader}>
-        {WardPatientHeader && <WardPatientHeader {...wardPatient} />}
+        <WardPatientName patient={patient} />
+        <WardPatientIdentifier patient={patient} />
+        <WardPatientGender patient={patient} />
+        <WardPatientAge patient={patient} />
       </div>
       <div className={classNames(styles.admissionRequestCardHeader, styles.admissionEncounterDetails)}>
         <div>

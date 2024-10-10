@@ -1,4 +1,4 @@
-import { useConfig, type Patient } from '@openmrs/esm-framework';
+import { showNotification, useConfig, type Patient } from '@openmrs/esm-framework';
 import type { TFunction } from 'i18next';
 import { useMemo } from 'react';
 import {
@@ -20,6 +20,7 @@ import type {
   WardMetrics,
   WardPatientGroupDetails,
 } from '../types';
+import { useTranslation } from 'react-i18next';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -167,7 +168,26 @@ export function useElementConfig(elementType: 'pendingItems', id: string): Pendi
 export function useElementConfig(elementType: 'admissionRequestNote', id: string): AdmissionRequestNoteElementConfig;
 export function useElementConfig(elementType, id: string): object {
   const config = useConfig<WardConfigObject>();
-  return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig.id == id);
+  const { t } = useTranslation();
+
+  try {
+    return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig?.id == id);
+  } catch (e) {
+    showNotification({
+      title: t('errorConfiguringPatientCard', 'Error configuring patient card'),
+      kind: 'error',
+      critical: true,
+      description: t(
+        'errorConfiguringPatientCardMessage',
+        'Unable to find configuration for {{elementType}}, id: {{id}}',
+        {
+          elementType,
+          id,
+        },
+      ),
+    });
+    return null;
+  }
 }
 
 export function useWardConfig(locationUuid: string): WardDefinition {
