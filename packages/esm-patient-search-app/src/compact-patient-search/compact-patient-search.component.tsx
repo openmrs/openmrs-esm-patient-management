@@ -8,6 +8,8 @@ import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 import styles from './compact-patient-search.scss';
+import { useSearchParams } from 'react-router-dom';
+import { inferModeFromSearchParams } from '../mpi/utils';
 
 interface CompactPatientSearchProps {
   isSearchPage: boolean;
@@ -29,7 +31,12 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const config = useConfig();
   const { showRecentlySearchedPatients } = config.search;
-  const patientSearchResponse = useInfinitePatientSearch(debouncedSearchTerm, config.includeDead);
+  const [searchParams] = useSearchParams();
+  const patientSearchResponse = useInfinitePatientSearch(
+    debouncedSearchTerm,
+    inferModeFromSearchParams(searchParams),
+    config.includeDead,
+  );
   const { data: searchedPatients } = patientSearchResponse;
   const { recentlyViewedPatients, addViewedPatient, mutateUserProperties } =
     useRecentlyViewedPatients(showRecentlySearchedPatients);
