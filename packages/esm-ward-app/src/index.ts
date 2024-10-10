@@ -1,19 +1,14 @@
 import {
   defineConfigSchema,
-  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
   registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { admissionRequestNoteRowConfigSchema } from './config-schema-admission-request-note';
-import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-colored-obs-tags';
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
 import rootComponent from './root.component';
-import { motherChildRowConfigSchema } from './config-schema-mother-child-row';
-import { pendingItemsExtensionConfigSchema } from './config-schema-pending-items-extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -59,26 +54,6 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
-export const coloredObsTagCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/colored-obs-tags-card-row.extension'),
-  options,
-);
-
-export const admissionRequestNoteRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/admission-request-note.extension'),
-  options,
-);
-
-export const motherChildRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/mother-child-row.extension'),
-  options,
-);
-
-export const pendingItemsCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/pending-items-car-row.extension'),
-  options,
-);
-
 // t('transfers', 'Transfers')
 export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/patient-transfer-bed-swap/patient-transfer-swap.workspace'),
@@ -117,13 +92,19 @@ export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
+export const defaultWardView = getAsyncLifecycle(
+  () => import('./ward-view/default-ward/default-ward-view.component'),
+  options,
+);
+
+export const maternalWardView = getAsyncLifecycle(
+  () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
-  defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
-  defineExtensionConfigSchema('admission-request-note-card-row', admissionRequestNoteRowConfigSchema);
-  defineExtensionConfigSchema('mother-child-card-row', motherChildRowConfigSchema);
-  defineExtensionConfigSchema('ward-patient-pending-items-card-row', pendingItemsExtensionConfigSchema);
 
   registerFeatureFlag(
     'bedmanagement-module',

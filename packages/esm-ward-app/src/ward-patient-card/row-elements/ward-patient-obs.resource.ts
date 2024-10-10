@@ -1,7 +1,7 @@
 import { restBaseUrl, useOpenmrsFetchAll, type Concept } from '@openmrs/esm-framework';
-import { type TagConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { type Observation } from '../../types';
 import { type TFunction } from 'i18next';
+import { type ColoredObsTagConfig } from '../../config-schema';
 
 // prettier-ignore
 export const obsCustomRepresentation = 
@@ -13,7 +13,7 @@ export const obsCustomRepresentation =
 //  get the setMembers of a concept set
 const conceptSetCustomRepresentation = 'custom:(uuid,setMembers:(uuid))';
 
-export function useConceptToTagColorMap(tags: Array<TagConfigObject>) {
+export function useConceptToTagColorMap(tags: Array<ColoredObsTagConfig> = []) {
   // The TacConfigObject allows us to specify the mapping of
   // concept sets to colors. However, we also need to build a map of
   // concepts to colors. This function does that.

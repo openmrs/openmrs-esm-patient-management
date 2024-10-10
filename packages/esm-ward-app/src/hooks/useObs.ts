@@ -6,12 +6,12 @@ interface ObsSearchCriteria {
   concept: string;
 }
 
-export function useObs(criteria?: ObsSearchCriteria, representation = 'default') {
+export function useObs(criteria?: ObsSearchCriteria, fetch: boolean = true, representation = 'default') {
   const params = new URLSearchParams({
     ...criteria,
     v: representation,
   });
 
   const apiUrl = `${restBaseUrl}/obs?${params}`;
-  return useOpenmrsFetchAll<Observation>(apiUrl);
+  return useOpenmrsFetchAll<Observation>(fetch ? apiUrl : null);
 }

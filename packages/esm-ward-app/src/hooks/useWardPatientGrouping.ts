@@ -21,5 +21,7 @@ export function useWardPatientGrouping() {
     admissionLocationResponse,
     inpatientAdmissionResponse,
     inpatientRequestResponse,
+    isLoading:
+      admissionLocationResponse.isLoading || inpatientAdmissionResponse.isLoading || inpatientRequestResponse.isLoading,
   };
 }

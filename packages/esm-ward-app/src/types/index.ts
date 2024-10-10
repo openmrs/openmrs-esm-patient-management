@@ -11,7 +11,7 @@ import type {
 import type React from 'react';
 import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
 
-export type WardPatientCard = React.FC<WardPatient>;
+export type WardPatientCardType = React.FC<WardPatient>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
@@ -44,10 +44,7 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
-}
-export interface MotherAndChildrenRelationships {
-  motherByChildUuid: Map<string, Patient>;
-  childrenByMotherUuid: Map<string, Array<Patient>>;
+  WardPatientHeader: React.FC<WardPatient>;
 }
 
 // server-side types defined in openmrs-module-bedmanagement:
@@ -144,9 +141,6 @@ export interface InpatientAdmission {
   // the current in patient request
   currentInpatientRequest: InpatientRequest;
 }
-export interface WardAppContext {
-  allPatientsByPatientUuid: Map<string, Patient>;
-}
 
 export interface MotherAndChild {
   mother: Patient;
@@ -228,11 +222,12 @@ export interface ObsPayload {
   groupMembers?: Array<ObsPayload>;
 }
 
-export interface MotherAndChildren {
-  childAdmission: InpatientAdmission;
-  child: Patient;
-  motherAdmission: InpatientAdmission;
-  mother: Patient;
+export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
+export interface WardViewContext {
+  wardPatientGroupDetails: WardPatientGroupDetails;
+  WardPatientHeader: React.FC<WardPatient>;
 }
 
-export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
+export interface MaternalWardViewContext {
+  motherChildrenRelationshipsByPatient: Map<string, MotherAndChild[]>;
+}

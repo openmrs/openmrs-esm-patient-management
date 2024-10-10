@@ -1,9 +1,10 @@
 import React from 'react';
-import { type IdentifierElementDefinition } from '../../config-schema';
+import { type IdentifierElementConfig } from '../../config-schema';
 import { Tag } from '@carbon/react';
 import { type Patient, translateFrom, type PatientIdentifier } from '@openmrs/esm-framework';
 import { moduleName } from '../../constant';
 import { useTranslation } from 'react-i18next';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 /** Sort the identifiers by preferred first. The identifier with value of true
  * takes precedence over false. If both identifiers have same preferred value,
@@ -21,18 +22,18 @@ const identifierCompareFunction = (pi1: PatientIdentifier, pi2: PatientIdentifie
 
 export interface WardPatientIdentifierProps {
   patient: Patient;
-  /** If the config is not passed, this will be the default identifier element, which uses the preferred identifier type. */
-  config?: IdentifierElementDefinition;
+  id?: string;
 }
 
-const defaultConfig: IdentifierElementDefinition = {
+const defaultConfig: IdentifierElementConfig = {
   id: 'patient-identifier',
   identifierTypeUuid: null,
 };
 
-const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ config: configProp, patient }) => {
+const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ id, patient }) => {
   const { t } = useTranslation();
-  const config = configProp ?? defaultConfig;
+  const config = useElementConfig('patientIdentifier', id) ?? defaultConfig;
+
   const { identifierTypeUuid, label } = config;
   const patientIdentifiers = patient.identifiers.filter(
     (patientIdentifier: PatientIdentifier) =>

@@ -4,6 +4,8 @@ import { useInpatientAdmission } from './src/hooks/useInpatientAdmission';
 import { createAndGetWardPatientGrouping } from './src/ward-view/ward-view.resource';
 import { useInpatientRequest } from './src/hooks/useInpatientRequest';
 import { useWardPatientGrouping } from './src/hooks/useWardPatientGrouping';
+import { type WardViewContext } from './src/types';
+import DefaultWardPatientCardHeader from './src/ward-view/default-ward/default-ward-patient-card-header.component';
 
 jest.mock('./src/hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
@@ -51,4 +53,10 @@ export const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).m
   inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
   inpatientRequestResponse: mockInpatientRequestResponse(),
   ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest),
+  isLoading: false,
 });
+
+export const mockWardViewContext: WardViewContext = {
+  wardPatientGroupDetails: mockWardPatientGroupDetails(),
+  WardPatientHeader: DefaultWardPatientCardHeader,
+};
