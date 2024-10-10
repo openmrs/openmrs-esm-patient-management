@@ -11,8 +11,8 @@ export interface FieldDefinition {
   type: string;
   label?: string;
   uuid: string;
-  placeholder?: string;
-  dateFormat?: string;
+  maxDate?: string;
+  minDate?: string;
   showHeading: boolean;
   validation?: {
     required: boolean;
