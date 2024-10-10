@@ -5,11 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { useObs } from '../../hooks/useObs';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
 import styles from '../ward-patient-card.scss';
-import WardPatientSkeletonText from './ward-pateint-skeleton-text';
-import { getObsEncounterString, obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
-import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
+import WardPatientSkeletonText from '../row-elements/ward-pateint-skeleton-text';
+import {
+  getObsEncounterString,
+  obsCustomRepresentation,
+  useConceptToTagColorMap,
+} from '../row-elements/ward-patient-obs.resource';
+import WardPatientResponsiveTooltip from '../row-elements/ward-patient-responsive-tooltip';
 
-interface WardPatientCodedObsTagsProps {
+interface WardPatientCodedObsTagsRowProps {
   id: string;
   patient: Patient;
   visit: Visit;
@@ -25,7 +29,7 @@ interface WardPatientCodedObsTagsProps {
  * @param config
  * @returns
  */
-const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ id, patient, visit }) => {
+const WardPatientCodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({ id, patient, visit }) => {
   const config = useElementConfig('coloredObsTags', id);
   const { conceptUuid, summaryLabel, summaryLabelColor } = config ?? {};
   const { data, isLoading } = useObs(
@@ -101,4 +105,4 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ id, p
   }
 };
 
-export default WardPatientCodedObsTags;
+export default WardPatientCodedObsTagsRow;

@@ -1,10 +1,15 @@
-import { getPatientName, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
-import React from 'react';
-import { type WardViewContext, type GenericWardPatientCardType, type WardPatientWorkspaceProps } from '../types';
+import { getPatientName, useAppContext } from '@openmrs/esm-framework';
+import React, { type ReactNode } from 'react';
+import { type WardViewContext, type WardPatient } from '../types';
 import styles from './ward-patient-card.scss';
 import { launchPatientWorkspace, setPatientWorkspaceProps } from './ward-patient-resource';
 
-const WardPatientCard: GenericWardPatientCardType = ({ children, wardPatient }) => {
+interface Props {
+  children: ReactNode;
+  wardPatient: WardPatient;
+}
+
+const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
   const { patient } = wardPatient;
   const { WardPatientHeader } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 

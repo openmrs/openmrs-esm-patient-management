@@ -61,21 +61,6 @@
       "slot": "action-menu-ward-patient-items-slot"
     },
     {
-      "component": "admissionRequestNoteRowExtension",
-      "name": "admission-request-note-card-row",
-      "slot": "ward-patient-card-slot"
-    },
-    {
-      "component": "motherChildRowExtension",
-      "name": "mother-child-card-row",
-      "slot": "ward-patient-card-slot"
-    },
-    {
-      "component": "pendingItemsCardRowExtension",
-      "name": "ward-patient-pending-items-card-row",
-      "slot": "ward-patient-card-pending-items-slot"
-    },
-    {
       "component": "defaultWardView",
       "name": "default-ward",
       "slot": "default-ward"

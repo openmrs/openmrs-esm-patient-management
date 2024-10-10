@@ -232,7 +232,7 @@ export interface WardConfigObject {
     patientIdentifier: Array<IdentifierElementConfig>;
     patientAddress: Array<PatientAddressElementConfig>;
     coloredObsTags: Array<ColoredObsTagsElementConfig>;
-    admissionRequestNote: [];
+    admissionRequestNote: Array<AdmissionRequestNoteElementConfig>;
   };
   wards: Array<WardDefinition>;
 }
@@ -265,6 +265,10 @@ export interface IdentifierElementConfig {
 export interface PatientAddressElementConfig {
   id: string;
   fields: Array<AddressField>;
+}
+
+export interface AdmissionRequestNoteElementConfig {
+  conceptUuid: string;
 }
 
 export interface WardDefinition {

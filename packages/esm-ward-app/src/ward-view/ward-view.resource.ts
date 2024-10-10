@@ -9,6 +9,7 @@ import {
   type PatientAddressElementConfig,
   type WardConfigObject,
   type WardDefinition,
+  type AdmissionRequestNoteElementConfig,
 } from '../config-schema';
 import type {
   AdmissionLocationFetchResponse,
@@ -163,6 +164,7 @@ export function useElementConfig(elementType: 'patientIdentifier', id: string): 
 export function useElementConfig(elementType: 'patientAddress', id: string): PatientAddressElementConfig;
 export function useElementConfig(elementType: 'coloredObsTags', id: string): ColoredObsTagsElementConfig;
 export function useElementConfig(elementType: 'pendingItems', id: string): PendingItemsElementConfig;
+export function useElementConfig(elementType: 'admissionRequestNote', id: string): AdmissionRequestNoteElementConfig;
 export function useElementConfig(elementType, id: string): object {
   const config = useConfig<WardConfigObject>();
   return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig.id == id);

@@ -13,5 +13,5 @@ export function useObs(criteria?: ObsSearchCriteria, fetch: boolean = true, repr
   });
 
   const apiUrl = `${restBaseUrl}/obs?${params}`;
-  return useOpenmrsFetchAll<Observation>(apiUrl);
+  return useOpenmrsFetchAll<Observation>(fetch ? apiUrl : null);
 }

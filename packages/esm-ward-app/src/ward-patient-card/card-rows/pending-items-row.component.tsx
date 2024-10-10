@@ -7,12 +7,12 @@ import { WardPatientPendingOrder } from '../row-elements/ward-patient-pending-or
 import WardPatientPendingTransfer from '../row-elements/ward-patient-pending-transfer';
 import styles from '../ward-patient-card.scss';
 
-export interface PendingItemsCardRowProps {
+export interface PendingItemsRowProps {
   id: string;
   wardPatient: WardPatient;
 }
 
-const PendingItemsCardRow: React.FC<PendingItemsCardRowProps> = ({ id, wardPatient }) => {
+const PendingItemsRow: React.FC<PendingItemsRowProps> = ({ id, wardPatient }) => {
   const { orders, showPendingItems } = useElementConfig('pendingItems', id);
   const [hasPendingOrders, setHasPendingOrders] = React.useState(false);
 
@@ -51,4 +51,4 @@ const PendingItemsCardRow: React.FC<PendingItemsCardRowProps> = ({ id, wardPatie
   );
 };
 
-export default PendingItemsCardRow;
+export default PendingItemsRow;

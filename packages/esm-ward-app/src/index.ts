@@ -54,21 +54,6 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
   options,
 );
 
-export const admissionRequestNoteRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/admission-request-note-row.component'),
-  options,
-);
-
-export const motherChildRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/mother-child-row.component'),
-  options,
-);
-
-export const pendingItemsCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/pending-items-card.component'),
-  options,
-);
-
 // t('transfers', 'Transfers')
 export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/patient-transfer-bed-swap/patient-transfer-swap.workspace'),
