@@ -1,8 +1,6 @@
 import React from 'react';
 import WardMetrics from './ward-metrics.component';
 import { renderWithSwr } from '../../../../tools/test-utils';
-import { useBeds } from '../hooks/useBeds';
-import { mockWardBeds } from '../../../../__mocks__/wardBeds.mock';
 import {
   createAndGetWardPatientGrouping,
   getInpatientAdmissionsUuidMap,
@@ -35,8 +33,6 @@ jest.mock('../hooks/useWardLocation', () =>
   }),
 );
 
-const mockUseWardLocation = jest.mocked(useWardLocation);
-
 jest.mock('../hooks/useBeds', () => ({
   useBeds: jest.fn(),
 }));
@@ -52,13 +48,7 @@ jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
 
-jest.mocked(useBeds).mockReturnValue({
-  error: undefined,
-  mutate: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  beds: mockWardBeds,
-});
+const mockUseWardLocation = jest.mocked(useWardLocation);
 
 const mockAdmissionLocationResponse = jest.mocked(useAdmissionLocation).mockReturnValue({
   error: undefined,
@@ -90,11 +80,12 @@ describe('Ward Metrics', () => {
       errorFetchingLocation: null,
       invalidLocation: true,
     });
-    const bedMetrics = getWardMetrics(mockWardBeds, mockWardPatientGroupDetails);
+    const { bedLayouts } = mockWardPatientGroupDetails;
+    const bedMetrics = getWardMetrics(bedLayouts, mockWardPatientGroupDetails);
     renderWithSwr(<WardMetrics />);
     for (let [key, value] of Object.entries(bedMetrics)) {
       const fieldName = wardMetrics.find((metric) => metric.name == key)?.defaultTranslation;
-      expect(screen.getByText(fieldName)).toBeInTheDocument();
+      expect(screen.getByText(fieldName!)).toBeInTheDocument();
     }
   });
 });

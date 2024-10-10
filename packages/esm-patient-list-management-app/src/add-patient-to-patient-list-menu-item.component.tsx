@@ -22,6 +22,7 @@ const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProp
     const dispose = showModal('add-patient-to-patient-list-modal', {
       closeModal: () => dispose(),
       patientUuid,
+      size: 'sm',
     });
     closeOverflowMenu();
   }, [patientUuid]);

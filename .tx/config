@@ -1,7 +1,7 @@
 [main]
 host = https://www.transifex.com
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-active-visits-app]
+[o:openmrs:p:openmrs3:r:esm-active-visits-app]
 file_filter            = packages/esm-active-visits-app/translations/<lang>.json
 source_file            = packages/esm-active-visits-app/translations/en.json
 source_lang            = en
@@ -10,7 +10,7 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-active-visits-app
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-appointments-app]
+[o:openmrs:p:openmrs3:r:esm-appointments-app]
 file_filter            = packages/esm-appointments-app/translations/<lang>.json
 source_file            = packages/esm-appointments-app/translations/en.json
 source_lang            = en
@@ -19,7 +19,7 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-appointments-app
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-bed-management-app]
+[o:openmrs:p:openmrs3:r:esm-bed-management-app]
 file_filter            = packages/esm-bed-management-app/translations/<lang>.json
 source_file            = packages/esm-bed-management-app/translations/en.json
 source_lang            = en
@@ -28,7 +28,7 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-bed-management-app
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-patient-list-management-app]
+[o:openmrs:p:openmrs3:r:esm-patient-list-management-app]
 file_filter            = packages/esm-patient-list-management-app/translations/<lang>.json
 source_file            = packages/esm-patient-list-management-app/translations/en.json
 source_lang            = en
@@ -37,7 +37,7 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-list-management-app
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-patient-registration-app]
+[o:openmrs:p:openmrs3:r:esm-patient-registration-app]
 file_filter            = packages/esm-patient-registration-app/translations/<lang>.json
 source_file            = packages/esm-patient-registration-app/translations/en.json
 source_lang            = en
@@ -46,7 +46,7 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-registration-app
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-patient-search-app]
+[o:openmrs:p:openmrs3:r:esm-patient-search-app]
 file_filter            = packages/esm-patient-search-app/translations/<lang>.json
 source_file            = packages/esm-patient-search-app/translations/en.json
 source_lang            = en
@@ -55,7 +55,7 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-search-app
 
-[o:openmrs:p:openmrs-esm-patient-management:r:esm-service-queues-app]
+[o:openmrs:p:openmrs3:r:esm-service-queues-app]
 file_filter            = packages/esm-service-queues-app/translations/<lang>.json
 source_file            = packages/esm-service-queues-app/translations/en.json
 source_lang            = en

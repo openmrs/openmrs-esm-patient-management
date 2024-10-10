@@ -7,6 +7,13 @@ export enum PatientListType {
   ALL = 'All',
 }
 
+export interface AddablePatientListViewModel {
+  addPatient(): Promise<void>;
+  displayName: string;
+  checked?: boolean;
+  id: string;
+}
+
 export interface PatientList {
   id: string;
   display: string;

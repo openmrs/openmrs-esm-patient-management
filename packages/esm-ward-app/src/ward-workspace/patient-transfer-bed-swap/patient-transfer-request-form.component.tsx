@@ -1,18 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ResponsiveWrapper, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
-import styles from './patient-transfer-swap.scss';
+import classNames from 'classnames';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import LocationSelector from '../../location-selector/location-selector.component';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import { createEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
+import LocationSelector from '../../location-selector/location-selector.component';
 import type { ObsPayload, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
-import classNames from 'classnames';
-import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
+import { createEncounter } from '../../ward.resource';
+import styles from './patient-transfer-swap.scss';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,
@@ -32,7 +31,8 @@ export default function PatientTransferForm({
   );
   const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = useInpatientRequest();
+  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
+  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
 
   const zodSchema = useMemo(
     () =>
@@ -65,7 +65,6 @@ export default function PatientTransferForm({
     formState: { errors, isDirty },
     control,
     handleSubmit,
-    getValues,
     setValue,
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema), defaultValues: formDefaultValues });
 
@@ -104,7 +103,7 @@ export default function PatientTransferForm({
 
       createEncounter({
         patient: patient?.uuid,
-        encounterType: emrConfiguration.visitNoteEncounterType.uuid,
+        encounterType: emrConfiguration.transferRequestEncounterType.uuid,
         location: location.uuid,
         encounterProviders: [
           {
@@ -124,9 +123,6 @@ export default function PatientTransferForm({
             title: t('patientTransferRequestCreated', 'Patient transfer request created'),
             kind: 'success',
           });
-          closeWorkspaceWithSavedChanges();
-          mutateAdmissionLocation();
-          mutateInpatientRequest();
         })
         .catch((err: Error) => {
           showSnackbar({
@@ -135,7 +131,13 @@ export default function PatientTransferForm({
             kind: 'error',
           });
         })
-        .finally(() => setIsSubmitting(false));
+        .finally(() => {
+          setIsSubmitting(false);
+          closeWorkspaceWithSavedChanges();
+          mutateAdmissionLocation();
+          mutateInpatientAdmission();
+          mutateInpatientRequest();
+        });
     },
     [
       setShowErrorNotifications,
@@ -145,6 +147,7 @@ export default function PatientTransferForm({
       patient?.uuid,
       dispositionsWithTypeTransfer,
       mutateAdmissionLocation,
+      mutateInpatientAdmission,
       mutateInpatientRequest,
     ],
   );

@@ -1,13 +1,14 @@
-import React from 'react';
-import { Movement } from '@carbon/react/icons';
 import { Button, InlineNotification } from '@carbon/react';
-import { ArrowRightIcon, isDesktop, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import { Movement } from '@carbon/react/icons';
+import { ArrowRightIcon, isDesktop, launchWorkspace, useAppContext, useLayoutType } from '@openmrs/esm-framework';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { type WardPatientGroupDetails } from '../types';
 import styles from './admission-requests.scss';
 
 const AdmissionRequestsBar = () => {
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(['ADMIT', 'TRANSFER']);
+  const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
+  const { inpatientRequests, isLoading, error } = wardPatientGrouping?.inpatientRequestResponse ?? {};
   const { t } = useTranslation();
   const layout = useLayoutType();
 

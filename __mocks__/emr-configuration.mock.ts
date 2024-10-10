@@ -3,4 +3,6 @@ export const emrConfigurationMock = {
   consultFreeTextCommentsConcept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
   visitNoteEncounterType: { uuid: 'd7151f82-c1f3-4152-a605-2f9ea7414a79' },
   admissionEncounterType: { uuid: 'e8151f82-c1f3-4152-a605-2f9ea7414a79' },
+  inpatientNoteEncounterType: { uuid: 'f8151f82-c1f3-4152-a605-2f9ea7414a79' },
+  transferRequestEncounterType: { uuid: 'g8151f82-c1f3-4152-a605-2f9ea7414a79' },
 };

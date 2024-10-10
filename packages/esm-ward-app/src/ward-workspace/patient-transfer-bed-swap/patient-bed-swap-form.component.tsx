@@ -1,16 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styles from './patient-transfer-swap.scss';
-import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { filterBeds } from '../../ward-view/ward-view.resource';
-import type { BedLayout, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
-import { assignPatientToBed, createEncounter } from '../../ward.resource';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import { showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
-import useWardLocation from '../../hooks/useWardLocation';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import {
   Button,
   ButtonSet,
@@ -20,7 +7,18 @@ import {
   RadioButtonGroup,
   RadioButtonSkeleton,
 } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
 import classNames from 'classnames';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import useWardLocation from '../../hooks/useWardLocation';
+import type { BedLayout, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
+import { assignPatientToBed, createEncounter } from '../../ward.resource';
+import styles from './patient-transfer-swap.scss';
 
 export default function PatientBedSwapForm({
   promptBeforeClosing,
@@ -36,7 +34,8 @@ export default function PatientBedSwapForm({
   const { location } = useWardLocation();
   const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { isLoading, mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = useInpatientRequest();
+  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
+  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
 
   const zodSchema = useMemo(
     () =>
@@ -112,9 +111,6 @@ export default function PatientBedSwapForm({
                 bedNumber: bedSelected.bedNumber,
               }),
             });
-            mutateAdmissionLocation();
-            mutateInpatientRequest();
-            closeWorkspaceWithSavedChanges();
           }
         })
         .catch((error: Error) => {
@@ -123,12 +119,13 @@ export default function PatientBedSwapForm({
             title: t('errorAssigningBedToPatient', 'Error assigning bed to patient'),
             subtitle: error?.message,
           });
-          mutateAdmissionLocation();
-          mutateInpatientRequest();
-          closeWorkspaceWithSavedChanges();
         })
         .finally(() => {
           setIsSubmitting(false);
+          mutateAdmissionLocation();
+          mutateInpatientRequest();
+          mutateInpatientAdmission();
+          closeWorkspaceWithSavedChanges();
         });
     },
     [
@@ -140,6 +137,7 @@ export default function PatientBedSwapForm({
       beds,
       mutateAdmissionLocation,
       mutateInpatientRequest,
+      mutateInpatientAdmission,
     ],
   );
 

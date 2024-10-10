@@ -107,6 +107,16 @@ export const patientDischargeWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
+export const patientClinicalFormsWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-clinical-forms-workspace/patient-clinical-forms.workspace'),
+  options,
+);
+
+export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/clinical-forms-workspace-siderail.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
@@ -117,7 +127,13 @@ export function startupApp() {
 
   registerFeatureFlag(
     'bedmanagement-module',
-    'Bed Management Module',
+    'Bed management module',
     'Enables features related to bed management / assignment. Requires the backend bed management module to be installed.',
+  );
+
+  registerFeatureFlag(
+    'ward-view-vertical-tiling',
+    'Ward view vertical tiling',
+    'Enable tiling of bed cards vertically in the ward view.',
   );
 }

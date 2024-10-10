@@ -28,6 +28,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
   const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGrouping?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientRequest } = wardPatientGrouping?.inpatientRequestResponse ?? {};
+  const { mutate: mutateInpatientAdmission } = wardPatientGrouping?.inpatientAdmissionResponse ?? {};
   const beds = isLoading ? [] : wardPatientGrouping?.bedLayouts ?? [];
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const getBedRepresentation = useCallback((bedLayout: BedLayout) => {
@@ -139,9 +140,6 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
                   }),
                 });
               }
-              mutateAdmissionLocation();
-              mutateInpatientRequest();
-              closeWorkspaceWithSavedChanges();
             }
           },
           () => {
@@ -153,13 +151,14 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
                 'Patient admitted successfully but fail to assign bed to patient',
               ),
             });
-            mutateAdmissionLocation();
-            mutateInpatientRequest();
-            closeWorkspaceWithSavedChanges();
           },
         )
         .finally(() => {
           setIsSubmitting(false);
+          mutateAdmissionLocation();
+          mutateInpatientRequest();
+          mutateInpatientAdmission();
+          closeWorkspaceWithSavedChanges();
         });
     },
     [
@@ -172,6 +171,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
       currentProvider,
       mutateAdmissionLocation,
       mutateInpatientRequest,
+      mutateInpatientAdmission,
     ],
   );
 

@@ -1,9 +1,11 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .modalContent {
   width: 100%;
-  background-color: #f4f4f4;
+  background-color: $ui-02;
 }
 
 .modalHeader {
@@ -18,6 +20,16 @@
   padding-bottom: 0.875rem;
 }
 
+.header {
+  @include type.type-style('heading-03');
+  margin: layout.$spacing-05 0;
+}
+
+.subheader {
+  @include type.type-style('body-01');
+  margin: layout.$spacing-05 0;
+}
+
 .pagination {
   width: 100%;
   overflow: hidden;
@@ -30,6 +42,11 @@
   position: relative;
 }
 
+.search {
+  background-color: colors.$white;
+  margin-bottom: 0.875rem;
+}
+
 .itemsCountDisplay {
   position: absolute;
   top: 0;
@@ -37,7 +54,7 @@
   height: layout.$spacing-09;
   display: flex;
   align-items: center;
-  color: #525252;
+  color: colors.$gray-70;
 }
 
 .pagination > div:first-child {
@@ -47,8 +64,22 @@
 
 .buttonSet {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  .createButton {
+    flex: 2;
+  }
+
+  div {
+    flex: 1;
+    display: flex;
+
+    > button {
+      flex: 1;
+    }
+  }
 }
 
 .productiveHeading03 {
@@ -57,4 +88,42 @@
 
 .bodyLong01 {
   @include type.type-style('body-01');
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  padding: layout.$spacing-09 0;
+  margin-bottom: layout.$spacing-05;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.actionText {
+  @include type.type-style('body-01');
+  color: $text-02;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: layout.$spacing-05;
 }
