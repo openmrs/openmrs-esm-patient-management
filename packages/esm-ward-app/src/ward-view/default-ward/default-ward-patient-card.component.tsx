@@ -10,11 +10,11 @@ const DefaultWardPatientCard: WardPatientCardType = (wardPatient) => {
   const { bed } = wardPatient;
 
   const card = (
-    <WardPatientCard
-      header={<DefaultWardPatientCardHeader {...wardPatient} />}
-      rows={[<PendingItemsCardRowExtension {...wardPatient} />, <AdmissionRequestNoteRowExtension {...wardPatient} />]}
-      wardPatient={wardPatient}
-    />
+    <WardPatientCard wardPatient={wardPatient}>
+      <DefaultWardPatientCardHeader {...wardPatient} />
+      <PendingItemsCardRowExtension {...wardPatient} />
+      <AdmissionRequestNoteRowExtension {...wardPatient} />
+    </WardPatientCard>
   );
 
   if (bed) {

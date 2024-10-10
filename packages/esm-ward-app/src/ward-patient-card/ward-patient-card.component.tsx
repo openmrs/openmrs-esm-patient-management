@@ -4,14 +4,13 @@ import { type WardViewContext, type GenericWardPatientCardType, type WardPatient
 import styles from './ward-patient-card.scss';
 import { launchPatientWorkspace, setPatientWorkspaceProps } from './ward-patient-resource';
 
-const WardPatientCard: GenericWardPatientCardType = ({ header, rows, wardPatient }) => {
+const WardPatientCard: GenericWardPatientCardType = ({ children, wardPatient }) => {
   const { patient } = wardPatient;
   const { WardPatientHeader } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   return (
     <div className={styles.wardPatientCard}>
-      {header}
-      {rows}
+      {children}
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {

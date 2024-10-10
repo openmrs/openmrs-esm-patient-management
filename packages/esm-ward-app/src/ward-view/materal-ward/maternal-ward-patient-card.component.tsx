@@ -16,22 +16,19 @@ const MaternalWardPatientCard: WardPatientCardType = (wardPatient) => {
   const { encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
 
   const card = (
-    <WardPatientCard
-      header={<MaternalWardPatientCardHeader {...wardPatient} />}
-      rows={[
-        <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
-          <WardPatientTimeOnWard
-            encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
-          />
-          <WardPatientObs id={"gravida"} patient={patient} visit={visit} />
-        </div>,
-        <PendingItemsCardRowExtension {...wardPatient} />, 
-        <WardPatientCodedObsTags id="pregnancy-complications" {...wardPatient} />,
-        <MotherChildRowExtension {...wardPatient} />,
-        <AdmissionRequestNoteRowExtension {...wardPatient} />
-      ]}
-      wardPatient={wardPatient}
-    />
+    <WardPatientCard wardPatient={wardPatient}>
+      <MaternalWardPatientCardHeader {...wardPatient} />
+      <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
+        <WardPatientTimeOnWard
+          encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
+        />
+        <WardPatientObs id={'gravida'} patient={patient} visit={visit} />
+      </div>
+      <PendingItemsCardRowExtension {...wardPatient} />
+      <WardPatientCodedObsTags id="pregnancy-complications" {...wardPatient} />
+      <MotherChildRowExtension {...wardPatient} />
+      <AdmissionRequestNoteRowExtension {...wardPatient} />
+    </WardPatientCard>
   );
 
   if (bed) {

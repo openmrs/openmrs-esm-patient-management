@@ -15,8 +15,7 @@ import { type ReactNode } from 'react';
 export type WardPatientCardType = React.FC<WardPatient>;
 
 export type GenericWardPatientCardType = React.FC<{
-  header: ReactNode;
-  rows?: ReactNode[];
+  children: ReactNode;
   wardPatient: WardPatient;
 }>;
 

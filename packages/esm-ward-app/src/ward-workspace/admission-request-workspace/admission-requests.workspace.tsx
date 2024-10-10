@@ -1,13 +1,10 @@
-import React, { type ReactNode } from 'react';
-import styles from './admission-requests-workspace.scss';
-import AdmissionRequestCard from '../admission-request-card/admission-request-card.component';
 import { Search } from '@carbon/react';
-import { type DefaultWorkspaceProps, ErrorState } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps } from '@openmrs/esm-framework';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
-import { type InpatientRequest } from '../../types';
+import styles from './admission-requests-workspace.scss';
 
-interface AdmissionRequestsWorkspaceProps extends DefaultWorkspaceProps {
+export interface AdmissionRequestsWorkspaceProps extends DefaultWorkspaceProps {
   wardPendingPatients: ReactNode;
 }
 const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ({ wardPendingPatients }) => {

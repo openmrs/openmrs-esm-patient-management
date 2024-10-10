@@ -9,9 +9,10 @@ import styles from './ward-view.scss';
 
 const WardView: React.FC<{}> = () => {
   const response = useWardLocation();
-  const { isLoadingLocation, invalidLocation, location: {uuid: locationUuid} } = response;
+  const { isLoadingLocation, invalidLocation, location } = response;
   const { t } = useTranslation();
 
+  const locationUuid = location?.uuid;
   const isVertical = useFeatureFlag('ward-view-vertical-tiling');
   const wardConfig = useWardConfig(locationUuid);
 
@@ -26,9 +27,9 @@ const WardView: React.FC<{}> = () => {
   const wardId = wardConfig.id;
 
   return (
-      <div className={classNames(styles.wardView, { [styles.verticalTiling]: isVertical })}>
-        <ExtensionSlot name={wardId} />
-      </div>
+    <div className={classNames(styles.wardView, { [styles.verticalTiling]: isVertical })}>
+      <ExtensionSlot name={wardId} />
+    </div>
   );
 };
 
