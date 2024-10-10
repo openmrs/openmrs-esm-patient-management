@@ -238,6 +238,30 @@ export const configSchema: ConfigSchema = {
       },
     },
   },
+  wards: {
+    _description: 'Configuration of what type of ward to use at different ward locations.',
+    _type: Type.Array,
+    _default: [{ id: 'default-ward' }],
+    _elements: {
+      id: {
+        _type: Type.String,
+        _description:
+          'The ward type to use. Currently, "default-ward" and "maternal-ward" are supported. This string also serves as the extension slot name for the ward view.',
+      },
+      appliedTo: {
+        _type: Type.Array,
+        _description:
+          'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
+        _elements: {
+          location: {
+            _type: Type.UUID,
+            _description: 'The UUID of the location. If not provided, applies to all wards.',
+            _default: null,
+          },
+        },
+      },
+    },
+  },
 };
 
 export interface WardConfigObject {
