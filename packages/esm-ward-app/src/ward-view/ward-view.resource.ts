@@ -1,4 +1,15 @@
 import { useConfig, type Patient } from '@openmrs/esm-framework';
+import type { TFunction } from 'i18next';
+import { useMemo } from 'react';
+import {
+  type PendingItemsElementConfig,
+  type ColoredObsTagsElementConfig,
+  type IdentifierElementConfig,
+  type ObsElementConfig,
+  type PatientAddressElementConfig,
+  type WardConfigObject,
+  type WardDefinition,
+} from '../config-schema';
 import type {
   AdmissionLocationFetchResponse,
   Bed,
@@ -8,17 +19,6 @@ import type {
   WardMetrics,
   WardPatientGroupDetails,
 } from '../types';
-import type { TFunction } from 'i18next';
-import {
-  type AddressElementDefinition,
-  ColoredObsTagConfigObject,
-  type ColoredObsTagsRowDefinition,
-  type IdentifierElementDefinition,
-  type ObsElementDefinition,
-  type WardConfigObject,
-  type WardDefinition,
-} from '../config-schema';
-import { useMemo } from 'react';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -158,10 +158,11 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
   }
 }
 
-export function useElementConfig(elementType: 'obs', id: string): ObsElementDefinition;
-export function useElementConfig(elementType: 'patientIdentifier', id: string): IdentifierElementDefinition;
-export function useElementConfig(elementType: 'patientAddress', id: string): AddressElementDefinition;
-export function useElementConfig(elementType: 'coloredObsTags', id: string): ColoredObsTagsRowDefinition;
+export function useElementConfig(elementType: 'obs', id: string): ObsElementConfig;
+export function useElementConfig(elementType: 'patientIdentifier', id: string): IdentifierElementConfig;
+export function useElementConfig(elementType: 'patientAddress', id: string): PatientAddressElementConfig;
+export function useElementConfig(elementType: 'coloredObsTags', id: string): ColoredObsTagsElementConfig;
+export function useElementConfig(elementType: 'pendingItems', id: string): PendingItemsElementConfig;
 export function useElementConfig(elementType, id: string): object {
   const config = useConfig<WardConfigObject>();
   return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig.id == id);

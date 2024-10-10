@@ -1,19 +1,14 @@
 import {
   defineConfigSchema,
-  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
   registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { admissionRequestNoteRowConfigSchema } from './config-schema-admission-request-note';
-import { coloredObsTagsCardRowConfigSchema } from './config-schema-extension-colored-obs-tags';
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
 import rootComponent from './root.component';
-import { motherChildRowConfigSchema } from './config-schema-mother-child-row';
-import { pendingItemsExtensionConfigSchema } from './config-schema-pending-items-extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -60,17 +55,17 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
 );
 
 export const admissionRequestNoteRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/admission-request-note.extension'),
+  () => import('./ward-patient-card/card-rows/admission-request-note-row.component'),
   options,
 );
 
 export const motherChildRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/mother-child-row.extension'),
+  () => import('./ward-patient-card/card-rows/mother-child-row.component'),
   options,
 );
 
 export const pendingItemsCardRowExtension = getAsyncLifecycle(
-  () => import('./ward-patient-card/card-rows/pending-items-card-row.extension'),
+  () => import('./ward-patient-card/card-rows/pending-items-card.component'),
   options,
 );
 
@@ -125,10 +120,6 @@ export const maternalWardView = getAsyncLifecycle(
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
-  defineExtensionConfigSchema('colored-obs-tags-card-row', coloredObsTagsCardRowConfigSchema);
-  defineExtensionConfigSchema('admission-request-note-card-row', admissionRequestNoteRowConfigSchema);
-  defineExtensionConfigSchema('mother-child-card-row', motherChildRowConfigSchema);
-  defineExtensionConfigSchema('ward-patient-pending-items-card-row', pendingItemsExtensionConfigSchema);
 
   registerFeatureFlag(
     'bedmanagement-module',

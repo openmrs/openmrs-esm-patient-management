@@ -2,13 +2,12 @@ import { Tag } from '@carbon/react';
 import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type ColoredObsTagsCardRowConfigObject } from '../../config-schema-extension-colored-obs-tags';
 import { useObs } from '../../hooks/useObs';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 import styles from '../ward-patient-card.scss';
 import WardPatientSkeletonText from './ward-pateint-skeleton-text';
 import { getObsEncounterString, obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
 import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
-import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 interface WardPatientCodedObsTagsProps {
   id: string;
@@ -27,9 +26,13 @@ interface WardPatientCodedObsTagsProps {
  * @returns
  */
 const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ id, patient, visit }) => {
-  const config = useElementConfig("coloredObsTags", id);
+  const config = useElementConfig('coloredObsTags', id);
   const { conceptUuid, summaryLabel, summaryLabelColor } = config ?? {};
-  const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, conceptUuid != null, obsCustomRepresentation);
+  const { data, isLoading } = useObs(
+    { patient: patient.uuid, concept: conceptUuid },
+    conceptUuid != null,
+    obsCustomRepresentation,
+  );
   const { t } = useTranslation();
   const conceptToTagColorMap = useConceptToTagColorMap(config.tags);
 

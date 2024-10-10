@@ -2,7 +2,7 @@ import { SkeletonText } from '@carbon/react';
 import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type ObsElementDefinition } from '../../config-schema';
+import { type ObsElementConfig } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import { getObsEncounterString, obsCustomRepresentation } from './ward-patient-obs.resource';
@@ -11,14 +11,20 @@ import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 export interface WardPatientObsProps {
   id: string;
+  configOverride?: ObsElementConfig;
   patient: Patient;
   visit: Visit;
 }
 
-const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, patient, visit }) => {
-  const config : ObsElementDefinition = useElementConfig("obs", id);
-  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config ?? {};
-  const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, conceptUuid != null, obsCustomRepresentation);
+const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, configOverride, patient, visit }) => {
+  const config: ObsElementConfig = useElementConfig('obs', id);
+  const configToUse = configOverride ?? config;
+  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = configToUse ?? {};
+  const { data, isLoading } = useObs(
+    { patient: patient.uuid, concept: conceptUuid },
+    conceptUuid != null,
+    obsCustomRepresentation,
+  );
   const { t } = useTranslation();
 
   if (isLoading) {

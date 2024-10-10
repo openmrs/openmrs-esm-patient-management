@@ -1,7 +1,7 @@
 import React from 'react';
 import { type WardPatientCardType } from '../../types';
-import AdmissionRequestNoteRowExtension from '../../ward-patient-card/card-rows/admission-request-note.extension';
-import PendingItemsCardRowExtension from '../../ward-patient-card/card-rows/pending-items-card-row.extension';
+import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
+import PendingItemsCardRow from '../../ward-patient-card/card-rows/pending-items-card.component';
 import WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
 import styles from '../../ward-patient-card/ward-patient-card.scss';
 import DefaultWardPatientCardHeader from './default-ward-patient-card-header.component';
@@ -12,8 +12,8 @@ const DefaultWardPatientCard: WardPatientCardType = (wardPatient) => {
   const card = (
     <WardPatientCard wardPatient={wardPatient}>
       <DefaultWardPatientCardHeader {...wardPatient} />
-      <PendingItemsCardRowExtension {...wardPatient} />
-      <AdmissionRequestNoteRowExtension {...wardPatient} />
+      <PendingItemsCardRow id={'pending-items'} wardPatient={wardPatient} />
+      <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
     </WardPatientCard>
   );
 

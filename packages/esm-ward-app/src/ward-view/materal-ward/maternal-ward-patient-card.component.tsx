@@ -1,19 +1,19 @@
 import classNames from 'classnames';
 import React from 'react';
 import { type WardPatientCardType } from '../../types';
-import AdmissionRequestNoteRowExtension from '../../ward-patient-card/card-rows/admission-request-note.extension';
-import MotherChildRowExtension from '../../ward-patient-card/card-rows/mother-child-row.extension';
-import PendingItemsCardRowExtension from '../../ward-patient-card/card-rows/pending-items-card-row.extension';
+import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
+import MotherChildRowExtension from '../../ward-patient-card/card-rows/mother-child-row.component';
+import PendingItemsCardRow from '../../ward-patient-card/card-rows/pending-items-card.component';
+import WardPatientCodedObsTags from '../../ward-patient-card/row-elements/ward-patient-coded-obs-tags';
 import WardPatientObs from '../../ward-patient-card/row-elements/ward-patient-obs';
 import WardPatientTimeOnWard from '../../ward-patient-card/row-elements/ward-patient-time-on-ward';
 import WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
 import styles from '../../ward-patient-card/ward-patient-card.scss';
 import MaternalWardPatientCardHeader from './maternal-ward-patient-card-header.component';
-import WardPatientCodedObsTags from '../../ward-patient-card/row-elements/ward-patient-coded-obs-tags';
 
 const MaternalWardPatientCard: WardPatientCardType = (wardPatient) => {
   const { patient, visit, bed, inpatientAdmission } = wardPatient;
-  const { encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
+  const { encounterAssigningToCurrentInpatientLocation } = inpatientAdmission ?? {};
 
   const card = (
     <WardPatientCard wardPatient={wardPatient}>
@@ -24,10 +24,10 @@ const MaternalWardPatientCard: WardPatientCardType = (wardPatient) => {
         />
         <WardPatientObs id={'gravida'} patient={patient} visit={visit} />
       </div>
-      <PendingItemsCardRowExtension {...wardPatient} />
+      <PendingItemsCardRow id={'pending-items'} wardPatient={wardPatient} />
       <WardPatientCodedObsTags id="pregnancy-complications" {...wardPatient} />
       <MotherChildRowExtension {...wardPatient} />
-      <AdmissionRequestNoteRowExtension {...wardPatient} />
+      <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
     </WardPatientCard>
   );
 

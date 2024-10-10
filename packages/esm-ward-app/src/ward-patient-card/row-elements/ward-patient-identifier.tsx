@@ -1,5 +1,5 @@
 import React from 'react';
-import { type IdentifierElementDefinition } from '../../config-schema';
+import { type IdentifierElementConfig } from '../../config-schema';
 import { Tag } from '@carbon/react';
 import { type Patient, translateFrom, type PatientIdentifier } from '@openmrs/esm-framework';
 import { moduleName } from '../../constant';
@@ -25,15 +25,15 @@ export interface WardPatientIdentifierProps {
   id?: string;
 }
 
-const defaultConfig: IdentifierElementDefinition = {
+const defaultConfig: IdentifierElementConfig = {
   id: 'patient-identifier',
   identifierTypeUuid: null,
 };
 
 const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ id, patient }) => {
   const { t } = useTranslation();
-  const config = useElementConfig("patientIdentifier", id) ?? defaultConfig;
-  
+  const config = useElementConfig('patientIdentifier', id) ?? defaultConfig;
+
   const { identifierTypeUuid, label } = config;
   const patientIdentifiers = patient.identifiers.filter(
     (patientIdentifier: PatientIdentifier) =>
