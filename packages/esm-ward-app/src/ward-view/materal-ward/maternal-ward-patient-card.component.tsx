@@ -2,9 +2,9 @@ import classNames from 'classnames';
 import React from 'react';
 import { type WardPatientCardType } from '../../types';
 import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
+import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
 import MotherChildRowExtension from '../../ward-patient-card/card-rows/mother-child-row.component';
 import PendingItemsRow from '../../ward-patient-card/card-rows/pending-items-row.component';
-import WardPatientCodedObsTagsRow from '../../ward-patient-card/card-rows/ward-patient-coded-obs-tags-row.component';
 import WardPatientObs from '../../ward-patient-card/row-elements/ward-patient-obs';
 import WardPatientTimeOnWard from '../../ward-patient-card/row-elements/ward-patient-time-on-ward';
 import WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
@@ -25,7 +25,7 @@ const MaternalWardPatientCard: WardPatientCardType = (wardPatient) => {
         <WardPatientObs id={'gravida'} patient={patient} visit={visit} />
       </div>
       <PendingItemsRow id={'pending-items'} wardPatient={wardPatient} />
-      <WardPatientCodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
+      <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
       <MotherChildRowExtension {...wardPatient} />
       <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
     </WardPatientCard>

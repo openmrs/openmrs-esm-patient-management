@@ -1,11 +1,15 @@
 import { useMemo } from 'react';
 import { type MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
 import { type MotherAndChild } from '../../types';
+import { showNotification } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 
 const motherAndChildrenRep =
   'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
 
 export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: string[], fetch: boolean) {
+  const { t } = useTranslation();
+
   const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
     mothers: allWardPatientUuids,
     requireMotherHasActiveVisit: true,
@@ -31,6 +35,23 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
     error: motherDataError,
   } = useMotherAndChildren(getMotherRequestParams, fetch && allWardPatientUuids.length > 0, motherAndChildrenRep);
 
+  if (childrenDataError) {
+    showNotification({
+      title: t('errorLoadingChildren', 'Error loading children info'),
+      kind: 'error',
+      critical: true,
+      description: childrenDataError?.message,
+    });
+  }
+  if (motherDataError) {
+    showNotification({
+      title: t('errorLoadingMother', 'Error loading mother info'),
+      kind: 'error',
+      critical: true,
+      description: motherDataError?.message,
+    });
+  }
+
   const motherChildrenRelationshipsByPatient = useMemo(() => {
     if (childrenData != null && motherData != null) {
       const map = new Map<string, MotherAndChild[]>();
@@ -48,7 +69,7 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
     } else {
       return null;
     }
-  }, [childrenData, motherData]);
+  }, [childrenData, motherData, isLoadingChildrenData, isLoadingMotherData]);
 
   return motherChildrenRelationshipsByPatient;
 }

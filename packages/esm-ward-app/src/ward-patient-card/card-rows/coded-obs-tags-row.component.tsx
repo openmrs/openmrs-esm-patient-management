@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useObs } from '../../hooks/useObs';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
 import styles from '../ward-patient-card.scss';
-import WardPatientSkeletonText from '../row-elements/ward-pateint-skeleton-text';
+import WardPatientSkeletonText from '../row-elements/ward-patient-skeleton-text';
 import {
   getObsEncounterString,
   obsCustomRepresentation,
@@ -29,7 +29,7 @@ interface WardPatientCodedObsTagsRowProps {
  * @param config
  * @returns
  */
-const WardPatientCodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({ id, patient, visit }) => {
+const CodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({ id, patient, visit }) => {
   const config = useElementConfig('coloredObsTags', id);
   const { conceptUuid, summaryLabel, summaryLabelColor } = config ?? {};
   const { data, isLoading } = useObs(
@@ -105,4 +105,4 @@ const WardPatientCodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({
   }
 };
 
-export default WardPatientCodedObsTagsRow;
+export default CodedObsTagsRow;
