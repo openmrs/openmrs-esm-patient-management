@@ -14,6 +14,7 @@ import {
   PatientBannerActionsMenu,
   PatientBannerToggleContactDetailsButton,
   PatientBannerContactDetails,
+  usePatient,
 } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
 import styles from './patient-banner.scss';
@@ -28,6 +29,7 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
+  const { patient: fhirPatient, isLoading } = usePatient(patientUuid);
   const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
 
   const patientName = patient.person.personName.display;
@@ -55,12 +57,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   };
 
   const isDeceased = !!patient.person.deathDate;
-
-  const fhirPatient = React.useMemo(() => {
-    return {
-      deceasedDateTime: patient.person.deathDate,
-    };
-  }, [patient]);
 
   return (
     <>
@@ -115,6 +111,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 launchPatientChart: true,
               }}
               isDeceased={patient.person.dead}
+              patient={fhirPatient}
             />
           ) : null}
           {!isDeceased && !currentVisit && (
