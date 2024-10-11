@@ -1,24 +1,29 @@
-import React, { type MouseEvent, useContext, useCallback } from 'react';
+import React, { type MouseEvent, useContext, useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
-  ExtensionSlot,
   age,
+  ConfigurableLink,
+  ExtensionSlot,
   formatDate,
   parseDate,
-  useVisit,
-  useConfig,
-  ConfigurableLink,
-  PatientPhoto,
   PatientBannerActionsMenu,
-  PatientBannerToggleContactDetailsButton,
   PatientBannerContactDetails,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
+  useConfig,
   usePatient,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
-import styles from './patient-banner.scss';
 import { PatientSearchContext } from '../../../patient-search-context';
+import styles from './patient-banner.scss';
+
+interface ClickablePatientContainerProps {
+  patientUuid: string;
+  children: React.ReactNode;
+}
 
 interface PatientBannerProps {
   patient: SearchedPatient;
@@ -31,10 +36,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const { currentVisit } = useVisit(patientUuid);
   const { patient: fhirPatient, isLoading } = usePatient(patientUuid);
   const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
-
   const patientName = patient.person.personName.display;
 
-  const [showContactDetails, setShowContactDetails] = React.useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback((e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -76,9 +80,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
+                className={styles.flexRow}
                 name="patient-banner-tags-slot"
                 state={{ patientUuid, patient: fhirPatient }}
-                className={styles.flexRow}
               />
             </div>
             <div className={styles.demographics}>
@@ -104,7 +108,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         <div className={styles.buttonCol}>
           {!hideActionsOverflow ? (
             <PatientBannerActionsMenu
-              patientUuid={patientUuid}
               actionsSlotName={'patient-search-actions-slot'}
               additionalActionsSlotState={{
                 selectPatientAction: nonNavigationSelectPatientAction,
@@ -112,6 +115,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               }}
               isDeceased={patient.person.dead}
               patient={fhirPatient}
+              patientUuid={patientUuid}
             />
           ) : null}
           {!isDeceased && !currentVisit && (
@@ -128,11 +132,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     </>
   );
 };
-
-interface ClickablePatientContainerProps {
-  patientUuid: string;
-  children: React.ReactNode;
-}
 
 const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
