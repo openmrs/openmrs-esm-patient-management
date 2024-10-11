@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
+import { toFhirPatient } from './compact-patient-search.resource';
 
 interface ClickablePatientContainerProps {
   patient: SearchedPatient;
@@ -56,43 +57,12 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
     }
   };
 
+  // TODO: If/When the online patient search is migrated to the FHIR API at some point, this could
+  // be removed. In fact, it could maybe be done at this point already, but doing it when the
+  // search returns FHIR objects is much simpler because the code which uses the `fhirPatients`
+  // doesn't have to be touched then.
   const fhirPatients: Array<FHIRPatientType> = useMemo(() => {
-    // TODO: If/When the online patient search is migrated to the FHIR API at some point, this could
-    // be removed. In fact, it could maybe be done at this point already, but doing it when the
-    // search returns FHIR objects is much simpler because the code which uses the `fhirPatients`
-    // doesn't have to be touched then.
-    return patients.map((patient) => {
-      const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
-      return {
-        id: patient.uuid,
-        name: [
-          {
-            id: String(Math.random()), // not used
-            given: [patient.person.personName.givenName, patient.person.personName.middleName],
-            family: patient.person.personName.familyName,
-            text: patient.person.personName.display,
-          },
-        ],
-        gender: patient.person.gender,
-        birthDate: patient.person.birthdate,
-        deceasedDateTime: patient.person.deathDate,
-        deceasedBoolean: patient.person.dead,
-        identifier: patient.identifiers as unknown as Array<FHIRIdentifier>,
-        address: preferredAddress
-          ? [
-              {
-                id: String(Math.random()), // not used
-                city: preferredAddress.cityVillage,
-                country: preferredAddress.country,
-                postalCode: preferredAddress.postalCode,
-                state: preferredAddress.stateProvince,
-                use: 'home',
-              },
-            ]
-          : [],
-        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display == 'Telephone Number'),
-      };
-    });
+    return patients.map(toFhirPatient);
   }, [patients]);
 
   return (
@@ -109,7 +79,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
           ? [preferredIdentifier, ...configuredIdentifiers]
           : configuredIdentifiers;
 
-        const patientName = getPatientName(patient);
+        const patientName = getPatientName(patient as fhir.Patient);
 
         return (
           <ClickablePatientContainer key={patient.id} patient={patients[index]}>

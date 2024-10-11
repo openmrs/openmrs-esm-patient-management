@@ -55,6 +55,7 @@ export interface FHIRPatientType {
     postalCode: string;
     country: string;
   }>;
+  telecom: object;
 }
 
 export interface FHIRIdentifier {

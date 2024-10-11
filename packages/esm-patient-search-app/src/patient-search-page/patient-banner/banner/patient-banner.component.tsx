@@ -18,6 +18,7 @@ import {
 import { type SearchedPatient } from '../../../types';
 import styles from './patient-banner.scss';
 import { PatientSearchContext } from '../../../patient-search-context';
+import { toFhirPatient } from '../../../compact-patient-search/compact-patient-search.resource';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
@@ -57,9 +58,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const isDeceased = !!patient.person.deathDate;
 
   const fhirPatient = React.useMemo(() => {
-    return {
-      deceasedDateTime: patient.person.deathDate,
-    };
+    return toFhirPatient(patient);
   }, [patient]);
 
   return (
@@ -109,6 +108,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           {!hideActionsOverflow ? (
             <PatientBannerActionsMenu
               patientUuid={patientUuid}
+              patient={fhirPatient as fhir.Patient}
               actionsSlotName={'patient-search-actions-slot'}
               additionalActionsSlotState={{
                 selectPatientAction: nonNavigationSelectPatientAction,
