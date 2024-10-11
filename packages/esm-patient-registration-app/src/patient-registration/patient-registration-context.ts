@@ -4,7 +4,7 @@ import { type RegistrationConfig } from '../config-schema';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type UseFormReturn } from 'react-hook-form';
 
-export interface PatientRegistrationContextProps extends UseFormReturn<FormValues> {
+export interface PatientRegistrationContextProps {
   currentPhoto: string;
   identifierTypes: Array<any>;
   inEditMode: boolean;

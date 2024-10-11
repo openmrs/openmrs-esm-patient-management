@@ -32,6 +32,7 @@ import { useInitialPatientRelationships } from './section/patient-relationships/
 import dayjs from 'dayjs';
 import { z } from 'zod';
 import { PatientRegistrationContext } from './patient-registration-context';
+import { useFormContext } from 'react-hook-form';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
@@ -340,5 +341,8 @@ function getPatientAttributeUuidMapForPatient(attributes: Array<PersonAttributeR
 }
 
 export function usePatientRegistrationContext() {
-  return useContext(PatientRegistrationContext);
+  return {
+    ...useContext(PatientRegistrationContext),
+    ...useFormContext<FormValues>(),
+  };
 }

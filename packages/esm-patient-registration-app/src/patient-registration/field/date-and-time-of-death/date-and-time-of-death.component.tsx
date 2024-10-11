@@ -7,6 +7,7 @@ import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
 import { Controller } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export const DateAndTimeOfDeathField: React.FC = () => {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ export const DateAndTimeOfDeathField: React.FC = () => {
 };
 
 function DeathDateField() {
-  const { watch, setValue, control } = useContext(PatientRegistrationContext);
+  const { watch, setValue, control } = usePatientRegistrationContext();
   const isDead = watch('isDead');
   const { t } = useTranslation();
   const today = dayjs().hour(23).minute(59).second(59).toDate();
@@ -58,7 +59,7 @@ function DeathDateField() {
 
 function DeathTimeField() {
   const { t } = useTranslation();
-  const { control } = useContext(PatientRegistrationContext);
+  const { control } = usePatientRegistrationContext();
 
   return (
     <Controller

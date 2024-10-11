@@ -10,6 +10,7 @@ import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
 import type { FormValues } from '../../patient-registration.types';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
@@ -48,7 +49,7 @@ export const AddressComponent: React.FC = () => {
     },
   } = config;
 
-  const { setValue } = useContext(PatientRegistrationContext);
+  const { setValue } = usePatientRegistrationContext();
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {

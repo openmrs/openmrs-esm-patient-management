@@ -157,7 +157,7 @@ interface DateObsFieldProps {
 function DateObsField({ concept, label, required, placeholder }: DateObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
-  const { setValue } = useContext(PatientRegistrationContext);
+  const { setValue } = usePatientRegistrationContext();
   const { control } = usePatientRegistrationContext();
 
   const onDateChange = (date: Date) => {

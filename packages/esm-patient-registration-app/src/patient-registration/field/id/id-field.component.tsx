@@ -14,6 +14,7 @@ import type {
 } from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
 import styles from '../field.scss';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export function setIdentifierSource(
   identifierSource: IdentifierSource,
@@ -64,7 +65,7 @@ export const Identifiers: React.FC = () => {
     formState: { defaultValues },
     setValue,
     isOffline,
-  } = useContext(PatientRegistrationContext);
+  } = usePatientRegistrationContext();
   const identifiers = watch('identifiers');
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -138,6 +139,7 @@ export const Identifiers: React.FC = () => {
       </UserHasAccess>
       <div>
         {Object.entries(identifiers).map(([fieldName, identifier]) => (
+          // @ts-ignore
           <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
         ))}
         {showIdentifierOverlay && (

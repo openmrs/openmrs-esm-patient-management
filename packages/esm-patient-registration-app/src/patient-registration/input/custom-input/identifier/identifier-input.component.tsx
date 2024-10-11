@@ -11,6 +11,7 @@ import { PatientRegistrationContext } from '../../../patient-registration-contex
 import { Input } from '../../basic-input/input/input.component';
 import styles from '../../input.scss';
 import { Controller, useFormContext } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../../patient-registration-hooks';
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
@@ -21,7 +22,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
   const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline, watch, setValue, getFieldState, control } = useContext(PatientRegistrationContext);
+  const { isOffline, watch, setValue, getFieldState, control } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],

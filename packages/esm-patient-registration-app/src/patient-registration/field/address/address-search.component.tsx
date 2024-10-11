@@ -4,7 +4,7 @@ import { Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 import styles from './address-search.scss';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 interface AddressSearchComponentProps {
   addressLayout: Array<any>;
@@ -13,7 +13,7 @@ interface AddressSearchComponentProps {
 const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ addressLayout }) => {
   const { t } = useTranslation();
   const separator = ' > ';
-  const { control, setValue } = useContext(PatientRegistrationContext);
+  const { control, setValue } = usePatientRegistrationContext();
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const [searchString, setSearchString] = useState<string>('');

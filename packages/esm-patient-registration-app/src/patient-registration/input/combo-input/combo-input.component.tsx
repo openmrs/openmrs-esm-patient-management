@@ -6,6 +6,7 @@ import styles from '../input.scss';
 import { Controller } from 'react-hook-form';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type FormValues } from '../../patient-registration.types';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 interface ComboInputProps {
   entries: Array<string>;
@@ -27,7 +28,7 @@ const ComboInput: React.FC<ComboInputProps> = ({
   const [highlightedEntry, setHighlightedEntry] = useState(-1);
   const [showEntries, setShowEntries] = useState(false);
   const comboInputRef = useRef(null);
-  const { control, setValue, watch } = useContext(PatientRegistrationContext);
+  const { control, setValue, watch } = usePatientRegistrationContext();
   const value = watch(name) ?? '';
 
   const handleFocus = useCallback(() => {

@@ -8,11 +8,12 @@ import { useConceptAnswers } from '../field.resource';
 import styles from '../field.scss';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Controller } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export const CauseOfDeathField: React.FC = () => {
   const { t } = useTranslation();
   const { fieldConfigurations, freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
-  const { getFieldState, control } = useContext(PatientRegistrationContext);
+  const { getFieldState, control } = usePatientRegistrationContext();
   const { error, isTouched } = getFieldState('deathCause');
 
   const conceptUuid = fieldConfigurations?.causeOfDeath?.conceptUuid;

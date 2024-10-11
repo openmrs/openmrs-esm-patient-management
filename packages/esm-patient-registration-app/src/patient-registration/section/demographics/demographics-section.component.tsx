@@ -16,13 +16,13 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
   const nameInLocalLanguage = watch(addNameInLocalLanguageFieldName);
   const isTouched = getFieldState(addNameInLocalLanguageFieldName);
 
-  useEffect(() => {
-    if (nameInLocalLanguage && isTouched) {
-      setValue('additionalGivenName', '');
-      setValue('additionalMiddleName', '');
-      setValue('additionalFamilyName', '');
-    }
-  }, [nameInLocalLanguage, isTouched]);
+  // useEffect(() => {
+  //   if (nameInLocalLanguage && isTouched) {
+  //     setValue('additionalGivenName', '');
+  //     setValue('additionalMiddleName', '');
+  //     setValue('additionalFamilyName', '');
+  //   }
+  // }, [nameInLocalLanguage, isTouched]);
 
   return (
     <section className={styles.formSection} aria-label="Demographics Section">

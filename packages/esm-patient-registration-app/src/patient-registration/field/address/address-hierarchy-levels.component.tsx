@@ -4,6 +4,7 @@ import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarc
 import ComboInput from '../../input/combo-input/combo-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import type { FormValues } from '../../patient-registration.types';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 interface AddressComboBoxProps {
   attribute: {
@@ -22,7 +23,7 @@ interface AddressHierarchyLevelsProps {
 const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   const { t } = useTranslation();
   const fieldName = `address.${attribute.name}` as keyof FormValues;
-  const { setValue, watch } = useContext(PatientRegistrationContext);
+  const { setValue, watch } = usePatientRegistrationContext();
   const fieldValue = watch(fieldName);
   const { fetchEntriesForField, searchString, updateChildElements } = useAddressEntryFetchConfig(attribute.name);
   const { entries } = useAddressEntries(fetchEntriesForField, searchString);

@@ -4,6 +4,7 @@ import { Layer, TextInput } from '@carbon/react';
 import { Controller, type ControllerRenderProps } from 'react-hook-form';
 import { type FormValues } from '../../../patient-registration.types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
+import { usePatientRegistrationContext } from '../../../patient-registration-hooks';
 
 // FIXME Temporarily imported here
 export interface TextInputProps
@@ -132,7 +133,7 @@ interface InputProps extends TextInputProps {
 
 export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   const { t } = useTranslation();
-  const { getFieldState, control, watch } = useContext(PatientRegistrationContext);
+  const { getFieldState, control, watch } = usePatientRegistrationContext();
   const { error } = getFieldState(props.name);
 
   /*

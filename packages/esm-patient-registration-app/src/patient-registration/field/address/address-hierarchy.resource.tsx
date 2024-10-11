@@ -57,7 +57,7 @@ export function useAddressEntries(fetchResults, searchString) {
  */
 export function useAddressEntryFetchConfig(addressField: string) {
   const { orderedFields, isLoadingFieldOrder } = useOrderedAddressHierarchyLevels();
-  const { setValue } = useContext(PatientRegistrationContext);
+  const { setValue } = usePatientRegistrationContext();
   const { watch } = usePatientRegistrationContext();
   const addressValues = watch('address');
 

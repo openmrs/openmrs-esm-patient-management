@@ -13,6 +13,7 @@ import {
 import { initializeIdentifier, setIdentifierSource } from './id-field.component';
 import styles from './identifier-selection.scss';
 import { type UseFormSetValue } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: UseFormSetValue<FormValues>;
@@ -26,9 +27,10 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
     isOffline,
     watch,
     formState: { defaultValues },
-  } = useContext(PatientRegistrationContext);
+  } = usePatientRegistrationContext();
   const identifiers = watch('identifiers');
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(identifiers);
+  console.log({ unsavedIdentifierTypes });
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
@@ -162,7 +164,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
 
   const handleConfiguringIdentifiers = useCallback(() => {
     setFieldValue('identifiers', unsavedIdentifierTypes);
-    closeOverlay();
+    // closeOverlay();
   }, [unsavedIdentifierTypes, setFieldValue, closeOverlay]);
 
   return (

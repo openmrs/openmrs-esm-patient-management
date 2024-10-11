@@ -85,6 +85,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     reset,
   } = methods;
 
+  console.log('rerendering');
+
   const onFormSubmit = async (values: FormValues) => {
     const abortController = new AbortController();
     // helpers.setSubmitting(true);
@@ -170,6 +172,18 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
+  const contextState = useMemo(
+    () => ({
+      identifierTypes: identifierTypes,
+      validationSchema,
+      inEditMode,
+      setCapturePhotoProps,
+      currentPhoto: photo?.imageSrc,
+      isOffline,
+    }),
+    [identifierTypes, identifierTypes, validationSchema, inEditMode, setCapturePhotoProps, photo?.imageSrc, isOffline],
+  );
+
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onFormSubmit, displayErrors)}>
       <BeforeSavePrompt when={isDirty} redirect={target} />
@@ -215,27 +229,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
           </div>
         </div>
         <div className={styles.infoGrid}>
-          <FormProvider {...methods}>
-            <PatientRegistrationContext.Provider
-              value={{
-                ...methods,
-                identifierTypes: identifierTypes,
-                validationSchema,
-                // values: props.values,
-                inEditMode,
-                // setFieldValue: props.setFieldValue,
-                // setFieldTouched: props.setFieldTouched,
-                setCapturePhotoProps,
-                currentPhoto: photo?.imageSrc,
-                isOffline,
-                // initialFormValues: defaultValues,
-                // setInitialFormValues,
-              }}>
+          <PatientRegistrationContext.Provider value={contextState}>
+            <FormProvider {...methods}>
               {sections.map((section, index) => (
                 <SectionWrapper key={`registration-section-${section.id}`} sectionDefinition={section} index={index} />
               ))}
-            </PatientRegistrationContext.Provider>
-          </FormProvider>
+            </FormProvider>
+          </PatientRegistrationContext.Provider>
         </div>
       </div>
     </Form>
