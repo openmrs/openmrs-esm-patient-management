@@ -54,7 +54,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
         provider: undefined,
       },
     ]),
-    encounterType: emrConfigurationMock.visitNoteEncounterType.uuid,
+    encounterType: emrConfigurationMock.inpatientNoteEncounterType.uuid,
     location: undefined,
     obs: expect.arrayContaining([
       {
