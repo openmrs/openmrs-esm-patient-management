@@ -41,10 +41,6 @@
       "slot": "service-queues-dashboard-slot"
     },
     {
-      "name": "edit-queue-entry-status-modal",
-      "component": "editQueueEntryStatusModal"
-    },
-    {
       "name": "patient-info-banner-slot",
       "component": "patientInfoBannerSlot"
     },
@@ -57,46 +53,11 @@
       "component": "clearAllQueueEntries"
     },
     {
-      "name": "add-visit-to-queue-modal",
-      "component": "addVisitToQueueModal"
-    },
-    {
-      "name": "transition-queue-entry-status-modal",
-      "component": "transitionQueueEntryStatusModal"
-    },
-    {
       "name": "previous-visit-summary-widget",
       "component": "pastVisitSummary",
       "slot": "previous-visit-summary-slot"
     },
-    {
-      "name": "add-provider-to-room-modal",
-      "component": "addProviderToRoomModal"
-    },
-    {
-      "name": "transition-queue-entry-modal",
-      "component": "transitionQueueEntryModal"
-    },
-    {
-      "name": "transition-patient-to-latest-queue-modal",
-      "component": "transitionPatientToLatestQueue"
-    },
-    {
-      "name": "edit-queue-entry-modal",
-      "component": "editQueueEntryModal"
-    },
-    {
-      "name": "undo-transition-queue-entry-modal",
-      "component": "undoTransitionQueueEntryModal"
-    },
-    {
-      "name": "void-queue-entry-modal",
-      "component": "voidQueueEntryModal"
-    },
-    {
-      "name": "end-queue-entry-modal",
-      "component": "endQueueEntryModal"
-    },
+
     {
       "name": "active-visits-row-actions",
       "component": "activeVisitsRowActions",
@@ -106,6 +67,48 @@
       "name": "visit-form-queue-fields",
       "component": "visitFormQueueFields",
       "slot":"visit-form-queue-slot"
+    }
+  ],
+  "modals": [
+    {
+      "name": "add-visit-to-queue-modal",
+      "component": "addVisitToQueueModal"
+    },
+    {
+      "name": "add-provider-to-room-modal",
+      "component": "addProviderToRoomModal"
+    },
+    {
+      "name": "edit-queue-entry-modal",
+      "component": "editQueueEntryModal"
+    },
+    {
+      "name": "edit-queue-entry-status-modal",
+      "component": "editQueueEntryStatusModal"
+    },
+    {
+      "name": "end-queue-entry-modal",
+      "component": "endQueueEntryModal"
+    },
+    {
+      "name": "transition-patient-to-latest-queue-modal",
+      "component": "transitionPatientToLatestQueue"
+    },
+    {
+      "name": "transition-queue-entry-modal",
+      "component": "transitionQueueEntryModal"
+    },
+    {
+      "name": "transition-queue-entry-status-modal",
+      "component": "transitionQueueEntryStatusModal"
+    },
+    {
+      "name": "undo-transition-queue-entry-modal",
+      "component": "undoTransitionQueueEntryModal"
+    },
+    {
+      "name": "void-queue-entry-modal",
+      "component": "voidQueueEntryModal"
     }
   ],
   "workspaces": [
