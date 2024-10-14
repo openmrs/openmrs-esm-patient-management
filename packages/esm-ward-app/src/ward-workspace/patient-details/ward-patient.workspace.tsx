@@ -9,8 +9,8 @@ attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
 export default function WardPatientWorkspace({ setTitle, wardPatient: { patient } }: WardPatientWorkspaceProps) {
   useEffect(() => {
-    setTitle(patient.person.display, <PatientWorkspaceTitle patient={patient} />);
-  }, []);
+    setTitle(patient.person.display, <PatientWorkspaceTitle key={patient.uuid} patient={patient} />);
+  }, [patient.uuid]);
 
   return (
     <div className={styles.workspaceContainer}>

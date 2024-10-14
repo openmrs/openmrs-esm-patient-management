@@ -12,6 +12,8 @@ interface EmrApiConfigurationResponse {
   clinicianEncounterRole: OpenmrsResource;
   consultFreeTextCommentsConcept: OpenmrsResource;
   visitNoteEncounterType: OpenmrsResource;
+  inpatientNoteEncounterType: OpenmrsResource;
+  transferRequestEncounterType: OpenmrsResource;
   transferWithinHospitalEncounterType: OpenmrsResource;
   exitFromInpatientEncounterType: OpenmrsResource;
   supportsTransferLocationTag: LocationTag;
@@ -65,6 +67,8 @@ const customRepProps = [
   ['diagnosisSets', 'ref'],
   ['personImageDirectory', 'ref'],
   ['visitNoteEncounterType', 'ref'],
+  ['inpatientNoteEncounterType', 'ref'],
+  ['transferRequestEncounterType', 'ref'],
   ['consultEncounterType', 'ref'],
   ['diagnosisMetadata', 'ref'],
   ['narrowerThanConceptMapType', 'ref'],
