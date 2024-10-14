@@ -36,7 +36,7 @@ describe('CompactPatientSearchComponent', () => {
       search: {
         showRecentlySearchedPatients: true,
         disableTabletSearchOnKeyUp: true,
-        patientResultUrl: configSchema.search.patientResultUrl._default,
+        patientChartUrl: configSchema.search.patientChartUrl._default,
       },
     });
     render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
