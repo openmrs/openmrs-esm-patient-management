@@ -7,7 +7,7 @@ import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/pa
 import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
 import { Button } from '@carbon/react';
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
 
 interface CommonProps {
   inTabletOrOverlay: boolean;
@@ -81,6 +81,7 @@ export const ErrorState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
 
 export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay, searchMode, searchTerm }) => {
   const { t } = useTranslation();
+  const isMPIEnabled = useFeatureFlag('mpiFlag');
   return (
     <Layer>
       <Tile
@@ -91,28 +92,36 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
         <p className={styles.emptyResultText}>
           {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
         </p>
-        <div className={styles.dividerWrapper}>
-          <div className={styles.divider}></div>
-        </div>
-        {searchMode == 'internal' && (
+        {isMPIEnabled ? (
           <>
-            <div className={styles.emptyResultsMarginRules}>
-              <p>
-                {t(
-                  'trySearchFromClientRegistry',
-                  "Try searching using the patient's unique ID number or search the external registry",
-                )}
-              </p>
+            <div className={styles.dividerWrapper}>
+              <div className={styles.divider}></div>
             </div>
-            <Button
-              kind="ghost"
-              renderIcon={'Search'}
-              onClick={(e) => {
-                doMPISearch(searchTerm);
-              }}>
-              {`${t('search', 'Search')} ${'External Registry'}`}
-            </Button>
+            {searchMode == 'internal' && (
+              <>
+                <div className={styles.emptyResultsMarginRules}>
+                  <p>
+                    {t(
+                      'trySearchFromClientRegistry',
+                      "Try searching using the patient's unique ID number or search the external registry",
+                    )}
+                  </p>
+                </div>
+                <Button
+                  kind="ghost"
+                  renderIcon={'Search'}
+                  onClick={(e) => {
+                    doMPISearch(searchTerm);
+                  }}>
+                  {`${t('search', 'Search')} ${'External Registry'}`}
+                </Button>
+              </>
+            )}
           </>
+        ) : (
+          <p className={styles.actionText}>
+            <span>{t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}</span>
+          </p>
         )}
       </Tile>
     </Layer>

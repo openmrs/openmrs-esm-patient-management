@@ -6,6 +6,7 @@ import {
   getSyncLifecycle,
   makeUrl,
   messageOmrsServiceWorker,
+  registerFeatureFlag,
   setupDynamicOfflineDataHandler,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
@@ -40,6 +41,8 @@ export const patientSearchWorkspace = getAsyncLifecycle(
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
+
+  registerFeatureFlag('mpiFlag', 'MPI Service', 'Enables the Master Patient Index workflows');
 
   setupDynamicOfflineDataHandler({
     id: 'esm-patient-search-app:patient',
