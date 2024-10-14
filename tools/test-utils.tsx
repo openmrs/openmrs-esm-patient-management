@@ -28,6 +28,7 @@ function getByTextWithMarkup(text: RegExp | string) {
   try {
     return screen.getByText((content, node) => {
       const hasText = (node: Element) => node.textContent === text || node.textContent.match(text);
+      // eslint-disable-next-line testing-library/no-node-access
       const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child as HTMLElement));
       return hasText(node) && childrenDontHaveText;
     });
@@ -35,6 +36,33 @@ function getByTextWithMarkup(text: RegExp | string) {
     throw new Error(`Text '${text}' not found. ${error}`);
   }
 }
+
+const mockOpenMRSIdentificationNumberIdType = {
+  uuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+  display: 'OpenMRS Identification Number',
+  name: 'OpenMRS Identification Number',
+  description: 'Unique number used in OpenMRS',
+  format: '',
+  formatDescription: null,
+  required: false,
+  validator: 'org.openmrs.patient.impl.LuhnIdentifierValidator',
+  locationBehavior: null,
+  uniquenessBehavior: null,
+  retired: false,
+  links: [
+    {
+      rel: 'self',
+      uri: 'http://localhost/openmrs/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+      resourceAlias: 'patientidentifiertype',
+    },
+    {
+      rel: 'full',
+      uri: 'http://localhost/openmrs/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f?v=full',
+      resourceAlias: 'patientidentifiertype',
+    },
+  ],
+  resourceVersion: '2.0',
+};
 
 const mockPatient = {
   resourceType: 'Patient',
@@ -61,6 +89,12 @@ const mockPatient = {
       use: 'usual',
       system: 'OpenMRS ID',
       value: '100GEJ',
+    },
+    {
+      id: '2f0ad7a1-430f-4397-b571-59ea654a52db',
+      use: 'official',
+      system: 'MPI OpenMRS ID',
+      value: '100GEG',
     },
   ],
   active: true,
@@ -111,6 +145,7 @@ export {
   waitForLoadingToFinish,
   getByTextWithMarkup,
   mockPatient,
+  mockOpenMRSIdentificationNumberIdType,
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,

@@ -2,8 +2,16 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, showNotification, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  showNotification,
+  useSession,
+  type FetchResponse,
+  restBaseUrl,
+  fhirBaseUrl,
+} from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
+import { mapToOpenMRSPatient } from './mpi/utils';
 
 const v =
   'custom:(patientId,uuid,identifiers,display,' +
@@ -13,6 +21,7 @@ const v =
 
 export function useInfinitePatientSearch(
   searchTerm: string,
+  searchMode: string,
   includeDead: boolean,
   searching: boolean = true,
   resultsToFetch: number = 10,
@@ -35,14 +44,32 @@ export function useInfinitePatientSearch(
     [searchTerm, customRepresentation, includeDead, resultsToFetch],
   );
 
+  const getExtUrl = useCallback(
+    (
+      page,
+      prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
+    ) => {
+      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
+        return null;
+      }
+      let url = `${fhirBaseUrl}/Patient/$cr-search?name=${searchTerm}`;
+
+      return url;
+    },
+    [searchTerm, customRepresentation, includeDead, resultsToFetch],
+  );
+
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<
     FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }>; totalCount: number }>,
     Error
-  >(searching ? getUrl : null, openmrsFetch);
-
+  >(searching ? (searchMode == 'external' ? getExtUrl : getUrl) : null, openmrsFetch);
   const results = useMemo(
     () => ({
-      data: data ? [].concat(...data?.map((resp) => resp?.data?.results)) : null,
+      data: data
+        ? searchMode == 'internal'
+          ? [].concat(...data?.map((resp) => resp?.data?.results))
+          : [mapToOpenMRSPatient(data?.map((resp) => resp?.data))][0]
+        : null,
       isLoading: isLoading,
       fetchError: error,
       hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
