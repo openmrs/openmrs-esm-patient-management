@@ -23,9 +23,8 @@ describe('PatientSearchLaunch', () => {
       ...getDefaultsFromConfigSchema(configSchema),
       search: {
         disableTabletSearchOnKeyUp: false,
-        patientChartUrl: configSchema.search.patientChartUrl._default,
         showRecentlySearchedPatients: false,
-      },
+      } as PatientSearchConfig['search'],
     });
   });
 

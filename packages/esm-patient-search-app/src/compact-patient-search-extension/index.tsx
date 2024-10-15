@@ -32,11 +32,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
 
-  const handleSubmit = useCallback((evt) => evt.preventDefault(), []);
-
   const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
-
-  const handleReset = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
   /**
    * handlePatientSelection: Manually handles everything that needs to happen when a patient
@@ -44,8 +40,8 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
    * for click handling.
    */
   const handlePatientSelection = useCallback(
-    (evt, index: number) => {
-      evt.preventDefault();
+    (event, index: number) => {
+      event.preventDefault();
       if (selectPatientAction) {
         selectPatientAction(patients[index].uuid);
       } else {
@@ -55,9 +51,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           }),
         });
       }
-      handleReset();
+      handleClear();
     },
-    [config.search, selectPatientAction, patients, handleReset],
+    [config.search, selectPatientAction, patients, handleClear],
   );
 
   const handleFocusToInput = useCallback(() => {
@@ -83,7 +79,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   return (
     <div className={styles.patientSearchBar}>
-      <form onSubmit={handleSubmit} className={styles.searchArea}>
+      <form onSubmit={(event) => event.preventDefault} className={styles.searchArea}>
         <Search
           autoFocus
           className={styles.patientSearchInput}
@@ -96,7 +92,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           size="lg"
           value={searchTerm}
         />
-        <Button type="submit" onClick={handleSubmit} {...buttonProps}>
+        <Button type="submit" onClick={(event) => event.preventDefault()} {...buttonProps}>
           {t('search', 'Search')}
         </Button>
       </form>
@@ -104,7 +100,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         <PatientSearchContext.Provider
           value={{
             nonNavigationSelectPatientAction: selectPatientAction,
-            patientClickSideEffect: handleReset,
+            patientClickSideEffect: handleClear,
           }}>
           <div className={styles.floatingSearchResultsContainer}>
             <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />

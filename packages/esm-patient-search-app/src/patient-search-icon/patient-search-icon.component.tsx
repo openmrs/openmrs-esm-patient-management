@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
-import classNames from 'classnames';
 import { preload } from 'swr';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -119,8 +118,10 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
             name="SearchPatientIcon"
             onClick={handleShowSearchInput}
             onMouseEnter={() => {
-              // Preloads user data on hover to determine recently viewed patients
-              // See: https://swr.vercel.app/docs/prefetching#programmatically-prefetch
+              // Preload the user object on hover. This object may contain a 'patientsVisited'
+              // property with UUIDs of recently viewed patients. This data can be used to display
+              // recently viewed patients if the 'showRecentlySearchedPatients' config property
+              // is enabled.
               if (userUuid) {
                 void preload(`${restBaseUrl}/user/${userUuid}`, openmrsFetch);
               }
