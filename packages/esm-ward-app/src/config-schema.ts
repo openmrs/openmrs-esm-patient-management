@@ -32,7 +32,7 @@ type AddressField = keyof typeof addressFields;
 export const configSchema: ConfigSchema = {
   patientCardElements: {
     _description:
-      'Configuration of various patient card elements. Each configured element must have an unique id, defined in the ward React component being used.',
+      'Configuration of various patient card elements. Each configured element must have a unique id, defined in the ward React component being used.',
     obs: {
       _type: Type.Array,
       _description: 'Configures obs values to display.',
@@ -118,11 +118,7 @@ export const configSchema: ConfigSchema = {
     patientIdentifier: {
       _type: Type.Array,
       _description: `Configures patient identifier to display. An unconfigured element displays the preferred identifier.`,
-      _default: [
-        {
-          id: 'patient-identifier',
-        },
-      ],
+      _default: [],
       _elements: {
         id: {
           _type: Type.String,
@@ -277,6 +273,7 @@ export interface WardConfigObject {
 }
 
 export interface PendingItemsElementConfig {
+  id: string;
   showPendingItems: boolean;
   orders: {
     orderTypes: Array<{
@@ -307,6 +304,7 @@ export interface PatientAddressElementConfig {
 }
 
 export interface AdmissionRequestNoteElementConfig {
+  id: string;
   conceptUuid: string;
 }
 
