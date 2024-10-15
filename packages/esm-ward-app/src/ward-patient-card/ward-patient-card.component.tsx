@@ -1,8 +1,7 @@
-import { getPatientName, useAppContext } from '@openmrs/esm-framework';
+import { getPatientName, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
 import React, { type ReactNode } from 'react';
-import { type WardViewContext, type WardPatient } from '../types';
+import { type WardViewContext, type WardPatient,type PatientWorkspaceAdditionalProps } from '../types';
 import styles from './ward-patient-card.scss';
-import { launchPatientWorkspace, setPatientWorkspaceProps } from './ward-patient-resource';
 
 interface Props {
   children: ReactNode;
@@ -19,12 +18,11 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
-          setPatientWorkspaceProps({
+          launchWorkspace<PatientWorkspaceAdditionalProps>('ward-patient-workspace', {
             wardPatient,
-            WardPatientHeader,
+            WardPatientHeader
           });
-          launchPatientWorkspace();
-        }}>
+         }}>
         {/* Name will not be displayed; just there for a11y */}
         {getPatientName(patient.person)}
       </button>

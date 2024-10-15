@@ -231,3 +231,5 @@ export interface WardViewContext {
 export interface MaternalWardViewContext {
   motherChildrenRelationshipsByPatient: Map<string, MotherAndChild[]>;
 }
+
+export type PatientWorkspaceAdditionalProps = Omit<WardPatientWorkspaceProps, keyof DefaultWorkspaceProps>;
