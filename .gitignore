@@ -93,3 +93,6 @@ moduleName
 
 # vim
 .swp
+
+# vscode
+.vscode

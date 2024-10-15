@@ -1,6 +1,3 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
@@ -20,9 +17,7 @@ import {
   TimePickerSelect,
   Toggle,
 } from '@carbon/react';
-import { Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import {
   ExtensionSlot,
   ResponsiveWrapper,
@@ -33,17 +28,14 @@ import {
   useLocations,
   usePatient,
   useSession,
+  type DefaultWorkspaceProps,
   type FetchResponse,
 } from '@openmrs/esm-framework';
-import {
-  checkAppointmentConflict,
-  saveAppointment,
-  saveRecurringAppointments,
-  useAppointmentService,
-  useMutateAppointments,
-} from './appointments-form.resource';
-import { useProviders } from '../hooks/useProviders';
-import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
+import dayjs from 'dayjs';
+import React, { useContext, useEffect, useState } from 'react';
+import { Controller, useController, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
 import {
   appointmentLocationTagName,
@@ -54,7 +46,16 @@ import {
   weekDays,
 } from '../constants';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import { useProviders } from '../hooks/useProviders';
+import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import Workload from '../workload/workload.component';
+import {
+  checkAppointmentConflict,
+  saveAppointment,
+  saveRecurringAppointments,
+  useAppointmentService,
+  useMutateAppointments,
+} from './appointments-form.resource';
 import styles from './appointments-form.scss';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
@@ -68,15 +69,15 @@ interface AppointmentsFormProps {
   recurringPattern?: RecurringPattern;
   patientUuid?: string;
   context: string;
-  closeWorkspace: () => void;
 }
 
-const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
+const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> = ({
   appointment,
   recurringPattern,
   patientUuid,
   context,
   closeWorkspace,
+  promptBeforeClosing,
 }) => {
   const { patient } = usePatient(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
@@ -219,7 +220,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     setValue,
     watch,
     handleSubmit,
-    formState: { errors },
+    formState: { isDirty },
   } = useForm<AppointmentFormData>({
     mode: 'all',
     resolver: zodResolver(appointmentsFormSchema),
@@ -267,6 +268,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     startDateRef(startDateElement);
     endDateRef(endDateElement);
   }, [startDateRef, endDateRef]);
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty, promptBeforeClosing]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
