@@ -1,16 +1,18 @@
 import { Button } from '@carbon/react';
-import { ArrowRightIcon, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { ArrowRightIcon, launchWorkspace, useAppContext, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { WardPatientWorkspaceProps, WardPatientCard } from '../../types';
+import type { WardPatientWorkspaceProps, WardPatientCardType, WardViewContext } from '../../types';
 import type { AdmitPatientFormWorkspaceProps } from '../admit-patient-form-workspace/types';
 import styles from './admission-request-card.scss';
 
-const AdmissionRequestCardActions: WardPatientCard = (wardPatient) => {
+const AdmissionRequestCardActions: WardPatientCardType = (wardPatient) => {
   const { patient, inpatientRequest } = wardPatient;
   const { dispositionType } = inpatientRequest;
   const { t } = useTranslation();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
+  const {WardPatientHeader} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+
   const launchPatientAdmissionForm = useCallback(
     () => launchWorkspace<AdmitPatientFormWorkspaceProps>('admit-patient-form-workspace', { patient, dispositionType }),
     [],
@@ -19,8 +21,9 @@ const AdmissionRequestCardActions: WardPatientCard = (wardPatient) => {
   const launchPatientTransferForm = useCallback(() => {
     launchWorkspace<WardPatientWorkspaceProps>('patient-transfer-request-workspace', {
       wardPatient,
+      WardPatientHeader
     });
-  }, [wardPatient]);
+  }, [wardPatient, WardPatientHeader]);
 
   return (
     <div className={styles.admissionRequestActionBar}>

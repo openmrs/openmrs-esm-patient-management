@@ -8,6 +8,11 @@
   height: fit-content;
   color: $color-gray-70;
   margin-bottom: layout.$spacing-05;
+
+  > div {
+    margin: layout.$spacing-04;
+    width: unset;
+  }
 }
 
 .admissionRequestCardHeaderContainer {
@@ -29,7 +34,7 @@
   display: none;
 
   &:has(div:not(:empty)) {
-    display: block;  
+    display: block;
     margin: layout.$spacing-03 0;
     background-color: white;
   }

@@ -1,15 +1,19 @@
-import React, { useCallback, useEffect } from 'react';
-import { type WardPatientCard } from '../../types';
 import { Hourglass } from '@carbon/react/icons';
+import React, { useCallback, useEffect } from 'react';
+import { type WardPatient } from '../../types';
 
-import { useConfig } from '@openmrs/esm-framework';
-import type { PendingItemsDefinition } from '../../config-schema';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 import { WardPatientPendingOrder } from '../row-elements/ward-patient-pending-order.component';
-import styles from '../ward-patient-card.scss';
 import WardPatientPendingTransfer from '../row-elements/ward-patient-pending-transfer';
+import styles from '../ward-patient-card.scss';
 
-const PendingItemsCarRowExtension: WardPatientCard = (wardPatient) => {
-  const { orders, showPendingItems } = useConfig<PendingItemsDefinition>();
+export interface PendingItemsRowProps {
+  id: string;
+  wardPatient: WardPatient;
+}
+
+const PendingItemsRow: React.FC<PendingItemsRowProps> = ({ id, wardPatient }) => {
+  const { orders, showPendingItems } = useElementConfig('pendingItems', id);
   const [hasPendingOrders, setHasPendingOrders] = React.useState(false);
 
   const hasPendingItems = !!wardPatient?.inpatientRequest || hasPendingOrders;
@@ -47,4 +51,4 @@ const PendingItemsCarRowExtension: WardPatientCard = (wardPatient) => {
   );
 };
 
-export default PendingItemsCarRowExtension;
+export default PendingItemsRow;

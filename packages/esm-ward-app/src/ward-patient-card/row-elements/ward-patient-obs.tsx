@@ -1,23 +1,30 @@
-import { SkeletonText, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { Information } from '@carbon/react/icons';
+import { SkeletonText } from '@carbon/react';
 import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type ObsElementDefinition } from '../../config-schema';
+import { type ObsElementConfig } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
 import styles from '../ward-patient-card.scss';
 import { getObsEncounterString, obsCustomRepresentation } from './ward-patient-obs.resource';
 import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 export interface WardPatientObsProps {
-  config: ObsElementDefinition;
+  id: string;
+  configOverride?: ObsElementConfig;
   patient: Patient;
   visit: Visit;
 }
 
-const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit }) => {
-  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config;
-  const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
+const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, configOverride, patient, visit }) => {
+  const config: ObsElementConfig = useElementConfig('obs', id);
+  const configToUse = configOverride ?? config;
+  const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = configToUse ?? {};
+  const { data, isLoading } = useObs(
+    { patient: patient.uuid, concept: conceptUuid },
+    conceptUuid != null,
+    obsCustomRepresentation,
+  );
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -53,7 +60,7 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ config, patient, visit 
           <span className={styles.wardPatientObsLabel}>
             {labelToDisplay ? t('labelColon', '{{label}}:', { label: labelToDisplay }) : ''}
           </span>
-          {obsNodes}
+          <div className={styles.dotSeparatedChildren}>{obsNodes}</div>
         </div>
       );
     } else {
