@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { BedLayout, WardPatientGroupDetails } from '../../types';
+import type { BedLayout, WardViewContext } from '../../types';
 import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
 import styles from './admit-patient-form.scss';
 import type { AdmitPatientFormWorkspaceProps } from './types';
@@ -25,11 +25,11 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const wardPatientGrouping = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGrouping?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = wardPatientGrouping?.inpatientRequestResponse ?? {};
-  const { mutate: mutateInpatientAdmission } = wardPatientGrouping?.inpatientAdmissionResponse ?? {};
-  const beds = isLoading ? [] : wardPatientGrouping?.bedLayouts ?? [];
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
+  const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
+  const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
+  const beds = isLoading ? [] : wardPatientGroupDetails?.bedLayouts ?? [];
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const getBedRepresentation = useCallback((bedLayout: BedLayout) => {
     const bedNumber = bedLayout.bedNumber;
@@ -92,7 +92,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
               if (bedSelected) {
                 return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
               } else {
-                const bed = wardPatientGrouping.bedLayouts.find((bedLayout) =>
+                const bed = wardPatientGroupDetails.bedLayouts.find((bedLayout) =>
                   bedLayout.patients.some((p) => p.uuid == patient.uuid),
                 );
                 if (bed) {
@@ -180,7 +180,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
     setIsSubmitting(false);
   }, []);
 
-  if (!wardPatientGrouping) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
   return (
     <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
       <div className={styles.formContent}>

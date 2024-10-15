@@ -1,3 +1,4 @@
+import { WorkspaceContainer } from '@openmrs/esm-framework';
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import WardView from './ward-view/ward-view.component';
@@ -14,6 +15,8 @@ const Root: React.FC = () => {
           <Route path="/:locationUuid" element={<WardView />} />
         </Routes>
       </BrowserRouter>
+      
+      <WorkspaceContainer overlay contextKey="ward" />
     </main>
   );
 };

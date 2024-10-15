@@ -4,12 +4,10 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { mockAdmissionLocation, mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
 import { renderWithSwr } from '../../../../../tools';
-import { mockWardPatientGroupDetails } from '../../../mock';
-import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
+import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { DispositionType } from '../../types';
+import type { DispositionType, WardViewContext } from '../../types';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import type { AdmitPatientFormWorkspaceProps } from './types';
 
@@ -40,7 +38,7 @@ const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseSession = jest.mocked(useSession);
 
-jest.mocked(useAppContext).mockReturnValue(mockWardPatientGroupDetails());
+jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
 const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
   patient: mockPatientAlice,
@@ -49,9 +47,6 @@ const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
   dispositionType: 'ADMIT',
-  setCancelTitle: jest.fn(),
-  setCancelMessage: jest.fn(),
-  setCancelConfirmText: jest.fn(),
 };
 
 function renderAdmissionForm(dispositionType: DispositionType = 'ADMIT') {
