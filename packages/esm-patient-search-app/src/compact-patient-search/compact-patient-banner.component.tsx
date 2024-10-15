@@ -1,3 +1,7 @@
+import React, { forwardRef, useContext, useMemo } from 'react';
+import classNames from 'classnames';
+import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
 import {
   age,
@@ -8,33 +12,21 @@ import {
   PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
-import classNames from 'classnames';
-import React, { forwardRef, useContext, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
+import { PatientSearchContext } from '../patient-search-context';
 import styles from './compact-patient-banner.scss';
 
 interface ClickablePatientContainerProps {
-  patient: SearchedPatient;
   children: React.ReactNode;
+  patient: SearchedPatient;
 }
 
 interface CompactPatientBannerProps {
   patients: Array<SearchedPatient>;
 }
 
-interface CustomIdentifierProps {
-  patient: SearchedPatient;
-  identifierName: string;
-}
-
 interface IdentifierTagProps {
   identifier: Identifier;
-}
-
-interface IdentifiersProps {
-  identifiers: Array<Identifier>;
 }
 
 const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
@@ -67,7 +59,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         id: patient.uuid,
         name: [
           {
-            id: String(Math.random()), // not used
+            id: uuidv4(), // not used
             given: [patient.person.personName.givenName, patient.person.personName.middleName],
             family: patient.person.personName.familyName,
             text: patient.person.personName.display,
@@ -81,7 +73,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         address: preferredAddress
           ? [
               {
-                id: String(Math.random()), // not used
+                id: uuidv4(), // not used
                 city: preferredAddress.cityVillage,
                 country: preferredAddress.country,
                 postalCode: preferredAddress.postalCode,
