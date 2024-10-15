@@ -1,6 +1,6 @@
 import { getPatientName, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
 import React, { type ReactNode } from 'react';
-import { type WardViewContext, type WardPatient, PatientWorkspaceAdditionalProps } from '../types';
+import { type WardViewContext, type WardPatient,type PatientWorkspaceAdditionalProps } from '../types';
 import styles from './ward-patient-card.scss';
 
 interface Props {
