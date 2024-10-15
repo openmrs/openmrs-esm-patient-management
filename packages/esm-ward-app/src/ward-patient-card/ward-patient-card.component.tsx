@@ -7,7 +7,6 @@ import WardPatientBedNumber from './row-elements/ward-patient-bed-number';
 import WardPatientName from './row-elements/ward-patient-name';
 import { WardPatientCardElement } from './ward-patient-card-element.component';
 import styles from './ward-patient-card.scss';
-import { launchPatientWorkspace, setWardPatient } from './ward-patient-resource';
 
 const WardPatientCard: WardPatientCard = (wardPatient) => {
   const { patient, bed } = wardPatient;
@@ -58,8 +57,9 @@ const WardPatientCard: WardPatientCard = (wardPatient) => {
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
-          setWardPatient(wardPatient);
-          launchPatientWorkspace();
+          launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', {
+            wardPatient,
+          });
         }}>
         {/* Name will not be displayed; just there for a11y */}
         {getPatientName(patient.person)}
