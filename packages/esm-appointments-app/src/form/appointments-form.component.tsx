@@ -98,11 +98,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
-  const [isConflict, setIsConflict] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
-
+  const [isSuccessful, setIsSuccessful] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // TODO can we clean this all up to be more consistent between using Date and dayjs?
@@ -220,6 +219,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     setValue,
     watch,
     handleSubmit,
+    reset,
     formState: { isDirty },
   } = useForm<AppointmentFormData>({
     mode: 'all',
@@ -270,8 +270,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   }, [startDateRef, endDateRef]);
 
   useEffect(() => {
+    if (isSuccessful) {
+      reset();
+      promptBeforeClosing(() => false);
+      closeWorkspace();
+      return;
+    }
     promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+  }, [isDirty, promptBeforeClosing, isSuccessful]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
@@ -356,7 +362,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       ({ status }) => {
         if (status === 200) {
           setIsSubmitting(false);
-          closeWorkspace();
+          setIsSuccessful(true);
           mutateAppointments();
           showSnackbar({
             isLowContrast: true,
