@@ -14,6 +14,7 @@ import type {
 } from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
 import styles from '../field.scss';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export function setIdentifierSource(
   identifierSource: IdentifierSource,
@@ -59,7 +60,13 @@ export function deleteIdentifierType(identifiers: FormValues['identifiers'], ide
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useContext(ResourcesContext);
   const isLoading = !identifierTypes?.length;
-  const { values, setFieldValue, initialFormValues, isOffline } = useContext(PatientRegistrationContext);
+  const {
+    watch,
+    formState: { defaultValues },
+    setValue,
+    isOffline,
+  } = usePatientRegistrationContext();
+  const identifiers = watch('identifiers');
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
@@ -78,11 +85,11 @@ export const Identifiers: React.FC = () => {
               (defaultIdentifierTypeUuid) => defaultIdentifierTypeUuid === type.uuid,
             ),
         )
-        .filter((type) => !values.identifiers[type.fieldName])
+        .filter((type) => !identifiers[type.fieldName])
         .forEach((type) => {
           identifiers[type.fieldName] = initializeIdentifier(
             type,
-            values.identifiers[type.uuid] ?? initialFormValues.identifiers[type.uuid] ?? {},
+            identifiers[type.uuid] ?? defaultValues.identifiers[type.uuid] ?? {},
           );
         });
       /*
@@ -91,14 +98,14 @@ export const Identifiers: React.FC = () => {
         fall into an infinite run.
       */
       if (Object.keys(identifiers).length) {
-        setFieldValue('identifiers', {
-          ...values.identifiers,
+        setValue('identifiers', {
+          ...identifiers,
           ...identifiers,
         });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identifierTypes, setFieldValue, defaultPatientIdentifierTypes, values.identifiers, initializeIdentifier]);
+  }, [identifierTypes, setValue, defaultPatientIdentifierTypes, identifiers, initializeIdentifier]);
 
   const closeIdentifierSelectionOverlay = useCallback(
     () => setShowIdentifierOverlay(false),
@@ -131,11 +138,12 @@ export const Identifiers: React.FC = () => {
         </div>
       </UserHasAccess>
       <div>
-        {Object.entries(values.identifiers).map(([fieldName, identifier]) => (
+        {Object.entries(identifiers).map(([fieldName, identifier]) => (
+          // @ts-ignore
           <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
         ))}
         {showIdentifierOverlay && (
-          <IdentifierSelectionOverlay setFieldValue={setFieldValue} closeOverlay={closeIdentifierSelectionOverlay} />
+          <IdentifierSelectionOverlay setFieldValue={setValue} closeOverlay={closeIdentifierSelectionOverlay} />
         )}
       </div>
     </div>

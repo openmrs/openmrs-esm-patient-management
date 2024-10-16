@@ -16,6 +16,7 @@ export function Section({ sectionDefinition }: SectionProps) {
     case 'death':
       return <DeathInfoSection fields={sectionDefinition.fields} />;
     case 'relationships':
+      return null;
       return <RelationshipsSection />;
     default: // includes 'contact'
       return <GenericSection sectionDefinition={sectionDefinition} />;

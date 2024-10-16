@@ -11,7 +11,7 @@ import {
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
 import { FormManager } from './patient-registration/form-manager';
-import { PatientRegistration } from './patient-registration/patient-registration.component';
+import { PatientRegistration } from './patient-registration/patient-registration-rhf.component';
 import styles from './root.scss';
 
 export default function Root() {
