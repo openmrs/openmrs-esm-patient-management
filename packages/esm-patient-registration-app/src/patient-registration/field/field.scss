@@ -115,6 +115,16 @@
   margin-bottom: layout.$spacing-05;
 }
 
+.locationAttributeFieldContainer {
+  position: relative;
+
+  .loadingContainer {
+    position: absolute;
+    right: -6rem;
+    bottom: 0;
+  }
+}
+
 :global(.omrs-breakpoint-lt-desktop) {
   .grid {
     grid-template-columns: 1fr;
