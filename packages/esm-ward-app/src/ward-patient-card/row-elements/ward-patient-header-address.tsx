@@ -1,15 +1,15 @@
-import React from 'react';
-import styles from '../ward-patient-card.scss';
 import { type Patient } from '@openmrs/esm-framework';
-import { type AddressElementDefinition } from '../../config-schema';
+import React from 'react';
+import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 export interface WardPatientAddressProps {
   patient: Patient;
-  config: AddressElementDefinition;
+  id: string;
 }
 
-const WardPatientAddress: React.FC<WardPatientAddressProps> = ({ patient, config }) => {
+const WardPatientAddress: React.FC<WardPatientAddressProps> = ({ patient, id }) => {
   const preferredAddress = patient?.person?.preferredAddress;
+  const config = useElementConfig("patientAddress", id);
 
   return (
     <>

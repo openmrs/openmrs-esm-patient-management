@@ -10,7 +10,9 @@ import {
 } from '../../../../__mocks__';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import useWardLocation from '../hooks/useWardLocation';
-import OccupiedBed from './occupied-bed.component';
+import WardBed from './ward-bed.component';
+import { type WardPatient } from '../types';
+import DefaultWardPatientCard from '../ward-view/default-ward/default-ward-patient-card.component';
 
 const defaultConfig: WardConfigObject = getDefaultsFromConfigSchema(configSchema);
 
@@ -31,34 +33,43 @@ mockedUseWardLocation.mockReturnValue({
 const mockBedToUse = mockBedLayouts[0];
 const mockBed = bedLayoutToBed(mockBedToUse);
 
-const mockWardPatientProps = {
-  admitted: true,
+const mockWardPatientAliceProps: WardPatient = {
   visit: null,
-  encounterAssigningToCurrentInpatientLocation: null,
-  firstAdmissionOrTransferEncounter: null,
+  patient: mockPatientAlice,
+  bed: mockBed,
+  inpatientAdmission: null,
+  inpatientRequest: null,
 };
 
-describe('Occupied bed', () => {
+const mockWardPatientBrianProps: WardPatient = {
+  visit: null,
+  patient: mockPatientBrian,
+  bed: mockBed,
+  inpatientAdmission: null,
+  inpatientRequest: null,
+};
+
+describe('Ward bed', () => {
   it('renders a single bed with patient details', () => {
-    render(<OccupiedBed wardPatients={[{ ...mockWardPatientProps, patient: mockPatientAlice }]} bed={mockBed} />);
+    render(
+      <WardBed
+        patientCards={[<DefaultWardPatientCard key={mockPatientAlice.uuid} {...mockWardPatientAliceProps} />]}
+        bed={mockBed}
+      />,
+    );
     const patientName = screen.getByText('Alice Johnson');
     expect(patientName).toBeInTheDocument();
     const patientAge = `${mockPatientAlice.person.age} yrs`;
     expect(screen.getByText(patientAge)).toBeInTheDocument();
-    const defaultAddressFields = ['cityVillage', 'country'];
-    defaultAddressFields.forEach((addressField) => {
-      const addressFieldValue = mockPatientAlice.person.preferredAddress[addressField] as string;
-      expect(screen.getByText(addressFieldValue)).toBeInTheDocument();
-    });
   });
 
   it('renders a divider for shared patients', () => {
     render(
-      <OccupiedBed
+      <WardBed
         bed={mockBed}
-        wardPatients={[
-          { ...mockWardPatientProps, patient: mockPatientAlice },
-          { ...mockWardPatientProps, patient: mockPatientBrian },
+        patientCards={[
+          <DefaultWardPatientCard key={mockPatientAlice.uuid} {...mockWardPatientAliceProps} />,
+          <DefaultWardPatientCard key={mockPatientBrian.uuid} {...mockWardPatientBrianProps} />,
         ]}
       />,
     );

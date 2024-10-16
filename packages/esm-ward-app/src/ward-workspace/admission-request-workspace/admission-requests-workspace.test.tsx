@@ -1,53 +1,26 @@
-import React from 'react';
+import { useAppContext } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
-import { defineConfigSchema } from '@openmrs/esm-framework';
-import { useInpatientRequest } from '../../hooks/useInpatientRequest';
-import { configSchema } from '../../config-schema';
-import useWardLocation from '../../hooks/useWardLocation';
-import AdmissionRequestsWorkspace from './admission-requests.workspace';
-import { mockInpatientRequest, mockLocationInpatientWard } from '../../../../../__mocks__';
+import React from 'react';
 import { renderWithSwr } from '../../../../../tools';
+import { mockWardViewContext } from '../../../mock';
+import { type WardViewContext } from '../../types';
+import DefaultWardPendingPatients from '../../ward-view/default-ward/default-ward-pending-patients.component';
+import AdmissionRequestsWorkspace, { type AdmissionRequestsWorkspaceProps } from './admission-requests.workspace';
 
-defineConfigSchema('@openmrs/esm-ward-app', configSchema);
+jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
-jest.mock('../../hooks/useInpatientRequest', () => ({
-  useInpatientRequest: jest.fn(),
-}));
-jest.mock('../../hooks/useWardLocation', () => jest.fn());
-
-const mockUseWardLocation = useWardLocation as jest.Mock;
-mockUseWardLocation.mockReturnValue({
-  location: mockLocationInpatientWard,
-  isLoadingLocation: false,
-  errorFetchingLocation: null,
-  invalidLocation: false,
-});
-
-const mockInpatientRequestResponse: ReturnType<typeof useInpatientRequest> = {
-  error: undefined,
-  mutate: jest.fn(),
-  isValidating: false,
-  isLoading: false,
-  inpatientRequests: mockInpatientRequest,
-  totalCount: 1,
-  hasMore: false,
-  loadMore: jest.fn(),
-};
-
-jest.mocked(useInpatientRequest).mockReturnValue(mockInpatientRequestResponse);
-
-const workspaceProps = {
+const workspaceProps: AdmissionRequestsWorkspaceProps = {
   closeWorkspace: jest.fn(),
   promptBeforeClosing: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   setTitle: jest.fn(),
+  wardPendingPatients: <DefaultWardPendingPatients />,
 };
 
 describe('Admission Requests Workspace', () => {
   it('should render a admission request card', () => {
     renderWithSwr(<AdmissionRequestsWorkspace {...workspaceProps} />);
-    expect(
-      screen.getByText(mockInpatientRequest[0].patient.person?.preferredName?.display as string),
-    ).toBeInTheDocument();
+    const alice = mockWardViewContext.wardPatientGroupDetails.inpatientRequestResponse.inpatientRequests[0].patient;
+    expect(screen.getByText(alice.person?.preferredName?.display as string)).toBeInTheDocument();
   });
 });

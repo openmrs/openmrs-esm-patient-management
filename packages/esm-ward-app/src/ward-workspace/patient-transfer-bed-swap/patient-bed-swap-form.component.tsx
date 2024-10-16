@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { BedLayout, WardPatientGroupDetails, WardPatientWorkspaceProps } from '../../types';
+import type { BedLayout, WardViewContext, WardPatientWorkspaceProps } from '../../types';
 import { assignPatientToBed, createEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
 
@@ -32,10 +32,10 @@ export default function PatientBedSwapForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
-  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { isLoading, mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
-  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
+  const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
+  const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
 
   const zodSchema = useMemo(
     () =>
@@ -70,7 +70,7 @@ export default function PatientBedSwapForm({
     [t],
   );
 
-  const beds = wardGroupingDetails?.bedLayouts ?? [];
+  const beds = wardPatientGroupDetails?.bedLayouts ?? [];
   const bedDetails = useMemo(
     () =>
       beds.map((bed) => {
@@ -145,7 +145,7 @@ export default function PatientBedSwapForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardGroupingDetails) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}

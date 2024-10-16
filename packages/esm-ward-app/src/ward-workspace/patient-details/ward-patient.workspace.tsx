@@ -7,15 +7,22 @@ import { getGender } from '../../ward-patient-card/row-elements/ward-patient-gen
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-export default function WardPatientWorkspace({ setTitle, wardPatient: { patient } }: WardPatientWorkspaceProps) {
+export default function WardPatientWorkspace({ setTitle, wardPatient }: WardPatientWorkspaceProps) {
   useEffect(() => {
-    setTitle(patient.person.display, <PatientWorkspaceTitle key={patient.uuid} patient={patient} />);
-  }, [patient.uuid]);
+    if (wardPatient) {
+      const { patient } = wardPatient;
+      setTitle(patient.person.display, <PatientWorkspaceTitle key={patient.uuid} patient={patient} />);
+    }
+  }, [wardPatient]);
 
   return (
-    <div className={styles.workspaceContainer}>
-      <WardPatientWorkspaceView patient={patient} />
-    </div>
+    <>
+      {wardPatient && (
+        <div className={styles.workspaceContainer}>
+          <WardPatientWorkspaceView patient={wardPatient.patient} />
+        </div>
+      )}
+    </>
   );
 }
 
