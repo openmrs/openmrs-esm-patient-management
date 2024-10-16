@@ -12,7 +12,8 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder?: string;
-  dateFormat?: string;
+  disableFutureDates?: boolean;
+  disablePastDates?: boolean;
   showHeading: boolean;
   validation?: {
     required: boolean;
