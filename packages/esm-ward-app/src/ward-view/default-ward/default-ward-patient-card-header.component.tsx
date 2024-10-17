@@ -18,7 +18,7 @@ const DefaultWardPatientCardHeader: WardPatientCardType = (wardPatient) => {
     <div className={classNames(styles.wardPatientCardRow, styles.wardPatientCardHeader)}>
       {bed ? <WardPatientBedNumber bed={bed} /> : null}
       <WardPatientName patient={patient} />
-      <WardPatientIdentifier patient={patient} />
+      <WardPatientIdentifier id="patient-identifier" patient={patient} />
       <WardPatientGender patient={patient} />
       <WardPatientAge patient={patient} />
       <WardPatientTimeSinceAdmission firstAdmissionOrTransferEncounter={firstAdmissionOrTransferEncounter} />

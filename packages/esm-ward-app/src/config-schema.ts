@@ -1,7 +1,5 @@
 import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
-export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission', 'patient-location'];
-
 export const addressFields = [
   'cityVillage',
   'stateProvince',
@@ -118,23 +116,21 @@ export const configSchema: ConfigSchema = {
     patientIdentifier: {
       _type: Type.Array,
       _description: `Configures patient identifier to display. An unconfigured element displays the preferred identifier.`,
-      _default: [],
+      _default: [
+        {
+          id: 'patient-identifier',
+          showIdentifierLabel: false,
+        },
+      ],
       _elements: {
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
         },
-        identifierTypeUuid: {
-          _type: Type.UUID,
+        showIdentifierLabel: {
+          _type: Type.Boolean,
           _description:
-            'The UUID of the identifier type to display. If not provided, defaults to the preferred identifier.',
-          _default: null,
-        },
-        label: {
-          _type: Type.String,
-          _description:
-            'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
-          _default: null,
+            'If true, the identifier type (eg: "OpenMRS ID") is shown along with the identifier itself. Defaults to false',
         },
       },
     },
@@ -294,8 +290,7 @@ export interface ObsElementConfig {
 
 export interface IdentifierElementConfig {
   id: string;
-  identifierTypeUuid: string;
-  label?: string;
+  showIdentifierLabel: boolean;
 }
 
 export interface PatientAddressElementConfig {
