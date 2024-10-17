@@ -36,8 +36,7 @@ describe('CompactPatientSearchComponent', () => {
       search: {
         showRecentlySearchedPatients: true,
         disableTabletSearchOnKeyUp: true,
-        patientResultUrl: configSchema.search.patientResultUrl._default,
-      },
+      } as PatientSearchConfig['search'],
     });
     render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
     const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');

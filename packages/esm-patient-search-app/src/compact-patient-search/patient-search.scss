@@ -38,6 +38,24 @@
   color: $text-02;
   line-height: layout.$spacing-05;
   margin: layout.$spacing-03 layout.$spacing-05;
+  display: flex;
+  align-items: center;
+}
+
+.resultsTextCount {
+  flex: 1;
+}
+
+.validationIcon {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: layout.$spacing-05 !important;
+  }
 }
 
 .helperText {

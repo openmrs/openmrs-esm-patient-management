@@ -13,6 +13,7 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
+import { type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext } from '../patient-search-context';
 import styles from './compact-patient-banner.scss';
 
@@ -30,7 +31,7 @@ interface IdentifierTagProps {
 }
 
 const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
-  const config = useConfig();
+  const config = useConfig<PatientSearchConfig>();
   const { t } = useTranslation();
 
   const getGender = (gender: string) => {
@@ -135,7 +136,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
-  const config = useConfig();
+  const config = useConfig<PatientSearchConfig>();
   const isDeceased = Boolean(patient?.person?.deathDate);
 
   if (nonNavigationSelectPatientAction) {
@@ -160,9 +161,9 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
         })}
         key={patient.uuid}
         onBeforeNavigate={() => patientClickSideEffect?.(patient.uuid)}
-        to={`${interpolateString(config.search.patientResultUrl, {
+        to={interpolateString(config.search.patientChartUrl, {
           patientUuid: patient.uuid,
-        })}`}>
+        })}>
         {children}
       </ConfigurableLink>
     );
