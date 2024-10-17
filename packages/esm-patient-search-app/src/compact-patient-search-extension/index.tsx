@@ -79,7 +79,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   return (
     <div className={styles.patientSearchBar}>
-      <form onSubmit={(event) => event.preventDefault} className={styles.searchArea}>
+      <form onSubmit={(event) => event.preventDefault()} className={styles.searchArea}>
         <Search
           autoFocus
           className={styles.patientSearchInput}
