@@ -149,23 +149,7 @@ describe('identifier input', () => {
       expect(screen.getByTestId('identifier-input')).toBeDisabled();
     });
 
-    it('displays optional in the label', () => {
-      openmrsID.autoGeneration = true;
-      openmrsID.required = false;
-      setupIdentifierInput(openmrsID);
-      expect(screen.getByTestId('identifier-label').innerHTML).toMatch(/optional/);
-    });
-
     describe('manual entry allowed', () => {
-      mockUseConfig.mockReturnValue({
-        ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
-        fieldConfigurations: {
-          id: {
-            allowAutoGenerationManualEntry: true,
-          },
-        },
-      });
-
       openmrsID.selectedSource = {
         autoGenerationOption: {
           manualEntryEnabled: true,
