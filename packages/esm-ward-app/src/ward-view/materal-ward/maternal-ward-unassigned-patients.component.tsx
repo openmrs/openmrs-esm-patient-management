@@ -8,19 +8,20 @@ import MaternalWardPatientCard from './maternal-ward-patient-card.component';
  * @returns
  */
 function MaternalWardUnassignedPatients() {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { wardUnassignedPatientsList } = wardPatientGroupDetails ?? {};
 
   const wardUnassignedPatients = wardUnassignedPatientsList?.map((inpatientAdmission) => {
     return (
       <MaternalWardPatientCard
-        {...{
+        wardPatient={{
           patient: inpatientAdmission.patient,
           visit: inpatientAdmission.visit,
           bed: null,
           inpatientAdmission,
           inpatientRequest: inpatientAdmission.currentInpatientRequest,
         }}
+        childrenOfWardPatientInSameBed={[]}
         key={inpatientAdmission.patient.uuid}
       />
     );

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { type InpatientRequest, type WardViewContext } from '../../types';
 import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
-import MotherChildRowExtension from '../../ward-patient-card/card-rows/mother-child-row.component';
+import MotherChildRow from '../../ward-patient-card/card-rows/mother-child-row.component';
 import WardPatientSkeletonText from '../../ward-patient-card/row-elements/ward-patient-skeleton-text';
 import AdmissionRequestCard from '../../ward-workspace/admission-request-card/admission-request-card.component';
 
@@ -36,7 +36,7 @@ function MaternalWardPendingPatients() {
         return (
           <AdmissionRequestCard key={`admission-request-card-${i}`} wardPatient={wardPatient}>
             <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
-            <MotherChildRowExtension {...wardPatient} />
+            <MotherChildRow wardPatient={wardPatient} childrenOfWardPatientInSameBed={[]} />
             <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
           </AdmissionRequestCard>
         );

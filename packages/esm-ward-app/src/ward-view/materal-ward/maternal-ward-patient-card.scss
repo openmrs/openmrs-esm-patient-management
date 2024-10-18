@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+
+.motherChildBedDivider {
+  background-color: vars.$ui-02;
+  color: vars.$text-02;
+  padding: layout.$spacing-01;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.motherChildBedDividerLine {
+  height: 1px;
+  width: 30%;
+  border-top: 1px dashed vars.$ui-05;
+}

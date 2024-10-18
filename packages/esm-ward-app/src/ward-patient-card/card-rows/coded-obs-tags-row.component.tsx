@@ -38,7 +38,7 @@ const CodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({ id, patien
     obsCustomRepresentation,
   );
   const { t } = useTranslation();
-  const conceptToTagColorMap = useConceptToTagColorMap(config.tags);
+  const conceptToTagColorMap = useConceptToTagColorMap(config?.tags ?? []);
 
   if (isLoading) {
     return (

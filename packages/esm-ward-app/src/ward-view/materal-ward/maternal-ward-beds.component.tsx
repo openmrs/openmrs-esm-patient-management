@@ -1,21 +1,20 @@
 import { useAppContext } from '@openmrs/esm-framework';
 import React from 'react';
 import WardBed from '../../beds/ward-bed.component';
-import { type MotherAndChild, type WardPatient, type WardViewContext } from '../../types';
+import { type MotherChildRelationships, type WardPatient, type WardViewContext } from '../../types';
 import { bedLayoutToBed } from '../ward-view.resource';
 import MaternalWardPatientCard from './maternal-ward-patient-card.component';
 
-interface MaternalWardBedsProps {
-  motherChildrenRelationshipsByPatient: Map<string, MotherAndChild[]>;
-}
-
-const MaternalWardBeds: React.FC<MaternalWardBedsProps> = ({ motherChildrenRelationshipsByPatient }) => {
+const MaternalWardBeds: React.FC<MotherChildRelationships> = (motherChildRelationships) => {
+  const { motherByChildUuid } = motherChildRelationships ?? {};
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {
     const { patients: patientsInCurrentBed } = bedLayout;
     const bed = bedLayoutToBed(bedLayout);
+    const childrenInSameBedByMotherUuid = new Map<string, WardPatient[]>();
+
     const wardPatients: WardPatient[] = patientsInCurrentBed
       .map((patient): WardPatient => {
         const inpatientAdmission = wardAdmittedPatientsWithBed?.get(patient.uuid);
@@ -36,19 +35,25 @@ const MaternalWardBeds: React.FC<MaternalWardBedsProps> = ({ motherChildrenRelat
       })
       .filter((wardPatient) => {
         // filter out any child patient whose mother is also assigned to the same bed
-        // (the child patient will instead have a sub-card rendered in the mother's patient card)
+        // and put the child in childrenInSameBedByMotherUuid
         const patientUuid = wardPatient.patient.uuid;
-        for (const relationship of motherChildrenRelationshipsByPatient?.get(patientUuid) ?? []) {
-          if (relationship.child.uuid == patientUuid) {
-            if (patientsInCurrentBed.some((patient) => patient.uuid == relationship.mother.uuid)) {
-              return false;
-            }
+        const { patient: mother } = motherByChildUuid?.get(patientUuid) ?? {};
+        const motherInSameBed = patientsInCurrentBed.some((p) => p.uuid == mother?.uuid);
+        if (motherInSameBed) {
+          if (!childrenInSameBedByMotherUuid.has(mother.uuid)) {
+            childrenInSameBedByMotherUuid.set(mother.uuid, []);
           }
+          childrenInSameBedByMotherUuid.get(mother.uuid).push(wardPatient);
         }
-        return true;
+        return !motherInSameBed;
       });
+
     const patientCards = wardPatients.map((wardPatient) => (
-      <MaternalWardPatientCard key={wardPatient.patient.uuid} {...wardPatient} />
+      <MaternalWardPatientCard
+        key={wardPatient.patient.uuid}
+        wardPatient={wardPatient}
+        childrenOfWardPatientInSameBed={childrenInSameBedByMotherUuid.get(wardPatient.patient.uuid)}
+      />
     ));
 
     return <WardBed key={bed.uuid} bed={bed} patientCards={patientCards} />;

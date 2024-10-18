@@ -18,15 +18,12 @@ const MaternalWardView = () => {
   });
   const { allWardPatientUuids, isLoading } = wardPatientGroupDetails;
 
-  const motherChildrenRelationshipsByPatient = useMotherChildrenRelationshipsByPatient(
-    Array.from(allWardPatientUuids),
-    !isLoading,
-  );
+  const motherChildRelationships = useMotherChildrenRelationshipsByPatient(Array.from(allWardPatientUuids), !isLoading);
   useDefineAppContext<MaternalWardViewContext>('maternal-ward-view-context', {
-    motherChildrenRelationshipsByPatient,
+    motherChildRelationships,
   });
 
-  const wardBeds = <MaternalWardBeds {...{ motherChildrenRelationshipsByPatient }} />;
+  const wardBeds = <MaternalWardBeds {...motherChildRelationships} />;
   const wardUnassignedPatients = <MaternalWardUnassignedPatients />;
   const wardPendingPatients = <MaternalWardPendingPatients />;
 
