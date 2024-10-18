@@ -1,12 +1,12 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useField } from 'formik';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
+import type { FormValues } from '../../patient-registration.types';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 const containsNoNumbers = /^([^0-9]*)$/;
@@ -21,7 +21,7 @@ function checkNumber(value: string) {
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
+  const { setCapturePhotoProps, currentPhoto, setValue, control, watch } = usePatientRegistrationContext();
   const {
     fieldConfigurations: {
       name: {
@@ -35,8 +35,14 @@ export const NameField = () => {
     },
   } = useConfig<RegistrationConfig>();
 
-  const [{ value: isPatientUnknownValue }, , { setValue: setUnknownPatient }] = useField<string>(
-    `attributes.${unidentifiedPatientAttributeTypeUuid}`,
+  const unknownPatientFieldName = useMemo(
+    () => `attributes.${unidentifiedPatientAttributeTypeUuid}` as keyof FormValues,
+    [],
+  );
+  const isPatientUnknownValue = watch(unknownPatientFieldName);
+  const setUnknownPatient = useCallback(
+    (value: string) => setValue(unknownPatientFieldName, value),
+    [unknownPatientFieldName, setValue],
   );
 
   const isPatientUnknown = isPatientUnknownValue === 'true';
@@ -48,7 +54,7 @@ export const NameField = () => {
           imageData: dataUri,
           dateTime: photoDateTime,
         });
-        setFieldTouched('photo', true, false);
+        // setFieldTouched('photo', true, false);
       }
     },
     [setCapturePhotoProps],
@@ -56,17 +62,17 @@ export const NameField = () => {
 
   const toggleNameKnown = (e) => {
     if (e.name === 'known') {
-      setFieldValue('givenName', '');
-      setFieldValue('familyName', '');
+      setValue('givenName', '');
+      setValue('familyName', '');
       setUnknownPatient('false');
     } else {
-      setFieldValue('givenName', defaultUnknownGivenName);
-      setFieldValue('familyName', defaultUnknownFamilyName);
+      setValue('givenName', defaultUnknownGivenName);
+      setValue('familyName', defaultUnknownFamilyName);
       setUnknownPatient('true');
     }
-    setFieldTouched('givenName', true);
-    setFieldTouched('familyName', true);
-    setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
+    // setFieldTouched('givenName', true);
+    // setFieldTouched('familyName', true);
+    // setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
   };
 
   const firstNameField = (
