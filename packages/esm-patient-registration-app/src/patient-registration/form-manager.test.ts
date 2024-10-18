@@ -1,7 +1,10 @@
 import { FormManager } from './form-manager';
 import { type FormValues } from './patient-registration.types';
+import { generateIdentifier } from './patient-registration.resource';
 
 jest.mock('./patient-registration.resource');
+
+const mockGenerateIdentifier = generateIdentifier as jest.Mock;
 
 const formValues: FormValues = {
   patientUuid: '',
@@ -65,6 +68,19 @@ describe('FormManager', () => {
           preferred: true,
         },
       ]);
+    });
+    it('should generate identifier if it has autoGeneration and manual entry disabled', async () => {
+      formValues.identifiers.foo.autoGeneration = true;
+      formValues.identifiers.foo.selectedSource.autoGenerationOption.manualEntryEnabled = false;
+      mockGenerateIdentifier.mockResolvedValue({ data: { identifier: '10001V' } });
+      await FormManager.savePatientIdentifiers(true, undefined, formValues.identifiers, {}, 'Nyc');
+      expect(mockGenerateIdentifier.mock.calls).toHaveLength(1);
+    });
+    it('should not generate identifiers if manual entry enabled and identifier value given', async () => {
+      formValues.identifiers.foo.autoGeneration = true;
+      formValues.identifiers.foo.selectedSource.autoGenerationOption.manualEntryEnabled = true;
+      await FormManager.savePatientIdentifiers(true, undefined, formValues.identifiers, {}, 'Nyc');
+      expect(mockGenerateIdentifier.mock.calls).toHaveLength(0);
     });
   });
 });
