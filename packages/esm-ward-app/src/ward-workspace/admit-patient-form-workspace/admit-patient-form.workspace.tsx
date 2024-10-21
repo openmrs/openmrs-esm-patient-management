@@ -11,6 +11,7 @@ import type { BedLayout, WardViewContext } from '../../types';
 import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
 import styles from './admit-patient-form.scss';
 import type { AdmitPatientFormWorkspaceProps } from './types';
+import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 
 const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   patient,
@@ -25,10 +26,13 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading, mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
   const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
+  const { data: bedsAssignedToPatient, isLoading: isLoadingBedsAssignedToPatient } = useAssignedBedByPatient(
+    patient.uuid,
+  );
   const beds = isLoading ? [] : wardPatientGroupDetails?.bedLayouts ?? [];
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const getBedRepresentation = useCallback((bedLayout: BedLayout) => {
@@ -92,11 +96,9 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
               if (bedSelected) {
                 return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
               } else {
-                const bed = wardPatientGroupDetails.bedLayouts.find((bedLayout) =>
-                  bedLayout.patients.some((p) => p.uuid == patient.uuid),
-                );
-                if (bed) {
-                  return removePatientFromBed(bed.bedId, patient.uuid);
+                const assignedBedId = bedsAssignedToPatient?.data?.results?.[0]?.bedId;
+                if (assignedBedId) {
+                  return removePatientFromBed(assignedBedId, patient.uuid);
                 }
                 return response;
               }
@@ -272,7 +274,13 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
         <Button
           type="submit"
           size="xl"
-          disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}>
+          disabled={
+            isSubmitting ||
+            isLoadingEmrConfiguration ||
+            errorFetchingEmrConfiguration ||
+            isLoading ||
+            isLoadingBedsAssignedToPatient
+          }>
           {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
         </Button>
       </ButtonSet>
