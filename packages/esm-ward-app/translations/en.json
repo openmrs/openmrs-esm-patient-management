@@ -43,6 +43,7 @@
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "male": "Male",
   "manage": "Manage",
+  "motherChildBedShare": "Mother / Child",
   "nextPage": "Next page",
   "noBedsConfigured": "No beds configured for this location",
   "noBedsConfiguredForLocation": "No beds configured for {{location}} location",
