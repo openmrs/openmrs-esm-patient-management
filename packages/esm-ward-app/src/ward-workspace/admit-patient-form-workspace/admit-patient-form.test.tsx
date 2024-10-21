@@ -1,13 +1,15 @@
-import { openmrsFetch, showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { mockAdmissionLocation, mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
 import { renderWithSwr } from '../../../../../tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
+import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import type { DispositionType, WardViewContext } from '../../types';
+import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import type { AdmitPatientFormWorkspaceProps } from './types';
 
@@ -31,12 +33,25 @@ jest.mock('../../hooks/useInpatientAdmission', () => ({
   useInpatientAdmission: jest.fn(),
 }));
 
+jest.mock('../../hooks/useAssignedBedByPatient', () => ({
+  useAssignedBedByPatient: jest.fn(),
+}));
+
+jest.mock('../../ward.resource', () => ({
+  createEncounter: jest.fn(),
+  assignPatientToBed: jest.fn(),
+  removePatientFromBed: jest.fn(),
+}));
+
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 const mockedUseWardLocation = jest.mocked(useWardLocation);
-const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseSession = jest.mocked(useSession);
+const mockedUseAssignedBedByPatient = jest.mocked(useAssignedBedByPatient);
+const mockedAssignPatientToBed = jest.mocked(assignPatientToBed);
+const mockedCreateEncounter = jest.mocked(createEncounter);
+const mockedRemovePatientFromBed = jest.mocked(removePatientFromBed);
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
@@ -90,6 +105,39 @@ describe('Testing AdmitPatientForm', () => {
       invalidLocation: false,
       isLoadingLocation: false,
       errorFetchingLocation: null,
+    });
+    mockedUseAssignedBedByPatient.mockReturnValue({
+      data: {
+        data: {
+          results: [
+            {
+              bedId: 1,
+              bedNumber: 1,
+              bedType: null,
+              patients: [mockPatientAlice],
+              physicalLocation: mockLocationInpatientWard,
+            },
+          ],
+        },
+      },
+    } as ReturnType<typeof useAssignedBedByPatient>);
+
+    // @ts-ignore - we only need these two keys for now
+    mockedCreateEncounter.mockResolvedValue({
+      ok: true,
+      data: {
+        uuid: 'encounter-uuid',
+      },
+    });
+
+    // @ts-ignore - we only need the ok key for now
+    mockedAssignPatientToBed.mockResolvedValue({
+      ok: true,
+    });
+
+    // @ts-ignore - we only need the ok key for now
+    mockedRemovePatientFromBed.mockResolvedValue({
+      ok: true,
     });
   });
 
@@ -152,13 +200,6 @@ describe('Testing AdmitPatientForm', () => {
   });
 
   it('should submit the form, create encounter and submit bed', async () => {
-    // @ts-ignore - we only need these two keys for now
-    mockedOpenmrsFetch.mockResolvedValue({
-      ok: true,
-      data: {
-        uuid: 'encounter-uuid',
-      },
-    });
     const user = userEvent.setup();
     renderAdmissionForm();
     const combobox = screen.getByRole('combobox', {
@@ -170,35 +211,19 @@ describe('Testing AdmitPatientForm', () => {
     const admitButton = screen.getByRole('button', { name: 'Admit' });
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(2);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/encounter', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: {
-        patient: mockPatientAlice.uuid,
-        encounterType: 'admission-encounter-type-uuid',
-        location: mockAdmissionLocation.ward.uuid,
-        obs: [],
-        encounterProviders: [
-          {
-            provider: 'current-provider-uuid',
-            encounterRole: 'clinician-encounter-role-uuid',
-          },
-        ],
-      },
+    expect(mockedCreateEncounter).toHaveBeenCalledWith({
+      patient: mockPatientAlice.uuid,
+      encounterType: 'admission-encounter-type-uuid',
+      location: mockAdmissionLocation.ward.uuid,
+      obs: [],
+      encounterProviders: [
+        {
+          provider: 'current-provider-uuid',
+          encounterRole: 'clinician-encounter-role-uuid',
+        },
+      ],
     });
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/beds/3', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: {
-        patientUuid: mockPatientAlice.uuid,
-        encounterUuid: 'encounter-uuid',
-      },
-    });
+    expect(mockedAssignPatientToBed).toHaveBeenCalledWith(3, mockPatientAlice.uuid, 'encounter-uuid');
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: '{{patientName}} has been successfully admitted and assigned to bed bed3',
@@ -207,7 +232,7 @@ describe('Testing AdmitPatientForm', () => {
   });
 
   it('should show snackbar if there was an issue creating an encounter', async () => {
-    mockedOpenmrsFetch.mockRejectedValue(new Error('Failed to create encounter'));
+    mockedCreateEncounter.mockRejectedValue(new Error('Failed to create encounter'));
     const user = userEvent.setup();
     renderAdmissionForm();
     const combobox = screen.getByRole('combobox', {
@@ -219,7 +244,6 @@ describe('Testing AdmitPatientForm', () => {
     const admitButton = screen.getByRole('button', { name: 'Admit' });
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(1);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'error',
       title: 'Failed to admit patient',
@@ -228,18 +252,7 @@ describe('Testing AdmitPatientForm', () => {
   });
 
   it('should show warning snackbar if encounter was created and bed assignment was not successful', async () => {
-    // @ts-ignore - matching whole FetchResponse type is not necessary
-    mockedOpenmrsFetch.mockImplementation((url) => {
-      if (url.startsWith('/ws/rest/v1/beds')) {
-        return Promise.reject(new Error('Failed to assign bed'));
-      }
-      return Promise.resolve({
-        ok: true,
-        data: {
-          uuid: 'encounter-uuid',
-        },
-      });
-    });
+    mockedAssignPatientToBed.mockRejectedValue(new Error('Failed to assign bed'));
 
     const user = userEvent.setup();
     renderAdmissionForm();
@@ -252,7 +265,6 @@ describe('Testing AdmitPatientForm', () => {
     const admitButton = screen.getByRole('button', { name: 'Admit' });
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(2);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'warning',
       title: 'Patient admitted successfully',
@@ -260,41 +272,25 @@ describe('Testing AdmitPatientForm', () => {
     });
   });
 
-  it('should admit patient if no beds are configured', async () => {
-    // @ts-ignore - we only need these two keys for now
-    mockedOpenmrsFetch.mockResolvedValue({
-      ok: true,
-      data: {
-        uuid: 'encounter-uuid',
-      },
-    });
+  it('should admit patient if no bed is selected', async () => {
     const user = userEvent.setup();
     renderAdmissionForm();
     const admitButton = screen.getByRole('button', { name: 'Admit' });
     expect(admitButton).toBeEnabled();
     await user.click(admitButton);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledTimes(2);
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/encounter', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: {
-        patient: mockPatientAlice.uuid,
-        encounterType: 'admission-encounter-type-uuid',
-        location: mockAdmissionLocation.ward.uuid,
-        obs: [],
-        encounterProviders: [
-          {
-            provider: 'current-provider-uuid',
-            encounterRole: 'clinician-encounter-role-uuid',
-          },
-        ],
-      },
+    expect(mockedCreateEncounter).toHaveBeenCalledWith({
+      patient: mockPatientAlice.uuid,
+      encounterType: 'admission-encounter-type-uuid',
+      location: mockAdmissionLocation.ward.uuid,
+      obs: [],
+      encounterProviders: [
+        {
+          provider: 'current-provider-uuid',
+          encounterRole: 'clinician-encounter-role-uuid',
+        },
+      ],
     });
-    expect(mockedOpenmrsFetch).toHaveBeenCalledWith(`/ws/rest/v1/beds/1?patientUuid=${mockPatientAlice.uuid}`, {
-      method: 'DELETE',
-    });
+    expect(mockedRemovePatientFromBed).toHaveBeenCalledWith(1, mockPatientAlice.uuid);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
       subtitle: 'Patient admitted successfully to Inpatient Ward',
