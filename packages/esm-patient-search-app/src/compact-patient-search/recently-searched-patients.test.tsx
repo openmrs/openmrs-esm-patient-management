@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { PatientSearchContext } from '../patient-search-context';
-import { configSchema } from '../config-schema';
+import { configSchema, type PatientSearchConfig } from '../config-schema';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
 const defaultProps = {
@@ -12,19 +12,64 @@ const defaultProps = {
   fetchError: null,
   hasMore: false,
   isLoading: false,
-  loadingNewData: false,
+  isValidating: false,
   setPage: jest.fn(),
   totalResults: 0,
 };
 
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 describe('RecentlySearchedPatients', () => {
+  const mockSearchResults: Array<SearchedPatient> = [
+    {
+      attributes: [],
+      identifiers: [
+        {
+          display: 'OpenMRS ID = 1000NLY',
+          uuid: '19e98c23-d26f-4668-8810-00da0e10e326',
+          identifier: '1000NLY',
+          identifierType: {
+            uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            display: 'OpenMRS ID',
+            links: [
+              {
+                rel: 'self',
+                uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/patientidentifiertype/05a29f94-c0ed-11e2-94be-8c13b969e334`,
+                resourceAlias: 'patientidentifiertype',
+              },
+            ],
+          },
+          location: {
+            uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
+            display: 'Outpatient Clinic',
+          },
+          preferred: true,
+        },
+      ],
+      person: {
+        age: 34,
+        addresses: [],
+        birthdate: '1990-01-01',
+        dead: false,
+        deathDate: null,
+        gender: 'M',
+        personName: {
+          display: 'Smith, John Doe',
+          givenName: 'John',
+          middleName: 'Doe',
+          familyName: 'Smith',
+        },
+      },
+      uuid: 'test-patient-uuid',
+    },
+  ];
+
   beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
-  it('renders a loading state when search results are being fetched', () => {
+  it('renders a loading state when fetching recently searched patients on initial render', () => {
     renderRecentlySearchedPatients({
       isLoading: true,
+      data: undefined,
     });
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -61,50 +106,6 @@ describe('RecentlySearchedPatients', () => {
   });
 
   it('renders a list of recently searched patients', () => {
-    const mockSearchResults: Array<SearchedPatient> = [
-      {
-        attributes: [],
-        identifiers: [
-          {
-            display: 'OpenMRS ID = 1000NLY',
-            uuid: '19e98c23-d26f-4668-8810-00da0e10e326',
-            identifier: '1000NLY',
-            identifierType: {
-              uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-              display: 'OpenMRS ID',
-              links: [
-                {
-                  rel: 'self',
-                  uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/patientidentifiertype/05a29f94-c0ed-11e2-94be-8c13b969e334`,
-                  resourceAlias: 'patientidentifiertype',
-                },
-              ],
-            },
-            location: {
-              uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
-              display: 'Outpatient Clinic',
-            },
-            preferred: true,
-          },
-        ],
-        person: {
-          age: 34,
-          addresses: [],
-          birthdate: '1990-01-01',
-          dead: false,
-          deathDate: null,
-          gender: 'M',
-          personName: {
-            display: 'Smith, John Doe',
-            givenName: 'John',
-            middleName: 'Doe',
-            familyName: 'Smith',
-          },
-        },
-        uuid: 'test-patient-uuid',
-      },
-    ];
-
     renderRecentlySearchedPatients({
       currentPage: 0,
       data: mockSearchResults,
@@ -122,6 +123,18 @@ describe('RecentlySearchedPatients', () => {
     expect(screen.getByRole('heading', { name: /Smith, John Doe/i })).toBeInTheDocument();
     expect(screen.getByRole('img')).toBeInTheDocument();
     expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
+  });
+
+  it('renders a loading spinner when revalidating recently searched patients', () => {
+    renderRecentlySearchedPatients({
+      currentPage: 0,
+      data: mockSearchResults,
+      hasMore: false,
+      totalResults: 1,
+      isValidating: true,
+    });
+
+    expect(screen.getByTitle(/loading/i)).toBeInTheDocument();
   });
 });
 

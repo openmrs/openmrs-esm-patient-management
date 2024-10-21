@@ -26,9 +26,8 @@ describe('PatientSearchPageComponent', () => {
       ...getDefaultsFromConfigSchema(configSchema),
       search: {
         disableTabletSearchOnKeyUp: false,
-        patientResultUrl: configSchema.search.patientResultUrl._default,
         showRecentlySearchedPatients: false,
-      },
+      } as PatientSearchConfig['search'],
     });
   });
 

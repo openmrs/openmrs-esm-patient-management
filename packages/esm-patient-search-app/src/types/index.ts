@@ -1,4 +1,4 @@
-import { type FetchResponse, type OpenmrsResource } from '@openmrs/esm-framework';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface SearchedPatient {
   uuid: string;
@@ -82,21 +82,14 @@ export interface FHIRPatientSearchResponse {
 }
 
 export interface PatientSearchResponse {
-  data?: Array<SearchedPatient>;
-  isLoading: boolean;
-  fetchError: Error;
-  loadingNewData: boolean;
-  hasMore: boolean;
   currentPage: number;
+  data?: Array<SearchedPatient>;
+  fetchError: Error;
+  hasMore: boolean;
+  isLoading: boolean;
+  isValidating: boolean;
+  setPage: (page: number | ((_page: number) => number)) => Promise<unknown[] | undefined>;
   totalResults: number;
-  setPage: (size: number | ((_size: number) => number)) => Promise<
-    FetchResponse<{
-      results: Array<SearchedPatient>;
-      links: Array<{
-        rel: 'prev' | 'next';
-      }>;
-    }>[]
-  >;
 }
 
 export interface AdvancedPatientSearchState {
@@ -136,5 +129,6 @@ export interface User {
   userProperties: {
     [x: string]: string;
     patientsVisited: string;
+    defaultLocation: string;
   };
 }

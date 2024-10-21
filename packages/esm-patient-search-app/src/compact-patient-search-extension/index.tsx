@@ -1,12 +1,13 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
-import PatientSearch from '../compact-patient-search/patient-search.component';
-import { Search, Button } from '@carbon/react';
+import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import styles from './compact-patient-search.scss';
-import { useInfinitePatientSearch } from '../patient-search.resource';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
-import useArrowNavigation from '../hooks/useArrowNavigation';
+import { type PatientSearchConfig } from '../config-schema';
+import { useInfinitePatientSearch } from '../patient-search.resource';
 import { PatientSearchContext } from '../patient-search-context';
+import useArrowNavigation from '../hooks/useArrowNavigation';
+import PatientSearch from '../compact-patient-search/patient-search.component';
+import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;
@@ -21,47 +22,39 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   buttonProps,
 }) => {
   const { t } = useTranslation();
+  const config = useConfig<PatientSearchConfig>();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const bannerContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
-  const config = useConfig();
   const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
   const { data: patients } = patientSearchResponse;
 
-  const handleSubmit = useCallback((evt) => {
-    evt.preventDefault();
-  }, []);
+  const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
 
-  const handleClear = useCallback(() => {
-    setSearchTerm('');
-  }, [setSearchTerm]);
+  const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
-  const handleReset = useCallback(() => {
-    setSearchTerm('');
-  }, [setSearchTerm]);
-
-  // handlePatientSelection: Manually handles everything that needs to happen when a patient
-  // from the result list is selected. This is used for the arrow navigation, but is not used
-  // for click handling.
+  /**
+   * handlePatientSelection: Manually handles everything that needs to happen when a patient
+   * from the result list is selected. This is used for the arrow navigation, but is not used
+   * for click handling.
+   */
   const handlePatientSelection = useCallback(
-    (evt, index: number) => {
-      evt.preventDefault();
+    (event, index: number) => {
+      event.preventDefault();
       if (selectPatientAction) {
         selectPatientAction(patients[index].uuid);
       } else {
         navigate({
-          to: `${interpolateString(config.search.patientResultUrl, {
+          to: interpolateString(config.search.patientChartUrl, {
             patientUuid: patients[index].uuid,
-          })}`,
+          }),
         });
       }
-      handleReset();
+      handleClear();
     },
-    [config.search, selectPatientAction, patients, handleReset],
+    [config.search, selectPatientAction, patients, handleClear],
   );
-
-  const bannerContainerRef = useRef(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFocusToInput = useCallback(() => {
     let len = inputRef.current.value?.length ?? 0;
@@ -86,7 +79,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   return (
     <div className={styles.patientSearchBar}>
-      <form onSubmit={handleSubmit} className={styles.searchArea}>
+      <form onSubmit={(event) => event.preventDefault()} className={styles.searchArea}>
         <Search
           autoFocus
           className={styles.patientSearchInput}
@@ -95,11 +88,11 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           onChange={(event) => handleChange(event.target.value)}
           onClear={handleClear}
           placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
-          value={searchTerm}
-          size="lg"
           ref={inputRef}
+          size="lg"
+          value={searchTerm}
         />
-        <Button type="submit" onClick={handleSubmit} {...buttonProps}>
+        <Button type="submit" onClick={(event) => event.preventDefault()} {...buttonProps}>
           {t('search', 'Search')}
         </Button>
       </form>
@@ -107,7 +100,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         <PatientSearchContext.Provider
           value={{
             nonNavigationSelectPatientAction: selectPatientAction,
-            patientClickSideEffect: handleReset,
+            patientClickSideEffect: handleClear,
           }}>
           <div className={styles.floatingSearchResultsContainer}>
             <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />

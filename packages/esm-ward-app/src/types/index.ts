@@ -67,6 +67,14 @@ export interface Bed {
   status: BedStatus;
 }
 
+export interface BedDetail {
+  bedId: number;
+  bedNumber: number;
+  bedType: BedType;
+  physicalLocation: Location;
+  patients: Array<Patient>;
+}
+
 export interface BedLayout {
   rowNumber: number;
   columnNumber: number;
