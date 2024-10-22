@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import { renderWithSwr } from 'tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../mock';
 import { configSchema } from '../config-schema';
+import { useObs } from '../hooks/useObs';
 import useWardLocation from '../hooks/useWardLocation';
 import { type WardViewContext } from '../types';
 import DefaultWardView from './default-ward/default-ward-view.component';
@@ -30,6 +31,9 @@ jest.mock('../hooks/useWardLocation', () =>
     invalidLocation: false,
   }),
 );
+jest.mock('../hooks/useObs', () => ({
+  useObs: jest.fn(),
+}));
 
 const mockUseWardLocation = jest.mocked(useWardLocation);
 
@@ -40,6 +44,10 @@ jest.mock('react-router-dom', () => ({
 const mockUseParams = useParams as jest.Mock;
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+//@ts-ignore
+jest.mocked(useObs).mockReturnValue({
+  data: [],
+});
 
 const intersectionObserverMock = () => ({
   observe: () => null,

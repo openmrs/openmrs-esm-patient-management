@@ -84,7 +84,7 @@ const MotherChildBedShareDivider = () => {
   return (
     <div className={maternalWardPatientCardStyles.motherChildBedDivider}>
       <div className={maternalWardPatientCardStyles.motherChildBedDividerLine}></div>
-      <Tag type="purple">{t('motherChildbedShare', 'Mother / Child')}</Tag>
+      <Tag type="purple">{t('motherChildBedShare', 'Mother / Child')}</Tag>
       <div className={maternalWardPatientCardStyles.motherChildBedDividerLine}></div>
     </div>
   );
