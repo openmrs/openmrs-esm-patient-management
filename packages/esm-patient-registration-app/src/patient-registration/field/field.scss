@@ -99,7 +99,13 @@
   align-items: center;
 }
 
+.arrowRightIcon {
+  fill: currentColor !important;
+}
+
 .configureIdentifiersButton {
+  display: flex;
+  align-items: center;
   margin: 0 0 layout.$spacing-05 layout.$spacing-05;
 
   svg {

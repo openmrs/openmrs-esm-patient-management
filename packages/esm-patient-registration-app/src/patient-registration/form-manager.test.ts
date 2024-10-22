@@ -69,6 +69,7 @@ describe('FormManager', () => {
         },
       ]);
     });
+
     it('should generate identifier if it has autoGeneration and manual entry disabled', async () => {
       formValues.identifiers.foo.autoGeneration = true;
       formValues.identifiers.foo.selectedSource.autoGenerationOption.manualEntryEnabled = false;

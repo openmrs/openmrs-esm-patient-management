@@ -9,7 +9,12 @@ import {
   PatientRegistrationContext,
   type PatientRegistrationContextProps,
 } from '../../../patient-registration-context';
-import type { AddressTemplate, FormValues, PatientIdentifierValue } from '../../../patient-registration.types';
+import type {
+  AddressTemplate,
+  FormValues,
+  IdentifierSource,
+  PatientIdentifierValue,
+} from '../../../patient-registration.types';
 import IdentifierInput from './identifier-input.component';
 import userEvent from '@testing-library/user-event';
 
@@ -79,11 +84,11 @@ describe('identifier input', () => {
         manualEntryEnabled: false,
         automaticGenerationEnabled: true,
       },
-    },
+    } as IdentifierSource,
     autoGeneration: false,
     preferred: true,
     required: true,
-  };
+  } as PatientIdentifierValue;
 
   const setupIdentifierInput = (patientIdentifier: PatientIdentifierValue, initialValues = {}) => {
     render(
@@ -101,7 +106,7 @@ describe('identifier input', () => {
 
   it('shows the identifier input', () => {
     openmrsID.autoGeneration = false;
-    setupIdentifierInput(openmrsID);
+    setupIdentifierInput(openmrsID as PatientIdentifierValue);
     expect(screen.getByLabelText(openmrsID.identifierName)).toBeInTheDocument();
   });
 
@@ -112,7 +117,7 @@ describe('identifier input', () => {
     openmrsID.initialValue = '1002UU9';
     openmrsID.identifierValue = '1002UU9';
     // replay
-    setupIdentifierInput(openmrsID);
+    setupIdentifierInput(openmrsID as PatientIdentifierValue);
     expect(screen.getByText('Edit')).toBeInTheDocument();
   });
 
@@ -139,7 +144,7 @@ describe('identifier input', () => {
     it('hides the input when the identifier is auto-generated', () => {
       openmrsID.autoGeneration = true;
       setupIdentifierInput(openmrsID);
-      expect(screen.getByTestId('identifier-input').type).toBe('hidden');
+      expect(screen.getByTestId('identifier-input')).toHaveAttribute('type', 'hidden');
     });
 
     it("displays 'Auto-Generated' when the indentifier has auto generation", () => {
@@ -154,7 +159,7 @@ describe('identifier input', () => {
         autoGenerationOption: {
           manualEntryEnabled: true,
         },
-      };
+      } as IdentifierSource;
 
       it('shows the edit button', () => {
         openmrsID.autoGeneration = true;
@@ -171,11 +176,11 @@ describe('identifier input', () => {
             autoGenerationOption: {
               manualEntryEnabled: true,
             },
-          };
+          } as IdentifierSource;
           setupIdentifierInput(openmrsID);
           const editButton = screen.getByTestId('edit-button');
           await user.click(editButton);
-          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`)).value).toBe('');
+          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('');
         });
 
         it('displays an input field with the identifier value if it exists', async () => {
@@ -186,11 +191,11 @@ describe('identifier input', () => {
             autoGenerationOption: {
               manualEntryEnabled: true,
             },
-          };
+          } as IdentifierSource;
           setupIdentifierInput(openmrsID, { identifiers: { [fieldName]: { identifierValue: '10001V' } } });
           const editButton = screen.getByTestId('edit-button');
           await user.click(editButton);
-          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`)).value).toBe('10001V');
+          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('10001V');
         });
       });
     });
