@@ -18,7 +18,7 @@ export function useLocations(locationTag: string | null, searchQuery: string = '
     urlSearchParameters.append('_summary', 'data');
 
     if (!debouncedSearchQuery) {
-      urlSearchParameters.append('_count', '5');
+      urlSearchParameters.append('_count', '10');
     }
 
     if (locationTag) {
