@@ -117,7 +117,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
           )}
         </div>
       )}
-      <div style={{ marginBottom: '1rem' }}>
+      <div className={styles.actionButtonContainer}>
         {showEditButton && (
           <UserHasAccess privilege="Edit Patient Identifiers">
             <Button

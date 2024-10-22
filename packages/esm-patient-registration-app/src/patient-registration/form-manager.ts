@@ -250,6 +250,7 @@ export class FormManager {
             : await (
                 await generateIdentifier(selectedSource.uuid)
               ).data.identifier;
+
         const identifierToCreate = {
           uuid: identifierUuid,
           identifier,
