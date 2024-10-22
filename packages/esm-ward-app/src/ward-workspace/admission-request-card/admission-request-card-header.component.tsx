@@ -17,7 +17,7 @@ const AdmissionRequestCardHeader: WardPatientCardType = (wardPatient) => {
     <div className={styles.admissionRequestCardHeaderContainer}>
       <div className={styles.admissionRequestCardHeader}>
         <WardPatientName patient={patient} />
-        <WardPatientIdentifier patient={patient} />
+        <WardPatientIdentifier id="patient-identifier" patient={patient} />
         <WardPatientGender patient={patient} />
         <WardPatientAge patient={patient} />
       </div>

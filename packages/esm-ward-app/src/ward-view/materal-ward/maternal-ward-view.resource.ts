@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { type MothersAndChildrenSearchCriteria, useMotherAndChildren } from '../../hooks/useMotherAndChildren';
-import { type MotherAndChild } from '../../types';
 import { showNotification } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMotherAndChildren, type MothersAndChildrenSearchCriteria } from '../../hooks/useMotherAndChildren';
+import { type PatientAndAdmission } from '../../types';
 
 const motherAndChildrenRep =
   'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
@@ -52,24 +52,38 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
     });
   }
 
-  const motherChildrenRelationshipsByPatient = useMemo(() => {
-    if (childrenData != null && motherData != null) {
-      const map = new Map<string, MotherAndChild[]>();
-      for (const data of [...childrenData, ...motherData]) {
-        if (!map.has(data.child.uuid)) {
-          map.set(data.child.uuid, []);
-        }
-        if (!map.has(data.mother.uuid)) {
-          map.set(data.mother.uuid, []);
-        }
-        map.get(data.child.uuid).push(data);
-        map.get(data.mother.uuid).push(data);
-      }
-      return map;
-    } else {
+  const relationships = useMemo(() => {
+    if (isLoadingChildrenData || isLoadingMotherData) {
       return null;
     }
+
+    const motherByChildUuid = new Map<string, PatientAndAdmission>();
+    const childrenByMotherUuid = new Map<string, PatientAndAdmission[]>();
+
+    for (const { child, childAdmission, mother, motherAdmission } of motherData ?? []) {
+      motherByChildUuid.set(child.uuid, { patient: mother, currentAdmission: motherAdmission });
+      if (!childrenByMotherUuid.has(mother.uuid)) {
+        childrenByMotherUuid.set(mother.uuid, []);
+      }
+      childrenByMotherUuid.get(mother.uuid).push({ patient: child, currentAdmission: childAdmission });
+    }
+
+    for (const { child, childAdmission, mother, motherAdmission } of childrenData ?? []) {
+      motherByChildUuid.set(child.uuid, { patient: mother, currentAdmission: motherAdmission });
+      if (!childrenByMotherUuid.has(mother.uuid)) {
+        childrenByMotherUuid.set(mother.uuid, []);
+      }
+
+      // careful, we need to avoid duplicate entries if both mother and child as in same ward
+      const children = childrenByMotherUuid.get(mother.uuid);
+      const hasChildAlready = children.some(({ patient }) => patient.uuid == child.uuid);
+      if (!hasChildAlready) {
+        children.push({ patient: child, currentAdmission: childAdmission });
+      }
+    }
+
+    return { motherByChildUuid, childrenByMotherUuid };
   }, [childrenData, motherData, isLoadingChildrenData, isLoadingMotherData]);
 
-  return motherChildrenRelationshipsByPatient;
+  return relationships;
 }

@@ -67,6 +67,14 @@ export interface Bed {
   status: BedStatus;
 }
 
+export interface BedDetail {
+  bedId: number;
+  bedNumber: number;
+  bedType: BedType;
+  physicalLocation: Location;
+  patients: Array<Patient>;
+}
+
 export interface BedLayout {
   rowNumber: number;
   columnNumber: number;
@@ -228,8 +236,18 @@ export interface WardViewContext {
   WardPatientHeader: React.FC<WardPatient>;
 }
 
+export interface PatientAndAdmission {
+  patient: Patient;
+  currentAdmission: InpatientAdmission;
+}
+
+export interface MotherChildRelationships {
+  motherByChildUuid: Map<string, PatientAndAdmission>;
+  childrenByMotherUuid: Map<string, PatientAndAdmission[]>;
+}
+
 export interface MaternalWardViewContext {
-  motherChildrenRelationshipsByPatient: Map<string, MotherAndChild[]>;
+  motherChildRelationships: MotherChildRelationships;
 }
 
 export type PatientWorkspaceAdditionalProps = Omit<WardPatientWorkspaceProps, keyof DefaultWorkspaceProps>;
