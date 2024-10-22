@@ -6,7 +6,6 @@ import styles from './../field.scss';
 import { useLocations } from './location-person-attribute-field.resource';
 import { ComboBox, InlineLoading, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 
 export interface LocationPersonAttributeFieldProps {
   id: string;
@@ -24,7 +23,6 @@ export function LocationPersonAttributeField({
   required,
 }: LocationPersonAttributeFieldProps) {
   const { t } = useTranslation();
-  const isTablet = !isDesktop(useLayoutType());
   const fieldName = `attributes.${personAttributeType.uuid}`;
   const [field, meta, { setValue }] = useField(`attributes.${personAttributeType.uuid}`);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -76,7 +74,6 @@ export function LocationPersonAttributeField({
   return (
     <div
       className={classNames(styles.customField, styles.halfWidthInDesktopView, styles.locationAttributeFieldContainer)}>
-      {loadingNewData && isTablet && <InlineLoading description="Loading..." />}
       <Layer>
         <Field name={fieldName}>
           {({ field, form: { touched, errors } }) => {
@@ -98,9 +95,9 @@ export function LocationPersonAttributeField({
           }}
         </Field>
       </Layer>
-      {loadingNewData && !isTablet && (
+      {loadingNewData && (
         <div className={styles.loadingContainer}>
-          <InlineLoading description="Loading..." />
+          <InlineLoading />
         </div>
       )}
     </div>

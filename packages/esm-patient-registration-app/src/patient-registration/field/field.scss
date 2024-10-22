@@ -119,9 +119,10 @@
   position: relative;
 
   .loadingContainer {
+    background-color: colors.$white;
     position: absolute;
-    right: -6rem;
-    bottom: 0;
+    right: layout.$spacing-07;
+    bottom: layout.$spacing-02;
   }
 }
 
