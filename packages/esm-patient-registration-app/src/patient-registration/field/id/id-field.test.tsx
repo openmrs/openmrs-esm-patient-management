@@ -1,18 +1,19 @@
 import React from 'react';
-import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
 import { Form, Formik } from 'formik';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { Identifiers } from './id-field.component';
-import { mockOpenmrsId, mockIdentifierTypes, mockPatient, mockSession } from '__mocks__';
-import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { type Resources, ResourcesContext } from '../../../offline.resources';
+import { type AddressTemplate, type IdentifierSource } from '../../patient-registration.types';
+import { mockIdentifierTypes, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
+import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
+import { ResourcesContext, type Resources } from '../../../offline.resources';
 import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
+import { Identifiers, setIdentifierSource } from './id-field.component';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
 const mockResourcesContextValue = {
-  addressTemplate: null,
+  addressTemplate: null as unknown as AddressTemplate,
   currentSession: mockSession.data,
   identifierTypes: [],
   relationshipTypes: [],
@@ -52,7 +53,7 @@ const mockContextValues: PatientRegistrationContextProps = {
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
-};
+} as unknown as PatientRegistrationContextProps;
 
 describe('Identifiers', () => {
   beforeEach(() => {
@@ -118,5 +119,23 @@ describe('Identifiers', () => {
     await user.click(configureButton);
 
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
+  });
+});
+
+describe('setIdentifierSource', () => {
+  describe('auto-generation', () => {
+    it('should return auto-generated as the identifier value', () => {
+      const identifierSource = { autoGenerationOption: { automaticGenerationEnabled: true } } as IdentifierSource;
+      const { identifierValue } = setIdentifierSource(identifierSource, '', '');
+      expect(identifierValue).toBe('auto-generated');
+    });
+
+    it('should return the identifier value when manual entry enabled', () => {
+      const identifierSource = {
+        autoGenerationOption: { automaticGenerationEnabled: true, manualEntryEnabled: true },
+      } as IdentifierSource;
+      const { identifierValue } = setIdentifierSource(identifierSource, '10001V', '');
+      expect(identifierValue).toBe('10001V');
+    });
   });
 });

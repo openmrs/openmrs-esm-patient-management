@@ -18,6 +18,7 @@ export interface FieldDefinition {
     required: boolean;
     matches?: string;
   };
+  locationTag?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
 }
@@ -182,6 +183,12 @@ export const esmPatientRegistrationSchema = {
           _default: null,
           _description: 'Optional RegEx for testing the validity of the input.',
         },
+      },
+      locationTag: {
+        _type: Type.String,
+        _default: null,
+        _description:
+          'Only for fields with "person attribute" type `org.openmrs.Location`. This filters the list of location options in the dropdown based on their location tag. By default, all locations are shown.',
       },
       answerConceptSetUuid: {
         _type: Type.ConceptUuid,

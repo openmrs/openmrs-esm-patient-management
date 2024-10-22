@@ -25,14 +25,16 @@ export function setIdentifierSource(
   selectedSource: IdentifierSource;
 } {
   const autoGeneration = identifierSource?.autoGenerationOption?.automaticGenerationEnabled;
+  const manualEntryEnabled = identifierSource?.autoGenerationOption?.manualEntryEnabled;
   return {
     selectedSource: identifierSource,
     autoGeneration,
-    identifierValue: autoGeneration
-      ? 'auto-generated'
-      : identifierValue !== 'auto-generated'
-        ? identifierValue
-        : initialValue,
+    identifierValue:
+      autoGeneration && !manualEntryEnabled
+        ? 'auto-generated'
+        : identifierValue !== 'auto-generated'
+          ? identifierValue
+          : initialValue,
   };
 }
 
@@ -126,7 +128,7 @@ export const Identifiers: React.FC = () => {
             className={styles.configureIdentifiersButton}
             onClick={() => setShowIdentifierOverlay(true)}
             size={isDesktop(layout) ? 'sm' : 'md'}>
-            {t('configure', 'Configure')} <ArrowRight size={16} />
+            {t('configure', 'Configure')} <ArrowRight className={styles.arrowRightIcon} size={16} />
           </Button>
         </div>
       </UserHasAccess>
