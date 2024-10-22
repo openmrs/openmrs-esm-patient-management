@@ -76,6 +76,7 @@ describe('FormManager', () => {
       await FormManager.savePatientIdentifiers(true, undefined, formValues.identifiers, {}, 'Nyc');
       expect(mockGenerateIdentifier.mock.calls).toHaveLength(1);
     });
+
     it('should not generate identifiers if manual entry enabled and identifier value given', async () => {
       formValues.identifiers.foo.autoGeneration = true;
       formValues.identifiers.foo.selectedSource.autoGenerationOption.manualEntryEnabled = true;
