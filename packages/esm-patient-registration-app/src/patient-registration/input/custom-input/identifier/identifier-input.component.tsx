@@ -58,7 +58,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     setFieldValue(`identifiers.${fieldName}`, {
       ...patientIdentifier,
       ...setIdentifierSource(identifierType?.identifierSources?.[0], initialValue, initialValue),
-      ...(autoGeneration && manualEntryEnabled && { identifierValue: initialValue || '' }),
+      ...(autoGeneration && manualEntryEnabled && { identifierValue: initialValue ?? '' }),
     });
   };
 
