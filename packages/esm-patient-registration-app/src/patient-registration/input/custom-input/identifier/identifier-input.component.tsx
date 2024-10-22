@@ -18,7 +18,6 @@ interface IdentifierInputProps {
 }
 
 const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
-  const { autoGeneration, initialValue, identifierValue, identifierName, required, selectedSource } = patientIdentifier;
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
   const { identifierTypes } = useContext(ResourcesContext);
@@ -27,6 +26,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
   );
+  const { autoGeneration, initialValue, identifierValue, identifierName, required, selectedSource } = patientIdentifier;
   const manualEntryEnabled = selectedSource?.autoGenerationOption?.manualEntryEnabled;
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
   const name = `identifiers.${fieldName}.identifierValue`;
