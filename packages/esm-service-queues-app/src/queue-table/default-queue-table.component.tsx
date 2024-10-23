@@ -133,7 +133,7 @@ function DefaultQueueTable() {
               queueUuid={null}
               statusUuid={null}
               ExpandedRow={QueueTableExpandedRow}
-              tableFilter={[
+              tableFilters={[
                 <QueueDropdownFilter />,
                 <StatusDropdownFilter />,
                 <TableToolbarSearch
@@ -159,16 +159,17 @@ function QueueDropdownFilter() {
   const layout = useLayoutType();
   const { services } = useQueueServices();
   const selectedService = useSelectedService();
-  const handleServiceChange = ({ selectedItem }) => {
+
+  const handleServiceChange = useCallback(({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem?.display);
-  };
+  }, []);
 
   return (
     <>
       <div className={styles.filterContainer}>
         <Dropdown
           id="serviceFilter"
-          titleText={t('filterByService', 'Filter by service :')}
+          titleText={t('filterByService', 'Filter by service:')}
           label={selectedService?.serviceDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
@@ -195,7 +196,7 @@ function StatusDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="statusFilter"
-          titleText={t('filterByStatus', 'Filter by status :')}
+          titleText={t('filterByStatus', 'Filter by status:')}
           label={queueStatus?.statusDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}
