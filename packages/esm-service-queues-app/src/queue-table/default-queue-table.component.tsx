@@ -133,17 +133,18 @@ function DefaultQueueTable() {
               queueUuid={null}
               statusUuid={null}
               ExpandedRow={QueueTableExpandedRow}
-              tableFilters={[
-                <QueueDropdownFilter />,
-                <StatusDropdownFilter />,
-                <TableToolbarSearch
-                  className={styles.search}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={t('searchThisList', 'Search this list')}
-                  size={isDesktop(layout) ? 'sm' : 'lg'}
-                />,
-                <ClearQueueEntries queueEntries={filteredQueueEntries} />,
-              ]}
+              tableFilters={
+                <>
+                  <QueueDropdownFilter /> <StatusDropdownFilter />
+                  <TableToolbarSearch
+                    className={styles.search}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size={isDesktop(layout) ? 'sm' : 'lg'}
+                  />
+                  <ClearQueueEntries queueEntries={filteredQueueEntries} />
+                </>
+              }
             />
           </div>
         ) : (

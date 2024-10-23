@@ -46,7 +46,7 @@ interface QueueTableProps {
   ExpandedRow?: FC<{ queueEntry: QueueEntry }>;
 
   // if provided, adds addition table toolbar elements
-  tableFilters?: React.ReactNode[];
+  tableFilters?: React.ReactNode;
 
   isLoading?: boolean;
 }
@@ -113,11 +113,7 @@ function QueueTable({
 
               {tableFilters && (
                 <TableToolbar {...getToolbarProps()}>
-                  <TableToolbarContent className={styles.toolbarContent}>
-                    {tableFilters.map((tableFilter, index) => (
-                      <React.Fragment key={index}>{tableFilter}</React.Fragment>
-                    ))}
-                  </TableToolbarContent>
+                  <TableToolbarContent className={styles.toolbarContent}>{tableFilters}</TableToolbarContent>
                 </TableToolbar>
               )}
             </div>
