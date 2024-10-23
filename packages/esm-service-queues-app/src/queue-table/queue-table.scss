@@ -28,6 +28,10 @@
 }
 
 .filterContainer {
+  label {
+    margin-right: layout.$spacing-03 !important;
+  }
+
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
   }
@@ -97,6 +101,7 @@
   .toolbarContent {
     display: flex;
     z-index: 1; // prevent dropdown from getting covered by table elements
+    column-gap: layout.$spacing-03;
   }
 
   :global(.cds--table-toolbar) {
