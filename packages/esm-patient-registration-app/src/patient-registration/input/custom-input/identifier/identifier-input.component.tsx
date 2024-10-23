@@ -1,16 +1,17 @@
 import React, { useState, useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
 import { Button } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { ResourcesContext } from '../../../../offline.resources';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
-import { type PatientIdentifierValue } from '../../../patient-registration.types';
+import type { FormValues, PatientIdentifierValue } from '../../../patient-registration.types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { Input } from '../../basic-input/input/input.component';
 import styles from '../../input.scss';
+import { Controller, useFormContext } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../../patient-registration-hooks';
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
@@ -21,7 +22,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
   const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline, values, setFieldValue } = useContext(PatientRegistrationContext);
+  const { isOffline, watch, setValue, getFieldState, control } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
@@ -29,8 +30,8 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { autoGeneration, initialValue, identifierValue, identifierName, required, selectedSource } = patientIdentifier;
   const manualEntryEnabled = selectedSource?.autoGenerationOption?.manualEntryEnabled;
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
-  const name = `identifiers.${fieldName}.identifierValue`;
-  const [identifierField, identifierFieldMeta] = useField(name);
+  const name = `identifiers.${fieldName}.identifierValue` as keyof FormValues;
+  const { isTouched, error } = getFieldState(name);
 
   const disabled = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
@@ -44,7 +45,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
 
   const handleReset = useCallback(() => {
     setHideInputField(true);
-    setFieldValue(`identifiers.${fieldName}`, {
+    setValue(`identifiers.${fieldName}`, {
       ...patientIdentifier,
       identifierValue: initialValue,
       selectedSource,
@@ -55,7 +56,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
 
   const handleEdit = () => {
     setHideInputField(false);
-    setFieldValue(`identifiers.${fieldName}`, {
+    setValue(`identifiers.${fieldName}`, {
       ...patientIdentifier,
       ...setIdentifierSource(identifierType?.identifierSources?.[0], initialValue, initialValue),
       ...(autoGeneration && manualEntryEnabled && { identifierValue: initialValue ?? '' }),
@@ -73,7 +74,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
       const confirmDeleteIdentifierModal = showModal('delete-identifier-confirmation-modal', {
         deleteIdentifier: (deleteIdentifier) => {
           if (deleteIdentifier) {
-            setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
+            setValue('identifiers', deleteIdentifierType(watch('identifiers'), fieldName));
           }
           confirmDeleteIdentifierModal();
         },
@@ -81,7 +82,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
         initialValue,
       });
     } else {
-      setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
+      setValue('identifiers', deleteIdentifierType(watch('identifiers'), fieldName));
     }
   };
 
@@ -94,13 +95,10 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
         <Input
           id={name}
           labelText={identifierName}
+          // @ts-ignore
           name={name}
           disabled={disabled}
           required={required}
-          invalid={!!(identifierFieldMeta.touched && identifierFieldMeta.error)}
-          invalidText={identifierFieldMeta.error && t(identifierFieldMeta.error)}
-          // t('identifierValueRequired', 'Identifier value is required')
-          {...identifierField}
         />
       ) : (
         <div className={styles.textID}>
@@ -110,11 +108,13 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
           <p data-testid="identifier-placeholder" className={styles.bodyShort02}>
             {autoGeneration ? t('autoGeneratedPlaceholderText', 'Auto-generated') : identifierValue}
           </p>
-          <input data-testid="identifier-input" type="hidden" {...identifierField} disabled />
+          <Controller
+            name={name}
+            control={control}
+            render={({ field }) => <input type="hidden" {...field} value={field.value as string} disabled />}
+          />
           {/* This is added for any error descriptions */}
-          {!!(identifierFieldMeta.touched && identifierFieldMeta.error) && (
-            <span className={styles.dangerLabel01}>{identifierFieldMeta.error && t(identifierFieldMeta.error)}</span>
-          )}
+          {Boolean(isTouched && error?.message) && <span className={styles.dangerLabel01}>{error?.message}</span>}
         </div>
       )}
       <div className={styles.actionButtonContainer}>

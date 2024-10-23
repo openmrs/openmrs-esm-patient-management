@@ -3,10 +3,12 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 import { Layer, Select, SelectItem } from '@carbon/react';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import type { FormValues, PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
-import { reportError } from '@openmrs/esm-framework';
+import { fetchCurrentPatient, reportError } from '@openmrs/esm-framework';
+import { Controller } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export interface CodedPersonAttributeFieldProps {
   id: string;
@@ -28,6 +30,7 @@ export function CodedPersonAttributeField({
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
     customConceptAnswers.length ? '' : answerConceptSetUuid,
   );
+  const { control } = usePatientRegistrationContext();
 
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
@@ -93,26 +96,25 @@ export function CodedPersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Layer>
-          <Field name={fieldName}>
-            {({ field, form: { touched, errors }, meta }) => {
-              return (
-                <>
-                  <Select
-                    id={id}
-                    name={`person-attribute-${personAttributeType.uuid}`}
-                    labelText={label ?? personAttributeType?.display}
-                    invalid={errors[fieldName] && touched[fieldName]}
-                    required={required}
-                    {...field}>
-                    <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />
-                    {answers.map((answer) => (
-                      <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
-                    ))}
-                  </Select>
-                </>
-              );
-            }}
-          </Field>
+          <Controller
+            control={control}
+            name={fieldName as keyof FormValues}
+            render={({ field, fieldState: { error, isTouched } }) => (
+              <Select
+                {...field}
+                id={id}
+                name={`person-attribute-${personAttributeType.uuid}`}
+                labelText={label ?? personAttributeType?.display}
+                invalid={Boolean(isTouched && error?.message)}
+                required={required}
+                invalidText={error?.message}>
+                <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />
+                {answers.map((answer) => (
+                  <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
+                ))}
+              </Select>
+            )}
+          />
         </Layer>
       ) : null}
     </div>

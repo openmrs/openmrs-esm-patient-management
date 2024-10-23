@@ -8,7 +8,7 @@ import {
   usePatient,
 } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
-import { type Dispatch, useEffect, useMemo, useState } from 'react';
+import { type Dispatch, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
 import { type RegistrationConfig } from '../config-schema';
@@ -30,6 +30,9 @@ import {
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 import dayjs from 'dayjs';
+import { z } from 'zod';
+import { PatientRegistrationContext } from './patient-registration-context';
+import { useFormContext } from 'react-hook-form';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
@@ -335,4 +338,11 @@ function getPatientAttributeUuidMapForPatient(attributes: Array<PersonAttributeR
     attributeUuidMap[`attribute.${attribute?.attributeType?.uuid}`] = attribute?.uuid;
   });
   return attributeUuidMap;
+}
+
+export function usePatientRegistrationContext() {
+  return {
+    ...useContext(PatientRegistrationContext),
+    ...useFormContext<FormValues>(),
+  };
 }
