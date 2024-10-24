@@ -1,8 +1,14 @@
 import React from 'react';
-import { of } from 'rxjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { updateVisit, showSnackbar, useVisit, type VisitReturnType } from '@openmrs/esm-framework';
+import {
+  updateVisit,
+  showSnackbar,
+  useVisit,
+  type VisitReturnType,
+  type FetchResponse,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import EndAppointmentModal from './end-appointment.modal';
 
@@ -20,7 +26,7 @@ jest.mock('../../form/appointments-form.resource', () => ({
 
 describe('EndAppointmentModal', () => {
   beforeEach(() => {
-    mockUpdateVisit.mockImplementation(() => of({}));
+    mockUpdateVisit.mockResolvedValue({} as FetchResponse<Visit>);
   });
 
   it('has a cancel button that closes the modal', async () => {
@@ -73,7 +79,7 @@ describe('EndAppointmentModal', () => {
     expect(closeModal).toHaveBeenCalled();
     expect(showSnackbar).toHaveBeenCalledWith({
       title: 'Appointment ended',
-      subtitle: 'Appointment successfully ended and visit successfully closed.',
+      subtitle: 'Appointment successfully ended and visit successfully closed',
       isLowContrast: true,
       kind: 'success',
     });

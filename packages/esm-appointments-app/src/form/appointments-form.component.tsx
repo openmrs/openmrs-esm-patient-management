@@ -837,7 +837,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     datePickerType="single"
                     dateFormat={datePickerFormat}
                     value={value}
-                    maxDate={new Date()}
+                    maxDate={new Date().toISOString()}
                     onChange={([date]) => onChange(date)}
                     invalid={!!fieldState?.error?.message}
                     invalidText={fieldState?.error?.message}>
