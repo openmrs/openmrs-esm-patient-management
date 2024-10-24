@@ -28,5 +28,12 @@
       "slot": "patient-search-bar-slot",
       "offline": true
     }
+  ],
+    "featureFlags": [
+      {
+        "flagName": "mpiFlag",
+        "label": "MPI Service",
+        "description": "Enables the Master Patient Index workflows."
+      }
   ]
 }
