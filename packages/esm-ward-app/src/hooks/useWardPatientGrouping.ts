@@ -23,5 +23,10 @@ export function useWardPatientGrouping() {
     inpatientRequestResponse,
     isLoading:
       admissionLocationResponse.isLoading || inpatientAdmissionResponse.isLoading || inpatientRequestResponse.isLoading,
+    mutate() {
+      admissionLocationResponse?.mutate();
+      inpatientAdmissionResponse?.mutate();
+      inpatientRequestResponse?.mutate();
+    },
   };
 }

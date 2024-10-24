@@ -9,7 +9,7 @@ import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import LocationSelector from '../../location-selector/location-selector.component';
-import type { ObsPayload, WardViewContext, WardPatientWorkspaceProps } from '../../types';
+import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { createEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
 
@@ -30,9 +30,6 @@ export default function PatientTransferForm({
     [emrConfiguration],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const { mutate: mutateAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientAdmission } = wardPatientGroupDetails?.inpatientAdmissionResponse ?? {};
-  const { mutate: mutateInpatientRequest } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
 
   const zodSchema = useMemo(
     () =>
@@ -134,9 +131,7 @@ export default function PatientTransferForm({
         .finally(() => {
           setIsSubmitting(false);
           closeWorkspaceWithSavedChanges();
-          mutateAdmissionLocation();
-          mutateInpatientAdmission();
-          mutateInpatientRequest();
+          wardPatientGroupDetails.mutate();
         });
     },
     [
@@ -146,9 +141,7 @@ export default function PatientTransferForm({
       emrConfiguration,
       patient?.uuid,
       dispositionsWithTypeTransfer,
-      mutateAdmissionLocation,
-      mutateInpatientAdmission,
-      mutateInpatientRequest,
+      wardPatientGroupDetails,
     ],
   );
 
