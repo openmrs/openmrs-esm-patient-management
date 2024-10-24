@@ -1,5 +1,5 @@
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wardView {
   background-color: #e4e4e4;

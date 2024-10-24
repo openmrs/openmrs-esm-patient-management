@@ -18,7 +18,7 @@ export default function QueueTableByStatusMenu() {
     <SideNavMenu title={t('serviceQueues', 'Service queues')} className={styles.queueTableByStatusNavMenu}>
       <BrowserRouter>
         {queues.map((queue) => (
-          <QueueTableByStatusLink queue={queue} />
+          <QueueTableByStatusLink key={queue.uuid} queue={queue} />
         ))}
       </BrowserRouter>
     </SideNavMenu>

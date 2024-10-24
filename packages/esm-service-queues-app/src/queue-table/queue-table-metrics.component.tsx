@@ -20,7 +20,12 @@ function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
       <QueueTableMetricsCard value={count} headerLabel={t('totalPatients', 'Total Patients')} />
       {allowedStatuses?.map((status) => {
         return (
-          <QueueTableMetricsCard queueUuid={selectedQueue.uuid} status={status.uuid} headerLabel={status.display} />
+          <QueueTableMetricsCard
+            headerLabel={status.display}
+            key={status.uuid}
+            queueUuid={selectedQueue.uuid}
+            status={status.uuid}
+          />
         );
       })}
     </div>
