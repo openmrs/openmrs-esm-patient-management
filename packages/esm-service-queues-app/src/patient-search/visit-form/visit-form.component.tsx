@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
-import { first } from 'rxjs/operators';
 import {
   Button,
   ButtonSet,
@@ -67,7 +66,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) =>
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
-  const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
+  const { activePatientEnrollment } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutateQueueEntries } = useMutateQueueEntries();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
@@ -116,56 +115,50 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) =>
 
       const abortController = new AbortController();
 
-      saveVisit(payload, abortController)
-        .pipe(first())
-        .subscribe(
-          (response) => {
-            if (response.status === 201) {
-              // add new queue entry if visit created successfully
-              postQueueEntry(
-                response.data.uuid,
-                service,
-                patientUuid,
-                priority,
-                status,
-                sortWeight,
-                queueLocation,
-                visitQueueNumberAttributeUuid,
-              ).then(
-                ({ status }) => {
-                  if (status === 201) {
-                    showSnackbar({
-                      kind: 'success',
-                      isLowContrast: true,
-                      title: t('startAVisit', 'Start a visit'),
-                      subtitle: t(
-                        'startVisitQueueSuccessfully',
-                        'Patient has been added to active visits list and queue.',
-                        `${hours} : ${minutes}`,
-                      ),
-                    });
-                    closeWorkspace();
-                    mutateQueueEntries();
-                  }
-                },
-                (error) => {
-                  showSnackbar({
-                    title: t('queueEntryError', 'Error adding patient to the queue'),
-                    kind: 'error',
-                    subtitle: error?.message,
-                  });
-                },
-              );
-            }
-          },
-          (error) => {
+      saveVisit(payload, abortController).then((response) => {
+        // add new queue entry if visit created successfully
+        postQueueEntry(
+          response.data.uuid,
+          service,
+          patientUuid,
+          priority,
+          status,
+          sortWeight,
+          queueLocation,
+          visitQueueNumberAttributeUuid,
+        )
+          .then(() => {
+            showSnackbar({
+              kind: 'success',
+              isLowContrast: true,
+              title: t('startAVisit', 'Start a visit'),
+              subtitle: t(
+                'startVisitQueueSuccessfully',
+                'Patient has been added to active visits list and queue.',
+                `${hours} : ${minutes}`,
+              ),
+            });
+            closeWorkspace();
+            setIsSubmitting(false);
+            mutateQueueEntries();
+          })
+          .catch((error) => {
+            showSnackbar({
+              title: t('queueEntryError', 'Error adding patient to the queue'),
+              kind: 'error',
+              subtitle: error?.message,
+            });
+            setIsSubmitting(false);
+          })
+          .catch((error) => {
             showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
               subtitle: error?.message,
             });
-          },
-        );
+            setIsSubmitting(false);
+          });
+      });
     },
     [
       closeWorkspace,
@@ -181,9 +174,9 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) =>
     ],
   );
 
-  const handleOnChange = () => {
+  const handleOnChange = useCallback(() => {
     setIgnoreChanges((prevState) => !prevState);
-  };
+  }, []);
 
   return (
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
