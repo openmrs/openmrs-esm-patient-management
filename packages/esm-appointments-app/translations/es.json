@@ -12,7 +12,7 @@
   "appointmentEdited": "Cita editada",
   "appointmentEditError": "Error al editar cita",
   "appointmentEnded": "Cita finalizada",
-  "appointmentEndedAndVisitClosedSuccessfully": "Cita finalizada con éxito y visita cerrada con éxito ",
+  "appointmentEndedAndVisitClosedSuccessfully": "Appointment successfully ended and visit successfully closed",
   "appointmentEndedButVisitNotClosedError": "Cita finalizada, pero hubo un error al cerrar la visita",
   "appointmentEndedSuccessfully": "Cita finalizada con éxito ",
   "appointmentEndError": "Error al finalizar cita",
