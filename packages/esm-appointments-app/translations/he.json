@@ -12,7 +12,7 @@
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",
   "appointmentEnded": "Appointment ended",
-  "appointmentEndedAndVisitClosedSuccessfully": "Appointment successfully ended and visit successfully closed.",
+  "appointmentEndedAndVisitClosedSuccessfully": "Appointment successfully ended and visit successfully closed",
   "appointmentEndedButVisitNotClosedError": "Appointment ended, but error closing visit",
   "appointmentEndedSuccessfully": "Appointment successfully ended.",
   "appointmentEndError": "Error ending appointment",
