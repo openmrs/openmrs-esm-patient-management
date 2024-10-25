@@ -3,8 +3,10 @@ import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import type { FormValues, PersonAttributeTypeResponse } from '../../patient-registration.types';
 import styles from './../field.scss';
+import { Controller } from 'react-hook-form';
+import { usePatientRegistrationContext } from '../../patient-registration-hooks';
 
 export interface TextPersonAttributeFieldProps {
   id: string;
@@ -39,20 +41,12 @@ export function TextPersonAttributeField({
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldName} validate={validateInput}>
-        {({ field, form: { touched, errors }, meta }) => {
-          return (
-            <Input
-              id={id}
-              name={`person-attribute-${personAttributeType.uuid}`}
-              labelText={label ?? personAttributeType?.display}
-              invalid={errors[fieldName] && touched[fieldName]}
-              {...field}
-              required={required}
-            />
-          );
-        }}
-      </Field>
+      <Input
+        id={id}
+        name={`person-attribute-${personAttributeType.uuid}` as keyof FormValues}
+        labelText={label ?? personAttributeType?.display}
+        required={required}
+      />
     </div>
   );
 }
