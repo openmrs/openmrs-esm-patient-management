@@ -1,19 +1,11 @@
-import React from 'react';
-import WardMetrics from './ward-metrics.component';
-import { renderWithSwr } from '../../../../tools/test-utils';
-import {
-  createAndGetWardPatientGrouping,
-  getInpatientAdmissionsUuidMap,
-  getWardMetrics,
-} from '../ward-view/ward-view.resource';
-import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequest } from '__mocks__';
-import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
-import useWardLocation from '../hooks/useWardLocation';
-import { screen } from '@testing-library/react';
 import { useAppContext } from '@openmrs/esm-framework';
-import { type WardViewContext } from '../types';
+import { screen } from '@testing-library/react';
+import React from 'react';
+import { renderWithSwr } from '../../../../tools/test-utils';
 import { mockWardViewContext } from '../../mock';
+import { type WardViewContext } from '../types';
+import { getWardMetrics } from '../ward-view/ward-view.resource';
+import WardMetrics from './ward-metrics.component';
 
 const wardMetrics = [
   { name: 'patients', key: 'patients', defaultTranslation: 'Patients' },

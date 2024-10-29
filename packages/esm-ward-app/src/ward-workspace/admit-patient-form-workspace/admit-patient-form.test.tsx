@@ -1,16 +1,22 @@
-import { showSnackbar, useAppContext, useFeatureFlag, useSession } from '@openmrs/esm-framework';
+import {
+  CloseWorkspaceOptions,
+  type DefaultWorkspaceProps,
+  showSnackbar,
+  useAppContext,
+  useFeatureFlag,
+  useSession,
+} from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
+import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
 import { renderWithSwr } from '../../../../../tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { DispositionType, WardViewContext } from '../../types';
+import type { DispositionType, WardPatient, WardViewContext } from '../../types';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
-import type { AdmitPatientFormWorkspaceProps } from './types';
 
 jest.mock('../../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
@@ -52,25 +58,35 @@ const mockedUseAdmitPatient = jest.mocked(useAdmitPatient);
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
+const mockedAdmitPatient = jest.fn();
 const mockUseAdmitPatientObj: ReturnType<typeof useAdmitPatient> = {
-  admitPatient: jest.fn(),
+  admitPatient: mockedAdmitPatient,
   isLoadingEmrConfiguration: false,
   errorFetchingEmrConfiguration: false,
 };
 jest.mocked(useAdmitPatient).mockReturnValue(mockUseAdmitPatientObj);
-const mockedAdmitPatient = mockUseAdmitPatientObj.admitPatient;
 
-const mockWorkspaceProps: AdmitPatientFormWorkspaceProps = {
-  patient: mockPatientAlice,
-  closeWorkspace: jest.fn(),
+const mockWorkspaceProps: DefaultWorkspaceProps = {
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
-  dispositionType: 'ADMIT',
+  closeWorkspace: jest.fn(),
 };
 
-function renderAdmissionForm(dispositionType: DispositionType = 'ADMIT') {
-  renderWithSwr(<AdmitPatientFormWorkspace {...{ ...mockWorkspaceProps, dispositionType }} />);
+const mockWardPatientAliceProps: WardPatient = {
+  visit: mockInpatientRequestAlice.visit,
+  patient: mockPatientAlice,
+  bed: null,
+  inpatientAdmission: null,
+  inpatientRequest: mockInpatientRequestAlice,
+};
+
+function renderAdmissionForm() {
+  renderWithSwr(
+    <AdmitPatientFormWorkspace
+      {...{ ...mockWorkspaceProps, wardPatient: mockWardPatientAliceProps, WardPatientHeader: jest.fn() }}
+    />,
+  );
 }
 
 describe('Testing AdmitPatientForm', () => {

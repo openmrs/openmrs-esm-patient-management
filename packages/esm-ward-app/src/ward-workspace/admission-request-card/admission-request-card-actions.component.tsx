@@ -13,7 +13,6 @@ import useWardLocation from '../../hooks/useWardLocation';
 import type { WardPatientCardType, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useAdmitPatient } from '../../ward.resource';
 import { AdmissionRequestsWorkspaceContext } from '../admission-request-workspace/admission-requests.workspace';
-import type { AdmitPatientFormWorkspaceProps } from '../admit-patient-form-workspace/types';
 import styles from './admission-request-card.scss';
 
 const AdmissionRequestCardActions: WardPatientCardType = (wardPatient) => {
@@ -25,10 +24,8 @@ const AdmissionRequestCardActions: WardPatientCardType = (wardPatient) => {
   const { WardPatientHeader, wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { admitPatient, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useAdmitPatient();
 
-  const launchPatientAdmissionForm = useCallback(
-    () => launchWorkspace<AdmitPatientFormWorkspaceProps>('admit-patient-form-workspace', { patient, dispositionType }),
-    [],
-  );
+  const launchPatientAdmissionForm = () =>
+    launchWorkspace<WardPatientWorkspaceProps>('admit-patient-form-workspace', { wardPatient, WardPatientHeader });
 
   const launchPatientTransferForm = useCallback(() => {
     launchWorkspace<WardPatientWorkspaceProps>('patient-transfer-request-workspace', {

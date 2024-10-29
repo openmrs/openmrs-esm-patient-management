@@ -2,6 +2,13 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.flexWrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #393939;
+}
+
 .form {
   display: flex;
   height: 100%;
