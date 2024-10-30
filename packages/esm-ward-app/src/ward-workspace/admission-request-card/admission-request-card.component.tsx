@@ -12,9 +12,9 @@ interface AdmissionRequestCardProps {
 const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({ wardPatient, children }) => {
   return (
     <div className={styles.admissionRequestCard}>
-      <AdmissionRequestCardHeader {...wardPatient} />
+      <AdmissionRequestCardHeader {...{ wardPatient }} />
       {children}
-      <AdmissionRequestCardActions {...wardPatient} />
+      <AdmissionRequestCardActions {...{ wardPatient }} />
     </div>
   );
 };

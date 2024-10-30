@@ -64,7 +64,7 @@ describe('Ward bed', () => {
   it('renders a single bed with patient details', () => {
     render(
       <WardBed
-        patientCards={[<DefaultWardPatientCard key={mockPatientAlice.uuid} {...mockWardPatientAliceProps} />]}
+        patientCards={[<DefaultWardPatientCard key={mockPatientAlice.uuid} wardPatient={mockWardPatientAliceProps} />]}
         bed={mockBed}
       />,
     );
@@ -79,8 +79,8 @@ describe('Ward bed', () => {
       <WardBed
         bed={mockBed}
         patientCards={[
-          <DefaultWardPatientCard key={mockPatientAlice.uuid} {...mockWardPatientAliceProps} />,
-          <DefaultWardPatientCard key={mockPatientBrian.uuid} {...mockWardPatientBrianProps} />,
+          <DefaultWardPatientCard key={mockPatientAlice.uuid} wardPatient={mockWardPatientAliceProps} />,
+          <DefaultWardPatientCard key={mockPatientBrian.uuid} wardPatient={mockWardPatientAliceProps} />,
         ]}
       />,
     );

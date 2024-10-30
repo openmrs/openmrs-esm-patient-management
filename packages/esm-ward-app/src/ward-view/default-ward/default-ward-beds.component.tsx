@@ -6,7 +6,7 @@ import { bedLayoutToBed } from '../ward-view.resource';
 import DefaultWardPatientCard from './default-ward-patient-card.component';
 
 function DefaultWardBeds() {
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {
@@ -28,10 +28,8 @@ function DefaultWardBeds() {
         };
       }
     });
-    const patientCards = wardPatients.map(wardPatient => (
-      <DefaultWardPatientCard 
-        key={wardPatient.patient.uuid}
-        {...wardPatient} />
+    const patientCards = wardPatients.map((wardPatient) => (
+      <DefaultWardPatientCard key={wardPatient.patient.uuid} {...{ wardPatient }} />
     ));
     return <WardBed key={bed.uuid} bed={bed} patientCards={patientCards} />;
   });

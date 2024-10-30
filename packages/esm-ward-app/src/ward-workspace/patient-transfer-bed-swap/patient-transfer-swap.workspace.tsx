@@ -23,7 +23,7 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
   return (
     <div className={styles.flexWrapper}>
       <div className={styles.patientWorkspaceBanner}>
-        <WardPatientWorkspaceBanner {...props?.wardPatient} />
+        <WardPatientWorkspaceBanner wardPatient={props?.wardPatient} />
       </div>
       {isBedManagementModuleInstalled && (
         <div className={styles.contentSwitcherWrapper}>

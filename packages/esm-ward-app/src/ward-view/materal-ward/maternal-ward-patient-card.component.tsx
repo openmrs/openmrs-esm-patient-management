@@ -43,7 +43,7 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
   const card = (
     <>
       <WardPatientCard wardPatient={wardPatient}>
-        <MaternalWardPatientCardHeader {...wardPatient} />
+        <MaternalWardPatientCardHeader {...{ wardPatient }} />
         <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
           <WardPatientTimeOnWard
             encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
@@ -59,7 +59,7 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
           <React.Fragment key={childWardPatient.patient.uuid}>
             <MotherChildBedShareDivider />
             <WardPatientCard wardPatient={childWardPatient}>
-              <MaternalWardPatientCardHeader {...childWardPatient} />
+              <MaternalWardPatientCardHeader wardPatient={childWardPatient} />
               <PendingItemsRow id={'pending-items'} wardPatient={childWardPatient} />
             </WardPatientCard>
           </React.Fragment>

@@ -6,12 +6,12 @@ import WardPatientCard from '../../ward-patient-card/ward-patient-card.component
 import styles from '../../ward-patient-card/ward-patient-card.scss';
 import DefaultWardPatientCardHeader from './default-ward-patient-card-header.component';
 
-const DefaultWardPatientCard: WardPatientCardType = (wardPatient) => {
+const DefaultWardPatientCard: WardPatientCardType = ({ wardPatient }) => {
   const { bed } = wardPatient;
 
   const card = (
     <WardPatientCard wardPatient={wardPatient}>
-      <DefaultWardPatientCardHeader {...wardPatient} />
+      <DefaultWardPatientCardHeader {...{ wardPatient }} />
       <PendingItemsRow id={'pending-items'} wardPatient={wardPatient} />
       <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
     </WardPatientCard>

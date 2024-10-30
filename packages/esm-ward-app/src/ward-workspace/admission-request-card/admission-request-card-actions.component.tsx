@@ -15,7 +15,7 @@ import { useAdmitPatient } from '../../ward.resource';
 import { AdmissionRequestsWorkspaceContext } from '../admission-request-workspace/admission-requests.workspace';
 import styles from './admission-request-card.scss';
 
-const AdmissionRequestCardActions: WardPatientCardType = (wardPatient) => {
+const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
   const { patient, inpatientRequest } = wardPatient;
   const { dispositionType } = inpatientRequest;
   const { t } = useTranslation();

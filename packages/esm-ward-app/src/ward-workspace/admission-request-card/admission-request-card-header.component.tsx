@@ -8,7 +8,7 @@ import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-pat
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
 import styles from './admission-request-card.scss';
 
-const AdmissionRequestCardHeader: WardPatientCardType = (wardPatient) => {
+const AdmissionRequestCardHeader: WardPatientCardType = ({ wardPatient }) => {
   const { inpatientRequest } = wardPatient;
   const { dispositionEncounter } = inpatientRequest;
   const { patient } = wardPatient;

@@ -144,7 +144,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
 
   return (
     <div className={styles.flexWrapper}>
-      <WardPatientWorkspaceBanner {...wardPatient} />
+      <WardPatientWorkspaceBanner {...{ wardPatient }} />
       <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <div className={styles.formContent}>
           <Row>
