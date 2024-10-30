@@ -3024,7 +3024,7 @@ __metadata:
     "@internationalized/date": "npm:^3.5.4"
     "@openmrs/esm-framework": "npm:next"
     "@openmrs/esm-patient-common-lib": "npm:next"
-    "@playwright/test": "npm:1.45.2"
+    "@playwright/test": "npm:1.48.2"
     "@swc/core": "npm:^1.2.165"
     "@swc/jest": "npm:^0.2.29"
     "@testing-library/dom": "npm:^9.3.3"
@@ -3285,14 +3285,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.45.2":
-  version: 1.45.2
-  resolution: "@playwright/test@npm:1.45.2"
+"@playwright/test@npm:1.48.2":
+  version: 1.48.2
+  resolution: "@playwright/test@npm:1.48.2"
   dependencies:
-    playwright: "npm:1.45.2"
+    playwright: "npm:1.48.2"
   bin:
     playwright: cli.js
-  checksum: 10/858ab8c44b430977bf21aa9b089aa5b844899bdb80ededc59dcb5f8a284d483a8b4f56f724fbedf24fa424a6727a23d89f3614af82d82c4813a69f0aa58d945b
+  checksum: 10/8557f9d60b93b9a60b66599d46f991b56df26b691f9285e8755298dabd9f42d1421c330a7d7578b76445fdd56040fe790d3f1081daa80e5e89a380170e0fd217
   languageName: node
   linkType: hard
 
@@ -13983,27 +13983,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.45.2":
-  version: 1.45.2
-  resolution: "playwright-core@npm:1.45.2"
+"playwright-core@npm:1.48.2":
+  version: 1.48.2
+  resolution: "playwright-core@npm:1.48.2"
   bin:
     playwright-core: cli.js
-  checksum: 10/ce35af648efca3f0c34630e76e2137cda183491ddfe04aadcff2217f44fcdb15e73e0334754b01ff60de799d745b2e5478c61e2693d7b9bdd9ccf73fe07df426
+  checksum: 10/dd029f797b1afb2240713a032fecc50e1ffc5464a39c075570cf10e929c145da3a8d0951a3f2b279e33b2f09cbeb8ff4330822cb1078452c0c75cc4ce34ca171
   languageName: node
   linkType: hard
 
-"playwright@npm:1.45.2":
-  version: 1.45.2
-  resolution: "playwright@npm:1.45.2"
+"playwright@npm:1.48.2":
+  version: 1.48.2
+  resolution: "playwright@npm:1.48.2"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.45.2"
+    playwright-core: "npm:1.48.2"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/3e21c453cfc33b41c545eac2c6386ff2a39265088409200bf045cba38f1661f1aba10e80902354cdce86e964084b6c9dbfb5d3af94326aa2a7cb8800ae1a1e3f
+  checksum: 10/331af352504336f419cdf1369f0ef399c6f0e905fdb79a5e97c41f33e74766efd21430ab6ae2de0b237ae765ebfbe701e119a990d8dc01bcdac3bc43c1fa1fbf
   languageName: node
   linkType: hard
 
