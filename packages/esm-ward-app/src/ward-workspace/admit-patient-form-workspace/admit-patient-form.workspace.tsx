@@ -7,11 +7,11 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { WardViewContext } from '../../types';
+import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import BedSelector from '../bed-selector.component';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './admit-patient-form.scss';
-import type { AdmitPatientFormWorkspaceProps } from './types';
 
 /**
  * This form gets rendered when the user clicks "admit patient" in
@@ -19,13 +19,15 @@ import type { AdmitPatientFormWorkspaceProps } from './types';
  * the bed management module is installed. It asks to (optionally) select
  * a bed to assign to patient
  */
-const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
-  patient,
-  dispositionType,
+const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
+  wardPatient,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
+  const { patient, inpatientRequest } = wardPatient;
+  const { dispositionType } = inpatientRequest;
+
   const { t } = useTranslation();
   const { location } = useWardLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,64 +141,68 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   }, []);
 
   if (!wardPatientGroupDetails) return <></>;
+
   return (
-    <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      <div className={styles.formContent}>
-        <Row>
-          <Column>
-            <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
-            <div className={styles.bedSelectionDropdown}>
-              <Controller
-                control={control}
-                name="bedId"
-                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                  return (
-                    <BedSelector
-                      beds={beds}
-                      isLoadingBeds={isLoading}
-                      currentPatient={patient}
-                      selectedBedId={value}
-                      error={error}
-                      control={control}
-                      onChange={onChange}
-                    />
-                  );
-                }}
-              />
-            </div>
-          </Column>
-        </Row>
-        <div className={styles.errorNotifications}>
-          {showErrorNotifications &&
-            Object.entries(errors).map(([key, value]) => {
-              return (
-                <Row key={key}>
-                  <Column>
-                    <InlineNotification kind="error" subtitle={value.message} lowContrast />
-                  </Column>
-                </Row>
-              );
-            })}
+    <div className={styles.flexWrapper}>
+      <WardPatientWorkspaceBanner {...{ wardPatient }} />
+      <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <div className={styles.formContent}>
+          <Row>
+            <Column>
+              <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
+              <div className={styles.bedSelectionDropdown}>
+                <Controller
+                  control={control}
+                  name="bedId"
+                  render={({ field: { onChange, value }, fieldState: { error } }) => {
+                    return (
+                      <BedSelector
+                        beds={beds}
+                        isLoadingBeds={isLoading}
+                        currentPatient={patient}
+                        selectedBedId={value}
+                        error={error}
+                        control={control}
+                        onChange={onChange}
+                      />
+                    );
+                  }}
+                />
+              </div>
+            </Column>
+          </Row>
+          <div className={styles.errorNotifications}>
+            {showErrorNotifications &&
+              Object.entries(errors).map(([key, value]) => {
+                return (
+                  <Row key={key}>
+                    <Column>
+                      <InlineNotification kind="error" subtitle={value.message} lowContrast />
+                    </Column>
+                  </Row>
+                );
+              })}
+          </div>
         </div>
-      </div>
-      <ButtonSet className={styles.buttonSet}>
-        <Button size="xl" kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
-          {t('cancel', 'Cancel')}
-        </Button>
-        <Button
-          type="submit"
-          size="xl"
-          disabled={
-            isSubmitting ||
-            isLoadingEmrConfiguration ||
-            errorFetchingEmrConfiguration ||
-            isLoading ||
-            isLoadingBedsAssignedToPatient
-          }>
-          {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
-        </Button>
-      </ButtonSet>
-    </Form>
+        <ButtonSet className={styles.buttonSet}>
+          <Button size="xl" kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
+            {t('cancel', 'Cancel')}
+          </Button>
+          <Button
+            type="submit"
+            size="xl"
+            disabled={
+              isSubmitting ||
+              isLoadingEmrConfiguration ||
+              errorFetchingEmrConfiguration ||
+              isLoading ||
+              isLoadingBedsAssignedToPatient
+            }>
+            {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </div>
   );
 };
 

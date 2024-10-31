@@ -10,7 +10,7 @@ import WardPatientObs from '../../ward-patient-card/row-elements/ward-patient-ob
 import WardPatientTimeSinceAdmission from '../../ward-patient-card/row-elements/ward-patient-time-since-admission';
 import styles from '../../ward-patient-card/ward-patient-card.scss';
 
-const MaternalWardPatientCardHeader: WardPatientCardType = (wardPatient) => {
+const MaternalWardPatientCardHeader: WardPatientCardType = ({ wardPatient }) => {
   const { patient, bed, visit, inpatientAdmission } = wardPatient;
   const { firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
 

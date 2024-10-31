@@ -96,7 +96,7 @@
       "name": "ward-patient-workspace",
       "component": "wardPatientWorkspace",
       "type": "ward",
-      "title": "Ward Patient",
+      "title": "Ward patient",
       "width": "extra-wide",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"

@@ -10,7 +10,7 @@ import styles from '../../ward-patient-card/ward-patient-card.scss';
 import { type WardPatientCardType } from '../../types';
 import WardPatientGender from '../../ward-patient-card/row-elements/ward-patient-gender.component';
 
-const DefaultWardPatientCardHeader: WardPatientCardType = (wardPatient) => {
+const DefaultWardPatientCardHeader: WardPatientCardType = ({ wardPatient }) => {
   const { patient, bed, inpatientAdmission } = wardPatient;
   const { encounterAssigningToCurrentInpatientLocation, firstAdmissionOrTransferEncounter } = inpatientAdmission ?? {};
 

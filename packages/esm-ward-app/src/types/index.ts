@@ -11,7 +11,11 @@ import type {
 import type React from 'react';
 import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
 
-export type WardPatientCardType = React.FC<WardPatient>;
+interface WardPatientCardProps {
+  wardPatient: WardPatient;
+}
+
+export type WardPatientCardType = React.FC<WardPatientCardProps>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
@@ -44,7 +48,7 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
-  WardPatientHeader: React.FC<WardPatient>;
+  WardPatientHeader: WardPatientCardType;
 }
 
 // server-side types defined in openmrs-module-bedmanagement:
@@ -233,7 +237,7 @@ export interface ObsPayload {
 export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
 export interface WardViewContext {
   wardPatientGroupDetails: WardPatientGroupDetails;
-  WardPatientHeader: React.FC<WardPatient>;
+  WardPatientHeader: WardPatientCardType;
 }
 
 export interface PatientAndAdmission {

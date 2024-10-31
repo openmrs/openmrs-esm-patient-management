@@ -75,7 +75,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   return (
     <div className={styles.workspaceContent}>
       <div className={styles.patientWorkspaceBanner}>
-        <WardPatientWorkspaceBanner {...props?.wardPatient} />
+        <WardPatientWorkspaceBanner wardPatient={props?.wardPatient} />
       </div>
       <div className={styles.workspaceForm}>
         <div>
