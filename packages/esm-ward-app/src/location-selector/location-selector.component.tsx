@@ -15,10 +15,11 @@ import useEmrConfiguration from '../hooks/useEmrConfiguration';
 import useLocations from '../hooks/useLocations';
 import styles from './location-selector.scss';
 
-interface LocationSelectorProps extends RadioButtonGroupProps {}
+interface LocationSelectorProps extends RadioButtonGroupProps {
+  paginationSize?: number;
+}
 
-export default function LocationSelector(props: LocationSelectorProps) {
-  const size = 5;
+export default function LocationSelector({ paginationSize = 15, ...props }: LocationSelectorProps) {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
   const isTablet = !isDesktop(useLayoutType());
@@ -42,7 +43,7 @@ export default function LocationSelector(props: LocationSelectorProps) {
     totalPages,
     goToNext,
     goToPrevious,
-  } = useLocations(filterCriteria, size, !emrConfiguration);
+  } = useLocations(filterCriteria, paginationSize, !emrConfiguration);
 
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,12 +82,12 @@ export default function LocationSelector(props: LocationSelectorProps) {
           </RadioButtonGroup>
         </ResponsiveWrapper>
       )}
-      {totalCount > size && (
+      {totalCount > paginationSize && (
         <div className={styles.pagination}>
           <span className={styles.bodyShort01}>
             {t('showingLocations', '{{start}}-{{end}} of {{count}} locations', {
-              start: (currentPage - 1) * size + 1,
-              end: Math.min(currentPage * size, totalCount),
+              start: (currentPage - 1) * paginationSize + 1,
+              end: Math.min(currentPage * paginationSize, totalCount),
               count: totalCount,
             })}
           </span>
