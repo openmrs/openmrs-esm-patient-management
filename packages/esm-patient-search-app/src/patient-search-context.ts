@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-interface PatientSearchContextProps {
+export interface PatientSearchContextProps {
   /**
    * A function to execute instead of navigating the user to the patient
    * dashboard. If null/undefined, patient results will be links to the

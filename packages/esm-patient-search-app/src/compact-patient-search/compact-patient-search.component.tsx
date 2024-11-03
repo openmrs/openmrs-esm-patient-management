@@ -31,7 +31,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const debouncedSearchTerm = useDebounce(searchTerm);
-  const hasSearchTerm = Boolean(debouncedSearchTerm.trim());
+  const hasSearchTerm = Boolean(debouncedSearchTerm?.trim());
 
   const config = useConfig<PatientSearchConfig>();
   const { showRecentlySearchedPatients } = config.search;
@@ -138,7 +138,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const handleSubmit = useCallback(
     (debouncedSearchTerm) => {
-      if (shouldNavigateToPatientSearchPage && debouncedSearchTerm.trim()) {
+      if (shouldNavigateToPatientSearchPage && hasSearchTerm) {
         if (!isSearchPage) {
           window.sessionStorage.setItem('searchReturnUrl', window.location.pathname);
         }
@@ -147,7 +147,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         });
       }
     },
-    [isSearchPage, shouldNavigateToPatientSearchPage],
+    [isSearchPage, shouldNavigateToPatientSearchPage, hasSearchTerm],
   );
 
   const handleClear = useCallback(() => {

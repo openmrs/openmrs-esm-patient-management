@@ -92,9 +92,11 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               onPatientSelect={resetToInitialState}
             />
           ) : (
-            <PatientSearchContext.Provider value={{ patientClickSideEffect: closePatientSearch }}>
-              <PatientSearchOverlay onClose={closePatientSearch} query={initialSearchTerm} />
-            </PatientSearchContext.Provider>
+            <PatientSearchOverlay
+              onClose={closePatientSearch}
+              query={initialSearchTerm}
+              patientClickSideEffect={closePatientSearch}
+            />
           )}
           <div className={styles.closeButton}>
             <HeaderGlobalAction

@@ -28,5 +28,12 @@
       "slot": "patient-search-bar-slot",
       "offline": true
     }
+  ],
+  "workspaces": [
+    {
+      "name": "patient-search-workspace",
+      "component": "patientSearchWorkspace",
+      "title": "searchPatient"
+    }
   ]
 }
