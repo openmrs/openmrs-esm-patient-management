@@ -8,10 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { BedLayout, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
 import BedSelector from '../bed-selector.component';
-import styles from './patient-transfer-swap.scss';
+import styles from './assign-bed-form.scss';
 
 export default function PatientBedSwapForm({
   promptBeforeClosing,
@@ -51,15 +51,6 @@ export default function PatientBedSwapForm({
     promptBeforeClosing(() => isDirty);
     return () => promptBeforeClosing(null);
   }, [isDirty]);
-
-  const getBedInformation = useCallback(
-    (bed: BedLayout) => {
-      const patients = bed.patients.map((bedPatient) => bedPatient?.person?.preferredName?.display);
-      const bedNumber = bed.bedNumber;
-      return [bedNumber, ...(patients.length ? patients : [t('empty', 'Empty')])].join(' · ');
-    },
-    [t],
-  );
 
   const beds = wardPatientGroupDetails?.bedLayouts ?? [];
 

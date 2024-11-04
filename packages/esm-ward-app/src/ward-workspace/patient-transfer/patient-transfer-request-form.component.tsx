@@ -11,7 +11,7 @@ import useWardLocation from '../../hooks/useWardLocation';
 import LocationSelector from '../../location-selector/location-selector.component';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { createEncounter } from '../../ward.resource';
-import styles from './patient-transfer-swap.scss';
+import styles from './patient-transfer.scss';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,

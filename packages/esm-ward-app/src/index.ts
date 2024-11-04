@@ -55,8 +55,8 @@ export const wardPatientNotesActionButtonExtension = getAsyncLifecycle(
 );
 
 // t('transfers', 'Transfers')
-export const patientTransferAndSwapWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/patient-transfer-bed-swap/patient-transfer-swap.workspace'),
+export const patientTransferWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-transfer/patient-transfer.workspace'),
   options,
 );
 
@@ -66,7 +66,7 @@ export const patientDischargeWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
+export const patientTransferWorkspaceSiderailIcon = getAsyncLifecycle(
   () => import('./action-menu-buttons/transfer-workspace-siderail.component'),
   options,
 );
@@ -74,6 +74,12 @@ export const patientTransferAndSwapWorkspaceSiderailIcon = getAsyncLifecycle(
 // t('transferRequest', 'Transfer request')
 export const patientTransferRequestWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/patient-transfer-request-workspace/patient-transfer-request.workspace'),
+  options,
+);
+
+// t('assignBed', 'Assign bed')
+export const assignBedWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/assign-bed-workspace/assign-bed.workspace'),
   options,
 );
 
@@ -99,6 +105,10 @@ export const defaultWardView = getAsyncLifecycle(
 
 export const maternalWardView = getAsyncLifecycle(
   () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  options,
+);
+export const assignBedWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./action-menu-buttons/assign-bed-workspace-siderail.component'),
   options,
 );
 
