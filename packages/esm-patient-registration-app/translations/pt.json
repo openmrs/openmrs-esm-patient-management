@@ -103,7 +103,7 @@
   "selectAnOption": "Selecione uma opção",
   "sexFieldLabelText": "Sexo",
   "source": "Fonte",
-  "submitting": "Enviando",
+  "submitting": "Submetendo",
   "timeFormat": "Formato de hora",
   "timeOfDeathInputLabel": "Hora de óbito (hh:mm)",
   "unableToFetch": "Não foi possível buscar o tipo de atributo pessoal - {{personattributetype}}",
