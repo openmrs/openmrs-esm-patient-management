@@ -1,28 +1,56 @@
-import {
-  type AdvancedPatientSearchAction,
-  AdvancedPatientSearchActionTypes,
-  type AdvancedPatientSearchState,
-} from '../types';
+import { AdvancedPatientSearchActionTypes, type AdvancedPatientSearchState } from '../types';
 
 export const initialState: AdvancedPatientSearchState = {
   gender: 'any',
   dateOfBirth: 0,
   monthOfBirth: 0,
   yearOfBirth: 0,
-  phoneNumber: 0,
   postcode: '',
   age: 0,
+  attributes: [],
 };
 
-const reducer: (
-  state: AdvancedPatientSearchState,
-  action: AdvancedPatientSearchAction,
-) => AdvancedPatientSearchState = (state, action) => {
+interface Action {
+  type: number;
+  [key: string]: any;
+}
+
+const isPersonAttributeField = (fieldName: string) => !['gender', 'dateOfBirth', 'postcode', 'age'].includes(fieldName);
+
+const reducer = (state: AdvancedPatientSearchState, action: Action): AdvancedPatientSearchState => {
   switch (action.type) {
-    case AdvancedPatientSearchActionTypes.SET_GENDER:
+    case AdvancedPatientSearchActionTypes.SET_FIELD:
+      if (!action.field) return state;
+
+      if (isPersonAttributeField(action.field)) {
+        const existingAttributeIndex = state.attributes.findIndex((attr) => attr.uuid === action.field);
+        const newAttributes = [...state.attributes];
+
+        if (existingAttributeIndex >= 0) {
+          if (action.value) {
+            newAttributes[existingAttributeIndex] = {
+              uuid: action.field,
+              value: action.value,
+            };
+          } else {
+            newAttributes.splice(existingAttributeIndex, 1);
+          }
+        } else if (action.value) {
+          newAttributes.push({
+            uuid: action.field,
+            value: action.value,
+          });
+        }
+
+        return {
+          ...state,
+          attributes: newAttributes,
+        };
+      }
+
       return {
         ...state,
-        gender: action.gender,
+        [action.field]: action.value,
       };
     case AdvancedPatientSearchActionTypes.SET_DATE_OF_BIRTH:
       return {
@@ -38,21 +66,6 @@ const reducer: (
       return {
         ...state,
         yearOfBirth: action.yearOfBirth,
-      };
-    case AdvancedPatientSearchActionTypes.SET_PHONE_NUMBER:
-      return {
-        ...state,
-        phoneNumber: action.phoneNumber,
-      };
-    case AdvancedPatientSearchActionTypes.SET_POSTCODE:
-      return {
-        ...state,
-        postcode: action.postcode,
-      };
-    case AdvancedPatientSearchActionTypes.SET_AGE:
-      return {
-        ...state,
-        age: action.age,
       };
     case AdvancedPatientSearchActionTypes.RESET_FIELDS:
       return initialState;

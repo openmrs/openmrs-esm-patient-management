@@ -97,20 +97,20 @@ export interface AdvancedPatientSearchState {
   dateOfBirth: number;
   monthOfBirth: number;
   yearOfBirth: number;
-  phoneNumber: number;
   postcode: string;
   age: number;
+  attributes: {
+    uuid: string;
+    value: string;
+  }[];
 }
 
 export enum AdvancedPatientSearchActionTypes {
-  SET_GENDER,
   SET_DATE_OF_BIRTH,
   SET_MONTH_OF_BIRTH,
   SET_YEAR_OF_BIRTH,
-  SET_PHONE_NUMBER,
-  SET_POSTCODE,
-  SET_AGE,
   RESET_FIELDS,
+  SET_FIELD,
 }
 
 export interface AdvancedPatientSearchAction {
@@ -131,4 +131,74 @@ export interface User {
     patientsVisited: string;
     defaultLocation: string;
   };
+}
+
+export interface PersonAttributeTypeResponse {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  format: string;
+}
+
+export interface ConceptResponse {
+  uuid: string;
+  display: string;
+  datatype: {
+    uuid: string;
+    display: string;
+  };
+  answers: Array<ConceptAnswers>;
+  setMembers: Array<ConceptAnswers>;
+}
+
+export interface ConceptAnswers {
+  display: string;
+  uuid: string;
+}
+
+export interface LocationEntry {
+  resource: {
+    id: string;
+    name: string;
+    resourceType: string;
+    status: 'active' | 'inactive';
+    meta?: {
+      tag?: Array<{
+        code: string;
+        display: string;
+        system: string;
+      }>;
+    };
+  };
+}
+
+export interface LocationResponse {
+  type: string;
+  total: number;
+  resourceType: string;
+  meta: {
+    lastUpdated: string;
+  };
+  link: Array<{
+    relation: string;
+    url: string;
+  }>;
+  id: string;
+  entry: Array<LocationEntry>;
+}
+
+export type SearchFieldType = 'age' | 'dateOfBirth' | 'gender' | 'personAttribute' | 'postcode';
+
+export interface SearchFieldConfig {
+  name: string;
+  type: SearchFieldType;
+  label?: string;
+  placeholder?: string;
+  answerConceptSetUuid?: string;
+  customConceptAnswers?: Array<{ uuid: string; label?: string }>;
+  locationTag?: string;
+  attributeTypeUuid?: string;
+  min?: number;
+  max?: number;
 }
