@@ -16,7 +16,7 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
   const { t } = useTranslation();
   const layout = useLayoutType();
 
-  if (isLoading || !inpatientRequests?.length) {
+  if (isLoading || !inpatientRequests) {
     return null;
   }
 
@@ -31,11 +31,13 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
   }
 
   return (
-    <div className={styles.admissionRequestsContainer}>
+    <div className={`${styles.admissionRequestsContainer} ${
+      inpatientRequests?.length ? styles.blackBackground : styles.lightBlueBackground
+    }`}>
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
         {t('admissionRequestsCount', '{{count}} admission request', {
-          count: inpatientRequests.length,
+          count: inpatientRequests?.length,
         })}
       </span>
       <Button
