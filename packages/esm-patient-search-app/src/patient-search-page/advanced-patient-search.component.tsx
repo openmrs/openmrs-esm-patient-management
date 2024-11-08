@@ -94,7 +94,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
 
         // Age filter
         if (filters.age) {
-          if (patient.person.age !== filters.age) {
+          if (Number(patient.person.age) !== Number(filters.age)) {
             return false;
           }
         }

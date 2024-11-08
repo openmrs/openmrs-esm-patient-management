@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, NumberInput, Switch, TextInput } from '@carbon/react';
 import styles from './search-field.scss';
-import { PersonAttributeSearchField } from './person-attribute-search-field.component';
+import { PersonAttributeField } from './person-attribute-field.component';
 import { type SearchFieldConfig } from '../../types';
 
 interface SearchFieldProps {
@@ -138,7 +138,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({
     case 'personAttribute':
       return (
         <div className={classNames({ [styles.fieldTabletOrOverlay]: inTabletOrOverlay })}>
-          <PersonAttributeSearchField
+          <PersonAttributeField
             field={field}
             formState={formState}
             inTabletOrOverlay={inTabletOrOverlay}

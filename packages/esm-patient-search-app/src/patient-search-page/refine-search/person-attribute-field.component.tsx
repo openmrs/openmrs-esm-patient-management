@@ -5,7 +5,7 @@ import { useAttributeConceptAnswers, useLocations, usePersonAttributeType } from
 import { type AdvancedPatientSearchState, type SearchFieldConfig } from '../../types';
 import styles from './search-field.scss';
 
-interface PersonAttributeSearchFieldProps {
+export interface PersonAttributeFieldProps {
   field: SearchFieldConfig;
   formState: AdvancedPatientSearchState;
   inTabletOrOverlay: boolean;
@@ -13,12 +13,7 @@ interface PersonAttributeSearchFieldProps {
   onInputChange: (fieldName: string) => (evt: { target: { value: string } } | { name: string }) => void;
 }
 
-export function PersonAttributeSearchField({
-  field,
-  formState,
-  isTablet,
-  onInputChange,
-}: PersonAttributeSearchFieldProps) {
+export function PersonAttributeField({ field, formState, isTablet, onInputChange }: PersonAttributeFieldProps) {
   const { t } = useTranslation();
   const { data: personAttributeType, isLoading, error } = usePersonAttributeType(field.attributeTypeUuid);
 
@@ -100,14 +95,16 @@ const ConceptAttributeField = ({
   attributeDisplay: string;
 }) => {
   const { t } = useTranslation();
-  const { data: conceptAnswers, isLoading } = useAttributeConceptAnswers(
-    field.customConceptAnswers.length ? '' : field.answerConceptSetUuid,
-  );
+  const {
+    data: conceptAnswers,
+    isLoading,
+    error,
+  } = useAttributeConceptAnswers(field.customConceptAnswers?.length ? '' : field.answerConceptSetUuid);
   const handleChange = onInputChange(field.name);
 
   const items = useMemo(() => {
-    if (field.customConceptAnswers.length) return field.customConceptAnswers;
-    if (!conceptAnswers || !isLoading) return [];
+    if (field.customConceptAnswers?.length) return field.customConceptAnswers;
+    if (!conceptAnswers || isLoading) return [];
     return conceptAnswers
       .map((answer) => ({
         uuid: answer.uuid,
@@ -118,6 +115,14 @@ const ConceptAttributeField = ({
 
   if (isLoading) {
     return <TextInputSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <InlineNotification kind="error" title={t('error', 'Error')}>
+        {t('errorLoadingConceptAttribute', 'Error loading concept attribute')}
+      </InlineNotification>
+    );
   }
 
   return (
@@ -150,7 +155,7 @@ const LocationAttributeField = ({
 }: LocationAttributeFieldProps) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const { locations, isLoading, loadingNewData } = useLocations(field.locationTag || null, searchQuery);
+  const { locations, isLoading, loadingNewData, error } = useLocations(field.locationTag || null, searchQuery);
   const prevLocationOptions = useRef([]);
   const handleChange = onInputChange(field.name);
 
@@ -195,6 +200,14 @@ const LocationAttributeField = ({
     },
     [handleChange],
   );
+
+  if (error) {
+    return (
+      <InlineNotification kind="error" title={t('error', 'Error')}>
+        {t('errorLoadingLocationAttribute', 'Error loading location attribute')}
+      </InlineNotification>
+    );
+  }
 
   return (
     <div className={styles.locationAttributeFieldContainer}>

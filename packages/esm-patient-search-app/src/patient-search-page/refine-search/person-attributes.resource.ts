@@ -44,6 +44,7 @@ export function useLocations(
   locations: Array<LocationEntry>;
   isLoading: boolean;
   loadingNewData: boolean;
+  error: any;
 } {
   const debouncedQuery = useDebounce(searchQuery);
 
@@ -77,6 +78,7 @@ export function useLocations(
       locations: data?.data?.entry || [],
       isLoading,
       loadingNewData: isValidating,
+      error,
     }),
     [data, isLoading, isValidating],
   );

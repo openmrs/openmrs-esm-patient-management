@@ -138,8 +138,8 @@ export interface User {
 export interface PersonAttributeTypeResponse {
   uuid: string;
   display: string;
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   format: string;
 }
 
