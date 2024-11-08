@@ -11,6 +11,7 @@
   "errorCopy": "Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.",
   "errorFetchingPatients": "Error fetching patients",
   "errorFetchingUserProperties": "Error fetching user properties",
+  "errorLoadingAttribute": "Error loading attribute type",
   "errorUpdatingRecentlyViewedPatients": "Error updating recently viewed patients",
   "female": "Female",
   "filtersAppliedText": "search queries added",
@@ -19,7 +20,6 @@
   "nextPage": "Next page",
   "noPatientChartsFoundMessage": "Sorry, no patient charts were found",
   "other": "Other",
-  "phoneNumber": "Phone number",
   "postcode": "Postcode",
   "previousPage": "Previous page",
   "recentSearchResultsCount_one": "{{count}} recent search result",
@@ -35,8 +35,9 @@
   "searchResults": "Search results",
   "searchResultsCount_one": "{{count}} search result",
   "searchResultsCount_other": "{{count}} search results",
-  "sex": "Sex",
+  "selectOption": "Select an option",
   "trySearchWithPatientUniqueID": "Try to search again using the patient's unique ID number",
   "unknown": "Unknown",
+  "unsupportedAttributeFormat": "Unsupported attribute format: {{format}}",
   "yearOfBirth": "Year of Birth"
 }

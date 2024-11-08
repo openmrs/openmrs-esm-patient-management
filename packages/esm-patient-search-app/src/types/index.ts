@@ -17,7 +17,10 @@ export interface SearchedPatient {
       middleName: string;
     };
   };
-  attributes: Array<{ value: string; attributeType: { uuid: string; display: string } }>;
+  attributes: Array<{
+    value: OpenmrsResource | string;
+    attributeType: { uuid: string; display: string };
+  }>;
 }
 
 export interface Identifier {
@@ -100,9 +103,8 @@ export interface AdvancedPatientSearchState {
   postcode: string;
   age: number;
   attributes: {
-    uuid: string;
-    value: string;
-  }[];
+    [key: string]: string;
+  };
 }
 
 export enum AdvancedPatientSearchActionTypes {

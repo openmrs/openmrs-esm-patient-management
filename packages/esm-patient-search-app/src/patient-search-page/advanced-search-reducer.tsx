@@ -7,7 +7,7 @@ export const initialState: AdvancedPatientSearchState = {
   yearOfBirth: 0,
   postcode: '',
   age: 0,
-  attributes: [],
+  attributes: {},
 };
 
 interface Action {
@@ -23,28 +23,12 @@ const reducer = (state: AdvancedPatientSearchState, action: Action): AdvancedPat
       if (!action.field) return state;
 
       if (isPersonAttributeField(action.field)) {
-        const existingAttributeIndex = state.attributes.findIndex((attr) => attr.uuid === action.field);
-        const newAttributes = [...state.attributes];
-
-        if (existingAttributeIndex >= 0) {
-          if (action.value) {
-            newAttributes[existingAttributeIndex] = {
-              uuid: action.field,
-              value: action.value,
-            };
-          } else {
-            newAttributes.splice(existingAttributeIndex, 1);
-          }
-        } else if (action.value) {
-          newAttributes.push({
-            uuid: action.field,
-            value: action.value,
-          });
-        }
-
         return {
           ...state,
-          attributes: newAttributes,
+          attributes: {
+            ...state.attributes,
+            [action.field]: action.value,
+          },
         };
       }
 

@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/colors';
 
 .fieldTabletOrOverlay {
   margin-bottom: layout.$spacing-07;
@@ -26,4 +27,15 @@
 
 .label01 {
   @include type.type-style('label-01');
+}
+
+.locationAttributeFieldContainer {
+  position: relative;
+
+  .loadingContainer {
+    background-color: colors.$white;
+    position: absolute;
+    right: layout.$spacing-07;
+    bottom: layout.$spacing-02;
+  }
 }

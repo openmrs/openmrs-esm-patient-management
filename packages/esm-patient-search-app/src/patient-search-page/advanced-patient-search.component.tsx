@@ -6,6 +6,7 @@ import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch from './refine-search/refine-search.component';
 import styles from './advanced-patient-search.scss';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 interface AdvancedPatientSearchProps {
   query: string;
@@ -27,7 +28,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
       }
     });
 
-    count += filters.attributes?.length ?? 0;
+    count += Object.entries(filters.attributes).length ?? 0;
     return count;
   }, [filters]);
 
@@ -99,13 +100,17 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
         }
 
         // Person attributes filter
-        if (filters.attributes?.length) {
-          for (const filterAttribute of filters.attributes) {
-            const matchingAttribute = patient.attributes.find(
-              (attr) => attr.attributeType.uuid === filterAttribute.uuid,
-            );
+        if (Object.entries(filters.attributes).length) {
+          for (const [attributeUuid, value] of Object.entries(filters.attributes)) {
+            const matchingAttribute = patient.attributes.find((attr) => attr.attributeType.uuid === attributeUuid);
 
-            if (!matchingAttribute || matchingAttribute.value !== filterAttribute.value) {
+            if (!matchingAttribute) return false;
+
+            const isValueObj = typeof matchingAttribute.value === 'object';
+            const matchingValue = isValueObj
+              ? (matchingAttribute.value as OpenmrsResource).uuid
+              : matchingAttribute.value;
+            if (matchingValue !== value) {
               return false;
             }
           }
