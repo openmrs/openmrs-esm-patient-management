@@ -37,7 +37,7 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
         {t('admissionRequestsCount', '{{count}} admission request', {
-          count: inpatientRequests?.length,
+          count: inpatientRequests.length,
         })}
       </span>
       <Button
