@@ -71,7 +71,7 @@ export const configSchema = {
         },
         personAttributes: [
           {
-            label: 'Phone number',
+            label: 'Phone Number',
             attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
           },
         ],

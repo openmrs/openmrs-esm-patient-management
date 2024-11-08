@@ -31,6 +31,7 @@
   "search": "Search",
   "searchForPatient": "Search for a patient by name or identifier number",
   "searchingText": "Searching...",
+  "searchLocationPersonAttribute": "Search location",
   "searchPatient": "Search patient",
   "searchResults": "Search results",
   "searchResultsCount_one": "{{count}} search result",
