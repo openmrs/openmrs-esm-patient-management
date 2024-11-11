@@ -133,17 +133,18 @@ function DefaultQueueTable() {
               queueUuid={null}
               statusUuid={null}
               ExpandedRow={QueueTableExpandedRow}
-              tableFilter={[
-                <QueueDropdownFilter />,
-                <StatusDropdownFilter />,
-                <TableToolbarSearch
-                  className={styles.search}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={t('searchThisList', 'Search this list')}
-                  size={isDesktop(layout) ? 'sm' : 'lg'}
-                />,
-                <ClearQueueEntries queueEntries={filteredQueueEntries} />,
-              ]}
+              tableFilters={
+                <>
+                  <QueueDropdownFilter /> <StatusDropdownFilter />
+                  <TableToolbarSearch
+                    className={styles.search}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size={isDesktop(layout) ? 'sm' : 'lg'}
+                  />
+                  <ClearQueueEntries queueEntries={filteredQueueEntries} />
+                </>
+              }
             />
           </div>
         ) : (
@@ -159,16 +160,17 @@ function QueueDropdownFilter() {
   const layout = useLayoutType();
   const { services } = useQueueServices();
   const selectedService = useSelectedService();
-  const handleServiceChange = ({ selectedItem }) => {
+
+  const handleServiceChange = useCallback(({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem?.display);
-  };
+  }, []);
 
   return (
     <>
       <div className={styles.filterContainer}>
         <Dropdown
           id="serviceFilter"
-          titleText={t('filterByService', 'Filter by service :')}
+          titleText={t('filterByService', 'Filter by service:')}
           label={selectedService?.serviceDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
@@ -195,7 +197,7 @@ function StatusDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="statusFilter"
-          titleText={t('filterByStatus', 'Filter by status :')}
+          titleText={t('filterByStatus', 'Filter by status:')}
           label={queueStatus?.statusDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}

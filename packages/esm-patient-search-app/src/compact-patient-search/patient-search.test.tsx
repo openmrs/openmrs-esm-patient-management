@@ -12,7 +12,7 @@ const defaultProps = {
   fetchError: null,
   hasMore: false,
   isLoading: false,
-  loadingNewData: false,
+  isValidating: false,
   setPage: jest.fn(),
   totalResults: 1,
   query: 'John',

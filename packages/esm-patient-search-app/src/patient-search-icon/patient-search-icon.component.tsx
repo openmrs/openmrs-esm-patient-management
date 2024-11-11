@@ -1,10 +1,18 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
-import classNames from 'classnames';
+import { preload } from 'swr';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HeaderGlobalAction } from '@carbon/react';
 import { Close, Search } from '@carbon/react/icons';
-import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
+import {
+  isDesktop,
+  navigate,
+  openmrsFetch,
+  restBaseUrl,
+  useLayoutType,
+  useOnClickOutside,
+  useSession,
+} from '@openmrs/esm-framework';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-icon.scss';
@@ -16,6 +24,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { page } = useParams();
+  const { user } = useSession();
+  const userUuid = user?.uuid;
   const isSearchPage = useMemo(() => page === 'search', [page]);
   const [searchParams] = useSearchParams();
   const initialSearchTerm = isSearchPage ? searchParams.get('query') : '';
@@ -82,17 +92,19 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               onPatientSelect={resetToInitialState}
             />
           ) : (
-            <PatientSearchContext.Provider value={{ patientClickSideEffect: closePatientSearch }}>
-              <PatientSearchOverlay onClose={closePatientSearch} query={initialSearchTerm} />
-            </PatientSearchContext.Provider>
+            <PatientSearchOverlay
+              onClose={closePatientSearch}
+              query={initialSearchTerm}
+              patientClickSideEffect={closePatientSearch}
+            />
           )}
           <div className={styles.closeButton}>
             <HeaderGlobalAction
               aria-label={t('closeSearch', 'Close Search Panel')}
               className={styles.activeSearchIconButton}
+              data-testid="closeSearchIcon"
               enterDelayMs={500}
               name="CloseSearchIcon"
-              data-testid="closeSearchIcon"
               onClick={closePatientSearch}>
               <Close size={20} />
             </HeaderGlobalAction>
@@ -103,10 +115,19 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           <HeaderGlobalAction
             aria-label={t('searchPatient', 'Search Patient')}
             className={styles.searchIconButton}
+            data-testid="searchPatientIcon"
             enterDelayMs={500}
             name="SearchPatientIcon"
-            data-testid="searchPatientIcon"
-            onClick={handleShowSearchInput}>
+            onClick={handleShowSearchInput}
+            onMouseEnter={() => {
+              // Preload the user object on hover. This object may contain a 'patientsVisited'
+              // property with UUIDs of recently viewed patients. This data can be used to display
+              // recently viewed patients if the 'showRecentlySearchedPatients' config property
+              // is enabled.
+              if (userUuid) {
+                void preload(`${restBaseUrl}/user/${userUuid}`, openmrsFetch);
+              }
+            }}>
             <Search size={20} />
           </HeaderGlobalAction>
         </div>

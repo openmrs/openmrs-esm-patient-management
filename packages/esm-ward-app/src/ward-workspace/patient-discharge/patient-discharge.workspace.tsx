@@ -5,7 +5,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
-import { type WardPatientGroupDetails, type WardPatientWorkspaceProps } from '../../types';
+import { type WardPatientWorkspaceProps, type WardViewContext } from '../../types';
 import { createEncounter, removePatientFromBed } from '../../ward.resource';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './patient-discharge.scss';
@@ -17,10 +17,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
-  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
-  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   const submitDischarge = useCallback(() => {
     setIsSubmitting(true);
@@ -63,9 +60,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
       .finally(() => {
         setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
-        mutateAdmissionLocation();
-        mutateInpatientRequest();
-        mutateInpatientAdmission();
+        wardPatientGroupDetails.mutate();
       });
   }, [
     currentProvider,
@@ -73,16 +68,14 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
     emrConfiguration,
     wardPatient?.patient?.uuid,
     wardPatient?.bed?.uuid,
-    mutateAdmissionLocation,
-    mutateInpatientRequest,
-    mutateInpatientAdmission,
+    wardPatientGroupDetails,
   ]);
 
-  if (!wardGroupingDetails) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
   return (
     <div className={styles.workspaceContent}>
       <div className={styles.patientWorkspaceBanner}>
-        <WardPatientWorkspaceBanner {...props?.wardPatient} />
+        <WardPatientWorkspaceBanner wardPatient={props?.wardPatient} />
       </div>
       <div className={styles.workspaceForm}>
         <div>

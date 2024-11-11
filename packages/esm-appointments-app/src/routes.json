@@ -3,12 +3,6 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
-  "modals": [
-    {
-      "name": "end-appointment-modal",
-      "component": "endAppointmentModal"
-    }
-  ],
   "extensions": [
     {
       "name": "home-appointments",
@@ -36,11 +30,7 @@
       "slot": "calendar-dashboard-slot",
       "component": "appointmentsCalendarDashboardLink"
     },
-    {
-      "name": "check-in-appointment-modal",
-      "slot": "todays-appointment-slot",
-      "component": "checkInModal"
-    },
+
     {
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
@@ -112,10 +102,6 @@
       "slot": "upcoming-appointment-slot"
     },
     {
-      "name": "patient-appointment-cancel-confirmation-dialog",
-      "component": "patientAppointmentsCancelConfirmationDialog"
-    },
-    {
       "name": "edit-appointments-form",
       "component": "appointmentsForm",
       "meta": {
@@ -153,6 +139,16 @@
       "name": "home-appointments-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile"
+    }
+  ],
+  "modals": [
+    {
+      "name": "end-appointment-modal",
+      "component": "endAppointmentModal"
+    },
+    {
+      "name": "patient-appointment-cancel-confirmation-dialog",
+      "component": "patientAppointmentsCancelConfirmationDialog"
     }
   ]
 }

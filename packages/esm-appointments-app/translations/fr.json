@@ -12,7 +12,7 @@
   "appointmentEdited": "Rendez-vous modifié",
   "appointmentEditError": "Erreur de modification du rendez-vous",
   "appointmentEnded": "Rendez-vous terminé",
-  "appointmentEndedAndVisitClosedSuccessfully": "Rendez-vous et visite terminés avec succès.",
+  "appointmentEndedAndVisitClosedSuccessfully": "Appointment successfully completed and visit successfully closed.",
   "appointmentEndedButVisitNotClosedError": "Rendez-vous terminé, mais erreur avec la clôture de la visite",
   "appointmentEndedSuccessfully": "Rendez-vous terminé avec succès.",
   "appointmentEndError": "Erreur lors de la clôture du rendez-vous",

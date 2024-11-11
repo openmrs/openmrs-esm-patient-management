@@ -16,6 +16,7 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
+import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
 import { PatientSearchContext } from '../../../patient-search-context';
 import styles from './patient-banner.scss';
@@ -135,7 +136,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
 const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
-  const config = useConfig();
+  const config = useConfig<PatientSearchConfig>();
 
   if (nonNavigationSelectPatientAction) {
     return (
@@ -156,7 +157,7 @@ const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientCo
       <ConfigurableLink
         className={styles.patientBanner}
         onBeforeNavigate={() => patientClickSideEffect?.(patientUuid)}
-        to={config.search.patientResultUrl}
+        to={config.search.patientChartUrl}
         templateParams={{ patientUuid: patientUuid }}>
         {children}
       </ConfigurableLink>

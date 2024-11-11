@@ -28,6 +28,7 @@ function getByTextWithMarkup(text: RegExp | string) {
   try {
     return screen.getByText((content, node) => {
       const hasText = (node: Element) => node.textContent === text || node.textContent.match(text);
+      // eslint-disable-next-line testing-library/no-node-access
       const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child as HTMLElement));
       return hasText(node) && childrenDontHaveText;
     });

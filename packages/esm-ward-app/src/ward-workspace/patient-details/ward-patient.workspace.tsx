@@ -1,53 +1,28 @@
-import { age, attach, ExtensionSlot, type Patient } from '@openmrs/esm-framework';
-import React, { useEffect } from 'react';
-import styles from './ward-patient.style.scss';
-import { useTranslation } from 'react-i18next';
+import { attach, ExtensionSlot } from '@openmrs/esm-framework';
+import React from 'react';
 import { type WardPatientWorkspaceProps } from '../../types';
-import { getGender } from '../../ward-patient-card/row-elements/ward-patient-gender.component';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import styles from './ward-patient.style.scss';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-export default function WardPatientWorkspace({ setTitle, wardPatient: { patient } }: WardPatientWorkspaceProps) {
-  useEffect(() => {
-    setTitle(patient.person.display, <PatientWorkspaceTitle key={patient.uuid} patient={patient} />);
-  }, [patient.uuid]);
-
-  return (
-    <div className={styles.workspaceContainer}>
-      <WardPatientWorkspaceView patient={patient} />
-    </div>
-  );
-}
-
-interface WardPatientWorkspaceViewProps {
-  patient: Patient;
-}
-
-const WardPatientWorkspaceView: React.FC<WardPatientWorkspaceViewProps> = ({ patient }) => {
-  const extensionSlotState = { patient, patientUuid: patient.uuid };
+export default function WardPatientWorkspace({ wardPatient, WardPatientHeader }: WardPatientWorkspaceProps) {
+  const { patient } = wardPatient ?? {};
+  const extensionSlotState = { patient, patientUuid: patient?.uuid };
 
   return (
     <>
-      <div>
-        <ExtensionSlot name="ward-patient-workspace-header-slot" state={extensionSlotState} />
-      </div>
-      <div>
-        <ExtensionSlot name="ward-patient-workspace-content-slot" state={extensionSlotState} />
-      </div>
-    </>
-  );
-};
-
-const PatientWorkspaceTitle: React.FC<WardPatientWorkspaceViewProps> = ({ patient }) => {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      <div>{patient.person.display} &nbsp;</div>
-      <div className={styles.headerPatientDetail}>&middot; &nbsp; {getGender(t, patient.person?.gender)}</div>
-      {patient.person?.birthdate && (
-        <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
+      {wardPatient && (
+        <div className={styles.workspaceContainer}>
+          <WardPatientWorkspaceBanner {...{ wardPatient }} />
+          <div>
+            <ExtensionSlot name="ward-patient-workspace-header-slot" state={extensionSlotState} />
+          </div>
+          <div>
+            <ExtensionSlot name="ward-patient-workspace-content-slot" state={extensionSlotState} />
+          </div>
+        </div>
       )}
     </>
   );
-};
+}
