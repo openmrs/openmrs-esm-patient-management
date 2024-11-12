@@ -5,13 +5,14 @@ import { ArrowRight } from '@carbon/react/icons';
 
 const BedManagementAdminCardLink: React.FC = () => {
   const { t } = useTranslation();
-  const header = t('manageBeds', 'Manage Beds');
+  const header = t('manageBeds', 'Manage beds');
+
   return (
     <Layer>
       <ClickableTile href={window.getOpenmrsSpaBase() + 'bed-management'} rel="noopener noreferrer">
         <div>
           <div className="heading">{header}</div>
-          <div className="content">{t('bedManagement', 'Bed Management')}</div>
+          <div className="content">{t('bedManagement', 'Bed management')}</div>
         </div>
         <div className="iconWrapper">
           <ArrowRight size={16} />

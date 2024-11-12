@@ -1,4 +1,6 @@
+import { useCallback } from 'react';
 import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
 import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import {
@@ -7,12 +9,10 @@ import {
   type AppointmentsFetchResponse,
   type RecurringAppointmentsPayload,
 } from '../types';
-import isToday from 'dayjs/plugin/isToday';
-import { useCallback } from 'react';
 dayjs.extend(isToday);
 
-const appointmentUrlMatcher = '/ws/rest/v1/appointment';
-const appointmentsSearchUrl = '/ws/rest/v1/appointments/search';
+const appointmentUrlMatcher = `${restBaseUrl}/appointment`;
+const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
 export function useMutateAppointments() {
   const { mutate } = useSWRConfig();
