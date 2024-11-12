@@ -2,8 +2,8 @@ import { useAppContext, type DefaultWorkspaceProps } from '@openmrs/esm-framewor
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
-import { renderWithSwr } from '../../../../../tools';
+import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import useWardLocation from '../../hooks/useWardLocation';
 import type { WardPatient, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
