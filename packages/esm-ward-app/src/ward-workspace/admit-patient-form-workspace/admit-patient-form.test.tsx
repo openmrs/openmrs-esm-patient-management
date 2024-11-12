@@ -41,7 +41,6 @@ jest.mock('../../hooks/useAssignedBedByPatient', () => ({
 }));
 
 jest.mock('../../ward.resource', () => ({
-  createEncounter: jest.fn(),
   useAdmitPatient: jest.fn(),
   assignPatientToBed: jest.fn(),
   removePatientFromBed: jest.fn(),

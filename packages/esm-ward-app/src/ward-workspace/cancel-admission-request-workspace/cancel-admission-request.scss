@@ -1,0 +1,55 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.flexWrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #393939;
+}
+
+.workspaceContent {
+  padding: layout.$spacing-05;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #393939;
+}
+
+.field {
+  margin-bottom: layout.$spacing-05;
+  & > h2 {
+    margin-bottom: layout.$spacing-03;
+  }
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.buttonSet {
+  display: flex;
+  align-items: center;
+  margin: 0 (-(layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05));
+
+  button {
+    max-width: unset !important;
+    width: 50% !important;
+
+    > svg {
+      fill: currentColor !important;
+    }
+  }
+}
+
+.notifications {
+  margin-top: layout.$spacing-05;
+}

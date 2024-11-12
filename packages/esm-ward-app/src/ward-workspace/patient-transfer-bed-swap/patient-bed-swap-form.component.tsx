@@ -9,7 +9,7 @@ import { z } from 'zod';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import type { BedLayout, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
+import { assignPatientToBed, useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import BedSelector from '../bed-selector.component';
 import styles from './patient-transfer-swap.scss';
 
@@ -21,7 +21,8 @@ export default function PatientBedSwapForm({
   const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
+    useCreateEncounter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
@@ -52,33 +53,13 @@ export default function PatientBedSwapForm({
     return () => promptBeforeClosing(null);
   }, [isDirty]);
 
-  const getBedInformation = useCallback(
-    (bed: BedLayout) => {
-      const patients = bed.patients.map((bedPatient) => bedPatient?.person?.preferredName?.display);
-      const bedNumber = bed.bedNumber;
-      return [bedNumber, ...(patients.length ? patients : [t('empty', 'Empty')])].join(' · ');
-    },
-    [t],
-  );
-
   const beds = wardPatientGroupDetails?.bedLayouts ?? [];
 
   const onSubmit = useCallback(
     (values: FormValues) => {
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
       setShowErrorNotifications(false);
-      createEncounter({
-        patient: patient.uuid,
-        encounterType: emrConfiguration.bedAssignmentEncounterType.uuid,
-        location: location?.uuid,
-        encounterProviders: [
-          {
-            provider: currentProvider?.uuid,
-            encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
-          },
-        ],
-        obs: [],
-      })
+      createEncounter(patient, emrConfiguration.bedAssignmentEncounterType)
         .then(async (response) => {
           if (response.ok) {
             if (bedSelected) {

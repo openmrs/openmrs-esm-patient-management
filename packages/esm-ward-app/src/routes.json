@@ -131,6 +131,13 @@
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient",
       "width": "wider"
+    },
+    {
+      "name": "cancel-admission-request-workspace",
+      "component": "cancelAdmissionRequestWorkspace",
+      "title": "cancelAdmissionRequest",
+      "type": "cancel-admission-request",
+      "sidebarFamily": "ward-patient"
     }
   ]
 }

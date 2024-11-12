@@ -41,6 +41,8 @@ interface EmrApiConfigurationResponse {
   }>;
   bedAssignmentEncounterType: OpenmrsResource;
   cancelADTRequestEncounterType: OpenmrsResource;
+  denyAdmissionConcept: OpenmrsResource;
+  admissionDecisionConcept: OpenmrsResource;
   // There are many more keys to this object, but we only need these for now
   // Add more keys as needed
 }
@@ -98,6 +100,8 @@ const customRepProps = [
   ['transferForm', 'ref'],
   ['bedAssignmentEncounterType', 'ref'],
   ['cancelADTRequestEncounterType', 'ref'],
+  ['admissionDecisionConcept', 'ref'],
+  ['denyAdmissionConcept', 'ref'],
 ];
 
 const customRep = `custom:${customRepProps.map((prop) => prop.join(':')).join(',')}`;

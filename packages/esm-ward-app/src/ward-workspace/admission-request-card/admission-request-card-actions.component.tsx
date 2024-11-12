@@ -33,6 +33,14 @@ const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
       WardPatientHeader,
     });
   }, [wardPatient, WardPatientHeader]);
+
+  const launchCancelAdmissionForm = () => {
+    launchWorkspace<WardPatientWorkspaceProps>('cancel-admission-request-workspace', {
+      wardPatient,
+      WardPatientHeader,
+    });
+  };
+
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const { closeWorkspaceWithSavedChanges } = useContext(AdmissionRequestsWorkspaceContext);
 
@@ -74,6 +82,9 @@ const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
     <div className={styles.admissionRequestActionBar}>
       <Button kind="ghost" size={responsiveSize} onClick={launchPatientTransferForm}>
         {t('transferElsewhere', 'Transfer elsewhere')}
+      </Button>
+      <Button kind="ghost" size={responsiveSize} onClick={launchCancelAdmissionForm}>
+        {t('cancel', 'Cancel')}
       </Button>
       <Button
         kind="ghost"
