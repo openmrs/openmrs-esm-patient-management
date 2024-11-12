@@ -1,8 +1,7 @@
-import { Tag } from '@carbon/react';
+import { Skeleton, Tag } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './bed-share-divider.scss';
-import { SkeletonText } from '@carbon/react';
 
 interface BedShareDividerProps {
   isLoading?: boolean;
