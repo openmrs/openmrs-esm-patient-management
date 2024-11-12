@@ -77,12 +77,7 @@ export default function CancelAdmissionRequestWorkspace({
         },
       ];
 
-      createEncounter(patient, emrConfiguration?.cancelADTRequestEncounterType, [
-        {
-          concept: emrConfiguration?.dispositionDescriptor?.dispositionSetConcept?.uuid,
-          groupMembers: obs,
-        },
-      ])
+      createEncounter(patient, emrConfiguration?.cancelADTRequestEncounterType, obs)
         .then(() => {
           showSnackbar({
             title: t('admissionRequestCancelled', 'Admission request cancelled.'),
