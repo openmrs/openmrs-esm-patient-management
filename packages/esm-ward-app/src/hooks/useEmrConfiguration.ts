@@ -39,6 +39,8 @@ interface EmrApiConfigurationResponse {
     excludedEncounterTypes: Array<string>;
     uuid: string;
   }>;
+  bedAssignmentEncounterType: OpenmrsResource;
+  cancelADTRequestEncounterType: OpenmrsResource;
   // There are many more keys to this object, but we only need these for now
   // Add more keys as needed
 }
@@ -94,6 +96,8 @@ const customRepProps = [
   ['unknownPatientPersonAttributeType', 'ref'],
   ['supportsVisitsLocationTag', '(uuid,display,name,links)'],
   ['transferForm', 'ref'],
+  ['bedAssignmentEncounterType', 'ref'],
+  ['cancelADTRequestEncounterType', 'ref'],
 ];
 
 const customRep = `custom:${customRepProps.map((prop) => prop.join(':')).join(',')}`;
