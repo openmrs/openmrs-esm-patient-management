@@ -254,6 +254,11 @@ export const configSchema: ConfigSchema = {
       },
     },
   },
+  hideWorkspaceVitalsLinks: {
+    _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
+    _type: Type.Boolean,
+    _default: false,
+  },
 };
 
 export interface WardConfigObject {
@@ -266,6 +271,7 @@ export interface WardConfigObject {
     admissionRequestNote: Array<AdmissionRequestNoteElementConfig>;
   };
   wards: Array<WardDefinition>;
+  hideWorkspaceVitalsLinks: boolean;
 }
 
 export interface PendingItemsElementConfig {
