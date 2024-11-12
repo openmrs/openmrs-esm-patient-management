@@ -1,10 +1,10 @@
 @use '@carbon/layout';
-@use '@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 @use '@carbon/type';
 
 .bedDivider {
-  background-color: vars.$ui-02;
-  color: vars.$text-02;
+  background-color: $ui-02;
+  color: $text-02;
   padding: layout.$spacing-01;
   display: flex;
   align-items: center;
@@ -13,6 +13,6 @@
 
 .bedDividerLine {
   height: 1px;
-  background-color: vars.$ui-05;
+  background-color: $ui-05;
   width: 30%;
 }
