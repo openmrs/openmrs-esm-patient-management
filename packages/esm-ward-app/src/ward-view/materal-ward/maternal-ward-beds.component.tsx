@@ -6,7 +6,7 @@ import { bedLayoutToBed } from '../ward-view.resource';
 import MaternalWardPatientCard from './maternal-ward-patient-card.component';
 
 const MaternalWardBeds: React.FC<MotherChildRelationships> = (motherChildRelationships) => {
-  const { motherByChildUuid } = motherChildRelationships ?? {};
+  const { motherByChildUuid, isLoading: isLoadingMotherChildRelationships } = motherChildRelationships ?? {};
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
 
@@ -56,7 +56,14 @@ const MaternalWardBeds: React.FC<MotherChildRelationships> = (motherChildRelatio
       />
     ));
 
-    return <WardBed key={bed.uuid} bed={bed} patientCards={patientCards} />;
+    return (
+      <WardBed
+        key={bed.uuid}
+        bed={bed}
+        patientCards={patientCards}
+        isLoadingDivider={isLoadingMotherChildRelationships}
+      />
+    );
   });
 
   return <>{wardBeds}</>;
