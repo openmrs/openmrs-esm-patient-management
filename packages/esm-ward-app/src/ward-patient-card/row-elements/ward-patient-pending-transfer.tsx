@@ -4,7 +4,7 @@ import styles from '../ward-patient-card.scss';
 import { useTranslation } from 'react-i18next';
 import { type WardPatientWorkspaceProps, type WardViewContext, type WardPatient } from '../../types';
 import { CloseOutlineIcon, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
-import { Button } from '@carbon/react';
+import { IconButton } from '@carbon/react';
 
 export interface WardPatientTransferProps {
   wardPatient: WardPatient;
@@ -41,14 +41,14 @@ const WardPatientPendingTransfer: React.FC<WardPatientTransferProps> = ({ wardPa
     <div className={styles.wardPatientCardDispositionTypeContainer}>
       <Movement className={styles.movementIcon} size={24} />
       {message}
-      <Button
-        hasIconOnly
-        iconDescription={t('cancel', 'Cancel')}
+      <IconButton
+        label={t('cancel', 'Cancel')}
         kind={'secondary'}
         className={styles.cancelTransferRequestButton}
         size={'sm'}
-        onClick={launchCancelAdmissionForm}
-        renderIcon={(props) => <CloseOutlineIcon {...props} />}></Button>
+        onClick={launchCancelAdmissionForm}>
+        <CloseOutlineIcon />
+      </IconButton>
     </div>
   );
 };
