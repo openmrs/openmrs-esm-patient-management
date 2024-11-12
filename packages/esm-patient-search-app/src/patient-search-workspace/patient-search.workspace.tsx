@@ -4,6 +4,8 @@ import { type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext, type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
+import { inferModeFromSearchParams } from '../mpi/utils';
+import { useSearchParams } from 'react-router-dom';
 
 export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
   initialQuery?: string;
@@ -25,6 +27,7 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const showSearchResults = Boolean(searchTerm?.trim());
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const [searchParams] = useSearchParams();
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
@@ -44,7 +47,13 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
         onClear={handleClearSearchTerm}
         onSubmit={onSearchTermChange}
       />
-      {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
+      {showSearchResults && (
+        <AdvancedPatientSearchComponent
+          query={debouncedSearchTerm}
+          inTabletOrOverlay
+          searchMode={inferModeFromSearchParams(searchParams)}
+        />
+      )}
     </PatientSearchContext.Provider>
   );
 };
