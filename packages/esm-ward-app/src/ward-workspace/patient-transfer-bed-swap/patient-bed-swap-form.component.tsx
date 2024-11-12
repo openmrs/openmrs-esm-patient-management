@@ -69,7 +69,7 @@ export default function PatientBedSwapForm({
       setShowErrorNotifications(false);
       createEncounter({
         patient: patient.uuid,
-        encounterType: emrConfiguration.transferWithinHospitalEncounterType.uuid,
+        encounterType: emrConfiguration.bedAssignmentEncounterType.uuid,
         location: location?.uuid,
         encounterProviders: [
           {
