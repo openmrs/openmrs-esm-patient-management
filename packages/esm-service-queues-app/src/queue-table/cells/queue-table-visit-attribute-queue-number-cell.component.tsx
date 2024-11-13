@@ -15,6 +15,7 @@ export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction
 
   const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTableCellComponentProps) => {
     const { t } = useTranslation();
+
     return (
       <>
         {visitQueueNumberAttributeUuid ? (

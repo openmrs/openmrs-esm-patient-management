@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type BedPostPayload } from '../types';
 
 interface BedForm {
@@ -13,16 +13,15 @@ interface BedForm {
 }
 
 export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): Promise<FetchResponse<BedForm>> {
-  const response: FetchResponse = await openmrsFetch(`/ws/rest/v1/bed`, {
+  return await openmrsFetch(`${restBaseUrl}/bed`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: bedPayload,
   });
-  return response;
 }
 
 export function useBedType() {
-  const locationsUrl = `/ws/rest/v1/bedtype`;
+  const locationsUrl = `${restBaseUrl}/bedtype`;
   const { data, error, isLoading } = useSWR<{ data }>(locationsUrl, openmrsFetch);
 
   const bedTypes = useMemo(() => {
@@ -38,7 +37,7 @@ export function useBedType() {
     return uniqueBedTypes;
   }, [data?.data?.results]);
 
-  return { bedTypes: bedTypes ? bedTypes : [], isLoading, error };
+  return { bedTypes: bedTypes ?? [], isLoading, error };
 }
 
 export async function editBed({
@@ -48,10 +47,9 @@ export async function editBed({
   bedPayload: BedPostPayload;
   bedId: string;
 }): Promise<FetchResponse<BedForm>> {
-  const response: FetchResponse = await openmrsFetch(`/ws/rest/v1/bed/${bedId}`, {
+  return await openmrsFetch(`${restBaseUrl}/bed/${bedId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: bedPayload,
   });
-  return response;
 }
