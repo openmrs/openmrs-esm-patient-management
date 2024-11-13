@@ -1,30 +1,28 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
-import { useBedType } from '../bed-administration/bed-administration.resource';
+import { showSnackbar } from '@openmrs/esm-framework';
+import { saveBedTag, useBedTags, useLocationsWithAdmissionTag } from '../summary/summary.resource';
+import { type BedTagData } from '../types';
 import BedTagsAdministrationForm from './bed-tags-admin-form.component';
-import { saveBedTag, useLocationsWithAdmissionTag } from '../summary/summary.resource';
-import { type BedTagData, type Mutator } from '../types';
 
 interface BedTagFormProps {
-  showModal: boolean;
+  mutate: () => void;
   onModalChange: (showModal: boolean) => void;
-  mutate: () => any;
+  showModal: boolean;
 }
 
 const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutate }) => {
   const { t } = useTranslation();
-  const { data: admissionLocations } = useLocationsWithAdmissionTag();
-  const headerTitle = t('addBedTag', 'Create Bed Tag');
-  const { bedTypes } = useBedType();
-  const availableBedTypes = bedTypes ? bedTypes : [];
+  const { admissionLocations } = useLocationsWithAdmissionTag();
+  const { bedTags } = useBedTags();
+  const headerTitle = t('createBedTag', 'Create bed tag');
 
   const initialData: BedTagData = {
-    uuid: '',
     name: '',
+    uuid: '',
   };
 
-  const handleCreateQuestion = useCallback(
+  const handleCreateBedTag = useCallback(
     (formData: BedTagData) => {
       const { name } = formData;
 
@@ -34,42 +32,39 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutat
 
       saveBedTag({ bedTagPayload })
         .then(() => {
-          showToast({
-            title: t('formCreated', 'Add Bed Tag'),
+          showSnackbar({
             kind: 'success',
-            critical: true,
-            description: `Tag ${name} was created successfully.`,
+            title: t('bedTagCreated', 'Bed tag created'),
+            subtitle: t('bedTagCreatedSuccessfully', `${name} created successfully`, {
+              bedTag: name,
+            }),
           });
-
           mutate();
-          onModalChange(false);
         })
         .catch((error) => {
-          showNotification({
-            title: t('errorCreatingForm', 'Error creating bed'),
+          showSnackbar({
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            title: t('errorCreatingForm', 'Error creating bed'),
+            subtitle: error?.message,
           });
+        })
+        .finally(() => {
           onModalChange(false);
         });
-      onModalChange(false);
     },
     [onModalChange, mutate, t],
   );
 
   return (
-    <>
-      <BedTagsAdministrationForm
-        onModalChange={onModalChange}
-        allLocations={admissionLocations}
-        availableBedTypes={availableBedTypes}
-        showModal={showModal}
-        handleCreateQuestion={handleCreateQuestion}
-        headerTitle={headerTitle}
-        initialData={initialData}
-      />
-    </>
+    <BedTagsAdministrationForm
+      allLocations={admissionLocations}
+      availableBedTags={bedTags}
+      handleCreateBedTag={handleCreateBedTag}
+      headerTitle={headerTitle}
+      initialData={initialData}
+      onModalChange={onModalChange}
+      showModal={showModal}
+    />
   );
 };
 
