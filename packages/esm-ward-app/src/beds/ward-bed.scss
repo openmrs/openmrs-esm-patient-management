@@ -1,0 +1,31 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars';
+@use '@carbon/type';
+
+.occupiedBed {
+  display: flex;
+  flex-direction: column;
+  background-color: vars.$ui-02;
+  height: fit-content;
+}
+
+.emptyBed {
+  display: flex;
+  gap: layout.$spacing-04;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed vars.$ui-04;
+  padding: layout.$spacing-03 layout.$spacing-04;
+  height: fit-content;
+}
+
+.emptyBed:hover:not(.skeleton) {
+  border: 1px solid transparent;
+  box-shadow: inset 0px 0px 0px 2px vars.$color-blue-60-2;
+  cursor: pointer;
+}
+
+.emptyBedText {
+  @include type.type-style('heading-compact-01');
+  color: vars.$text-02;
+}

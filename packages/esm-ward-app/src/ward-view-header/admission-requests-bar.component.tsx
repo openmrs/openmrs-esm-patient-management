@@ -1,17 +1,22 @@
-import React from 'react';
-import { Movement } from '@carbon/react/icons';
 import { Button, InlineNotification } from '@carbon/react';
-import { ArrowRightIcon, isDesktop, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import { Movement } from '@carbon/react/icons';
+import { ArrowRightIcon, isDesktop, launchWorkspace, useAppContext, useLayoutType } from '@openmrs/esm-framework';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { type WardViewContext } from '../types';
 import styles from './admission-requests.scss';
 
-const AdmissionRequestsBar = () => {
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(['ADMIT', 'TRANSFER']);
+interface AdmissionRequestsBarProps {
+  wardPendingPatients: ReactNode;
+}
+
+const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPendingPatients }) => {
+  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { inpatientRequests, isLoading, error } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
   const { t } = useTranslation();
   const layout = useLayoutType();
 
-  if (isLoading || !inpatientRequests?.length) {
+  if (isLoading || !inpatientRequests) {
     return null;
   }
 
@@ -26,7 +31,9 @@ const AdmissionRequestsBar = () => {
   }
 
   return (
-    <div className={styles.admissionRequestsContainer}>
+    <div className={`${styles.admissionRequestsContainer} ${
+      inpatientRequests?.length ? styles.blackBackground : styles.lightBlueBackground
+    }`}>
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
         {t('admissionRequestsCount', '{{count}} admission request', {
@@ -34,7 +41,7 @@ const AdmissionRequestsBar = () => {
         })}
       </span>
       <Button
-        onClick={() => launchWorkspace('admission-requests-workspace')}
+        onClick={() => launchWorkspace('admission-requests-workspace', { wardPendingPatients })}
         renderIcon={ArrowRightIcon}
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}>

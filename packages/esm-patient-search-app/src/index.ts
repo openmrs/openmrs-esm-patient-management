@@ -2,6 +2,7 @@ import {
   defineConfigSchema,
   fetchCurrentPatient,
   fhirBaseUrl,
+  getAsyncLifecycle,
   getSyncLifecycle,
   makeUrl,
   messageOmrsServiceWorker,
@@ -31,6 +32,11 @@ export const patientSearchButton = getSyncLifecycle(patientSearchButtonComponent
 
 // This extension is not compatible with the tablet view.
 export const patientSearchBar = getSyncLifecycle(patientSearchBarComponent, options);
+
+export const patientSearchWorkspace = getAsyncLifecycle(
+  () => import('./patient-search-workspace/patient-search.workspace'),
+  options,
+);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

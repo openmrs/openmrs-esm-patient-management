@@ -1,4 +1,16 @@
-import { type Patient } from '@openmrs/esm-framework';
+import { showNotification, useConfig, type Patient } from '@openmrs/esm-framework';
+import type { TFunction } from 'i18next';
+import { useMemo } from 'react';
+import {
+  type PendingItemsElementConfig,
+  type ColoredObsTagsElementConfig,
+  type IdentifierElementConfig,
+  type ObsElementConfig,
+  type PatientAddressElementConfig,
+  type WardConfigObject,
+  type WardDefinition,
+  type AdmissionRequestNoteElementConfig,
+} from '../config-schema';
 import type {
   AdmissionLocationFetchResponse,
   Bed,
@@ -8,7 +20,7 @@ import type {
   WardMetrics,
   WardPatientGroupDetails,
 } from '../types';
-import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -30,19 +42,19 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
   const bedLayouts = admissionLocation.bedLayouts
     .filter((bl) => bl.bedId)
     .sort((bedA, bedB) => collator.compare(bedA.bedNumber, bedB.bedNumber));
+
   return bedLayouts;
 }
 
-//TODO: This implementation will change when the api is ready
-export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
+export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   const bedMetrics = {
     patients: '--',
     freeBeds: '--',
     capacity: '--',
   };
-  if (beds == null || beds.length == 0) return bedMetrics;
-  const total = beds.length;
-  const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
+  if (bedLayouts == null || bedLayouts.length == 0) return bedMetrics;
+  const total = bedLayouts.length;
+  const occupiedBeds = bedLayouts.filter((bed) => bed.patients.length > 0);
   const patients = occupiedBeds.length;
   const freeBeds = total - patients;
   const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
@@ -56,7 +68,10 @@ export function getWardMetrics(beds: Bed[], wardPatientGroup: WardPatientGroupDe
 export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmission[]) {
   const map = new Map<string, InpatientAdmission>();
   for (const inpatientAdmission of inpatientAdmissions ?? []) {
-    map.set(inpatientAdmission.patient.uuid, inpatientAdmission);
+    // TODO: inpatientAdmission is undefined sometimes, why?
+    if (inpatientAdmission) {
+      map.set(inpatientAdmission.patient.uuid, inpatientAdmission);
+    }
   }
   return map;
 }
@@ -72,7 +87,6 @@ export function createAndGetWardPatientGrouping(
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
   const bedLayouts = admissionLocation && filterBeds(admissionLocation);
   const allWardPatientUuids = new Set<string>();
-
   let wardPatientPendingCount = 0;
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
@@ -103,7 +117,10 @@ export function createAndGetWardPatientGrouping(
   const totalPatientsCount = allWardPatientUuids.size;
 
   for (const inpatientRequest of inpatientRequests ?? []) {
-    allWardPatientUuids.add(inpatientRequest.patient.uuid);
+    // TODO: inpatientRequest is undefined sometimes, why?
+    if (inpatientRequest) {
+      allWardPatientUuids.add(inpatientRequest.patient.uuid);
+    }
   }
 
   return {
@@ -141,4 +158,59 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
     case 'pendingOut':
       return t('pendingOutMetricValue', '{{ metricValue }}', { metricValue: value });
   }
+}
+
+export function useElementConfig(elementType: 'obs', id: string): ObsElementConfig;
+export function useElementConfig(elementType: 'patientIdentifier', id: string): IdentifierElementConfig;
+export function useElementConfig(elementType: 'patientAddress', id: string): PatientAddressElementConfig;
+export function useElementConfig(elementType: 'coloredObsTags', id: string): ColoredObsTagsElementConfig;
+export function useElementConfig(elementType: 'pendingItems', id: string): PendingItemsElementConfig;
+export function useElementConfig(elementType: 'admissionRequestNote', id: string): AdmissionRequestNoteElementConfig;
+export function useElementConfig(elementType, id: string): object {
+  const config = useConfig<WardConfigObject>();
+  const { t } = useTranslation();
+
+  try {
+    return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig?.id == id);
+  } catch (e) {
+    showNotification({
+      title: t('errorConfiguringPatientCard', 'Error configuring patient card'),
+      kind: 'error',
+      critical: true,
+      description: t(
+        'errorConfiguringPatientCardMessage',
+        'Unable to find configuration for {{elementType}}, id: {{id}}',
+        {
+          elementType,
+          id,
+        },
+      ),
+    });
+    return null;
+  }
+}
+
+export function useWardConfig(locationUuid: string): WardDefinition {
+  const { wards } = useConfig<WardConfigObject>();
+
+  const currentWardConfig = useMemo(() => {
+    const cardDefinition = wards?.find((wardDef) => {
+      return (
+        wardDef.appliedTo == null ||
+        wardDef.appliedTo?.length == 0 ||
+        wardDef.appliedTo.some((criteria) => criteria.location == locationUuid)
+      );
+    });
+
+    return cardDefinition;
+  }, [wards, locationUuid]);
+
+  if (!currentWardConfig) {
+    console.warn(
+      'No ward card configuration has `appliedTo` criteria that matches the current location. Using the default configuration.',
+    );
+    return { id: 'default-ward' };
+  }
+
+  return currentWardConfig;
 }

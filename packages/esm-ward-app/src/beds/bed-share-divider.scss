@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/type';
+
+.bedDivider {
+  background-color: $ui-02;
+  color: $text-02;
+  padding: layout.$spacing-01;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bedDividerLine {
+  height: 1px;
+  background-color: $ui-05;
+  width: 30%;
+}

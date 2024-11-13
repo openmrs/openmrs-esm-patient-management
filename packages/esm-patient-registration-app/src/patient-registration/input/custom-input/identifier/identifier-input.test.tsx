@@ -1,29 +1,28 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Formik, Form } from 'formik';
-import { type PatientIdentifierType } from '../../../patient-registration.types';
-import { initialFormValues } from '../../../patient-registration.component';
+import { Form, Formik } from 'formik';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
+import { ResourcesContext, type Resources } from '../../../../offline.resources';
+import {
+  PatientRegistrationContext,
+  type PatientRegistrationContextProps,
+} from '../../../patient-registration-context';
+import type {
+  AddressTemplate,
+  FormValues,
+  IdentifierSource,
+  PatientIdentifierValue,
+} from '../../../patient-registration.types';
 import IdentifierInput from './identifier-input.component';
+import userEvent from '@testing-library/user-event';
 
-// TODO: Fix this test
-xdescribe('identifier input', () => {
-  const openmrsID = {
-    name: 'OpenMRS ID',
+const mockIdentifierTypes = [
+  {
     fieldName: 'openMrsId',
-    required: true,
-    uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-    format: null,
-    isPrimary: true,
+    format: '',
     identifierSources: [
-      {
-        uuid: '691eed12-c0f1-11e2-94be-8c13b969e334',
-        name: 'Generator 1 for OpenMRS ID',
-        autoGenerationOption: {
-          manualEntryEnabled: false,
-          automaticGenerationEnabled: true,
-        },
-      },
       {
         uuid: '01af8526-cea4-4175-aa90-340acb411771',
         name: 'Generator 2 for OpenMRS ID',
@@ -33,72 +32,172 @@ xdescribe('identifier input', () => {
         },
       },
     ],
-    autoGenerationSource: null,
-  };
+    isPrimary: true,
+    name: 'OpenMRS ID',
+    required: true,
+    uniquenessBehavior: 'UNIQUE' as const,
+    uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+  },
+];
 
-  const setupIdentifierInput = async (identifierType: PatientIdentifierType) => {
-    initialFormValues['source-for-' + identifierType.fieldName] = identifierType.identifierSources[0].name;
+const mockResourcesContextValue: Resources = {
+  addressTemplate: {} as AddressTemplate,
+  currentSession: {
+    authenticated: true,
+    sessionId: 'JSESSION',
+    currentProvider: { uuid: 'provider-uuid', identifier: 'PRO-123' },
+  },
+  relationshipTypes: [],
+  identifierTypes: [...mockIdentifierTypes],
+};
 
+const mockContextValues: PatientRegistrationContextProps = {
+  currentPhoto: '',
+  inEditMode: false,
+  identifierTypes: [],
+  initialFormValues: {} as FormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldValue: jest.fn(),
+  setInitialFormValues: jest.fn(),
+  setFieldTouched: jest.fn(),
+  validationSchema: null,
+  values: {} as FormValues,
+};
+
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+
+describe('identifier input', () => {
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+  });
+
+  const fieldName = 'openMrsId';
+  const openmrsID = {
+    identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+    initialValue: '',
+    identifierName: 'OpenMRS ID',
+    selectedSource: {
+      uuid: '01af8526-cea4-4175-aa90-340acb411771',
+      name: 'Generator 2 for OpenMRS ID',
+      autoGenerationOption: {
+        manualEntryEnabled: false,
+        automaticGenerationEnabled: true,
+      },
+    } as IdentifierSource,
+    autoGeneration: false,
+    preferred: true,
+    required: true,
+  } as PatientIdentifierValue;
+
+  const setupIdentifierInput = (patientIdentifier: PatientIdentifierValue, initialValues = {}) => {
     render(
-      <Formik initialValues={initialFormValues} onSubmit={null}>
-        <Form>
-          <IdentifierInput identifierType={identifierType} />
-        </Form>
-      </Formik>,
+      <ResourcesContext.Provider value={mockResourcesContextValue}>
+        <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+          <Form>
+            <PatientRegistrationContext.Provider value={mockContextValues}>
+              <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
+            </PatientRegistrationContext.Provider>
+          </Form>
+        </Formik>
+      </ResourcesContext.Provider>,
     );
-    const identifierInput = screen.getByLabelText(identifierType.fieldName) as HTMLInputElement;
-    let identifierSourceSelectInput = screen.getByLabelText('source-for-' + identifierType.fieldName);
-    return {
-      identifierInput,
-      identifierSourceSelectInput,
-    };
   };
 
-  it('exists', async () => {
-    const { identifierInput, identifierSourceSelectInput } = await setupIdentifierInput(openmrsID);
-
-    expect(identifierInput.type).toBe('text');
-    expect(identifierSourceSelectInput.type).toBe('select-one');
+  it('shows the identifier input', () => {
+    openmrsID.autoGeneration = false;
+    setupIdentifierInput(openmrsID as PatientIdentifierValue);
+    expect(screen.getByLabelText(openmrsID.identifierName)).toBeInTheDocument();
   });
 
-  it('has correct props for identifier source select input', async () => {
-    const { identifierSourceSelectInput } = await setupIdentifierInput(openmrsID);
-
-    expect(identifierSourceSelectInput.childElementCount).toBe(3);
-    expect(identifierSourceSelectInput.value).toBe('Generator 1 for OpenMRS ID');
-  });
-
-  it('has correct props for identifier input', async () => {
-    const { identifierInput } = await setupIdentifierInput(openmrsID);
-    expect(identifierInput.placeholder).toBe('Auto-generated');
-    expect(identifierInput.disabled).toBe(true);
-  });
-
-  it('text input should not be disabled if manual entry is enabled', async () => {
+  it('displays an edit button when there is an initial value', async () => {
     // setup
-    openmrsID.identifierSources[0].autoGenerationOption.manualEntryEnabled = true;
+    openmrsID.autoGeneration = false;
+    openmrsID.required = false;
+    openmrsID.initialValue = '1002UU9';
+    openmrsID.identifierValue = '1002UU9';
     // replay
-    const { identifierInput } = await setupIdentifierInput(openmrsID);
-    expect(identifierInput.placeholder).toBe('Auto-generated');
-    expect(identifierInput.disabled).toBe(false);
+    setupIdentifierInput(openmrsID as PatientIdentifierValue);
+    expect(screen.getByText('Edit')).toBeInTheDocument();
   });
 
-  it('should not render select widget if auto-entry is false', async () => {
+  it('hides the edit button when the identifier is required', async () => {
     // setup
-    openmrsID.identifierSources = [
-      {
-        uuid: '691eed12-c0f1-11e2-94be-8c13b969e334',
-        name: 'Generator 1 for OpenMRS ID',
+    openmrsID.autoGeneration = false;
+    openmrsID.required = true;
+    openmrsID.initialValue = '1002UU9';
+    openmrsID.identifierValue = '1002UU9';
+    // replay
+    setupIdentifierInput(openmrsID);
+    expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+  });
+
+  it('displays a delete button when the identifier is not a default type', () => {
+    // setup
+    openmrsID.required = false;
+    // replay
+    setupIdentifierInput(openmrsID);
+    expect(screen.getByText('Delete')).toBeInTheDocument();
+  });
+
+  describe('auto-generated identifier', () => {
+    it('hides the input when the identifier is auto-generated', () => {
+      openmrsID.autoGeneration = true;
+      setupIdentifierInput(openmrsID);
+      expect(screen.getByTestId('identifier-input')).toHaveAttribute('type', 'hidden');
+    });
+
+    it("displays 'Auto-Generated' when the indentifier has auto generation", () => {
+      openmrsID.autoGeneration = true;
+      setupIdentifierInput(openmrsID);
+      expect(screen.getByTestId('identifier-placeholder').innerHTML).toBe('Auto-generated');
+      expect(screen.getByTestId('identifier-input')).toBeDisabled();
+    });
+
+    describe('manual entry allowed', () => {
+      openmrsID.selectedSource = {
         autoGenerationOption: {
           manualEntryEnabled: true,
-          automaticGenerationEnabled: false,
         },
-      },
-    ];
-    // replay
-    const { identifierInput, identifierSourceSelectInput } = await setupIdentifierInput(openmrsID);
-    expect(identifierInput.placeholder).toBe('Enter identifier');
-    expect(identifierInput.disabled).toBe(false);
-    expect(identifierSourceSelectInput).toBe(undefined);
+      } as IdentifierSource;
+
+      it('shows the edit button', () => {
+        openmrsID.autoGeneration = true;
+        setupIdentifierInput(openmrsID);
+        expect(screen.getByText('Edit')).toBeInTheDocument();
+      });
+
+      describe('edit button clicked', () => {
+        it('displays an empty input field', async () => {
+          const user = userEvent.setup();
+          openmrsID.autoGeneration = true;
+          openmrsID.required = false;
+          openmrsID.selectedSource = {
+            autoGenerationOption: {
+              manualEntryEnabled: true,
+            },
+          } as IdentifierSource;
+          setupIdentifierInput(openmrsID);
+          const editButton = screen.getByTestId('edit-button');
+          await user.click(editButton);
+          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('');
+        });
+
+        it('displays an input field with the identifier value if it exists', async () => {
+          const user = userEvent.setup();
+          openmrsID.autoGeneration = true;
+          openmrsID.required = false;
+          openmrsID.selectedSource = {
+            autoGenerationOption: {
+              manualEntryEnabled: true,
+            },
+          } as IdentifierSource;
+          setupIdentifierInput(openmrsID, { identifiers: { [fieldName]: { identifierValue: '10001V' } } });
+          const editButton = screen.getByTestId('edit-button');
+          await user.click(editButton);
+          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('10001V');
+        });
+      });
+    });
   });
 });

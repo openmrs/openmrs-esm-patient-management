@@ -12,6 +12,8 @@ interface EmrApiConfigurationResponse {
   clinicianEncounterRole: OpenmrsResource;
   consultFreeTextCommentsConcept: OpenmrsResource;
   visitNoteEncounterType: OpenmrsResource;
+  inpatientNoteEncounterType: OpenmrsResource;
+  transferRequestEncounterType: OpenmrsResource;
   transferWithinHospitalEncounterType: OpenmrsResource;
   exitFromInpatientEncounterType: OpenmrsResource;
   supportsTransferLocationTag: LocationTag;
@@ -37,6 +39,10 @@ interface EmrApiConfigurationResponse {
     excludedEncounterTypes: Array<string>;
     uuid: string;
   }>;
+  bedAssignmentEncounterType: OpenmrsResource;
+  cancelADTRequestEncounterType: OpenmrsResource;
+  denyAdmissionConcept: OpenmrsResource;
+  admissionDecisionConcept: OpenmrsResource;
   // There are many more keys to this object, but we only need these for now
   // Add more keys as needed
 }
@@ -65,6 +71,8 @@ const customRepProps = [
   ['diagnosisSets', 'ref'],
   ['personImageDirectory', 'ref'],
   ['visitNoteEncounterType', 'ref'],
+  ['inpatientNoteEncounterType', 'ref'],
+  ['transferRequestEncounterType', 'ref'],
   ['consultEncounterType', 'ref'],
   ['diagnosisMetadata', 'ref'],
   ['narrowerThanConceptMapType', 'ref'],
@@ -90,6 +98,10 @@ const customRepProps = [
   ['unknownPatientPersonAttributeType', 'ref'],
   ['supportsVisitsLocationTag', '(uuid,display,name,links)'],
   ['transferForm', 'ref'],
+  ['bedAssignmentEncounterType', 'ref'],
+  ['cancelADTRequestEncounterType', 'ref'],
+  ['admissionDecisionConcept', 'ref'],
+  ['denyAdmissionConcept', 'ref'],
 ];
 
 const customRep = `custom:${customRepProps.map((prop) => prop.join(':')).join(',')}`;

@@ -1,14 +1,5 @@
 import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
-export const defaultWardPatientCard: WardPatientCardDefinition = {
-  id: 'default',
-  headerRowElements: ['patient-age', 'patient-address', 'patient-identifier'],
-  footerRowElements: [],
-  appliedTo: null,
-};
-
-export const builtInPatientCardElements = ['patient-age', 'time-on-ward', 'time-since-admission', 'patient-location'];
-
 export const addressFields = [
   'cityVillage',
   'stateProvince',
@@ -37,11 +28,12 @@ export const addressFields = [
 type AddressField = keyof typeof addressFields;
 
 export const configSchema: ConfigSchema = {
-  wardPatientCards: {
-    _description: 'Configure the display of ward patient cards',
-    obsElementDefinitions: {
+  patientCardElements: {
+    _description:
+      'Configuration of various patient card elements. Each configured element must have a unique id, defined in the ward React component being used.',
+    obs: {
       _type: Type.Array,
-      _description: 'Defines obs display elements that can be included in the card header or footer.',
+      _description: 'Configures obs values to display.',
       _default: [],
       _elements: {
         id: {
@@ -79,12 +71,16 @@ export const configSchema: ConfigSchema = {
         },
       },
     },
-    identifierElementDefinitions: {
+    pendingItems: {
       _type: Type.Array,
-      _description: `Defines patient identifier elements that can be included in the card header or footer. The default element 'patient-identifier' displays the preferred identifier.`,
+      _description: 'Configures pending orders and transfers to display.',
       _default: [
         {
-          id: 'patient-identifier',
+          id: 'pending-items',
+          orders: {
+            orderTypes: [{ label: 'Labs', uuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e' }],
+          },
+          showPendingItems: true,
         },
       ],
       _elements: {
@@ -92,23 +88,55 @@ export const configSchema: ConfigSchema = {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
         },
-        identifierTypeUuid: {
-          _type: Type.UUID,
-          _description:
-            'The UUID of the identifier type to display. If not provided, defaults to the preferred identifier.',
-          _default: null,
+        orders: {
+          orderTypes: {
+            _type: Type.Array,
+            _description: 'Configures pending orders and transfers to display.',
+            _elements: {
+              uuid: {
+                _type: Type.UUID,
+                _description: 'Identifies the order type.',
+              },
+              label: {
+                _type: Type.String,
+                _description:
+                  "The label or i18n key to the translated label to display. If not provided, defaults to 'Orders'",
+                _default: null,
+              },
+            },
+          },
         },
-        label: {
-          _type: Type.String,
+        showPendingItems: {
+          _type: Type.Boolean,
           _description:
-            'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
-          _default: null,
+            'Optional. If true, pending items (e.g., number of pending orders) will be displayed on the patient card.',
         },
       },
     },
-    addressElementDefinitions: {
+    patientIdentifier: {
       _type: Type.Array,
-      _description: 'Defines patient address elements that can be included in the card header or footer.',
+      _description: `Configures patient identifier to display. An unconfigured element displays the preferred identifier.`,
+      _default: [
+        {
+          id: 'patient-identifier',
+          showIdentifierLabel: false,
+        },
+      ],
+      _elements: {
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for this patient card element',
+        },
+        showIdentifierLabel: {
+          _type: Type.Boolean,
+          _description:
+            'If true, the identifier type (eg: "OpenMRS ID") is shown along with the identifier itself. Defaults to false',
+        },
+      },
+    },
+    patientAddress: {
+      _type: Type.Array,
+      _description: 'Configures patient address elements.',
       _default: [
         {
           id: 'patient-address',
@@ -132,66 +160,122 @@ export const configSchema: ConfigSchema = {
         },
       },
     },
-    cardDefinitions: {
+    admissionRequestNote: {
       _type: Type.Array,
-      _default: [defaultWardPatientCard],
-      _description: `An array of card configuration. A card configuration can be applied to different ward locations.
-         If multiple card configurations apply to a location, only the first one is chosen.`,
+      _description: 'Configures admission request notes to display.',
+      _default: [
+        {
+          id: 'admission-request-note',
+          conceptUuid: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+      ],
       _elements: {
-        id: {
-          _type: Type.String,
-          _description:
-            'The unique identifier for this card definition. This is used to set the name of the extension slot the card has, where the rows go. The slot name is "ward-patient-card-<id>", unless the id is "default", in which case the slot name is "ward-patient-card".',
-          _default: 'default',
-        },
-        headerRowElements: {
-          _type: Type.Array,
-          _description: `IDs of patient card elements to appear in the header row. These can be built-in, or custom ones can be defined in patientCardElementDefinitions. Built-in elements are: '${builtInPatientCardElements.join(
-            "', '",
-          )}'.`,
-          _elements: {
+        fields: {
+          id: {
             _type: Type.String,
+            _description: 'The unique identifier for this patient card element',
+          },
+          conceptUuid: {
+            _type: Type.UUID,
+            _description: 'Required. Identifies the concept for the admission request note.',
           },
         },
-        footerRowElements: {
-          _type: Type.Array,
-          _description: `IDs of patient card elements to appear in the footer row. These can be built-in, or custom ones can be defined in patientCardElementDefinitions. Built-in elements are: '${builtInPatientCardElements.join(
-            "', '",
-          )}'.`,
-          _elements: {
-            _type: Type.String,
+      },
+      coloredObsTags: {
+        _type: Type.Array,
+        _description: 'Configures observation values to display as Carbon tags.',
+        _elements: {
+          conceptUuid: {
+            _type: Type.UUID,
+            _description: 'Required. Identifies the concept to use to identify the desired observations.',
+            // Problem list
+            _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
           },
-        },
-        appliedTo: {
-          _type: Type.Array,
-          _description:
-            'Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
-          _elements: {
-            location: {
-              _type: Type.UUID,
-              _description: 'The UUID of the location. If not provided, applies to all wards.',
-              _default: null,
+          summaryLabel: {
+            _type: Type.String,
+            _description: `Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag shows the count of the number of answers that are present but not configured to show as their own tags. If not provided, defaults to the name of the concept.`,
+            _default: null,
+          },
+          summaryLabelI18nModule: {
+            _type: Type.String,
+            _description: 'Optional. The custom module to use for translation of the summary label',
+            _default: null,
+          },
+          summaryLabelColor: {
+            _type: Type.String,
+            _description:
+              'The color of the summary tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors',
+            _default: null,
+          },
+          tags: {
+            _type: Type.Array,
+            _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
+            _default: [],
+            _elements: {
+              color: {
+                _type: Type.String,
+                _description:
+                  'Color of the tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors.',
+              },
+              appliedToConceptSets: {
+                _type: Type.Array,
+                _description: `The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets will be displayed as their own tag with the specified color. If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.`,
+                _elements: {
+                  _type: Type.UUID,
+                },
+              },
             },
           },
         },
       },
     },
   },
+  wards: {
+    _description: 'Configuration of what type of ward to use at different ward locations.',
+    _type: Type.Array,
+    _default: [{ id: 'default-ward' }],
+    _elements: {
+      id: {
+        _type: Type.String,
+        _description:
+          'The ward type to use. Currently, "default-ward" and "maternal-ward" are supported. This string also serves as the extension slot name for the ward view.',
+      },
+      appliedTo: {
+        _type: Type.Array,
+        _description:
+          'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
+        _elements: {
+          location: {
+            _type: Type.UUID,
+            _description: 'The UUID of the location. If not provided, applies to all wards.',
+            _default: null,
+          },
+        },
+      },
+    },
+  },
+  hideWorkspaceVitalsLinks: {
+    _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
+    _type: Type.Boolean,
+    _default: false,
+  },
 };
 
 export interface WardConfigObject {
-  wardPatientCards: WardPatientCardsConfig;
+  patientCardElements: {
+    obs: Array<ObsElementConfig>;
+    pendingItems: Array<PendingItemsElementConfig>;
+    patientIdentifier: Array<IdentifierElementConfig>;
+    patientAddress: Array<PatientAddressElementConfig>;
+    coloredObsTags: Array<ColoredObsTagsElementConfig>;
+    admissionRequestNote: Array<AdmissionRequestNoteElementConfig>;
+  };
+  wards: Array<WardDefinition>;
+  hideWorkspaceVitalsLinks: boolean;
 }
 
-export interface WardPatientCardsConfig {
-  obsElementDefinitions: Array<ObsElementDefinition>;
-  pendingItemsDefinitions: Array<PendingItemsDefinition>;
-  identifierElementDefinitions: Array<IdentifierElementDefinition>;
-  addressElementDefinitions: Array<AddressElementDefinition>;
-  cardDefinitions: Array<WardPatientCardDefinition>;
-}
-
-export interface PendingItemsDefinition {
+export interface PendingItemsElementConfig {
+  id: string;
   showPendingItems: boolean;
   orders: {
     orderTypes: Array<{
@@ -201,7 +285,7 @@ export interface PendingItemsDefinition {
   };
 }
 
-export interface ObsElementDefinition {
+export interface ObsElementConfig {
   id: string;
   conceptUuid: string;
   onlyWithinCurrentVisit: boolean;
@@ -210,25 +294,68 @@ export interface ObsElementDefinition {
   label?: string;
 }
 
-export interface IdentifierElementDefinition {
+export interface IdentifierElementConfig {
   id: string;
-  identifierTypeUuid: string;
-  label?: string;
+  showIdentifierLabel: boolean;
 }
 
-export interface AddressElementDefinition {
+export interface PatientAddressElementConfig {
   id: string;
   fields: Array<AddressField>;
 }
 
-export interface WardPatientCardDefinition {
+export interface AdmissionRequestNoteElementConfig {
   id: string;
-  headerRowElements: Array<string>;
-  footerRowElements: Array<string>;
+  conceptUuid: string;
+}
+
+export interface WardDefinition {
+  id: string;
   appliedTo?: Array<{
     /**
      * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
      */
     location: string;
   }>;
+}
+export interface ColoredObsTagsElementConfig {
+  /**
+   * Required. Identifies the concept to use to identify the desired observations.
+   */
+  conceptUuid: string;
+
+  /**
+   * Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag
+   * shows the count of the number of answers that are present but not configured to show as their own tags. If not
+   * provided, defaults to the name of the concept.
+   */
+  summaryLabel?: string;
+
+  /**
+   * The color of the summary tag.
+   * See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors
+   */
+  summaryLabelColor?: string;
+
+  /**
+   * An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets
+   * will be displayed as their own tags with the specified color. Any observation with coded values not belonging to
+   * any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times,
+   * the first matching applied-to rule takes precedence.
+   */
+  tags: Array<ColoredObsTagConfig>;
+}
+
+export interface ColoredObsTagConfig {
+  /**
+   * Color of the tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors.
+   */
+  color: string;
+
+  /**
+   * The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets
+   * will be displayed as their own tag with the specified color.
+   * If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.
+   */
+  appliedToConceptSets: Array<string>;
 }

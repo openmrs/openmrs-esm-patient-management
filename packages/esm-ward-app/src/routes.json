@@ -56,19 +56,19 @@
       "component": "patientDischargeWorkspaceSideRailIcon"
     },
     {
-      "component": "admissionRequestNoteRowExtension",
-      "name": "admission-request-note-card-row",
-      "slot": "ward-patient-card-slot"
+      "name": "clinical-forms-workspace-siderail-button",
+      "component": "clinicalFormWorkspaceSideRailIcon",
+      "slot": "action-menu-ward-patient-items-slot"
     },
     {
-      "component": "motherChildRowExtension",
-      "name": "mother-child-card-row",
-      "slot": "ward-patient-card-slot"
+      "component": "defaultWardView",
+      "name": "default-ward",
+      "slot": "default-ward"
     },
     {
-      "component": "pendingItemsCardRowExtension",
-      "name": "ward-patient-pending-items-card-row",
-      "slot": "ward-patient-card-pending-items-slot"
+      "component": "maternalWardView",
+      "name": "maternal-ward",
+      "slot": "maternal-ward"
     }
   ],
   "workspaces": [
@@ -96,7 +96,7 @@
       "name": "ward-patient-workspace",
       "component": "wardPatientWorkspace",
       "type": "ward",
-      "title": "Ward Patient",
+      "title": "Ward patient",
       "width": "extra-wide",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient"
@@ -121,6 +121,22 @@
       "title": "discharge",
       "type": "ward-patient-discharge",
       "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    },
+    {
+      "name": "ward-patient-clinical-forms-workspace",
+      "component": "patientClinicalFormsWorkspace",
+      "title": "clinicalForms",
+      "type": "ward-patient-clinical-forms",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient",
+      "width": "wider"
+    },
+    {
+      "name": "cancel-admission-request-workspace",
+      "component": "cancelAdmissionRequestWorkspace",
+      "title": "cancelAdmissionRequest",
+      "type": "cancel-admission-request",
       "sidebarFamily": "ward-patient"
     }
   ]

@@ -36,7 +36,7 @@ export const mockAdmissionLocation: AdmissionLocationFetchResponse = {
       rowNumber: 1,
       columnNumber: 2,
       bedNumber: 'bed2',
-      bedId: 1,
+      bedId: 2,
       bedUuid: '0000-bed2',
       status: 'AVAILABLE',
       bedType: mockBedType,

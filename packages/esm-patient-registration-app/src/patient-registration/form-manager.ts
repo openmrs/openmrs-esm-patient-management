@@ -241,11 +241,16 @@ export class FormManager {
           initialValue,
         } = patientIdentifier;
 
-        const identifier = !autoGeneration
-          ? identifierValue
-          : await (
-              await generateIdentifier(selectedSource.uuid)
-            ).data.identifier;
+        const autoGenerationManualEntry =
+          autoGeneration && selectedSource?.autoGenerationOption?.manualEntryEnabled && !!identifierValue;
+
+        const identifier =
+          !autoGeneration || autoGenerationManualEntry
+            ? identifierValue
+            : await (
+                await generateIdentifier(selectedSource.uuid)
+              ).data.identifier;
+
         const identifierToCreate = {
           uuid: identifierUuid,
           identifier,

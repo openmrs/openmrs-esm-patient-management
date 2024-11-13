@@ -1,10 +1,15 @@
 @use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wardView {
   background-color: #e4e4e4;
   display: flex;
   flex-direction: column;
   padding: 0 layout.$spacing-05;
+
+  &.verticalTiling {
+    height: calc(100vh - var(--omrs-topnav-height));
+  }
 }
 
 .wardViewMain {
@@ -12,4 +17,16 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   display: grid;
   gap: layout.$spacing-05;
+
+  &.verticalTiling {
+    display: block;
+    column-width: 280px;
+    overflow-x: auto;
+    height: calc(100% - 4rem);
+
+    > div {
+      break-inside: avoid;
+      margin-bottom: 10px;
+    }
+  }
 }

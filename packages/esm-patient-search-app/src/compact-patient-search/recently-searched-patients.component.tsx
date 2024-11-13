@@ -1,6 +1,6 @@
 import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layer, Loading, Tile } from '@carbon/react';
+import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
 import type { PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
@@ -10,12 +10,12 @@ import styles from './patient-search.scss';
 interface RecentPatientSearchProps extends PatientSearchResponse {}
 
 const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
-  ({ isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore }, ref) => {
+  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
     const loadingIconRef = useCallback(
       (node) => {
-        if (loadingNewData) {
+        if (isValidating) {
           return;
         }
         if (observer.current) {
@@ -35,10 +35,10 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
           observer.current.observe(node);
         }
       },
-      [loadingNewData, hasMore, setPage],
+      [isValidating, hasMore, setPage],
     );
 
-    if (isLoading) {
+    if (!searchResults && isLoading) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
@@ -74,9 +74,16 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>
-              {t('recentSearchResultsCount', '{{count}} recent search result', {
-                count: searchResults.length,
-              })}
+              <span className={styles.resultsTextCount}>
+                {t('recentSearchResultsCount', '{{count}} recent search result', {
+                  count: searchResults.length,
+                })}
+              </span>
+              {isValidating && (
+                <span className={styles.validationIcon}>
+                  <InlineLoading className={styles.spinner} />
+                </span>
+              )}
             </p>
             <CompactPatientBanner patients={searchResults} ref={ref} />
             {hasMore && (
@@ -89,25 +96,27 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
       );
     }
 
-    return (
-      <div className={styles.searchResultsContainer}>
-        <div className={styles.searchResults}>
-          <Layer>
-            <Tile className={styles.emptySearchResultsTile}>
-              <EmptyDataIllustration />
-              <p className={styles.emptyResultText}>
-                {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-              </p>
-              <p className={styles.actionText}>
-                <span>
-                  {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
-                </span>
-              </p>
-            </Tile>
-          </Layer>
+    if (searchResults?.length === 0) {
+      return (
+        <div className={styles.searchResultsContainer}>
+          <div className={styles.searchResults}>
+            <Layer>
+              <Tile className={styles.emptySearchResultsTile}>
+                <EmptyDataIllustration />
+                <p className={styles.emptyResultText}>
+                  {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
+                </p>
+                <p className={styles.actionText}>
+                  <span>
+                    {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+                  </span>
+                </p>
+              </Tile>
+            </Layer>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   },
 );
 
