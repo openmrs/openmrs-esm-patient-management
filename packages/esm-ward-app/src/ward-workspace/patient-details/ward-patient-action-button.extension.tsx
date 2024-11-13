@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserAvatarIcon } from '@openmrs/esm-framework';
-import { ActionMenuButton, launchWorkspace } from '@openmrs/esm-framework';
+import { ActionMenuButton, launchWorkspace, UserAvatarIcon } from '@openmrs/esm-framework';
 import type { WardPatientWorkspaceProps } from '../../types';
 
 export default function WardPatientActionButton() {
@@ -12,7 +11,7 @@ export default function WardPatientActionButton() {
       getIcon={(props) => <UserAvatarIcon {...props} />}
       label={t('Patient', 'patient')}
       iconDescription={t('Patient', 'patient')}
-      handler={() =>  launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace')}
+      handler={() => launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace')}
       type={'ward'}
     />
   );
