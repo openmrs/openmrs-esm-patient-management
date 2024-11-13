@@ -230,7 +230,7 @@ export interface EncounterPayload {
 
 export interface ObsPayload {
   concept: Concept | string;
-  value?: string;
+  value?: string | OpenmrsResource;
   groupMembers?: Array<ObsPayload>;
 }
 

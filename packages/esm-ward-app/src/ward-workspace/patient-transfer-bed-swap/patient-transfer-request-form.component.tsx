@@ -6,11 +6,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import LocationSelector from '../../location-selector/location-selector.component';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { createEncounter } from '../../ward.resource';
+import { useCreateEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
 
 export default function PatientTransferForm({
@@ -22,7 +21,8 @@ export default function PatientTransferForm({
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
+    useCreateEncounter();
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const dispositionsWithTypeTransfer = useMemo(
@@ -98,23 +98,12 @@ export default function PatientTransferForm({
         });
       }
 
-      createEncounter({
-        patient: patient?.uuid,
-        encounterType: emrConfiguration.transferRequestEncounterType.uuid,
-        location: location.uuid,
-        encounterProviders: [
-          {
-            encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
-            provider: currentProvider?.uuid,
-          },
-        ],
-        obs: [
-          {
-            concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
-            groupMembers: obs,
-          },
-        ],
-      })
+      createEncounter(patient, emrConfiguration.transferRequestEncounterType, [
+        {
+          concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+          groupMembers: obs,
+        },
+      ])
         .then(() => {
           showSnackbar({
             title: t('patientTransferRequestCreated', 'Patient transfer request created'),
