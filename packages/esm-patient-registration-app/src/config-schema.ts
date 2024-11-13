@@ -1,4 +1,5 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
+import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
   id: string;
@@ -12,7 +13,8 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder?: string;
-  dateFormat?: string;
+  allowFutureDates?: boolean;
+  allowPastDates?: boolean;
   showHeading: boolean;
   validation?: {
     required: boolean;
@@ -175,6 +177,16 @@ export const esmPatientRegistrationSchema = {
         _type: Type.String,
         _default: '',
         _description: 'Placeholder that will appear in the input.',
+      },
+      allowFutureDates: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Indicates whether the date input field should allow the selection of future dates or not.',
+      },
+      allowPastDates: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Indicates whether the date input field should allow the selection of past dates or not.',
       },
       validation: {
         required: { _type: Type.Boolean, _default: false },
