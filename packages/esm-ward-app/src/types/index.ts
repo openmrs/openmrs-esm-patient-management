@@ -248,6 +248,7 @@ export interface PatientAndAdmission {
 export interface MotherChildRelationships {
   motherByChildUuid: Map<string, PatientAndAdmission>;
   childrenByMotherUuid: Map<string, PatientAndAdmission[]>;
+  isLoading: boolean;
 }
 
 export interface MaternalWardViewContext {

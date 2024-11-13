@@ -2,12 +2,15 @@ import { showNotification } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMotherAndChildren, type MothersAndChildrenSearchCriteria } from '../../hooks/useMotherAndChildren';
-import { type PatientAndAdmission } from '../../types';
+import { type MotherChildRelationships, type PatientAndAdmission } from '../../types';
 
 const motherAndChildrenRep =
   'custom:(childAdmission,mother:(person,identifiers:full,uuid),child:(person,identifiers:full,uuid),motherAdmission)';
 
-export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: string[], fetch: boolean) {
+export function useMotherChildrenRelationshipsByPatient(
+  allWardPatientUuids: string[],
+  fetch: boolean,
+): MotherChildRelationships {
   const { t } = useTranslation();
 
   const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
@@ -53,12 +56,9 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
   }
 
   const relationships = useMemo(() => {
-    if (isLoadingChildrenData || isLoadingMotherData) {
-      return null;
-    }
-
     const motherByChildUuid = new Map<string, PatientAndAdmission>();
     const childrenByMotherUuid = new Map<string, PatientAndAdmission[]>();
+    const isLoading = isLoadingChildrenData || isLoadingMotherData;
 
     for (const { child, childAdmission, mother, motherAdmission } of motherData ?? []) {
       motherByChildUuid.set(child.uuid, { patient: mother, currentAdmission: motherAdmission });
@@ -82,7 +82,7 @@ export function useMotherChildrenRelationshipsByPatient(allWardPatientUuids: str
       }
     }
 
-    return { motherByChildUuid, childrenByMotherUuid };
+    return { motherByChildUuid, childrenByMotherUuid, isLoading };
   }, [childrenData, motherData, isLoadingChildrenData, isLoadingMotherData]);
 
   return relationships;
