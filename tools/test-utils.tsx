@@ -1,5 +1,5 @@
-import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import React, { type ReactElement } from 'react';
+import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import { type RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
