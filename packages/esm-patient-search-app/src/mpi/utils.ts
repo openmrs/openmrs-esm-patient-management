@@ -1,20 +1,21 @@
-import { capitalize } from 'lodash-es';
-import { type SearchedPatient } from '../types';
 import { getCoreTranslation } from '@openmrs/esm-framework';
+import { type SearchedPatient } from '../types';
+
 export function inferModeFromSearchParams(searchParams: URLSearchParams) {
   return searchParams.get('mode')?.toLowerCase() === 'external' ? 'external' : 'internal';
 }
 
 export function mapToOpenMRSPatient(fhirPatients: Array<any>): Array<SearchedPatient> {
-  if (fhirPatients[0].total < 1) {
+  if (fhirPatients?.[0]?.total < 1) {
     return [];
   }
-  //Consider patient // https://github.com/openmrs/openmrs-esm-core/blob/main/packages/framework/esm-api/src/types/patient-resource.ts
-  const pts: Array<SearchedPatient> = [];
+  // Consider patient // https://github.com/openmrs/openmrs-esm-core/blob/main/packages/framework/esm-api/src/types/patient-resource.ts
+  const mappedPatients: Array<SearchedPatient> = [];
 
-  fhirPatients[0].entry.forEach((pt, index) => {
-    let fhirPatient = pt.resource;
-    pts.push({
+  fhirPatients[0].entry.forEach((patient) => {
+    const fhirPatient = patient.resource;
+
+    mappedPatients.push({
       externalId: fhirPatient.id,
       uuid: null,
       identifiers: null,
@@ -45,5 +46,5 @@ export function mapToOpenMRSPatient(fhirPatients: Array<any>): Array<SearchedPat
     });
   });
 
-  return pts;
+  return mappedPatients;
 }

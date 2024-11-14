@@ -28,7 +28,6 @@
 
 .productiveHeading02 {
   @include type.type-style('heading-02');
-  align-self: center;
 }
 
 .results {
@@ -48,7 +47,7 @@
 .emptyResultText {
   @include type.type-style('heading-02');
   color: $text-02;
-  margin-top: layout.$spacing-03;
+  margin-top: layout.$spacing-05;
 }
 
 .actionText {
@@ -58,6 +57,11 @@
   margin: layout.$spacing-03 auto 0;
   max-width: 13.75rem;
   text-align: center;
+
+  span {
+    display: block;
+    margin-top: layout.$spacing-03;
+  }
 }
 
 .spacer {
@@ -71,14 +75,12 @@
 
 .errorMessage {
   @include type.type-style('heading-compact-02');
-  margin-top: 2.25rem;
+  margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
 }
 
 .errorCopy {
-  margin-bottom: layout.$spacing-03;
-  @include type.type-style('body-01');
-  color: $text-02;
+  @extend .actionText;
 }
 
 // Refine Search Params
@@ -93,4 +95,8 @@
   input {
     margin-left: layout.$spacing-05;
   }
+}
+
+.searchExternalRegistryButton {
+  margin-top: layout.$spacing-05;
 }

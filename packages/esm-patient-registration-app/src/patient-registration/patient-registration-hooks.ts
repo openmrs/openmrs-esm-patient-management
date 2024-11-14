@@ -1,16 +1,17 @@
+import { type Dispatch, useEffect, useMemo, useState } from 'react';
+import camelCase from 'lodash-es/camelCase';
+import dayjs from 'dayjs';
+import useSWR from 'swr';
+import { v4 } from 'uuid';
 import {
-  type FetchResponse,
   getSynchronizationItems,
   openmrsFetch,
-  type OpenmrsResource,
   restBaseUrl,
+  type FetchResponse,
+  type OpenmrsResource,
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
-import camelCase from 'lodash-es/camelCase';
-import { type Dispatch, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
-import { v4 } from 'uuid';
 import { type RegistrationConfig } from '../config-schema';
 import { patientRegistration } from '../constants';
 import {
@@ -30,13 +31,12 @@ import {
   latestFirstEncounter,
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
-import dayjs from 'dayjs';
 import { useMpiPatient } from './mpi/mpi-patient.resource';
 
 export function useInitialFormValues(patientUuid: string, isLocal: boolean): [FormValues, Dispatch<FormValues>] {
   const { freeTextFieldConceptUuid, fieldConfigurations } = useConfig<RegistrationConfig>();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(isLocal ? patientUuid : null);
-  const { isLoading: isLoadingMpiPatient, patient: mpiPatient } = useMpiPatient(!isLocal ? patientUuid : null);
+  const { isLoadingMpiPatient, mpiPatient } = useMpiPatient(!isLocal ? patientUuid : null);
   const { data: deathInfo, isLoading: isLoadingDeathInfo } = useInitialPersonDeathInfo(isLocal ? patientUuid : null);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(isLocal ? patientUuid : null);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(
@@ -109,22 +109,19 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   useEffect(() => {
+    const fieldConfigIdentifier = fieldConfigurations.identifier;
+    const fieldConfigPhoneUuid = fieldConfigurations.phone.personAttributeUuid;
+
     const fetchValues = async () => {
-      if (mpiPatient?.data?.identifier) {
-        const identifiers = await getIdentifierFieldValuesFromFhirPatient(
-          mpiPatient.data,
-          fieldConfigurations.identifier,
-        );
+      if (mpiPatient?.identifier) {
+        const identifiers = await getIdentifierFieldValuesFromFhirPatient(mpiPatient, fieldConfigIdentifier);
 
         const values = {
           ...initialFormValues,
-          ...getFormValuesFromFhirPatient(mpiPatient.data),
-          address: getAddressFieldValuesFromFhirPatient(mpiPatient.data),
+          ...getFormValuesFromFhirPatient(mpiPatient),
+          address: getAddressFieldValuesFromFhirPatient(mpiPatient),
           identifiers,
-          attributes: getPhonePersonAttributeValueFromFhirPatient(
-            mpiPatient.data,
-            fieldConfigurations.phone.personAttributeUuid,
-          ),
+          attributes: getPhonePersonAttributeValueFromFhirPatient(mpiPatient, fieldConfigPhoneUuid),
         };
 
         setInitialFormValues(values);
@@ -132,7 +129,13 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
     };
 
     fetchValues();
-  }, [mpiPatient, isLoadingMpiPatient]);
+  }, [
+    fieldConfigurations.identifier,
+    fieldConfigurations.phone.personAttributeUuid,
+    initialFormValues,
+    isLoadingMpiPatient,
+    mpiPatient,
+  ]);
 
   // Set initial patient death info
   useEffect(() => {

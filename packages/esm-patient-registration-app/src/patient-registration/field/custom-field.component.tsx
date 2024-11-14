@@ -10,7 +10,7 @@ export interface CustomFieldProps {
 }
 
 export function CustomField({ name }: CustomFieldProps) {
-  const config = useConfig() as RegistrationConfig;
+  const config = useConfig<RegistrationConfig>();
   const fieldDefinition = config.fieldDefinitions.filter((def) => def.id == name)[0];
 
   if (fieldDefinition.type === 'person attribute') {

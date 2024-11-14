@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
 import Pagination from '../ui-components/pagination/pagination.component';
@@ -10,10 +11,10 @@ import {
   PatientSearchResults,
   SearchResultsEmptyState,
 } from './patient-search-views.component';
+import { inferModeFromSearchParams } from '../mpi/utils';
 import type { SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
-import { useSearchParams } from 'react-router-dom';
-import { inferModeFromSearchParams } from '../mpi/utils';
+
 interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
@@ -94,9 +95,9 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
             [styles.stickyPagination]: stickyPagination,
           })}>
           <Pagination
-            setCurrentPage={goTo}
             currentPage={currentPage}
             hasMore={showNextButton}
+            setCurrentPage={goTo}
             totalPages={totalPages}
           />
         </div>

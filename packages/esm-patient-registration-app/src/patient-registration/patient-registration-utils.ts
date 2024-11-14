@@ -9,6 +9,7 @@ import {
   type PatientIdentifierValue,
   type PatientUuidMapType,
 } from './patient-registration.types';
+import { type RegistrationConfig } from '../config-schema';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
@@ -194,7 +195,7 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Arr
 
 export async function getIdentifierFieldValuesFromFhirPatient(
   patient: fhir.Patient,
-  identifierConfig,
+  identifierConfig: RegistrationConfig['fieldConfigurations']['identifier'],
 ): Promise<{ [identifierFieldName: string]: PatientIdentifierValue }> {
   const identifiers: FormValues['identifiers'] = {};
 
@@ -203,9 +204,11 @@ export async function getIdentifierFieldValuesFromFhirPatient(
       const identifierConfig = config.identifierTypeSystem === identifier.system ? config : null;
 
       if (identifierConfig) {
-        let identifierTypeName;
+        let identifierTypeName: string;
 
         const url = `${restBaseUrl}/patientidentifiertype/${identifierConfig.identifierTypeUuid}`;
+
+        // TODO: Move this to a try/catch block so we can handle errors
         await openmrsFetch(url).then((response) => {
           if (response.status == 200 && response.data) {
             identifierTypeName = response.data.name;

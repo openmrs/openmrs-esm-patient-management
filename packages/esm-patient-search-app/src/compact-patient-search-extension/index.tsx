@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
@@ -7,9 +8,8 @@ import { useInfinitePatientSearch } from '../patient-search.resource';
 import { PatientSearchContext } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from '../compact-patient-search/patient-search.component';
-import styles from './compact-patient-search.scss';
-import { useSearchParams } from 'react-router-dom';
 import { inferModeFromSearchParams } from '../mpi/utils';
+import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;

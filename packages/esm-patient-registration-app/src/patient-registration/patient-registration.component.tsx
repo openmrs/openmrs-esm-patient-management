@@ -36,7 +36,7 @@ export interface PatientRegistrationProps {
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
   const { currentSession, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
-  const config = useConfig() as RegistrationConfig;
+  const config = useConfig<RegistrationConfig>();
   const [target, setTarget] = useState<undefined | string>();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const sourcePatientId = new URLSearchParams(search).get('sourceRecord');

@@ -3,9 +3,9 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer, Tile } from '@carbon/react';
 import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
+import { type SearchedPatient } from '../types';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
-import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
 
 interface CommonProps {
@@ -67,10 +67,12 @@ export const ErrorState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
         <div>
           <p className={styles.errorMessage}>{`${t('error', 'Error')}`}</p>
           <p className={styles.errorCopy}>
-            {t(
-              'errorCopy',
-              'Sorry, there was an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
-            )}
+            <span>
+              {t(
+                'errorCopy',
+                'Sorry, there was an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
+              )}
+            </span>
           </p>
         </div>
       </Tile>
@@ -96,23 +98,24 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
             <div className={styles.dividerWrapper}>
               <div className={styles.divider}></div>
             </div>
-            {searchMode == 'internal' && (
+            {searchMode === 'internal' && (
               <>
-                <div className={styles.emptyResultsMarginRules}>
-                  <p>
+                <p className={styles.actionText}>
+                  <span>
                     {t(
-                      'trySearchFromClientRegistry',
-                      "Try searching using the patient's unique ID number or search the external registry",
+                      'trySearchingAgainOrSearchExternalRegistry',
+                      "Try to search again using the patient's unique ID number or search the external registry",
                     )}
-                  </p>
-                </div>
+                  </span>
+                </p>
                 <Button
+                  className={styles.searchExternalRegistryButton}
                   kind="ghost"
                   renderIcon={'Search'}
-                  onClick={(e) => {
+                  onClick={() => {
                     doMPISearch(searchTerm);
                   }}>
-                  {`${t('search', 'Search')} ${'External Registry'}`}
+                  {`${t('search', 'Search')} ${t('externalRegistry', 'External Registry')}`}
                 </Button>
               </>
             )}
@@ -128,7 +131,6 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
 };
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults, searchMode }) => {
-  const { t } = useTranslation();
   return (
     <div className={styles.results} data-openmrs-role="Search Results">
       {searchResults.map((patient, indx) => (
@@ -136,7 +138,7 @@ export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ sear
           key={indx}
           patientUuid={patient.uuid}
           patient={patient}
-          isMPIPatient={searchMode == 'external'}
+          isMpiPatient={searchMode === 'external'}
         />
       ))}
     </div>

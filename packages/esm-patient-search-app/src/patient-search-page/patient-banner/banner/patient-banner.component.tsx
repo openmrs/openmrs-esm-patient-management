@@ -7,6 +7,7 @@ import {
   ConfigurableLink,
   ExtensionSlot,
   formatDate,
+  navigate,
   parseDate,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
@@ -14,9 +15,8 @@ import {
   PatientPhoto,
   useConfig,
   usePatient,
-  useVisit,
-  navigate,
   UserFollowIcon,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
@@ -32,10 +32,10 @@ interface PatientBannerProps {
   patient: SearchedPatient;
   patientUuid: string;
   hideActionsOverflow?: boolean;
-  isMPIPatient: boolean;
+  isMpiPatient: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow, isMPIPatient }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow, isMpiPatient }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const { patient: fhirPatient, isLoading } = usePatient(patientUuid);
@@ -49,7 +49,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     setShowContactDetails((state) => !state);
   }, []);
 
-  const getGender = (gender) => {
+  const getGender = (gender: string) => {
     switch (gender) {
       case 'M':
         return t('male', 'Male');
@@ -83,7 +83,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
-              {isMPIPatient && (
+              {isMpiPatient && (
                 <div>
                   <Tag className={styles.mpiTag} type="blue">
                     &#127760; {'MPI'}
@@ -129,23 +129,21 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               patientUuid={patientUuid}
             />
           ) : null}
-          {isMPIPatient && (
-            <div>
-              <Button
-                kind="ghost"
-                renderIcon={UserFollowIcon}
-                iconDescription="Create Patient Record"
-                onClick={() =>
-                  navigate({
-                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${patient.externalId}`,
-                  })
-                }
-                style={{ marginTop: '-0.25rem' }}>
-                {t('createPatientRecord', 'Create Patient Record')}
-              </Button>
-            </div>
+          {isMpiPatient && (
+            <Button
+              className={styles.createPatientRecordButton}
+              iconDescription={t('createPatientRecord', 'Create patient record')}
+              kind="ghost"
+              onClick={() =>
+                navigate({
+                  to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${patient.externalId}`,
+                })
+              }
+              renderIcon={UserFollowIcon}>
+              {t('createPatientRecord', 'Create patient record')}
+            </Button>
           )}
-          {!isDeceased && !currentVisit && !isMPIPatient && (
+          {!isDeceased && !currentVisit && !isMpiPatient && (
             <ExtensionSlot
               name="start-visit-button-slot"
               state={{

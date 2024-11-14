@@ -357,12 +357,13 @@ export const esmPatientRegistrationSchema = {
       _elements: {
         identifierTypeSystem: {
           _type: Type.String,
-          _description: 'Identifier system from the fhir server',
+          _description: 'A string that represents the identifier system in FHIR',
         },
         identifierTypeUuid: {
           _type: Type.String,
           _default: null,
-          _description: 'Identifier type uuid of OpenMRS to map the identifier system',
+          _description:
+            'The corresponding OpenMRS identifier type UUID that this FHIR identifier system should map to.',
         },
       },
       _default: [],

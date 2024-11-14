@@ -1,8 +1,10 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { navigate, interpolateString, useConfig, useSession, useDebounce, showSnackbar } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
 import { type SearchedPatient } from '../types';
+import { inferModeFromSearchParams } from '../mpi/utils';
 import { useRecentlyViewedPatients, useInfinitePatientSearch, useRestPatients } from '../patient-search.resource';
 import { PatientSearchContext } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
@@ -10,8 +12,6 @@ import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 import styles from './compact-patient-search.scss';
-import { useSearchParams } from 'react-router-dom';
-import { inferModeFromSearchParams } from '../mpi/utils';
 
 interface CompactPatientSearchProps {
   isSearchPage: boolean;
