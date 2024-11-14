@@ -1,13 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Layer, Tile } from '@carbon/react';
+import { Button, Layer, Tile } from '@carbon/react';
+import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
 import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
-import { Button } from '@carbon/react';
-import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
 
 interface CommonProps {
   inTabletOrOverlay: boolean;
