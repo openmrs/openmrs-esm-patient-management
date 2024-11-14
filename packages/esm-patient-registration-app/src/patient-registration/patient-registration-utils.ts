@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import camelCase from 'lodash-es/camelCase';
-import { parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
 import {
   type AddressValidationSchemaType,
   type Encounter,
@@ -192,10 +192,48 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Arr
   });
 }
 
-export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient) {
+export async function getIdentifierFieldValuesFromFhirPatient(
+  patient: fhir.Patient,
+  identifierConfig,
+): Promise<{ [identifierFieldName: string]: PatientIdentifierValue }> {
+  const identifiers: FormValues['identifiers'] = {};
+
+  for (const identifier of patient.identifier) {
+    for (const config of identifierConfig) {
+      const identifierConfig = config.identifierTypeSystem === identifier.system ? config : null;
+
+      if (identifierConfig) {
+        let identifierTypeName;
+
+        const url = `${restBaseUrl}/patientidentifiertype/${identifierConfig.identifierTypeUuid}`;
+        await openmrsFetch(url).then((response) => {
+          if (response.status == 200 && response.data) {
+            identifierTypeName = response.data.name;
+          }
+        });
+
+        identifiers[identifierTypeName] = {
+          identifierUuid: null,
+          preferred: false, // consider identifier.use === 'official' ?? by default autogen is preferred
+          initialValue: identifier.value,
+          identifierValue: identifier.value,
+          identifierTypeUuid: identifierConfig.identifierTypeUuid,
+          identifierName: identifierTypeName,
+          required: false,
+          selectedSource: null,
+          autoGeneration: false,
+        };
+      }
+    }
+  }
+
+  return identifiers;
+}
+
+export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient, phoneUuid) {
   const result = {};
   if (patient.telecom) {
-    result['phone'] = patient.telecom[0].value;
+    result[phoneUuid] = patient.telecom[0].value;
   }
   return result;
 }
