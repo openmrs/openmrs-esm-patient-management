@@ -1,7 +1,7 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { renderWithRouter } from 'tools';
 import { Autosuggest } from './autosuggest.component';
 
 const mockPersons = [
@@ -33,18 +33,16 @@ const mockHandleSuggestionSelected = jest.fn((field, value) => [field, value]);
 
 describe('Autosuggest', () => {
   it('renders a search box', () => {
-    render(
-      <BrowserRouter>
-        <Autosuggest
-          getSearchResults={mockGetSearchResults}
-          getDisplayValue={(item) => item.display}
-          getFieldValue={(item) => item.uuid}
-          id="person"
-          labelText=""
-          onSuggestionSelected={mockHandleSuggestionSelected}
-          placeholder="Find Person"
-        />
-      </BrowserRouter>,
+    renderWithRouter(
+      <Autosuggest
+        getSearchResults={mockGetSearchResults}
+        getDisplayValue={(item) => item.display}
+        getFieldValue={(item) => item.uuid}
+        id="person"
+        labelText=""
+        onSuggestionSelected={mockHandleSuggestionSelected}
+        placeholder="Find Person"
+      />,
     );
 
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
@@ -54,18 +52,16 @@ describe('Autosuggest', () => {
   it('renders matching search results in a list when the user types a query', async () => {
     const user = userEvent.setup();
 
-    render(
-      <BrowserRouter>
-        <Autosuggest
-          getSearchResults={mockGetSearchResults}
-          getDisplayValue={(item) => item.display}
-          getFieldValue={(item) => item.uuid}
-          id="person"
-          labelText=""
-          onSuggestionSelected={mockHandleSuggestionSelected}
-          placeholder="Find Person"
-        />
-      </BrowserRouter>,
+    renderWithRouter(
+      <Autosuggest
+        getSearchResults={mockGetSearchResults}
+        getDisplayValue={(item) => item.display}
+        getFieldValue={(item) => item.uuid}
+        id="person"
+        labelText=""
+        onSuggestionSelected={mockHandleSuggestionSelected}
+        placeholder="Find Person"
+      />,
     );
 
     const searchbox = screen.getByRole('searchbox');
@@ -82,18 +78,16 @@ describe('Autosuggest', () => {
   it('clears the list of suggestions when a suggestion is selected', async () => {
     const user = userEvent.setup();
 
-    render(
-      <BrowserRouter>
-        <Autosuggest
-          getSearchResults={mockGetSearchResults}
-          getDisplayValue={(item) => item.display}
-          getFieldValue={(item) => item.uuid}
-          id="person"
-          labelText=""
-          onSuggestionSelected={mockHandleSuggestionSelected}
-          placeholder="Find Person"
-        />
-      </BrowserRouter>,
+    renderWithRouter(
+      <Autosuggest
+        getSearchResults={mockGetSearchResults}
+        getDisplayValue={(item) => item.display}
+        getFieldValue={(item) => item.uuid}
+        id="person"
+        labelText=""
+        onSuggestionSelected={mockHandleSuggestionSelected}
+        placeholder="Find Person"
+      />,
     );
 
     let list = screen.queryByRole('list');
@@ -117,18 +111,16 @@ describe('Autosuggest', () => {
   it('changes suggestions when a search input is changed', async () => {
     const user = userEvent.setup();
 
-    render(
-      <BrowserRouter>
-        <Autosuggest
-          getSearchResults={mockGetSearchResults}
-          getDisplayValue={(item) => item.display}
-          getFieldValue={(item) => item.uuid}
-          id="person"
-          labelText=""
-          onSuggestionSelected={mockHandleSuggestionSelected}
-          placeholder="Find Person"
-        />
-      </BrowserRouter>,
+    renderWithRouter(
+      <Autosuggest
+        getSearchResults={mockGetSearchResults}
+        getDisplayValue={(item) => item.display}
+        getFieldValue={(item) => item.uuid}
+        id="person"
+        labelText=""
+        onSuggestionSelected={mockHandleSuggestionSelected}
+        placeholder="Find Person"
+      />,
     );
 
     let list = screen.queryByRole('list');
@@ -149,18 +141,16 @@ describe('Autosuggest', () => {
   it('hides the list of suggestions when the user clicks outside of the component', async () => {
     const user = userEvent.setup();
 
-    render(
-      <BrowserRouter>
-        <Autosuggest
-          getSearchResults={mockGetSearchResults}
-          getDisplayValue={(item) => item.display}
-          getFieldValue={(item) => item.uuid}
-          id="person"
-          labelText=""
-          onSuggestionSelected={mockHandleSuggestionSelected}
-          placeholder="Find Person"
-        />
-      </BrowserRouter>,
+    renderWithRouter(
+      <Autosuggest
+        getSearchResults={mockGetSearchResults}
+        getDisplayValue={(item) => item.display}
+        getFieldValue={(item) => item.uuid}
+        id="person"
+        labelText=""
+        onSuggestionSelected={mockHandleSuggestionSelected}
+        placeholder="Find Person"
+      />,
     );
 
     const input = screen.getByRole('searchbox');
