@@ -93,6 +93,8 @@
   "transfers": "Transfers",
   "transferType": "Transfer type",
   "typeOfTransfer": "Type of transfer",
+  "unableToTransferPatient": "Unable to transfer patient",
+  "unableToTransferPatientNotYetAdmitted": "This patient is not admitted to this ward. Admit this patient before transferring them to a different location.",
   "unknown": "Unknown",
   "visitNoteSaved": "Patient note saved",
   "wardClinicalNotePlaceholder": "Write any notes here",
