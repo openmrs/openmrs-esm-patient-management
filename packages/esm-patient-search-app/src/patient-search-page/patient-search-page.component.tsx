@@ -5,6 +5,7 @@ import { PatientSearchContext } from '../patient-search-context';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 import styles from './patient-search-page.scss';
+import { inferModeFromSearchParams } from '../mpi/utils';
 
 interface PatientSearchPageComponentProps {}
 
@@ -29,6 +30,7 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
             query={searchParams?.get('query') ?? ''}
             inTabletOrOverlay={!isDesktop(layout)}
             stickyPagination
+            searchMode={inferModeFromSearchParams(searchParams)}
           />
         </PatientSearchContext.Provider>
       </div>
