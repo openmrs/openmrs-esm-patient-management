@@ -1,6 +1,13 @@
 import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
+import {
+  ArrowRightIcon,
+  ResponsiveWrapper,
+  showSnackbar,
+  useAppContext,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -11,13 +18,14 @@ import LocationSelector from '../../location-selector/location-selector.componen
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
+import AdmissionPatientButton from '../admit-patient-button.component';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,
   wardPatient,
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
-  const { patient } = wardPatient ?? {};
+  const { patient, inpatientAdmission } = wardPatient ?? {};
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,6 +38,8 @@ export default function PatientTransferForm({
     [emrConfiguration],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
+  const isAdmitted = inpatientAdmission != null;
 
   const zodSchema = useMemo(
     () =>
@@ -139,7 +149,28 @@ export default function PatientTransferForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return <></>;
+  }
+  if (!isAdmitted) {
+    return (
+      <div className={styles.workspaceContent}>
+        <div className={styles.formError}>
+          <InlineNotification
+            kind="info"
+            title={t('unableToTransferPatient', 'Unable to transfer patient')}
+            subtitle={t(
+              'unableToTransferPatientNotYetAdmitted',
+              'This patient is not admitted to this ward. Admit this patient before transferring them to a different location.',
+            )}
+            lowContrast
+            hideCloseButton
+          />
+        </div>
+        <AdmissionPatientButton wardPatient={wardPatient} onAdmitPatientSuccess={closeWorkspaceWithSavedChanges} />
+      </div>
+    );
+  }
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
