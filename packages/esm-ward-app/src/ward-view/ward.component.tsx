@@ -11,12 +11,11 @@ import styles from './ward-view.scss';
 const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardUnassignedPatients: ReactNode }) => {
   const { location } = useWardLocation();
   const { t } = useTranslation();
-  const isVertical = useFeatureFlag('ward-view-vertical-tiling');
 
-  const {wardPatientGroupDetails} = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { bedLayouts } = wardPatientGroupDetails ?? {};
   const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
-  wardPatientGroupDetails?.admissionLocationResponse ?? {};
+    wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const {
     isLoading: isLoadingInpatientAdmissions,
     error: errorLoadingInpatientAdmissions,
@@ -56,7 +55,7 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
   if (!wardPatientGroupDetails) return <></>;
 
   return (
-    <div className={classNames(styles.wardViewMain, { [styles.verticalTiling]: isVertical })}>
+    <div className={classNames(styles.wardViewMain, styles.verticalTiling)}>
       {wardBeds}
       {bedLayouts?.length == 0 && isBedManagementModuleInstalled && (
         <InlineNotification
