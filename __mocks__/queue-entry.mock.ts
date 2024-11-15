@@ -125,7 +125,7 @@ export const mockQueueEntryAlice: QueueEntry = {
   endedAt: null,
   locationWaitingFor: null,
   patient: mockPatientAlice,
-  priority: mockPriorityNonUrgent,
+  priority: mockPriorityUrgent,
   priorityComment: null,
   providerWaitingFor: null,
   queue: mockQueueSurgery,

@@ -19,15 +19,23 @@ const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment
         <DefinitionTooltip className={styles.tooltip} align="bottom-left" definition={priorityComment}>
           <Tag
             role="tooltip"
-            className={classNames(styles.tag, priorityConfig?.style === 'bold' && styles.bold)}
-            type={priorityConfig?.color}>
+            className={classNames(
+              styles.tag,
+              priorityConfig?.style === 'bold' && styles.bold,
+              priorityConfig?.color === 'orange' && styles.orange,
+            )}
+            type={priorityConfig?.color !== 'orange' ? priorityConfig?.color : null}>
             {priority.display}
           </Tag>
         </DefinitionTooltip>
       ) : (
         <Tag
-          className={classNames(styles.tag, priorityConfig?.style === 'bold' && styles.bold)}
-          type={priorityConfig?.color}>
+          className={classNames(
+            styles.tag,
+            priorityConfig?.style === 'bold' && styles.bold,
+            priorityConfig?.color === 'orange' && styles.orange,
+          )}
+          type={priorityConfig?.color !== 'orange' ? priorityConfig?.color : null}>
           {priority.display}
         </Tag>
       )}

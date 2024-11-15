@@ -23,7 +23,7 @@ type ColumnType = (typeof columnTypes)[number];
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
 
-// Options from https://react.carbondesignsystem.com/?path=/docs/components-tag--overview
+// Options from https://react.carbondesignsystem.com/?path=/docs/components-tag--overview plus orange for priority tags
 const carbonTagColors = [
   'red',
   'magenta',
@@ -32,6 +32,7 @@ const carbonTagColors = [
   'teal',
   'cyan',
   'gray',
+  'orange',
   'green',
   'warm-gray',
   'cool-gray',
@@ -46,10 +47,29 @@ type TagStyle = (typeof tagStyles)[number];
 // equal to columnTypes but without extension
 export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
 const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
+const defaultPriorityUuid = 'f4620bfa-3625-4883-bd3f-84c2cce14470';
+const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
+const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
 
 export const defaultColumnConfig: ColumnConfig = {
   identifierTypeUuid: defaultIdentifierTypeUuid,
-  priorityConfigs: [],
+  priorityConfigs: [
+    {
+      conceptUuid: defaultEmergencyPriorityUuid,
+      style: null,
+      color: 'red',
+    },
+    {
+      conceptUuid: defaultPriorityUuid,
+      style: null,
+      color: 'green',
+    },
+    {
+      conceptUuid: defaultUrgentPriorityUuid,
+      style: null,
+      color: 'orange',
+    },
+  ],
   statusConfigs: [],
   visitQueueNumberAttributeUuid: null,
 };
@@ -70,7 +90,7 @@ export const configSchema = {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
-      _default: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
+      _default: defaultPriorityUuid,
     },
     defaultStatusConceptUuid: {
       _type: Type.ConceptUuid,
@@ -93,7 +113,7 @@ export const configSchema = {
     emergencyPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
-      _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
+      _default: defaultEmergencyPriorityUuid,
     },
     heightUuid: {
       _type: Type.ConceptUuid,
