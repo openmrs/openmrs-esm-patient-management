@@ -13,26 +13,26 @@
   border-bottom: 1px solid colors.$gray-20;
 }
 
-.left-justified-items {
+.leftJustifiedItems {
   display: flex;
   flex-direction: row;
   align-items: center;
   cursor: pointer;
 }
 
-.right-justified-items {
+.rightJustifiedItems {
   @include type.type-style('body-compact-02');
   color: colors.$gray-70;
   margin: layout.$spacing-03;
   padding-top: layout.$spacing-04;
 }
 
-.page-name {
+.pageName {
   white-space: nowrap;
   @include type.type-style('heading-04');
 }
 
-.page-labels {
+.pageLabels {
   margin: layout.$spacing-05;
 }
 
@@ -40,7 +40,7 @@
   margin: 0 layout.$spacing-03;
 }
 
-.date-and-location {
+.dateAndLocation {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -60,8 +60,8 @@
 }
 
 svg.iconOverrides {
-  width: 72 !important;
-  height: 72 !important;
+  width: 4.5rem !important;
+  height: 4.5rem !important;
   fill: var(--brand-03);
 }
 

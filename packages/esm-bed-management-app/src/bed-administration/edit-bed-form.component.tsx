@@ -1,88 +1,88 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showToast, showNotification } from '@openmrs/esm-framework';
-
-import type { BedFormData } from '../types';
-import { useBedType, editBed } from './bed-administration.resource';
-import BedAdministrationForm from './bed-administration-form.component';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
+import { type BedFormData } from '../types';
+import { editBed, useBedType } from './bed-administration.resource';
 import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
+import BedAdministrationForm from './bed-administration-form.component';
 
 interface EditBedFormProps {
-  showModal: boolean;
-  onModalChange: (showModal: boolean) => void;
   editData: BedFormData;
-  mutate: () => any;
+  mutate: () => void;
+  onModalChange: (showModal: boolean) => void;
+  showModal: boolean;
 }
 
 const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, editData, mutate }) => {
   const { t } = useTranslation();
-  const { data: admissionLocations } = useLocationsWithAdmissionTag();
-
-  const headerTitle = t('editBed', 'Edit bed');
-  const occupancyStatuses = ['Available', 'Occupied'];
+  const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
   const availableBedTypes = bedTypes ? bedTypes : [];
-  const handleCreateQuestion = useCallback(
+  const headerTitle = t('editBed', 'Edit bed');
+  const occupancyStatuses = ['Available', 'Occupied'];
+
+  const handleCreateBed = useCallback(
     (formData: BedAdministrationData) => {
       const bedUuid = editData.uuid;
+
       const {
-        bedId = editData.bedNumber,
-        description = editData.description,
-        occupancyStatus = editData.status,
-        bedRow = editData.row.toString(),
         bedColumn = editData.column.toString(),
-        location: { uuid: bedLocation = editData.location.uuid },
+        bedId = editData.bedNumber,
+        bedRow = editData.row.toString(),
         bedType = editData.bedType.name,
+        description = editData.description,
+        location: { uuid: bedLocation = editData.location.uuid },
+        occupancyStatus = editData.status,
       } = formData;
+
       const bedPayload = {
         bedNumber: bedId,
         bedType,
-        description,
-        status: occupancyStatus.toUpperCase(),
-        row: parseInt(bedRow),
         column: parseInt(bedColumn),
+        description,
         locationUuid: bedLocation,
+        row: parseInt(bedRow),
+        status: occupancyStatus.toUpperCase(),
       };
+
       editBed({ bedPayload, bedId: bedUuid })
         .then(() => {
-          showToast({
-            title: t('formSaved', 'Bed saved'),
+          showSnackbar({
             kind: 'success',
-            critical: true,
-            description: bedPayload.bedNumber + ' ' + t('saveSuccessMessage', 'was saved successfully.'),
+            title: t('bedUpdated', 'Bed updated'),
+            subtitle: t('bedUpdatedSuccessfully', `${bedPayload.bedNumber} updated successfully`, {
+              bedNumber: bedPayload.bedNumber,
+            }),
           });
 
           mutate();
-          onModalChange(false);
         })
         .catch((error) => {
-          showNotification({
-            title: t('errorCreatingForm', 'Error creating bed'),
+          showSnackbar({
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            title: t('errorCreatingForm', 'Error creating bed'),
+            subtitle: error?.message,
           });
+        })
+        .finally(() => {
           onModalChange(false);
         });
-      onModalChange(false);
     },
-    [onModalChange, mutate, editData, t],
+    [editData, mutate, onModalChange, t],
   );
 
   return (
-    <>
-      <BedAdministrationForm
-        onModalChange={onModalChange}
-        allLocations={admissionLocations}
-        availableBedTypes={availableBedTypes}
-        showModal={showModal}
-        handleCreateQuestion={handleCreateQuestion}
-        headerTitle={headerTitle}
-        occupancyStatuses={occupancyStatuses}
-        initialData={editData}
-      />
-    </>
+    <BedAdministrationForm
+      allLocations={admissionLocations}
+      availableBedTypes={availableBedTypes}
+      handleCreateBed={handleCreateBed}
+      headerTitle={headerTitle}
+      initialData={editData}
+      occupancyStatuses={occupancyStatuses}
+      onModalChange={onModalChange}
+      showModal={showModal}
+    />
   );
 };
 

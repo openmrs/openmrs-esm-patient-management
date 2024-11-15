@@ -8,7 +8,7 @@ interface CardHeaderProps {
   children: React.ReactNode;
 }
 
-export function CardHeader({ title, children }: CardHeaderProps) {
+function CardHeader({ title, children }: CardHeaderProps) {
   const isTablet = useLayoutType() === 'tablet';
 
   return (
@@ -18,3 +18,5 @@ export function CardHeader({ title, children }: CardHeaderProps) {
     </div>
   );
 }
+
+export default CardHeader;

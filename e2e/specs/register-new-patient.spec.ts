@@ -50,21 +50,21 @@ test('Register a new patient', async ({ page }) => {
     await expect(patientBanner).toBeVisible();
     await expect(patientBanner.getByText('Johnny Donny Ronny')).toBeVisible();
     await expect(patientBanner.getByText(/male/i)).toBeVisible();
-    await expect(patientBanner.getByText(/01 — Feb — 2020/i)).toBeVisible();
+    await expect(patientBanner.getByText(/01-Feb-2020/i)).toBeVisible();
     await expect(patientBanner.getByText(/OpenMRS ID/i)).toBeVisible();
   });
 
-  await test.step('And when I click the `Show details` button in the patient banner', async () => {
+  await test.step('And when I click the `Show more` button in the patient banner', async () => {
     await page
       .getByLabel('patient banner')
-      .getByRole('button', { name: /show details/i })
+      .getByRole('button', { name: /show more/i })
       .click();
   });
 
   await test.step("Then I should see the patient's address and contact details displayed in the patient banner", async () => {
     const patientBanner = page.locator('header[aria-label="patient banner"]');
 
-    await expect(patientBanner.getByRole('button', { name: /hide details/i })).toBeVisible();
+    await expect(patientBanner.getByRole('button', { name: /show less/i })).toBeVisible();
     await expect(patientBanner.getByText(/^address$/i)).toBeVisible();
     await expect(patientBanner.getByText(/address line 1: Bom Jesus Street/i)).toBeVisible();
     await expect(patientBanner.getByText(/city: Recife/i)).toBeVisible();
@@ -127,7 +127,7 @@ test('Register an unknown patient', async ({ api, page }) => {
     await expect(patientBanner.getByText('Unknown Unknown')).toBeVisible();
     await expect(patientBanner.getByText(/female/i)).toBeVisible();
     await expect(patientBanner.getByText(/25 yrs/i)).toBeVisible();
-    await expect(patientBanner.getByText(/01 — Jan — 1999/i)).toBeVisible();
+    await expect(patientBanner.getByText(/01-Jan-1999/i)).toBeVisible();
     await expect(patientBanner.getByText(/OpenMRS ID/i)).toBeVisible();
   });
 });

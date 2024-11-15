@@ -230,7 +230,7 @@ export interface EncounterPayload {
 
 export interface ObsPayload {
   concept: Concept | string;
-  value?: string;
+  value?: string | OpenmrsResource;
   groupMembers?: Array<ObsPayload>;
 }
 
@@ -248,6 +248,7 @@ export interface PatientAndAdmission {
 export interface MotherChildRelationships {
   motherByChildUuid: Map<string, PatientAndAdmission>;
   childrenByMotherUuid: Map<string, PatientAndAdmission[]>;
+  isLoading: boolean;
 }
 
 export interface MaternalWardViewContext {

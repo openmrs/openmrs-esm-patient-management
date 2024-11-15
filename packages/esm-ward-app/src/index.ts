@@ -87,6 +87,12 @@ export const patientClinicalFormsWorkspace = getAsyncLifecycle(
   options,
 );
 
+// t('cancelAdmissionRequest', 'Cancel admission request')
+export const cancelAdmissionRequestWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/cancel-admission-request-workspace/cancel-admission-request.workspace'),
+  options,
+);
+
 export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
   () => import('./action-menu-buttons/clinical-forms-workspace-siderail.component'),
   options,

@@ -1,4 +1,5 @@
 import React, { type ReactElement } from 'react';
+import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import { type RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
@@ -16,6 +17,16 @@ const swrWrapper = ({ children }) => {
 
 const renderWithSwr = (ui: ReactElement, options?: Omit<RenderOptions, 'queries'>) =>
   render(ui, { wrapper: swrWrapper, ...options });
+
+const renderWithRouter = (component: React.ReactElement, initialRoute = '/') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path="/" element={component} />
+      </Routes>
+    </MemoryRouter>,
+  );
+};
 
 function waitForLoadingToFinish() {
   return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
@@ -36,6 +47,33 @@ function getByTextWithMarkup(text: RegExp | string) {
     throw new Error(`Text '${text}' not found. ${error}`);
   }
 }
+
+const mockOpenMRSIdentificationNumberIdType = {
+  uuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+  display: 'OpenMRS Identification Number',
+  name: 'OpenMRS Identification Number',
+  description: 'Unique number used in OpenMRS',
+  format: '',
+  formatDescription: null,
+  required: false,
+  validator: 'org.openmrs.patient.impl.LuhnIdentifierValidator',
+  locationBehavior: null,
+  uniquenessBehavior: null,
+  retired: false,
+  links: [
+    {
+      rel: 'self',
+      uri: 'http://localhost/openmrs/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f',
+      resourceAlias: 'patientidentifiertype',
+    },
+    {
+      rel: 'full',
+      uri: 'http://localhost/openmrs/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f?v=full',
+      resourceAlias: 'patientidentifiertype',
+    },
+  ],
+  resourceVersion: '2.0',
+};
 
 const mockPatient = {
   resourceType: 'Patient',
@@ -62,6 +100,12 @@ const mockPatient = {
       use: 'usual',
       system: 'OpenMRS ID',
       value: '100GEJ',
+    },
+    {
+      id: '2f0ad7a1-430f-4397-b571-59ea654a52db',
+      use: 'official',
+      system: 'MPI OpenMRS ID',
+      value: '100GEG',
     },
   ],
   active: true,
@@ -108,11 +152,13 @@ const mockPatientWithoutFormattedName = {
 const patientChartBasePath = `/patient/${mockPatient.id}/chart`;
 
 export {
-  renderWithSwr,
-  waitForLoadingToFinish,
   getByTextWithMarkup,
   mockPatient,
+  mockOpenMRSIdentificationNumberIdType,
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,
+  renderWithSwr,
+  renderWithRouter,
+  waitForLoadingToFinish,
 };

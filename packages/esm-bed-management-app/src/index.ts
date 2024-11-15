@@ -2,7 +2,7 @@ import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle } from '@openmr
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel-link.component';
 
-const moduleName = '@ugandaemr/esm-bed-management-app';
+const moduleName = '@openmrs/esm-bed-management-app';
 
 const options = {
   featureName: 'bed-management',
@@ -42,6 +42,7 @@ export const bedTypeLeftPanelLink = getSyncLifecycle(
   }),
   options,
 );
+
 export const bedTagLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'bed-tag',

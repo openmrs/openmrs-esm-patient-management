@@ -1,28 +1,36 @@
 import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
+import {
+  ArrowRightIcon,
+  ResponsiveWrapper,
+  showSnackbar,
+  useAppContext,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import useWardLocation from '../../hooks/useWardLocation';
 import LocationSelector from '../../location-selector/location-selector.component';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { createEncounter } from '../../ward.resource';
+import { useCreateEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
+import AdmissionPatientButton from '../admit-patient-button.component';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,
   wardPatient,
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
-  const { patient } = wardPatient ?? {};
+  const { patient, inpatientAdmission } = wardPatient ?? {};
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
+    useCreateEncounter();
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
   const dispositionsWithTypeTransfer = useMemo(
@@ -30,6 +38,8 @@ export default function PatientTransferForm({
     [emrConfiguration],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
+  const isAdmitted = inpatientAdmission != null;
 
   const zodSchema = useMemo(
     () =>
@@ -98,23 +108,12 @@ export default function PatientTransferForm({
         });
       }
 
-      createEncounter({
-        patient: patient?.uuid,
-        encounterType: emrConfiguration.transferRequestEncounterType.uuid,
-        location: location.uuid,
-        encounterProviders: [
-          {
-            encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
-            provider: currentProvider?.uuid,
-          },
-        ],
-        obs: [
-          {
-            concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
-            groupMembers: obs,
-          },
-        ],
-      })
+      createEncounter(patient, emrConfiguration.transferRequestEncounterType, [
+        {
+          concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+          groupMembers: obs,
+        },
+      ])
         .then(() => {
           showSnackbar({
             title: t('patientTransferRequestCreated', 'Patient transfer request created'),
@@ -150,7 +149,28 @@ export default function PatientTransferForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return <></>;
+  }
+  if (!isAdmitted) {
+    return (
+      <div className={styles.workspaceContent}>
+        <div className={styles.formError}>
+          <InlineNotification
+            kind="info"
+            title={t('unableToTransferPatient', 'Unable to transfer patient')}
+            subtitle={t(
+              'unableToTransferPatientNotYetAdmitted',
+              'This patient is not admitted to this ward. Admit this patient before transferring them to a different location.',
+            )}
+            lowContrast
+            hideCloseButton
+          />
+        </div>
+        <AdmissionPatientButton wardPatient={wardPatient} onAdmitPatientSuccess={closeWorkspaceWithSavedChanges} />
+      </div>
+    );
+  }
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}

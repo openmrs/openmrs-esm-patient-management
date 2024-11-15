@@ -9,10 +9,6 @@
   color: #393939;
 }
 
-.formError {
-  margin-bottom: layout.$spacing-05;
-}
-
 .workspaceContent {
   padding: layout.$spacing-05;
   height: 100%;
@@ -21,27 +17,11 @@
   color: #393939;
 }
 
-.contentSwitcherWrapper {
-  padding: 0 layout.$spacing-05;
-}
-
-.patientWorkspaceBanner {
-  margin-bottom: layout.$spacing-05;
-}
-
 .field {
   margin-bottom: layout.$spacing-05;
   & > h2 {
     margin-bottom: layout.$spacing-03;
   }
-}
-
-.contentSwitcher {
-  margin-top: layout.$spacing-03;
-}
-
-.workspaceForm {
-  flex: 1;
 }
 
 .productiveHeading02 {
@@ -66,18 +46,6 @@
 
     > svg {
       fill: currentColor !important;
-    }
-  }
-}
-
-.radioButtonGroup {
-  margin-top: layout.$spacing-03;
-  fieldset {
-    flex-direction: column;
-    align-items: flex-start;
-
-    :global(.cds--radio-button-wrapper) {
-      margin-bottom: layout.$spacing-04;
     }
   }
 }

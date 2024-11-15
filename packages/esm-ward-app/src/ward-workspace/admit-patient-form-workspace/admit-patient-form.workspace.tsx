@@ -25,8 +25,8 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
-  const { patient, inpatientRequest } = wardPatient;
-  const { dispositionType } = inpatientRequest;
+  const { patient, inpatientRequest } = wardPatient ?? {};
+  const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
 
   const { t } = useTranslation();
   const { location } = useWardLocation();
