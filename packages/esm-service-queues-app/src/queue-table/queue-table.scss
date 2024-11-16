@@ -30,6 +30,7 @@
 .filterContainer {
   label {
     margin-right: layout.$spacing-03 !important;
+    font-size: 12px !important;
   }
 
   :global(.cds--dropdown__wrapper--inline) {
@@ -38,10 +39,6 @@
 
   :global(.cds--list-box__menu-icon) {
     height: layout.$spacing-05;
-  }
-
-  :global(.cds--dropdown--inline) :global(.cds--list-box__field) {
-    min-width: 12rem;
   }
 }
 
@@ -101,7 +98,6 @@
   .toolbarContent {
     display: flex;
     z-index: 1; // prevent dropdown from getting covered by table elements
-    column-gap: layout.$spacing-03;
   }
 
   :global(.cds--table-toolbar) {

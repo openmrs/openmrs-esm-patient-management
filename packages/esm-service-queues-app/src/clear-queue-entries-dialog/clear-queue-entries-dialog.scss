@@ -5,3 +5,11 @@
   @include type.type-style('heading-compact-01');
   color: $ui-05;
 }
+
+.clear-queues-btn-desktop {
+  padding-top: 4px;
+}
+
+.clear-queues-btn-tablet {
+  padding-top: 12px;
+}
