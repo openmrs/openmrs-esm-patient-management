@@ -3,6 +3,9 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies": {
+    "clientregistry": "^1.1.8"
+  },
   "pages": [
     {
       "component": "root",
@@ -41,6 +44,6 @@
       "flagName": "mpiFlag",
       "label": "MPI Service",
       "description": "Enables the Master Patient Index workflows."
-    }    
+    }
   ]
 }
