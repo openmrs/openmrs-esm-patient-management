@@ -23,7 +23,6 @@ import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import { useBedTypes } from '../summary/summary.resource';
 import type { BedTypeData } from '../types';
-import EditBedTypeForm from './edit-bed-type.component';
 
 const BedTypeAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -38,7 +37,6 @@ const BedTypeAdministrationTable: React.FC = () => {
   const [currentPageSize, setPageSize] = useState(10);
   const [editData, setEditData] = useState<BedTypeData>();
   const [pageSize] = useState(10);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
 
   const tableHeaders = [
     {
@@ -66,6 +64,14 @@ const BedTypeAdministrationTable: React.FC = () => {
     });
   };
 
+  const openEditBedTypeModal = () => {
+    const dispose = showModal('edit-bed-type-modal', {
+      onClose: () => dispose(),
+      mutate: mutateBedTypes,
+      editData,
+    });
+  };
+
   const tableRows = useMemo(
     () =>
       bedTypes?.map((entry) => ({
@@ -82,7 +88,7 @@ const BedTypeAdministrationTable: React.FC = () => {
             onClick={(e) => {
               e.preventDefault();
               setEditData(entry);
-              setShowEditBedModal(true);
+              openEditBedTypeModal();
             }}
             size={responsiveSize}>
             <Edit />
@@ -118,14 +124,6 @@ const BedTypeAdministrationTable: React.FC = () => {
     <>
       <Header route="Bed Type" />
       <div className={styles.widgetCard}>
-        {showEditBedModal ? (
-          <EditBedTypeForm
-            editData={editData}
-            mutate={mutateBedTypes}
-            onModalChange={setShowEditBedModal}
-            showModal={showEditBedModal}
-          />
-        ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedTypes ? <InlineLoading /> : null}</span>

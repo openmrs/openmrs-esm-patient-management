@@ -73,6 +73,10 @@
     {
       "name": "new-bed-type-modal",
       "component": "newBedTypeModal"
+    },
+    {
+      "name": "edit-bed-type-modal",
+      "component": "editBedTypeModal"
     }
   ]
 }
