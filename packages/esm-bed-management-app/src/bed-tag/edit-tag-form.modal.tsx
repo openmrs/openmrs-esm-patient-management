@@ -1,10 +1,5 @@
-import React, { useState } from 'react';
-import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -14,9 +9,21 @@ import {
   Stack,
   TextInput,
 } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
+import React, { useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
-import type { BedTagData } from '../types';
+import { z } from 'zod';
+import { type BedTagDataAdministration } from '../bed-administration/bed-administration-types';
+import { editBedTag } from '../summary/summary.resource';
+import { type BedTagData, type Mutator } from '../types';
+
+interface EditBedTagFormProps {
+  editData: BedTagData;
+  mutate: Mutator<BedTagData>;
+  closeModal: () => void;
+}
 
 const BedTagAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -37,14 +44,42 @@ interface ErrorType {
   message: string;
 }
 
-const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
-  handleCreateBedTag,
-  headerTitle,
-  initialData,
-  onModalChange,
-  showModal,
-}) => {
+const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
+
+  const handleUpdateBedTag = useCallback(
+    (formData: BedTagDataAdministration) => {
+      const bedUuid = editData.uuid;
+      const { name } = formData;
+
+      const bedTagPayload = {
+        name,
+      };
+
+      editBedTag({ bedTagPayload, bedTagId: bedUuid })
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            title: t('bedTagUpdated', 'Bed tag updated'),
+            subtitle: t('bedTagUpdatedSuccessfully', `${bedTagPayload.name} updated successfully`, {
+              bedTag: bedTagPayload.name,
+            }),
+          });
+          mutate();
+        })
+        .catch((error) => {
+          showSnackbar({
+            kind: 'error',
+            title: t('errorCreatingBedTag', 'Error creating bed tag'),
+            subtitle: error?.message,
+          });
+        })
+        .finally(() => {
+          closeModal();
+        });
+    },
+    [mutate, editData, t],
+  );
 
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
@@ -57,7 +92,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
     mode: 'all',
     resolver: zodResolver(BedTagAdministrationSchema),
     defaultValues: {
-      name: initialData.name || '',
+      name: editData.name || '',
     },
   });
 
@@ -65,7 +100,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
     const result = BedTagAdministrationSchema.safeParse(formData);
     if (result.success) {
       setShowErrorNotification(false);
-      handleCreateBedTag(formData);
+      handleUpdateBedTag(formData);
     }
   };
 
@@ -75,8 +110,8 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={t('editTag', 'Edit Tag')} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -97,7 +132,6 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                 )}
               />
             </FormGroup>
-
             {showErrorNotification && (
               <InlineNotification
                 lowContrast
@@ -113,15 +147,15 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 
-export default BedTagsAdministrationForm;
+export default EditBedTagForm;

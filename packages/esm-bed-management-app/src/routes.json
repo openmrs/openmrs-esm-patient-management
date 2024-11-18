@@ -65,6 +65,14 @@
     {
       "name": "new-bed-tag-modal",
       "component": "newBedTagModal"
+    },
+    {
+      "name": "edit-bed-tag-modal",
+      "component": "editBedTagModal"
+    },
+    {
+      "name": "new-bed-type-modal",
+      "component": "newBedTypeModal"
     }
   ]
 }

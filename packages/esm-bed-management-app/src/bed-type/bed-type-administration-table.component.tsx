@@ -1,5 +1,3 @@
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -17,14 +15,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
-import type { BedTypeData } from '../types';
-import { useBedTypes } from '../summary/summary.resource';
-import CardHeader from '../card-header/card-header.component';
-import BedTypeForm from './new-bed-type-form.component';
-import EditBedTypeForm from './edit-bed-type.component';
-import Header from '../header/header.component';
+import { ErrorState, isDesktop as desktopLayout, showModal, useLayoutType } from '@openmrs/esm-framework';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from '../bed-administration/bed-administration-table.scss';
+import CardHeader from '../card-header/card-header.component';
+import Header from '../header/header.component';
+import { useBedTypes } from '../summary/summary.resource';
+import type { BedTypeData } from '../types';
+import EditBedTypeForm from './edit-bed-type.component';
 
 const BedTypeAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -39,7 +38,6 @@ const BedTypeAdministrationTable: React.FC = () => {
   const [currentPageSize, setPageSize] = useState(10);
   const [editData, setEditData] = useState<BedTypeData>();
   const [pageSize] = useState(10);
-  const [showBedTypeModal, setAddBedTypeModal] = useState(false);
   const [showEditBedModal, setShowEditBedModal] = useState(false);
 
   const tableHeaders = [
@@ -61,6 +59,13 @@ const BedTypeAdministrationTable: React.FC = () => {
     },
   ];
 
+  const openNewBedTypeModal = () => {
+    const dispose = showModal('new-bed-type-modal', {
+      onClose: () => dispose(),
+      mutate: mutateBedTypes,
+    });
+  };
+
   const tableRows = useMemo(
     () =>
       bedTypes?.map((entry) => ({
@@ -78,7 +83,6 @@ const BedTypeAdministrationTable: React.FC = () => {
               e.preventDefault();
               setEditData(entry);
               setShowEditBedModal(true);
-              setAddBedTypeModal(false);
             }}
             size={responsiveSize}>
             <Edit />
@@ -113,11 +117,7 @@ const BedTypeAdministrationTable: React.FC = () => {
   return (
     <>
       <Header route="Bed Type" />
-
       <div className={styles.widgetCard}>
-        {showBedTypeModal ? (
-          <BedTypeForm onModalChange={setAddBedTypeModal} showModal={showBedTypeModal} mutate={mutateBedTypes} />
-        ) : null}
         {showEditBedModal ? (
           <EditBedTypeForm
             editData={editData}
@@ -131,10 +131,7 @@ const BedTypeAdministrationTable: React.FC = () => {
             <span>{isValidatingBedTypes ? <InlineLoading /> : null}</span>
           </span>
           {bedTypes?.length ? (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setAddBedTypeModal(true)}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedTypeModal}>
               {t('addBedType', 'Add bed type')}
             </Button>
           ) : null}
@@ -172,7 +169,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setAddBedTypeModal(true)}>
+                      onClick={openNewBedTypeModal}>
                       {t('addBedType', 'Add bed type')}
                     </Button>
                   </Tile>
