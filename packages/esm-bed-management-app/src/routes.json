@@ -52,5 +52,11 @@
         "title": "Bed-admission"
       }
     }
+  ],
+  "modals": [
+    {
+      "name": "new-bed-modal",
+      "component": "newBedModal"
+    }
   ]
 }
