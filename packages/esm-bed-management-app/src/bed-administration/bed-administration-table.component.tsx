@@ -30,7 +30,6 @@ import Header from '../header/header.component';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import type { BedFormData } from '../types';
 import styles from './bed-administration-table.scss';
-import EditBedForm from './edit-bed-form.component';
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -47,8 +46,6 @@ const BedAdministrationTable: React.FC = () => {
     mutateBedsGroupedByLocation,
     errorFetchingBedsGroupedByLocation,
   } = useBedsGroupedByLocation();
-  // const [showAddBedModal, setShowAddBedModal] = useState(false);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
   const [editData, setEditData] = useState<BedFormData>();
   const [filterOption, setFilterOption] = useState('ALL');
 
@@ -111,6 +108,14 @@ const BedAdministrationTable: React.FC = () => {
     });
   };
 
+  const openEditBedModal = () => {
+    const dispose = showModal('edit-bed-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedsGroupedByLocation,
+      editData,
+    });
+  };
+
   const tableRows = useMemo(() => {
     return results.flat().map((bed) => ({
       id: bed.uuid,
@@ -126,8 +131,7 @@ const BedAdministrationTable: React.FC = () => {
             onClick={(e) => {
               e.preventDefault();
               setEditData(bed);
-              setShowEditBedModal(true);
-              openNewBedModal();
+              openEditBedModal();
             }}
             kind={'ghost'}
             iconDescription={t('editBed', 'Edit bed')}
@@ -181,14 +185,6 @@ const BedAdministrationTable: React.FC = () => {
         ) : null}
       </div>
       <div className={styles.widgetCard}>
-        {showEditBedModal ? (
-          <EditBedForm
-            editData={editData}
-            mutate={mutateBedsGroupedByLocation}
-            onModalChange={setShowEditBedModal}
-            showModal={showEditBedModal}
-          />
-        ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedsGroupedByLocation ? <InlineLoading /> : null}</span>

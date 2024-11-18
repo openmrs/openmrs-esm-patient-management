@@ -1,8 +1,6 @@
 import {
   Button,
   ComboBox,
-  ComposedModal,
-  Form,
   FormGroup,
   InlineNotification,
   ModalBody,
@@ -16,28 +14,22 @@ import {
   TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
-import capitalize from 'lodash-es/capitalize';
-import React, { useState } from 'react';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
+import { capitalize } from 'lodash-es';
+import React, { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { Form } from 'react-router-dom';
 import { z } from 'zod';
-import { type BedFormData, type BedType } from '../types';
+import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
+import { type BedFormData } from '../types';
 import { type BedAdministrationData } from './bed-administration-types';
+import { editBed, useBedType } from './bed-administration.resource';
 
-interface BedAdministrationFormProps {
-  allLocations: Location[];
-  availableBedTypes: Array<BedType>;
-  handleCreateBed?: (formData: BedAdministrationData) => void;
-  headerTitle: string;
-  initialData: BedFormData;
-  occupancyStatuses: string[];
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
-}
-
-interface ErrorType {
-  message: string;
+interface EditBedFormProps {
+  editData: BedFormData;
+  mutate: () => void;
+  closeModal: () => void;
 }
 
 const numberInString = z.string().transform((val, ctx) => {
@@ -65,22 +57,71 @@ const BedAdministrationSchema = z.object({
   occupancyStatus: z.string().refine((value) => value != '', 'Please select a valid occupied status'),
 });
 
-const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
-  allLocations,
-  availableBedTypes,
-  handleCreateBed,
-  headerTitle,
-  initialData,
-  occupancyStatuses,
-  onModalChange,
-  showModal,
-}) => {
+interface ErrorType {
+  message: string;
+}
+
+const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate }) => {
+  const [occupancyStatus, setOccupancyStatus] = useState(capitalize(editData.status));
   const { t } = useTranslation();
-  const [occupancyStatus, setOccupancyStatus] = useState(capitalize(initialData.status));
-  const [selectedBedType] = useState(initialData.bedType?.name ?? '');
+  const { admissionLocations } = useLocationsWithAdmissionTag();
+  const { bedTypes } = useBedType();
+  const availableBedTypes = bedTypes ? bedTypes : [];
+  const headerTitle = t('editBed', 'Edit bed');
+  const occupancyStatuses = ['Available', 'Occupied'];
+  const [selectedBedType] = useState(editData.bedType?.name ?? '');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
 
+  const handleCreateBed = useCallback(
+    (formData: BedAdministrationData) => {
+      const bedUuid = editData.uuid;
+
+      const {
+        bedColumn = editData.column.toString(),
+        bedId = editData.bedNumber,
+        bedRow = editData.row.toString(),
+        bedType = editData.bedType.name,
+        description = editData.description,
+        location: { uuid: bedLocation = editData.location.uuid },
+        occupancyStatus = editData.status,
+      } = formData;
+
+      const bedPayload = {
+        bedNumber: bedId,
+        bedType,
+        column: parseInt(bedColumn),
+        description,
+        locationUuid: bedLocation,
+        row: parseInt(bedRow),
+        status: occupancyStatus.toUpperCase(),
+      };
+
+      editBed({ bedPayload, bedId: bedUuid })
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            title: t('bedUpdated', 'Bed updated'),
+            subtitle: t('bedUpdatedSuccessfully', `${bedPayload.bedNumber} updated successfully`, {
+              bedNumber: bedPayload.bedNumber,
+            }),
+          });
+
+          mutate();
+        })
+        .catch((error) => {
+          showSnackbar({
+            kind: 'error',
+            title: t('errorCreatingForm', 'Error creating bed'),
+            subtitle: error?.message,
+          });
+        })
+        .finally(() => {
+          closeModal();
+        });
+    },
+    [editData, mutate, t],
+  );
   const {
     handleSubmit,
     control,
@@ -89,13 +130,13 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     mode: 'all',
     resolver: zodResolver(BedAdministrationSchema),
     defaultValues: {
-      bedColumn: initialData.column.toString() ?? '0',
-      bedId: initialData.bedNumber ?? '',
-      bedRow: initialData.row.toString() ?? '0',
-      bedType: initialData.bedType?.name ?? '',
-      description: initialData.bedType?.description ?? '',
-      location: initialData.location ?? {},
-      occupancyStatus: capitalize(initialData.status) ?? occupancyStatus,
+      bedColumn: editData.column.toString() ?? '0',
+      bedId: editData.bedNumber ?? '',
+      bedRow: editData.row.toString() ?? '0',
+      bedType: editData.bedType?.name ?? '',
+      description: editData.bedType?.description ?? '',
+      location: editData.location ?? {},
+      occupancyStatus: capitalize(editData.status) ?? occupancyStatus,
     },
   });
 
@@ -113,7 +154,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
+    <React.Fragment>
       <ModalHeader title={headerTitle} />
       <ModalBody hasScrollingContent>
         <Form>
@@ -198,7 +239,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     aria-label={t('location', 'Location')}
                     id="location"
                     invalidText={fieldState?.error?.message}
-                    items={allLocations}
+                    items={admissionLocations}
                     itemToString={(location) => location?.display ?? ''}
                     label={t('location', 'Location')}
                     onBlur={onBlur}
@@ -275,15 +316,15 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 
-export default BedAdministrationForm;
+export default EditBedForm;
