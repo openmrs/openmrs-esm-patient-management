@@ -131,7 +131,7 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, close
 
   return (
     <React.Fragment>
-      <ModalHeader title={t('editTag', 'Edit Tag')} />
+      <ModalHeader title={t('editTag', 'Edit Tag')} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>

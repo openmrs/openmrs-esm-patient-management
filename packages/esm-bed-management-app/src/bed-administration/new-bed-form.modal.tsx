@@ -189,7 +189,7 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ closeModal, mutate }) => {
 
   return (
     <React.Fragment>
-      <ModalHeader closeModal={closeModal}>{t('createNewBed', 'Create a new bed')}</ModalHeader>
+      <ModalHeader closeModal={closeModal} title={t('createNewBed', 'Create a new bed')} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>

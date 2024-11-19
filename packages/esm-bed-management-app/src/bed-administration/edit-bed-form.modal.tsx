@@ -181,7 +181,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
 
   return (
     <React.Fragment>
-      <ModalHeader title={t('editBed', 'Edit bed')} />
+      <ModalHeader title={t('editBed', 'Edit bed')} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
