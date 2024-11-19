@@ -71,7 +71,20 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         });
       },
     );
-  }, [queueEntry]);
+  }, [
+    closeModal,
+    defaultTransitionStatus,
+    mutateQueueEntries,
+    queueEntry?.patientUuid,
+    queueEntry?.priority?.uuid,
+    queueEntry?.queue.name,
+    queueEntry?.queueEntryUuid,
+    queueEntry?.queueUuid,
+    queueEntry?.sortWeight,
+    queueEntry?.visitQueueNumber,
+    queueEntry?.visitUuid,
+    t,
+  ]);
 
   const handleRequeuePatient = useCallback(() => {
     requeueQueueEntry(priorityComment.REQUEUED, queueEntry?.queueUuid, queueEntry?.queueEntryUuid).then(
@@ -96,7 +109,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         });
       },
     );
-  }, []);
+  }, [closeModal, mutateQueueEntries, queueEntry?.queueEntryUuid, queueEntry?.queueUuid, t]);
 
   return (
     <div>

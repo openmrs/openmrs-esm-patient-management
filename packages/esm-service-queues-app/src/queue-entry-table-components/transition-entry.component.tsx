@@ -35,7 +35,7 @@ const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry }) => {
       closeModal: () => dispose(),
       queueEntry,
     });
-  }, [queueEntry]);
+  }, [queueEntry, t]);
 
   return (
     <Button

@@ -251,7 +251,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     },
   });
 
-  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
 
   // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
@@ -277,7 +277,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       return;
     }
     promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing, isSuccessful]);
+  }, [isDirty, promptBeforeClosing, isSuccessful, reset, closeWorkspace]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');

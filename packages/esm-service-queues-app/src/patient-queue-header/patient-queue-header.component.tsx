@@ -27,16 +27,19 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
   const currentQueueLocationName = useSelectedQueueLocationName();
   const currentQueueLocationUuid = useSelectedQueueLocationUuid();
 
-  const handleQueueLocationChange = useCallback(({ selectedItem }) => {
-    if (selectedItem.id === 'all') {
-      updateSelectedQueueLocationUuid(null);
-      updateSelectedQueueLocationName(null);
-    } else {
-      updateSelectedQueueLocationUuid(selectedItem.id);
-      updateSelectedQueueLocationName(selectedItem.name);
-      updateSelectedService(null, t('all', 'All'));
-    }
-  }, []);
+  const handleQueueLocationChange = useCallback(
+    ({ selectedItem }) => {
+      if (selectedItem.id === 'all') {
+        updateSelectedQueueLocationUuid(null);
+        updateSelectedQueueLocationName(null);
+      } else {
+        updateSelectedQueueLocationUuid(selectedItem.id);
+        updateSelectedQueueLocationName(selectedItem.name);
+        updateSelectedService(null, t('all', 'All'));
+      }
+    },
+    [t],
+  );
 
   useEffect(() => {
     if (!isLoading && !error && !currentQueueLocationUuid) {
@@ -56,12 +59,16 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
       }
     }
   }, [
-    queueLocations,
     currentQueueLocationName,
     currentQueueLocationUuid,
-    isLoading,
     error,
+    handleQueueLocationChange,
+    isLoading,
+    queueLocations,
+    userSession?.sessionLocation?.display,
     userSession?.sessionLocation?.uuid,
+    handleQueueLocationChange,
+    userSession?.sessionLocation?.display,
   ]);
 
   return (

@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
 import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -11,9 +12,8 @@ import {
 } from '@openmrs/esm-framework';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import styles from './visit-form.scss';
-import classNames from 'classnames';
 import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
+import styles from './visit-form.scss';
 
 interface ExistingVisitFormProps {
   closeWorkspace: () => void;
@@ -80,7 +80,19 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         },
       );
     },
-    [closeWorkspace, mutateQueueEntries, visit, t, visitQueueNumberAttributeUuid],
+    [
+      closeWorkspace,
+      mutateQueueEntries,
+      priority,
+      queueLocation,
+      service,
+      sortWeight,
+      status,
+      t,
+      visit.patient.uuid,
+      visit.uuid,
+      visitQueueNumberAttributeUuid,
+    ],
   );
 
   return visit ? (

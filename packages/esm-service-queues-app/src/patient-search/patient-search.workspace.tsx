@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, DataTableSkeleton } from '@carbon/react';
 import isNil from 'lodash-es/isNil';
 import { useTranslation } from 'react-i18next';
+import { Button, DataTableSkeleton } from '@carbon/react';
 import {
-  type DefaultWorkspaceProps,
   ArrowLeftIcon,
   ErrorState,
   getPatientName,
@@ -11,6 +10,7 @@ import {
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
+  type DefaultWorkspaceProps,
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
@@ -69,7 +69,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
     if (searchType === SearchTypes.SCHEDULED_VISITS && appointments && !hasAppointments) {
       setSearchType(SearchTypes.VISIT_FORM);
     }
-  }, [hasAppointments, appointments]);
+  }, [appointments, hasAppointments, searchType]);
 
   useEffect(() => {
     if (searchType === SearchTypes.SEARCH_RESULTS) {

@@ -34,6 +34,8 @@ Component with default values / sub-components passed into the more generic Queu
 This is used in the main dashboard of the queues app. (Currently behind a feature flag)
 */
 function DefaultQueueTable() {
+  const { t } = useTranslation();
+  const layout = useLayoutType();
   const selectedService = useSelectedService();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const selectedQueueStatus = useSelectedQueueStatus();
@@ -48,8 +50,6 @@ function DefaultQueueTable() {
   );
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 
-  const { t } = useTranslation();
-
   useEffect(() => {
     if (error?.message) {
       showSnackbar({
@@ -58,8 +58,7 @@ function DefaultQueueTable() {
         subtitle: error?.message,
       });
     }
-  }, [error?.message]);
-  const layout = useLayoutType();
+  }, [error?.message, t]);
 
   const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
   const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
@@ -88,7 +87,7 @@ function DefaultQueueTable() {
         return columnSearchTerm?.includes(searchTermLowercase);
       });
     });
-  }, [queueEntries, searchTerm]);
+  }, [columns, queueEntries, searchTerm]);
 
   return (
     <div className={styles.defaultQueueTable}>

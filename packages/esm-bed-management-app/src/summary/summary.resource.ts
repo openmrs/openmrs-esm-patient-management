@@ -142,7 +142,7 @@ export function useBedsGroupedByLocation() {
       isValidatingBedsGroupedByLocation: isValidating,
       mutateBedsGroupedByLocation: mutate,
     }),
-    [result, error, isLoading, isValidating, mutate],
+    [error, isLoading, isLoadingAdmissionLocations, isValidating, mutate, result],
   );
 
   return results;
