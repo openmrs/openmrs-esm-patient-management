@@ -1,6 +1,8 @@
 import {
   Button,
+  Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -13,10 +15,10 @@ import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import React, { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Form } from 'react-router-dom';
 import { z } from 'zod';
 import { saveBedTag } from '../summary/summary.resource';
 import { type BedTagData } from '../types';
+import styles from './new-tag.scss';
 
 interface BedTagFormProps {
   mutate: () => void;
@@ -32,9 +34,21 @@ const BedTagAdministrationSchema = z.object({
 });
 
 const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
+  console.log('close-modal', closeModal);
   const { t } = useTranslation();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
+  const [{ isErrored, isSubmitting, isSuccessful, description }, setSubmissionStatus] = useState<{
+    isSubmitting: boolean;
+    isSuccessful: boolean | undefined;
+    isErrored: boolean | undefined;
+    description: string | undefined;
+  }>({
+    isSubmitting: false,
+    isSuccessful: false,
+    isErrored: undefined,
+    description: undefined,
+  });
 
   const initialData: BedTagData = {
     name: '',
@@ -74,6 +88,12 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
         name,
       };
 
+      setSubmissionStatus({
+        isErrored: false,
+        isSuccessful: undefined,
+        isSubmitting: true,
+        description: 'Submitting...',
+      });
       saveBedTag({ bedTagPayload })
         .then(() => {
           showSnackbar({
@@ -84,6 +104,12 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
             }),
           });
           mutate();
+          setSubmissionStatus({
+            isErrored: false,
+            isSuccessful: true,
+            isSubmitting: false,
+            description: 'Saved...',
+          });
         })
         .catch((error) => {
           showSnackbar({
@@ -91,17 +117,21 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
             title: t('errorCreatingForm', 'Error creating bed'),
             subtitle: error?.message,
           });
+          setSubmissionStatus({
+            isErrored: true,
+            isSuccessful: false,
+            isSubmitting: false,
+            description: 'Errored',
+          });
         })
-        .finally(() => {
-          closeModal();
-        });
+        .finally(() => closeModal());
     },
     [mutate, t],
   );
 
   return (
     <React.Fragment>
-      <ModalHeader title={t('createBedTag', 'Create bed tag')} />
+      <ModalHeader title={t('createBedTag', 'Create bed tag')} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -141,9 +171,19 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
         <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('save', 'Save')}</span>
-        </Button>
+        {isSubmitting || isErrored || isSuccessful ? (
+          <Button>
+            <InlineLoading
+              status={isSubmitting ? 'active' : isErrored ? 'error' : isSuccessful ? 'finished' : 'inactive'}
+              description={description}
+              className={styles.inlineLoading}
+            />
+          </Button>
+        ) : (
+          <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+            {t('save', 'save')}
+          </Button>
+        )}
       </ModalFooter>
     </React.Fragment>
   );

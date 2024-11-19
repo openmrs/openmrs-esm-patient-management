@@ -54,14 +54,14 @@ const BedTagAdministrationTable: React.FC = () => {
 
   const openNewBedTagModal = () => {
     const dispose = showModal('new-bed-tag-modal', {
-      onClose: () => dispose(),
+      closeModal: () => dispose(),
       mutate: mutateBedTags,
     });
   };
 
   const openEditBedTagModal = () => {
     const dispose = showModal('edit-bed-tag-modal', {
-      onClose: () => dispose(),
+      closeModal: () => dispose(),
       mutate: mutateBedTags,
       editData: editData,
     });
