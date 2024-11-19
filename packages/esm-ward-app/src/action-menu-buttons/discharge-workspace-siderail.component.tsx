@@ -14,7 +14,7 @@ export default function PatientDischargeSideRailIcon() {
       label={t('discharge', 'Discharge')}
       iconDescription={t('discharge', 'Discharge')}
       handler={handler}
-      type="patient-discharge-workspace"
+      type="ward-patient-discharge"
     />
   );
 }
