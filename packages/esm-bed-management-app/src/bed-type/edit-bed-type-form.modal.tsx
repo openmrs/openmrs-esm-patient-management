@@ -2,6 +2,7 @@ import {
   Button,
   Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -19,6 +20,7 @@ import { z } from 'zod';
 import { type BedTypeDataAdministration } from '../bed-administration/bed-administration-types';
 import { editBedType } from '../summary/summary.resource';
 import { type BedType, type BedTypeData, type Mutator } from '../types';
+import styles from './new-bed-type.scss';
 
 interface EditBedTypeFormProps {
   editData: BedTypeData;
@@ -38,6 +40,17 @@ const BedTypeAdministrationSchema = z.object({
 
 const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
+  const [{ isErrored, isSubmitting, isSuccessful, description }, setSubmissionStatus] = useState<{
+    isSubmitting: boolean;
+    isSuccessful: boolean | undefined;
+    isErrored: boolean | undefined;
+    description: string | undefined;
+  }>({
+    isSubmitting: false,
+    isSuccessful: false,
+    isErrored: undefined,
+    description: undefined,
+  });
 
   const handleUpdateBedType = useCallback(
     (formData: BedTypeDataAdministration) => {
@@ -50,6 +63,13 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
         description,
       };
 
+      setSubmissionStatus({
+        description: 'editing...',
+        isErrored: undefined,
+        isSubmitting: true,
+        isSuccessful: undefined,
+      });
+
       editBedType({ bedTypePayload, bedTypeId: bedUuid })
         .then(() => {
           showSnackbar({
@@ -60,6 +80,13 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
             kind: 'success',
           });
 
+          setSubmissionStatus({
+            description: 'edited.',
+            isErrored: undefined,
+            isSubmitting: false,
+            isSuccessful: true,
+          });
+
           mutate();
         })
         .catch((error) => {
@@ -68,6 +95,7 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
             subtitle: error?.message,
             kind: 'error',
           });
+          setSubmissionStatus({ description: 'errorred', isErrored: true, isSubmitting: false, isSuccessful: false });
         })
         .finally(() => closeModal());
     },
@@ -177,9 +205,19 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
         <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('save', 'Save')}</span>
-        </Button>
+        {isSubmitting || isErrored || isSuccessful ? (
+          <Button>
+            <InlineLoading
+              status={isSubmitting ? 'active' : isErrored ? 'error' : isSuccessful ? 'finished' : 'inactive'}
+              description={description}
+              className={styles.inlineLoading}
+            />
+          </Button>
+        ) : (
+          <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+            {t('save', 'save')}
+          </Button>
+        )}
       </ModalFooter>
     </React.Fragment>
   );

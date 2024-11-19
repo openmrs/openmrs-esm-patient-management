@@ -35,7 +35,6 @@ const BedTypeAdministrationTable: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setPageSize] = useState(10);
-  const [editData, setEditData] = useState<BedTypeData>();
   const [pageSize] = useState(10);
 
   const tableHeaders = [
@@ -59,14 +58,14 @@ const BedTypeAdministrationTable: React.FC = () => {
 
   const openNewBedTypeModal = () => {
     const dispose = showModal('new-bed-type-modal', {
-      onClose: () => dispose(),
+      closeModal: () => dispose(),
       mutate: mutateBedTypes,
     });
   };
 
-  const openEditBedTypeModal = () => {
+  const openEditBedTypeModal = (editData: BedTypeData) => {
     const dispose = showModal('edit-bed-type-modal', {
-      onClose: () => dispose(),
+      closeModal: () => dispose(),
       mutate: mutateBedTypes,
       editData,
     });
@@ -87,8 +86,7 @@ const BedTypeAdministrationTable: React.FC = () => {
             label={t('editBedType', 'Edit bed type')}
             onClick={(e) => {
               e.preventDefault();
-              setEditData(entry);
-              openEditBedTypeModal();
+              openEditBedTypeModal(entry);
             }}
             size={responsiveSize}>
             <Edit />

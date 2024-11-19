@@ -2,6 +2,7 @@ import {
   Button,
   Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -18,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { saveBedType } from '../summary/summary.resource';
 import type { BedType, BedTypeData, Mutator } from '../types';
+import styles from './new-bed-type.scss';
 
 interface BedTypeFormProps {
   mutate: Mutator<BedType>;
@@ -37,6 +39,17 @@ interface ErrorType {
 const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
   const { t } = useTranslation();
   const headerTitle = t('createBedType', 'Create bed type');
+  const [{ isErrored, isSubmitting, isSuccessful, description }, setSubmissionStatus] = useState<{
+    isSubmitting: boolean;
+    isSuccessful: boolean | undefined;
+    isErrored: boolean | undefined;
+    description: string | undefined;
+  }>({
+    isSubmitting: false,
+    isSuccessful: false,
+    isErrored: undefined,
+    description: undefined,
+  });
 
   const initialData: BedTypeData = {
     description: '',
@@ -55,6 +68,12 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
         description,
       };
 
+      setSubmissionStatus({
+        isErrored: false,
+        isSuccessful: undefined,
+        isSubmitting: true,
+        description: 'Submitting...',
+      });
       saveBedType({ bedTypePayload })
         .then(() => {
           showSnackbar({
@@ -65,12 +84,24 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
             }),
           });
           mutate();
+          setSubmissionStatus({
+            isErrored: false,
+            isSuccessful: true,
+            isSubmitting: false,
+            description: 'Saved...',
+          });
         })
         .catch((error) => {
           showSnackbar({
             kind: 'error',
             title: t('errorCreatingForm', 'Error creating bed'),
             subtitle: error?.message,
+          });
+          setSubmissionStatus({
+            isErrored: true,
+            isSuccessful: false,
+            isSubmitting: false,
+            description: 'Errored',
           });
         })
         .finally(() => closeModal());
@@ -181,9 +212,19 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
         <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('save', 'Save')}</span>
-        </Button>
+        {isSubmitting || isErrored || isSuccessful ? (
+          <Button>
+            <InlineLoading
+              status={isSubmitting ? 'active' : isErrored ? 'error' : isSuccessful ? 'finished' : 'inactive'}
+              description={description}
+              className={styles.inlineLoading}
+            />
+          </Button>
+        ) : (
+          <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+            {t('save', 'save')}
+          </Button>
+        )}
       </ModalFooter>
     </React.Fragment>
   );
