@@ -1,7 +1,9 @@
 import {
   Button,
   ComboBox,
+  Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -19,12 +21,12 @@ import { capitalize } from 'lodash-es';
 import React, { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Form } from 'react-router-dom';
 import { z } from 'zod';
 import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
 import { type BedFormData } from '../types';
 import { type BedAdministrationData } from './bed-administration-types';
 import { editBed, useBedType } from './bed-administration.resource';
+import styles from './new-bed-form.scss';
 
 interface EditBedFormProps {
   editData: BedFormData;
@@ -67,11 +69,21 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
   const availableBedTypes = bedTypes ? bedTypes : [];
-  const headerTitle = t('editBed', 'Edit bed');
   const occupancyStatuses = ['Available', 'Occupied'];
   const [selectedBedType] = useState(editData.bedType?.name ?? '');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
+  const [{ isErrored, isSubmitting, isSuccessful, description }, setSubmissionStatus] = useState<{
+    isSubmitting: boolean;
+    isSuccessful: boolean | undefined;
+    isErrored: boolean | undefined;
+    description: string | undefined;
+  }>({
+    isSubmitting: false,
+    isSuccessful: false,
+    isErrored: undefined,
+    description: undefined,
+  });
 
   const handleCreateBed = useCallback(
     (formData: BedAdministrationData) => {
@@ -97,6 +109,13 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
         status: occupancyStatus.toUpperCase(),
       };
 
+      setSubmissionStatus({
+        description: 'editing...',
+        isErrored: undefined,
+        isSubmitting: true,
+        isSuccessful: undefined,
+      });
+
       editBed({ bedPayload, bedId: bedUuid })
         .then(() => {
           showSnackbar({
@@ -107,6 +126,12 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
             }),
           });
 
+          setSubmissionStatus({
+            description: 'edited.',
+            isErrored: undefined,
+            isSubmitting: false,
+            isSuccessful: true,
+          });
           mutate();
         })
         .catch((error) => {
@@ -115,6 +140,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
             title: t('errorCreatingForm', 'Error creating bed'),
             subtitle: error?.message,
           });
+          setSubmissionStatus({ description: 'errorred', isErrored: true, isSubmitting: false, isSuccessful: false });
         })
         .finally(() => {
           closeModal();
@@ -155,7 +181,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
 
   return (
     <React.Fragment>
-      <ModalHeader title={headerTitle} />
+      <ModalHeader title={t('editBed', 'Edit bed')} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -319,9 +345,19 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
         <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('save', 'Save')}</span>
-        </Button>
+        {isSubmitting || isErrored || isSuccessful ? (
+          <Button>
+            <InlineLoading
+              status={isSubmitting ? 'active' : isErrored ? 'error' : isSuccessful ? 'finished' : 'inactive'}
+              description={description}
+              className={styles.inlineLoading}
+            />
+          </Button>
+        ) : (
+          <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+            {t('save', 'save')}
+          </Button>
+        )}
       </ModalFooter>
     </React.Fragment>
   );

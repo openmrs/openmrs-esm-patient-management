@@ -46,7 +46,6 @@ const BedAdministrationTable: React.FC = () => {
     mutateBedsGroupedByLocation,
     errorFetchingBedsGroupedByLocation,
   } = useBedsGroupedByLocation();
-  const [editData, setEditData] = useState<BedFormData>();
   const [filterOption, setFilterOption] = useState('ALL');
 
   function CustomTag({ condition }: { condition: boolean }) {
@@ -108,7 +107,7 @@ const BedAdministrationTable: React.FC = () => {
     });
   };
 
-  const openEditBedModal = () => {
+  const openEditBedModal = (editData: BedFormData) => {
     const dispose = showModal('edit-bed-modal', {
       closeModal: () => dispose(),
       mutate: mutateBedsGroupedByLocation,
@@ -130,8 +129,7 @@ const BedAdministrationTable: React.FC = () => {
             renderIcon={Edit}
             onClick={(e) => {
               e.preventDefault();
-              setEditData(bed);
-              openEditBedModal();
+              openEditBedModal(bed);
             }}
             kind={'ghost'}
             iconDescription={t('editBed', 'Edit bed')}
