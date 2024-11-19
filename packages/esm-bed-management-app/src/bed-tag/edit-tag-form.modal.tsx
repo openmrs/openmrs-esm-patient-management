@@ -2,6 +2,7 @@ import {
   Button,
   Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -18,6 +19,7 @@ import { z } from 'zod';
 import { type BedTagDataAdministration } from '../bed-administration/bed-administration-types';
 import { editBedTag } from '../summary/summary.resource';
 import { type BedTagData, type Mutator } from '../types';
+import styles from './new-tag.scss';
 
 interface EditBedTagFormProps {
   editData: BedTagData;
@@ -29,23 +31,23 @@ const BedTagAdministrationSchema = z.object({
   name: z.string().max(255),
 });
 
-interface BedTagAdministrationFormProps {
-  allLocations: Location[];
-  availableBedTags: Array<BedTagData>;
-  handleCreateBedTag?: (formData: BedTagData) => void;
-  handleDeleteBedTag?: () => void;
-  headerTitle: string;
-  initialData: BedTagData;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
-}
-
 interface ErrorType {
   message: string;
 }
 
 const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
+  const [{ isErrored, isSubmitting, isSuccessful, description }, setSubmissionStatus] = useState<{
+    isSubmitting: boolean;
+    isSuccessful: boolean | undefined;
+    isErrored: boolean | undefined;
+    description: string | undefined;
+  }>({
+    isSubmitting: false,
+    isSuccessful: false,
+    isErrored: undefined,
+    description: undefined,
+  });
 
   const handleUpdateBedTag = useCallback(
     (formData: BedTagDataAdministration) => {
@@ -56,6 +58,12 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, close
         name,
       };
 
+      setSubmissionStatus({
+        isErrored: false,
+        isSuccessful: undefined,
+        isSubmitting: true,
+        description: 'Submitting...',
+      });
       editBedTag({ bedTagPayload, bedTagId: bedUuid })
         .then(() => {
           showSnackbar({
@@ -66,12 +74,24 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, close
             }),
           });
           mutate();
+          setSubmissionStatus({
+            isErrored: false,
+            isSuccessful: true,
+            isSubmitting: false,
+            description: 'Saved...',
+          });
         })
         .catch((error) => {
           showSnackbar({
             kind: 'error',
             title: t('errorCreatingBedTag', 'Error creating bed tag'),
             subtitle: error?.message,
+          });
+          setSubmissionStatus({
+            isErrored: true,
+            isSuccessful: false,
+            isSubmitting: false,
+            description: 'Errored',
           });
         })
         .finally(() => {
@@ -150,9 +170,19 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, close
         <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('save', 'Save')}</span>
-        </Button>
+        {isSubmitting || isErrored || isSuccessful ? (
+          <Button>
+            <InlineLoading
+              status={isSubmitting ? 'active' : isErrored ? 'error' : isSuccessful ? 'finished' : 'inactive'}
+              description={description}
+              className={styles.inlineLoading}
+            />
+          </Button>
+        ) : (
+          <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+            {t('save', 'save')}
+          </Button>
+        )}
       </ModalFooter>
     </React.Fragment>
   );

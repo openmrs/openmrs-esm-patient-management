@@ -33,7 +33,6 @@ const BedTagAdministrationTable: React.FC = () => {
   const { bedTags, errorLoadingBedTags, isLoadingBedTags, isValidatingBedTags, mutateBedTags } = useBedTags();
 
   const [isBedDataLoading] = useState(false);
-  const [editData, setEditData] = useState<BedTagData>();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -59,7 +58,7 @@ const BedTagAdministrationTable: React.FC = () => {
     });
   };
 
-  const openEditBedTagModal = () => {
+  const openEditBedTagModal = (editData: BedTagData) => {
     const dispose = showModal('edit-bed-tag-modal', {
       closeModal: () => dispose(),
       mutate: mutateBedTags,
@@ -78,8 +77,7 @@ const BedTagAdministrationTable: React.FC = () => {
             renderIcon={Edit}
             onClick={(e) => {
               e.preventDefault();
-              setEditData(entry);
-              openEditBedTagModal();
+              openEditBedTagModal(entry);
             }}
             kind={'ghost'}
             iconDescription={t('editBedTag', 'Edit Bed Tag')}
