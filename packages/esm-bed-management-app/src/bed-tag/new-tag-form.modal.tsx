@@ -34,7 +34,6 @@ const BedTagAdministrationSchema = z.object({
 });
 
 const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
-  console.log('close-modal', closeModal);
   const { t } = useTranslation();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
