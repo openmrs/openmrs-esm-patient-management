@@ -6,7 +6,6 @@
   "clearSearch": "Clear",
   "closeSearch": "Close Search Panel",
   "countOfFiltersApplied": "filters applied",
-  "createPatientRecord": "Create Patient Record",
   "dayOfBirth": "Day of Birth",
   "error": "Error",
   "errorCopy": "Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.",
@@ -37,7 +36,6 @@
   "searchResultsCount_one": "{{count}} search result",
   "searchResultsCount_other": "{{count}} search results",
   "sex": "Sex",
-  "trySearchFromClientRegistry": "Try searching using the patient's unique ID number or search the external registry",
   "trySearchWithPatientUniqueID": "Try to search again using the patient's unique ID number",
   "unknown": "Unknown",
   "yearOfBirth": "Year of Birth"

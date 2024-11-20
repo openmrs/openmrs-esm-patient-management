@@ -1,8 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter as Router, useParams, useLocation } from 'react-router-dom';
-import { act, render, screen, within } from '@testing-library/react';
+import { BrowserRouter as Router, useParams } from 'react-router-dom';
+import { render, screen, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -10,17 +10,15 @@ import {
   showSnackbar,
   useConfig,
   usePatient,
-  openmrsFetch,
 } from '@openmrs/esm-framework';
 import { mockedAddressTemplate } from '__mocks__';
-import { mockPatient, mockOpenMRSIdentificationNumberIdType } from 'tools';
+import { mockPatient } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
 import type { AddressTemplate, Encounter } from './patient-registration.types';
 import { ResourcesContext } from '../offline.resources';
 import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
-import { useMpiPatient } from './mpi/mpi-patient.resource';
 
 const mockSaveEncounter = jest.mocked(saveEncounter);
 const mockSavePatient = savePatient as jest.Mock;
@@ -28,11 +26,6 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = jest.mocked(usePatient);
 const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
-const mockUseMpiPatient = useMpiPatient as jest.Mock;
-
-jest.mock('./mpi/mpi-patient.resource', () => ({
-  useMpiPatient: jest.fn(),
-}));
 
 jest.mock('./field/field.resource', () => ({
   useConcept: jest.fn().mockImplementation((uuid: string) => {
@@ -93,7 +86,7 @@ jest.mock('./field/field.resource', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),
-  useLocation: jest.fn().mockReturnValue({
+  useLocation: () => ({
     pathname: 'openmrs/spa/patient-registration',
   }),
   useHistory: () => [],
@@ -136,7 +129,7 @@ const mockResourcesContextValue = {
 let mockOpenmrsConfig: RegistrationConfig = {
   sections: ['demographics', 'contact'],
   sectionDefinitions: [
-    { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'id'] },
+    { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob'] },
     { id: 'contact', name: 'Contact Info', fields: ['address'] },
     { id: 'relationships', name: 'Relationships', fields: ['relationship'] },
   ],
@@ -167,9 +160,6 @@ let mockOpenmrsConfig: RegistrationConfig = {
         label: 'Male',
       },
     ],
-    identifier: [
-      { identifierTypeSystem: 'MPI OpenMRS ID', identifierTypeUuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f' },
-    ],
     address: {
       useAddressHierarchy: {
         enabled: true,
@@ -184,7 +174,7 @@ let mockOpenmrsConfig: RegistrationConfig = {
   links: {
     submitButton: '#',
   },
-  defaultPatientIdentifierTypes: ['8d793bee-c2cc-11de-8d13-0010c6dffd0f'],
+  defaultPatientIdentifierTypes: [],
   registrationObs: {
     encounterTypeUuid: null,
     encounterProviderRoleUuid: 'asdf',
@@ -266,24 +256,6 @@ describe('Registering a new patient', () => {
       ...mockOpenmrsConfig,
     });
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
-    mockUseMpiPatient.mockReturnValue({
-      isLoading: false,
-      patient: { data: null },
-      error: undefined,
-    });
-    mockUsePatient.mockReturnValue({
-      isLoading: false,
-      patient: null,
-      patientUuid: null,
-      error: null,
-    });
-    (useLocation as jest.Mock).mockReturnValue({
-      pathname: 'openmrs/spa/patient-registration',
-      state: undefined,
-      key: '',
-      search: '',
-      hash: '',
-    });
   });
 
   it('renders without crashing', () => {
@@ -425,11 +397,7 @@ describe('Updating an existing patient record', () => {
     const mockUseParams = useParams as jest.Mock;
 
     mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
-    mockUseMpiPatient.mockReturnValue({
-      isLoading: false,
-      patient: { data: null },
-      error: undefined,
-    });
+
     mockUsePatient.mockReturnValue({
       isLoading: false,
       patient: mockPatient,
@@ -470,9 +438,6 @@ describe('Updating an existing patient record', () => {
         '1': {
           openMrsId: '100GEJ',
         },
-        '2': {
-          mpiOpenMrsId: '100GEG',
-        },
         addNameInLocalLanguage: undefined,
         additionalFamilyName: '',
         additionalGivenName: '',
@@ -489,134 +454,6 @@ describe('Updating an existing patient record', () => {
         gender: expect.stringMatching(/male/i),
         givenName: 'Eric',
         identifiers: {},
-        isDead: false,
-        middleName: 'Johnson',
-        monthsEstimated: 0,
-        patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
-        relationships: [],
-        telephoneNumber: '',
-        unidentifiedPatient: undefined,
-        yearsEstimated: 0,
-      },
-      expect.anything(),
-      expect.anything(),
-      null,
-      undefined,
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      { patientSaved: false },
-      expect.anything(),
-    );
-  });
-});
-
-describe('Import an MPI patient record', () => {
-  beforeEach(() => {
-    mockUseConfig.mockReturnValue(mockOpenmrsConfig);
-    mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
-    (useParams as jest.Mock).mockReturnValue({ patientUuid: undefined }),
-      (useLocation as jest.Mock).mockReturnValue({
-        pathname: 'openmrs/spa/patient-registration',
-        state: undefined,
-        key: '',
-        search: '?sourceRecord=55',
-        hash: '',
-      });
-  });
-
-  it('fills patient demographics from MPI patient', async () => {
-    const user = userEvent.setup();
-    mockSavePatient.mockResolvedValue({} as FetchResponse);
-
-    mockUsePatient.mockReturnValue({
-      isLoading: false,
-      patient: null,
-      patientUuid: null,
-      error: null,
-    });
-
-    mockUseMpiPatient.mockReturnValue({
-      isLoading: false,
-      patient: { data: mockPatient },
-      error: undefined,
-    });
-
-    const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-    const mockResponse = { status: 200, data: mockOpenMRSIdentificationNumberIdType };
-    mockOpenmrsFetch.mockResolvedValue(mockResponse);
-
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatient} />, { wrapper: Wrapper });
-    });
-    expect(mockOpenmrsFetch.mock.calls[0][0]).toEqual(
-      `/ws/rest/v1/patientidentifiertype/8d793bee-c2cc-11de-8d13-0010c6dffd0f`,
-    );
-
-    const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
-    const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
-    const middleNameInput: HTMLInputElement = screen.getByLabelText(/Middle Name/);
-    const dateOfBirthInput: HTMLInputElement = screen.getByLabelText(/Date of Birth/i);
-    const genderInput: HTMLInputElement = screen.getByLabelText(/Male/);
-
-    // assert initial values
-    expect(givenNameInput.value).toBe('John');
-    expect(familyNameInput.value).toBe('Wilson');
-    expect(middleNameInput.value).toBeFalsy();
-    expect(dateOfBirthInput.value).toBe('04/04/1972');
-    expect(genderInput.value).toBe('male');
-
-    // do some edits
-    await user.clear(givenNameInput);
-    await user.clear(middleNameInput);
-    await user.clear(familyNameInput);
-    await user.type(givenNameInput, 'Eric');
-    await user.type(middleNameInput, 'Johnson');
-    await user.type(familyNameInput, 'Smith');
-    await user.click(screen.getByText(/Register patient/i));
-
-    expect(mockSavePatient).toHaveBeenCalledWith(
-      true,
-      {
-        '0': {
-          oldIdentificationNumber: '100732HE',
-        },
-        '1': {
-          openMrsId: '100GEJ',
-        },
-        '2': {
-          mpiOpenMrsId: '100GEG',
-        },
-        addNameInLocalLanguage: undefined,
-        additionalFamilyName: '',
-        additionalGivenName: '',
-        additionalMiddleName: '',
-        address: {},
-        attributes: {},
-        birthdate: new Date('1972-04-04T00:00:00.000Z'),
-        birthdateEstimated: false,
-        deathCause: '',
-        nonCodedCauseOfDeath: '',
-        deathDate: undefined,
-        deathTime: undefined,
-        deathTimeFormat: 'AM',
-        familyName: 'Smith',
-        gender: expect.stringMatching(/male/i),
-        givenName: 'Eric',
-        identifiers: {
-          'OpenMRS Identification Number': {
-            identifierUuid: null,
-            preferred: false,
-            initialValue: '100GEG',
-            identifierValue: '100GEG',
-            identifierTypeUuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
-            identifierName: 'OpenMRS Identification Number',
-            required: false,
-            selectedSource: null,
-            autoGeneration: false,
-          },
-        },
         isDead: false,
         middleName: 'Johnson',
         monthsEstimated: 0,

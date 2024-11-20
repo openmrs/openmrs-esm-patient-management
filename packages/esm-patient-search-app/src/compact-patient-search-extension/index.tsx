@@ -8,8 +8,6 @@ import { PatientSearchContext } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from '../compact-patient-search/patient-search.component';
 import styles from './compact-patient-search.scss';
-import { useSearchParams } from 'react-router-dom';
-import { inferModeFromSearchParams } from '../mpi/utils';
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;
@@ -29,13 +27,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const bannerContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
-  const [searchParams] = useSearchParams();
-  const patientSearchResponse = useInfinitePatientSearch(
-    searchTerm,
-    inferModeFromSearchParams(searchParams),
-    config.includeDead,
-    showSearchResults,
-  );
+  const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
   const { data: patients } = patientSearchResponse;
 
   const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);

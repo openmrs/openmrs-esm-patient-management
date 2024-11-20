@@ -39,14 +39,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
-  const sourcePatientId = new URLSearchParams(search).get('sourceRecord');
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(
-    uuidOfPatientToEdit || sourcePatientId,
-    !!uuidOfPatientToEdit,
-  );
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
   const location = currentSession?.sessionLocation?.uuid;

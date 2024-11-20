@@ -1,5 +1,5 @@
-import { type Patient, type PatientIdentifier, PatientBannerPatientIdentifier } from '@openmrs/esm-framework';
 import React from 'react';
+import { type Patient, type PatientIdentifier, PatientBannerPatientIdentifiers } from '@openmrs/esm-framework';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 export interface WardPatientIdentifierProps {
@@ -23,7 +23,7 @@ const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ id, patie
   }));
 
   return (
-    <PatientBannerPatientIdentifier identifier={fhirIdentifiers} showIdentifierLabel={config?.showIdentifierLabel} />
+    <PatientBannerPatientIdentifiers identifiers={fhirIdentifiers} showIdentifierLabel={config?.showIdentifierLabel} />
   );
 };
 
