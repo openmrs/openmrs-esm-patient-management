@@ -24,7 +24,7 @@ const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
 
 // Options from https://react.carbondesignsystem.com/?path=/docs/components-tag--overview plus orange for priority tags
-const carbonTagColors = [
+const priorityTagColors = [
   'red',
   'magenta',
   'purple',
@@ -39,7 +39,7 @@ const carbonTagColors = [
   'high-contrast',
   'outline',
 ] as const;
-type CarbonTagColor = (typeof carbonTagColors)[number];
+type PriorityTagColor = (typeof priorityTagColors)[number];
 
 const tagStyles = ['bold'] as const;
 type TagStyle = (typeof tagStyles)[number];
@@ -282,7 +282,7 @@ export const configSchema = {
                 _type: Type.String,
                 _description:
                   'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
-                _validators: [validators.oneOf(carbonTagColors)],
+                _validators: [validators.oneOf(priorityTagColors)],
                 _default: 'gray',
               },
               style: {
@@ -467,7 +467,7 @@ export interface PatientIdentifierColumnConfig {
 }
 export interface PriorityConfig {
   conceptUuid: string;
-  color: CarbonTagColor;
+  color: PriorityTagColor;
   style: TagStyle;
 }
 
