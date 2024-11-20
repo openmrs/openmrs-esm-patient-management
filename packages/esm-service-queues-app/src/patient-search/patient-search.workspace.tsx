@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-
-import { SearchTypes } from '../types';
-import PatientScheduledVisits from './patient-scheduled-visits.component';
-import VisitForm from './visit-form/visit-form.component';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import isNil from 'lodash-es/isNil';
+import { useTranslation } from 'react-i18next';
 import {
   type DefaultWorkspaceProps,
   ArrowLeftIcon,
@@ -15,12 +14,12 @@ import {
   usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
-import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
-import styles from './patient-search.scss';
-import { Button, DataTableSkeleton } from '@carbon/react';
+import { SearchTypes } from '../types';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
-import isNil from 'lodash-es/isNil';
-import { useTranslation } from 'react-i18next';
+import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
+import PatientScheduledVisits from './patient-scheduled-visits.component';
+import VisitForm from './visit-form/visit-form.component';
+import styles from './patient-search.scss';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
   selectedPatientUuid: string;
@@ -41,11 +40,13 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
-  const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
-  const [showContactDetails, setContactDetails] = useState(false);
   const { appointments, isLoading, error } = useScheduledVisits(selectedPatientUuid);
 
+  const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
+  const [showContactDetails, setContactDetails] = useState(false);
+
   const hasAppointments = !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits));
+  const patientName = patient && getPatientName(patient);
 
   const backButtonDescription =
     searchType === SearchTypes.VISIT_FORM && hasAppointments
@@ -76,7 +77,6 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
     }
   }, [searchType, handleBackToSearchList]);
 
-  const patientName = patient && getPatientName(patient);
   return patient ? (
     <div className={styles.patientSearchContainer}>
       <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
