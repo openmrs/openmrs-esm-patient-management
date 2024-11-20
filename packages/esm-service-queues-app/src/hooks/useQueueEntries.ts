@@ -1,4 +1,4 @@
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -68,104 +68,22 @@ export function useMutateQueueEntries() {
   };
 }
 
-export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
-  // This manually implements a kind of pagination using the useSWR hook. It does not use useSWRInfinite
-  // because useSWRInfinite does not support with `mutate`. The hook starts by fetching the first page,
-  // page zero, waits until data is fetched, then fetches the next page, and so on.
-  //
-  // Fine so far. Where things get complicated is in supporting mutation. When a mutation is made, the
-  // SWR hook first returns stale data with `isValidating` set to false. At this point we say we are
-  // "waiting for mutate," because we have called mutate, but the useSWR hook hasn't updated properly
-  // for it yet. Next it returns stale data again, this time with `isValidating` set to true. At this
-  // point we say we are no longer waiting for mutate. Finally, it returns fresh data with `isValidating`
-  // again set to false. We may then update the data array and move on to the next page.
-  const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
-  const [totalCount, setTotalCount] = useState<number>();
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [currentSearchCriteria, setCurrentSearchCriteria] = useState(searchCriteria);
-  const [currentRep, setCurrentRep] = useState(rep);
-  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(currentRep, currentSearchCriteria));
-  const [error, setError] = useState<Error>();
-  const { mutateQueueEntries } = useMutateQueueEntries();
-  const [waitingForMutate, setWaitingForMutate] = useState(false);
+export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString){
 
-  const refetchAllData = useCallback(
-    (newRep: string = currentRep, newSearchCriteria: QueueEntrySearchCriteria = currentSearchCriteria) => {
-      setWaitingForMutate(true);
-      setCurrentPage(0);
-      setPageUrl(getInitialUrl(newRep, newSearchCriteria));
-    },
-    [currentRep, currentSearchCriteria],
-  );
-
-  // This hook listens to the searchCriteria and rep values and refetches the data when they change.
-  useEffect(() => {
-    const isSearchCriteriaUpdated = !isEqual(currentSearchCriteria, searchCriteria);
-    const isRepUpdated = currentRep !== rep;
-    if (isSearchCriteriaUpdated || isRepUpdated) {
-      if (isSearchCriteriaUpdated) {
-        setCurrentSearchCriteria(searchCriteria);
-      }
-      if (isRepUpdated) {
-        setCurrentRep(rep);
-      }
-      refetchAllData(rep, searchCriteria);
-    }
-  }, [searchCriteria, currentSearchCriteria, setCurrentSearchCriteria, currentRep, rep]);
-
-  const { data: pageData, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
+  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
+  const {data,mutate,...rest}=useOpenmrsFetchAll<any>(pageUrl);
 
   useEffect(() => {
-    const nextUrl = getNextUrlFromResponse(pageData);
-    const stillWaitingForMutate = waitingForMutate && !isValidating;
-    if (waitingForMutate && isValidating) {
-      setWaitingForMutate(false);
-    }
-    if (pageData && !isValidating && !stillWaitingForMutate) {
-      // We've got results! Time to update the data array and move on to the next page.
-      if (pageData?.data?.totalCount > -1 && pageData?.data?.totalCount !== totalCount) {
-        setTotalCount(pageData?.data?.totalCount);
-      }
-      if (pageData?.data?.results) {
-        const newData = [...data];
-        newData[currentPage] = pageData?.data?.results;
-        setData(newData);
-      }
-      setCurrentPage(currentPage + 1);
-      setPageUrl(nextUrl);
-      // If we're mutating existing data, then we again need to wait for the mutate to work,
-      // since useSWR will (again) first return stale data with isValidating set to false.
-      const inMutateMode = data.length > currentPage;
-      if (inMutateMode && nextUrl) {
-        setWaitingForMutate(true);
-      }
-    }
-    // It may happen that there are fewer pages in the new data than in the old data. In this
-    // case, we need to remove the extra pages, which are stored on the `data` array.
-    // Note that since we mutated the `data` state earlier in this function, it is important to
-    // use the functional form of `setData` so as not to use the stale `data` state.
-    if (!nextUrl) {
-      // I will not be very suprised if there is an off-by-one error here.
-      if (data.length > currentPage + 1) {
-        setData((prevData) => {
-          const newData = [...prevData];
-          newData.splice(currentPage + 1);
-          return newData;
-        });
-      }
-    }
-  }, [pageData, data, currentPage, totalCount, waitingForMutate, isValidating]);
+   setPageUrl(getInitialUrl(rep, searchCriteria));
+ }, [searchCriteria,rep]);
 
-  useEffect(() => {
-    // An error to one is an error to all
-    if (pageError) {
-      setError(pageError);
-    }
-  }, [pageError]);
+  useEffect(()=>{
+     mutate();
+  },[pageUrl])
 
   const queueUpdateListener = useCallback(() => {
-    refetchAllData();
-  }, [refetchAllData]);
+    mutate();
+  }, []);
 
   useEffect(() => {
     window.addEventListener('queue-entry-updated', queueUpdateListener);
@@ -174,16 +92,12 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     };
   }, [queueUpdateListener]);
 
-  const queueEntries = useMemo(() => data.flat(), [data]);
-
   return {
-    queueEntries,
-    totalCount,
-    isLoading: totalCount === undefined || (totalCount && queueEntries.length < totalCount),
-    isValidating: isValidating || currentPage < data.length,
-    error,
-    mutate: mutateQueueEntries,
-  };
+    queueEntries:data,
+    mutate,
+    ...rest
+  }
+
 }
 
 export function useQueueEntriesMetrics(searchCriteria?: QueueEntrySearchCriteria) {
