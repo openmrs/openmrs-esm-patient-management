@@ -35,12 +35,5 @@
       "component": "patientSearchWorkspace",
       "title": "searchPatient"
     }
-  ],
-  "featureFlags": [
-    {
-      "flagName": "mpiFlag",
-      "label": "MPI Service",
-      "description": "Enables the Master Patient Index workflows."
-    }    
   ]
 }
