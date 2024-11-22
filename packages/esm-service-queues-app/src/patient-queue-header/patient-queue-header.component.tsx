@@ -67,8 +67,6 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
     queueLocations,
     userSession?.sessionLocation?.display,
     userSession?.sessionLocation?.uuid,
-    handleQueueLocationChange,
-    userSession?.sessionLocation?.display,
   ]);
 
   return (
