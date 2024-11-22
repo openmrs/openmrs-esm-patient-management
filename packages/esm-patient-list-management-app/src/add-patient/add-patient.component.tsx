@@ -39,7 +39,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     const key = `${restBaseUrl}/cohortm/cohortmember?patient=${patientUuid}&v=custom:(uuid,patient:ref,cohort:(uuid,name,startDate,endDate))`;
 
     return mutate((k) => typeof k === 'string' && k === key);
-  }, []);
+  }, [patientUuid]);
 
   const handleSubmit = useCallback(() => {
     Promise.all(
@@ -67,7 +67,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           });
       }),
     ).finally(closeModal);
-  }, [data, selected, closeModal, t, patientUuid]);
+  }, [selected, closeModal, data, mutateCohortMembers, t]);
 
   const searchResults = useMemo(() => {
     if (!data) {
@@ -88,7 +88,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     if (currentPage !== 1) {
       goTo(1);
     }
-  }, [searchValue]);
+  }, [currentPage, goTo, searchValue]);
 
   return (
     <div className={styles.modalContent}>

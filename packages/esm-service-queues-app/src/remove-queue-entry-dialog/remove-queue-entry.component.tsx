@@ -56,7 +56,18 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
           subtitle: error?.message,
         });
       });
-  }, [appointments, currentVisit, queueEntry]);
+  }, [
+    appointments,
+    closeModal,
+    currentVisit?.location?.uuid,
+    currentVisit?.startDatetime,
+    currentVisit?.visitType?.uuid,
+    mutateQueueEntries,
+    queueEntry?.queue?.uuid,
+    queueEntry?.queueEntryUuid,
+    queueEntry?.visitUuid,
+    t,
+  ]);
 
   return (
     <div>

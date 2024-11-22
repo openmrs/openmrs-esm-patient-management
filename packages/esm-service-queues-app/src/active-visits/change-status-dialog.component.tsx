@@ -46,7 +46,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
         service: z.string({ required_error: t('serviceIsRequired', 'Service is required') }),
         status: z.string({ required_error: t('statusIsRequired', 'Status is required') }),
       }),
-    [],
+    [t],
   );
 
   type ChangeStatusForm = z.infer<typeof schema>;

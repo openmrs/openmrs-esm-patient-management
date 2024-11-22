@@ -12,9 +12,9 @@ import {
   TextInput,
 } from '@carbon/react';
 import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import { useQueues } from '../../hooks/useQueues';
 import { useQueueLocations } from '../hooks/useQueueLocations';
-import { type ConfigObject } from '../../config-schema';
 import { AddPatientToQueueContext } from '../patient-search.workspace';
 import styles from './visit-form-queue-fields.scss';
 
@@ -47,19 +47,19 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
     if (priority === config.concepts.emergencyPriorityConceptUuid) {
       setSortWeight(1);
     }
-  }, [priority]);
+  }, [config.concepts.emergencyPriorityConceptUuid, priority]);
 
   useEffect(() => {
     if (currentServiceQueueUuid) {
       setSelectedService(currentServiceQueueUuid);
     }
-  }, [queues]);
+  }, [currentServiceQueueUuid, queues]);
 
   useEffect(() => {
     if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
       setSelectedQueueLocation(sessionLocation.uuid);
     }
-  }, [queueLocations]);
+  }, [queueLocations, sessionLocation.uuid]);
 
   useEffect(() => {
     setFormFields({
@@ -69,7 +69,7 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
       priority,
       sortWeight,
     });
-  }, [selectedQueueLocation, selectedService, defaultStatus, priority, sortWeight]);
+  }, [selectedQueueLocation, selectedService, defaultStatus, priority, sortWeight, setFormFields]);
 
   return (
     <div>

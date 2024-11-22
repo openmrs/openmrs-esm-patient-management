@@ -86,7 +86,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) =>
     } else if (!loadingDefaultFacility && defaultFacility) {
       setSelectedLocation(defaultFacility?.uuid);
     }
-  }, [locations, sessionUser, loadingDefaultFacility]);
+  }, [defaultFacility, loadingDefaultFacility, locations, sessionUser]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -164,7 +164,12 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) =>
       closeWorkspace,
       mutateQueueEntries,
       patientUuid,
+      priority,
+      queueLocation,
       selectedLocation,
+      service,
+      sortWeight,
+      status,
       t,
       timeFormat,
       visitDate,

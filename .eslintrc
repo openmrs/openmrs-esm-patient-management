@@ -11,8 +11,6 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import", "jest-dom", "react-hooks", "testing-library"],
   "rules": {
-    "import/no-duplicates": "error",
-    "react-hooks/rules-of-hooks": "error",
     // Disabling these rules for now just to keep the diff small. We'll enable them one by one as we go.
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-types": "off",
@@ -32,7 +30,7 @@
         "fixStyle": "inline-type-imports"
       }
     ],
-    "prefer-const": "off",
+    "import/no-duplicates": "error",
     "no-console": [
       "error",
       {
@@ -69,7 +67,10 @@
           }
         ]
       }
-    ]
+    ],
+    "prefer-const": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   },
   "overrides": [
     {
