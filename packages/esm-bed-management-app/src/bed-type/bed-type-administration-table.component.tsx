@@ -91,7 +91,7 @@ const BedTypeAdministrationTable: React.FC = () => {
   if (isLoadingBedTypes) {
     return (
       <>
-        <Header route="Bed Type" />
+        <Header title={t('bedType', 'Bed Type')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -102,7 +102,7 @@ const BedTypeAdministrationTable: React.FC = () => {
   if (errorLoadingBedTypes) {
     return (
       <>
-        <Header route="Bed Type" />
+        <Header title={t('bedType', 'Bed Type')} />
         <div className={styles.widgetCard}>
           <ErrorState error={errorLoadingBedTypes} headerTitle={headerTitle} />
         </div>
@@ -112,7 +112,7 @@ const BedTypeAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Bed Type" />
+      <Header title={t('bedType', 'Bed Type')} />
 
       <div className={styles.widgetCard}>
         {showBedTypeModal ? (

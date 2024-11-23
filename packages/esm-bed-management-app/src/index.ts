@@ -20,6 +20,7 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 export const adminCardLink = getAsyncLifecycle(() => import('./admin-card-link.component'), options);
 
 export const summaryLeftPanelLink = getSyncLifecycle(
+  // t('summary', 'Summary')
   createLeftPanelLink({
     name: 'bed-management',
     title: 'Summary',
@@ -28,6 +29,7 @@ export const summaryLeftPanelLink = getSyncLifecycle(
 );
 
 export const adminLeftPanelLink = getSyncLifecycle(
+  // t('wardAllocation', 'Ward Allocation')
   createLeftPanelLink({
     name: 'administration',
     title: 'Ward Allocation',
@@ -36,6 +38,7 @@ export const adminLeftPanelLink = getSyncLifecycle(
 );
 
 export const bedTypeLeftPanelLink = getSyncLifecycle(
+  // t('bedType', 'Bed Type')
   createLeftPanelLink({
     name: 'bed-type',
     title: 'Bed Type',
@@ -44,6 +47,7 @@ export const bedTypeLeftPanelLink = getSyncLifecycle(
 );
 
 export const bedTagLeftPanelLink = getSyncLifecycle(
+  // t('bedTag', 'Bed Tag')
   createLeftPanelLink({
     name: 'bed-tag',
     title: 'Bed Tag',

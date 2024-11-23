@@ -85,7 +85,7 @@ const BedTagAdministrationTable: React.FC = () => {
   if (isBedDataLoading || isLoadingBedTags) {
     return (
       <>
-        <Header route="Bed Tag" />
+        <Header title={t('bedTag', 'Bed Tag')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -96,7 +96,7 @@ const BedTagAdministrationTable: React.FC = () => {
   if (errorLoadingBedTags) {
     return (
       <>
-        <Header route="Bed Tag" />
+        <Header title={t('bedTag', 'Bed Tag')} />
         <div className={styles.widgetCard}>
           <ErrorState error={errorLoadingBedTags} headerTitle={headerTitle} />
         </div>
@@ -106,7 +106,7 @@ const BedTagAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Bed Tag" />
+      <Header title={t('bedTag', 'Bed Tag')} />
 
       <div className={styles.widgetCard}>
         {showBedTagsModal ? (

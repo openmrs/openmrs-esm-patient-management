@@ -12,11 +12,10 @@ import {
 import styles from './header.scss';
 
 type HeaderProps = {
-  route: string;
-  headerTitle?: string;
+  title: string;
 };
 
-const Header: React.FC<HeaderProps> = ({ route, headerTitle }) => {
+const Header: React.FC<HeaderProps> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
@@ -29,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ route, headerTitle }) => {
             <InPatientPictogram className={styles.inPatientPictogram} />
           </ConfigurableLink>
         }
-        title={route}
+        title={title}
         className={styles.leftJustifiedItems}
       />
       <div className={styles.rightJustifiedItems}>
