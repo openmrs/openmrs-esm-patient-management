@@ -11,43 +11,86 @@ import {
   SelectSkeleton,
   TextInput,
 } from '@carbon/react';
-import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
+import { useConfig, ResponsiveWrapper, useSession, type Visit, showSnackbar } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { useQueues } from '../../hooks/useQueues';
 import { useQueueLocations } from '../hooks/useQueueLocations';
-import { AddPatientToQueueContext } from '../patient-search.workspace';
-import styles from './visit-form-queue-fields.scss';
+import { AddPatientToQueueContext } from '../create-queue-entry.workspace';
+import styles from './queue-fields.scss';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { postQueueEntry } from './queue-fields.resource';
 
-export interface VisitFormQueueFieldsProps {
-  setFormFields: (fields: {
-    queueLocation: string;
-    service: string;
-    status: string;
-    priority: string;
-    sortWeight: number;
-  }) => void;
+export interface QueueFieldsProps {
+  setOnSubmit(onSubmit: (visit: Visit) => Promise<any>);
 }
 
-const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
-  const { setFormFields } = props;
+/**
+ * This component contains form fields for starting a patient's queue entry.
+ */
+const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
   const { t } = useTranslation();
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const { sessionLocation } = useSession();
-  const config = useConfig<ConfigObject>();
+  const {
+    visitQueueNumberAttributeUuid,
+    concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
+  } = useConfig<ConfigObject>();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
-  const defaultStatus = config.concepts.defaultStatusConceptUuid;
   const [selectedService, setSelectedService] = useState('');
   const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
-  const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
+  const [priority, setPriority] = useState(defaultPriorityConceptUuid);
   const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
-  const [sortWeight, setSortWeight] = useState(0);
+  const { mutateQueueEntries } = useMutateQueueEntries();
+
+  const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
 
   useEffect(() => {
-    if (priority === config.concepts.emergencyPriorityConceptUuid) {
-      setSortWeight(1);
-    }
-  }, [config.concepts.emergencyPriorityConceptUuid, priority]);
+    setOnSubmit?.((visit: Visit) => {
+      if (selectedQueueLocation && selectedService && priority) {
+        return postQueueEntry(
+          visit.uuid,
+          selectedService,
+          visit.patient.uuid,
+          priority,
+          defaultStatusConceptUuid,
+          sortWeight,
+          selectedQueueLocation,
+          visitQueueNumberAttributeUuid,
+        )
+          .then(() => {
+            showSnackbar({
+              kind: 'success',
+              isLowContrast: true,
+              title: t('addedPatientToQueue', 'Added patient to queue'),
+              subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
+            });
+            mutateQueueEntries();
+          })
+          .catch((error) => {
+            showSnackbar({
+              title: t('queueEntryError', 'Error adding patient to the queue'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
+            throw error;
+          });
+      } else {
+        return Promise.resolve();
+      }
+    });
+  }, [
+    selectedQueueLocation,
+    selectedService,
+    priority,
+    sortWeight,
+    defaultStatusConceptUuid,
+    visitQueueNumberAttributeUuid,
+    mutateQueueEntries,
+    setOnSubmit,
+    t,
+  ]);
 
   useEffect(() => {
     if (currentServiceQueueUuid) {
@@ -60,16 +103,6 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
       setSelectedQueueLocation(sessionLocation.uuid);
     }
   }, [queueLocations, sessionLocation.uuid]);
-
-  useEffect(() => {
-    setFormFields({
-      queueLocation: selectedQueueLocation,
-      service: selectedService,
-      status: defaultStatus,
-      priority,
-      sortWeight,
-    });
-  }, [selectedQueueLocation, selectedService, defaultStatus, priority, sortWeight, setFormFields]);
 
   return (
     <div>
@@ -159,7 +192,7 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
               className={styles.radioButtonWrapper}
               name="priority"
               id="priority"
-              defaultSelected={config.concepts.defaultPriorityConceptUuid}
+              defaultSelected={defaultPriorityConceptUuid}
               onChange={(uuid) => setPriority(uuid)}>
               {priorities.map(({ uuid, display }) => (
                 <RadioButton key={uuid} labelText={display} value={uuid} />
@@ -182,4 +215,4 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
   );
 };
 
-export default VisitFormQueueFields;
+export default QueueFields;

@@ -6,8 +6,8 @@ import QueueRoomForm from './queue-room-form.workspace';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 
-jest.mock('../patient-search/hooks/useQueueLocations', () => ({
-  ...jest.requireActual('../patient-search/hooks/useQueueLocations'),
+jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  ...jest.requireActual('../create-queue-entry/hooks/useQueueLocations'),
   useQueueLocations: jest.fn(() => ({
     queueLocations: { uuid: 'e7786d9a-ab62-11ec-b909-0242ac120002', display: 'Location Test' },
   })),

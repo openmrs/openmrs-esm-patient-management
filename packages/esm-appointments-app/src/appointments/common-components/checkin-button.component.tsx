@@ -31,7 +31,11 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid 
                     to: checkInButton.customUrl,
                     templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
                   })
-                : launchWorkspace('start-visit-workspace-form', { patientUuid: patientUuid, showPatientHeader: true })
+                : launchWorkspace('start-visit-workspace-form', {
+                    patientUuid: patientUuid,
+                    showPatientHeader: true,
+                    openedFrom: 'appointments-check-in',
+                  })
             }>
             {t('checkIn', 'Check in')}
           </Button>

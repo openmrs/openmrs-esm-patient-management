@@ -15,7 +15,7 @@ import {
 import { mutate } from 'swr';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
 
 const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {

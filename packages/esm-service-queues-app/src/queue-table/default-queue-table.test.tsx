@@ -13,7 +13,7 @@ import {
 import { renderWithSwr } from 'tools';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { type ConfigObject, configSchema } from '../config-schema';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
@@ -29,8 +29,8 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-jest.mock('../patient-search/hooks/useQueueLocations', () => ({
-  ...jest.requireActual('../patient-search/hooks/useQueueLocations'),
+jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  ...jest.requireActual('../create-queue-entry/hooks/useQueueLocations'),
   useQueueLocations: jest.fn(),
 }));
 
