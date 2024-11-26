@@ -5,6 +5,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../types';
 import styles from './clear-queue-entries-dialog.scss';
+import classNames from 'classnames';
 
 interface ClearQueueEntriesProps {
   queueEntries: Array<QueueEntry>;
@@ -31,11 +32,11 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) =
   return (
     <Button
       size={isDesktop(layout) ? 'sm' : 'lg'}
-      kind="danger--tertiary"
-      renderIcon={(props) => <TrashCan size={16} {...props} />}
+      className={classNames(isDesktop(layout) ? styles['clear-queues-btn-desktop'] : styles['clear-queues-btn-tablet'])}
+      kind="danger--ghost"
       onClick={launchClearAllQueueEntriesModal}
       iconDescription={t('clearQueue', 'Clear queue')}>
-      {t('clearQueue', 'Clear queue')}
+      {t('clearThisList', 'Clear this list')}
     </Button>
   );
 };

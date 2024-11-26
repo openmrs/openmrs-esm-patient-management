@@ -134,14 +134,15 @@ function DefaultQueueTable() {
               ExpandedRow={QueueTableExpandedRow}
               tableFilters={
                 <>
-                  <QueueDropdownFilter /> <StatusDropdownFilter />
+                  <ClearQueueEntries queueEntries={filteredQueueEntries} />
+                  <QueueDropdownFilter />
                   <TableToolbarSearch
                     className={styles.search}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder={t('searchThisList', 'Search this list')}
                     size={isDesktop(layout) ? 'sm' : 'lg'}
+                    expanded
                   />
-                  <ClearQueueEntries queueEntries={filteredQueueEntries} />
                 </>
               }
             />
@@ -169,7 +170,7 @@ function QueueDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="serviceFilter"
-          titleText={t('filterByService', 'Filter by service:')}
+          titleText={t('showPatientsWithStatus', 'Show patients with status:')}
           label={selectedService?.serviceDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}

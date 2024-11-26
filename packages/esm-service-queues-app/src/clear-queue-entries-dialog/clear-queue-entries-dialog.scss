@@ -1,7 +1,16 @@
 @use '@carbon/type';
+@use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 #subHeading {
   @include type.type-style('heading-compact-01');
   color: $ui-05;
+}
+
+.clear-queues-btn-desktop {
+  padding-top: layout.$spacing-02;
+}
+
+.clear-queues-btn-tablet {
+  padding-top: layout.$spacing-04;
 }
