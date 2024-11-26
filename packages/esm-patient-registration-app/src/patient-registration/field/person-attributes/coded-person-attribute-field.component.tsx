@@ -3,10 +3,10 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 import { Layer, Select, SelectItem } from '@carbon/react';
+import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
-import { reportError } from '@openmrs/esm-framework';
 
 export interface CodedPersonAttributeFieldProps {
   id: string;
@@ -44,7 +44,7 @@ export function CodedPersonAttributeField({
       );
       setError(true);
     }
-  }, [answerConceptSetUuid, customConceptAnswers]);
+  }, [answerConceptSetUuid, customConceptAnswers, id, t]);
 
   useEffect(() => {
     if (!isLoadingConceptAnswers && !customConceptAnswers.length) {
@@ -72,7 +72,7 @@ export function CodedPersonAttributeField({
         setError(true);
       }
     }
-  }, [isLoadingConceptAnswers, conceptAnswers, customConceptAnswers]);
+  }, [isLoadingConceptAnswers, conceptAnswers, customConceptAnswers, t, id, answerConceptSetUuid]);
 
   const answers = useMemo(() => {
     if (customConceptAnswers.length) {

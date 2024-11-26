@@ -4,6 +4,33 @@ import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-fram
 import { type RelationshipValue } from '../../patient-registration.types';
 import { personRelationshipRepresentation } from '../../../constants';
 
+export interface Relationship {
+  display: string;
+  uuid: string;
+  personA: {
+    age: number;
+    display: string;
+    birthdate: string;
+    uuid: string;
+  };
+  personB: {
+    age: number;
+    display: string;
+    birthdate: string;
+    uuid: string;
+  };
+  relationshipType: {
+    uuid: string;
+    display: string;
+    aIsToB: string;
+    bIsToA: string;
+  };
+}
+
+interface RelationshipsResponse {
+  results: Array<Relationship>;
+}
+
 export function useInitialPatientRelationships(patientUuid: string): {
   data: Array<RelationshipValue>;
   isLoading: boolean;
@@ -45,34 +72,7 @@ export function useInitialPatientRelationships(patientUuid: string): {
       error,
       isLoading,
     };
-  }, [patientUuid, data, error]);
+  }, [data?.data?.results, error, isLoading, patientUuid]);
 
   return result;
-}
-
-export interface Relationship {
-  display: string;
-  uuid: string;
-  personA: {
-    age: number;
-    display: string;
-    birthdate: string;
-    uuid: string;
-  };
-  personB: {
-    age: number;
-    display: string;
-    birthdate: string;
-    uuid: string;
-  };
-  relationshipType: {
-    uuid: string;
-    display: string;
-    aIsToB: string;
-    bIsToA: string;
-  };
-}
-
-interface RelationshipsResponse {
-  results: Array<Relationship>;
 }
