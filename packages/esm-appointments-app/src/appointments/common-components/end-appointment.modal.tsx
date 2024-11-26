@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../form/appointments-form.resource';
 
@@ -68,7 +68,7 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
       .finally(() => {
         closeModal();
       });
-  }, [activeVisit, mutate, mutateAppointments, closeModal, patientUuid, appointmentUuid]);
+  }, [activeVisit, appointmentUuid, closeModal, mutate, mutateAppointments, t]);
 
   return (
     <div>

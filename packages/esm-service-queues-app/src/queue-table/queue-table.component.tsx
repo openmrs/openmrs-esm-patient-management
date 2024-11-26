@@ -74,7 +74,7 @@ function QueueTable({
 
   useEffect(() => {
     goTo(1);
-  }, [queueEntries]);
+  }, [goTo, queueEntries]);
 
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {

@@ -12,10 +12,10 @@ import {
   Tile,
 } from '@carbon/react';
 import { ResponsiveWrapper, useDebounce, useLayoutType, useVisitTypes, type VisitType } from '@openmrs/esm-framework';
+import { type PatientProgram } from '../../types';
+import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
 import EmptyDataIllustration from '../empty-data-illustration.component';
 import styles from './visit-type-selector.scss';
-import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
-import { type PatientProgram } from '../../types';
 
 export interface VisitTypeSelectorProps {
   onChange: (event) => void;
@@ -104,7 +104,7 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
       onChange(results[0].uuid);
       setSelectedVisitType(results[0].uuid);
     }
-  }, [results]);
+  }, [onChange, results]);
 
   return (
     <div

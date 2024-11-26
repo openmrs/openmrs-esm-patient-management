@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +59,7 @@ const ScheduledVisitsForVisitType: React.FC<{
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const timeFormat = new Date().getHours() >= 12 ? 'PM' : 'AM';
-  const visitDate = new Date();
+  const visitDate = useMemo(() => new Date(), []);
   const visitTime = dayjs(new Date()).format('hh:mm');
   const [appointment, setAppointment] = useState<Appointment>();
   const [patientId, setPatientId] = useState('');
@@ -159,23 +159,21 @@ const ScheduledVisitsForVisitType: React.FC<{
       }
     },
     [
-      visitTime,
-      timeFormat,
       allVisitTypes,
-      patientId,
-      visitDate,
-      userLocation,
-      queues,
-      config.concepts.defaultStatusConceptUuid,
-      config.concepts.defaultPriorityConceptUuid,
-      currentVisit,
-      t,
-      priorities,
       appointment,
-      selectedQueueLocation,
-      visitQueueNumberAttributeUuid,
       closeWorkspace,
+      currentVisit,
+      defaultStatus,
       mutateQueueEntries,
+      patientId,
+      selectedQueueLocation,
+      service,
+      t,
+      timeFormat,
+      userLocation,
+      visitDate,
+      visitQueueNumberAttributeUuid,
+      visitTime,
     ],
   );
 

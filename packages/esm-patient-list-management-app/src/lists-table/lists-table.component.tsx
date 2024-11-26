@@ -269,19 +269,22 @@ function useStarredLists() {
     setStarredLists(starredPatientLists.split(','));
   }, [currentUser?.userProperties?.starredPatientLists, setStarredLists]);
 
-  const updateUserProperties = (newStarredLists: Array<string>) => {
-    const starredPatientLists = newStarredLists.join(',');
-    const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
+  const updateUserProperties = useCallback(
+    (newStarredLists: Array<string>) => {
+      const starredPatientLists = newStarredLists.join(',');
+      const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
 
-    starPatientList(currentUser?.uuid, userProperties).catch(() => {
-      setInitialStarredLists();
-      showSnackbar({
-        subtitle: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
-        kind: 'error',
-        title: 'Failed to update patient lists',
+      starPatientList(currentUser?.uuid, userProperties).catch(() => {
+        setInitialStarredLists();
+        showSnackbar({
+          subtitle: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
+          kind: 'error',
+          title: 'Failed to update patient lists',
+        });
       });
-    });
-  };
+    },
+    [currentUser?.userProperties, currentUser?.uuid, setInitialStarredLists, t],
+  );
 
   /**
    * Handles toggling the starred list

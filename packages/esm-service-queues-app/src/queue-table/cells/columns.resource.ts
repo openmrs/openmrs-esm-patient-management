@@ -1,5 +1,5 @@
-import { showToast, translateFrom, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
+import { showToast, useConfig } from '@openmrs/esm-framework';
 import { useTranslation, type TFunction } from 'react-i18next';
 import {
   builtInColumns,
@@ -30,11 +30,14 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
   const config = useConfig<ConfigObject>();
   const { queueTables, visitQueueNumberAttributeUuid } = config;
   const { columnDefinitions } = queueTables;
-  const tableDefinitions = [...queueTables.tableDefinitions, defaultQueueTable];
-  const globalColumnConfig = {
-    ...defaultColumnConfig,
-    visitQueueNumberAttributeUuid,
-  };
+  const tableDefinitions = useMemo(() => [...queueTables.tableDefinitions, defaultQueueTable], [queueTables]);
+  const globalColumnConfig = useMemo(
+    () => ({
+      ...defaultColumnConfig,
+      visitQueueNumberAttributeUuid,
+    }),
+    [visitQueueNumberAttributeUuid],
+  );
 
   const columnsMap = useMemo(() => {
     const map = new Map<string, QueueTableColumn>();
@@ -49,7 +52,7 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
       map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
     }
     return map;
-  }, [columnDefinitions, t]);
+  }, [columnDefinitions, globalColumnConfig, t, visitQueueNumberAttributeUuid]);
 
   const tableDefinition = useMemo(
     () =>
