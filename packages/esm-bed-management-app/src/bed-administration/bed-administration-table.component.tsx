@@ -72,7 +72,7 @@ const BedAdministrationTable: React.FC = () => {
   const { results, currentPage, totalPages, goTo } = usePagination(
     filterOption === 'ALL'
       ? bedsGroupedByLocation
-      : bedsGroupedByLocation.filter((bed) => bed.status === filterOption) ?? [],
+      : bedsGroupedByLocation.flat().filter((bed) => bed.status === filterOption) ?? [],
     pageSize,
   );
 
