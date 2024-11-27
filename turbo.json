@@ -6,7 +6,12 @@
         "dist/**"
       ]
     },
-    "coverage": {},
+    "coverage": {
+      "outputs": [
+        "coverage/**"
+      ],
+      "dependsOn": ["test"]
+    },
     "extract-translations": {},
     "lint": {
       "dependsOn": [

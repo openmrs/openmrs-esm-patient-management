@@ -70,6 +70,7 @@ function ClinicMetrics() {
             label=""
             onChange={handleServiceChange}
             size={isDesktop(layout) ? 'sm' : 'lg'}
+            titleText=""
             type="inline"
           />
         </MetricsCard>

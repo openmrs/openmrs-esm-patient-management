@@ -20,6 +20,8 @@ const defaultProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  setTitle: jest.fn(),
 };
 
 const mockCreateAppointment = jest.mocked(saveAppointment);
@@ -206,6 +208,7 @@ describe('AppointmentForm', () => {
     await user.selectOptions(timeFormat, 'AM');
     await user.selectOptions(serviceSelect, ['Outpatient']);
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+    // TODO: Fix the `Error: Not implemented: HTMLFormElement.prototype.requestSubmit` error shown after the form is submitted
     await user.click(saveButton);
   });
 });

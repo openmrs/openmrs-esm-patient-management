@@ -1,7 +1,7 @@
-import { useAppContext, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
+import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import { useAppContext, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
 import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import useWardLocation from '../../hooks/useWardLocation';
@@ -75,7 +75,7 @@ function renderCancelAdmissionRequestWorkspace() {
   );
 }
 
-describe('Testing CancelAdmissionRequestWorkspace', () => {
+describe('CancelAdmissionRequestWorkspace', () => {
   it('should cancel admission request form creates encounter when form is filled out and submitted ', async () => {
     const user = userEvent.setup();
     renderCancelAdmissionRequestWorkspace();
@@ -85,7 +85,7 @@ describe('Testing CancelAdmissionRequestWorkspace', () => {
     const submit = screen.getByRole('button', { name: /save/i });
     await user.click(submit);
 
-    const warningText = /Notes required for cancelling admission or transfer request/;
+    const warningText = /notes required for cancelling admission or transfer request/i;
     const warning = screen.getByText(warningText);
     expect(warning).toBeInTheDocument();
 
