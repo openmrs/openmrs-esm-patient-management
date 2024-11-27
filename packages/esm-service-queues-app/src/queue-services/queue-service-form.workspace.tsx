@@ -1,16 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Button,
+  ButtonSet,
   Column,
   Form,
+  InlineNotification,
   Layer,
-  Stack,
-  TextInput,
   Select,
   SelectItem,
-  ButtonSet,
-  Button,
-  InlineNotification,
+  Stack,
+  TextInput,
 } from '@carbon/react';
 import { mutate } from 'swr';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
@@ -21,13 +21,13 @@ import styles from './queue-service-form.scss';
 const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const { queueConcepts } = useServiceConcepts();
+  const { queueLocations } = useQueueLocations();
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
   const [isMissingName, setMissingName] = useState(false);
   const [isMissingQueue, setMissingQueue] = useState(false);
   const [isMissingLocation, setMissingLocation] = useState(false);
   const [userLocation, setUserLocation] = useState('');
-  const { queueLocations } = useQueueLocations();
 
   const createQueue = useCallback(
     (event) => {
@@ -90,10 +90,11 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
             />
             {isMissingName && (
               <section>
+                {/* TODO: Use a zod schema instead of this */}
                 <InlineNotification
                   style={{ margin: '0', minWidth: '100%' }}
                   kind="error"
-                  lowContrast={true}
+                  lowContrast
                   title={t('missingQueueName', 'Missing queue name')}
                   subtitle={t('addQueueName', 'Please add a queue name')}
                 />
@@ -108,8 +109,8 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
               labelText={t('selectServiceType', 'Select a service type')}
               id="queueConcept"
               invalidText="Required"
-              value={queueConcept}
-              onChange={(event) => setQueueConcept(event.target.value)}>
+              onChange={(event) => setQueueConcept(event.target.value)}
+              value={queueConcept}>
               {!queueConcept && <SelectItem text={t('selectServiceType', 'Select a service type')} />}
               {queueConcepts.length === 0 && <SelectItem text={t('noServicesAvailable', 'No services available')} />}
               {queueConcepts?.length > 0 &&
@@ -124,7 +125,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                 <InlineNotification
                   style={{ margin: '0', minWidth: '100%' }}
                   kind="error"
-                  lowContrast={true}
+                  lowContrast
                   title={t('missingService', 'Missing service')}
                   subtitle={t('selectServiceType', 'Select a service type')}
                 />
@@ -136,11 +137,11 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
         <Column>
           <Layer className={styles.input}>
             <Select
-              labelText={t('selectALocation', 'Select a location')}
               id="location"
               invalidText="Required"
-              value={userLocation}
-              onChange={(event) => setUserLocation(event.target.value)}>
+              labelText={t('selectALocation', 'Select a location')}
+              onChange={(event) => setUserLocation(event.target.value)}
+              value={userLocation}>
               {!userLocation && <SelectItem text={t('selectALocation', 'Select a location')} />}
               {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
               {queueLocations?.length > 0 &&
@@ -155,7 +156,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                 <InlineNotification
                   style={{ margin: '0', minWidth: '100%' }}
                   kind="error"
-                  lowContrast={true}
+                  lowContrast
                   title={t('missingLocation', 'Missing location')}
                   subtitle={t('pleaseSelectLocation', 'Please select a location')}
                 />
