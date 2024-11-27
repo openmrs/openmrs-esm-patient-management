@@ -1,8 +1,8 @@
-import { useConfig, useDebounce } from '@openmrs/esm-framework';
 import React, { useCallback, useState } from 'react';
+import { useConfig, useDebounce } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
-import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import { PatientSearchContext, type PatientSearchContextProps } from '../patient-search-context';
+import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
 export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
@@ -28,10 +28,13 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
-  const onSearchTermChange = useCallback((value: string) => {
-    setSearchTerm(value);
-    handleSearchTermUpdated && handleSearchTermUpdated(value);
-  }, []);
+  const onSearchTermChange = useCallback(
+    (value: string) => {
+      setSearchTerm(value);
+      handleSearchTermUpdated && handleSearchTermUpdated(value);
+    },
+    [handleSearchTermUpdated],
+  );
 
   return (
     <PatientSearchContext.Provider value={{ nonNavigationSelectPatientAction, patientClickSideEffect }}>

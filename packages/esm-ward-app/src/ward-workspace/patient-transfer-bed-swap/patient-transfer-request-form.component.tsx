@@ -1,32 +1,25 @@
-import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  ArrowRightIcon,
-  ResponsiveWrapper,
-  showSnackbar,
-  useAppContext,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
-import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import { z } from 'zod';
+import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import useWardLocation from '../../hooks/useWardLocation';
-import LocationSelector from '../../location-selector/location-selector.component';
-import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useAppContext, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { useCreateEncounter } from '../../ward.resource';
-import styles from './patient-transfer-swap.scss';
+import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import useWardLocation from '../../hooks/useWardLocation';
 import AdmissionPatientButton from '../admit-patient-button.component';
+import LocationSelector from '../../location-selector/location-selector.component';
+import styles from './patient-transfer-swap.scss';
 
 export default function PatientTransferForm({
   closeWorkspaceWithSavedChanges,
   wardPatient,
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
-  const { patient, inpatientAdmission } = wardPatient ?? {};
   const { t } = useTranslation();
+  const { patient, inpatientAdmission } = wardPatient ?? {};
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -79,12 +72,12 @@ export default function PatientTransferForm({
     if (dispositionsWithTypeTransfer?.length === 1) {
       setValue('transferType', dispositionsWithTypeTransfer[0].uuid);
     }
-  }, [dispositionsWithTypeTransfer]);
+  }, [dispositionsWithTypeTransfer, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
     return () => promptBeforeClosing(null);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = useCallback(
     (values: FormValues) => {
@@ -134,12 +127,16 @@ export default function PatientTransferForm({
         });
     },
     [
-      setShowErrorNotifications,
-      currentProvider,
-      location,
-      emrConfiguration,
-      patient?.uuid,
+      closeWorkspaceWithSavedChanges,
+      createEncounter,
       dispositionsWithTypeTransfer,
+      emrConfiguration.consultFreeTextCommentsConcept.uuid,
+      emrConfiguration.dispositionDescriptor.dispositionConcept.uuid,
+      emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+      emrConfiguration.dispositionDescriptor.internalTransferLocationConcept.uuid,
+      emrConfiguration.transferRequestEncounterType,
+      patient,
+      t,
       wardPatientGroupDetails,
     ],
   );

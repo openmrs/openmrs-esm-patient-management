@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useField } from 'formik';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
@@ -51,7 +51,7 @@ export const NameField = () => {
         setFieldTouched('photo', true, false);
       }
     },
-    [setCapturePhotoProps],
+    [setCapturePhotoProps, setFieldTouched],
   );
 
   const toggleNameKnown = (e) => {

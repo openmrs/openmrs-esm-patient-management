@@ -1,11 +1,11 @@
-import { InlineNotification } from '@carbon/react';
-import { useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
-import classNames from 'classnames';
 import React, { useEffect, useRef, type ReactNode } from 'react';
+import classNames from 'classnames';
+import { InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
-import useWardLocation from '../hooks/useWardLocation';
+import { useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
 import { type WardViewContext } from '../types';
+import useWardLocation from '../hooks/useWardLocation';
+import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import styles from './ward-view.scss';
 
 const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardUnassignedPatients: ReactNode }) => {
@@ -43,13 +43,22 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
       if (scrollToLoadMoreTrigger.current) {
         observer.observe(scrollToLoadMoreTrigger.current);
       }
+
       return () => {
         if (scrollToLoadMoreTrigger.current) {
+          // TODO: Fix this more meaningfully
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           observer.unobserve(scrollToLoadMoreTrigger.current);
         }
       };
     },
-    [scrollToLoadMoreTrigger, hasMoreInpatientAdmissions, errorLoadingInpatientAdmissions, loadMoreInpatientAdmissions],
+    [
+      errorLoadingInpatientAdmissions,
+      hasMoreInpatientAdmissions,
+      isLoadingInpatientAdmissions,
+      loadMoreInpatientAdmissions,
+      scrollToLoadMoreTrigger,
+    ],
   );
 
   if (!wardPatientGroupDetails) return <></>;

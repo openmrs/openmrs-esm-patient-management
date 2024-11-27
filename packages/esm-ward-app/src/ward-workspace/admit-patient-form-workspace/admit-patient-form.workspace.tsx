@@ -1,14 +1,14 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, ButtonSet, Column, Form, InlineNotification, Row } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
-import useWardLocation from '../../hooks/useWardLocation';
+import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
+import useWardLocation from '../../hooks/useWardLocation';
 import BedSelector from '../bed-selector.component';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './admit-patient-form.scss';
@@ -46,7 +46,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
       z.object({
         bedId: z.number().optional(),
       }),
-    [beds],
+    [],
   );
 
   type FormValues = z.infer<typeof zodSchema>;
@@ -61,7 +61,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = (values: FormValues) => {
     setShowErrorNotifications(false);

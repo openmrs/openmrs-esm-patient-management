@@ -92,7 +92,7 @@ export function useInfinitePatientSearch(
       currentPage: size,
       totalResults: data?.[0]?.data?.totalCount ?? 0,
     }),
-    [data, isLoading, isValidating, error, setSize, size],
+    [mappedData, isLoading, error, data, isValidating, setSize, size],
   );
 }
 
@@ -120,7 +120,10 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
   );
 
   const userProperties = data?.data?.userProperties;
-  const patientsVisited = userProperties?.patientsVisited?.split(',').filter(Boolean) ?? [];
+  const patientsVisited = useMemo(
+    () => userProperties?.patientsVisited?.split(',').filter(Boolean) ?? [],
+    [userProperties],
+  );
 
   const updateRecentlyViewedPatients = useCallback(
     (patientUuid: string) => {
@@ -138,7 +141,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
         },
       });
     },
-    [patientsVisited, userProperties],
+    [patientsVisited, url, userProperties],
   );
 
   return useMemo(
@@ -149,7 +152,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
       updateRecentlyViewedPatients,
       mutateUserProperties: mutate,
     }),
-    [data, error, mutate],
+    [error, isLoading, mutate, patientsVisited, updateRecentlyViewedPatients],
   );
 }
 
@@ -213,6 +216,6 @@ export function useRestPatients(
       currentPage: size,
       totalResults: patientUuids?.length ?? 0,
     }),
-    [data, isLoading, isValidating, error, setSize, size, patientUuids],
+    [mappedData, isLoading, error, patientUuids, size, isValidating, setSize],
   );
 }

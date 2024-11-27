@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Movement } from '@carbon/react/icons';
-import styles from '../ward-patient-card.scss';
-import { useTranslation } from 'react-i18next';
-import { type WardPatientWorkspaceProps, type WardViewContext, type WardPatient } from '../../types';
-import { CloseOutlineIcon, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
 import { IconButton } from '@carbon/react';
+import { Movement } from '@carbon/react/icons';
+import { useTranslation } from 'react-i18next';
+import { CloseOutlineIcon, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
+import { type WardPatientWorkspaceProps, type WardViewContext, type WardPatient } from '../../types';
+import styles from '../ward-patient-card.scss';
 
 export interface WardPatientTransferProps {
   wardPatient: WardPatient;
@@ -26,7 +26,7 @@ const WardPatientPendingTransfer: React.FC<WardPatientTransferProps> = ({ wardPa
       return t('pendingDischarge', 'Pending Discharge');
     }
     return '';
-  }, [dispositionType, dispositionLocation]);
+  }, [dispositionType, dispositionLocation, t]);
 
   const launchCancelAdmissionForm = () => {
     launchWorkspace<WardPatientWorkspaceProps>('cancel-admission-request-workspace', {
