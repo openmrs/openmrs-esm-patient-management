@@ -31,7 +31,7 @@
   "errorUpdatingList": "Error updating list",
   "identifier": "المعرف",
   "items": "العناصر",
-  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} العناصر",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "مثل: المرضى الذين تم تشخيصهم بالربو والذين قد يكونون على استعداد للمشاركة في دراسة جامعية",
   "listName": "اسم القائمة",
