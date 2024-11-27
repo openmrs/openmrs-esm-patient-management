@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem, Modal } from '@carbon/react';
+import { Modal, OverflowMenuItem } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
 import { navigate, formatDate, parseDate, showSnackbar, CustomOverflowMenu } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';

@@ -61,11 +61,17 @@ const mockAppointments = [
   },
 ] as unknown as Array<Appointment>;
 
-const mockExportAppointmentsToSpreadsheet = jest.mocked(exportAppointmentsToSpreadsheet);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockExportAppointmentsToSpreadsheet = jest.mocked(exportAppointmentsToSpreadsheet);
 
-jest.mock('../../helpers/excel');
-jest.mock('../../hooks/useOverlay');
+jest.mock('../../helpers/excel', () => {
+  return {
+    ...jest.requireActual('../../helpers/excel'),
+    exportAppointmentsToSpreadsheet: jest.fn(),
+  };
+});
+
+// jest.mock('../../hooks/useOverlay');
 
 describe('AppointmentsTable', () => {
   beforeEach(() => {

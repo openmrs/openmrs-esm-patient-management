@@ -73,7 +73,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
       return (
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
-            <p className={styles.resultsText}>
+            <div className={styles.resultsText}>
               <span className={styles.resultsTextCount}>
                 {t('recentSearchResultsCount', '{{count}} recent search result', {
                   count: searchResults.length,
@@ -84,7 +84,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
                   <InlineLoading className={styles.spinner} />
                 </span>
               )}
-            </p>
+            </div>
             <CompactPatientBanner patients={searchResults} ref={ref} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
