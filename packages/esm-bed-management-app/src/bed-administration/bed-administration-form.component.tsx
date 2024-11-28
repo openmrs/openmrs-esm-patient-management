@@ -249,7 +249,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     defaultValue={selectedBedType}
                     id="bedType"
                     invalidText={t('required', 'Required')}
-                    labelText={t('bedType', 'Bed type')}
+                    labelText={t('bedTypes', 'Bed types')}
                     {...field}>
                     <SelectItem text={t('chooseBedtype', 'Choose a bed type')} />
                     {availableBedTypes.map((bedType, index) => (

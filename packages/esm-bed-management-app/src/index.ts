@@ -20,37 +20,37 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 export const adminCardLink = getAsyncLifecycle(() => import('./admin-card-link.component'), options);
 
 export const summaryLeftPanelLink = getSyncLifecycle(
-  // t('summary', 'Summary')
   createLeftPanelLink({
     name: 'bed-management',
+    // t('summary', 'Summary')
     title: 'Summary',
   }),
   options,
 );
 
 export const adminLeftPanelLink = getSyncLifecycle(
-  // t('wardAllocation', 'Ward Allocation')
   createLeftPanelLink({
-    name: 'administration',
-    title: 'Ward Allocation',
+    name: 'bed-administration',
+    // t('wardAllocation', 'Ward allocation')
+    title: 'Ward allocation',
   }),
   options,
 );
 
 export const bedTypeLeftPanelLink = getSyncLifecycle(
-  // t('bedType', 'Bed Type')
   createLeftPanelLink({
-    name: 'bed-type',
-    title: 'Bed Type',
+    name: 'bed-types',
+    // t('bedTypes', 'Bed types')
+    title: 'Bed types',
   }),
   options,
 );
 
 export const bedTagLeftPanelLink = getSyncLifecycle(
-  // t('bedTag', 'Bed Tag')
   createLeftPanelLink({
-    name: 'bed-tag',
-    title: 'Bed Tag',
+    name: 'bed-tags',
+    // t('bedTags', 'Bed tags')
+    title: 'Bed tags',
   }),
   options,
 );

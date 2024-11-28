@@ -27,7 +27,7 @@ import styles from '../bed-administration/bed-administration-table.scss';
 
 const BedTagAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t('bedTag', 'Bed tag');
+  const headerTitle = t('bedTags', 'Bed tags');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
@@ -43,7 +43,7 @@ const BedTagAdministrationTable: React.FC = () => {
 
   const tableHeaders = [
     {
-      header: t('ids', 'Id'),
+      header: t('ids', 'ID'),
       key: 'ids',
     },
     {
@@ -85,7 +85,7 @@ const BedTagAdministrationTable: React.FC = () => {
   if (isBedDataLoading || isLoadingBedTags) {
     return (
       <>
-        <Header title={t('bedTag', 'Bed Tag')} />
+        <Header title={t('bedTags', 'Bed tags')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -96,7 +96,7 @@ const BedTagAdministrationTable: React.FC = () => {
   if (errorLoadingBedTags) {
     return (
       <>
-        <Header title={t('bedTag', 'Bed Tag')} />
+        <Header title={t('bedTags', 'Bed tags')} />
         <div className={styles.widgetCard}>
           <ErrorState error={errorLoadingBedTags} headerTitle={headerTitle} />
         </div>
@@ -106,7 +106,7 @@ const BedTagAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header title={t('bedTag', 'Bed Tag')} />
+      <Header title={t('bedTags', 'Bed tags')} />
 
       <div className={styles.widgetCard}>
         {showBedTagsModal ? (
