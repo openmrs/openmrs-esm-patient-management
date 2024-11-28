@@ -71,8 +71,6 @@ jest.mock('../../helpers/excel', () => {
   };
 });
 
-// jest.mock('../../hooks/useOverlay');
-
 describe('AppointmentsTable', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({

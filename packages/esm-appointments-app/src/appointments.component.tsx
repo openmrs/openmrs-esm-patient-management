@@ -8,7 +8,7 @@ import AppointmentsHeader from './header/appointments-header.component';
 import AppointmentMetrics from './metrics/appointments-metrics.component';
 import SelectedDateContext from './hooks/selectedDateContext';
 
-const Appointments = () => {
+const Appointments: React.FC = () => {
   const { t } = useTranslation();
   const [appointmentServiceType, setAppointmentServiceType] = useState('');
   const [selectedDate, setSelectedDate] = useState(dayjs().startOf('day').format(omrsDateFormat));
