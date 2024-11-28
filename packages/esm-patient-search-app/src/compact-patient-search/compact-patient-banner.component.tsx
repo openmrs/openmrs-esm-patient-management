@@ -1,6 +1,6 @@
 import React, { forwardRef, useContext, useMemo } from 'react';
-import classNames from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
 import {
@@ -173,7 +173,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
 const IdentifierTag: React.FC<IdentifierTagProps> = ({ identifier }) => {
   return (
     <>
-      <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
+      <Tag size="sm" className={styles.configuredTag} type="warm-gray">
         {identifier.identifierType.display}
       </Tag>
       <span className={styles.configuredLabel}>{identifier.identifier}</span>

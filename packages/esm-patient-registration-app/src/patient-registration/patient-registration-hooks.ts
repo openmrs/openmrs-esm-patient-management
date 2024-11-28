@@ -1,14 +1,15 @@
+import { type Dispatch, useEffect, useMemo, useState } from 'react';
 import {
   type FetchResponse,
+  type OpenmrsResource,
   getSynchronizationItems,
   openmrsFetch,
-  type OpenmrsResource,
   restBaseUrl,
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
-import { type Dispatch, useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
 import { type RegistrationConfig } from '../config-schema';
@@ -29,7 +30,15 @@ import {
   latestFirstEncounter,
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
-import dayjs from 'dayjs';
+
+interface DeathInfoResults {
+  uuid: string;
+  display: string;
+  causeOfDeath: OpenmrsResource | null;
+  dead: boolean;
+  deathDate: string;
+  causeOfDeathNonCoded: string | null;
+}
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
@@ -99,7 +108,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
         setInitialFormValues(registration._patientRegistrationData.formValues);
       }
     })();
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [initialFormValues, isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   // Set initial patient death info
   useEffect(() => {
@@ -118,7 +127,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
         nonCodedCauseOfDeath: deathInfo.causeOfDeathNonCoded,
       }));
     }
-  }, [isLoadingDeathInfo, deathInfo, setInitialFormValues]);
+  }, [isLoadingDeathInfo, deathInfo, setInitialFormValues, freeTextFieldConceptUuid]);
 
   // Set initial patient relationships
   useEffect(() => {
@@ -187,7 +196,7 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
         setInitialAddressFieldValues(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
       }
     })();
-  }, [isLoading, patient, patientUuid]);
+  }, [fallback, initialAddressFieldValues, isLoading, patient, patientUuid]);
 
   return [initialAddressFieldValues, setInitialAddressFieldValues];
 }
@@ -208,7 +217,7 @@ export function usePatientUuidMap(
         setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback),
       );
     }
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [fallback, isLoadingPatientToEdit, patientToEdit, patientUuid, patientUuidMap]);
 
   useEffect(() => {
     if (attributes) {
@@ -263,7 +272,7 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
       data: identifiers,
       isLoading,
     };
-  }, [data, error]);
+  }, [data?.data?.results, isLoading]);
 
   return result;
 }
@@ -299,17 +308,8 @@ function useInitialPersonAttributes(personUuid: string) {
       data: data?.data?.results,
       isLoading,
     };
-  }, [data, error]);
+  }, [data?.data?.results, isLoading]);
   return result;
-}
-
-interface DeathInfoResults {
-  uuid: string;
-  display: string;
-  causeOfDeath: OpenmrsResource | null;
-  dead: boolean;
-  deathDate: string;
-  causeOfDeathNonCoded: string | null;
 }
 
 function useInitialPersonDeathInfo(personUuid: string) {
@@ -325,7 +325,7 @@ function useInitialPersonDeathInfo(personUuid: string) {
       data: data?.data,
       isLoading,
     };
-  }, [data, error]);
+  }, [data?.data, isLoading]);
   return result;
 }
 

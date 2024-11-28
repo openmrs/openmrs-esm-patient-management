@@ -148,7 +148,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
 
       <Layer>
         <Tile className={styles.filterTile}>
-          <Tag size="md" title="Clear Filter" type="blue">
+          <Tag size="md" type="blue">
             {t('today', 'Today')}
           </Tag>
 

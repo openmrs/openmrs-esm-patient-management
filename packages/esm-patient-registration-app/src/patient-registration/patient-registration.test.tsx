@@ -11,21 +11,24 @@ import {
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
+import type { AddressTemplate, Encounter, FormValues } from './patient-registration.types';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
-import type { AddressTemplate, Encounter } from './patient-registration.types';
 import { ResourcesContext } from '../offline.resources';
 import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
+import { useInitialFormValues } from './patient-registration-hooks';
 
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockSaveEncounter = jest.mocked(saveEncounter);
 const mockSavePatient = savePatient as jest.Mock;
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = jest.mocked(usePatient);
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+const mockUseParams = useParams as jest.Mock;
+const mockUseInitialFormValues = jest.mocked(useInitialFormValues);
 
 jest.mock('./field/field.resource', () => ({
   useConcept: jest.fn().mockImplementation((uuid: string) => {
@@ -85,7 +88,7 @@ jest.mock('./field/field.resource', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
-  ...(jest.requireActual('react-router-dom') as any),
+  ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
     pathname: 'openmrs/spa/patient-registration',
   }),
@@ -97,6 +100,13 @@ jest.mock('./patient-registration.resource', () => ({
   ...jest.requireActual('./patient-registration.resource'),
   saveEncounter: jest.fn(),
   savePatient: jest.fn(),
+}));
+
+jest.mock('./patient-registration-hooks', () => ({
+  ...jest.requireActual('./patient-registration-hooks'),
+  useInitialFormValues: jest.fn().mockReturnValue([{}, jest.fn()]),
+  useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
+  usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
 }));
 
 mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
@@ -126,7 +136,7 @@ const mockResourcesContextValue = {
   identifierTypes: [],
 };
 
-let mockOpenmrsConfig: RegistrationConfig = {
+const mockOpenmrsConfig: RegistrationConfig = {
   sections: ['demographics', 'contact'],
   sectionDefinitions: [
     { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob'] },
@@ -159,6 +169,10 @@ let mockOpenmrsConfig: RegistrationConfig = {
         value: 'male',
         label: 'Male',
       },
+      {
+        value: 'female',
+        label: 'Female',
+      },
     ],
     address: {
       useAddressHierarchy: {
@@ -180,11 +194,10 @@ let mockOpenmrsConfig: RegistrationConfig = {
     encounterProviderRoleUuid: 'asdf',
     registrationFormUuid: null,
   },
+  freeTextFieldConceptUuid: '',
 };
-
-const path = `/patient/:patientUuid/edit`;
-
 const configWithObs = JSON.parse(JSON.stringify(mockOpenmrsConfig));
+
 configWithObs.fieldDefinitions = [
   {
     id: 'weight',
@@ -217,7 +230,6 @@ configWithObs.fieldDefinitions = [
     customConceptAnswers: [],
   },
 ];
-
 configWithObs.sectionDefinitions?.push({
   id: 'custom',
   name: 'Custom',
@@ -238,16 +250,14 @@ const fillRequiredFields = async () => {
   await user.type(familyNameInput, 'Gaihre');
   await user.clear(dateOfBirthInput);
   await user.type(dateOfBirthInput, '02/08/1993');
-  user.click(genderInput);
+  await user.click(genderInput);
 };
 
-function Wrapper({ children }) {
-  return (
-    <ResourcesContext.Provider value={mockResourcesContextValue}>
-      <Router>{children}</Router>
-    </ResourcesContext.Provider>
-  );
-}
+const Wrapper = ({ children }) => (
+  <ResourcesContext.Provider value={mockResourcesContextValue}>
+    <Router>{children}</Router>
+  </ResourcesContext.Provider>
+);
 
 describe('Registering a new patient', () => {
   beforeEach(() => {
@@ -258,15 +268,30 @@ describe('Registering a new patient', () => {
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
   });
 
-  it('renders without crashing', () => {
-    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
-  });
-
-  it('has the expected sections', async () => {
+  it('should render all the required fields and sections', async () => {
     render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
 
-    expect(screen.getByRole('region', { name: /demographics section/i })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: /contact info section/i })).toBeInTheDocument();
+    await screen.findByRole('heading', { name: /create new patient/i });
+
+    const demographicSection = screen.getByRole('region', { name: /demographics section/i });
+    const contactSection = screen.getByRole('region', { name: /contact info section/i });
+
+    expect(demographicSection).toBeInTheDocument();
+    expect(contactSection).toBeInTheDocument();
+    expect(screen.getByText(/jump to/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByLabelText(/first name/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByLabelText(/middle name \(optional\)/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByLabelText(/family name/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByLabelText(/date of birth/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByRole('radio', { name: /^male$/i })).toBeInTheDocument();
+    expect(within(demographicSection).getByRole('radio', { name: /^female$/i })).toBeInTheDocument();
+    expect(within(demographicSection).getByText(/date of birth known\?/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByLabelText(/date of birth/i)).toBeInTheDocument();
+
+    expect(within(contactSection).getByRole('heading', { name: /address/i })).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /register patient/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
   // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
@@ -300,14 +325,12 @@ describe('Registering a new patient', () => {
 
   it('should not save the patient if validation fails', async () => {
     const user = userEvent.setup();
-
     const mockSavePatientForm = jest.fn();
+
     render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />, { wrapper: Wrapper });
 
-    const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
-
-    await user.type(givenNameInput, '5');
-    await user.click(screen.getByText(/Register Patient/i));
+    await screen.findByRole('heading', { name: /create new patient/i });
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
 
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
@@ -386,76 +409,149 @@ describe('Registering a new patient', () => {
 
 describe('Updating an existing patient record', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue(mockOpenmrsConfig);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      ...mockOpenmrsConfig,
+    });
+    mockUsePatient.mockImplementation(() => {
+      return {
+        error: null,
+        isLoading: false,
+        patient: mockPatient,
+        patientUuid: mockPatient.id,
+      };
+    });
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
+    mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
   });
 
   it('edits patient demographics', async () => {
     const user = userEvent.setup();
-    mockSavePatient.mockResolvedValue({} as FetchResponse);
+    const mockSavePatientForm = jest.fn();
 
-    const mockUseParams = useParams as jest.Mock;
-
-    mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
-
-    mockUsePatient.mockReturnValue({
-      isLoading: false,
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-      error: null,
-    });
-
-    render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatient} />, { wrapper: Wrapper });
-
-    const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
-    const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
-    const middleNameInput: HTMLInputElement = screen.getByLabelText(/Middle Name/);
-    const dateOfBirthInput: HTMLInputElement = screen.getByLabelText(/Date of Birth/i);
-    const genderInput: HTMLInputElement = screen.getByLabelText(/Male/);
-
-    // assert initial values
-    expect(givenNameInput.value).toBe('John');
-    expect(familyNameInput.value).toBe('Wilson');
-    expect(middleNameInput.value).toBeFalsy();
-    expect(dateOfBirthInput.value).toBe('04/04/1972');
-    expect(genderInput.value).toBe('male');
-
-    // do some edits
-    await user.clear(givenNameInput);
-    await user.clear(middleNameInput);
-    await user.clear(familyNameInput);
-    await user.type(givenNameInput, 'Eric');
-    await user.type(middleNameInput, 'Johnson');
-    await user.type(familyNameInput, 'Smith');
-    await user.click(screen.getByText(/Update patient/i));
-
-    expect(mockSavePatient).toHaveBeenCalledWith(
-      false,
+    mockUseInitialFormValues.mockReturnValue([
       {
-        '0': {
-          oldIdentificationNumber: '100732HE',
-        },
-        '1': {
-          openMrsId: '100GEJ',
-        },
-        addNameInLocalLanguage: undefined,
         additionalFamilyName: '',
         additionalGivenName: '',
         additionalMiddleName: '',
+        addNameInLocalLanguage: false,
         address: {},
-        birthdate: new Date('1972-04-04T00:00:00.000Z'),
+        birthdate: mockPatient.birthDate,
+        birthdateEstimated: false,
+        deathCause: '',
+        deathDate: undefined,
+        deathTime: undefined,
+        deathTimeFormat: 'AM',
+        familyName: mockPatient.name[0].family,
+        gender: mockPatient.gender,
+        givenName: mockPatient.name[0].given[0],
+        identifiers: {
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
+            selectedSource: null,
+          },
+          idCard: {
+            autoGeneration: false,
+            identifierName: 'ID Card',
+            identifierTypeUuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
+            identifierUuid: '346d09b1-8509-43c6-9697-3b4d1ce06ad6',
+            identifierValue: '1234567890',
+            initialValue: '1234567890',
+            preferred: false,
+            required: false,
+            selectedSource: null,
+          },
+        },
+        isDead: false,
+        middleName: '',
+        monthsEstimated: 0,
+        nonCodedCauseOfDeath: '',
+        patientUuid: mockPatient.id,
+        relationships: [],
+        telephoneNumber: '',
+        yearsEstimated: 0,
+      } as FormValues,
+      jest.fn(),
+    ]);
+
+    render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />, { wrapper: Wrapper });
+
+    await screen.findByRole('heading', { name: /edit patient details/i });
+
+    expect(screen.queryByRole('button', { name: /register patient/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /update patient/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/first name/i)).toHaveValue(mockPatient.name[0].given[0]);
+    expect(screen.getByLabelText(/family name/i)).toHaveValue(mockPatient.name[0].family);
+    expect(screen.getByLabelText(/date of birth/i)).toHaveValue('04/04/1972');
+    expect(
+      screen.getByRole('radio', {
+        name: /^male$/i,
+      }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole('radio', {
+        name: /^female$/i,
+      }),
+    ).not.toBeChecked();
+    expect(screen.getAllByRole('tab', { name: /yes/i })).toHaveLength(2);
+
+    await user.click(screen.getByRole('button', { name: /update patient/i }));
+
+    expect(mockSavePatientForm).toHaveBeenCalledWith(
+      false,
+      {
+        addNameInLocalLanguage: false,
+        additionalFamilyName: '',
+        additionalGivenName: '',
+        additionalMiddleName: '',
+        address: {
+          country: 'កម្ពុជា (Cambodia)',
+        },
+        birthdate: '1972-04-04',
         birthdateEstimated: false,
         deathCause: '',
         nonCodedCauseOfDeath: '',
         deathDate: undefined,
         deathTime: undefined,
         deathTimeFormat: 'AM',
-        familyName: 'Smith',
-        gender: expect.stringMatching(/male/i),
-        givenName: 'Eric',
-        identifiers: {},
+        familyName: 'Wilson',
+        gender: 'male',
+        givenName: 'John',
+        identifiers: {
+          idCard: {
+            autoGeneration: false,
+            identifierName: 'ID Card',
+            identifierTypeUuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
+            identifierUuid: '346d09b1-8509-43c6-9697-3b4d1ce06ad6',
+            identifierValue: '1234567890',
+            initialValue: '1234567890',
+            preferred: false,
+            required: false,
+            selectedSource: null,
+          },
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
+            selectedSource: null,
+          },
+        },
         isDead: false,
-        middleName: 'Johnson',
+        middleName: '',
         monthsEstimated: 0,
         patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         relationships: [],

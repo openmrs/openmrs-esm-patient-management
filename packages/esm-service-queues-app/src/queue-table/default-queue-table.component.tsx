@@ -169,13 +169,13 @@ function QueueDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="serviceFilter"
-          titleText={t('filterByService', 'Filter by service:')}
-          label={selectedService?.serviceDisplay ?? t('all', 'All')}
-          type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
           itemToString={(item) => (item ? item.display : '')}
+          label={selectedService?.serviceDisplay ?? t('all', 'All')}
           onChange={handleServiceChange}
           size={isDesktop(layout) ? 'sm' : 'lg'}
+          titleText={t('filterByService', 'Filter by service:')}
+          type="inline"
         />
       </div>
     </>
@@ -196,13 +196,13 @@ function StatusDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="statusFilter"
-          titleText={t('filterByStatus', 'Filter by status:')}
-          label={queueStatus?.statusDisplay ?? t('all', 'All')}
-          type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}
           itemToString={(item) => (item ? item.display : '')}
+          label={queueStatus?.statusDisplay ?? t('all', 'All')}
           onChange={handleServiceChange}
           size={isDesktop(layout) ? 'sm' : 'lg'}
+          titleText={t('filterByStatus', 'Filter by status:')}
+          type="inline"
         />
       </div>
     </>

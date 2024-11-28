@@ -354,7 +354,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       appointmentRequest: appointmentPayload,
       recurringPattern: constructRecurringPattern(data),
     };
+
     const abortController = new AbortController();
+
     (isRecurringAppointment
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
       : saveAppointment(appointmentPayload, abortController)

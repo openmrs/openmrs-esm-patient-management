@@ -29,7 +29,7 @@
   "errorDeletingList": "删除患者列表时出现错误",
   "errorRemovingPatientFromList": "未能从列表中移除患者",
   "errorUpdatingList": "更新列表时出现错误",
-  "identifier": "ID",
+  "identifier": "Identifier",
   "items": "项",
   "itemsDisplayed": "{{numberOfItemsDisplayed}} 项",
   "listCreated": "列表创建成功",
