@@ -88,7 +88,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedTag"
-                      labelText={t('bedTag', 'Bed tag')}
+                      labelText={t('bedTags', 'Bed tags')}
                       placeholder={t('bedTagPlaceholder', '')}
                       invalidText={fieldState.error?.message}
                       {...field}

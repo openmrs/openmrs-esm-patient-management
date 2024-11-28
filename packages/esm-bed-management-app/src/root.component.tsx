@@ -28,9 +28,9 @@ const Root: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/location/:location" element={<WardWithBeds />} />
-          <Route path="/administration" element={<BedAdministrationTable />} />
-          <Route path="/bed-tag" element={<BedTagAdministrationTable />} />
-          <Route path="/bed-type" element={<BedTypeAdministrationTable />} />
+          <Route path="/bed-administration" element={<BedAdministrationTable />} />
+          <Route path="/bed-tags" element={<BedTagAdministrationTable />} />
+          <Route path="/bed-types" element={<BedTypeAdministrationTable />} />
         </Routes>
       </main>
     </BrowserRouter>
