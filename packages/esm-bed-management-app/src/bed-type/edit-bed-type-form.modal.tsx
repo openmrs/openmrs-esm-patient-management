@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
-import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
-  ComposedModal,
   Form,
   FormGroup,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -15,9 +11,26 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
+import { default as React, useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
-import type { BedType, BedTypeData } from '../types';
+import { z } from 'zod';
+import { type BedTypeDataAdministration } from '../bed-administration/bed-administration-types';
+import { editBedType } from '../summary/summary.resource';
+import { type BedType, type BedTypeData, type Mutator } from '../types';
+import styles from './new-bed-type.scss';
+
+interface EditBedTypeFormProps {
+  editData: BedTypeData;
+  mutate: Mutator<BedType>;
+  closeModal: () => void;
+}
+
+interface ErrorType {
+  message: string;
+}
 
 const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -25,28 +38,69 @@ const BedTypeAdministrationSchema = z.object({
   description: z.string().max(255),
 });
 
-interface BedAdministrationFormProps {
-  allLocations: Location[];
-  availableBedTypes: Array<BedType>;
-  handleSubmission?: (formData: BedTypeData) => void;
-  headerTitle: string;
-  initialData: BedTypeData;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
-}
-
-interface ErrorType {
-  message: string;
-}
-
-const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
-  handleSubmission,
-  headerTitle,
-  initialData,
-  onModalChange,
-  showModal,
-}) => {
+const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
+  const [{ isErrored, isSubmitting, isSuccessful, description }, setSubmissionStatus] = useState<{
+    isSubmitting: boolean;
+    isSuccessful: boolean | undefined;
+    isErrored: boolean | undefined;
+    description: string | undefined;
+  }>({
+    isSubmitting: false,
+    isSuccessful: false,
+    isErrored: undefined,
+    description: undefined,
+  });
+
+  const handleUpdateBedType = useCallback(
+    (formData: BedTypeDataAdministration) => {
+      const bedUuid = editData.uuid;
+      const { name, displayName, description } = formData;
+
+      const bedTypePayload = {
+        name,
+        displayName,
+        description,
+      };
+
+      setSubmissionStatus({
+        description: 'editing...',
+        isErrored: undefined,
+        isSubmitting: true,
+        isSuccessful: undefined,
+      });
+
+      editBedType({ bedTypePayload, bedTypeId: bedUuid })
+        .then(() => {
+          showSnackbar({
+            title: t('bedTypeUpdated', 'Bed type updated'),
+            subtitle: t('bedTypeUpdatedSuccessfully', `${bedTypePayload.name} updated successfully`, {
+              bedType: bedTypePayload.name,
+            }),
+            kind: 'success',
+          });
+
+          setSubmissionStatus({
+            description: 'edited.',
+            isErrored: undefined,
+            isSubmitting: false,
+            isSuccessful: true,
+          });
+
+          mutate();
+        })
+        .catch((error) => {
+          showSnackbar({
+            title: t('errorCreatingForm', 'Error creating bed'),
+            subtitle: error?.message,
+            kind: 'error',
+          });
+          setSubmissionStatus({ description: 'errorred', isErrored: true, isSubmitting: false, isSuccessful: false });
+        })
+        .finally(() => closeModal());
+    },
+    [mutate, editData],
+  );
 
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
@@ -59,9 +113,9 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     mode: 'all',
     resolver: zodResolver(BedTypeAdministrationSchema),
     defaultValues: {
-      name: initialData.name || '',
-      displayName: initialData.displayName || '',
-      description: initialData.description || '',
+      name: editData.name || '',
+      displayName: editData.displayName || '',
+      description: editData.description || '',
     },
   });
 
@@ -69,7 +123,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     const result = BedTypeAdministrationSchema.safeParse(formData);
     if (result.success) {
       setShowErrorNotification(false);
-      handleSubmission?.(formData);
+      handleUpdateBedType(formData);
     }
   };
 
@@ -79,8 +133,8 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={t('editBedType', 'Edit bed type')} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -148,15 +202,25 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('save', 'Save')}</span>
-        </Button>
+        {isSubmitting || isErrored || isSuccessful ? (
+          <Button>
+            <InlineLoading
+              status={isSubmitting ? 'active' : isErrored ? 'error' : isSuccessful ? 'finished' : 'inactive'}
+              description={description}
+              className={styles.inlineLoading}
+            />
+          </Button>
+        ) : (
+          <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
+            {t('save', 'save')}
+          </Button>
+        )}
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 
-export default BedTypeAdministrationForm;
+export default EditBedTypeForm;

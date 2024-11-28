@@ -1,5 +1,3 @@
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -18,13 +16,19 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import type { BedFormData } from '../types';
-import { useBedsGroupedByLocation } from '../summary/summary.resource';
+import {
+  ErrorState,
+  isDesktop as desktopLayout,
+  showModal,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import CardHeader from '../card-header/card-header.component';
-import EditBedForm from './edit-bed-form.component';
 import Header from '../header/header.component';
-import NewBedForm from './new-bed-form.component';
+import { useBedsGroupedByLocation } from '../summary/summary.resource';
+import type { BedFormData } from '../types';
 import styles from './bed-administration-table.scss';
 
 const BedAdministrationTable: React.FC = () => {
@@ -42,9 +46,6 @@ const BedAdministrationTable: React.FC = () => {
     mutateBedsGroupedByLocation,
     errorFetchingBedsGroupedByLocation,
   } = useBedsGroupedByLocation();
-  const [showAddBedModal, setShowAddBedModal] = useState(false);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
-  const [editData, setEditData] = useState<BedFormData>();
   const [filterOption, setFilterOption] = useState('ALL');
 
   function CustomTag({ condition }: { condition: boolean }) {
@@ -99,6 +100,21 @@ const BedAdministrationTable: React.FC = () => {
     },
   ];
 
+  const openNewBedModal = () => {
+    const dispose = showModal('new-bed-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedsGroupedByLocation,
+    });
+  };
+
+  const openEditBedModal = (editData: BedFormData) => {
+    const dispose = showModal('edit-bed-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedsGroupedByLocation,
+      editData,
+    });
+  };
+
   const tableRows = useMemo(() => {
     return results.flat().map((bed) => ({
       id: bed.uuid,
@@ -113,9 +129,7 @@ const BedAdministrationTable: React.FC = () => {
             renderIcon={Edit}
             onClick={(e) => {
               e.preventDefault();
-              setEditData(bed);
-              setShowEditBedModal(true);
-              setShowAddBedModal(false);
+              openEditBedModal(bed);
             }}
             kind={'ghost'}
             iconDescription={t('editBed', 'Edit bed')}
@@ -169,30 +183,12 @@ const BedAdministrationTable: React.FC = () => {
         ) : null}
       </div>
       <div className={styles.widgetCard}>
-        {showAddBedModal ? (
-          <NewBedForm
-            mutate={mutateBedsGroupedByLocation}
-            onModalChange={setShowAddBedModal}
-            showModal={showAddBedModal}
-          />
-        ) : null}
-        {showEditBedModal ? (
-          <EditBedForm
-            editData={editData}
-            mutate={mutateBedsGroupedByLocation}
-            onModalChange={setShowEditBedModal}
-            showModal={showEditBedModal}
-          />
-        ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedsGroupedByLocation ? <InlineLoading /> : null}</span>
           </span>
           {results?.length ? (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setShowAddBedModal(true)}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedModal}>
               {t('addBed', 'Add bed')}
             </Button>
           ) : null}
@@ -230,7 +226,7 @@ const BedAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setShowAddBedModal(true)}>
+                      onClick={openNewBedModal}>
                       {t('addBed', 'Add bed')}
                     </Button>
                   </Tile>

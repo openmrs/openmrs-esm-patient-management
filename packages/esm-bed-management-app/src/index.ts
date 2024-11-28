@@ -1,4 +1,4 @@
-import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel-link.component';
 
@@ -50,3 +50,10 @@ export const bedTagLeftPanelLink = getSyncLifecycle(
   }),
   options,
 );
+
+export const newBedModal = getAsyncLifecycle(() => import('./bed-administration/new-bed-form.modal'), options);
+export const editBedModal = getAsyncLifecycle(() => import('./bed-administration/edit-bed-form.modal'), options);
+export const newBedTagModal = getAsyncLifecycle(() => import('./bed-tag/new-tag-form.modal'), options);
+export const editBedTagModal = getAsyncLifecycle(() => import('./bed-tag/edit-tag-form.modal'), options);
+export const newBedTypeModal = getAsyncLifecycle(() => import('./bed-type/new-bed-type-form.modal'), options);
+export const editBedTypeModal = getAsyncLifecycle(() => import('./bed-type/edit-bed-type-form.modal'), options);
