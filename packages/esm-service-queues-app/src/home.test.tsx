@@ -39,7 +39,7 @@ describe('Home Component', () => {
     window.location = { pathname: '/some-path/screen' } as Location;
 
     render(<Home />);
-    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
+    expect(screen.getByText(/active visit/i)).toBeInTheDocument();
 
     window.location = originalLocation;
   });
