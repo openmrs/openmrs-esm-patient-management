@@ -28,7 +28,7 @@ import styles from '../bed-administration/bed-administration-table.scss';
 
 const BedTypeAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t('bedType', 'Bed type');
+  const headerTitle = t('bedTypes', 'Bed types');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
@@ -91,7 +91,7 @@ const BedTypeAdministrationTable: React.FC = () => {
   if (isLoadingBedTypes) {
     return (
       <>
-        <Header route="Bed Type" />
+        <Header title={t('bedTypes', 'Bed types')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -102,7 +102,7 @@ const BedTypeAdministrationTable: React.FC = () => {
   if (errorLoadingBedTypes) {
     return (
       <>
-        <Header route="Bed Type" />
+        <Header title={t('bedTypes', 'Bed types')} />
         <div className={styles.widgetCard}>
           <ErrorState error={errorLoadingBedTypes} headerTitle={headerTitle} />
         </div>
@@ -112,7 +112,7 @@ const BedTypeAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Bed Type" />
+      <Header title={t('bedTypes', 'Bed types')} />
 
       <div className={styles.widgetCard}>
         {showBedTypeModal ? (
