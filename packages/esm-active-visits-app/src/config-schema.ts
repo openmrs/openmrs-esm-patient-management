@@ -1,10 +1,11 @@
 import { Type } from '@openmrs/esm-framework';
 
-export interface SectionDefinition {
+export interface ActiveVisitsConfigSchema {
   activeVisits: {
     pageSize: Number;
     pageSizes: Array<Number>;
     identifiers: Array<IdentifiersDefinition>;
+    obs: Array<string>;
   };
 }
 
@@ -52,6 +53,15 @@ export const configSchema = {
       _type: Type.Array,
       _description: 'Customizable page sizes that user can choose',
       _default: [10, 20, 50],
+    },
+    obs: {
+      _type: Type.Array,
+      _description: 'Array of observation concept UUIDs to be displayed on the active visits table.',
+      _elements: {
+        _type: Type.UUID,
+        _description: 'UUID of an observation concept.',
+      },
+      _default: [],
     },
   },
 };
