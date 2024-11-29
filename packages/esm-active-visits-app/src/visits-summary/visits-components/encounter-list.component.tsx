@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  TableContainer,
   Table,
-  TableHead,
-  TableExpandHeader,
-  TableRow,
-  TableHeader,
   TableBody,
-  TableExpandRow,
   TableCell,
+  TableContainer,
   TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@carbon/react';
-import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
-import { type Observation } from '../visit.resource';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { type Observation } from '../../types';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 

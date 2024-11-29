@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { type Observation } from '../visit.resource';
+import { type Observation } from '../../types';
 import EncounterObservations from './encounter-observations.component';
 
 describe('EncounterObservations', () => {
