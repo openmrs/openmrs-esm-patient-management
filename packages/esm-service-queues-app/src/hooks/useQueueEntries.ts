@@ -1,11 +1,11 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr/_internal';
 import isEqual from 'lodash-es/isEqual';
 
-type QueueEntryResponse = FetchResponse<{
+export type QueueEntryResponse = FetchResponse<{
   results: Array<QueueEntry>;
   links: Array<{
     rel: 'prev' | 'next';
@@ -16,10 +16,10 @@ type QueueEntryResponse = FetchResponse<{
 
 const queueEntryBaseUrl = `${restBaseUrl}/queue-entry`;
 
-const repString =
+export const repString =
   'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
-function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
+export function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
   searchParam.append('totalCount', 'true');
@@ -33,22 +33,6 @@ function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
   }
 
   return `${queueEntryBaseUrl}?${searchParam.toString()}`;
-}
-
-function getNextUrlFromResponse(data: QueueEntryResponse) {
-  const next = data?.data?.links?.find((link) => link.rel === 'next');
-  if (next) {
-    const nextUrl = new URL(next.uri);
-    // default for production
-    if (nextUrl.origin === window.location.origin) {
-      return nextUrl.toString();
-    }
-
-    // in development, the request should be routed through the local proxy
-    return new URL(`${nextUrl.pathname}${nextUrl.search ? nextUrl.search : ''}`, window.location.origin).toString();
-  }
-  // There's no next URL
-  return null;
 }
 
 export function useMutateQueueEntries() {
@@ -68,18 +52,26 @@ export function useMutateQueueEntries() {
   };
 }
 
-export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString){
-
+export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
+  const initialMount = useRef<boolean>(true);
   const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
-  const {data,mutate,...rest}=useOpenmrsFetchAll<any>(pageUrl);
+  const { data, mutate, ...rest } = useOpenmrsFetchAll<QueueEntry>(pageUrl, {
+    swrInfiniteConfig: {
+      revalidateFirstPage: false,
+    },
+  });
 
   useEffect(() => {
-   setPageUrl(getInitialUrl(rep, searchCriteria));
- }, [searchCriteria,rep]);
+    setPageUrl(getInitialUrl(rep, searchCriteria));
+  }, [searchCriteria, rep]);
 
-  useEffect(()=>{
-     mutate();
-  },[pageUrl])
+  useEffect(() => {
+    if (initialMount) {
+      initialMount.current = false;
+      return;
+    }
+    mutate();
+  }, [pageUrl]);
 
   const queueUpdateListener = useCallback(() => {
     mutate();
@@ -93,11 +85,10 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   }, [queueUpdateListener]);
 
   return {
-    queueEntries:data,
+    queueEntries: data,
     mutate,
-    ...rest
-  }
-
+    ...rest,
+  };
 }
 
 export function useQueueEntriesMetrics(searchCriteria?: QueueEntrySearchCriteria) {

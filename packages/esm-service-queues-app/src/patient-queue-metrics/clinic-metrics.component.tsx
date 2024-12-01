@@ -8,9 +8,10 @@ import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount } from './queue-metrics.resource';
 import styles from './clinic-metrics.scss';
 import { useQueues } from '../hooks/useQueues';
-import { useQueueEntries } from '../hooks/useQueueEntries';
+import { getInitialUrl, type QueueEntryResponse, repString, useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueServices from '../hooks/useQueueService';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 
 export interface Service {
   uuid: string;
@@ -28,11 +29,15 @@ function ClinicMetrics() {
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
     return !currentService?.serviceDisplay || !currentService?.serviceUuid;
   });
-  const { totalCount } = useQueueEntries({
-    service: currentService?.serviceUuid,
-    location: currentQueueLocation,
-    isEnded: false,
-  });
+
+  const { data } = useSWR<QueueEntryResponse>(
+    getInitialUrl(repString, {
+      service: currentService?.serviceUuid,
+      location: currentQueueLocation,
+      isEnded: false,
+    }),
+  );
+  const totalCount = data?.data?.totalCount;
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
   const { waitTime } = useAverageWaitTime(currentService?.serviceUuid, '');
 
