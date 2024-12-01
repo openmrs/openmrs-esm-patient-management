@@ -62,7 +62,7 @@ function ClinicMetrics() {
         />
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={initialSelectedItem ? totalCount || '--' : serviceCount}
+          value={initialSelectedItem ? totalCount ?? '--' : serviceCount}
           headerLabel={`${t('waitingFor', 'Waiting for')}:`}
           service={currentService?.serviceDisplay}
           serviceUuid={currentService?.serviceUuid}
