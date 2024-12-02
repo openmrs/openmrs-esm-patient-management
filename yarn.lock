@@ -1901,12 +1901,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:^3.3.1":
-  version: 3.3.4
-  resolution: "@hookform/resolvers@npm:3.3.4"
+"@hookform/resolvers@npm:^3.9.1":
+  version: 3.9.1
+  resolution: "@hookform/resolvers@npm:3.9.1"
   peerDependencies:
     react-hook-form: ^7.0.0
-  checksum: 10/0845e15f53b515ab5dc8d970d4ee7f47bbdfc4f4391bc166361535482d96b6ae3d1812669107fca05bf8687fa5447e3ed65f2eee3e349759b23b229ca978f917
+  checksum: 10/4e7a24f79ead48db5c869c17b5f47412a7d628939f743bdc1248ea3a291b1a9dd777cd02f84326e91d258283a6351566f13bca5cb30f996e5a9db7ee490b5cc5
   languageName: node
   linkType: hard
 
@@ -3302,7 +3302,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.11.6"
     "@carbon/react": "npm:^1.71.0"
-    "@hookform/resolvers": "npm:^3.3.1"
+    "@hookform/resolvers": "npm:^3.9.1"
     "@internationalized/date": "npm:^3.5.4"
     "@openmrs/esm-framework": "npm:next"
     "@openmrs/esm-patient-common-lib": "npm:next"
@@ -3361,7 +3361,7 @@ __metadata:
     webpack-cli: "npm:^4.10.0"
     webpack-dev-server: "npm:^4.15.1"
     xlsx: "npm:^0.18.5"
-    zod: "npm:^3.22.2"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -19384,10 +19384,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.22.2":
-  version: 3.22.4
-  resolution: "zod@npm:3.22.4"
-  checksum: 10/73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
+"zod@npm:^3.23.8":
+  version: 3.23.8
+  resolution: "zod@npm:3.23.8"
+  checksum: 10/846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1
   languageName: node
   linkType: hard
 
