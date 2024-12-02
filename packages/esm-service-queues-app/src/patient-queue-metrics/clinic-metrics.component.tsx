@@ -5,11 +5,12 @@ import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { updateSelectedService, useSelectedService, useSelectedQueueLocationUuid } from '../helpers/helpers';
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount } from './queue-metrics.resource';
-import { useQueueEntries } from '../hooks/useQueueEntries';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import useQueueServices from '../hooks/useQueueService';
 import styles from './clinic-metrics.scss';
+import { getInitialUrl, type QueueEntryResponse, repString } from '../hooks/useQueueEntries';
+import useSWR from 'swr';
 
 export interface Service {
   uuid: string;
@@ -27,11 +28,17 @@ function ClinicMetrics() {
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
     return !currentService?.serviceDisplay || !currentService?.serviceUuid;
   });
-  const { totalCount } = useQueueEntries({
-    service: currentService?.serviceUuid,
-    location: currentQueueLocation,
-    isEnded: false,
-  });
+
+  const { data } = useSWR<QueueEntryResponse>(
+    getInitialUrl(repString, {
+      service: currentService?.serviceUuid,
+      location: currentQueueLocation,
+      isEnded: false,
+    }),
+  );
+
+  const totalCount = data?.data?.totalCount;
+
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
   const { waitTime } = useAverageWaitTime(currentService?.serviceUuid, '');
 
