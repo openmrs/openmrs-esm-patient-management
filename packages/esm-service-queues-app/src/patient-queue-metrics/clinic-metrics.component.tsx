@@ -9,7 +9,7 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import useQueueServices from '../hooks/useQueueService';
 import styles from './clinic-metrics.scss';
-import { getInitialUrl, QueueEntryResponse, repString } from '../hooks/useQueueEntries';
+import { getInitialUrl, type QueueEntryResponse, repString } from '../hooks/useQueueEntries';
 import useSWR from 'swr';
 
 export interface Service {
