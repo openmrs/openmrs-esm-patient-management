@@ -71,10 +71,6 @@
   ],
   "modals": [
     {
-      "name": "add-visit-to-queue-modal",
-      "component": "addVisitToQueueModal"
-    },
-    {
       "name": "add-provider-to-room-modal",
       "component": "addProviderToRoomModal"
     },
