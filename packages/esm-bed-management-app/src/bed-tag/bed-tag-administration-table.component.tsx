@@ -18,31 +18,32 @@ import {
 import { Add, Edit } from '@carbon/react/icons';
 import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
 import type { BedTagData } from '../types';
-import { useBedTag } from '../summary/summary.resource';
+import { useBedTags } from '../summary/summary.resource';
+import BedTagForm from './new-tag-form.component';
+import CardHeader from '../card-header/card-header.component';
+import EditBedTagForm from './edit-tag-form.component';
 import Header from '../header/header.component';
 import styles from '../bed-administration/bed-administration-table.scss';
-import { CardHeader } from '../card-header/card-header.component';
-import BedTagForm from './new-tag-form.component';
-import EditBedTagForm from './edit-tag-form.component';
 
 const BedTagAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t('bedTag', 'Bed Tag');
+  const headerTitle = t('bedTags', 'Bed tags');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
   const isDesktop = desktopLayout(layout);
+  const { bedTags, errorLoadingBedTags, isLoadingBedTags, isValidatingBedTags, mutateBedTags } = useBedTags();
+
   const [isBedDataLoading] = useState(false);
   const [showBedTagsModal, setAddBedTagsModal] = useState(false);
   const [showEditBedModal, setShowEditBedModal] = useState(false);
   const [editData, setEditData] = useState<BedTagData>();
   const [currentPage, setCurrentPage] = useState(1);
-  const { bedTypeData, isError, loading, validate, mutate } = useBedTag();
   const [pageSize, setPageSize] = useState(10);
 
   const tableHeaders = [
     {
-      header: t('ids', 'Id'),
+      header: t('ids', 'ID'),
       key: 'ids',
     },
     {
@@ -56,9 +57,8 @@ const BedTagAdministrationTable: React.FC = () => {
   ];
 
   const tableRows = useMemo(() => {
-    return bedTypeData?.map((entry) => ({
+    return bedTags?.map((entry) => ({
       id: entry.uuid,
-      ids: entry.id,
       name: entry?.name,
       actions: (
         <>
@@ -80,12 +80,12 @@ const BedTagAdministrationTable: React.FC = () => {
         </>
       ),
     }));
-  }, [responsiveSize, bedTypeData, t]);
+  }, [responsiveSize, bedTags, t]);
 
-  if (isBedDataLoading || loading) {
+  if (isBedDataLoading || isLoadingBedTags) {
     return (
       <>
-        <Header route="Bed Tag" />
+        <Header title={t('bedTags', 'Bed tags')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -93,12 +93,12 @@ const BedTagAdministrationTable: React.FC = () => {
     );
   }
 
-  if (isError) {
+  if (errorLoadingBedTags) {
     return (
       <>
-        <Header route="Bed Tag" />
+        <Header title={t('bedTags', 'Bed tags')} />
         <div className={styles.widgetCard}>
-          <ErrorState error={isError} headerTitle={headerTitle} />
+          <ErrorState error={errorLoadingBedTags} headerTitle={headerTitle} />
         </div>
       </>
     );
@@ -106,30 +106,30 @@ const BedTagAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Bed Tag" />
+      <Header title={t('bedTags', 'Bed tags')} />
 
       <div className={styles.widgetCard}>
         {showBedTagsModal ? (
-          <BedTagForm onModalChange={setAddBedTagsModal} showModal={showBedTagsModal} mutate={mutate} />
+          <BedTagForm onModalChange={setAddBedTagsModal} showModal={showBedTagsModal} mutate={mutateBedTags} />
         ) : null}
         {showEditBedModal ? (
           <EditBedTagForm
             onModalChange={setShowEditBedModal}
             showModal={showEditBedModal}
             editData={editData}
-            mutate={mutate}
+            mutate={mutateBedTags}
           />
         ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
-            <span>{validate ? <InlineLoading /> : null}</span>
+            <span>{isValidatingBedTags ? <InlineLoading /> : null}</span>
           </span>
-          {bedTypeData?.length ? (
+          {bedTags?.length ? (
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               onClick={() => setAddBedTagsModal(true)}>
-              {t('addBedTag', 'Add Bed Tag')}
+              {t('addBedTag', 'Add bed tag')}
             </Button>
           ) : null}
         </CardHeader>
@@ -167,7 +167,7 @@ const BedTagAdministrationTable: React.FC = () => {
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
                       onClick={() => setAddBedTagsModal(true)}>
-                      {t('bedTag', 'Add Bed Tag')}
+                      {t('addBedTag', 'Add bed tag')}
                     </Button>
                   </Tile>
                 </div>
@@ -176,7 +176,7 @@ const BedTagAdministrationTable: React.FC = () => {
                 page={currentPage}
                 pageSize={pageSize}
                 pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={bedTypeData.length}
+                totalItems={bedTags.length}
                 onChange={({ page, pageSize }) => {
                   setCurrentPage(page);
                   setPageSize(pageSize);

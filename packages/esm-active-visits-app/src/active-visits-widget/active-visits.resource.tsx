@@ -76,7 +76,7 @@ export function useActiveVisits() {
     if (data && data?.[pageNumber - 1]?.data?.links?.some((link) => link.rel === 'next')) {
       setSize((currentSize) => currentSize + 1);
     }
-  }, [data, pageNumber]);
+  }, [data, pageNumber, setSize]);
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => {
     // create base object

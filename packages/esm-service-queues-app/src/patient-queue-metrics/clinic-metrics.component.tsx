@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
-import MetricsCard from './metrics-card.component';
-import MetricsHeader from './metrics-header.component';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { updateSelectedService, useSelectedService, useSelectedQueueLocationUuid } from '../helpers/helpers';
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount } from './queue-metrics.resource';
-import styles from './clinic-metrics.scss';
-import { useQueues } from '../hooks/useQueues';
-import { getInitialUrl, type QueueEntryResponse, repString } from '../hooks/useQueueEntries';
+import MetricsCard from './metrics-card.component';
+import MetricsHeader from './metrics-header.component';
 import useQueueServices from '../hooks/useQueueService';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import styles from './clinic-metrics.scss';
+import { getInitialUrl, QueueEntryResponse, repString } from '../hooks/useQueueEntries';
 import useSWR from 'swr';
 
 export interface Service {
@@ -71,13 +70,15 @@ function ClinicMetrics() {
           locationUuid={currentQueueLocation}>
           <Dropdown
             id="inline"
-            type="inline"
             items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
             itemToString={(item) =>
               item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
             }
+            label=""
             onChange={handleServiceChange}
             size={isDesktop(layout) ? 'sm' : 'lg'}
+            titleText=""
+            type="inline"
           />
         </MetricsCard>
         <MetricsCard

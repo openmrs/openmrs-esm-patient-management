@@ -15,7 +15,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceProps> = (props) =
 
   return (
     <div>
-      <WardPatientWorkspaceBanner {...wardPatient} />
+      <WardPatientWorkspaceBanner {...{ wardPatient }} />
       <PatientNotesForm {...notesFormState} />
       <PatientNotesHistory patientUuid={patientUuid} visitUuid={wardPatient?.visit?.uuid} />
     </div>

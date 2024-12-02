@@ -1,0 +1,15 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.radioButtonGroup {
+  margin-top: layout.$spacing-03;
+  fieldset {
+    flex-direction: column;
+    align-items: flex-start;
+
+    :global(.cds--radio-button-wrapper) {
+      margin-bottom: layout.$spacing-04;
+    }
+  }
+}

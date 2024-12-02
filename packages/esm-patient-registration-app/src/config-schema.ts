@@ -1,4 +1,5 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
+import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
   id: string;
@@ -12,12 +13,14 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder?: string;
-  dateFormat?: string;
+  allowFutureDates?: boolean;
+  allowPastDates?: boolean;
   showHeading: boolean;
   validation?: {
     required: boolean;
     matches?: string;
   };
+  locationTag?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
 }
@@ -175,6 +178,16 @@ export const esmPatientRegistrationSchema = {
         _default: '',
         _description: 'Placeholder that will appear in the input.',
       },
+      allowFutureDates: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Indicates whether the date input field should allow the selection of future dates or not.',
+      },
+      allowPastDates: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Indicates whether the date input field should allow the selection of past dates or not.',
+      },
       validation: {
         required: { _type: Type.Boolean, _default: false },
         matches: {
@@ -182,6 +195,12 @@ export const esmPatientRegistrationSchema = {
           _default: null,
           _description: 'Optional RegEx for testing the validity of the input.',
         },
+      },
+      locationTag: {
+        _type: Type.String,
+        _default: null,
+        _description:
+          'Only for fields with "person attribute" type `org.openmrs.Location`. This filters the list of location options in the dropdown based on their location tag. By default, all locations are shown.',
       },
       answerConceptSetUuid: {
         _type: Type.ConceptUuid,

@@ -11,7 +11,11 @@ import type {
 import type React from 'react';
 import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
 
-export type WardPatientCard = React.FC<WardPatient>;
+interface WardPatientCardProps {
+  wardPatient: WardPatient;
+}
+
+export type WardPatientCardType = React.FC<WardPatientCardProps>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
@@ -44,10 +48,7 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
-}
-export interface MotherAndChildrenRelationships {
-  motherByChildUuid: Map<string, Patient>;
-  childrenByMotherUuid: Map<string, Array<Patient>>;
+  WardPatientHeader: WardPatientCardType;
 }
 
 // server-side types defined in openmrs-module-bedmanagement:
@@ -68,6 +69,14 @@ export interface Bed {
   row: number;
   column: number;
   status: BedStatus;
+}
+
+export interface BedDetail {
+  bedId: number;
+  bedNumber: number;
+  bedType: BedType;
+  physicalLocation: Location;
+  patients: Array<Patient>;
 }
 
 export interface BedLayout {
@@ -143,9 +152,6 @@ export interface InpatientAdmission {
 
   // the current in patient request
   currentInpatientRequest: InpatientRequest;
-}
-export interface WardAppContext {
-  allPatientsByPatientUuid: Map<string, Patient>;
 }
 
 export interface MotherAndChild {
@@ -224,15 +230,29 @@ export interface EncounterPayload {
 
 export interface ObsPayload {
   concept: Concept | string;
-  value?: string;
+  value?: string | OpenmrsResource;
   groupMembers?: Array<ObsPayload>;
 }
 
-export interface MotherAndChildren {
-  childAdmission: InpatientAdmission;
-  child: Patient;
-  motherAdmission: InpatientAdmission;
-  mother: Patient;
+export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
+export interface WardViewContext {
+  wardPatientGroupDetails: WardPatientGroupDetails;
+  WardPatientHeader: WardPatientCardType;
 }
 
-export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
+export interface PatientAndAdmission {
+  patient: Patient;
+  currentAdmission: InpatientAdmission;
+}
+
+export interface MotherChildRelationships {
+  motherByChildUuid: Map<string, PatientAndAdmission>;
+  childrenByMotherUuid: Map<string, PatientAndAdmission[]>;
+  isLoading: boolean;
+}
+
+export interface MaternalWardViewContext {
+  motherChildRelationships: MotherChildRelationships;
+}
+
+export type PatientWorkspaceAdditionalProps = Omit<WardPatientWorkspaceProps, keyof DefaultWorkspaceProps>;

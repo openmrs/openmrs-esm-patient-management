@@ -1,9 +1,11 @@
-import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequest } from '__mocks__';
+import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequests } from '__mocks__';
 import { useAdmissionLocation } from './src/hooks/useAdmissionLocation';
 import { useInpatientAdmission } from './src/hooks/useInpatientAdmission';
 import { createAndGetWardPatientGrouping } from './src/ward-view/ward-view.resource';
 import { useInpatientRequest } from './src/hooks/useInpatientRequest';
 import { useWardPatientGrouping } from './src/hooks/useWardPatientGrouping';
+import { type WardViewContext } from './src/types';
+import DefaultWardPatientCardHeader from './src/ward-view/default-ward/default-ward-patient-card-header.component';
 
 jest.mock('./src/hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
@@ -36,19 +38,26 @@ const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockRe
 });
 
 const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturnValue({
-  inpatientRequests: mockInpatientRequest,
+  inpatientRequests: mockInpatientRequests,
   hasMore: false,
   loadMore: jest.fn(),
   isValidating: false,
   isLoading: false,
   error: undefined,
   mutate: jest.fn(),
-  totalCount: mockInpatientRequest.length,
+  totalCount: mockInpatientRequests.length,
 });
 
 export const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockReturnValue({
   admissionLocationResponse: mockAdmissionLocationResponse(),
   inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
   inpatientRequestResponse: mockInpatientRequestResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequest),
+  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequests),
+  isLoading: false,
+  mutate: jest.fn(),
 });
+
+export const mockWardViewContext: WardViewContext = {
+  wardPatientGroupDetails: mockWardPatientGroupDetails(),
+  WardPatientHeader: DefaultWardPatientCardHeader,
+};

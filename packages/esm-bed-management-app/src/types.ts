@@ -138,9 +138,9 @@ export interface BedTypePayload {
   description: string;
 }
 
-export type Mutator = KeyedMutator<{
+export type Mutator<T> = KeyedMutator<{
   data: {
-    results: Array<Location>;
+    results: Array<T>;
   };
 }>;
 

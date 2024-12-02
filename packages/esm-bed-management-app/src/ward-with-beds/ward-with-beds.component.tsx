@@ -17,22 +17,21 @@ import {
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate, usePagination } from '@openmrs/esm-framework';
-import Header from '../header/header.component';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
+import Header from '../header/header.component';
 import styles from './ward-with-beds.scss';
 
 type RouteParams = { location: string };
 
 const WardWithBeds: React.FC = () => {
   const { location } = useParams<RouteParams>();
-  const { isLoading, bedData } = useBedsForLocation(location);
-
+  const { bedsData, isLoadingBeds } = useBedsForLocation(location);
   const { name } = useLocationName(location);
 
   const [pageSize, setPageSize] = useState(10);
-  const { results: paginatedData, goTo, currentPage } = usePagination(bedData, pageSize);
+  const { results: paginatedData, goTo, currentPage } = usePagination(bedsData, pageSize);
 
-  if (isLoading) {
+  if (isLoadingBeds) {
     <p>Loading...</p>;
   }
 
@@ -94,14 +93,14 @@ const WardWithBeds: React.FC = () => {
 
   return (
     <>
-      <Header route={name ? name : '--'} />
-      {isLoading && (
+      <Header title={name ? name : '--'} />
+      {isLoadingBeds && (
         <div className={styles.container}>
           <DataTableSkeleton role="progressbar" zebra />
         </div>
       )}
 
-      {bedData?.length ? (
+      {bedsData?.length ? (
         <>
           <div className={styles.backButton}>
             <Button

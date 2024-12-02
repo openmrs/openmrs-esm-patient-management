@@ -1,20 +1,22 @@
 export interface BedAdministrationData {
-  bedId: string;
-  description: string;
-  bedRow: string;
   bedColumn: string;
+  bedId: string;
+  bedRow: string;
+  bedType: string;
+  description: string;
   location: {
     display: string;
     uuid: string;
   };
   occupancyStatus: string;
-  bedType: string;
 }
+
 export interface BedTypeDataAdministration {
-  name: string;
-  displayName: string;
   description: string;
+  displayName: string;
+  name: string;
 }
+
 export interface BedTagDataAdministration {
   name: string;
 }

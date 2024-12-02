@@ -1,53 +1,31 @@
-import { age, attach, ExtensionSlot, type Patient } from '@openmrs/esm-framework';
-import React, { useEffect } from 'react';
-import styles from './ward-patient.style.scss';
-import { useTranslation } from 'react-i18next';
+import { attach, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import React from 'react';
 import { type WardPatientWorkspaceProps } from '../../types';
-import { getGender } from '../../ward-patient-card/row-elements/ward-patient-gender.component';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import styles from './ward-patient.style.scss';
+import { type WardConfigObject } from '../../config-schema';
+import classNames from 'classnames';
 
 attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
 
-export default function WardPatientWorkspace({ setTitle, wardPatient: { patient } }: WardPatientWorkspaceProps) {
-  useEffect(() => {
-    setTitle(patient.person.display, <PatientWorkspaceTitle patient={patient} />);
-  }, []);
-
-  return (
-    <div className={styles.workspaceContainer}>
-      <WardPatientWorkspaceView patient={patient} />
-    </div>
-  );
-}
-
-interface WardPatientWorkspaceViewProps {
-  patient: Patient;
-}
-
-const WardPatientWorkspaceView: React.FC<WardPatientWorkspaceViewProps> = ({ patient }) => {
-  const extensionSlotState = { patient, patientUuid: patient.uuid };
+export default function WardPatientWorkspace({ wardPatient }: WardPatientWorkspaceProps) {
+  const { patient } = wardPatient ?? {};
+  const { hideWorkspaceVitalsLinks } = useConfig<WardConfigObject>();
+  const extensionSlotState = { patient, patientUuid: patient?.uuid, hideLinks: hideWorkspaceVitalsLinks };
 
   return (
     <>
-      <div>
-        <ExtensionSlot name="ward-patient-workspace-header-slot" state={extensionSlotState} />
-      </div>
-      <div>
-        <ExtensionSlot name="ward-patient-workspace-content-slot" state={extensionSlotState} />
-      </div>
-    </>
-  );
-};
-
-const PatientWorkspaceTitle: React.FC<WardPatientWorkspaceViewProps> = ({ patient }) => {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      <div>{patient.person.display} &nbsp;</div>
-      <div className={styles.headerPatientDetail}>&middot; &nbsp; {getGender(t, patient.person?.gender)}</div>
-      {patient.person?.birthdate && (
-        <div className={styles.headerPatientDetail}>&middot; &nbsp; {age(patient.person?.birthdate)}</div>
+      {wardPatient && (
+        <div className={classNames(styles.workspaceContainer, styles.patientWorkspace)}>
+          <WardPatientWorkspaceBanner {...{ wardPatient }} />
+          <ExtensionSlot name="ward-patient-workspace-header-slot" state={extensionSlotState} />
+          <ExtensionSlot
+            name="ward-patient-workspace-content-slot"
+            state={extensionSlotState}
+            className={styles.patientWorkspaceContentSlot}
+          />
+        </div>
       )}
     </>
   );
-};
+}

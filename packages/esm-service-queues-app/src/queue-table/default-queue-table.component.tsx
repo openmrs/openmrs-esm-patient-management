@@ -34,6 +34,8 @@ Component with default values / sub-components passed into the more generic Queu
 This is used in the main dashboard of the queues app. (Currently behind a feature flag)
 */
 function DefaultQueueTable() {
+  const { t } = useTranslation();
+  const layout = useLayoutType();
   const selectedService = useSelectedService();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const selectedQueueStatus = useSelectedQueueStatus();
@@ -48,8 +50,6 @@ function DefaultQueueTable() {
   );
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 
-  const { t } = useTranslation();
-
   useEffect(() => {
     if (error?.message) {
       showSnackbar({
@@ -58,8 +58,7 @@ function DefaultQueueTable() {
         subtitle: error?.message,
       });
     }
-  }, [error?.message]);
-  const layout = useLayoutType();
+  }, [error?.message, t]);
 
   const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
   const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
@@ -88,7 +87,7 @@ function DefaultQueueTable() {
         return columnSearchTerm?.includes(searchTermLowercase);
       });
     });
-  }, [queueEntries, searchTerm]);
+  }, [columns, queueEntries, searchTerm]);
 
   return (
     <div className={styles.defaultQueueTable}>
@@ -133,17 +132,18 @@ function DefaultQueueTable() {
               queueUuid={null}
               statusUuid={null}
               ExpandedRow={QueueTableExpandedRow}
-              tableFilter={[
-                <QueueDropdownFilter />,
-                <StatusDropdownFilter />,
-                <TableToolbarSearch
-                  className={styles.search}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={t('searchThisList', 'Search this list')}
-                  size={isDesktop(layout) ? 'sm' : 'lg'}
-                />,
-                <ClearQueueEntries queueEntries={filteredQueueEntries} />,
-              ]}
+              tableFilters={
+                <>
+                  <QueueDropdownFilter /> <StatusDropdownFilter />
+                  <TableToolbarSearch
+                    className={styles.search}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size={isDesktop(layout) ? 'sm' : 'lg'}
+                  />
+                  <ClearQueueEntries queueEntries={filteredQueueEntries} />
+                </>
+              }
             />
           </div>
         ) : (
@@ -159,22 +159,23 @@ function QueueDropdownFilter() {
   const layout = useLayoutType();
   const { services } = useQueueServices();
   const selectedService = useSelectedService();
-  const handleServiceChange = ({ selectedItem }) => {
+
+  const handleServiceChange = useCallback(({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem?.display);
-  };
+  }, []);
 
   return (
     <>
       <div className={styles.filterContainer}>
         <Dropdown
           id="serviceFilter"
-          titleText={t('filterByService', 'Filter by service :')}
-          label={selectedService?.serviceDisplay ?? t('all', 'All')}
-          type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
           itemToString={(item) => (item ? item.display : '')}
+          label={selectedService?.serviceDisplay ?? t('all', 'All')}
           onChange={handleServiceChange}
           size={isDesktop(layout) ? 'sm' : 'lg'}
+          titleText={t('filterByService', 'Filter by service:')}
+          type="inline"
         />
       </div>
     </>
@@ -195,13 +196,13 @@ function StatusDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="statusFilter"
-          titleText={t('filterByStatus', 'Filter by status :')}
-          label={queueStatus?.statusDisplay ?? t('all', 'All')}
-          type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}
           itemToString={(item) => (item ? item.display : '')}
+          label={queueStatus?.statusDisplay ?? t('all', 'All')}
           onChange={handleServiceChange}
           size={isDesktop(layout) ? 'sm' : 'lg'}
+          titleText={t('filterByStatus', 'Filter by status:')}
+          type="inline"
         />
       </div>
     </>

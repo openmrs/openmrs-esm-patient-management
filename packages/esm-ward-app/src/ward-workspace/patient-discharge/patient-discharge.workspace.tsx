@@ -1,42 +1,28 @@
+import React, { useCallback, useState } from 'react';
 import { Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { Exit } from '@carbon/react/icons';
-import { ExtensionSlot, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
-import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import { ExtensionSlot, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
+import { type WardPatientWorkspaceProps, type WardViewContext } from '../../types';
+import { removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
-import { type WardPatientGroupDetails, type WardPatientWorkspaceProps } from '../../types';
-import { createEncounter, removePatientFromBed } from '../../ward.resource';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './patient-discharge.scss';
 
 export default function PatientDischargeWorkspace(props: WardPatientWorkspaceProps) {
   const { wardPatient, closeWorkspaceWithSavedChanges } = props;
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { currentProvider } = useSession();
   const { location } = useWardLocation();
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
-  const wardGroupingDetails = useAppContext<WardPatientGroupDetails>('ward-patients-group');
-  const { mutate: mutateAdmissionLocation } = wardGroupingDetails?.admissionLocationResponse ?? {};
-  const { mutate: mutateInpatientRequest } = wardGroupingDetails?.inpatientRequestResponse ?? {};
-  const { mutate: mutateInpatientAdmission } = wardGroupingDetails?.inpatientAdmissionResponse ?? {};
+  const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
+    useCreateEncounter();
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   const submitDischarge = useCallback(() => {
     setIsSubmitting(true);
 
-    createEncounter({
-      patient: wardPatient?.patient?.uuid,
-      encounterType: emrConfiguration.exitFromInpatientEncounterType.uuid,
-      location: location.uuid,
-      encounterProviders: [
-        {
-          encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
-          provider: currentProvider?.uuid,
-        },
-      ],
-      obs: [],
-    })
+    createEncounter(wardPatient?.patient, emrConfiguration.exitFromInpatientEncounterType)
       .then((response) => {
         if (response?.ok) {
           if (wardPatient?.bed?.id) {
@@ -63,26 +49,23 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
       .finally(() => {
         setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
-        mutateAdmissionLocation();
-        mutateInpatientRequest();
-        mutateInpatientAdmission();
+        wardPatientGroupDetails.mutate();
       });
   }, [
-    currentProvider,
-    location,
-    emrConfiguration,
-    wardPatient?.patient?.uuid,
-    wardPatient?.bed?.uuid,
-    mutateAdmissionLocation,
-    mutateInpatientRequest,
-    mutateInpatientAdmission,
+    createEncounter,
+    wardPatient?.patient,
+    wardPatient.bed.id,
+    emrConfiguration.exitFromInpatientEncounterType,
+    t,
+    closeWorkspaceWithSavedChanges,
+    wardPatientGroupDetails,
   ]);
 
-  if (!wardGroupingDetails) return <></>;
+  if (!wardPatientGroupDetails) return <></>;
   return (
     <div className={styles.workspaceContent}>
       <div className={styles.patientWorkspaceBanner}>
-        <WardPatientWorkspaceBanner {...props?.wardPatient} />
+        <WardPatientWorkspaceBanner wardPatient={props?.wardPatient} />
       </div>
       <div className={styles.workspaceForm}>
         <div>

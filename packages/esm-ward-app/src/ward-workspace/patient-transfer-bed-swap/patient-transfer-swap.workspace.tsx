@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useFeatureFlag } from '@openmrs/esm-framework';
 import { ContentSwitcher, Switch } from '@carbon/react';
+import { useFeatureFlag } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PatientTransferForm from './patient-transfer-request-form.component';
-import PatientBedSwapForm from './patient-bed-swap-form.component';
-import styles from './patient-transfer-swap.scss';
-import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import type { WardPatientWorkspaceProps } from '../../types';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import PatientBedSwapForm from './patient-bed-swap-form.component';
+import PatientTransferForm from './patient-transfer-request-form.component';
+import styles from './patient-transfer-swap.scss';
 
 const TransferSection = {
   TRANSFER: 'transfer',
@@ -23,7 +23,7 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
   return (
     <div className={styles.flexWrapper}>
       <div className={styles.patientWorkspaceBanner}>
-        <WardPatientWorkspaceBanner {...props?.wardPatient} />
+        <WardPatientWorkspaceBanner wardPatient={props?.wardPatient} />
       </div>
       {isBedManagementModuleInstalled && (
         <div className={styles.contentSwitcherWrapper}>
@@ -37,7 +37,11 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
         </div>
       )}
       <div className={styles.workspaceForm}>
-        {selectedSection === 'transfer' ? <PatientTransferForm {...props} /> : <PatientBedSwapForm {...props} />}
+        {selectedSection === TransferSection.TRANSFER ? (
+          <PatientTransferForm {...props} />
+        ) : (
+          <PatientBedSwapForm {...props} />
+        )}
       </div>
     </div>
   );

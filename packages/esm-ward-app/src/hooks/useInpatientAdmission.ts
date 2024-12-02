@@ -8,7 +8,7 @@ export function useInpatientAdmission() {
   // prettier-ignore
   const customRepresentation =
     'custom:(visit,' +
-    'patient:(uuid,identifiers,voided,' +
+    'patient:(uuid,identifiers:(uuid,display,identifier,identifierType),voided,' +
     'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)),' +
     'encounterAssigningToCurrentInpatientLocation:(encounterDatetime),' +
     'currentInpatientRequest:(dispositionLocation,dispositionType,disposition:(uuid,display),dispositionEncounter:(uuid,display),dispositionObsGroup:(uuid,display),visit:(uuid),patient:(uuid)),' +

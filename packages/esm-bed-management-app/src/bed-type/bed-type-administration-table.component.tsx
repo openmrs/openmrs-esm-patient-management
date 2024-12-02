@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   DataTableSkeleton,
+  IconButton,
   InlineLoading,
   Pagination,
   Table,
@@ -18,36 +19,36 @@ import {
 import { Add, Edit } from '@carbon/react/icons';
 import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
 import type { BedTypeData } from '../types';
-import { useBedType } from '../summary/summary.resource';
-import Header from '../header/header.component';
+import { useBedTypes } from '../summary/summary.resource';
+import CardHeader from '../card-header/card-header.component';
 import BedTypeForm from './new-bed-type-form.component';
-import styles from '../bed-administration/bed-administration-table.scss';
-import { CardHeader } from '../card-header/card-header.component';
 import EditBedTypeForm from './edit-bed-type.component';
+import Header from '../header/header.component';
+import styles from '../bed-administration/bed-administration-table.scss';
 
 const BedTypeAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t('bedType', 'Bed Type');
+  const headerTitle = t('bedTypes', 'Bed types');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
   const isDesktop = desktopLayout(layout);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
-  const [isBedDataLoading, setIsBedDataLoading] = useState(false);
-  const [showBedTypeModal, setAddBedTypeModal] = useState(false);
+  const { bedTypes, errorLoadingBedTypes, isLoadingBedTypes, isValidatingBedTypes, mutateBedTypes } = useBedTypes();
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentPageSize, setPageSize] = useState(10);
   const [editData, setEditData] = useState<BedTypeData>();
   const [pageSize] = useState(10);
-  const { bedTypeData, isError, loading, validate, mutate } = useBedType();
-  const [currentPageSize, setPageSize] = useState(10);
-  const pageSizes = [10, 20, 30, 40, 50];
+  const [showBedTypeModal, setAddBedTypeModal] = useState(false);
+  const [showEditBedModal, setShowEditBedModal] = useState(false);
+
   const tableHeaders = [
     {
       header: t('name', 'Name'),
       key: 'name',
     },
     {
-      header: t('displayName', 'Display Name'),
+      header: t('displayName', 'Display name'),
       key: 'displayName',
     },
     {
@@ -60,38 +61,37 @@ const BedTypeAdministrationTable: React.FC = () => {
     },
   ];
 
-  const tableRows = useMemo(() => {
-    return bedTypeData?.map((entry) => ({
-      id: entry.uuid,
-      name: entry?.name,
-      displayName: entry?.displayName,
-      description: entry?.description,
-      actions: (
-        <>
-          <Button
+  const tableRows = useMemo(
+    () =>
+      bedTypes?.map((entry) => ({
+        id: entry.uuid,
+        name: entry?.name,
+        displayName: entry?.displayName,
+        description: entry?.description,
+        actions: (
+          <IconButton
+            align="top-start"
             enterDelayMs={300}
-            renderIcon={Edit}
+            kind="ghost"
+            label={t('editBedType', 'Edit bed type')}
             onClick={(e) => {
               e.preventDefault();
               setEditData(entry);
               setShowEditBedModal(true);
               setAddBedTypeModal(false);
             }}
-            kind={'ghost'}
-            iconDescription={t('editBedType', 'Edit Bed Type')}
-            hasIconOnly
-            size={responsiveSize}
-            tooltipAlignment="start"
-          />
-        </>
-      ),
-    }));
-  }, [responsiveSize, bedTypeData, t]);
+            size={responsiveSize}>
+            <Edit />
+          </IconButton>
+        ),
+      })),
+    [responsiveSize, bedTypes, t],
+  );
 
-  if (isBedDataLoading || loading) {
+  if (isLoadingBedTypes) {
     return (
       <>
-        <Header route="Bed Type" />
+        <Header title={t('bedTypes', 'Bed types')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -99,12 +99,12 @@ const BedTypeAdministrationTable: React.FC = () => {
     );
   }
 
-  if (isError) {
+  if (errorLoadingBedTypes) {
     return (
       <>
-        <Header route="Bed Type" />
+        <Header title={t('bedTypes', 'Bed types')} />
         <div className={styles.widgetCard}>
-          <ErrorState error={isError} headerTitle={headerTitle} />
+          <ErrorState error={errorLoadingBedTypes} headerTitle={headerTitle} />
         </div>
       </>
     );
@@ -112,30 +112,30 @@ const BedTypeAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Bed Type" />
+      <Header title={t('bedTypes', 'Bed types')} />
 
       <div className={styles.widgetCard}>
         {showBedTypeModal ? (
-          <BedTypeForm onModalChange={setAddBedTypeModal} showModal={showBedTypeModal} mutate={mutate} />
+          <BedTypeForm onModalChange={setAddBedTypeModal} showModal={showBedTypeModal} mutate={mutateBedTypes} />
         ) : null}
         {showEditBedModal ? (
           <EditBedTypeForm
+            editData={editData}
+            mutate={mutateBedTypes}
             onModalChange={setShowEditBedModal}
             showModal={showEditBedModal}
-            editData={editData}
-            mutate={mutate}
           />
         ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
-            <span>{validate ? <InlineLoading /> : null}</span>
+            <span>{isValidatingBedTypes ? <InlineLoading /> : null}</span>
           </span>
-          {bedTypeData?.length ? (
+          {bedTypes?.length ? (
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               onClick={() => setAddBedTypeModal(true)}>
-              {t('addBedtype', 'Add Bed Type')}
+              {t('addBedType', 'Add bed type')}
             </Button>
           ) : null}
         </CardHeader>
@@ -146,7 +146,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader>{header.header?.content ?? header.header}</TableHeader>
+                      <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -164,7 +164,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                 <div className={styles.tileContainer}>
                   <Tile className={styles.tile}>
                     <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('No data', 'No data to display')}</p>
+                      <p className={styles.content}>{t('noDataToDisplay', 'No data to display')}</p>
                       <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                     </div>
                     <p className={styles.separator}>{t('or', 'or')}</p>
@@ -173,7 +173,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
                       onClick={() => setAddBedTypeModal(true)}>
-                      {t('bedType', 'Add Bed Type')}
+                      {t('addBedType', 'Add bed type')}
                     </Button>
                   </Tile>
                 </div>
@@ -182,7 +182,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                 page={currentPage}
                 pageSize={pageSize}
                 pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={bedTypeData.length}
+                totalItems={bedTypes.length}
                 onChange={({ page, pageSize }) => {
                   setCurrentPage(page);
                   setPageSize(pageSize);

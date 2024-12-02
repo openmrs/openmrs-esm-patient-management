@@ -1,16 +1,14 @@
-import { openmrsFetch, restBaseUrl, updateVisit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { endPatientStatus } from '../active-visits/active-visits-table.resource';
-import { type AppointmentsFetchResponse, type EndVisitPayload } from '../types';
 import useSWR from 'swr';
+import { openmrsFetch, restBaseUrl, updateVisit } from '@openmrs/esm-framework';
+import { type AppointmentsFetchResponse, type EndVisitPayload } from '../types';
+import { endPatientStatus } from '../active-visits/active-visits-table.resource';
 import { omrsDateFormat, timeZone } from '../constants';
-import { first } from 'rxjs/operators';
 
 const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
 
 export async function endQueueEntry(
   queueUuid: string,
-
   queueEntryUuid: string,
   endedAt: Date,
   endCurrentVisitPayload: EndVisitPayload,
@@ -21,31 +19,27 @@ export async function endQueueEntry(
 
   if (endCurrentVisitPayload) {
     if (appointments?.length) {
-      appointments.forEach(async (appointment) => {
-        await Promise.all([changeAppointmentStatus('Completed', appointment.uuid)]);
-      });
+      await Promise.all(
+        appointments.map(async (appointment) => {
+          await changeAppointmentStatus('Completed', appointment.uuid);
+        }),
+      );
     }
 
-    await Promise.all([endPatientStatus(queueUuid, queueEntryUuid, endedAt)]);
+    await endPatientStatus(queueUuid, queueEntryUuid, endedAt);
 
-    return updateVisit(visitUuid, endCurrentVisitPayload, abortController)
-      .pipe(first())
-      .subscribe(
-        (response) => {
-          return response.status;
-        },
-        (error) => {
-          return error;
-        },
-      );
+    try {
+      const response = await updateVisit(visitUuid, endCurrentVisitPayload, abortController);
+      return response.status;
+    } catch (error) {
+      return error;
+    }
   } else {
-    return await Promise.all([endPatientStatus(queueUuid, queueEntryUuid, endedAt)])
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        return error;
-      });
+    try {
+      return await endPatientStatus(queueUuid, queueEntryUuid, endedAt);
+    } catch (error) {
+      return error;
+    }
   }
 }
 

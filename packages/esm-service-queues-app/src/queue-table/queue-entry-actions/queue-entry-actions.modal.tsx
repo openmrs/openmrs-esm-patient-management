@@ -198,7 +198,13 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       );
     }
     return null;
-  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat, t]);
+  }, [
+    formState.transitionDate,
+    formState.transitionTime,
+    formState.transitionTimeFormat,
+    queueEntry.previousQueueEntry?.startedAt,
+    t,
+  ]);
 
   const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
 

@@ -46,7 +46,7 @@ interface QueueTableProps {
   ExpandedRow?: FC<{ queueEntry: QueueEntry }>;
 
   // if provided, adds addition table toolbar elements
-  tableFilter?: React.ReactNode[];
+  tableFilters?: React.ReactNode;
 
   isLoading?: boolean;
 }
@@ -58,7 +58,7 @@ function QueueTable({
   statusUuid,
   queueTableColumnsOverride,
   ExpandedRow,
-  tableFilter,
+  tableFilters,
   isLoading,
 }: QueueTableProps) {
   const { t } = useTranslation();
@@ -74,13 +74,13 @@ function QueueTable({
 
   useEffect(() => {
     goTo(1);
-  }, [queueEntries]);
+  }, [goTo, queueEntries]);
 
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
       columns.forEach(({ key, CellComponent }) => {
-        row[key] = <CellComponent queueEntry={queueEntry} />;
+        row[key] = <CellComponent key={key} queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
@@ -111,9 +111,9 @@ function QueueTable({
                 </span>
               ) : null}
 
-              {tableFilter && (
+              {tableFilters && (
                 <TableToolbar {...getToolbarProps()}>
-                  <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+                  <TableToolbarContent className={styles.toolbarContent}>{tableFilters}</TableToolbarContent>
                 </TableToolbar>
               )}
             </div>
@@ -121,8 +121,8 @@ function QueueTable({
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
-                  {headers.map((header, i) => (
-                    <TableHeader key={i} {...getHeaderProps({ header })}>
+                  {headers.map((header) => (
+                    <TableHeader key={header.key} {...getHeaderProps({ header })}>
                       {header.header}
                     </TableHeader>
                   ))}
@@ -146,7 +146,10 @@ function QueueTable({
                         ))}
                       </Row>
                       {ExpandedRow && row.isExpanded && (
-                        <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
+                        <TableExpandedRow
+                          key={i}
+                          className={styles.expandedActiveVisitRow}
+                          colSpan={headers.length + 1}>
                           <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
                         </TableExpandedRow>
                       )}

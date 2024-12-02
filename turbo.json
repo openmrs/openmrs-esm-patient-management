@@ -6,7 +6,12 @@
         "dist/**"
       ]
     },
-    "coverage": {},
+    "coverage": {
+      "outputs": [
+        "coverage/**"
+      ],
+      "dependsOn": ["test"]
+    },
     "extract-translations": {},
     "lint": {
       "dependsOn": [
@@ -18,8 +23,15 @@
         "^typescript"
       ]
     },
-    "test": {},
+    "test": {
+      "dependsOn": [
+        "^test"
+      ]
+    },
     "test:watch": {
+      "dependsOn": [
+        "^test:watch"
+      ],
       "cache": false,
       "persistent": true
     }

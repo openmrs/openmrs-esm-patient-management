@@ -13,34 +13,36 @@
   border-bottom: 1px solid colors.$gray-20;
 }
 
-.left-justified-items {
+.leftJustifiedItems {
   display: flex;
   flex-direction: row;
   align-items: center;
   cursor: pointer;
+
+  & > div:nth-child(2) {
+    margin: layout.$spacing-05;
+
+    & > p:last-child {
+      white-space: nowrap;
+      @include type.type-style('heading-04');
+    }
+  }
 }
 
-.right-justified-items {
+.inPatientPictogram {
+  width: 4.5rem;
+  height: 4.5rem;
+  fill: var(--brand-03);
+}
+
+.rightJustifiedItems {
   @include type.type-style('body-compact-02');
   color: colors.$gray-70;
   margin: layout.$spacing-03;
   padding-top: layout.$spacing-04;
 }
 
-.page-name {
-  white-space: nowrap;
-  @include type.type-style('heading-04');
-}
-
-.page-labels {
-  margin: layout.$spacing-05;
-}
-
-.middot {
-  margin: 0 layout.$spacing-03;
-}
-
-.date-and-location {
+.dateAndLocation {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -53,20 +55,4 @@
 
 .middot {
   margin: 0 layout.$spacing-03;
-}
-
-.view {
-  @include type.type-style('label-01');
-}
-
-svg.iconOverrides {
-  width: 72 !important;
-  height: 72 !important;
-  fill: var(--brand-03);
-}
-
-.svgContainer svg {
-  width: 4.5rem;
-  height: 4.5rem;
-  fill: var(--brand-03);
 }

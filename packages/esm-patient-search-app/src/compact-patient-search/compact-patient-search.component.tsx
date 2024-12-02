@@ -1,9 +1,11 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { navigate, interpolateString, useConfig, useSession, useDebounce } from '@openmrs/esm-framework';
-import useArrowNavigation from '../hooks/useArrowNavigation';
-import type { SearchedPatient } from '../types';
-import { useRecentlyViewedPatients, useInfinitePatientSearch, useRESTPatients } from '../patient-search.resource';
+import { useTranslation } from 'react-i18next';
+import { navigate, interpolateString, useConfig, useSession, useDebounce, showSnackbar } from '@openmrs/esm-framework';
+import { type PatientSearchConfig } from '../config-schema';
+import { type SearchedPatient } from '../types';
+import { useRecentlyViewedPatients, useInfinitePatientSearch, useRestPatients } from '../patient-search.resource';
 import { PatientSearchContext } from '../patient-search-context';
+import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import RecentlySearchedPatients from './recently-searched-patients.component';
@@ -22,29 +24,43 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   onPatientSelect,
   shouldNavigateToPatientSearchPage,
 }) => {
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const debouncedSearchTerm = useDebounce(searchTerm);
-  const hasSearchTerm = Boolean(debouncedSearchTerm.trim());
+  const { t } = useTranslation();
+
   const bannerContainerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const config = useConfig();
+
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const hasSearchTerm = Boolean(debouncedSearchTerm?.trim());
+
+  const config = useConfig<PatientSearchConfig>();
   const { showRecentlySearchedPatients } = config.search;
-  const patientSearchResponse = useInfinitePatientSearch(debouncedSearchTerm, config.includeDead);
-  const { data: searchedPatients } = patientSearchResponse;
-  const { recentlyViewedPatients, addViewedPatient, mutateUserProperties } =
-    useRecentlyViewedPatients(showRecentlySearchedPatients);
-  const recentPatientSearchResponse = useRESTPatients(recentlyViewedPatients, !hasSearchTerm);
-  const { data: recentPatients } = recentPatientSearchResponse;
+
   const {
     user,
     sessionLocation: { uuid: currentLocation },
   } = useSession();
 
+  const patientSearchResponse = useInfinitePatientSearch(debouncedSearchTerm, config.includeDead);
+  const { data: searchedPatients } = patientSearchResponse;
+
+  const {
+    error: errorFetchingUserProperties,
+    mutateUserProperties,
+    recentlyViewedPatientUuids,
+    updateRecentlyViewedPatients,
+  } = useRecentlyViewedPatients(showRecentlySearchedPatients);
+
+  const recentPatientSearchResponse = useRestPatients(recentlyViewedPatientUuids, !hasSearchTerm);
+  const { data: recentPatients, fetchError } = recentPatientSearchResponse;
+
   const handleFocusToInput = useCallback(() => {
-    const len = searchInputRef.current.value?.length ?? 0;
-    searchInputRef.current.setSelectionRange(len, len);
-    searchInputRef.current.focus();
-  }, [searchInputRef]);
+    if (searchInputRef.current) {
+      const inputElement = searchInputRef.current;
+      inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+      inputElement.focus();
+    }
+  }, []);
 
   const handleCloseSearchResults = useCallback(() => {
     setSearchTerm('');
@@ -52,13 +68,20 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   }, [onPatientSelect, setSearchTerm]);
 
   const addViewedPatientAndCloseSearchResults = useCallback(
-    (patientUuid: string) => {
-      addViewedPatient(patientUuid).then(() => {
-        mutateUserProperties();
-      });
+    async (patientUuid: string) => {
       handleCloseSearchResults();
+      try {
+        await updateRecentlyViewedPatients(patientUuid);
+        await mutateUserProperties();
+      } catch (error) {
+        showSnackbar({
+          kind: 'error',
+          title: t('errorUpdatingRecentlyViewedPatients', 'Error updating recently viewed patients'),
+          subtitle: error instanceof Error ? error.message : String(error),
+        });
+      }
     },
-    [handleCloseSearchResults, mutateUserProperties, addViewedPatient],
+    [handleCloseSearchResults, mutateUserProperties, updateRecentlyViewedPatients, t],
   );
 
   const handlePatientSelection = useCallback(
@@ -67,13 +90,13 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       if (patients) {
         addViewedPatientAndCloseSearchResults(patients[index].uuid);
         navigate({
-          to: `${interpolateString(config.search.patientResultUrl, {
+          to: interpolateString(config.search.patientChartUrl, {
             patientUuid: patients[index].uuid,
-          })}`,
+          }),
         });
       }
     },
-    [config.search.patientResultUrl, user, currentLocation],
+    [addViewedPatientAndCloseSearchResults, config.search.patientChartUrl],
   );
   const focusedResult = useArrowNavigation(
     !recentPatients ? searchedPatients?.length ?? 0 : recentPatients?.length ?? 0,
@@ -95,9 +118,27 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     }
   }, [focusedResult, bannerContainerRef, handleFocusToInput]);
 
+  useEffect(() => {
+    if (fetchError) {
+      showSnackbar({
+        kind: 'error',
+        title: t('errorFetchingPatients', 'Error fetching patients'),
+        subtitle: fetchError?.message,
+      });
+    }
+
+    if (errorFetchingUserProperties) {
+      showSnackbar({
+        kind: 'error',
+        title: t('errorFetchingUserProperties', 'Error fetching user properties'),
+        subtitle: errorFetchingUserProperties?.message,
+      });
+    }
+  }, [fetchError, errorFetchingUserProperties, t]);
+
   const handleSubmit = useCallback(
     (debouncedSearchTerm) => {
-      if (shouldNavigateToPatientSearchPage && debouncedSearchTerm.trim()) {
+      if (shouldNavigateToPatientSearchPage && hasSearchTerm) {
         if (!isSearchPage) {
           window.sessionStorage.setItem('searchReturnUrl', window.location.pathname);
         }
@@ -106,7 +147,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         });
       }
     },
-    [isSearchPage, shouldNavigateToPatientSearchPage],
+    [isSearchPage, shouldNavigateToPatientSearchPage, hasSearchTerm],
   );
 
   const handleClear = useCallback(() => {
@@ -122,7 +163,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       }}>
       <div className={styles.patientSearchBar}>
         <PatientSearchBar
-          small
+          isCompact
           initialSearchTerm={initialSearchTerm ?? ''}
           onChange={handleSearchTermChange}
           onSubmit={handleSubmit}

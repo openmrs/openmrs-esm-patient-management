@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -21,26 +21,26 @@ import { Add, Edit } from '@carbon/react/icons';
 import { ErrorState, isDesktop as desktopLayout, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import type { BedFormData } from '../types';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
+import CardHeader from '../card-header/card-header.component';
 import EditBedForm from './edit-bed-form.component';
 import Header from '../header/header.component';
 import NewBedForm from './new-bed-form.component';
 import styles from './bed-administration-table.scss';
-import { CardHeader } from '../card-header/card-header.component';
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t('wardAllocation', 'Ward Allocation');
+  const headerTitle = t('wardAllocation', 'Ward allocation');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
   const isDesktop = desktopLayout(layout);
 
   const {
-    data: wardsGroupedByLocations,
-    isLoading: isLoadingBeds,
-    isValidating,
-    mutate,
-    error,
+    bedsGroupedByLocation,
+    isLoadingBedsGroupedByLocation,
+    isValidatingBedsGroupedByLocation,
+    mutateBedsGroupedByLocation,
+    errorFetchingBedsGroupedByLocation,
   } = useBedsGroupedByLocation();
   const [showAddBedModal, setShowAddBedModal] = useState(false);
   const [showEditBedModal, setShowEditBedModal] = useState(false);
@@ -71,8 +71,8 @@ const BedAdministrationTable: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const { results, currentPage, totalPages, goTo } = usePagination(
     filterOption === 'ALL'
-      ? wardsGroupedByLocations
-      : wardsGroupedByLocations.filter((bed) => bed.status === filterOption) ?? [],
+      ? bedsGroupedByLocation
+      : bedsGroupedByLocation.flat().filter((bed) => bed.status === filterOption) ?? [],
     pageSize,
   );
 
@@ -87,7 +87,7 @@ const BedAdministrationTable: React.FC = () => {
     },
     {
       key: 'occupancyStatus',
-      header: t('occupancyStatus', 'Occupied'),
+      header: t('occupancyStatus', 'Occupancy status'),
     },
     {
       key: 'allocationStatus',
@@ -118,7 +118,7 @@ const BedAdministrationTable: React.FC = () => {
               setShowAddBedModal(false);
             }}
             kind={'ghost'}
-            iconDescription={t('editBed', 'Edit Bed')}
+            iconDescription={t('editBed', 'Edit bed')}
             hasIconOnly
             size={responsiveSize}
             tooltipAlignment="start"
@@ -128,10 +128,10 @@ const BedAdministrationTable: React.FC = () => {
     }));
   }, [responsiveSize, results, t]);
 
-  if (isLoadingBeds && !wardsGroupedByLocations.length) {
+  if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
       <>
-        <Header route="Ward Allocation" />
+        <Header title={t('wardAllocation', 'Ward allocation')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -139,12 +139,12 @@ const BedAdministrationTable: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (errorFetchingBedsGroupedByLocation) {
     return (
       <>
-        <Header route="Ward Allocation" />
+        <Header title={t('wardAllocation', 'Ward allocation')} />
         <div className={styles.widgetCard}>
-          <ErrorState error={error} headerTitle={headerTitle} />
+          <ErrorState error={errorFetchingBedsGroupedByLocation} headerTitle={headerTitle} />
         </div>
       </>
     );
@@ -152,7 +152,7 @@ const BedAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Ward Allocation" />
+      <Header title={t('wardAllocation', 'Ward allocation')} />
       <div className={styles.flexContainer}>
         {results?.length ? (
           <div className={styles.filterContainer}>
@@ -170,19 +170,23 @@ const BedAdministrationTable: React.FC = () => {
       </div>
       <div className={styles.widgetCard}>
         {showAddBedModal ? (
-          <NewBedForm onModalChange={setShowAddBedModal} showModal={showAddBedModal} mutate={mutate} />
+          <NewBedForm
+            mutate={mutateBedsGroupedByLocation}
+            onModalChange={setShowAddBedModal}
+            showModal={showAddBedModal}
+          />
         ) : null}
         {showEditBedModal ? (
           <EditBedForm
+            editData={editData}
+            mutate={mutateBedsGroupedByLocation}
             onModalChange={setShowEditBedModal}
             showModal={showEditBedModal}
-            editData={editData}
-            mutate={mutate}
           />
         ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
-            <span>{isValidating ? <InlineLoading /> : null}</span>
+            <span>{isValidatingBedsGroupedByLocation ? <InlineLoading /> : null}</span>
           </span>
           {results?.length ? (
             <Button
@@ -239,7 +243,7 @@ const BedAdministrationTable: React.FC = () => {
                 pageNumberText="Page Number"
                 pageSize={totalPages}
                 pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={wardsGroupedByLocations.length}
+                totalItems={bedsGroupedByLocation.length}
                 onChange={({ pageSize, page }) => {
                   setPageSize(pageSize);
                   if (page !== currentPage) {

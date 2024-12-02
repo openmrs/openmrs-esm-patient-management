@@ -1,4 +1,5 @@
 import React, { type ReactElement } from 'react';
+import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import { type RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
@@ -17,6 +18,16 @@ const swrWrapper = ({ children }) => {
 const renderWithSwr = (ui: ReactElement, options?: Omit<RenderOptions, 'queries'>) =>
   render(ui, { wrapper: swrWrapper, ...options });
 
+const renderWithRouter = (component: React.ReactElement, initialRoute = '/') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path="/" element={component} />
+      </Routes>
+    </MemoryRouter>,
+  );
+};
+
 function waitForLoadingToFinish() {
   return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
     timeout: 4000,
@@ -28,6 +39,7 @@ function getByTextWithMarkup(text: RegExp | string) {
   try {
     return screen.getByText((content, node) => {
       const hasText = (node: Element) => node.textContent === text || node.textContent.match(text);
+      // eslint-disable-next-line testing-library/no-node-access
       const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child as HTMLElement));
       return hasText(node) && childrenDontHaveText;
     });
@@ -107,11 +119,12 @@ const mockPatientWithoutFormattedName = {
 const patientChartBasePath = `/patient/${mockPatient.id}/chart`;
 
 export {
-  renderWithSwr,
-  waitForLoadingToFinish,
   getByTextWithMarkup,
   mockPatient,
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,
+  renderWithSwr,
+  renderWithRouter,
+  waitForLoadingToFinish,
 };

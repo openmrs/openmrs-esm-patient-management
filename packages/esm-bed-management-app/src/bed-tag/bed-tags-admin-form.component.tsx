@@ -7,12 +7,12 @@ import {
   ComposedModal,
   Form,
   FormGroup,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
   Stack,
   TextInput,
-  InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
@@ -23,14 +23,14 @@ const BedTagAdministrationSchema = z.object({
 });
 
 interface BedTagAdministrationFormProps {
-  showModal: boolean;
-  onModalChange: (showModal: boolean) => void;
-  availableBedTypes: Array<BedTagData>;
   allLocations: Location[];
-  handleCreateQuestion?: (formData: BedTagData) => void;
+  availableBedTags: Array<BedTagData>;
+  handleCreateBedTag?: (formData: BedTagData) => void;
   handleDeleteBedTag?: () => void;
   headerTitle: string;
   initialData: BedTagData;
+  onModalChange: (showModal: boolean) => void;
+  showModal: boolean;
 }
 
 interface ErrorType {
@@ -38,11 +38,11 @@ interface ErrorType {
 }
 
 const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
-  showModal,
-  onModalChange,
-  handleCreateQuestion,
+  handleCreateBedTag,
   headerTitle,
   initialData,
+  onModalChange,
+  showModal,
 }) => {
   const { t } = useTranslation();
 
@@ -65,7 +65,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
     const result = BedTagAdministrationSchema.safeParse(formData);
     if (result.success) {
       setShowErrorNotification(false);
-      handleCreateQuestion(formData);
+      handleCreateBedTag(formData);
     }
   };
 
@@ -88,7 +88,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedTag"
-                      labelText={t('bedTag', 'Bed Tag Name')}
+                      labelText={t('bedTags', 'Bed tags')}
                       placeholder={t('bedTagPlaceholder', '')}
                       invalidText={fieldState.error?.message}
                       {...field}

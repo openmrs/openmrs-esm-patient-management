@@ -35,7 +35,7 @@ function DeathDateField() {
         selectedDate ? dayjs(selectedDate).hour(0).minute(0).second(0).millisecond(0).toDate() : undefined,
       );
     },
-    [deathDate],
+    [setFieldValue],
   );
 
   return (

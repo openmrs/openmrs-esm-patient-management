@@ -1,5 +1,5 @@
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wardView {
   background-color: #e4e4e4;
@@ -22,6 +22,7 @@
     display: block;
     column-width: 280px;
     overflow-x: auto;
+    height: calc(100% - 4rem);
 
     > div {
       break-inside: avoid;

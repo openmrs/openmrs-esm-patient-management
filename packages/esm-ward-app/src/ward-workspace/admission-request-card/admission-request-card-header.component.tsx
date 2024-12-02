@@ -1,32 +1,25 @@
-import { ExtensionSlot, formatDatetime, getLocale } from '@openmrs/esm-framework';
+import { formatDatetime, getLocale } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
-import { useCurrentWardCardConfig } from '../../hooks/useCurrentWardCardConfig';
+import { type WardPatientCardType } from '../../types';
+import WardPatientAge from '../../ward-patient-card/row-elements/ward-patient-age';
+import WardPatientGender from '../../ward-patient-card/row-elements/ward-patient-gender.component';
+import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
-import { WardPatientCardElement } from '../../ward-patient-card/ward-patient-card-element.component';
-import type WardPatientCard from '../../ward-patient-card/ward-patient-card.component';
 import styles from './admission-request-card.scss';
 
-const AdmissionRequestCardHeader: WardPatientCard = (wardPatient) => {
+const AdmissionRequestCardHeader: WardPatientCardType = ({ wardPatient }) => {
   const { inpatientRequest } = wardPatient;
   const { dispositionEncounter } = inpatientRequest;
-  const { id, headerRowElements } = useCurrentWardCardConfig();
   const { patient } = wardPatient;
-  const extensionSlotState = wardPatient;
-
-  const rowsExtensionSlotName = id == 'default' ? 'ward-patient-card-slot' : `ward-patient-card-${id}-slot`;
 
   return (
     <div className={styles.admissionRequestCardHeaderContainer}>
       <div className={styles.admissionRequestCardHeader}>
         <WardPatientName patient={patient} />
-        {headerRowElements.map((elementId, i) => (
-          <WardPatientCardElement
-            key={`ward-card-${patient.uuid}-header-${i}`}
-            elementId={elementId}
-            {...wardPatient}
-          />
-        ))}
+        <WardPatientIdentifier id="patient-identifier" patient={patient} />
+        <WardPatientGender patient={patient} />
+        <WardPatientAge patient={patient} />
       </div>
       <div className={classNames(styles.admissionRequestCardHeader, styles.admissionEncounterDetails)}>
         <div>
@@ -38,11 +31,6 @@ const AdmissionRequestCardHeader: WardPatientCard = (wardPatient) => {
         <div>{dispositionEncounter?.encounterProviders?.map((provider) => provider?.provider?.display).join(',')}</div>
         <div>{dispositionEncounter?.location?.display}</div>
       </div>
-      <ExtensionSlot
-        name={rowsExtensionSlotName}
-        state={extensionSlotState}
-        className={styles.admissionRequestCardExtensionSlot}
-      />
     </div>
   );
 };

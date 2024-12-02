@@ -28,6 +28,10 @@
 }
 
 .filterContainer {
+  label {
+    margin-right: layout.$spacing-03 !important;
+  }
+
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
   }
@@ -97,6 +101,7 @@
   .toolbarContent {
     display: flex;
     z-index: 1; // prevent dropdown from getting covered by table elements
+    column-gap: layout.$spacing-03;
   }
 
   :global(.cds--table-toolbar) {
@@ -187,13 +192,12 @@ html[dir='rtl'] {
 }
 
 .tileContainer {
-  background-color: $ui-02;
   border-top: 1px solid $ui-03;
   padding: layout.$spacing-07 0;
-  // margin: 0 layout.$spacing-05;
 }
 
 .tile {
+  background-color: $ui-01;
   margin: auto;
   width: fit-content;
 }
@@ -203,4 +207,15 @@ html[dir='rtl'] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
 }

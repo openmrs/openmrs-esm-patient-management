@@ -57,8 +57,8 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           concept={concept}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
-          dateFormat={fieldDefinition.dateFormat}
-          placeholder={fieldDefinition.placeholder}
+          allowPastDates={fieldDefinition.allowPastDates}
+          allowFutureDates={fieldDefinition.allowFutureDates}
         />
       );
     case 'Coded':
@@ -159,14 +159,16 @@ interface DateObsFieldProps {
   concept: ConceptResponse;
   label: string;
   required?: boolean;
-  dateFormat?: string;
-  placeholder?: string;
+  allowPastDates?: boolean;
+  allowFutureDates?: boolean;
 }
 
-function DateObsField({ concept, label, required, placeholder }: DateObsFieldProps) {
+function DateObsField({ concept, label, required, allowPastDates, allowFutureDates }: DateObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
   const { setFieldValue } = useContext(PatientRegistrationContext);
+  const futureDatesAllowed = allowFutureDates ?? true;
+  const pastDatesAllowed = allowPastDates ?? true;
 
   const onDateChange = (date: Date) => {
     setFieldValue(fieldName, date);
@@ -188,6 +190,8 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
                   isInvalid={errors[fieldName] && touched[fieldName]}
                   invalidText={t(meta.error)}
                   value={field.value}
+                  minDate={!pastDatesAllowed ? new Date() : undefined}
+                  maxDate={!futureDatesAllowed ? new Date() : undefined}
                 />
               </>
             );

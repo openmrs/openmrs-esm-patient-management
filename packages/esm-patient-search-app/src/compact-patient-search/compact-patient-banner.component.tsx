@@ -1,3 +1,7 @@
+import React, { forwardRef, useContext, useMemo } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
 import {
   age,
@@ -8,37 +12,26 @@ import {
   PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
-import classNames from 'classnames';
-import React, { forwardRef, useContext, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
+import { type PatientSearchConfig } from '../config-schema';
+import { PatientSearchContext } from '../patient-search-context';
 import styles from './compact-patient-banner.scss';
 
 interface ClickablePatientContainerProps {
-  patient: SearchedPatient;
   children: React.ReactNode;
+  patient: SearchedPatient;
 }
 
 interface CompactPatientBannerProps {
   patients: Array<SearchedPatient>;
 }
 
-interface CustomIdentifierProps {
-  patient: SearchedPatient;
-  identifierName: string;
-}
-
 interface IdentifierTagProps {
   identifier: Identifier;
 }
 
-interface IdentifiersProps {
-  identifiers: Array<Identifier>;
-}
-
 const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
-  const config = useConfig();
+  const config = useConfig<PatientSearchConfig>();
   const { t } = useTranslation();
 
   const getGender = (gender: string) => {
@@ -67,7 +60,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         id: patient.uuid,
         name: [
           {
-            id: String(Math.random()), // not used
+            id: uuidv4(), // not used
             given: [patient.person.personName.givenName, patient.person.personName.middleName],
             family: patient.person.personName.familyName,
             text: patient.person.personName.display,
@@ -81,7 +74,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         address: preferredAddress
           ? [
               {
-                id: String(Math.random()), // not used
+                id: uuidv4(), // not used
                 city: preferredAddress.cityVillage,
                 country: preferredAddress.country,
                 postalCode: preferredAddress.postalCode,
@@ -143,7 +136,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
-  const config = useConfig();
+  const config = useConfig<PatientSearchConfig>();
   const isDeceased = Boolean(patient?.person?.deathDate);
 
   if (nonNavigationSelectPatientAction) {
@@ -168,9 +161,9 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
         })}
         key={patient.uuid}
         onBeforeNavigate={() => patientClickSideEffect?.(patient.uuid)}
-        to={`${interpolateString(config.search.patientResultUrl, {
+        to={interpolateString(config.search.patientChartUrl, {
           patientUuid: patient.uuid,
-        })}`}>
+        })}>
         {children}
       </ConfigurableLink>
     );
@@ -180,7 +173,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
 const IdentifierTag: React.FC<IdentifierTagProps> = ({ identifier }) => {
   return (
     <>
-      <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
+      <Tag size="sm" className={styles.configuredTag} type="warm-gray">
         {identifier.identifierType.display}
       </Tag>
       <span className={styles.configuredLabel}>{identifier.identifier}</span>

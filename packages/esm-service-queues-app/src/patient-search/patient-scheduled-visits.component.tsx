@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
-import { first } from 'rxjs/operators';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -60,7 +59,7 @@ const ScheduledVisitsForVisitType: React.FC<{
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const timeFormat = new Date().getHours() >= 12 ? 'PM' : 'AM';
-  const visitDate = new Date();
+  const visitDate = useMemo(() => new Date(), []);
   const visitTime = dayjs(new Date()).format('hh:mm');
   const [appointment, setAppointment] = useState<Appointment>();
   const [patientId, setPatientId] = useState('');
@@ -113,78 +112,68 @@ const ScheduledVisitsForVisitType: React.FC<{
         const abortController = new AbortController();
 
         saveVisit(payload, abortController)
-          .pipe(first())
-          .subscribe(
-            (response) => {
-              if (response.status === 201) {
-                postQueueEntry(
-                  response.data.uuid,
-                  patientId,
-                  priority,
-                  defaultStatus,
-                  service,
-                  appointment,
-                  selectedQueueLocation,
-                  visitQueueNumberAttributeUuid,
-                ).then(
-                  ({ status }) => {
-                    if (status === 201) {
-                      showSnackbar({
-                        kind: 'success',
-                        title: t('startAVisit', 'Start a visit'),
-                        subtitle: t(
-                          'startVisitQueueSuccessfully',
-                          'Patient has been added to active visits list and queue.',
-                          `${hours} : ${minutes}`,
-                        ),
-                      });
-                      closeWorkspace();
-                      setIsSubmitting(false);
-                      mutateQueueEntries();
-                    }
-                  },
-                  (error) => {
-                    showSnackbar({
-                      title: t('queueEntryError', 'Error adding patient to the queue'),
-                      kind: 'error',
-                      isLowContrast: false,
-                      subtitle: error?.message,
-                    });
-                    setIsSubmitting(false);
-                  },
-                );
-              }
-            },
-            (error) => {
-              showSnackbar({
-                title: t('startVisitError', 'Error starting visit'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message,
+          .then((response) => {
+            postQueueEntry(
+              response.data.uuid,
+              patientId,
+              priority,
+              defaultStatus,
+              service,
+              appointment,
+              selectedQueueLocation,
+              visitQueueNumberAttributeUuid,
+            )
+              .then(() => {
+                showSnackbar({
+                  kind: 'success',
+                  title: t('startAVisit', 'Start a visit'),
+                  subtitle: t(
+                    'startVisitQueueSuccessfully',
+                    'Patient has been added to active visits list and queue.',
+                    `${hours} : ${minutes}`,
+                  ),
+                });
+                closeWorkspace();
+                setIsSubmitting(false);
+                mutateQueueEntries();
+              })
+              .catch((error) => {
+                showSnackbar({
+                  title: t('queueEntryError', 'Error adding patient to the queue'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: error?.message,
+                });
+                setIsSubmitting(false);
               });
-              setIsSubmitting(false);
-            },
-          );
+          })
+          .catch((error) => {
+            showSnackbar({
+              title: t('startVisitError', 'Error starting visit'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
+            setIsSubmitting(false);
+          });
       }
     },
     [
-      visitTime,
-      timeFormat,
       allVisitTypes,
-      patientId,
-      visitDate,
-      userLocation,
-      queues,
-      config.concepts.defaultStatusConceptUuid,
-      config.concepts.defaultPriorityConceptUuid,
-      currentVisit,
-      t,
-      priorities,
       appointment,
-      selectedQueueLocation,
-      visitQueueNumberAttributeUuid,
       closeWorkspace,
+      currentVisit,
+      defaultStatus,
       mutateQueueEntries,
+      patientId,
+      selectedQueueLocation,
+      service,
+      t,
+      timeFormat,
+      userLocation,
+      visitDate,
+      visitQueueNumberAttributeUuid,
+      visitTime,
     ],
   );
 
