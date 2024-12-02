@@ -241,6 +241,78 @@ export function useActiveVisitsSorting(tableRows: Array<any>) {
   };
 }
 
+export function useTableHeaders(t, config, obsConcepts) {
+  return useMemo(() => {
+    let headersIndex = 0;
+
+    const headers = [
+      {
+        id: headersIndex++,
+        header: t('visitStartTime', 'Visit Time'),
+        key: 'visitStartTime',
+      },
+    ];
+
+    config?.activeVisits?.identifiers?.forEach((identifier) => {
+      headers.push({
+        id: headersIndex++,
+        header: t(identifier?.header?.key, identifier?.header?.default),
+        key: identifier?.header?.key,
+      });
+    });
+
+    if (!config?.activeVisits?.identifiers) {
+      headers.push({
+        id: headersIndex++,
+        header: t('idNumber', 'ID Number'),
+        key: 'idNumber',
+      });
+    }
+
+    config?.activeVisits?.attributes?.forEach((attribute) => {
+      headers.push({
+        id: headersIndex++,
+        header: t(attribute?.header?.key, attribute?.header?.default),
+        key: attribute?.header?.key,
+      });
+    });
+
+    // Add headers for obs concepts
+    obsConcepts?.forEach((concept) => {
+      headers.push({
+        id: headersIndex++,
+        header: concept.display,
+        key: `obs-${concept.uuid}`,
+      });
+    });
+
+    headers.push(
+      {
+        id: headersIndex++,
+        header: t('name', 'Name'),
+        key: 'name',
+      },
+      {
+        id: headersIndex++,
+        header: t('gender', 'Gender'),
+        key: 'gender',
+      },
+      {
+        id: headersIndex++,
+        header: t('age', 'Age'),
+        key: 'age',
+      },
+      {
+        id: headersIndex++,
+        header: t('visitType', 'Visit Type'),
+        key: 'visitType',
+      },
+    );
+
+    return headers;
+  }, [t, config, obsConcepts]);
+}
+
 export const getOriginFromPathName = (pathname = '') => {
   const from = pathname.split('/');
   return last(from);

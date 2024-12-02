@@ -24,86 +24,15 @@ import {
   ErrorState,
   ExtensionSlot,
   isDesktop,
-  type OpenmrsResource,
   useConfig,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
-import { useActiveVisits, useActiveVisitsSorting, useObsConcepts } from './active-visits.resource';
+import { useActiveVisits, useActiveVisitsSorting, useObsConcepts, useTableHeaders } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { type ActiveVisitsConfigSchema } from '../config-schema';
 import { type ActiveVisit } from '../types';
-
-function generateTableHeaders(t, config, obsConcepts) {
-  let headersIndex = 0;
-
-  const headers = [
-    {
-      id: headersIndex++,
-      header: t('visitStartTime', 'Visit Time'),
-      key: 'visitStartTime',
-    },
-  ];
-
-  config?.activeVisits?.identifiers?.map((identifier) => {
-    headers.push({
-      id: headersIndex++,
-      header: t(identifier?.header?.key, identifier?.header?.default),
-      key: identifier?.header?.key,
-    });
-  });
-
-  if (!config?.activeVisits?.identifiers) {
-    headers.push({
-      id: headersIndex++,
-      header: t('idNumber', 'ID Number'),
-      key: 'idNumber',
-    });
-  }
-
-  config?.activeVisits?.attributes?.map((attribute) => {
-    headers.push({
-      id: headersIndex++,
-      header: t(attribute?.header?.key, attribute?.header?.default),
-      key: attribute?.header?.key,
-    });
-  });
-
-  // Add headers for obs concepts
-  obsConcepts?.forEach((concept: OpenmrsResource) => {
-    headers.push({
-      id: headersIndex++,
-      header: concept.display,
-      key: `obs-${concept.uuid}`,
-    });
-  });
-
-  headers.push(
-    {
-      id: headersIndex++,
-      header: t('name', 'Name'),
-      key: 'name',
-    },
-    {
-      id: headersIndex++,
-      header: t('gender', 'Gender'),
-      key: 'gender',
-    },
-    {
-      id: headersIndex++,
-      header: t('age', 'Age'),
-      key: 'age',
-    },
-    {
-      id: headersIndex++,
-      header: t('visitType', 'Visit Type'),
-      key: 'visitType',
-    },
-  );
-
-  return headers;
-}
 
 const ActiveVisitsTable = () => {
   const { t } = useTranslation();
@@ -114,7 +43,7 @@ const ActiveVisitsTable = () => {
   const { obsConcepts, isLoadingObsConcepts } = useObsConcepts(config.activeVisits.obs);
   const { activeVisits, isLoading, isValidating, error } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
-  const headerData = useMemo(() => generateTableHeaders(t, config, obsConcepts), [config, t, obsConcepts]);
+  const headerData = useTableHeaders(t, config, obsConcepts);
 
   const transformVisitForDisplay = useCallback(
     (visit: ActiveVisit) => {
