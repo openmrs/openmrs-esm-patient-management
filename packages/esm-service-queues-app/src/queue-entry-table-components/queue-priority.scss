@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/colors';
 
 .tag {
   margin: layout.$spacing-02 0;
@@ -8,4 +9,8 @@
 
 .bold {
   font-weight: bold;
+}
+
+.orange {
+  background-color: colors.$orange-20;
 }
