@@ -16,6 +16,7 @@ import {
 } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type ActiveVisit, type VisitResponse } from '../types';
+import { useTranslation } from 'react-i18next';
 
 dayjs.extend(isToday);
 
@@ -241,7 +242,9 @@ export function useActiveVisitsSorting(tableRows: Array<any>) {
   };
 }
 
-export function useTableHeaders(t, config, obsConcepts) {
+export function useTableHeaders(obsConcepts: OpenmrsResource[]) {
+  const { t } = useTranslation();
+  const config = useConfig();
   return useMemo(() => {
     let headersIndex = 0;
 

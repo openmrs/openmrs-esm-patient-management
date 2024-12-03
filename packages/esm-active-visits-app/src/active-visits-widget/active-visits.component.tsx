@@ -43,7 +43,7 @@ const ActiveVisitsTable = () => {
   const { obsConcepts, isLoadingObsConcepts } = useObsConcepts(config.activeVisits.obs);
   const { activeVisits, isLoading, isValidating, error } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
-  const headerData = useTableHeaders(t, config, obsConcepts);
+  const headerData = useTableHeaders(obsConcepts);
 
   const transformVisitForDisplay = useCallback(
     (visit: ActiveVisit) => {
@@ -198,7 +198,7 @@ const ActiveVisitsTable = () => {
                     return null;
                   }
 
-                  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
+                  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart';
 
                   return (
                     <React.Fragment key={`active-visit-row-${index}`}>
