@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { type Encounter } from '../visit.resource';
+import { type Encounter } from '../../types';
 import styles from '../visit-detail-overview.scss';
 
 const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encounters: Array<Encounter> }) => {

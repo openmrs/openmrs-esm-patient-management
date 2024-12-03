@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
-import { type OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
+import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
+import { formatTime, type OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import NotesSummary from './notes-summary.component';
 import MedicationSummary from './medications-summary.component';
 import TestsSummary from './tests-summary.component';
-import { type Order, type Encounter, type Note, type Observation, type OrderItem } from '../visit.resource';
+import type { Encounter, Note, Observation, Order, OrderItem } from '../../types';
 import styles from '../visit-detail-overview.scss';
 
 interface DiagnosisItem {

@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import type { Note } from '../visit.resource';
+import type { Note } from '../../types';
 import { EmptyDataIllustration } from '../../active-visits-widget/empty-data-illustration.component';
 import styles from '../visit-detail-overview.scss';
 
