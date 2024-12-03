@@ -64,14 +64,6 @@ export const clearAllQueueEntries = getAsyncLifecycle(
   },
 );
 
-export const addVisitToQueueModal = getAsyncLifecycle(
-  () => import('./add-patient-toqueue/add-patient-toqueue-dialog.component'),
-  {
-    featureName: 'add visit to queue',
-    moduleName,
-  },
-);
-
 export const transitionQueueEntryStatusModal = getAsyncLifecycle(
   () => import('./transition-queue-entry/transition-queue-entry-dialog.component'),
   {
