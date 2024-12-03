@@ -61,7 +61,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
             },
       )}>
       {isSameMonth(dateTime, dayjs(selectedDate)) && (
-        <p>
+        <div>
           <span className={classNames(styles.totals)}>
             {currentData?.services ? (
               <div role="button" tabIndex={0}>
@@ -100,7 +100,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               )}
             </div>
           )}
-        </p>
+        </div>
       )}
     </div>
   );

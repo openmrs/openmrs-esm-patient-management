@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, TabPanel, TabPanels, TabList } from '@carbon/react';
-import WorkloadCard from './workload-card.component';
-import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
-import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
-import styles from './workload.scss';
 import { useAppointmentService } from '../form/appointments-form.resource';
+import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
 import MonthlyCalendarView from './monthly-view-workload/monthly-view.component';
+import styles from './workload.scss';
 
 interface WorkloadProps {
   selectedService: string;
@@ -15,31 +11,28 @@ interface WorkloadProps {
 }
 
 const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, onWorkloadDateChange }) => {
-  const { t } = useTranslation();
-  const [selectedTab, setSelectedTab] = useState(0);
   const { data: services } = useAppointmentService();
   const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const calendarWorkload = useCalendarDistribution(serviceUuid, selectedTab === 0 ? 'week' : 'month', appointmentDate);
+
   const monthlyCalendarWorkload = useMonthlyCalendarDistribution(
     serviceUuid,
     selectedTab === 0 ? 'week' : 'month',
     appointmentDate,
   );
-  const handleDateClick = (pickedDate: Date) => {
-    onWorkloadDateChange(pickedDate);
-  };
+
+  const handleDateClick = (pickedDate: Date) => onWorkloadDateChange(pickedDate);
 
   return (
     <div className={styles.workLoadContainer}>
-      <div>
-        <div>
-          <MonthlyCalendarView
-            calendarWorkload={monthlyCalendarWorkload}
-            dateToDisplay={appointmentDate.toISOString()}
-            onDateClick={handleDateClick}
-          />
-        </div>
-      </div>
+      <MonthlyCalendarView
+        calendarWorkload={monthlyCalendarWorkload}
+        dateToDisplay={appointmentDate.toISOString()}
+        onDateClick={handleDateClick}
+      />
     </div>
   );
 };

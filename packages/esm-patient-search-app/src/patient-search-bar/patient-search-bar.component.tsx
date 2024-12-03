@@ -13,10 +13,10 @@ interface PatientSearchBarProps {
 }
 
 const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChildren<PatientSearchBarProps>>(
-  ({ buttonProps, initialSearchTerm, onChange, onClear, onSubmit, isCompact }, ref) => {
+  ({ buttonProps, initialSearchTerm = '', onChange, onClear, onSubmit, isCompact }, ref) => {
     const { t } = useTranslation();
-    const responsiveSize = isCompact ? 'sm' : 'lg';
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+    const responsiveSize = isCompact ? 'sm' : 'lg';
 
     const handleChange = useCallback(
       (value: string) => {

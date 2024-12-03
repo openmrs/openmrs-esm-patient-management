@@ -23,7 +23,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
   const { identifierTypes } = useContext(ResourcesContext);
   const { isOffline, values, initialFormValues } = useContext(PatientRegistrationContext);
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(values.identifiers);
-  const [searchString, setSearchString] = useState<string>('');
+  const [searchString, setSearchString] = useState('');
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
   const defaultPatientIdentifierTypesMap = useMemo(() => {
@@ -107,11 +107,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
             />
             {patientIdentifier &&
               identifierType?.identifierSources?.length > 0 &&
-              /* 
+              /*
                 This check are for the cases when there's an initialValue identifier is assigned
                 to the patient
                 The corresponding flow is like:
-                1. If there's no change to the actual initial identifier, then the source remains null, 
+                1. If there's no change to the actual initial identifier, then the source remains null,
                 hence the list of the identifier sources shouldn't be displayed.
                 2. If user wants to edit the patient identifier's value, hence there will be an initialValue,
                 along with a source assigned to itself(only if the identifierType has sources, else there's nothing to worry about), which by

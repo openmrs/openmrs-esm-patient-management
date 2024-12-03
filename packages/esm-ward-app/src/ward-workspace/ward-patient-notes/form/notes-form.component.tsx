@@ -40,7 +40,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   const session = useSession();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rows, setRows] = useState<number>();
+  const [rows, setRows] = useState(0);
 
   const {
     control,

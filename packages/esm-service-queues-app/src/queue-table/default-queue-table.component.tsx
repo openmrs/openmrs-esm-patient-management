@@ -61,7 +61,7 @@ function DefaultQueueTable() {
   }, [error?.message, t]);
 
   const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
-  const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
+  const [patientSearchQuery, setPatientSearchQuery] = useState('');
 
   const handleBackToSearchList = useCallback(() => {
     setIsPatientSearchOpen(true);

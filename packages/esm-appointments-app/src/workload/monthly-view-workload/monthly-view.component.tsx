@@ -1,11 +1,11 @@
-import dayjs from 'dayjs';
 import React, { useContext } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import { monthDays } from '../../helpers';
+import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
+import MonthlyWorkloadCard from './monthlyWorkCard';
 import SelectedDateContext from '../../hooks/selectedDateContext';
 import styles from './monthly-workload.scss';
-import MonthlyWorkloadCard from './monthlyWorkCard';
 
 interface MonthlyCalendarViewProps {
   calendarWorkload: Array<{ count: number; date: string }>;
@@ -13,22 +13,24 @@ interface MonthlyCalendarViewProps {
   onDateClick?: (pickedDate: Date) => void;
 }
 
-const monthFormat = 'MMMM, YYYY';
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   calendarWorkload,
   dateToDisplay = '',
   onDateClick,
 }) => {
+  const monthFormat = 'MMMM, YYYY';
+  const { t } = useTranslation();
   const { selectedDate } = useContext(SelectedDateContext);
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
+  const daysInWeeks = daysInWeek.map((day) => t(day));
+
   const handleClick = (date: Date) => {
     if (onDateClick) {
       onDateClick(date);
     }
   };
-  const { t } = useTranslation();
-  const daysInWeeks = daysInWeek.map((day) => t(day));
+
   return (
     <div className={styles.calendarViewContainer}>
       <>

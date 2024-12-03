@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader, Tag } from '@carbon/react';
 import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import {
   type MappedVisitQueueEntry,
   serveQueueEntry,
@@ -9,19 +10,18 @@ import {
 } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import { type ConfigObject } from '../config-schema';
 import styles from './transition-queue-entry-dialog.scss';
 
 interface TransitionQueueEntryModalProps {
-  queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
+  queueEntry: MappedVisitQueueEntry;
 }
 
 enum priorityComment {
   REQUEUED = 'Requeued',
 }
 
-const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ closeModal, queueEntry }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const defaultTransitionStatus = config.concepts.defaultTransitionStatus;
@@ -46,21 +46,17 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
       queueEntry?.sortWeight,
     ).then(
       ({ status }) => {
-        if (status === 201) {
-          serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
-            if (status === 200) {
-              showSnackbar({
-                isLowContrast: true,
-                title: t('success', 'Success'),
-                kind: 'success',
-                subtitle: t('patientAttendingService', 'Patient attending service'),
-              });
-              closeModal();
-              mutateQueueEntries();
-              navigate({ to: `\${openmrsSpaBase}/patient/${queueEntry?.patientUuid}/chart` });
-            }
+        serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
+          showSnackbar({
+            isLowContrast: true,
+            title: t('success', 'Success'),
+            kind: 'success',
+            subtitle: t('patientAttendingService', 'Patient attending service'),
           });
-        }
+          closeModal();
+          mutateQueueEntries();
+          navigate({ to: `\${openmrsSpaBase}/patient/${queueEntry?.patientUuid}/chart` });
+        });
       },
       (error) => {
         showSnackbar({
@@ -88,17 +84,15 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
 
   const handleRequeuePatient = useCallback(() => {
     requeueQueueEntry(priorityComment.REQUEUED, queueEntry?.queueUuid, queueEntry?.queueEntryUuid).then(
-      ({ status }) => {
-        if (status === 200) {
-          showSnackbar({
-            isLowContrast: true,
-            title: t('success', 'Success'),
-            kind: 'success',
-            subtitle: t('patientRequeued', 'Patient has been requeued'),
-          });
-          closeModal();
-          mutateQueueEntries();
-        }
+      () => {
+        showSnackbar({
+          isLowContrast: true,
+          title: t('success', 'Success'),
+          kind: 'success',
+          subtitle: t('patientRequeued', 'Patient has been requeued'),
+        });
+        closeModal();
+        mutateQueueEntries();
       },
       (error) => {
         showSnackbar({
@@ -130,7 +124,9 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             <p className={styles.p}>
               {t('patientAge', 'Age')} : &nbsp; {queueEntry?.patientAge}
             </p>
-            <p>{queueEntry.identifiers?.map((identifier) => <Tag key={identifier.uuid}>{identifier.display}</Tag>)}</p>
+            <div>
+              {queueEntry.identifiers?.map((identifier) => <Tag key={identifier.uuid}>{identifier.display}</Tag>)}
+            </div>
           </section>
         </div>
       </ModalBody>
