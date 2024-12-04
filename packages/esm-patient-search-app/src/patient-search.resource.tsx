@@ -1,13 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import {
-  openmrsFetch,
-  useSession,
-  type FetchResponse,
-  restBaseUrl,
-  fhirBaseUrl,
-} from '@openmrs/esm-framework';
+import { openmrsFetch, useSession, type FetchResponse, restBaseUrl, fhirBaseUrl } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 import { mapToOpenMRSPatient } from './mpi/utils';
 
@@ -102,9 +96,12 @@ export function useInfinitePatientSearch(
     openmrsFetch,
   );
 
-  const mappedData = searchMode === 'internal'
-  ? data?.flatMap((response) => response?.data?.results ?? []) ?? null
-  : data ? mapToOpenMRSPatient(data.map(response => response?.data)) : null;
+  const mappedData =
+    searchMode === 'external'
+      ? data
+        ? mapToOpenMRSPatient(data.map((response) => response?.data))
+        : null
+      : data?.flatMap((response) => response?.data?.results ?? []) ?? null;
 
   return useMemo(
     () => ({
