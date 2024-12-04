@@ -92,7 +92,6 @@
   "highestServiceVolume": "Service le plus utilisé: {{time}}",
   "identifier": "Identifiant",
   "invalidNumber": "Le numéro n'est pas valide",
-  "invalidTime": "Heure non valide",
   "isRecurringAppointment": "S'agit-il d'un rendez-vous récurrent?",
   "itemsPerPage": "Eléments par page",
   "loading": "En cours de chargement",

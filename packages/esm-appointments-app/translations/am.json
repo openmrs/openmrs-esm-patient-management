@@ -92,7 +92,6 @@
   "highestServiceVolume": "Highest volume service: {{time}}",
   "identifier": "Identifier",
   "invalidNumber": "Number is not valid",
-  "invalidTime": "Invalid time",
   "isRecurringAppointment": "Is this a recurring appointment?",
   "itemsPerPage": "Items per page",
   "loading": "Loading",
