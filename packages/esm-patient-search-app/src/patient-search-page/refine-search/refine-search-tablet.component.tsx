@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
@@ -32,7 +32,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const renderSearchFields = () => {
+  const renderSearchFields = useMemo(() => {
     const fields: Array<SearchFieldConfig> = [];
 
     Object.entries(config.search.searchFields.fields).forEach(([fieldName, fieldConfig]) => {
@@ -76,7 +76,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
 
     return (
       <>
-        {(genderField || dobField) && (
+        {Boolean(genderField || dobField) && (
           <div className={classNames(styles.padded, styles.refineSearchDialogGenderSexRow)}>
             {genderField && (
               <div className={styles.fieldTabletOrOverlay}>
@@ -95,7 +95,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
         )}
       </>
     );
-  };
+  }, [config, control, isTablet]);
 
   return (
     <>
@@ -137,7 +137,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
               </Button>
             </div>
             <form onSubmit={onSubmit} role="refine-search-tablet">
-              {renderSearchFields()}
+              {renderSearchFields}
               <div className={classNames(styles.buttonSet, styles.paddedButtons)}>
                 <Button kind="secondary" size="xl" onClick={onResetFields} className={styles.button}>
                   {t('resetFields', 'Reset fields')}
