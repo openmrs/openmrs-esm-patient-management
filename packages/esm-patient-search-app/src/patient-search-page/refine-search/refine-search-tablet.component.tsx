@@ -57,13 +57,14 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
     const dobField = fields.find((field) => field.type === 'dateOfBirth');
     const otherFields = fields.filter((field) => !['gender', 'dateOfBirth'].includes(field.type));
 
-    const renderOtherFields = () => {
-      const rows: SearchFieldConfig[][] = [];
-      for (let i = 0; i < otherFields.length; i += 3) {
-        rows.push(otherFields.slice(i, i + 3));
-      }
-
-      return rows.map((row, index) => (
+    const otherFieldsRows = otherFields
+      .reduce((rows, field, index) => {
+        const rowIndex = Math.floor(index / 3);
+        rows[rowIndex] = rows[rowIndex] || [];
+        rows[rowIndex].push(field);
+        return rows;
+      }, [] as SearchFieldConfig[][])
+      .map((row, index) => (
         <div key={index} className={styles.otherFieldsRow}>
           {row.map((field) => (
             <div key={field.name} className={styles.fieldTabletOrOverlay}>
@@ -72,7 +73,6 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
           ))}
         </div>
       ));
-    };
 
     return (
       <>
@@ -91,7 +91,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
           </div>
         )}
         {otherFields.length > 0 && (
-          <div className={classNames(styles.padded, styles.otherFieldsContainer)}>{renderOtherFields()}</div>
+          <div className={classNames(styles.padded, styles.otherFieldsContainer)}>{otherFieldsRows}</div>
         )}
       </>
     );
