@@ -35,7 +35,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
   // t('checkedIn', 'Checked in');
   // t('expected', 'Expected');
 
-  const [currentTab, setCurrentTab] = useState<string>(null);
+  const [currentTab, setCurrentTab] = useState(null);
   const [dateType, setDateType] = useState<DateType>('today');
   const scheduledAppointmentPanels = useConnectedExtensions(scheduledAppointmentsPanelsSlot);
   const { allowedExtensions, showExtension, hideExtension } = useAllowedExtensions();

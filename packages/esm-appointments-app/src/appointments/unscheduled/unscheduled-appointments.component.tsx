@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Button,
   DataTable,
-  TableContainer,
+  DataTableSkeleton,
+  Pagination,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
   TableRow,
-  TableBody,
-  TableCell,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Pagination,
-  DataTableSkeleton,
-  Button,
 } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
 import { ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';

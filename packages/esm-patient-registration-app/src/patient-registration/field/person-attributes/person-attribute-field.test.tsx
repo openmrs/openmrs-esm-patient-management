@@ -1,13 +1,20 @@
 import React from 'react';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
+import { type FieldDefinition } from '../../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { useConceptAnswers } from '../field.resource';
-import { type FieldDefinition } from '../../../config-schema';
 import { PersonAttributeField } from './person-attribute-field.component';
 
-jest.mock('./person-attributes.resource');
-jest.mock('../field.resource');
+jest.mock('./person-attributes.resource', () => ({
+  ...jest.requireActual('./person-attributes.resource'),
+  usePersonAttributeType: jest.fn(),
+}));
+
+jest.mock('../field.resource', () => ({
+  ...jest.requireActual('../field.resource'),
+  useConceptAnswers: jest.fn(),
+}));
 
 const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
 const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
@@ -92,6 +99,7 @@ describe('PersonAttributeField', () => {
         { uuid: '1', display: 'Option 1' },
         { uuid: '2', display: 'Option 2' },
       ],
+      error: null,
       isLoading: false,
     });
 
@@ -180,6 +188,6 @@ describe('PersonAttributeField', () => {
     );
 
     await screen.findByRole('heading', { name: /attribute/i });
-    expect(screen.queryByLabelText(/Referred by/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/referred by/i)).not.toBeInTheDocument();
   });
 });

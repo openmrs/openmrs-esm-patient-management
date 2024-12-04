@@ -13,23 +13,28 @@ interface QueuePriorityProps {
 
 const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment, priorityConfigs }) => {
   const priorityConfig = priorityConfigs.find((c) => c.conceptUuid === priority.uuid);
+
+  const tag = (
+    <Tag
+      role={priorityComment ? 'tooltip' : null}
+      className={classNames(
+        styles.tag,
+        priorityConfig?.style === 'bold' && styles.bold,
+        priorityConfig?.color === 'orange' && styles.orange,
+      )}
+      type={priorityConfig?.color !== 'orange' ? priorityConfig?.color : null}>
+      {priority.display}
+    </Tag>
+  );
+
   return (
     <>
       {priorityComment ? (
         <DefinitionTooltip className={styles.tooltip} align="bottom-left" definition={priorityComment}>
-          <Tag
-            role="tooltip"
-            className={classNames(styles.tag, priorityConfig?.style === 'bold' && styles.bold)}
-            type={priorityConfig?.color}>
-            {priority.display}
-          </Tag>
+          {tag}
         </DefinitionTooltip>
       ) : (
-        <Tag
-          className={classNames(styles.tag, priorityConfig?.style === 'bold' && styles.bold)}
-          type={priorityConfig?.color}>
-          {priority.display}
-        </Tag>
+        tag
       )}
     </>
   );

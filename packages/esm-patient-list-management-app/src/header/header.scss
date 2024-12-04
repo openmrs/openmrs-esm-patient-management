@@ -2,51 +2,13 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.patientListHeader {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  height: layout.$spacing-12;
-  display: flex;
-  justify-content: space-between;
-}
-
-.leftJustifiedItems {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.rightJustifiedItems {
-  @include type.type-style('body-compact-02');
-  display: flex;
-  flex-direction: column;
-  color: $text-02;
-  padding: layout.$spacing-05 0;
-  justify-content: space-between;
-}
-
-.date {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-right: layout.$spacing-05;
-
-  svg {
-    margin-right: layout.$spacing-03;
-  }
-}
-
-.pageName {
-  @include type.type-style('heading-04');
-}
-
-.pageLabels {
-  p:first-of-type {
-    margin-bottom: layout.$spacing-02;
-  }
+.header {
+  background-color: $ui-02;
+  border-bottom: 1px solid $ui-03;
 }
 
 .newListButton {
-  align-self: flex-end;
   width: fit-content;
+  height: fit-content;
+  margin: layout.$spacing-05 0;
 }

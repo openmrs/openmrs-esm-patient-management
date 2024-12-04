@@ -24,6 +24,14 @@
 }
 
 .activeVisitsTable {
+  width: 100%;
+
+  th,
+  td {
+    white-space: nowrap;
+    text-align: left;
+  }
+
   tbody tr[data-parent-row] {
     // Don't show a bottom border on the last row so we don't end up with a double border from the activeVisitContainer
     &:nth-last-of-type(2) > td {
@@ -154,12 +162,14 @@ html[dir='rtl'] {
     .activeVisitsDetailHeaderContainer {
       padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-04 0;
     }
+
     .desktopHeading,
     .tabletHeading {
       h4 {
         text-align: right;
       }
     }
+
     div[role='search'] {
       & :first-child {
         svg {
@@ -167,21 +177,29 @@ html[dir='rtl'] {
           right: layout.$spacing-03;
         }
       }
+
       & :last-child {
         right: unset;
         left: 0;
       }
     }
+
     .tableContainer {
+      overflow-x: auto;
+      text-wrap: nowrap;
+
       th > div {
         text-align: right;
       }
+
       td {
         text-align: right;
+
         .serviceColor {
           margin-right: 0;
           margin-left: layout.$spacing-03;
         }
+
         button {
           text-align: right;
         }

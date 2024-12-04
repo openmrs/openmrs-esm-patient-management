@@ -368,10 +368,12 @@ export const mockProviders = {
     {
       uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66',
       person: { uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' },
+      display: 'doctor - James Cook',
     },
     {
       uuid: '3191eddf-5cc5-4fa4-94ef-dfc25e8d33e4',
       person: { uuid: '89af8ba6-2ec5-4d77-b3ed-7e9e02448e96', display: 'Dr Amstrong Neil' },
+      display: 'doctor - Amstrong Neil',
     },
   ],
 };

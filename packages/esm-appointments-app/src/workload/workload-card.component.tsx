@@ -2,13 +2,14 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from './workload.scss';
 
-interface WorkloadCardProp {
+interface WorkloadCardProps {
+  count: number;
   day: string;
   date: string;
-  count: number;
   isActive: boolean;
 }
-const WorkloadCard: React.FC<WorkloadCardProp> = ({ day, date, count, isActive }) => {
+
+const WorkloadCard = ({ count, day, date, isActive }: WorkloadCardProps) => {
   return (
     <div
       tabIndex={0}
@@ -28,4 +29,5 @@ const WorkloadCard: React.FC<WorkloadCardProp> = ({ day, date, count, isActive }
     </div>
   );
 };
+
 export default WorkloadCard;
