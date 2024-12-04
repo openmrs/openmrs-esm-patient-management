@@ -83,9 +83,9 @@ const MAX_RESULTS = 5;
 const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps> = ({ visitTypes, onChange }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
-  const [selectedVisitType, setSelectedVisitType] = useState<string>();
+  const [selectedVisitType, setSelectedVisitType] = useState('');
 
   const results = useMemo(() => {
     if (!isEmpty(debouncedSearchTerm)) {

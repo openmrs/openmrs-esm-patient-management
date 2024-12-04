@@ -35,7 +35,6 @@ import {
   updateRelationship,
 } from './patient-registration.resource';
 import { type RegistrationConfig } from '../config-schema';
-import dayjs from 'dayjs';
 
 export type SavePatientForm = (
   isNewPatient: boolean,

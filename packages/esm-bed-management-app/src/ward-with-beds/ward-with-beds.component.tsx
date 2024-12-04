@@ -93,7 +93,7 @@ const WardWithBeds: React.FC = () => {
 
   return (
     <>
-      <Header route={name ? name : '--'} />
+      <Header title={name ? name : '--'} />
       {isLoadingBeds && (
         <div className={styles.container}>
           <DataTableSkeleton role="progressbar" zebra />

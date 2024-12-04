@@ -29,7 +29,7 @@ import styles from './bed-administration-table.scss';
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t('wardAllocation', 'Ward Allocation');
+  const headerTitle = t('wardAllocation', 'Ward allocation');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
@@ -131,7 +131,7 @@ const BedAdministrationTable: React.FC = () => {
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
       <>
-        <Header route="Ward Allocation" />
+        <Header title={t('wardAllocation', 'Ward allocation')} />
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
         </div>
@@ -142,7 +142,7 @@ const BedAdministrationTable: React.FC = () => {
   if (errorFetchingBedsGroupedByLocation) {
     return (
       <>
-        <Header route="Ward Allocation" />
+        <Header title={t('wardAllocation', 'Ward allocation')} />
         <div className={styles.widgetCard}>
           <ErrorState error={errorFetchingBedsGroupedByLocation} headerTitle={headerTitle} />
         </div>
@@ -152,7 +152,7 @@ const BedAdministrationTable: React.FC = () => {
 
   return (
     <>
-      <Header route="Ward Allocation" />
+      <Header title={t('wardAllocation', 'Ward allocation')} />
       <div className={styles.flexContainer}>
         {results?.length ? (
           <div className={styles.filterContainer}>

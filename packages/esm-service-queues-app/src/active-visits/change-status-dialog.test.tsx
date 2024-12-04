@@ -14,11 +14,11 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { updateQueueEntry } from './active-visits-table.resource';
 import ChangeStatus from './change-status-dialog.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUpdateQueueEntry = jest.mocked(updateQueueEntry);
-const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
+const mockUseSession = jest.mocked(useSession);
 
 jest.mock('./active-visits-table.resource', () => ({
   ...jest.requireActual('./active-visits-table.resource'),
@@ -40,6 +40,8 @@ jest.mock('../hooks/useQueues', () => {
 });
 
 describe('ChangeStatusDialog', () => {
+  let consoleSpy: jest.SpyInstance;
+
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
@@ -47,6 +49,12 @@ describe('ChangeStatusDialog', () => {
     } as ConfigObject);
     mockUseLocations.mockReturnValue(mockLocations.data.results);
     mockUseSession.mockReturnValue(mockSession.data);
+
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleSpy.mockRestore();
   });
 
   it('should update a queue entry and display toast message', async () => {
