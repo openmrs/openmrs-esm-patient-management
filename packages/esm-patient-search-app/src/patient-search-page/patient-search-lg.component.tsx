@@ -34,7 +34,12 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
   const totalResults = searchResults.length;
-  const [searchParams] = useSearchParams();
+  let searchParams;
+  try {
+    [searchParams] = useSearchParams();
+  } catch (error) {
+    searchParams = new URLSearchParams();
+  }
   const searchMode = inferModeFromSearchParams(searchParams);
 
   const { results, goTo, totalPages, currentPage, showNextButton, paginated } = usePagination(
@@ -48,20 +53,20 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
 
   const searchResultsView = useMemo(() => {
     if (!query) {
-      return <EmptyState inTabletOrOverlay={inTabletOrOverlay} searchMode={searchMode} searchTerm={query} />;
+      return <EmptyState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
     }
 
     if (isLoading) {
-      return <LoadingState inTabletOrOverlay={inTabletOrOverlay} searchMode={searchMode} searchTerm={query} />;
+      return <LoadingState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
     }
 
     if (fetchError) {
-      return <ErrorState inTabletOrOverlay={inTabletOrOverlay} searchMode={searchMode} searchTerm={query} />;
+      return <ErrorState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
     }
 
     if (results?.length === 0) {
       return (
-        <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} searchMode={searchMode} searchTerm={query} />
+        <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} searchMode={searchMode} />
       );
     }
 

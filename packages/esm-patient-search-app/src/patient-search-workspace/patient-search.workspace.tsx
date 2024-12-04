@@ -27,7 +27,6 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const showSearchResults = Boolean(searchTerm?.trim());
   const debouncedSearchTerm = useDebounce(searchTerm);
-  const [searchParams] = useSearchParams();
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
@@ -47,13 +46,7 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
         onClear={handleClearSearchTerm}
         onSubmit={onSearchTermChange}
       />
-      {showSearchResults && (
-        <AdvancedPatientSearchComponent
-          query={debouncedSearchTerm}
-          inTabletOrOverlay
-          searchMode={inferModeFromSearchParams(searchParams)}
-        />
-      )}
+      {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
     </PatientSearchContext.Provider>
   );
 };

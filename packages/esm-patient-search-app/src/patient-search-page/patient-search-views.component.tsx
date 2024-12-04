@@ -11,14 +11,14 @@ import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
 
 interface CommonProps {
   inTabletOrOverlay: boolean;
-  searchMode: string;
+  searchMode?: string;
   searchTerm: string;
 }
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
   searchTerm: string;
-  searchMode: string;
+  searchMode?: string;
 }
 
 export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
@@ -82,6 +82,7 @@ export const ErrorState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
 export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay, searchMode, searchTerm }) => {
   const { t } = useTranslation();
   const isMPIEnabled = useFeatureFlag('mpiFlag');
+  const isSearchPage = window.location.pathname === '/openmrs/spa/search';
   return (
     <Layer>
       <Tile
@@ -92,12 +93,12 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
         <p className={styles.emptyResultText}>
           {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
         </p>
-        {isMPIEnabled ? (
+        {isMPIEnabled && isSearchPage ? (
           <>
             <div className={styles.dividerWrapper}>
               <div className={styles.divider}></div>
             </div>
-            {searchMode == 'internal' && (
+            {(searchMode === undefined || searchMode === null || searchMode !== 'external') && (
               <>
                 <div className={styles.emptyResultsMarginRules}>
                   <p>
@@ -129,7 +130,6 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
 };
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults, searchMode }) => {
-  const { t } = useTranslation();
   return (
     <div className={styles.results} data-openmrs-role="Search Results">
       {searchResults.map((patient, indx) => (
