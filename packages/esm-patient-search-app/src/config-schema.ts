@@ -72,9 +72,6 @@ export const configSchema = {
           {
             attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
           },
-          {
-            attributeTypeUuid: '8d87236c-c2cc-11de-8d13-0010c6dffd0f',
-          },
         ],
       },
       fields: {
