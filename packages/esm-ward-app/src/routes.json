@@ -84,7 +84,9 @@
       "type": "ward-patient-notes",
       "title": "inpatientNotesWorkspaceTitle",
       "sidebarFamily": "ward-patient",
-      "hasOwnSidebar": true
+      "hasOwnSidebar": true,
+      "groups": ["ward-patient"]
+
     },
     {
       "name": "admit-patient-form-workspace",
@@ -99,7 +101,8 @@
       "title": "Ward patient",
       "width": "extra-wide",
       "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient"
+      "sidebarFamily": "ward-patient",
+      "groups": ["ward-patient"]
     },
     {
       "name": "patient-transfer-swap-workspace",
@@ -107,7 +110,9 @@
       "title": "transfers",
       "type": "transfer-swap-bed-form",
       "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient"
+      "sidebarFamily": "ward-patient",
+      "groups": ["ward-patient"]
+
     },
     {
       "name": "patient-transfer-request-workspace",
@@ -121,7 +126,8 @@
       "title": "discharge",
       "type": "ward-patient-discharge",
       "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient"
+      "sidebarFamily": "ward-patient",
+      "groups": ["ward-patient"]
     },
     {
       "name": "ward-patient-clinical-forms-workspace",
@@ -130,7 +136,8 @@
       "type": "ward-patient-clinical-forms",
       "hasOwnSidebar": true,
       "sidebarFamily": "ward-patient",
-      "width": "wider"
+      "width": "wider",
+      "groups": ["ward-patient"]
     },
     {
       "name": "cancel-admission-request-workspace",
