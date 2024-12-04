@@ -15,7 +15,7 @@ const Root: React.FC = () => {
           <Route path="/:locationUuid" element={<WardView />} />
         </Routes>
       </BrowserRouter>
-      
+
       <WorkspaceContainer overlay contextKey="ward" />
     </main>
   );
