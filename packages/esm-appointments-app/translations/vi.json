@@ -92,7 +92,6 @@
   "highestServiceVolume": "Dịch vụ có khối lượng cao nhất: {{hour}}",
   "identifier": "Mã định danh",
   "invalidNumber": "Số không hợp lệ",
-  "invalidTime": "Thời gian không hợp lệ",
   "isRecurringAppointment": "Đây có phải là cuộc hẹn định kỳ không?",
   "itemsPerPage": "Số mục trên mỗi trang",
   "loading": "Đang tải",

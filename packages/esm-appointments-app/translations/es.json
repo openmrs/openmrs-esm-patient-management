@@ -92,7 +92,6 @@
   "highestServiceVolume": "Servicio de mayor volumen: {{time}}",
   "identifier": "Identificador",
   "invalidNumber": "El número no es válido",
-  "invalidTime": "Hora inválida",
   "isRecurringAppointment": "¿Esta es una cita recurrente?",
   "itemsPerPage": "Elementos por página",
   "loading": "Cargando",
