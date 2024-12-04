@@ -1,19 +1,19 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { ComboBox, InlineLoading, InlineNotification, TextInput, TextInputSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { type Control, Controller } from 'react-hook-form';
 import { useAttributeConceptAnswers, useLocations, usePersonAttributeType } from './person-attributes.resource';
 import { type AdvancedPatientSearchState, type SearchFieldConfig } from '../../types';
 import styles from './search-field.scss';
 
 export interface PersonAttributeFieldProps {
   field: SearchFieldConfig;
-  formState: AdvancedPatientSearchState;
+  control: Control<AdvancedPatientSearchState>;
   inTabletOrOverlay: boolean;
   isTablet: boolean;
-  onInputChange: (fieldName: string) => (evt: { target: { value: string } } | { name: string }) => void;
 }
 
-export function PersonAttributeField({ field, formState, isTablet, onInputChange }: PersonAttributeFieldProps) {
+export function PersonAttributeField({ field, control, isTablet }: PersonAttributeFieldProps) {
   const { t } = useTranslation();
   const { data: personAttributeType, isLoading, error } = usePersonAttributeType(field.attributeTypeUuid);
 
@@ -25,15 +25,20 @@ export function PersonAttributeField({ field, formState, isTablet, onInputChange
     switch (personAttributeType.format) {
       case 'java.lang.String':
         return (
-          <TextInput
-            id={field.name}
-            labelText={t(field.label || personAttributeType.display)}
-            value={formState.attributes[field.name] || ''}
-            onChange={(e: { target: { value: any } }) => {
-              onInputChange(field.name)({ target: { value: e.target.value } });
-            }}
-            placeholder={field.placeholder}
-            size={isTablet ? 'lg' : 'md'}
+          <Controller
+            name={`attributes.${field.name}`}
+            control={control}
+            defaultValue=""
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                id={field.name}
+                labelText={t(personAttributeType.display)}
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={field.placeholder}
+                size={isTablet ? 'lg' : 'md'}
+              />
+            )}
           />
         );
 
@@ -41,9 +46,8 @@ export function PersonAttributeField({ field, formState, isTablet, onInputChange
         return (
           <ConceptAttributeField
             field={field}
-            formState={formState}
+            control={control}
             isTablet={isTablet}
-            onInputChange={onInputChange}
             attributeDisplay={personAttributeType.display}
           />
         );
@@ -52,9 +56,8 @@ export function PersonAttributeField({ field, formState, isTablet, onInputChange
         return (
           <LocationAttributeField
             field={field}
-            formState={formState}
+            control={control}
             isTablet={isTablet}
-            onInputChange={onInputChange}
             attributeDisplay={personAttributeType.display}
           />
         );
@@ -68,7 +71,7 @@ export function PersonAttributeField({ field, formState, isTablet, onInputChange
           </InlineNotification>
         );
     }
-  }, [personAttributeType, isLoading, field, formState, onInputChange, t, isTablet]);
+  }, [personAttributeType, isLoading, field, control, t, isTablet]);
 
   if (error) {
     return (
@@ -81,18 +84,18 @@ export function PersonAttributeField({ field, formState, isTablet, onInputChange
   return formatField;
 }
 
-const ConceptAttributeField = ({
-  field,
-  formState,
-  isTablet,
-  onInputChange,
-  attributeDisplay,
-}: {
+interface ConceptAttributeFieldProps {
   field: SearchFieldConfig;
-  formState: AdvancedPatientSearchState;
+  control: Control<AdvancedPatientSearchState>;
   isTablet: boolean;
-  onInputChange: (fieldName: string) => (evt: { target: { value: string } } | { name: string }) => void;
   attributeDisplay: string;
+}
+
+const ConceptAttributeField: React.FC<ConceptAttributeFieldProps> = ({
+  field,
+  control,
+  isTablet,
+  attributeDisplay,
 }) => {
   const { t } = useTranslation();
   const {
@@ -100,7 +103,6 @@ const ConceptAttributeField = ({
     isLoading,
     error,
   } = useAttributeConceptAnswers(field.customConceptAnswers?.length ? '' : field.answerConceptSetUuid);
-  const handleChange = onInputChange(field.name);
 
   const items = useMemo(() => {
     if (field.customConceptAnswers?.length) return field.customConceptAnswers;
@@ -126,38 +128,42 @@ const ConceptAttributeField = ({
   }
 
   return (
-    <ComboBox
-      id={field.name}
-      titleText={t(field.label || attributeDisplay)}
-      items={items}
-      selectedItem={items.find((item) => item.uuid === formState.attributes[field.name])}
-      onChange={({ selectedItem }) => handleChange({ target: { value: selectedItem?.uuid } })}
-      placeholder={t('selectOption', 'Select an option')}
-      size={isTablet ? 'lg' : 'md'}
+    <Controller
+      name={`attributes.${field.name}`}
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => (
+        <ComboBox
+          id={field.name}
+          titleText={t(attributeDisplay)}
+          items={items}
+          selectedItem={items.find((item) => item.uuid === value)}
+          onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
+          placeholder={t('selectOption', 'Select an option')}
+          size={isTablet ? 'lg' : 'md'}
+        />
+      )}
     />
   );
 };
 
 interface LocationAttributeFieldProps {
   field: SearchFieldConfig;
-  formState: AdvancedPatientSearchState;
+  control: Control<AdvancedPatientSearchState>;
   isTablet: boolean;
-  onInputChange: (fieldName: string) => (evt: { target: { value: string } } | { name: string }) => void;
   attributeDisplay: string;
 }
 
-const LocationAttributeField = ({
+const LocationAttributeField: React.FC<LocationAttributeFieldProps> = ({
   field,
-  formState,
+  control,
   isTablet,
-  onInputChange,
   attributeDisplay,
-}: LocationAttributeFieldProps) => {
+}) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const { locations, isLoading, loadingNewData, error } = useLocations(field.locationTag || null, searchQuery);
   const prevLocationOptions = useRef([]);
-  const handleChange = onInputChange(field.name);
 
   const locationOptions = useMemo(() => {
     if (!(isLoading && loadingNewData)) {
@@ -171,36 +177,6 @@ const LocationAttributeField = ({
     return prevLocationOptions.current;
   }, [locations, isLoading, loadingNewData]);
 
-  const selectedItem = useMemo(() => {
-    const currentValue = formState.attributes[field.name];
-    if (!currentValue) return null;
-
-    return locationOptions.find(({ value }) => value === currentValue) || null;
-  }, [locationOptions, formState.attributes, field.name]);
-
-  const handleInputChange = useCallback(
-    (value: string | null) => {
-      if (value) {
-        // If the value exists in the locationOptions, exit the function
-        if (locationOptions.find(({ label }) => label === value)) return;
-        // If the input is a new value, set the search query
-        setSearchQuery(value);
-        // Clear the current selected value
-        handleChange({ target: { value: null } });
-      }
-    },
-    [locationOptions, handleChange],
-  );
-
-  const handleSelect = useCallback(
-    ({ selectedItem }) => {
-      if (selectedItem) {
-        handleChange({ target: { value: selectedItem.value } });
-      }
-    },
-    [handleChange],
-  );
-
   if (error) {
     return (
       <InlineNotification kind="error" title={t('error', 'Error')}>
@@ -211,16 +187,28 @@ const LocationAttributeField = ({
 
   return (
     <div className={styles.locationAttributeFieldContainer}>
-      <ComboBox
-        id={field.name}
-        titleText={t(field.label || attributeDisplay)}
-        items={locationOptions}
-        selectedItem={selectedItem}
-        onChange={handleSelect}
-        onInputChange={handleInputChange}
-        placeholder={t('searchLocationPersonAttribute', 'Search location')}
-        size={isTablet ? 'lg' : 'md'}
-        typeahead
+      <Controller
+        name={`attributes.${field.name}`}
+        control={control}
+        defaultValue=""
+        render={({ field: { onChange, value } }) => (
+          <ComboBox
+            id={field.name}
+            titleText={t(attributeDisplay)}
+            items={locationOptions}
+            selectedItem={locationOptions.find((option) => option.value === value)}
+            onChange={({ selectedItem }) => onChange(selectedItem?.value)}
+            onInputChange={(inputValue) => {
+              if (inputValue && !locationOptions.find(({ label }) => label === inputValue)) {
+                setSearchQuery(inputValue);
+                onChange('');
+              }
+            }}
+            placeholder={t('searchLocationPersonAttribute', 'Search location')}
+            size={isTablet ? 'lg' : 'md'}
+            typeahead
+          />
+        )}
       />
       {loadingNewData && (
         <div className={styles.loadingContainer}>

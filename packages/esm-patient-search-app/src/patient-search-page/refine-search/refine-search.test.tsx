@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import RefineSearch from './refine-search.component';
-import { initialState } from '../advanced-search-reducer';
 import { type PatientSearchConfig } from '../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 
@@ -43,7 +42,6 @@ describe('RefineSearch', () => {
         },
         personAttributes: [
           {
-            label: 'Phone Number',
             attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
           },
         ],
@@ -78,7 +76,6 @@ describe('RefineSearch', () => {
     expect(screen.getByText('Year of Birth')).toBeInTheDocument();
     expect(screen.getByLabelText('Age')).toBeInTheDocument();
     expect(screen.getByLabelText('Postcode')).toBeInTheDocument();
-    expect(screen.getByLabelText('Phone Number')).toBeInTheDocument();
   });
 
   it('shows number of filters applied in Apply button when filters are active', () => {
@@ -93,7 +90,15 @@ describe('RefineSearch', () => {
 
     await user.click(screen.getByRole('button', { name: /reset fields/i }));
 
-    expect(mockSetFilters).toHaveBeenCalledWith(initialState);
+    expect(mockSetFilters).toHaveBeenCalledWith({
+      gender: 'any',
+      dateOfBirth: 0,
+      monthOfBirth: 0,
+      yearOfBirth: 0,
+      postcode: '',
+      age: 0,
+      attributes: {},
+    });
   });
 
   it('submits form with current state when Apply is clicked', async () => {
@@ -105,8 +110,13 @@ describe('RefineSearch', () => {
 
     expect(mockSetFilters).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...initialState,
-        age: '30',
+        gender: 'any',
+        dateOfBirth: 0,
+        monthOfBirth: 0,
+        yearOfBirth: 0,
+        postcode: '',
+        attributes: {},
+        age: 30,
       }),
     );
   });

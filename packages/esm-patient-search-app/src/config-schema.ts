@@ -4,7 +4,6 @@ export type BuiltInFieldType = 'gender' | 'dateOfBirth' | 'age' | 'postcode';
 
 export interface PersonAttributeFieldConfig {
   attributeTypeUuid: string;
-  label?: string;
   placeholder?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<{ uuid: string; label?: string }>;
@@ -71,8 +70,10 @@ export const configSchema = {
         },
         personAttributes: [
           {
-            label: 'Phone Number',
             attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+          },
+          {
+            attributeTypeUuid: '8d87236c-c2cc-11de-8d13-0010c6dffd0f',
           },
         ],
       },
@@ -153,10 +154,6 @@ export const configSchema = {
         _description: 'Configuration for person attributes to display on advanced search',
         _elements: {
           _type: Type.Object,
-          label: {
-            _type: Type.String,
-            _description: 'The label text for the field',
-          },
           placeholder: {
             _type: Type.String,
             _description: 'Placeholder text for the field',

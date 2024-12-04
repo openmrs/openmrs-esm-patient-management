@@ -20,7 +20,7 @@ import {
 export function useAttributeConceptAnswers(conceptUuid: string): {
   data: Array<ConceptAnswers>;
   isLoading: boolean;
-  error: Error;
+  error: Error | undefined;
 } {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
@@ -34,7 +34,7 @@ export function useAttributeConceptAnswers(conceptUuid: string): {
       kind: 'error',
     });
   }
-  return useMemo(() => ({ data: data?.data?.answers, isLoading, error }), [isLoading, error, data]);
+  return useMemo(() => ({ data: data?.data?.answers ?? [], isLoading, error }), [isLoading, error, data]);
 }
 
 export function useLocations(
@@ -80,12 +80,12 @@ export function useLocations(
       loadingNewData: isValidating,
       error,
     }),
-    [data, isLoading, isValidating],
+    [data?.data?.entry, error, isLoading, isValidating],
   );
 }
 
 export function usePersonAttributeType(personAttributeTypeUuid: string): {
-  data: PersonAttributeTypeResponse;
+  data: PersonAttributeTypeResponse | undefined;
   isLoading: boolean;
   error: any;
 } {
@@ -94,9 +94,12 @@ export function usePersonAttributeType(personAttributeTypeUuid: string): {
     openmrsFetch,
   );
 
-  return {
-    data: data?.data,
-    isLoading,
-    error,
-  };
+  return useMemo(
+    () => ({
+      data: data?.data,
+      isLoading,
+      error,
+    }),
+    [data, isLoading, error],
+  );
 }

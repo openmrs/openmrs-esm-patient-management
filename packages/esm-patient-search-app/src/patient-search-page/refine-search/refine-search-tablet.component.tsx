@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@openmrs/esm-framework';
+import { type Control } from 'react-hook-form';
 import { type AdvancedPatientSearchState, type SearchFieldConfig, type SearchFieldType } from '../../types';
 import { type PatientSearchConfig, type PersonAttributeFieldConfig } from '../../config-schema';
 import { SearchField } from './search-field.component';
@@ -11,27 +12,23 @@ import styles from './refine-search-tablet.scss';
 interface RefineSearchTabletProps {
   showRefineSearchDialog: boolean;
   filtersApplied: number;
-  formState: AdvancedPatientSearchState;
+  control: Control<AdvancedPatientSearchState>;
   config: PatientSearchConfig;
   isTablet: boolean;
   onResetFields: () => void;
   onToggleDialog: () => void;
   onSubmit: (evt: React.FormEvent) => void;
-  onInputChange: (fieldName: string) => (evt: { target: { value: string } } | { name: string }) => void;
-  onDateOfBirthChange: (dateComponent: 'date' | 'month' | 'year') => (evt: { target: { value: string } }) => void;
 }
 
 export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
   showRefineSearchDialog,
   filtersApplied,
-  formState,
+  control,
   config,
   isTablet,
   onResetFields,
   onToggleDialog,
   onSubmit,
-  onInputChange,
-  onDateOfBirthChange,
 }) => {
   const { t } = useTranslation();
 
@@ -50,11 +47,9 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
 
     config.search.searchFields.personAttributes?.forEach((attribute: PersonAttributeFieldConfig) => {
       fields.push({
+        ...attribute,
         name: attribute.attributeTypeUuid,
         type: 'personAttribute',
-        label: attribute.label,
-        attributeTypeUuid: attribute.attributeTypeUuid,
-        ...attribute,
       });
     });
 
@@ -72,14 +67,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
         <div key={index} className={styles.otherFieldsRow}>
           {row.map((field) => (
             <div key={field.name} className={styles.fieldTabletOrOverlay}>
-              <SearchField
-                field={field}
-                formState={formState}
-                inTabletOrOverlay={true}
-                isTablet={isTablet}
-                onInputChange={onInputChange}
-                onDateOfBirthChange={onDateOfBirthChange}
-              />
+              <SearchField field={field} control={control} inTabletOrOverlay={true} isTablet={isTablet} />
             </div>
           ))}
         </div>
@@ -92,26 +80,12 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
           <div className={classNames(styles.padded, styles.refineSearchDialogGenderSexRow)}>
             {genderField && (
               <div className={styles.fieldTabletOrOverlay}>
-                <SearchField
-                  field={genderField}
-                  formState={formState}
-                  inTabletOrOverlay={true}
-                  isTablet={isTablet}
-                  onInputChange={onInputChange}
-                  onDateOfBirthChange={onDateOfBirthChange}
-                />
+                <SearchField field={genderField} control={control} inTabletOrOverlay={true} isTablet={isTablet} />
               </div>
             )}
             {dobField && (
               <div className={styles.fieldTabletOrOverlay}>
-                <SearchField
-                  field={dobField}
-                  formState={formState}
-                  inTabletOrOverlay={true}
-                  isTablet={isTablet}
-                  onInputChange={onInputChange}
-                  onDateOfBirthChange={onDateOfBirthChange}
-                />
+                <SearchField field={dobField} control={control} inTabletOrOverlay={true} isTablet={isTablet} />
               </div>
             )}
           </div>

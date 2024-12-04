@@ -107,25 +107,6 @@ export interface AdvancedPatientSearchState {
   };
 }
 
-export enum AdvancedPatientSearchActionTypes {
-  SET_DATE_OF_BIRTH,
-  SET_MONTH_OF_BIRTH,
-  SET_YEAR_OF_BIRTH,
-  RESET_FIELDS,
-  SET_FIELD,
-}
-
-export interface AdvancedPatientSearchAction {
-  type: AdvancedPatientSearchActionTypes;
-  gender?: 'any' | 'male' | 'female' | 'other' | 'unknown';
-  dateOfBirth?: number;
-  monthOfBirth?: number;
-  yearOfBirth?: number;
-  phoneNumber?: number;
-  postcode?: string;
-  age?: number;
-}
-
 export interface User {
   uuid: string;
   userProperties: {

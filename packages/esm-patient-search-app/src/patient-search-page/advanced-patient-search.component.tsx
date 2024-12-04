@@ -2,9 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import { type AdvancedPatientSearchState } from '../types';
-import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
-import RefineSearch from './refine-search/refine-search.component';
+import RefineSearch, { initialFilters } from './refine-search/refine-search.component';
 import styles from './advanced-patient-search.scss';
 import type { OpenmrsResource } from '@openmrs/esm-framework';
 
@@ -19,11 +18,11 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   stickyPagination,
   inTabletOrOverlay,
 }) => {
-  const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialState);
+  const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialFilters);
   const filtersApplied = useMemo(() => {
     let count = 0;
     Object.entries(filters).forEach(([key, value]) => {
-      if (key !== 'attributes' && value !== initialState[key]) {
+      if (key !== 'attributes' && value !== initialFilters[key]) {
         count++;
       }
     });
@@ -107,10 +106,10 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
             if (!matchingAttribute) return false;
 
             const isValueObj = typeof matchingAttribute.value === 'object';
-            const matchingValue = isValueObj
+            const patientAttributeValue = isValueObj
               ? (matchingAttribute.value as OpenmrsResource).uuid
               : matchingAttribute.value;
-            if (matchingValue !== value) {
+            if (patientAttributeValue !== value) {
               return false;
             }
           }

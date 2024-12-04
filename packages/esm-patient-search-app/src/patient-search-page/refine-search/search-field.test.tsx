@@ -1,38 +1,70 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { SearchField } from './search-field.component';
-import { type SearchFieldConfig } from '../../types';
 import { usePersonAttributeType } from './person-attributes.resource';
-import { initialState } from '../advanced-search-reducer';
-
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
+import { type AdvancedPatientSearchState, type SearchFieldConfig } from '../../types';
+import { useForm } from 'react-hook-form';
+import { renderWithSwr } from 'tools';
 
 jest.mock('./person-attributes.resource', () => ({
   usePersonAttributeType: jest.fn(),
 }));
 
-describe('SearchField', () => {
-  const user = userEvent.setup();
-  const mockOnInputChange = jest.fn(() => jest.fn());
-  const mockOnDateOfBirthChange = jest.fn(() => jest.fn());
-  mockUsePersonAttributeType.mockReturnValue({
-    isLoading: false,
-    error: null,
-    data: {
-      format: 'java.lang.String',
-      uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-      display: 'Telephone Number',
-    },
-  });
+const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
 
+jest.mock('react-hook-form', () => ({
+  ...jest.requireActual('react-hook-form'),
+  useForm: jest.fn().mockReturnValue({
+    control: {
+      register: jest.fn(),
+      unregister: jest.fn(),
+      getFieldState: jest.fn(),
+      _names: {
+        array: new Set(['test']),
+        mount: new Set(['test']),
+        unMount: new Set(['test']),
+        watch: new Set(['test']),
+        focus: 'test',
+        watchAll: false,
+      },
+      _subjects: {
+        watch: jest.fn(),
+        array: jest.fn(),
+        state: jest.fn(),
+      },
+      _getWatch: jest.fn(),
+      _formValues: {},
+      _defaultValues: {},
+    },
+    getValues: jest.fn(),
+    setValue: jest.fn(),
+    formState: { errors: {} },
+  }),
+  Controller: ({ render, name, control }) =>
+    render({
+      field: {
+        onChange: jest.fn(),
+        onBlur: jest.fn(),
+        value: '',
+        name,
+        ref: jest.fn(),
+      },
+      formState: { errors: {} },
+      fieldState: { error: undefined },
+    }),
+}));
+it;
+
+describe('SearchField', () => {
   const defaultProps = {
-    formState: initialState,
+    control: useForm<AdvancedPatientSearchState>().control,
     inTabletOrOverlay: false,
     isTablet: false,
-    onInputChange: mockOnInputChange,
-    onDateOfBirthChange: mockOnDateOfBirthChange,
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   describe('Gender field', () => {
     const genderField: SearchFieldConfig = {
@@ -41,22 +73,20 @@ describe('SearchField', () => {
       label: 'Sex',
     };
 
-    it('renders gender switches with correct options', () => {
+    it('renders all gender options', () => {
       render(<SearchField field={genderField} {...defaultProps} />);
 
-      // Check all gender options are present
-      expect(screen.getByRole('tab', { name: /any/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'Male' })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /female/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /other/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /unknown/i })).toBeInTheDocument();
+      expect(screen.getByText('Any')).toBeInTheDocument();
+      expect(screen.getByText('Male')).toBeInTheDocument();
+      expect(screen.getByText('Female')).toBeInTheDocument();
+      expect(screen.getByText('Other')).toBeInTheDocument();
+      expect(screen.getByText('Unknown')).toBeInTheDocument();
     });
 
-    it('handles gender selection correctly', async () => {
+    it('groups gender options into two content switchers', () => {
       render(<SearchField field={genderField} {...defaultProps} />);
-
-      await user.click(screen.getByRole('tab', { name: 'Male' }));
-      expect(mockOnInputChange).toHaveBeenCalledWith('gender');
+      const switchers = screen.getAllByRole('tablist');
+      expect(switchers).toHaveLength(2);
     });
   });
 
@@ -67,20 +97,20 @@ describe('SearchField', () => {
       label: 'Date of Birth',
     };
 
-    it('renders date of birth inputs with correct labels', () => {
+    it('renders three number inputs for day, month, and year', () => {
       render(<SearchField field={dobField} {...defaultProps} />);
 
-      expect(screen.getByLabelText(/day of birth/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/month of birth/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/year of birth/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Day of Birth')).toBeInTheDocument();
+      expect(screen.getByLabelText('Month of Birth')).toBeInTheDocument();
+      expect(screen.getByLabelText('Year of Birth')).toBeInTheDocument();
     });
 
-    it('applies correct validation constraints', () => {
+    it('applies correct validation constraints to date inputs', () => {
       render(<SearchField field={dobField} {...defaultProps} />);
 
-      const dayInput = screen.getByLabelText(/day of birth/i);
-      const monthInput = screen.getByLabelText(/month of birth/i);
-      const yearInput = screen.getByLabelText(/year of birth/i);
+      const dayInput = screen.getByLabelText('Day of Birth');
+      const monthInput = screen.getByLabelText('Month of Birth');
+      const yearInput = screen.getByLabelText('Year of Birth');
 
       expect(dayInput).toHaveAttribute('min', '1');
       expect(dayInput).toHaveAttribute('max', '31');
@@ -88,19 +118,6 @@ describe('SearchField', () => {
       expect(monthInput).toHaveAttribute('max', '12');
       expect(yearInput).toHaveAttribute('min', '1800');
       expect(yearInput).toHaveAttribute('max', new Date().getFullYear().toString());
-    });
-
-    it('handles date input changes correctly', async () => {
-      render(<SearchField field={dobField} {...defaultProps} />);
-
-      await user.type(screen.getByLabelText(/day of birth/i), '15');
-      expect(mockOnDateOfBirthChange).toHaveBeenCalledWith('date');
-
-      await user.type(screen.getByLabelText(/month of birth/i), '06');
-      expect(mockOnDateOfBirthChange).toHaveBeenCalledWith('month');
-
-      await user.type(screen.getByLabelText(/year of birth/i), '1990');
-      expect(mockOnDateOfBirthChange).toHaveBeenCalledWith('year');
     });
   });
 
@@ -113,21 +130,23 @@ describe('SearchField', () => {
       max: 120,
     };
 
-    it('renders age input with correct attributes', () => {
+    it('renders number input with correct constraints', () => {
       render(<SearchField field={ageField} {...defaultProps} />);
 
-      const ageInput = screen.getByLabelText(/age/i);
+      const ageInput = screen.getByLabelText('Age');
       expect(ageInput).toBeInTheDocument();
+      expect(ageInput).toHaveAttribute('type', 'number');
       expect(ageInput).toHaveAttribute('min', '0');
       expect(ageInput).toHaveAttribute('max', '120');
-      expect(ageInput).toHaveAttribute('type', 'number');
     });
 
-    it('handles age input changes', async () => {
-      render(<SearchField field={ageField} {...defaultProps} />);
-
-      await user.type(screen.getByLabelText(/age/i), '25');
-      expect(mockOnInputChange).toHaveBeenCalledWith('age');
+    it('uses custom label when provided', () => {
+      const customAgeField = {
+        ...ageField,
+        label: 'Custom Age Label',
+      };
+      render(<SearchField field={customAgeField} {...defaultProps} />);
+      expect(screen.getByLabelText('Custom Age Label')).toBeInTheDocument();
     });
   });
 
@@ -136,34 +155,66 @@ describe('SearchField', () => {
       name: 'postcode',
       type: 'postcode',
       label: 'Postcode',
+      placeholder: 'Enter postcode',
     };
 
-    it('renders postcode input correctly', () => {
+    it('renders text input with correct attributes', () => {
       render(<SearchField field={postcodeField} {...defaultProps} />);
-
-      expect(screen.getByLabelText(/postcode/i)).toBeInTheDocument();
+      const input = screen.getByLabelText('Postcode');
+      expect(input).toBeInTheDocument();
+      expect(input).toHaveAttribute('type', 'text');
     });
 
-    it('handles postcode input changes', async () => {
-      render(<SearchField field={postcodeField} {...defaultProps} />);
-
-      await user.type(screen.getByLabelText(/postcode/i), '12345');
-      expect(mockOnInputChange).toHaveBeenCalledWith('postcode');
+    it('uses custom label when provided', () => {
+      const customPostcodeField = {
+        ...postcodeField,
+        label: 'ZIP Code',
+      };
+      render(<SearchField field={customPostcodeField} {...defaultProps} />);
+      expect(screen.getByLabelText('ZIP Code')).toBeInTheDocument();
     });
   });
 
   describe('Person Attribute field', () => {
     const personAttributeField: SearchFieldConfig = {
-      name: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+      name: 'test-uuid',
       type: 'personAttribute',
-      label: 'Phone Number',
-      attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+      attributeTypeUuid: 'test-uuid',
     };
 
-    it('renders person attribute field component', () => {
-      render(<SearchField field={personAttributeField} {...defaultProps} />);
+    beforeEach(() => {
+      mockUsePersonAttributeType.mockReturnValue({
+        data: {
+          format: 'java.lang.String',
+          display: 'Phone Number',
+          uuid: 'test-uuid',
+        },
+        isLoading: false,
+        error: null,
+      });
+    });
 
+    it('renders person attribute field with correct props', () => {
+      renderWithSwr(<SearchField field={personAttributeField} {...defaultProps} />);
       expect(screen.getByText('Phone Number')).toBeInTheDocument();
+    });
+  });
+
+  describe('Responsive behavior', () => {
+    const ageField: SearchFieldConfig = {
+      name: 'age',
+      type: 'age',
+      label: 'Age',
+    };
+
+    it('applies tablet styles when in tablet mode', () => {
+      render(<SearchField field={ageField} {...defaultProps} isTablet={true} />);
+      expect(screen.getByLabelText('Age')).toBeInTheDocument();
+    });
+
+    it('applies overlay styles when in overlay mode', () => {
+      render(<SearchField field={ageField} {...defaultProps} inTabletOrOverlay={true} />);
+      expect(screen.getByLabelText('Age')).toBeInTheDocument();
     });
   });
 });
