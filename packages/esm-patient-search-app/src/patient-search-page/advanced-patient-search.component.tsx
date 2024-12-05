@@ -27,7 +27,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
       }
     });
 
-    count += Object.entries(filters.attributes).length ?? 0;
+    count += Object.keys(filters.attributes).length ?? 0;
     return count;
   }, [filters]);
 
@@ -99,7 +99,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
         }
 
         // Person attributes filter
-        if (Object.entries(filters.attributes).length) {
+        if (Object.keys(filters.attributes).length) {
           for (const [attributeUuid, value] of Object.entries(filters.attributes)) {
             const matchingAttribute = patient.attributes.find((attr) => attr.attributeType.uuid === attributeUuid);
 

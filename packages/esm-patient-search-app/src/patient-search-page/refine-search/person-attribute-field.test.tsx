@@ -2,7 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PersonAttributeField, type PersonAttributeFieldProps } from './person-attribute-field.component';
-import { useAttributeConceptAnswers, useLocations, usePersonAttributeType } from './person-attributes.resource';
+import {
+  useAttributeConceptAnswers,
+  useConfiguredAnswerConcepts,
+  useLocations,
+  usePersonAttributeType,
+} from './person-attributes.resource';
 import {
   type AdvancedPatientSearchState,
   type LocationEntry,
@@ -64,11 +69,13 @@ jest.mock('react-hook-form', () => ({
 jest.mock('./person-attributes.resource', () => ({
   usePersonAttributeType: jest.fn(),
   useAttributeConceptAnswers: jest.fn(),
+  useConfiguredAnswerConcepts: jest.fn(),
   useLocations: jest.fn(),
 }));
 
 const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
 const mockUseAttributeConceptAnswers = jest.mocked(useAttributeConceptAnswers);
+const mockUseConfiguredAnswerConcepts = jest.mocked(useConfiguredAnswerConcepts);
 const mockUseLocations = jest.mocked(useLocations);
 
 describe('PersonAttributeField', () => {
@@ -114,13 +121,18 @@ describe('PersonAttributeField', () => {
         error: null,
       });
 
+      mockUseConfiguredAnswerConcepts.mockReturnValue({
+        configuredConceptAnswers: [],
+        isLoadingConfiguredAnswers: false,
+      });
+
       mockUseAttributeConceptAnswers.mockReturnValue({
-        data: [
+        conceptAnswers: [
           { uuid: 'concept-answer-uuid-1', display: 'concept-answer-1' },
           { uuid: 'concept-answer-uuid-2', display: 'concept-answer-2' },
         ],
-        isLoading: false,
-        error: null,
+        isLoadingConceptAnswers: false,
+        errorFetchingConceptAnswers: null,
       });
     });
 
@@ -144,15 +156,21 @@ describe('PersonAttributeField', () => {
         isLoading: false,
         error: null,
       });
+
+      mockUseConfiguredAnswerConcepts.mockReturnValue({
+        configuredConceptAnswers: [
+          { uuid: 'concept-answer-1-uuid', display: 'concept-answer-1' },
+          { uuid: 'concept-answer-2-uuid', display: 'concept-answer-2' },
+        ],
+        isLoadingConfiguredAnswers: false,
+      });
+
       const propsWithCustomConcepts: PersonAttributeFieldProps = {
         ...defaultProps,
         field: {
           ...defaultProps.field,
           answerConceptSetUuid: 'test-concept-set-uuid',
-          customConceptAnswers: [
-            { uuid: 'concept-answer-1-uuid', label: 'concept-answer-1' },
-            { uuid: 'concept-answer-2-uuid', label: 'concept-answer-2' },
-          ],
+          conceptAnswersUuids: ['concept-answer-1-uuid', 'concept-answer-2-uuid'],
         },
       };
 
@@ -172,15 +190,19 @@ describe('PersonAttributeField', () => {
         isLoading: false,
         error: null,
       });
+      mockUseConfiguredAnswerConcepts.mockReturnValue({
+        configuredConceptAnswers: [
+          { uuid: 'concept-answer-1-uuid', display: 'concept-answer-1' },
+          { uuid: 'concept-answer-2-uuid', display: 'concept-answer-2' },
+        ],
+        isLoadingConfiguredAnswers: false,
+      });
       const propsWithAnswerConceptUuidAndCustomAnswers: PersonAttributeFieldProps = {
         ...defaultProps,
         field: {
           ...defaultProps.field,
           answerConceptSetUuid: 'test-concept-set-uuid',
-          customConceptAnswers: [
-            { uuid: 'concept-answer-1-uuid', label: 'concept-answer-1' },
-            { uuid: 'concept-answer-2-uuid', label: 'concept-answer-2' },
-          ],
+          conceptAnswersUuids: ['concept-answer-1-uuid', 'concept-answer-2-uuid'],
         },
       };
 
@@ -233,7 +255,7 @@ describe('PersonAttributeField', () => {
         error: new Error('Failed to load attribute type'),
       });
       render(<PersonAttributeField {...defaultProps} />);
-      expect(screen.getByText('Error loading attribute type')).toBeInTheDocument();
+      expect(screen.getByText('Error loading attribute type test-uuid')).toBeInTheDocument();
     });
   });
 

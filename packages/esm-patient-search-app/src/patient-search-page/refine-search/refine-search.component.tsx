@@ -5,7 +5,11 @@ import { Button, Layer } from '@carbon/react';
 import { useForm } from 'react-hook-form';
 import { type AdvancedPatientSearchState, type SearchFieldConfig, type SearchFieldType } from '../../types';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { type PatientSearchConfig, type PersonAttributeFieldConfig } from '../../config-schema';
+import {
+  type BuiltInFieldConfig,
+  type PatientSearchConfig,
+  type PersonAttributeFieldConfig,
+} from '../../config-schema';
 import { RefineSearchTablet } from './refine-search-tablet.component';
 import styles from './refine-search.scss';
 import { SearchField } from './search-field.component';
@@ -79,17 +83,16 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
   const renderSearchFields = useMemo(() => {
     const fields: Array<SearchFieldConfig> = [];
 
-    Object.entries(config.search.searchFields.fields).forEach(([fieldName, fieldConfig]) => {
-      if (fieldConfig.enabled) {
+    Object.entries(config.search.searchFilterFields).forEach(([fieldName, fieldConfig]) => {
+      if (fieldName !== 'personAttributes' && (fieldConfig as BuiltInFieldConfig).enabled) {
         fields.push({
           name: fieldName,
           type: fieldName as SearchFieldType,
-          label: fieldConfig.label ?? fieldName,
         });
       }
     });
 
-    config.search.searchFields.personAttributes?.forEach((attribute: PersonAttributeFieldConfig) => {
+    config.search.searchFilterFields.personAttributes?.forEach((attribute: PersonAttributeFieldConfig) => {
       fields.push({
         name: attribute.attributeTypeUuid,
         type: 'personAttribute',
@@ -132,7 +135,9 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
       <hr className={classNames(styles.field, styles.horizontalDivider)} />
       <Button type="submit" kind="primary" size="md" className={classNames(styles.field, styles.button)}>
         {t('apply', 'Apply')}{' '}
-        {filtersApplied ? `(${filtersApplied} ${t('countOfFiltersApplied', 'filters applied')})` : null}
+        {filtersApplied
+          ? `(${t('countOfFiltersApplied', '{{count}} filters applied', { count: filtersApplied })})`
+          : null}
       </Button>
       <Button
         kind="secondary"

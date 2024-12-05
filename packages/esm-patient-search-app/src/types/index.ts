@@ -131,13 +131,8 @@ export interface ConceptResponse {
     uuid: string;
     display: string;
   };
-  answers: Array<ConceptAnswers>;
-  setMembers: Array<ConceptAnswers>;
-}
-
-export interface ConceptAnswers {
-  display: string;
-  uuid: string;
+  answers: Array<OpenmrsResource>;
+  setMembers: Array<OpenmrsResource>;
 }
 
 export interface LocationEntry {
@@ -176,10 +171,9 @@ export type SearchFieldType = 'age' | 'dateOfBirth' | 'gender' | 'personAttribut
 export interface SearchFieldConfig {
   name: string;
   type: SearchFieldType;
-  label?: string;
   placeholder?: string;
   answerConceptSetUuid?: string;
-  customConceptAnswers?: Array<{ uuid: string; label?: string }>;
+  conceptAnswersUuids?: Array<string>;
   locationTag?: string;
   attributeTypeUuid?: string;
   min?: number;

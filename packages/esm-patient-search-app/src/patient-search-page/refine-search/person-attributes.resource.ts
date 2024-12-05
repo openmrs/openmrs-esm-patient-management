@@ -3,38 +3,49 @@ import {
   type FetchResponse,
   fhirBaseUrl,
   openmrsFetch,
+  type OpenmrsResource,
   restBaseUrl,
-  showSnackbar,
   useDebounce,
 } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import {
-  type ConceptAnswers,
   type ConceptResponse,
   type LocationEntry,
   type LocationResponse,
   type PersonAttributeTypeResponse,
 } from '../../types';
 
-export function useAttributeConceptAnswers(conceptUuid: string): {
-  data: Array<ConceptAnswers>;
-  isLoading: boolean;
-  error: Error | undefined;
+export function useAttributeConceptAnswers(conceptUuid: string | undefined): {
+  conceptAnswers: Array<OpenmrsResource>;
+  isLoadingConceptAnswers: boolean;
+  errorFetchingConceptAnswers: Error | undefined;
 } {
-  const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
+  const shouldFetch = Boolean(conceptUuid);
+
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
     shouldFetch ? `${restBaseUrl}/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
-  if (error) {
-    showSnackbar({
-      title: error.name,
-      subtitle: error.message,
-      kind: 'error',
-    });
-  }
-  return useMemo(() => ({ data: data?.data?.answers ?? [], isLoading, error }), [isLoading, error, data]);
+
+  useEffect(() => {
+    if (error) {
+      console.error(`Error loading concept answers for conceptUuid: ${conceptUuid}`, error);
+    }
+  }, [conceptUuid, error]);
+
+  const conceptAnswers = useMemo(() => {
+    if (!data?.data) {
+      return [];
+    }
+    return data.data.answers?.length > 0 ? data.data.answers : data.data.setMembers ?? [];
+  }, [data]);
+
+  return {
+    conceptAnswers,
+    isLoadingConceptAnswers: isLoading,
+    errorFetchingConceptAnswers: error,
+  };
 }
 
 export function useLocations(
@@ -101,5 +112,33 @@ export function usePersonAttributeType(personAttributeTypeUuid: string): {
       error,
     }),
     [data, isLoading, error],
+  );
+}
+
+export function useConfiguredAnswerConcepts(uuids: Array<string>): {
+  configuredConceptAnswers: Array<OpenmrsResource>;
+  isLoadingConfiguredAnswers: boolean;
+} {
+  const fetchConcept = async (uuid: string): Promise<OpenmrsResource | null> => {
+    try {
+      const response = await openmrsFetch(`${restBaseUrl}/concept/${uuid}?v=custom:(uuid,display)`);
+      return response?.data;
+    } catch (error) {
+      console.error(`Error fetching concept for UUID: ${uuid}`, error);
+      return null;
+    }
+  };
+
+  const { data, isLoading } = useSWR(uuids.length > 0 ? ['answer-concepts', uuids] : null, async () => {
+    const results = await Promise.all(uuids.map(fetchConcept));
+    return results.filter((concept) => concept !== null);
+  });
+
+  return useMemo(
+    () => ({
+      configuredConceptAnswers: data ?? [],
+      isLoadingConfiguredAnswers: isLoading,
+    }),
+    [data, isLoading],
   );
 }

@@ -5,7 +5,11 @@ import { Button } from '@carbon/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@openmrs/esm-framework';
 import { type Control } from 'react-hook-form';
 import { type AdvancedPatientSearchState, type SearchFieldConfig, type SearchFieldType } from '../../types';
-import { type PatientSearchConfig, type PersonAttributeFieldConfig } from '../../config-schema';
+import {
+  type BuiltInFieldConfig,
+  type PatientSearchConfig,
+  type PersonAttributeFieldConfig,
+} from '../../config-schema';
 import { SearchField } from './search-field.component';
 import styles from './refine-search-tablet.scss';
 
@@ -35,21 +39,20 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
   const renderSearchFields = useMemo(() => {
     const fields: Array<SearchFieldConfig> = [];
 
-    Object.entries(config.search.searchFields.fields).forEach(([fieldName, fieldConfig]) => {
-      if (fieldConfig.enabled) {
+    Object.entries(config.search.searchFilterFields).forEach(([fieldName, fieldConfig]) => {
+      if (fieldName !== 'personAttributes' && (fieldConfig as BuiltInFieldConfig).enabled) {
         fields.push({
           name: fieldName,
           type: fieldName as SearchFieldType,
-          label: fieldConfig.label,
         });
       }
     });
 
-    config.search.searchFields.personAttributes?.forEach((attribute: PersonAttributeFieldConfig) => {
+    config.search.searchFilterFields.personAttributes?.forEach((attribute: PersonAttributeFieldConfig) => {
       fields.push({
-        ...attribute,
         name: attribute.attributeTypeUuid,
         type: 'personAttribute',
+        ...attribute,
       });
     });
 
@@ -144,7 +147,9 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
                 </Button>
                 <Button type="submit" kind="primary" size="xl" className={styles.button}>
                   {t('apply', 'Apply')}{' '}
-                  {filtersApplied ? `(${filtersApplied} ${t('countOfFiltersApplied', 'filters applied')})` : null}
+                  {filtersApplied
+                    ? `(${t('countOfFiltersApplied', '{{count}} filters applied', { count: filtersApplied })})`
+                    : null}
                 </Button>
               </div>
             </form>

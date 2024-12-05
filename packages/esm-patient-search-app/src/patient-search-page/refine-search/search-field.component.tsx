@@ -23,7 +23,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
         <div className={classNames({ [styles.fieldTabletOrOverlay]: inTabletOrOverlay })}>
           <div className={styles.labelText}>
             <label className={classNames(styles.sexLabelText, styles.label01)} htmlFor="gender">
-              {t(field.name, field.label)}
+              {t('sex', 'Sex')}
             </label>
           </div>
           <Controller
@@ -132,7 +132,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 value={value || ''}
                 onChange={(e) => onChange(parseInt(e.target.value) || 0)}
                 type="number"
-                label={field.label ? t(field.label) : t('age', 'Age')}
+                label={t('age', 'Age')}
                 min={field.min}
                 max={field.max}
                 allowEmpty
@@ -154,7 +154,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
             render={({ field: { onChange, value } }) => (
               <TextInput
                 id={field.name}
-                labelText={field.label ? t(field.label) : t('postcode', 'Postcode')}
+                labelText={t('postcode', 'Postcode')}
                 onChange={(e) => onChange(e.target.value)}
                 value={value}
                 size={isTablet ? 'lg' : 'md'}

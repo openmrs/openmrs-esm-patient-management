@@ -2,9 +2,15 @@ import React, { useMemo, useRef, useState } from 'react';
 import { ComboBox, InlineLoading, InlineNotification, TextInput, TextInputSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller } from 'react-hook-form';
-import { useAttributeConceptAnswers, useLocations, usePersonAttributeType } from './person-attributes.resource';
+import {
+  useAttributeConceptAnswers,
+  useConfiguredAnswerConcepts,
+  useLocations,
+  usePersonAttributeType,
+} from './person-attributes.resource';
 import { type AdvancedPatientSearchState, type SearchFieldConfig } from '../../types';
 import styles from './search-field.scss';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface PersonAttributeFieldProps {
   field: SearchFieldConfig;
@@ -15,7 +21,7 @@ export interface PersonAttributeFieldProps {
 
 export function PersonAttributeField({ field, control, isTablet }: PersonAttributeFieldProps) {
   const { t } = useTranslation();
-  const { data: personAttributeType, isLoading, error } = usePersonAttributeType(field.attributeTypeUuid);
+  const { data: personAttributeType, isLoading, error } = usePersonAttributeType(field.attributeTypeUuid || '');
 
   const formatField = useMemo(() => {
     if (!personAttributeType || isLoading) {
@@ -76,7 +82,9 @@ export function PersonAttributeField({ field, control, isTablet }: PersonAttribu
   if (error) {
     return (
       <InlineNotification kind="error" title={t('error', 'Error')}>
-        {t('errorLoadingAttribute', 'Error loading attribute type')}
+        {t('errorLoadingAttribute', 'Error loading attribute type {{attributeUuid}}', {
+          attributeUuid: field.attributeTypeUuid,
+        })}
       </InlineNotification>
     );
   }
@@ -98,31 +106,33 @@ const ConceptAttributeField: React.FC<ConceptAttributeFieldProps> = ({
   attributeDisplay,
 }) => {
   const { t } = useTranslation();
-  const {
-    data: conceptAnswers,
-    isLoading,
-    error,
-  } = useAttributeConceptAnswers(field.customConceptAnswers?.length ? '' : field.answerConceptSetUuid);
+  const { configuredConceptAnswers, isLoadingConfiguredAnswers } = useConfiguredAnswerConcepts(
+    field.conceptAnswersUuids ?? [],
+  );
+  const { conceptAnswers, isLoadingConceptAnswers, errorFetchingConceptAnswers } = useAttributeConceptAnswers(
+    field.conceptAnswersUuids?.length ? '' : field.answerConceptSetUuid,
+  );
 
   const items = useMemo(() => {
-    if (field.customConceptAnswers?.length) return field.customConceptAnswers;
-    if (!conceptAnswers || isLoading) return [];
-    return conceptAnswers
-      .map((answer) => ({
-        uuid: answer.uuid,
-        label: answer.display,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [conceptAnswers, field.customConceptAnswers, isLoading]);
+    if (isLoadingConceptAnswers || isLoadingConfiguredAnswers) return [];
+    if (field.conceptAnswersUuids?.length) return configuredConceptAnswers || [];
+    return conceptAnswers || [];
+  }, [
+    isLoadingConceptAnswers,
+    isLoadingConfiguredAnswers,
+    field.conceptAnswersUuids,
+    configuredConceptAnswers,
+    conceptAnswers,
+  ]);
 
-  if (isLoading) {
+  if (isLoadingConceptAnswers || isLoadingConfiguredAnswers) {
     return <TextInputSkeleton />;
   }
 
-  if (error) {
+  if (errorFetchingConceptAnswers) {
     return (
       <InlineNotification kind="error" title={t('error', 'Error')}>
-        {t('errorLoadingConceptAttribute', 'Error loading concept attribute')}
+        {t('errorLoadingConceptAttributeAnswers', 'Error loading concept attribute answers')}
       </InlineNotification>
     );
   }
@@ -137,7 +147,8 @@ const ConceptAttributeField: React.FC<ConceptAttributeFieldProps> = ({
           id={field.name}
           titleText={t(attributeDisplay)}
           items={items}
-          selectedItem={items.find((item) => item.uuid === value)}
+          itemToString={(item: OpenmrsResource) => item?.display}
+          selectedItem={items.sort((a, b) => a.display.localeCompare(b.display)).find((item) => item.uuid === value)}
           onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
           placeholder={t('selectOption', 'Select an option')}
           size={isTablet ? 'lg' : 'md'}
@@ -180,7 +191,9 @@ const LocationAttributeField: React.FC<LocationAttributeFieldProps> = ({
   if (error) {
     return (
       <InlineNotification kind="error" title={t('error', 'Error')}>
-        {t('errorLoadingLocationAttribute', 'Error loading location attribute')}
+        {t('errorLoadingLocationsForAttribute', 'Error loading locations for person attribute {{attributeName}}', {
+          attributeName: attributeDisplay,
+        })}
       </InlineNotification>
     );
   }
