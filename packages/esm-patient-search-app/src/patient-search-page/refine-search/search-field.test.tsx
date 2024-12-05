@@ -70,7 +70,6 @@ describe('SearchField', () => {
     const genderField: SearchFieldConfig = {
       name: 'gender',
       type: 'gender',
-      label: 'Sex',
     };
 
     it('renders all gender options', () => {
@@ -94,7 +93,6 @@ describe('SearchField', () => {
     const dobField: SearchFieldConfig = {
       name: 'dateOfBirth',
       type: 'dateOfBirth',
-      label: 'Date of Birth',
     };
 
     it('renders three number inputs for day, month, and year', () => {
@@ -125,7 +123,6 @@ describe('SearchField', () => {
     const ageField: SearchFieldConfig = {
       name: 'age',
       type: 'age',
-      label: 'Age',
       min: 0,
       max: 120,
     };
@@ -139,22 +136,12 @@ describe('SearchField', () => {
       expect(ageInput).toHaveAttribute('min', '0');
       expect(ageInput).toHaveAttribute('max', '120');
     });
-
-    it('uses custom label when provided', () => {
-      const customAgeField = {
-        ...ageField,
-        label: 'Custom Age Label',
-      };
-      render(<SearchField field={customAgeField} {...defaultProps} />);
-      expect(screen.getByLabelText('Custom Age Label')).toBeInTheDocument();
-    });
   });
 
   describe('Postcode field', () => {
     const postcodeField: SearchFieldConfig = {
       name: 'postcode',
       type: 'postcode',
-      label: 'Postcode',
       placeholder: 'Enter postcode',
     };
 
@@ -163,15 +150,6 @@ describe('SearchField', () => {
       const input = screen.getByLabelText('Postcode');
       expect(input).toBeInTheDocument();
       expect(input).toHaveAttribute('type', 'text');
-    });
-
-    it('uses custom label when provided', () => {
-      const customPostcodeField = {
-        ...postcodeField,
-        label: 'ZIP Code',
-      };
-      render(<SearchField field={customPostcodeField} {...defaultProps} />);
-      expect(screen.getByLabelText('ZIP Code')).toBeInTheDocument();
     });
   });
 
@@ -204,7 +182,6 @@ describe('SearchField', () => {
     const ageField: SearchFieldConfig = {
       name: 'age',
       type: 'age',
-      label: 'Age',
     };
 
     it('applies tablet styles when in tablet mode', () => {

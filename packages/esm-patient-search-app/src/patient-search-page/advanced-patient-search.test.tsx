@@ -65,29 +65,22 @@ describe('AdvancedPatientSearchComponent', () => {
       search: {
         disableTabletSearchOnKeyUp: false,
         showRecentlySearchedPatients: false,
-        searchFields: {
-          fields: {
-            gender: {
-              enabled: true,
-              label: 'Sex',
-            },
-            dateOfBirth: {
-              enabled: true,
-              label: 'Date of Birth',
-            },
-            age: {
-              enabled: true,
-              label: 'Age',
-              min: 0,
-            },
-            postcode: {
-              enabled: true,
-              label: 'Postcode',
-            },
+        searchFilterFields: {
+          gender: {
+            enabled: true,
+          },
+          dateOfBirth: {
+            enabled: true,
+          },
+          age: {
+            enabled: true,
+            min: 0,
+          },
+          postcode: {
+            enabled: true,
           },
           personAttributes: [
             {
-              label: 'Phone Number',
               attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
             },
           ],

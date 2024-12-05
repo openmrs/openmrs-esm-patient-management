@@ -20,25 +20,19 @@ describe('RefineSearch', () => {
   const mockSetFilters = jest.fn();
   const mockConfig = {
     search: {
-      searchFields: {
-        fields: {
-          gender: {
-            enabled: true,
-            label: 'Sex',
-          },
-          dateOfBirth: {
-            enabled: true,
-            label: 'Date of Birth',
-          },
-          age: {
-            enabled: true,
-            label: 'Age',
-            min: 0,
-          },
-          postcode: {
-            enabled: true,
-            label: 'Postcode',
-          },
+      searchFilterFields: {
+        gender: {
+          enabled: true,
+        },
+        dateOfBirth: {
+          enabled: true,
+        },
+        age: {
+          enabled: true,
+          min: 0,
+        },
+        postcode: {
+          enabled: true,
         },
         personAttributes: [
           {
