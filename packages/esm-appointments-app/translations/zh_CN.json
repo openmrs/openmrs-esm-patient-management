@@ -92,7 +92,6 @@
   "highestServiceVolume": "最高量服务：{{time}}",
   "identifier": "ID",
   "invalidNumber": "数值无效",
-  "invalidTime": "无效时间",
   "isRecurringAppointment": "这是一个定期预约吗？",
   "itemsPerPage": "每页条目数",
   "loading": "加载中",
