@@ -55,7 +55,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
     createEncounter,
     wardPatient?.patient,
     wardPatient.bed.id,
-    emrConfiguration.exitFromInpatientEncounterType,
+    emrConfiguration,
     t,
     closeWorkspaceWithSavedChanges,
     wardPatientGroupDetails,
