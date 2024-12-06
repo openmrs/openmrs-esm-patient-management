@@ -5,7 +5,7 @@
   "clear": "Clear",
   "clearSearch": "Clear",
   "closeSearch": "Close Search Panel",
-  "countOfFiltersApplied": "filters applied {{count}}",
+  "countOfFiltersApplied": "{{count}} filters applied",
   "dayOfBirth": "Day of Birth",
   "error": "Error",
   "errorCopy": "Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.",
