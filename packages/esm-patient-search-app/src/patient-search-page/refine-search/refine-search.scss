@@ -1,0 +1,25 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.refineSearchContainer {
+  h2 {
+    margin: layout.$spacing-03 0;
+  }
+}
+
+.field {
+  margin-bottom: layout.$spacing-05;
+
+  input {
+    min-width: unset !important;
+  }
+}
+
+.button {
+  width: 100%;
+  max-width: unset;
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+}

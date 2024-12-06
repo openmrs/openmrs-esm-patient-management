@@ -17,7 +17,10 @@ export interface SearchedPatient {
       middleName: string;
     };
   };
-  attributes: Array<{ value: string; attributeType: { uuid: string; display: string } }>;
+  attributes: Array<{
+    value: OpenmrsResource | string;
+    attributeType: { uuid: string; display: string };
+  }>;
 }
 
 export interface Identifier {
@@ -97,31 +100,11 @@ export interface AdvancedPatientSearchState {
   dateOfBirth: number;
   monthOfBirth: number;
   yearOfBirth: number;
-  phoneNumber: number;
   postcode: string;
   age: number;
-}
-
-export enum AdvancedPatientSearchActionTypes {
-  SET_GENDER,
-  SET_DATE_OF_BIRTH,
-  SET_MONTH_OF_BIRTH,
-  SET_YEAR_OF_BIRTH,
-  SET_PHONE_NUMBER,
-  SET_POSTCODE,
-  SET_AGE,
-  RESET_FIELDS,
-}
-
-export interface AdvancedPatientSearchAction {
-  type: AdvancedPatientSearchActionTypes;
-  gender?: 'any' | 'male' | 'female' | 'other' | 'unknown';
-  dateOfBirth?: number;
-  monthOfBirth?: number;
-  yearOfBirth?: number;
-  phoneNumber?: number;
-  postcode?: string;
-  age?: number;
+  attributes: {
+    [key: string]: string;
+  };
 }
 
 export interface User {
@@ -131,4 +114,68 @@ export interface User {
     patientsVisited: string;
     defaultLocation: string;
   };
+}
+
+export interface PersonAttributeTypeResponse {
+  uuid: string;
+  display: string;
+  name?: string;
+  description?: string;
+  format: string;
+}
+
+export interface ConceptResponse {
+  uuid: string;
+  display: string;
+  datatype: {
+    uuid: string;
+    display: string;
+  };
+  answers: Array<OpenmrsResource>;
+  setMembers: Array<OpenmrsResource>;
+}
+
+export interface LocationEntry {
+  resource: {
+    id: string;
+    name: string;
+    resourceType: string;
+    status: 'active' | 'inactive';
+    meta?: {
+      tag?: Array<{
+        code: string;
+        display: string;
+        system: string;
+      }>;
+    };
+  };
+}
+
+export interface LocationResponse {
+  type: string;
+  total: number;
+  resourceType: string;
+  meta: {
+    lastUpdated: string;
+  };
+  link: Array<{
+    relation: string;
+    url: string;
+  }>;
+  id: string;
+  entry: Array<LocationEntry>;
+}
+
+export type SearchFieldType = 'age' | 'dateOfBirth' | 'gender' | 'personAttribute' | 'postcode';
+
+export interface SearchFieldConfig {
+  name: string;
+  type: SearchFieldType;
+  placeholder?: string;
+  answerConceptSetUuid?: string;
+  conceptAnswersUuids?: Array<string>;
+  locationTag?: string;
+  attributeTypeUuid?: string;
+  min?: number;
+  max?: number;
 }
