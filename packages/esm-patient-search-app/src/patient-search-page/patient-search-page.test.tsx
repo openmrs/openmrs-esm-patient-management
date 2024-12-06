@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, isDesktop, useConfig } from '@openmrs/esm-framework';
-import { type PatientSearchConfig, configSchema } from '../config-schema';
+import { configSchema, type PatientSearchConfig } from '../config-schema';
 import PatientSearchPageComponent from './patient-search-page.component';
 
 const mockIsDesktop = jest.mocked(isDesktop);
@@ -27,6 +27,26 @@ describe('PatientSearchPageComponent', () => {
       search: {
         disableTabletSearchOnKeyUp: false,
         showRecentlySearchedPatients: false,
+        searchFilterFields: {
+          gender: {
+            enabled: true,
+          },
+          dateOfBirth: {
+            enabled: true,
+          },
+          age: {
+            enabled: true,
+            min: 0,
+          },
+          postcode: {
+            enabled: true,
+          },
+          personAttributes: [
+            {
+              attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+            },
+          ],
+        },
       } as PatientSearchConfig['search'],
     });
   });
