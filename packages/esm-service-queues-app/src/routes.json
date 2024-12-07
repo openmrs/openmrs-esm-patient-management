@@ -66,7 +66,7 @@
     {
       "name": "visit-form-queue-fields",
       "component": "visitFormQueueFields",
-      "slot":"visit-form-queue-slot"
+      "slot":"visit-form-bottom-slot"
     }
   ],
   "modals": [
@@ -127,9 +127,9 @@
       "type": "service-queues"
     },
     {
-      "name": "service-queues-patient-search",
-      "title": "searchPatient",
-      "component": "patientSearchWorkspace",
+      "name": "create-queue-entry-workspace",
+      "title": "addPatientToQueue",
+      "component": "createQueueEntryWorkspace",
       "type": "service-queues"
     }
   ]

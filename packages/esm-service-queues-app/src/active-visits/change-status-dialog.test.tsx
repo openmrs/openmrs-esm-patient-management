@@ -25,7 +25,7 @@ jest.mock('./active-visits-table.resource', () => ({
   updateQueueEntry: jest.fn(),
 }));
 
-jest.mock('../patient-search/hooks/useQueueLocations', () => {
+jest.mock('../create-queue-entry/hooks/useQueueLocations', () => {
   return {
     useQueueLocations: jest.fn().mockReturnValue({
       queueLocations: mockLocations.data?.results.map((location) => ({ ...location, id: location.uuid })),

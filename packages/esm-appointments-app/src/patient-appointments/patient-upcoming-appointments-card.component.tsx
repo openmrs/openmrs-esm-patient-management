@@ -10,30 +10,71 @@ import {
   StructuredListRow,
   StructuredListWrapper,
 } from '@carbon/react';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { usePatientAppointments } from './patient-appointments.resource';
+import { formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import styles from './patient-upcoming-appointments-card.scss';
 import dayjs from 'dayjs';
 import { type Appointment } from '../types';
+import { useMutateAppointments } from '../form/appointments-form.resource';
 
-interface PatientUpcomingAppointmentsProps {
+// See VisitFormExtensionState in esm-patient-chart-app
+export interface PatientUpcomingAppointmentsProps {
+  setOnVisitCreatedOrUpdated(onSubmit: (visit: Visit) => Promise<any>);
+  visitFormOpenedFrom: string;
+  patientChartConfig?: {
+    showUpcomingAppointments: boolean;
+  };
   patientUuid: string;
-  setUpcomingAppointment: (value: Appointment) => void;
 }
 
+/**
+ * This is an extension that gets slotted into the patient chart start visit form when
+ * the appropriate config values are enabled.
+ * @param param0
+ * @returns
+ */
 const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps> = ({
   patientUuid,
-  setUpcomingAppointment,
+  setOnVisitCreatedOrUpdated,
+  patientChartConfig,
 }) => {
   const { t } = useTranslation();
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment>(null);
+  const { mutateAppointments } = useMutateAppointments();
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
   const { data: appointmentsData, error, isLoading } = usePatientAppointments(patientUuid, startDate, ac);
+
+  useEffect(() => {
+    setOnVisitCreatedOrUpdated(() => {
+      if (selectedAppointment) {
+        return changeAppointmentStatus('CheckedIn', selectedAppointment.uuid)
+          .then(() => {
+            mutateAppointments();
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+              title: t('appointmentCheckedIn', 'Appointment Checked In'),
+            });
+          })
+          .catch((error) => {
+            showSnackbar({
+              title: t('updateError', 'Error updating upcoming appointment'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
+          });
+      } else {
+        return Promise.resolve();
+      }
+    });
+  }, [selectedAppointment, mutateAppointments, setOnVisitCreatedOrUpdated, t]);
 
   const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
@@ -46,8 +87,11 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
 
   const handleRadioChange = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
-    setUpcomingAppointment(appointment);
   };
+
+  if (!patientChartConfig.showUpcomingAppointments) {
+    return <></>;
+  }
 
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;

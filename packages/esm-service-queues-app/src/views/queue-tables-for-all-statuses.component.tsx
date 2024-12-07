@@ -58,7 +58,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
                   size: isDesktop(layout) ? 'sm' : 'lg',
                 },
                 selectPatientAction: (selectedPatientUuid) => {
-                  launchWorkspace('service-queues-patient-search', {
+                  launchWorkspace('create-queue-entry-workspace', {
                     selectedPatientUuid,
                     currentServiceQueueUuid: selectedQueue.uuid,
                   });

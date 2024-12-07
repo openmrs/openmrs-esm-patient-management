@@ -14,7 +14,7 @@ import {
 } from '@carbon/react';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { saveQueueRoom } from './queue-room.resource';
 import styles from './queue-room-form.scss';
 import { useQueues } from '../hooks/useQueues';

@@ -13,7 +13,7 @@ import {
   SelectItem,
 } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
   updateProviderToQueueRoom,
