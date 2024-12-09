@@ -37,8 +37,7 @@ interface BedAdministrationFormProps {
   headerTitle: string;
   initialData: BedWithLocation;
   occupancyStatuses: string[];
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
@@ -86,8 +85,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   headerTitle,
   initialData,
   occupancyStatuses,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
   const [occupancyStatus, setOccupancyStatus] = useState(capitalize(initialData.status));
@@ -129,9 +127,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    // TODO: Port this over to the modal system or create individual modals for each form
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -283,14 +280,14 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 

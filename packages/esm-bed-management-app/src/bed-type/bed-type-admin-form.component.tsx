@@ -79,8 +79,8 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={headerTitle} closeModal={() => onModalChange(false)} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -155,7 +155,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 

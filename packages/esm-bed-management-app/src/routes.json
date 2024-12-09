@@ -37,5 +37,11 @@
       "slot": "bed-management-left-panel-slot",
       "order": 0
     }
+  ],
+  "modals": [
+    {
+      "name": "new-bed-modal",
+      "component": "newBedModal"
+    }
   ]
 }
