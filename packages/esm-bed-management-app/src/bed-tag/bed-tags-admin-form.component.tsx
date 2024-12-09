@@ -29,8 +29,7 @@ interface BedTagAdministrationFormProps {
   handleDeleteBedTag?: () => void;
   headerTitle: string;
   initialData: BedTagData;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
@@ -41,8 +40,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   handleCreateBedTag,
   headerTitle,
   initialData,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
 
@@ -76,7 +74,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
 
   return (
     <React.Fragment>
-      <ModalHeader title={headerTitle} closeModal={() => onModalChange(false)} />
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -113,7 +111,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>

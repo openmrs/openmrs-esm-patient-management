@@ -7,11 +7,10 @@ import BedTagsAdministrationForm from './bed-tags-admin-form.component';
 
 interface BedTagFormProps {
   mutate: () => void;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutate }) => {
+const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTags } = useBedTags();
@@ -48,11 +47,9 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutat
             subtitle: error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, t],
+    [closeModal, t, mutate],
   );
 
   return (
@@ -62,8 +59,7 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutat
       handleCreateBedTag={handleCreateBedTag}
       headerTitle={headerTitle}
       initialData={initialData}
-      onModalChange={onModalChange}
-      showModal={showModal}
+      closeModal={closeModal}
     />
   );
 };
