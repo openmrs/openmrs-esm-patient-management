@@ -31,8 +31,7 @@ interface BedAdministrationFormProps {
   handleSubmission?: (formData: BedTypeData) => void;
   headerTitle: string;
   initialData: BedTypeData;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
@@ -43,8 +42,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   handleSubmission,
   headerTitle,
   initialData,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
 
@@ -80,7 +78,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
 
   return (
     <React.Fragment>
-      <ModalHeader title={headerTitle} closeModal={() => onModalChange(false)} />
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -148,7 +146,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>

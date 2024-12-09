@@ -62,7 +62,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
             subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
-        .finally(() => closeModal());
+        .finally(closeModal);
     },
     [closeModal, mutate, t],
   );

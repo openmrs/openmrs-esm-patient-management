@@ -63,7 +63,7 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ closeModal, mutate, defaultLoca
             subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
-        .finally(() => closeModal());
+        .finally(closeModal);
     },
     [t, mutate, closeModal],
   );
