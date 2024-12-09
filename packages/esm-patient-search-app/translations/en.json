@@ -7,6 +7,7 @@
   "closeSearch": "Close Search Panel",
   "countOfFiltersApplied_one": "{{count}} filters applied",
   "countOfFiltersApplied_other": "{{count}} filters applied",
+  "createPatientRecord": "Create Patient Record",
   "dayOfBirth": "Day of Birth",
   "error": "Error",
   "errorCopy": "Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.",
