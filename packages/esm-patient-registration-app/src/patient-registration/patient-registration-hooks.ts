@@ -40,7 +40,6 @@ interface DeathInfoResults {
   deathDate: string;
   causeOfDeathNonCoded: string | null;
 }
-import dayjs from 'dayjs';
 import { useMpiPatient } from './mpi/mpi-patient.resource';
 
 export function useInitialFormValues(patientUuid: string, isLocal: boolean): [FormValues, Dispatch<FormValues>] {
@@ -116,7 +115,14 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
         setInitialFormValues(registration._patientRegistrationData.formValues);
       }
     })();
-  }, [initialFormValues, isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [
+    initialFormValues,
+    isLoadingPatientToEdit,
+    patientToEdit,
+    patientUuid,
+    fieldConfigurations.phone.personAttributeUuid,
+    isLocal,
+  ]);
 
   useEffect(() => {
     const fetchValues = async () => {
@@ -142,6 +148,7 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
     };
 
     fetchValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mpiPatient, isLoadingMpiPatient]);
 
   // Set initial patient death info
