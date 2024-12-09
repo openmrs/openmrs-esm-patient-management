@@ -56,3 +56,4 @@ export const bedTagLeftPanelLink = getSyncLifecycle(
 );
 
 export const newBedModal = getAsyncLifecycle(() => import('./bed-administration/new-bed-form.component'), options);
+export const editBedModal = getAsyncLifecycle(() => import('./bed-administration/edit-bed-form.component'), options);
