@@ -9,11 +9,10 @@ import BedAdministrationForm from './bed-administration-form.component';
 
 interface NewBedFormProps {
   mutate: () => void;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate }) => {
+const NewBedForm: React.FC<NewBedFormProps> = ({ closeModal, mutate }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
@@ -68,19 +67,16 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
             subtitle: error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, t],
+    [t, mutate, closeModal],
   );
 
   return (
     <BedAdministrationForm
-      onModalChange={onModalChange}
+      closeModal={closeModal}
       allLocations={admissionLocations}
       availableBedTypes={availableBedTypes}
-      showModal={showModal}
       handleCreateBed={handleCreateBed}
       headerTitle={headerTitle}
       occupancyStatuses={occupancyStatuses}

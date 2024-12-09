@@ -9,11 +9,10 @@ import BedTagsAdministrationForm from './bed-tags-admin-form.component';
 interface EditBedTagFormProps {
   editData: BedTagData;
   mutate: Mutator<BedTagData>;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onModalChange, showModal }) => {
+const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
   const { bedTags } = useBedTags();
   const headerTitle = t('editTag', 'Edit Tag');
@@ -45,11 +44,9 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onMod
             subtitle: error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, editData, t],
+    [editData.uuid, closeModal, t, mutate],
   );
 
   return (
@@ -60,8 +57,7 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onMod
         handleCreateBedTag={handleUpdateBedTag}
         headerTitle={headerTitle}
         initialData={editData}
-        onModalChange={onModalChange}
-        showModal={showModal}
+        closeModal={closeModal}
       />
     </>
   );
