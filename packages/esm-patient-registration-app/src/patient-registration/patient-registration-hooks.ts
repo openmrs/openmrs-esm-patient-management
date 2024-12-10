@@ -25,6 +25,7 @@ import {
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
+  getIdentifierFieldValuesFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
   latestFirstEncounter,
@@ -39,14 +40,20 @@ interface DeathInfoResults {
   deathDate: string;
   causeOfDeathNonCoded: string | null;
 }
+import { useMpiPatient } from './mpi/mpi-patient.resource';
 
-export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
-  const { freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
-  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
-  const { data: deathInfo, isLoading: isLoadingDeathInfo } = useInitialPersonDeathInfo(patientUuid);
-  const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
-  const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
-  const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
+export function useInitialFormValues(patientUuid: string, isLocal: boolean): [FormValues, Dispatch<FormValues>] {
+  const { freeTextFieldConceptUuid, fieldConfigurations } = useConfig<RegistrationConfig>();
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(isLocal ? patientUuid : null);
+  const { isLoading: isLoadingMpiPatient, patient: mpiPatient } = useMpiPatient(!isLocal ? patientUuid : null);
+  const { data: deathInfo, isLoading: isLoadingDeathInfo } = useInitialPersonDeathInfo(isLocal ? patientUuid : null);
+  const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(isLocal ? patientUuid : null);
+  const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(
+    isLocal ? patientUuid : null,
+  );
+  const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(
+    isLocal ? patientUuid : null,
+  );
   const { data: encounters } = useInitialEncounters(patientUuid, patientToEdit);
 
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
@@ -90,12 +97,12 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patientToEdit),
           address: getAddressFieldValuesFromFhirPatient(patientToEdit),
-          ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
+          ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit, fieldConfigurations.phone.personAttributeUuid),
           birthdateEstimated: !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate),
           yearsEstimated,
           monthsEstimated,
         });
-      } else if (!isLoadingPatientToEdit && patientUuid) {
+      } else if (!isLoadingPatientToEdit && patientUuid && isLocal) {
         const registration = await getPatientRegistration(patientUuid);
 
         if (!registration._patientRegistrationData.formValues) {
@@ -108,7 +115,41 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
         setInitialFormValues(registration._patientRegistrationData.formValues);
       }
     })();
-  }, [initialFormValues, isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [
+    initialFormValues,
+    isLoadingPatientToEdit,
+    patientToEdit,
+    patientUuid,
+    fieldConfigurations.phone.personAttributeUuid,
+    isLocal,
+  ]);
+
+  useEffect(() => {
+    const fetchValues = async () => {
+      if (mpiPatient?.data?.identifier) {
+        const identifiers = await getIdentifierFieldValuesFromFhirPatient(
+          mpiPatient.data,
+          fieldConfigurations.identifier,
+        );
+
+        const values = {
+          ...initialFormValues,
+          ...getFormValuesFromFhirPatient(mpiPatient.data),
+          address: getAddressFieldValuesFromFhirPatient(mpiPatient.data),
+          identifiers,
+          attributes: getPhonePersonAttributeValueFromFhirPatient(
+            mpiPatient.data,
+            fieldConfigurations.phone.personAttributeUuid,
+          ),
+        };
+
+        setInitialFormValues(values);
+      }
+    };
+
+    fetchValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mpiPatient, isLoadingMpiPatient]);
 
   // Set initial patient death info
   useEffect(() => {
