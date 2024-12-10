@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, navigate, useConfig, useSession } from '@openmrs/esm-framework';
 import { renderWithRouter } from 'tools';
 import { mockSession } from '__mocks__';
@@ -78,21 +78,22 @@ describe('CompactPatientSearchComponent', () => {
 
     renderWithRouter(
       <CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" shouldNavigateToPatientSearchPage />,
-    render(
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <CompactPatientSearchComponent
-                isSearchPage={false}
-                initialSearchTerm=""
-                shouldNavigateToPatientSearchPage
-              />
-            }
-          />
-        </Routes>
-      </BrowserRouter>,
+      render(
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <CompactPatientSearchComponent
+                  isSearchPage={false}
+                  initialSearchTerm=""
+                  shouldNavigateToPatientSearchPage
+                />
+              }
+            />
+          </Routes>
+        </BrowserRouter>,
+      ),
     );
 
     const searchbox = screen.getByRole('searchbox');
