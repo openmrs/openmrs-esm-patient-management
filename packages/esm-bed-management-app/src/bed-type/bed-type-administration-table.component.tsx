@@ -17,7 +17,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop as desktopLayout, showModal, useLayoutType } from '@openmrs/esm-framework';
 import type { BedTypeData } from '../types';
 import { useBedTypes } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
@@ -37,10 +37,22 @@ const BedTypeAdministrationTable: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setPageSize] = useState(10);
-  const [editData, setEditData] = useState<BedTypeData>();
   const [pageSize] = useState(10);
-  const [showBedTypeModal, setAddBedTypeModal] = useState(false);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
+
+  const openNewBedTypeModal = () => {
+    const dispose = showModal('new-bed-type-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedTypes,
+    });
+  };
+
+  const openEditBedTypeModal = (editData: BedTypeData) => {
+    const dispose = showModal('edit-bed-type-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedTypes,
+      editData,
+    });
+  };
 
   const tableHeaders = [
     {
@@ -76,9 +88,7 @@ const BedTypeAdministrationTable: React.FC = () => {
             label={t('editBedType', 'Edit bed type')}
             onClick={(e) => {
               e.preventDefault();
-              setEditData(entry);
-              setShowEditBedModal(true);
-              setAddBedTypeModal(false);
+              openEditBedTypeModal(entry);
             }}
             size={responsiveSize}>
             <Edit />
@@ -113,28 +123,13 @@ const BedTypeAdministrationTable: React.FC = () => {
   return (
     <>
       <Header title={t('bedTypes', 'Bed types')} />
-
       <div className={styles.widgetCard}>
-        {showBedTypeModal ? (
-          <BedTypeForm onModalChange={setAddBedTypeModal} showModal={showBedTypeModal} mutate={mutateBedTypes} />
-        ) : null}
-        {showEditBedModal ? (
-          <EditBedTypeForm
-            editData={editData}
-            mutate={mutateBedTypes}
-            onModalChange={setShowEditBedModal}
-            showModal={showEditBedModal}
-          />
-        ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedTypes ? <InlineLoading /> : null}</span>
           </span>
           {bedTypes?.length ? (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setAddBedTypeModal(true)}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedTypeModal}>
               {t('addBedType', 'Add bed type')}
             </Button>
           ) : null}
@@ -172,7 +167,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setAddBedTypeModal(true)}>
+                      onClick={openNewBedTypeModal}>
                       {t('addBedType', 'Add bed type')}
                     </Button>
                   </Tile>
