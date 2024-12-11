@@ -52,7 +52,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
     (data: AdvancedPatientSearchState) => {
       const cleanedAttributes = Object.entries(data.attributes || {}).reduce(
         (acc, [key, value]) => {
-          if (value !== '') {
+          if (value) {
             acc[key] = value;
           }
           return acc;
@@ -71,7 +71,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
     [setFilters],
   );
   const handleResetFields = useCallback(() => {
-    reset();
+    reset({ ...initialFilters, attributes: {} });
     setFilters(initialFilters);
     setShowRefineSearchDialog(false);
   }, [reset, setFilters]);
