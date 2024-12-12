@@ -14,7 +14,7 @@ const testProps = {
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-describe('AppointmensOverview', () => {
+describe('AppointmentsOverview', () => {
   it('renders an empty state if appointments data is unavailable', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({
       data: [],

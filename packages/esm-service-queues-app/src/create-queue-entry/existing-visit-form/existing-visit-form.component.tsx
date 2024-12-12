@@ -22,22 +22,26 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutateQueueEntries } = useMutateQueueEntries();
-  const [submitQueueEntry, setSubmitQueueEntry] = useState<(visit: Visit, patientUuid: string) => Promise<any>>(null);
+  const [callback, setCallback] = useState<{
+    submitQueueEntry: (visit: Visit) => Promise<any>;
+  }>(null);
 
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
       setIsSubmitting(true);
 
-      submitQueueEntry?.(visit, visit.patient.uuid)
+      callback
+        .submitQueueEntry?.(visit)
         ?.then(() => {
           closeWorkspace();
+          mutateQueueEntries();
         })
         ?.finally(() => {
           setIsSubmitting(false);
         });
     },
-    [closeWorkspace, submitQueueEntry, visit],
+    [closeWorkspace, callback, visit, mutateQueueEntries],
   );
 
   return visit ? (
@@ -52,7 +56,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         </Row>
       )}
       <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
-        <QueueFields setOnSubmit={setSubmitQueueEntry} />
+        <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
