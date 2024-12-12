@@ -109,7 +109,9 @@ describe('RefineSearch', () => {
         monthOfBirth: 0,
         yearOfBirth: 0,
         postcode: '',
-        attributes: {},
+        attributes: {
+          '14d4f066-15f5-102d-96e4-000c29c2a5d7': '',
+        },
         age: 30,
       }),
     );

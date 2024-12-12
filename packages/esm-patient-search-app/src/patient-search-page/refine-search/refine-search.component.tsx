@@ -50,22 +50,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
 
   const onSubmit = useCallback(
     (data: AdvancedPatientSearchState) => {
-      const cleanedAttributes = Object.entries(data.attributes || {}).reduce(
-        (acc, [key, value]) => {
-          if (value) {
-            acc[key] = value;
-          }
-          return acc;
-        },
-        {} as Record<string, string>,
-      );
-
-      const cleanedData = {
-        ...data,
-        attributes: cleanedAttributes,
-      };
-
-      setFilters(cleanedData);
+      setFilters(data);
       setShowRefineSearchDialog(false);
     },
     [setFilters],
