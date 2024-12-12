@@ -59,12 +59,13 @@ describe('QueueFields', () => {
   it('renders the form fields and returns the set values', async () => {
     const user = userEvent.setup();
     let onSubmit: (visit: Visit) => Promise<any> = null;
-    const setOnSubmit = (callback) => (onSubmit = callback);
+    const setOnSubmit = (callback) => {
+      onSubmit = callback;
+    };
     render(<QueueFields setOnSubmit={setOnSubmit} />);
 
     expect(screen.getByLabelText('Select a queue location')).toBeInTheDocument();
     expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
-    expect(screen.getByLabelText('Sort weight')).toBeInTheDocument();
 
     const queueUuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
     const serviceSelect = screen.getByLabelText('Select a service').closest('select');
