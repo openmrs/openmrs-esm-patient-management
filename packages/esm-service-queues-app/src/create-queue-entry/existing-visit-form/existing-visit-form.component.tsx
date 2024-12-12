@@ -32,7 +32,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
       setIsSubmitting(true);
 
       callback
-        .submitQueueEntry?.(visit)
+        ?.submitQueueEntry?.(visit)
         ?.then(() => {
           closeWorkspace();
           mutateQueueEntries();
