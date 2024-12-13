@@ -1,6 +1,3 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import classNames from 'classnames';
 import {
   InlineNotification,
   RadioButton,
@@ -9,16 +6,17 @@ import {
   Select,
   SelectItem,
   SelectSkeleton,
-  TextInput,
 } from '@carbon/react';
-import { useConfig, ResponsiveWrapper, useSession, type Visit, showSnackbar } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type ConfigObject } from '../../config-schema';
-import { useQueues } from '../../hooks/useQueues';
-import { useQueueLocations } from '../hooks/useQueueLocations';
-import { AddPatientToQueueContext } from '../create-queue-entry.workspace';
-import styles from './queue-fields.scss';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { useQueues } from '../../hooks/useQueues';
+import { AddPatientToQueueContext } from '../create-queue-entry.workspace';
+import { useQueueLocations } from '../hooks/useQueueLocations';
 import { postQueueEntry } from './queue-fields.resource';
+import styles from './queue-fields.scss';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<any>);
@@ -42,11 +40,12 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
   const [priority, setPriority] = useState(defaultPriorityConceptUuid);
   const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const memoMutateQueueEntries = useCallback(mutateQueueEntries, [mutateQueueEntries]);
 
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
 
-  useEffect(() => {
-    setOnSubmit?.((visit: Visit) => {
+  const onSubmit = useCallback(
+    (visit: Visit) => {
       if (selectedQueueLocation && selectedService && priority) {
         return postQueueEntry(
           visit.uuid,
@@ -65,7 +64,7 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
               title: t('addedPatientToQueue', 'Added patient to queue'),
               subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
             });
-            mutateQueueEntries();
+            memoMutateQueueEntries();
           })
           .catch((error) => {
             showSnackbar({
@@ -79,18 +78,22 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
       } else {
         return Promise.resolve();
       }
-    });
-  }, [
-    selectedQueueLocation,
-    selectedService,
-    priority,
-    sortWeight,
-    defaultStatusConceptUuid,
-    visitQueueNumberAttributeUuid,
-    mutateQueueEntries,
-    setOnSubmit,
-    t,
-  ]);
+    },
+    [
+      selectedQueueLocation,
+      selectedService,
+      priority,
+      sortWeight,
+      defaultStatusConceptUuid,
+      visitQueueNumberAttributeUuid,
+      memoMutateQueueEntries,
+      t,
+    ],
+  );
+
+  useEffect(() => {
+    setOnSubmit?.(onSubmit);
+  }, [onSubmit, setOnSubmit]);
 
   useEffect(() => {
     if (currentServiceQueueUuid) {
@@ -201,16 +204,6 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
           ) : null}
         </section>
       ) : null}
-
-      <section className={classNames(styles.section, styles.sectionHidden)}>
-        <TextInput
-          type="number"
-          id="sortWeight"
-          name="sortWeight"
-          labelText={t('sortWeight', 'Sort weight')}
-          value={sortWeight}
-        />
-      </section>
     </div>
   );
 };

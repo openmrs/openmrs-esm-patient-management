@@ -3,15 +3,13 @@ import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import {
   addPatientToCohort,
-  type Cohort,
-  type CohortMember,
   deleteCohort,
   deletePatient,
   generateRandomCohort,
   generateRandomPatient,
-  type Patient,
   removePatientFromCohort,
 } from '../commands';
+import { type Cohort, type CohortMember, type Patient } from '../types';
 
 let cohortMembership: CohortMember;
 let cohort: Cohort;
@@ -123,7 +121,7 @@ test('Return to patient list after navigating to visits and refreshing the page'
 
 test('Return to patient list from the patient chart on a new tab', async ({ page, context }) => {
   const patientListPage = new PatientListsPage(page);
-  const locator = await page.locator('table tbody tr td:nth-child(1) a');
+  const locator = page.locator('table tbody tr td:nth-child(1) a');
   const pagePromise = context.waitForEvent('page');
 
   await test.step('When I navigate to the patient list', async () => {

@@ -1,5 +1,5 @@
-import { Provider } from '../../packages/esm-appointments-app/src/types/index';
-import { APIRequestContext, expect } from '@playwright/test';
+import { type APIRequestContext, expect } from '@playwright/test';
+import { type Provider } from '../types';
 
 export const getProvider = async (api: APIRequestContext): Promise<Provider> => {
   const providerRes = await api.get('provider?q=admin', {
