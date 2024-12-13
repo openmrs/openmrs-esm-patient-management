@@ -126,6 +126,7 @@ export function useInitialFormValues(patientUuid: string, isLocal: boolean): [Fo
 
   useEffect(() => {
     const fetchValues = async () => {
+      //check that patient is not dead
       if (mpiPatient?.data?.identifier) {
         const identifiers = await getIdentifierFieldValuesFromFhirPatient(
           mpiPatient.data,

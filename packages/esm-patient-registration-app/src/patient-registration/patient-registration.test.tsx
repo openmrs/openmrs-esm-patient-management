@@ -279,6 +279,98 @@ describe('Registering a new patient', () => {
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
   });
 
+  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
+  it.skip('saves the patient without extra info', async () => {
+    const user = userEvent.setup();
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
+
+    await screen.findByRole('heading', { name: /create new patientnj/i });
+
+    await fillRequiredFields();
+    await user.click(await screen.findByText(/Register Patientsed/i));
+
+    expect(mockSavePatient).toHaveBeenCalledWith(
+      true,
+      {
+        addNameInLocalLanguage: false,
+        additionalFamilyName: '',
+        additionalGivenName: '',
+        additionalMiddleName: '',
+        address: { country: 'កម្ពុជា (Cambodia)' },
+        attributes: {},
+        birthdate: '1972-04-04',
+        birthdateEstimated: false,
+        deathCause: '',
+        nonCodedCauseOfDeath: '',
+        deathDate: undefined,
+        deathTime: undefined,
+        deathTimeFormat: 'AM',
+        familyName: 'Smith',
+        gender: 'male',
+        givenName: 'Eric',
+        identifiers: {
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
+            selectedSource: null,
+          },
+          idCard: {
+            autoGeneration: false,
+            identifierName: 'ID Card',
+            identifierTypeUuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
+            identifierUuid: '346d09b1-8509-43c6-9697-3b4d1ce06ad6',
+            identifierValue: '1234567890',
+            initialValue: '1234567890',
+            preferred: false,
+            required: false,
+            selectedSource: null,
+          },
+        },
+        isDead: false,
+        middleName: 'Johnson',
+        monthsEstimated: 0,
+        patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773ef',
+        relationships: [],
+        telephoneNumber: '',
+        unidentifiedPatient: undefined,
+        yearsEstimated: 0,
+      },
+      expect.anything(),
+      expect.anything(),
+      null,
+      undefined,
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      { patientSaved: false },
+      expect.anything(),
+    );
+
+    expect(mockSavePatient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' },
+        person: {
+          addresses: expect.arrayContaining([expect.any(Object)]),
+          attributes: [],
+          birthdate: '1993-8-2',
+          birthdateEstimated: false,
+          gender: expect.stringMatching(/^M$/),
+          names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
+          dead: false,
+          uuid: expect.anything(),
+        },
+        uuid: expect.anything(),
+      }),
+      undefined,
+    );
+  });
+
   it('should render all the required fields and sections', async () => {
     render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
 
@@ -460,7 +552,6 @@ describe('Import an MPI patient record', () => {
         additionalMiddleName: '',
         addNameInLocalLanguage: false,
         address: {},
-        attributes: {},
         birthdate: mockPatient.birthDate,
         birthdateEstimated: false,
         deathCause: '',
@@ -539,8 +630,9 @@ describe('Import an MPI patient record', () => {
         additionalFamilyName: '',
         additionalGivenName: '',
         additionalMiddleName: '',
-        address: { country: 'កម្ពុជា (Cambodia)' },
-        attributes: {},
+        address: {
+          country: 'កម្ពុជា (Cambodia)',
+        },
         birthdate: '1972-04-04',
         birthdateEstimated: false,
         deathCause: '',
@@ -552,17 +644,6 @@ describe('Import an MPI patient record', () => {
         gender: 'male',
         givenName: 'Eric',
         identifiers: {
-          openMrsId: {
-            autoGeneration: false,
-            identifierName: 'OpenMRS ID',
-            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
-            identifierValue: '100GEJ',
-            initialValue: '100GEJ',
-            preferred: true,
-            required: true,
-            selectedSource: null,
-          },
           idCard: {
             autoGeneration: false,
             identifierName: 'ID Card',
@@ -572,6 +653,17 @@ describe('Import an MPI patient record', () => {
             initialValue: '1234567890',
             preferred: false,
             required: false,
+            selectedSource: null,
+          },
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
             selectedSource: null,
           },
         },
@@ -615,7 +707,7 @@ describe('Updating an existing patient record', () => {
     mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
   });
 
-  xit('edits patient demographics', async () => {
+  it('edits patient demographics', async () => {
     const user = userEvent.setup();
     const mockSavePatientForm = jest.fn();
 
