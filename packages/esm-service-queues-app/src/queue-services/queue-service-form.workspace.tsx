@@ -154,7 +154,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                 <Select
                   {...field}
                   id="location"
-                  invalidText={errors.userLocation.message}
+                  invalidText="Required"
                   labelText={t('selectALocation', 'Select a location')}>
                   {!field.value && <SelectItem text={t('selectALocation', 'Select a location')} value="" />}
                   {queueLocations.length === 0 && (
