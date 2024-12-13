@@ -1,19 +1,18 @@
 import { expect } from '@playwright/test';
 import type { Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
-import type { Provider } from '../../packages/esm-appointments-app/src/types/index';
-import type { Encounter } from '../../packages/esm-active-visits-app/src/visits-summary/visit.resource';
+
 import {
   createEncounter,
   deleteEncounter,
   deletePatient,
   endVisit,
   generateRandomPatient,
-  type Patient,
-  startVisit,
   getProvider,
+  startVisit,
 } from '../commands';
 import { HomePage } from '../pages';
+import { type Encounter, type Patient, type Provider } from '../types';
 
 let patient: Patient;
 let visit: Visit;
