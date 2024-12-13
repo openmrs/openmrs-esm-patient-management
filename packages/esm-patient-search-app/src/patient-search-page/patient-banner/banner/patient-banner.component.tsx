@@ -1,7 +1,7 @@
 import React, { type MouseEvent, useContext, useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
+import { ButtonSkeleton, SkeletonIcon, SkeletonText, Button, Tag } from '@carbon/react';
 import {
   age,
   ConfigurableLink,
@@ -27,8 +27,6 @@ interface ClickablePatientContainerProps {
   patientUuid: string;
   children: React.ReactNode;
 }
-import { Tag } from '@carbon/react';
-import { Button } from '@carbon/react';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
