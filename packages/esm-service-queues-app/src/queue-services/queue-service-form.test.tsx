@@ -38,12 +38,17 @@ jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
   }),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-  restBaseUrl: '/ws/rest/v1',
-  useLayoutType: jest.fn(),
-}));
+jest.mock('@openmrs/esm-framework', () => {
+  return {
+    showSnackbar: jest.fn(),
+    restBaseUrl: '/ws/rest/v1',
+    useLayoutType: jest.fn(),
+
+    useExtensionSlot: jest.requireActual('@openmrs/esm-framework').useExtensionSlot,
+
+    importDynamic: jest.fn(),
+  };
+});
 
 describe('QueueServiceForm', () => {
   beforeEach(() => {
