@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import camelCase from 'lodash-es/camelCase';
-import { parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, parseDate } from '@openmrs/esm-framework';
 import {
   type AddressValidationSchemaType,
   type Encounter,
@@ -9,7 +9,6 @@ import {
   type PatientIdentifierValue,
   type PatientUuidMapType,
 } from './patient-registration.types';
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
