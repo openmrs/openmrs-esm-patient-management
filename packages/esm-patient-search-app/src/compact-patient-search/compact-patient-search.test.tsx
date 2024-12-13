@@ -21,13 +21,6 @@ describe('CompactPatientSearchComponent', () => {
   it('renders a compact search bar', () => {
     renderWithRouter(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
 
-    render(
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CompactPatientSearchComponent isSearchPage initialSearchTerm="" />} />
-        </Routes>
-      </BrowserRouter>,
-    );
     expect(screen.getByPlaceholderText(/Search for a patient by name or identifier number/i)).toBeInTheDocument();
   });
 
@@ -36,13 +29,6 @@ describe('CompactPatientSearchComponent', () => {
 
     renderWithRouter(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
 
-    render(
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />} />
-        </Routes>
-      </BrowserRouter>,
-    );
     const searchbox = screen.getByPlaceholderText(/Search for a patient by name or identifier number/i);
 
     await user.type(searchbox, 'John');
@@ -62,13 +48,6 @@ describe('CompactPatientSearchComponent', () => {
 
     renderWithRouter(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
 
-    render(
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />} />
-        </Routes>
-      </BrowserRouter>,
-    );
     const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
     expect(searchResultsContainer).toBeInTheDocument();
   });
@@ -78,22 +57,6 @@ describe('CompactPatientSearchComponent', () => {
 
     renderWithRouter(
       <CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" shouldNavigateToPatientSearchPage />,
-      render(
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <CompactPatientSearchComponent
-                  isSearchPage={false}
-                  initialSearchTerm=""
-                  shouldNavigateToPatientSearchPage
-                />
-              }
-            />
-          </Routes>
-        </BrowserRouter>,
-      ),
     );
 
     const searchbox = screen.getByRole('searchbox');
