@@ -2,11 +2,19 @@
   "env": {
     "node": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:jest-dom/recommended",
-    "plugin:testing-library/react"
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:jest-dom/recommended"],
+  "overrides": [
+    {
+      "files": ["**/*.test.tsx"],
+      "extends": ["plugin:testing-library/react"]
+    },
+    {
+      "files": ["e2e/**/*.spec.ts"],
+      "extends": ["plugin:playwright/recommended"],
+      "rules": {
+        "testing-library/prefer-screen-queries": "off"
+      }
+    }
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import", "jest-dom", "react-hooks", "testing-library"],
@@ -71,35 +79,5 @@
     "prefer-const": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"
-  },
-  "overrides": [
-    {
-      "files": ["**/e2e/**"],
-      "rules": {
-        "testing-library/await-async-events": "off",
-        "testing-library/await-async-query": "off",
-        "testing-library/await-async-utils": "off",
-        "testing-library/no-await-sync-events": "off",
-        "testing-library/no-await-sync-queries": "off",
-        "testing-library/no-container": "off",
-        "testing-library/no-debugging-utils": "off",
-        "testing-library/no-dom-import": "off",
-        "testing-library/no-global-regexp-flag-in-query": "off",
-        "testing-library/no-manual-cleanup": "off",
-        "testing-library/no-node-access": "off",
-        "testing-library/no-promise-in-fire-event": "off",
-        "testing-library/no-render-in-lifecycle": "off",
-        "testing-library/no-unnecessary-act": "off",
-        "testing-library/no-wait-for-multiple-assertions": "off",
-        "testing-library/no-wait-for-side-effects": "off",
-        "testing-library/no-wait-for-snapshot": "off",
-        "testing-library/prefer-find-by": "off",
-        "testing-library/prefer-implicit-assert": "off",
-        "testing-library/prefer-presence-queries": "off",
-        "testing-library/prefer-query-by-disappearance": "off",
-        "testing-library/prefer-screen-queries": "off",
-        "testing-library/render-result-naming-convention": "off"
-      }
-    }
-  ]
+  }
 }

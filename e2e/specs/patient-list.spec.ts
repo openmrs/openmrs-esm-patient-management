@@ -2,9 +2,6 @@ import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import {
-  type Cohort,
-  type CohortMember,
-  type Patient,
   addPatientToCohort,
   deleteCohort,
   deletePatient,
@@ -12,6 +9,7 @@ import {
   generateRandomPatient,
   removePatientFromCohort,
 } from '../commands';
+import { type Cohort, type CohortMember, type Patient } from '../types';
 
 let cohortMember: CohortMember;
 let cohortUuid: string;
@@ -46,7 +44,8 @@ test('Create and edit a patient list', async ({ page }) => {
 
   await test.step('Then I should see the information about the list', async () => {
     await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient-lists\\/[\\w\\d-]+$'));
-    cohortUuid = /patient-lists\/([\w\d-]+)/.exec(page.url())?.[1] ?? null;
+    const [, extractedUuid] = /patient-lists\/([\w\d-]+)/.exec(page.url());
+    cohortUuid = extractedUuid;
 
     await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListName));
     await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListDescription));

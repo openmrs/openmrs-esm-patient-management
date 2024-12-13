@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
+import { RegistrationAndEditPage } from '../pages';
+import { type PatientRegistrationFormValues } from '../types';
 import { deletePatient } from '../commands';
 
 let patientUuid: string;
@@ -101,7 +102,7 @@ test('Register an unknown patient', async ({ api, page }) => {
   });
 
   await test.step('And then I fill in 25 as the estimated age in years', async () => {
-    const estimatedAgeField = await page.getByLabel(/estimated age in years/i);
+    const estimatedAgeField = page.getByLabel(/estimated age in years/i);
     await estimatedAgeField.clear();
     await estimatedAgeField.fill('25');
   });
@@ -123,7 +124,7 @@ test('Register an unknown patient', async ({ api, page }) => {
   await test.step("And I should see the newly registered patient's details displayed in the patient banner", async () => {
     const patientBanner = page.locator('header[aria-label="patient banner"]');
 
-    expect(patientBanner).toBeVisible();
+    await expect(patientBanner).toBeVisible();
     await expect(patientBanner.getByText('Unknown Unknown')).toBeVisible();
     await expect(patientBanner.getByText(/female/i)).toBeVisible();
     await expect(patientBanner.getByText(/25 yrs/i)).toBeVisible();

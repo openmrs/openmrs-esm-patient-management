@@ -1,50 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-
-export interface Patient {
-  uuid: string;
-  identifiers: Identifier[];
-  display: string;
-  person: {
-    uuid: string;
-    display: string;
-    gender: string;
-    age: number;
-    birthdate: string;
-    birthdateEstimated: boolean;
-    dead: boolean;
-    deathDate?: any;
-    causeOfDeath?: any;
-    preferredAddress: {
-      address1: string;
-      cityVillage: string;
-      country: string;
-      postalCode: string;
-      stateProvince: string;
-      countyDistrict: string;
-    };
-    attributes: any[];
-    voided: boolean;
-    birthtime?: any;
-    deathdateEstimated: boolean;
-    resourceVersion: string;
-  };
-  attributes: { value: string; attributeType: { uuid: string; display: string } }[];
-  voided: boolean;
-}
-
-export interface Address {
-  preferred: boolean;
-  address1: string;
-  cityVillage: string;
-  country: string;
-  postalCode: string;
-  stateProvince: string;
-}
-
-export interface Identifier {
-  uuid: string;
-  display: string;
-}
+import { type Patient } from '../types';
 
 export const generateRandomPatient = async (api: APIRequestContext): Promise<Patient> => {
   const identifierRes = await api.post('idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier', {
