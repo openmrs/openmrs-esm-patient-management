@@ -22,11 +22,20 @@ import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
 import { t } from 'i18next';
+const oldPasswordValidation = z
+  .string({
+    required_error: t('oldPasswordRequired', 'Old password is required'),
+  })
+  .trim()
+  .min(1, t('oldPasswordRequired', 'Old password is required'));
 
 const QueueServiceSchema = z.object({
-  queueName: z.string({
-    required_error: t('queueNameRequired', 'Queue name is required'),
-  }),
+  queueName: z
+    .string({
+      required_error: t('queueNameRequired', 'Queue name is required'),
+    })
+    .trim()
+    .min(1, t('queueNameRequired', 'Queue name is required')),
   queueConcept: z.string({
     required_error: t('queueConceptRequired', 'Queue concept is required'),
   }),
