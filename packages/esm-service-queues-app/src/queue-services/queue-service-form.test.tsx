@@ -44,7 +44,7 @@ describe('QueueServiceForm', () => {
 
     const submitButton = screen.getByText('Save');
     await user.click(submitButton);
-    expect(screen.getByText('Missing queue name')).toBeInTheDocument();
+    expect(screen.getByText('Queue name is required')).toBeInTheDocument();
   });
 
   it('should submit the form when all fields are filled', async () => {
