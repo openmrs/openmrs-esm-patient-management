@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import * as z from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
@@ -21,11 +21,18 @@ import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
+import { t } from 'i18next';
 
 const QueueServiceSchema = z.object({
-  queueName: z.string().min(1, { message: 'Queue name is required' }),
-  queueConcept: z.string().min(1, { message: 'Queue concept is required' }),
-  userLocation: z.string().min(1, { message: 'Queue location is required' }),
+  queueName: z.string({
+    required_error: t('queueNameRequired', 'Queue name is required'),
+  }),
+  queueConcept: z.string({
+    required_error: t('queueConceptRequired', 'Queue concept is required'),
+  }),
+  userLocation: z.string({
+    required_error: t('queueLocationRequired', 'Queue location is required'),
+  }),
 });
 type QueueServiceFormData = z.infer<typeof QueueServiceSchema>;
 
@@ -49,8 +56,8 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
   });
 
   const createQueue = (data: QueueServiceFormData) => {
-    saveQueue(data.queueName, data.queueConcept, data.queueName, data.userLocation).then(
-      ({ status }) => {
+    saveQueue(data.queueName, data.queueConcept, data.queueName, data.userLocation)
+      .then(({ status }) => {
         if (status === 201) {
           showSnackbar({
             title: t('addQueue', 'Add queue'),
@@ -61,16 +68,15 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
           mutate(`${restBaseUrl}/queue?${data.userLocation}`);
           mutate(`${restBaseUrl}/queue?location=${data.userLocation}`);
         }
-      },
-      (error) => {
+      })
+      .catch((error) => {
         showSnackbar({
           title: t('errorAddingQueue', 'Error adding queue'),
           kind: 'error',
           isLowContrast: false,
           subtitle: error?.message,
         });
-      },
-    );
+      });
   };
 
   return (
