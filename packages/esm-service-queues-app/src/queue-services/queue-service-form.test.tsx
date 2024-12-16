@@ -53,7 +53,6 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('QueueServiceForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
-    jest.clearAllMocks();
   });
 
   it('should display required error messages when form is submitted with missing fields', async () => {
