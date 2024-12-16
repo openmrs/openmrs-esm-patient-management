@@ -1,8 +1,9 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
+import { generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
+import { type Visit } from '@openmrs/esm-framework';
+import { type Patient } from '../types';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
-import { type Visit } from '@openmrs/esm-framework';
 
 let patient: Patient;
 let visit: Visit;
@@ -111,7 +112,7 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
     await page.getByRole('button', { name: 'Options' }).click();
   });
 
-  await test.step('And I choose the "Cancel" option ', async () => {
+  await test.step('And I choose the "Cancel" option', async () => {
     await page.getByRole('menuitem', { name: 'Cancel' }).click();
   });
 

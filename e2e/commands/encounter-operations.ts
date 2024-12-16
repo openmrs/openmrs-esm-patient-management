@@ -1,6 +1,6 @@
-import { Encounter } from './../../packages/esm-active-visits-app/src/visits-summary/visit.resource';
-import { APIRequestContext, expect } from '@playwright/test';
+import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
+import { type Encounter } from '../types';
 
 export const createEncounter = async (
   api: APIRequestContext,

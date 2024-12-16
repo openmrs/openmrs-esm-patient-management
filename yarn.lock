@@ -3333,6 +3333,7 @@ __metadata:
     eslint: "npm:^8.55.0"
     eslint-plugin-import: "npm:^2.31.0"
     eslint-plugin-jest-dom: "npm:^5.4.0"
+    eslint-plugin-playwright: "npm:^2.1.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-testing-library: "npm:^6.2.2"
     husky: "npm:^8.0.3"
@@ -9942,6 +9943,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-playwright@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "eslint-plugin-playwright@npm:2.1.0"
+  dependencies:
+    globals: "npm:^13.23.0"
+  peerDependencies:
+    eslint: ">=8.40.0"
+  checksum: 10/5c36202a56760203bf3738b03fbd1fddce520f09772b998d2cd7631636f5dec1c4dda724af94ccafb462ffadd113bb8a940ef6991661095cab4997cf19863000
+  languageName: node
+  linkType: hard
+
 "eslint-plugin-react-hooks@npm:^4.6.0":
   version: 4.6.0
   resolution: "eslint-plugin-react-hooks@npm:4.6.0"
@@ -10970,7 +10982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^13.19.0":
+"globals@npm:^13.19.0, globals@npm:^13.23.0":
   version: 13.24.0
   resolution: "globals@npm:13.24.0"
   dependencies:

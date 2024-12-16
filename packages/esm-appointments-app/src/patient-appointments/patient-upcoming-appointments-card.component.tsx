@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   InlineLoading,
@@ -18,9 +18,13 @@ import dayjs from 'dayjs';
 import { type Appointment } from '../types';
 import { useMutateAppointments } from '../form/appointments-form.resource';
 
+interface VisitFormCallbacks {
+  onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
+}
+
 // See VisitFormExtensionState in esm-patient-chart-app
 export interface PatientUpcomingAppointmentsProps {
-  setOnVisitCreatedOrUpdated(onSubmit: (visit: Visit) => Promise<any>);
+  setVisitFormCallbacks(callbacks: VisitFormCallbacks);
   visitFormOpenedFrom: string;
   patientChartConfig?: {
     showUpcomingAppointments: boolean;
@@ -36,7 +40,7 @@ export interface PatientUpcomingAppointmentsProps {
  */
 const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps> = ({
   patientUuid,
-  setOnVisitCreatedOrUpdated,
+  setVisitFormCallbacks,
   patientChartConfig,
 }) => {
   const { t } = useTranslation();
@@ -44,37 +48,45 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment>(null);
   const { mutateAppointments } = useMutateAppointments();
+  const memoMutateAppointments = useMemo(() => mutateAppointments, [mutateAppointments]);
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
   const { data: appointmentsData, error, isLoading } = usePatientAppointments(patientUuid, startDate, ac);
 
+  const onVisitCreatedOrUpdated = useMemo(
+    () => ({
+      onVisitCreatedOrUpdated: () => {
+        if (selectedAppointment) {
+          return changeAppointmentStatus('CheckedIn', selectedAppointment.uuid)
+            .then(() => {
+              memoMutateAppointments();
+              showSnackbar({
+                isLowContrast: true,
+                kind: 'success',
+                subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
+                title: t('appointmentCheckedIn', 'Appointment Checked In'),
+              });
+            })
+            .catch((error) => {
+              showSnackbar({
+                title: t('updateError', 'Error updating upcoming appointment'),
+                kind: 'error',
+                isLowContrast: false,
+                subtitle: error?.message,
+              });
+            });
+        } else {
+          return Promise.resolve();
+        }
+      },
+    }),
+    [selectedAppointment, memoMutateAppointments, t],
+  );
+
   useEffect(() => {
-    setOnVisitCreatedOrUpdated(() => {
-      if (selectedAppointment) {
-        return changeAppointmentStatus('CheckedIn', selectedAppointment.uuid)
-          .then(() => {
-            mutateAppointments();
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: t('appointmentMarkedChecked', 'Appointment marked as Checked In'),
-              title: t('appointmentCheckedIn', 'Appointment Checked In'),
-            });
-          })
-          .catch((error) => {
-            showSnackbar({
-              title: t('updateError', 'Error updating upcoming appointment'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: error?.message,
-            });
-          });
-      } else {
-        return Promise.resolve();
-      }
-    });
-  }, [selectedAppointment, mutateAppointments, setOnVisitCreatedOrUpdated, t]);
+    setVisitFormCallbacks(onVisitCreatedOrUpdated);
+  }, [onVisitCreatedOrUpdated, setVisitFormCallbacks]);
 
   const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
