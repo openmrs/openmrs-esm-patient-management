@@ -11,7 +11,7 @@ interface AdvancedPatientSearchProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
-  searchMode?: string;
+  searchMode?: 'mpi' | null | undefined;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({

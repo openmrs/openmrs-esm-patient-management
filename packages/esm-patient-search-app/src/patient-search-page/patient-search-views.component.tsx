@@ -10,14 +10,14 @@ import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
 
 interface CommonProps {
   inTabletOrOverlay: boolean;
-  searchMode?: string;
+  searchMode?: 'mpi' | null | undefined;
   searchTerm: string;
 }
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
   searchTerm: string;
-  searchMode?: string;
+  searchMode?: 'mpi' | null | undefined;
 }
 
 export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
@@ -97,7 +97,7 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
             <div className={styles.dividerWrapper}>
               <div className={styles.divider}></div>
             </div>
-            {(searchMode === undefined || searchMode === null || searchMode !== 'external') && (
+            {(searchMode === undefined || searchMode === null || searchMode !== 'mpi') && (
               <>
                 <div className={styles.emptyResultsMarginRules}>
                   <p>
@@ -132,12 +132,7 @@ export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ sear
   return (
     <div className={styles.results} data-openmrs-role="Search Results">
       {searchResults.map((patient, indx) => (
-        <PatientBanner
-          key={indx}
-          patientUuid={patient.uuid}
-          patient={patient}
-          isMPIPatient={searchMode == 'external'}
-        />
+        <PatientBanner key={indx} patientUuid={patient.uuid} patient={patient} isMPIPatient={searchMode == 'mpi'} />
       ))}
     </div>
   );
@@ -145,7 +140,7 @@ export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ sear
 
 function doMPISearch(searchTerm: string) {
   navigate({
-    to: '${openmrsSpaBase}/search?query=${searchTerm}&mode=external',
+    to: '${openmrsSpaBase}/search?query=${searchTerm}&mode=mpi',
     templateParams: { searchTerm: searchTerm },
   });
 }

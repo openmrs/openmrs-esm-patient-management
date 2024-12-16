@@ -17,6 +17,7 @@ import {
   useVisit,
   navigate,
   UserFollowIcon,
+  useDefineAppContext,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
@@ -33,6 +34,10 @@ interface PatientBannerProps {
   patientUuid: string;
   hideActionsOverflow?: boolean;
   isMPIPatient: boolean;
+}
+
+export interface MPIContext {
+  sourceRecord: string;
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow, isMPIPatient }) => {
@@ -65,6 +70,17 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   };
 
   const isDeceased = !!patient.person.deathDate;
+  /*   const [sourceRecord, setSourceRecord ] = useState<string | undefined>()
+    useDefineAppContext<MPIContext>("sourceRecord", {
+      sourceRecord: sourceRecord
+    }); */
+
+  const handleCreatePatientRecord = (externalId: string) => {
+    //setSourceRecord(externalId);
+    navigate({
+      to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${externalId}`,
+    });
+  };
 
   return (
     <>
@@ -135,11 +151,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 kind="ghost"
                 renderIcon={UserFollowIcon}
                 iconDescription="Create Patient Record"
-                onClick={() =>
-                  navigate({
-                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${patient.externalId}`,
-                  })
-                }
+                onClick={() => handleCreatePatientRecord(patient.externalId)}
                 style={{ marginTop: '-0.25rem' }}>
                 {t('createPatientRecord', 'Create Patient Record')}
               </Button>

@@ -197,44 +197,54 @@ export async function getIdentifierFieldValuesFromFhirPatient(
   identifierConfig,
 ): Promise<{ [identifierFieldName: string]: PatientIdentifierValue }> {
   const identifiers: FormValues['identifiers'] = {};
+  const promises: Promise<void>[] = [];
 
   for (const identifier of patient.identifier) {
     for (const config of identifierConfig) {
-      const identifierConfig = config.identifierTypeSystem === identifier.system ? config : null;
-
-      if (identifierConfig) {
-        let identifierTypeName;
-
-        const url = `${restBaseUrl}/patientidentifiertype/${identifierConfig.identifierTypeUuid}`;
-        await openmrsFetch(url).then((response) => {
-          if (response.status == 200 && response.data) {
-            identifierTypeName = response.data.name;
-          }
-        });
-
-        identifiers[identifierTypeName] = {
-          identifierUuid: null,
-          preferred: false, // consider identifier.use === 'official' ?? by default autogen is preferred
-          initialValue: identifier.value,
-          identifierValue: identifier.value,
-          identifierTypeUuid: identifierConfig.identifierTypeUuid,
-          identifierName: identifierTypeName,
-          required: false,
-          selectedSource: null,
-          autoGeneration: false,
-        };
+      if (config.identifierTypeSystem !== identifier.system) {
+        continue;
       }
+
+      const url = `${restBaseUrl}/patientidentifiertype/${config.identifierTypeUuid}`;
+
+      promises.push(
+        openmrsFetch(url)
+          .then((response) => {
+            if (!response.data?.name) {
+              return;
+            }
+            identifiers[response.data.name] = {
+              identifierUuid: null,
+              preferred: false,
+              initialValue: identifier.value,
+              identifierValue: identifier.value,
+              identifierTypeUuid: config.identifierTypeUuid,
+              identifierName: response.data.name,
+              required: false,
+              selectedSource: null,
+              autoGeneration: false,
+            };
+          })
+          .catch((error) => {
+            console.error(`Error fetching identifier type for ${config.identifierTypeUuid}:`, error);
+          }),
+      );
     }
   }
-
+  await Promise.all(promises);
   return identifiers;
 }
 
 export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient, phoneUuid) {
   const result = {};
-  if (patient.telecom) {
-    result[phoneUuid] = patient.telecom[0].value;
+
+  if (patient.telecom && Array.isArray(patient.telecom)) {
+    const phoneEntry = patient.telecom.find((entry) => entry.system === 'phone');
+    if (phoneEntry) {
+      result[phoneUuid] = phoneEntry.value;
+    }
   }
+
   return result;
 }
 

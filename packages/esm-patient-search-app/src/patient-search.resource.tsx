@@ -1,9 +1,17 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useSession, type FetchResponse, restBaseUrl, fhirBaseUrl } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  useSession,
+  type FetchResponse,
+  restBaseUrl,
+  fhirBaseUrl,
+  useConfig,
+} from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 import { mapToOpenMRSPatient } from './mpi/utils';
+import { type PatientSearchConfig } from './config-schema';
 
 type InfinitePatientSearchResponse = FetchResponse<{
   results: Array<SearchedPatient>;
@@ -44,7 +52,7 @@ const patientSearchCustomRepresentation = `custom:(${patientProperties.join(',')
  */
 export function useInfinitePatientSearch(
   searchQuery: string,
-  searchMode: string,
+  searchMode: 'mpi' | null | undefined,
   includeDead: boolean,
   isSearching: boolean = true,
   resultsToFetch: number = 10,
@@ -86,20 +94,25 @@ export function useInfinitePatientSearch(
 
       return url;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
   const shouldFetch = isSearching && searchQuery;
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
-    shouldFetch ? (searchMode == 'external' ? getExtUrl : getUrl) : null,
+    shouldFetch ? (searchMode == 'mpi' ? getExtUrl : getUrl) : null,
     openmrsFetch,
   );
+  const { nameTemplate } = useConfig() as PatientSearchConfig;
 
   const mappedData =
-    searchMode === 'external'
+    searchMode === 'mpi'
       ? data
-        ? mapToOpenMRSPatient(data.map((response) => response?.data))
+        ? mapToOpenMRSPatient(
+            data.map((response) => response?.data),
+            nameTemplate,
+          )
         : null
       : data?.flatMap((response) => response?.data?.results ?? []) ?? null;
 

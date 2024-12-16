@@ -156,6 +156,11 @@ export const configSchema = {
       '05a29f94-c0ed-11e2-94be-8c13b969e334',
     ],
   },
+  nameTemplate: {
+    _type: Type.String,
+    _default: '{given} {family}',
+    _description: 'Name template format for fhir patient name display like {given} {family} {fullName}',
+  },
 };
 
 export type BuiltInFieldType = 'gender' | 'dateOfBirth' | 'age' | 'postcode';
@@ -191,4 +196,5 @@ export type PatientSearchConfig = {
   defaultIdentifier: string;
   defaultIdentifierTypes: Array<string>;
   includeDead: boolean;
+  nameTemplate: string;
 };
