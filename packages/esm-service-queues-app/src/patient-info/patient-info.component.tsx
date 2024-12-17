@@ -1,18 +1,18 @@
+import React, { useState } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { ClickableTile } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import {
-  ConfigurableLink,
-  PatientBannerContactDetails,
-  PatientBannerToggleContactDetailsButton,
-  PatientPhoto,
   age,
+  ConfigurableLink,
   formatDate,
   getPatientName,
   parseDate,
+  PatientBannerContactDetails,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
 } from '@openmrs/esm-framework';
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import AppointmentDetails from './appointment-details.component';
 import styles from './patient-info.scss';
 
@@ -23,8 +23,8 @@ interface PatientInfoProps {
 
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoClick }) => {
   const { t } = useTranslation();
-  const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const patientName = getPatientName(patient);
+  const [showContactDetails, setShowContactDetails] = useState(false);
 
   const toggleShowMore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -32,6 +32,8 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
   };
 
   return (
+    // TODO: Fix this warning: validateDOMNesting(...): <a> cannot appear as a descendant of <a>.
+    // This is because the ConfigurableLink is inside a ClickableTile.
     <ClickableTile className={styles.container} onClick={handlePatientInfoClick}>
       <div
         className={classNames({

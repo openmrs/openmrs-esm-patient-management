@@ -39,7 +39,7 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-jest.mock('../patient-search/hooks/useQueueLocations', () => ({
+jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn().mockReturnValue({
     queueLocations: [
       { id: '1GHI12', name: 'Location 1' },

@@ -99,7 +99,7 @@
     {
       "name": "patient-upcoming-appointment-widget",
       "component": "patientUpcomingAppointmentsWidget",
-      "slot": "upcoming-appointment-slot"
+      "slot": "visit-form-top-slot"
     },
     {
       "name": "edit-appointments-form",

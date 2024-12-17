@@ -54,6 +54,7 @@ export default function PatientBedSwapForm({
   const onSubmit = useCallback(
     (values: FormValues) => {
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
+      setIsSubmitting(true);
       setShowErrorNotifications(false);
       createEncounter(patient, emrConfiguration.bedAssignmentEncounterType)
         .then(async (response) => {
@@ -109,15 +110,7 @@ export default function PatientBedSwapForm({
           closeWorkspaceWithSavedChanges();
         });
     },
-    [
-      beds,
-      createEncounter,
-      patient,
-      emrConfiguration.bedAssignmentEncounterType,
-      t,
-      wardPatientGroupDetails,
-      closeWorkspaceWithSavedChanges,
-    ],
+    [beds, createEncounter, patient, emrConfiguration, t, wardPatientGroupDetails, closeWorkspaceWithSavedChanges],
   );
 
   const onError = useCallback(() => {

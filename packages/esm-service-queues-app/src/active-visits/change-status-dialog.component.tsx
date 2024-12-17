@@ -25,7 +25,7 @@ import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../hooks/useQueues';
 import { updateQueueEntry } from './active-visits-table.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
 
 interface ChangeStatusDialogProps {

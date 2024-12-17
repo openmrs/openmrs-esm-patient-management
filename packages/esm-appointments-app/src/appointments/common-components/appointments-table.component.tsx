@@ -44,7 +44,6 @@ import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
-import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
 
 dayjs.extend(utc);

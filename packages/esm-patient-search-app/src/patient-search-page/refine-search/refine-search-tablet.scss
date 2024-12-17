@@ -1,0 +1,116 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
+
+.refineSearchBanner {
+  padding: layout.$spacing-03 layout.$spacing-05;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #343a3f;
+
+  p {
+    color: $ui-02;
+  }
+}
+
+.refineSearchBannerFilterInfo {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  color: $ui-02;
+
+  p {
+    margin-left: layout.$spacing-03;
+  }
+}
+
+.refineSearchDialogContainer {
+  position: absolute;
+  top: layout.$spacing-09;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background-color: #393939cc;
+  z-index: 99;
+}
+
+.refineSearchDialog {
+  background-color: $ui-02;
+  width: 100%;
+}
+
+.refineSearchDialogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}
+
+.padded {
+  padding: 0 layout.$spacing-05;
+}
+
+.refineSearchDialogGenderSexRow {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  grid-gap: layout.$spacing-11;
+  padding: 0 layout.$spacing-05;
+}
+
+.otherFieldsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.otherFieldsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: layout.$spacing-05;
+
+  &:has(:only-child) {
+    grid-template-columns: 1fr;
+  }
+
+  &:has(:nth-child(2)):not(:has(:nth-child(3))) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &:has(:nth-child(3)) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.buttonSet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: layout.$spacing-05;
+}
+
+.paddedButtons {
+  margin: layout.$spacing-07 layout.$spacing-05;
+}
+
+.button {
+  width: 100%;
+  max-width: unset;
+}
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.filtersAppliedCount {
+  padding: 0 layout.$spacing-03;
+  background-color: $color-blue-60-2;
+  color: $ui-01;
+}
+
+.refineSearchDialogOpener {
+  color: $inverse-link;
+}

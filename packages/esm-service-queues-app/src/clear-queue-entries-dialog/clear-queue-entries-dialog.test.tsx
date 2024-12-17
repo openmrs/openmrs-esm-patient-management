@@ -12,7 +12,10 @@ const defaultProps = {
   closeModal: mockCloseModal,
 };
 
-jest.mock('./clear-queue-entries-dialog.resource');
+jest.mock('./clear-queue-entries-dialog.resource', () => ({
+  batchClearQueueEntries: jest.fn(),
+}));
+
 jest.mock('../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));

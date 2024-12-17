@@ -1,27 +1,5 @@
 import { type Locator, type Page, expect } from '@playwright/test';
-
-export type PatientRegistrationSex = 'male' | 'female' | 'other' | 'unknown';
-
-export interface PatientRegistrationFormValues {
-  givenName?: string;
-  middleName?: string;
-  familyName?: string;
-  sex?: PatientRegistrationSex;
-  birthdate?: {
-    day: string;
-    month: string;
-    year: string;
-  };
-  postalCode?: string;
-  address1?: string;
-  address2?: string;
-  country?: string;
-  countyDistrict?: string;
-  stateProvince?: string;
-  cityVillage?: string;
-  phone?: string;
-  email?: string;
-}
+import { type PatientRegistrationFormValues, type PatientRegistrationSex } from '../types';
 
 export class RegistrationAndEditPage {
   constructor(readonly page: Page) {}

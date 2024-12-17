@@ -1,0 +1,41 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.fieldTabletOrOverlay {
+  margin-bottom: layout.$spacing-07;
+
+  input {
+    min-width: unset !important;
+  }
+}
+
+.dobFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  grid-gap: layout.$spacing-03;
+
+  input {
+    min-width: unset !important;
+    padding-right: layout.$spacing-02 !important;
+  }
+}
+
+.labelText {
+  margin-bottom: layout.$spacing-03;
+}
+
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.locationAttributeFieldContainer {
+  position: relative;
+
+  .loadingContainer {
+    background-color: colors.$white;
+    position: absolute;
+    right: layout.$spacing-07;
+    bottom: layout.$spacing-02;
+  }
+}

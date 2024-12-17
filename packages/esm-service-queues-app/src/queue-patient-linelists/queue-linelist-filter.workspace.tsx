@@ -1,18 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  DatePicker,
-  DatePickerInput,
-  Form,
-  Layer,
-  Stack,
-  RadioButtonGroup,
-  RadioButton,
-  Dropdown,
-  Column,
   Button,
   ButtonSet,
+  Column,
+  DatePicker,
+  DatePickerInput,
+  Dropdown,
+  Form,
+  Layer,
   NumberInput,
+  RadioButton,
+  RadioButtonGroup,
+  Stack,
   Toggle,
 } from '@carbon/react';
 import dayjs from 'dayjs';
@@ -23,18 +23,19 @@ import {
   useLayoutType,
   useVisitTypes,
 } from '@openmrs/esm-framework';
-import styles from './queue-linelist-filter.scss';
 import { datePickerFormat, datePickerPlaceHolder } from '../constants';
+import styles from './queue-linelist-filter.scss';
 
 const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
-  const [gender, setGender] = useState('');
-  const [startAge, setStartAge] = useState<number>();
-  const [endAge, setEndAge] = useState<number>();
-  const [returnDate, setReturnDate] = useState(new Date());
-  const [visitType, setVisitType] = useState('');
-  const isTablet = useLayoutType() === 'tablet';
   const allVisitTypes = useVisitTypes();
+  const isTablet = useLayoutType() === 'tablet';
+
+  const [endAge, setEndAge] = useState();
+  const [gender, setGender] = useState('');
+  const [returnDate, setReturnDate] = useState(new Date());
+  const [startAge, setStartAge] = useState();
+  const [visitType, setVisitType] = useState('');
 
   const handleFilter = useCallback(
     (event) => {

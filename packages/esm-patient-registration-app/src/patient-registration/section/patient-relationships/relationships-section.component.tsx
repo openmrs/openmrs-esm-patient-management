@@ -40,7 +40,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
-  const [isInvalid, setIsInvalid] = useState<boolean>(false);
+  const [isInvalid, setIsInvalid] = useState(false);
   const newRelationship = !relationship.uuid;
 
   const handleRelationshipTypeChange = useCallback(

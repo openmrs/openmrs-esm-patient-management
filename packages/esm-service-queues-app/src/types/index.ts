@@ -2,14 +2,6 @@ import { type Visit, type OpenmrsResource, type Location, type Patient } from '@
 import type React from 'react';
 import { type ColumnConfig } from '../config-schema';
 
-export enum SearchTypes {
-  BASIC = 'basic',
-  ADVANCED = 'advanced',
-  SEARCH_RESULTS = 'search_results',
-  SCHEDULED_VISITS = 'scheduled-visits',
-  VISIT_FORM = 'visit_form',
-}
-
 export interface Attribute {
   attributeType: OpenmrsResource;
   display: string;

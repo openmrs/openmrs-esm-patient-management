@@ -13,8 +13,8 @@ interface AppointmentTabsProps {
 
 const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const { showUnscheduledAppointmentsTab } = useConfig<ConfigObject>();
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const handleTabChange = ({ selectedIndex }: { selectedIndex: number }) => {
     setActiveTabIndex(selectedIndex);

@@ -15,7 +15,7 @@ import {
 import { mutate } from 'swr';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
 
 const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
@@ -111,8 +111,10 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
               invalidText="Required"
               onChange={(event) => setQueueConcept(event.target.value)}
               value={queueConcept}>
-              {!queueConcept && <SelectItem text={t('selectServiceType', 'Select a service type')} />}
-              {queueConcepts.length === 0 && <SelectItem text={t('noServicesAvailable', 'No services available')} />}
+              {!queueConcept && <SelectItem text={t('selectServiceType', 'Select a service type')} value="" />}
+              {queueConcepts.length === 0 && (
+                <SelectItem text={t('noServicesAvailable', 'No services available')} value="" />
+              )}
               {queueConcepts?.length > 0 &&
                 queueConcepts.map((concept) => (
                   <SelectItem key={concept.uuid} text={concept.display} value={concept.uuid}>
@@ -142,8 +144,10 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
               labelText={t('selectALocation', 'Select a location')}
               onChange={(event) => setUserLocation(event.target.value)}
               value={userLocation}>
-              {!userLocation && <SelectItem text={t('selectALocation', 'Select a location')} />}
-              {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
+              {!userLocation && <SelectItem text={t('selectALocation', 'Select a location')} value="" />}
+              {queueLocations.length === 0 && (
+                <SelectItem text={t('noLocationsAvailable', 'No locations available')} value="" />
+              )}
               {queueLocations?.length > 0 &&
                 queueLocations.map((location) => (
                   <SelectItem key={location.id} text={location.name} value={location.id}>

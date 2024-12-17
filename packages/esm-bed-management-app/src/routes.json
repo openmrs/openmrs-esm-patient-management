@@ -36,21 +36,6 @@
       "name": "bed-management-home-dashboard-link",
       "slot": "bed-management-left-panel-slot",
       "order": 0
-    },
-    {
-      "component": "bedAdmission",
-      "name": "bed-admission-dashboard",
-      "slot": "bed-admission-dashboard-slot"
-    },
-    {
-      "name": "bed-admission-dashboard-link",
-      "component": "bedAdmissionDashboardLink",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "bed-admission",
-        "slot": "bed-admission-dashboard-slot",
-        "title": "Bed-admission"
-      }
     }
   ]
 }

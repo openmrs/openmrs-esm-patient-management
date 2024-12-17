@@ -149,7 +149,7 @@ export interface AppointmentSummary {
 export interface Provider {
   uuid: string;
   display: string;
-  comments: string;
+  comments?: string;
   response?: string;
   person: OpenmrsResource;
   name?: string;

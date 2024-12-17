@@ -15,6 +15,7 @@ interface MonthlyWorkloadComponentProps {
 const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, count, isActive, selectedDate }) => {
   const layout = useLayoutType();
   const isToday = date.isSame(dayjs(), 'day');
+
   return (
     <div
       className={classNames(
@@ -30,7 +31,7 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, co
           [styles.largeDesktop]: layout !== 'small-desktop',
         },
       )}>
-      <p>
+      <div>
         <b className={[styles.calendarDate, isToday ? styles.blue : ''].join(' ')}>{date.format('D')}</b>
         <div className={styles.currentData}>
           <div tabIndex={0} role="button" className={classNames(styles.tileContainer, {})}></div>
@@ -38,7 +39,7 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, co
             <span className={isActive ? styles.blue : ''}>{count}</span>
           </div>
         </div>
-      </p>
+      </div>
     </div>
   );
 };

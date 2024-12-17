@@ -27,7 +27,7 @@ import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
 
-const serviceQueuesPatientSearchWorkspace = 'service-queues-patient-search';
+const serviceQueuesPatientSearchWorkspace = 'create-queue-entry-workspace';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -61,7 +61,7 @@ function DefaultQueueTable() {
   }, [error?.message, t]);
 
   const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
-  const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
+  const [patientSearchQuery, setPatientSearchQuery] = useState('');
 
   const handleBackToSearchList = useCallback(() => {
     setIsPatientSearchOpen(true);
