@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
+import styles from './delete-identifier-confirmation.scss';
 
 interface DeleteIdentifierConfirmationModalProps {
   closeModal: () => void;
@@ -20,6 +21,7 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
   return (
     <>
       <ModalHeader
+        className={styles.modalHeader}
         closeModal={closeModal}
         title={t('deleteIdentifierModalHeading', 'Delete identifier?')}></ModalHeader>
       <ModalBody>

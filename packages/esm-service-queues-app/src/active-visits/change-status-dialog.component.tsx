@@ -106,7 +106,13 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const onError = (errors) => console.error(errors);
 
   if (Object.keys(queueEntry)?.length === 0) {
-    return <ModalHeader closeModal={closeModal} title={t('patientNotInQueue', 'The patient is not in the queue')} />;
+    return (
+      <ModalHeader
+        className={styles.modalHeader}
+        closeModal={closeModal}
+        title={t('patientNotInQueue', 'The patient is not in the queue')}
+      />
+    );
   }
 
   if (Object.keys(queueEntry)?.length > 0) {
@@ -114,6 +120,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       <div>
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
           <ModalHeader
+            className={styles.modalHeader}
             closeModal={closeModal}
             title={t('movePatientToNextService', 'Move patient to the next service?')}
           />
