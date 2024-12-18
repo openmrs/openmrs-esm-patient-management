@@ -20,7 +20,7 @@ import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config
 import { ResourcesContext } from '../offline.resources';
 import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
-import { useInitialFormValues } from './patient-registration-hooks';
+import { useInitialFormValuesLocal } from './patient-registration-hooks';
 import { useMpiPatient } from './mpi/mpi-patient.resource';
 
 const mockSaveEncounter = jest.mocked(saveEncounter);
@@ -29,7 +29,7 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = jest.mocked(usePatient);
 const mockUseParams = useParams as jest.Mock;
-const mockUseInitialFormValues = jest.mocked(useInitialFormValues);
+const mockUseInitialFormValues = jest.mocked(useInitialFormValuesLocal);
 const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseMpiPatient = useMpiPatient as jest.Mock;
 
@@ -111,7 +111,8 @@ jest.mock('./patient-registration.resource', () => ({
 
 jest.mock('./patient-registration-hooks', () => ({
   ...jest.requireActual('./patient-registration-hooks'),
-  useInitialFormValues: jest.fn().mockReturnValue([{}, jest.fn()]),
+  useInitialFormValuesLocal: jest.fn().mockReturnValue([{}, jest.fn()]),
+  useInitialFormValueMpi: jest.fn().mockReturnValue([{}, jest.fn()]),
   useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
   usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
 }));
@@ -277,6 +278,12 @@ describe('Registering a new patient', () => {
       ...mockOpenmrsConfig,
     });
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
+
+    mockUseMpiPatient.mockReturnValue({
+      isLoading: false,
+      patient: { data: null },
+      error: undefined,
+    });
   });
 
   // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
@@ -512,8 +519,21 @@ describe('Registering a new patient', () => {
 
 describe('Import an MPI patient record', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue(mockOpenmrsConfig);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      ...mockOpenmrsConfig,
+    });
+
+    mockUsePatient.mockImplementation(() => {
+      return {
+        error: null,
+        isLoading: false,
+        patient: null,
+        patientUuid: null,
+      };
+    });
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
+    mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
     (useParams as jest.Mock).mockReturnValue({ patientUuid: undefined }),
       (useLocation as jest.Mock).mockReturnValue({
         pathname: 'openmrs/spa/patient-registration',
@@ -526,24 +546,12 @@ describe('Import an MPI patient record', () => {
 
   it('fills patient demographics from MPI patient', async () => {
     const user = userEvent.setup();
-    mockSavePatient.mockResolvedValue({} as FetchResponse);
-
-    mockUsePatient.mockReturnValue({
-      isLoading: false,
-      patient: null,
-      patientUuid: null,
-      error: null,
-    });
-
+    const mockSavePatientForm = jest.fn();
     mockUseMpiPatient.mockReturnValue({
       isLoading: false,
       patient: { data: mockPatient },
       error: undefined,
     });
-
-    const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-    const mockResponse = { status: 200, data: mockOpenMRSIdentificationNumberIdType };
-    mockOpenmrsFetch.mockResolvedValue(mockResponse);
 
     mockUseInitialFormValues.mockReturnValue([
       {
@@ -598,7 +606,7 @@ describe('Import an MPI patient record', () => {
     ]);
     // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
-      render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatient} />, { wrapper: Wrapper });
+      render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />, { wrapper: Wrapper });
     });
 
     const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
@@ -623,7 +631,7 @@ describe('Import an MPI patient record', () => {
     await user.type(familyNameInput, 'Smith');
     await user.click(screen.getByText(/Register patient/i));
 
-    expect(mockSavePatient).toHaveBeenCalledWith(
+    expect(mockSavePatientForm).toHaveBeenCalledWith(
       true,
       {
         addNameInLocalLanguage: false,

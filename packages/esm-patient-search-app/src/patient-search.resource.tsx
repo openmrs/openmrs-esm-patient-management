@@ -18,6 +18,7 @@ type InfinitePatientSearchResponse = FetchResponse<{
   links: Array<{ rel: 'prev' | 'next' }>;
   totalCount: number;
 }>;
+type InfinitePatientBundleResponse = FetchResponse<fhir.Bundle>;
 
 const patientProperties = [
   'patientId',
@@ -101,18 +102,28 @@ export function useInfinitePatientSearch(
   const shouldFetch = isSearching && searchQuery;
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
-    shouldFetch ? (searchMode == 'mpi' ? getExtUrl : getUrl) : null,
+    shouldFetch ? (searchMode !== 'mpi' ? getUrl : null) : null,
     openmrsFetch,
   );
+
+  const {
+    data: mpiData,
+    isLoading: isLoadingMpi,
+    isValidating: isValidatingMpi,
+    setSize: setMpiSize,
+    error: mpiError,
+    size: mpiSize,
+  } = useSWRInfinite<InfinitePatientBundleResponse, Error>(
+    shouldFetch ? (searchMode == 'mpi' ? getExtUrl : null) : null,
+    openmrsFetch,
+  );
+
   const { nameTemplate } = useConfig() as PatientSearchConfig;
 
   const mappedData =
     searchMode === 'mpi'
-      ? data
-        ? mapToOpenMRSPatient(
-            data.map((response) => response?.data),
-            nameTemplate,
-          )
+      ? mpiData
+        ? mapToOpenMRSPatient(mpiData ? mpiData[0].data : null, nameTemplate)
         : null
       : data?.flatMap((response) => response?.data?.results ?? []) ?? null;
 

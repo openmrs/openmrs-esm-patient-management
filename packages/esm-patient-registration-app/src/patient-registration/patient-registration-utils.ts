@@ -116,9 +116,9 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   result.middleName = patientName?.given[1];
   result.familyName = patientName?.family;
   result.addNameInLocalLanguage = !!additionalPatientName ? true : undefined;
-  result.additionalGivenName = additionalPatientName?.given[0];
-  result.additionalMiddleName = additionalPatientName?.given[1];
-  result.additionalFamilyName = additionalPatientName?.family;
+  result.additionalGivenName = additionalPatientName?.given?.[0] ?? undefined;
+  result.additionalMiddleName = additionalPatientName?.given?.[1] ?? undefined;
+  result.additionalFamilyName = additionalPatientName?.family ?? undefined;
 
   result.gender = patient.gender;
   result.birthdate = patient.birthDate ? parseDate(patient.birthDate) : undefined;

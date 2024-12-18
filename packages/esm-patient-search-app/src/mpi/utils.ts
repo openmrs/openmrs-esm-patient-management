@@ -6,14 +6,14 @@ export function inferModeFromSearchParams(searchParams: URLSearchParams): 'mpi' 
 }
 
 export function mapToOpenMRSPatient(fhirPatients: fhir.Bundle, nameTemplate: string): Array<SearchedPatient> {
-  if (fhirPatients[0].total < 1) {
+  if (fhirPatients.total < 1) {
     return [];
   }
   //Consider patient // https://github.com/openmrs/openmrs-esm-core/blob/main/packages/framework/esm-api/src/types/patient-resource.ts
   const pts: Array<SearchedPatient> = [];
 
-  fhirPatients[0].entry.forEach((pt, index) => {
-    let fhirPatient = pt.resource;
+  fhirPatients.entry.forEach((pt, index) => {
+    let fhirPatient = pt.resource as fhir.Patient;
     pts.push({
       externalId: fhirPatient.id,
       uuid: null,
@@ -26,10 +26,11 @@ export function mapToOpenMRSPatient(fhirPatients: fhir.Bundle, nameTemplate: str
           postalCode: address.postalCode,
           preferred: false,
           address1: address?.line && address.line.length > 0 ? address.line[0] : undefined,
+          voided: false,
         })),
         age: null,
         birthdate: fhirPatient.birthDate,
-        gender: getCoreTranslation(fhirPatient.gender),
+        gender: getCoreTranslation(fhirPatient.gender as 'female' | 'male' | 'other' | 'unknown'),
         dead: checkDeceased(fhirPatient),
         deathDate: fhirPatient.deceasedDateTime,
         personName: {
