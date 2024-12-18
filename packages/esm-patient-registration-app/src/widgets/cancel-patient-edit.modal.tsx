@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import styles from './cancel-patient-edit.scss';
 
 interface CancelPatientEditPropsModal {
   close(): void;
@@ -12,6 +13,7 @@ const CancelPatientEditModal: React.FC<CancelPatientEditPropsModal> = ({ close, 
   return (
     <>
       <ModalHeader
+        className={styles.modalHeader}
         closeModal={close}
         title={t('confirmDiscardChangesTitle', 'Are you sure you want to discard these changes?')}
       />
