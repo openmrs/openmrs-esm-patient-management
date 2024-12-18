@@ -59,17 +59,15 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
 
   const createQueue = (data: QueueServiceFormData) => {
     saveQueue(data.queueName, data.queueConcept, data.queueName, data.userLocation)
-      .then(({ status }) => {
-        if (status === 201) {
-          showSnackbar({
-            title: t('addQueue', 'Add queue'),
-            kind: 'success',
-            subtitle: t('queueAddedSuccessfully', 'Queue added successfully'),
-          });
-          closeWorkspace();
-          mutate(`${restBaseUrl}/queue?${data.userLocation}`);
-          mutate(`${restBaseUrl}/queue?location=${data.userLocation}`);
-        }
+      .then(() => {
+        showSnackbar({
+          title: t('addQueue', 'Add queue'),
+          kind: 'success',
+          subtitle: t('queueAddedSuccessfully', 'Queue added successfully'),
+        });
+        closeWorkspace();
+        mutate(`${restBaseUrl}/queue?${data.userLocation}`);
+        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`);
       })
       .catch((error) => {
         showSnackbar({
@@ -107,7 +105,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                   kind="error"
                   lowContrast
                   title={t('missingQueueName', 'Missing queue name')}
-                  subtitle={errors.queueName.message}
+                  subtitle={errors.queueName?.message}
                 />
               </section>
             )}
@@ -146,7 +144,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                   kind="error"
                   lowContrast
                   title={t('missingService', 'Missing service')}
-                  subtitle={errors.queueConcept.message}
+                  subtitle={errors.queueConcept?.message}
                 />
               </section>
             )}
@@ -185,7 +183,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                   kind="error"
                   lowContrast
                   title={t('missingLocation', 'Missing location')}
-                  subtitle={errors.userLocation.message}
+                  subtitle={errors.userLocation?.message}
                 />
               </section>
             )}

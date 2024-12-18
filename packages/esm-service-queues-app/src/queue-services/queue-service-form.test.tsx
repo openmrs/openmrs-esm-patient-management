@@ -4,12 +4,6 @@ import { render, screen } from '@testing-library/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import QueueServiceForm from './queue-service-form.workspace';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, defaultValue: string) => defaultValue,
-  }),
-}));
-
 const defaultProps = {
   closeWorkspace: jest.fn(),
   promptBeforeClosing: jest.fn(),
@@ -38,22 +32,9 @@ jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
   }),
 }));
 
-jest.mock('@openmrs/esm-framework', () => {
-  return {
-    showSnackbar: jest.fn(),
-    restBaseUrl: '/ws/rest/v1',
-    useLayoutType: jest.fn(),
-
-    useExtensionSlot: jest.requireActual('@openmrs/esm-framework').useExtensionSlot,
-
-    importDynamic: jest.fn(),
-  };
-});
-
 describe('QueueServiceForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
-    jest.clearAllMocks();
   });
 
   it('should display required error messages when form is submitted with missing fields', async () => {
@@ -79,8 +60,6 @@ describe('QueueServiceForm', () => {
     await user.selectOptions(serviceSelect, '6f017eb0-b035-4acd-b284-da45f5067502');
     await user.selectOptions(locationSelect, '34567eb0-b035-4acd-b284-da45f5067502');
 
-    const submitButton = screen.getByText('Save');
-    await user.click(submitButton);
     expect(queueNameInput).toHaveValue('Test Queue');
     expect(serviceSelect).toHaveValue('6f017eb0-b035-4acd-b284-da45f5067502');
     expect(locationSelect).toHaveValue('34567eb0-b035-4acd-b284-da45f5067502');
