@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
+import styles from './patient-appointments-cancel.scss';
 
 interface PatientCancelAppointmentModalProps {
   closeCancelModal: () => void;
@@ -47,7 +48,11 @@ const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps
 
   return (
     <div>
-      <ModalHeader closeModal={closeCancelModal} title={t('cancelAppointment', 'Cancel appointment')} />
+      <ModalHeader
+        className={styles.modalHeader}
+        closeModal={closeCancelModal}
+        title={t('cancelAppointment', 'Cancel appointment')}
+      />
       <ModalBody>
         <p>{t('cancelAppointmentModalConfirmationText', 'Are you sure you want to cancel this appointment?')}</p>
       </ModalBody>

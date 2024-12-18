@@ -18,6 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedType, BedTypeData } from '../types';
+import styles from '../modals.scss';
 
 const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -80,7 +81,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
 
   return (
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+      <ModalHeader className={styles.modalHeader} title={headerTitle} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
