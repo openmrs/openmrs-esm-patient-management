@@ -3,9 +3,8 @@ import { launchWorkspace, useAppContext, useLayoutType } from '@openmrs/esm-fram
 import React, { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { WardPatientCardType, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { useAdmitPatient } from '../../ward.resource';
 import { AdmissionRequestsWorkspaceContext } from '../admission-request-workspace/admission-requests.workspace';
-import AdmissionPatientButton from '../admit-patient-button.component';
+import AdmitPatientButton from '../admit-patient-button.component';
 import styles from './admission-request-card.scss';
 
 const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
@@ -37,8 +36,9 @@ const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
       <Button kind="ghost" size={responsiveSize} onClick={launchCancelAdmissionForm}>
         {t('cancel', 'Cancel')}
       </Button>
-      <AdmissionPatientButton
+      <AdmitPatientButton
         wardPatient={wardPatient}
+        dispositionType={wardPatient.inpatientRequest.dispositionType}
         onAdmitPatientSuccess={() => closeWorkspaceWithSavedChanges()}
       />
     </div>
