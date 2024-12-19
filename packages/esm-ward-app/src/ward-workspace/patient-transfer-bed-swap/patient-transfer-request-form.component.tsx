@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import classNames from 'classnames';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { useCreateEncounter } from '../../ward.resource';
-import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import useWardLocation from '../../hooks/useWardLocation';
-import AdmissionPatientButton from '../admit-patient-button.component';
+import { z } from 'zod';
 import LocationSelector from '../../location-selector/location-selector.component';
+import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import { useCreateEncounter } from '../../ward.resource';
+import AdmitPatientButton from '../admit-patient-button.component';
 import styles from './patient-transfer-swap.scss';
 
 export default function PatientTransferForm({
@@ -24,14 +23,11 @@ export default function PatientTransferForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
-  const { currentProvider } = useSession();
-  const { location } = useWardLocation();
   const dispositionsWithTypeTransfer = useMemo(
     () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
     [emrConfiguration],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
   const isAdmitted = inpatientAdmission != null;
 
   const zodSchema = useMemo(
@@ -160,7 +156,7 @@ export default function PatientTransferForm({
             hideCloseButton
           />
         </div>
-        <AdmissionPatientButton wardPatient={wardPatient} onAdmitPatientSuccess={closeWorkspaceWithSavedChanges} />
+        <AdmitPatientButton wardPatient={wardPatient} dispositionType={'ADMIT'} onAdmitPatientSuccess={closeWorkspaceWithSavedChanges} />
       </div>
     );
   }
