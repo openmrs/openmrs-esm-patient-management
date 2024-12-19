@@ -1,8 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter as Router, useParams } from 'react-router-dom';
-import { render, screen, within } from '@testing-library/react';
+import { BrowserRouter as Router, useParams, useLocation } from 'react-router-dom';
+import { act, render, screen, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -10,25 +10,32 @@ import {
   showSnackbar,
   useConfig,
   usePatient,
+  openmrsFetch,
 } from '@openmrs/esm-framework';
 import type { AddressTemplate, Encounter, FormValues } from './patient-registration.types';
 import { mockedAddressTemplate } from '__mocks__';
-import { mockPatient } from 'tools';
+import { mockPatient, mockOpenMRSIdentificationNumberIdType } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
 import { ResourcesContext } from '../offline.resources';
 import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
-import { useInitialFormValues } from './patient-registration-hooks';
+import { useInitialFormValuesLocal } from './patient-registration-hooks';
+import { useMpiPatient } from './mpi/mpi-patient.resource';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockSaveEncounter = jest.mocked(saveEncounter);
 const mockSavePatient = savePatient as jest.Mock;
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = jest.mocked(usePatient);
 const mockUseParams = useParams as jest.Mock;
-const mockUseInitialFormValues = jest.mocked(useInitialFormValues);
+const mockUseInitialFormValues = jest.mocked(useInitialFormValuesLocal);
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+const mockUseMpiPatient = useMpiPatient as jest.Mock;
+
+jest.mock('./mpi/mpi-patient.resource', () => ({
+  useMpiPatient: jest.fn(),
+}));
 
 jest.mock('./field/field.resource', () => ({
   useConcept: jest.fn().mockImplementation((uuid: string) => {
@@ -88,8 +95,8 @@ jest.mock('./field/field.resource', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: () => ({
+  ...(jest.requireActual('react-router-dom') as any),
+  useLocation: jest.fn().mockReturnValue({
     pathname: 'openmrs/spa/patient-registration',
   }),
   useHistory: () => [],
@@ -104,7 +111,8 @@ jest.mock('./patient-registration.resource', () => ({
 
 jest.mock('./patient-registration-hooks', () => ({
   ...jest.requireActual('./patient-registration-hooks'),
-  useInitialFormValues: jest.fn().mockReturnValue([{}, jest.fn()]),
+  useInitialFormValuesLocal: jest.fn().mockReturnValue([{}, jest.fn()]),
+  useInitialFormValueMpi: jest.fn().mockReturnValue([{}, jest.fn()]),
   useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
   usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
 }));
@@ -139,7 +147,7 @@ const mockResourcesContextValue = {
 const mockOpenmrsConfig: RegistrationConfig = {
   sections: ['demographics', 'contact'],
   sectionDefinitions: [
-    { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob'] },
+    { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'id'] },
     { id: 'contact', name: 'Contact Info', fields: ['address'] },
     { id: 'relationships', name: 'Relationships', fields: ['relationship'] },
   ],
@@ -174,6 +182,9 @@ const mockOpenmrsConfig: RegistrationConfig = {
         label: 'Female',
       },
     ],
+    identifier: [
+      { identifierTypeSystem: 'MPI OpenMRS ID', identifierTypeUuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f' },
+    ],
     address: {
       useAddressHierarchy: {
         enabled: true,
@@ -188,7 +199,7 @@ const mockOpenmrsConfig: RegistrationConfig = {
   links: {
     submitButton: '#',
   },
-  defaultPatientIdentifierTypes: [],
+  defaultPatientIdentifierTypes: ['8d793bee-c2cc-11de-8d13-0010c6dffd0f'],
   registrationObs: {
     encounterTypeUuid: null,
     encounterProviderRoleUuid: 'asdf',
@@ -196,6 +207,7 @@ const mockOpenmrsConfig: RegistrationConfig = {
   },
   freeTextFieldConceptUuid: '',
 };
+const path = `/patient/:patientUuid/edit`;
 const configWithObs = JSON.parse(JSON.stringify(mockOpenmrsConfig));
 
 configWithObs.fieldDefinitions = [
@@ -266,6 +278,104 @@ describe('Registering a new patient', () => {
       ...mockOpenmrsConfig,
     });
     mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
+
+    mockUseMpiPatient.mockReturnValue({
+      isLoading: false,
+      patient: { data: null },
+      error: undefined,
+    });
+  });
+
+  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
+  it.skip('saves the patient without extra info', async () => {
+    const user = userEvent.setup();
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
+
+    await screen.findByRole('heading', { name: /create new patientnj/i });
+
+    await fillRequiredFields();
+    await user.click(await screen.findByText(/Register Patientsed/i));
+
+    expect(mockSavePatient).toHaveBeenCalledWith(
+      true,
+      {
+        addNameInLocalLanguage: false,
+        additionalFamilyName: '',
+        additionalGivenName: '',
+        additionalMiddleName: '',
+        address: { country: 'កម្ពុជា (Cambodia)' },
+        attributes: {},
+        birthdate: '1972-04-04',
+        birthdateEstimated: false,
+        deathCause: '',
+        nonCodedCauseOfDeath: '',
+        deathDate: undefined,
+        deathTime: undefined,
+        deathTimeFormat: 'AM',
+        familyName: 'Smith',
+        gender: 'male',
+        givenName: 'Eric',
+        identifiers: {
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
+            selectedSource: null,
+          },
+          idCard: {
+            autoGeneration: false,
+            identifierName: 'ID Card',
+            identifierTypeUuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
+            identifierUuid: '346d09b1-8509-43c6-9697-3b4d1ce06ad6',
+            identifierValue: '1234567890',
+            initialValue: '1234567890',
+            preferred: false,
+            required: false,
+            selectedSource: null,
+          },
+        },
+        isDead: false,
+        middleName: 'Johnson',
+        monthsEstimated: 0,
+        patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773ef',
+        relationships: [],
+        telephoneNumber: '',
+        unidentifiedPatient: undefined,
+        yearsEstimated: 0,
+      },
+      expect.anything(),
+      expect.anything(),
+      null,
+      undefined,
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      { patientSaved: false },
+      expect.anything(),
+    );
+
+    expect(mockSavePatient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' },
+        person: {
+          addresses: expect.arrayContaining([expect.any(Object)]),
+          attributes: [],
+          birthdate: '1993-8-2',
+          birthdateEstimated: false,
+          gender: expect.stringMatching(/^M$/),
+          names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
+          dead: false,
+          uuid: expect.anything(),
+        },
+        uuid: expect.anything(),
+      }),
+      undefined,
+    );
   });
 
   it('should render all the required fields and sections', async () => {
@@ -404,6 +514,186 @@ describe('Registering a new patient', () => {
     expect(mockSaveEncounter).toHaveBeenCalledTimes(2);
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+  });
+});
+
+describe('Import an MPI patient record', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      ...mockOpenmrsConfig,
+    });
+
+    mockUsePatient.mockImplementation(() => {
+      return {
+        error: null,
+        isLoading: false,
+        patient: null,
+        patientUuid: null,
+      };
+    });
+    mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
+    mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
+    (useParams as jest.Mock).mockReturnValue({ patientUuid: undefined }),
+      (useLocation as jest.Mock).mockReturnValue({
+        pathname: 'openmrs/spa/patient-registration',
+        state: undefined,
+        key: '',
+        search: '?sourceRecord=55',
+        hash: '',
+      });
+  });
+
+  it('fills patient demographics from MPI patient', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = jest.fn();
+    mockUseMpiPatient.mockReturnValue({
+      isLoading: false,
+      patient: { data: mockPatient },
+      error: undefined,
+    });
+
+    mockUseInitialFormValues.mockReturnValue([
+      {
+        additionalFamilyName: '',
+        additionalGivenName: '',
+        additionalMiddleName: '',
+        addNameInLocalLanguage: false,
+        address: {},
+        birthdate: mockPatient.birthDate,
+        birthdateEstimated: false,
+        deathCause: '',
+        deathDate: undefined,
+        deathTime: undefined,
+        deathTimeFormat: 'AM',
+        familyName: mockPatient.name[0].family,
+        gender: mockPatient.gender,
+        givenName: mockPatient.name[0].given[0],
+        identifiers: {
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
+            selectedSource: null,
+          },
+          idCard: {
+            autoGeneration: false,
+            identifierName: 'ID Card',
+            identifierTypeUuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
+            identifierUuid: '346d09b1-8509-43c6-9697-3b4d1ce06ad6',
+            identifierValue: '1234567890',
+            initialValue: '1234567890',
+            preferred: false,
+            required: false,
+            selectedSource: null,
+          },
+        },
+        isDead: false,
+        middleName: '',
+        monthsEstimated: 0,
+        nonCodedCauseOfDeath: '',
+        patientUuid: mockPatient.id,
+        relationships: [],
+        telephoneNumber: '',
+        yearsEstimated: 0,
+      } as FormValues,
+      jest.fn(),
+    ]);
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />, { wrapper: Wrapper });
+    });
+
+    const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
+    const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
+    const middleNameInput: HTMLInputElement = screen.getByLabelText(/Middle Name/);
+    const dateOfBirthInput: HTMLInputElement = screen.getByLabelText(/Date of Birth/i);
+    const genderInput: HTMLInputElement = screen.getByLabelText(/Male/);
+
+    // assert initial values
+    expect(givenNameInput.value).toBe('John');
+    expect(familyNameInput.value).toBe('Wilson');
+    expect(middleNameInput.value).toBeFalsy();
+    expect(dateOfBirthInput.value).toBe('04/04/1972');
+    expect(genderInput.value).toBe('male');
+
+    // do some edits
+    await user.clear(givenNameInput);
+    await user.clear(middleNameInput);
+    await user.clear(familyNameInput);
+    await user.type(givenNameInput, 'Eric');
+    await user.type(middleNameInput, 'Johnson');
+    await user.type(familyNameInput, 'Smith');
+    await user.click(screen.getByText(/Register patient/i));
+
+    expect(mockSavePatientForm).toHaveBeenCalledWith(
+      true,
+      {
+        addNameInLocalLanguage: false,
+        additionalFamilyName: '',
+        additionalGivenName: '',
+        additionalMiddleName: '',
+        address: {
+          country: 'កម្ពុជា (Cambodia)',
+        },
+        birthdate: '1972-04-04',
+        birthdateEstimated: false,
+        deathCause: '',
+        nonCodedCauseOfDeath: '',
+        deathDate: undefined,
+        deathTime: undefined,
+        deathTimeFormat: 'AM',
+        familyName: 'Smith',
+        gender: 'male',
+        givenName: 'Eric',
+        identifiers: {
+          idCard: {
+            autoGeneration: false,
+            identifierName: 'ID Card',
+            identifierTypeUuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
+            identifierUuid: '346d09b1-8509-43c6-9697-3b4d1ce06ad6',
+            identifierValue: '1234567890',
+            initialValue: '1234567890',
+            preferred: false,
+            required: false,
+            selectedSource: null,
+          },
+          openMrsId: {
+            autoGeneration: false,
+            identifierName: 'OpenMRS ID',
+            identifierTypeUuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+            identifierUuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+            identifierValue: '100GEJ',
+            initialValue: '100GEJ',
+            preferred: true,
+            required: true,
+            selectedSource: null,
+          },
+        },
+        isDead: false,
+        middleName: 'Johnson',
+        monthsEstimated: 0,
+        patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        relationships: [],
+        telephoneNumber: '',
+        unidentifiedPatient: undefined,
+        yearsEstimated: 0,
+      },
+      expect.anything(),
+      expect.anything(),
+      null,
+      undefined,
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      { patientSaved: false },
+      expect.anything(),
+    );
   });
 });
 

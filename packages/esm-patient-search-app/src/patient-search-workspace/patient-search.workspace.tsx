@@ -4,6 +4,8 @@ import { type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext, type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
+import { inferModeFromSearchParams } from '../mpi/utils';
+import { useSearchParams } from 'react-router-dom';
 
 export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
   initialQuery?: string;
