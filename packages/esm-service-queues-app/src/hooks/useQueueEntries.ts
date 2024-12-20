@@ -23,7 +23,7 @@ export function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCrit
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
   searchParam.append('totalCount', 'true');
-
+ 
   if (searchCriteria) {
     for (let [key, value] of Object.entries(searchCriteria)) {
       if (value != null) {
@@ -31,7 +31,7 @@ export function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCrit
       }
     }
   }
-
+ 
   return `${queueEntryBaseUrl}?${searchParam.toString()}`;
 }
 
@@ -53,7 +53,6 @@ export function useMutateQueueEntries() {
 }
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
-  const initialMount = useRef<boolean>(true);
   const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
   const { data, mutate, ...rest } = useOpenmrsFetchAll<QueueEntry>(pageUrl, {
     swrInfiniteConfig: {
@@ -65,15 +64,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     setPageUrl(getInitialUrl(rep, searchCriteria));
   }, [searchCriteria, rep]);
 
-  useEffect(() => {
-    if (initialMount) {
-      initialMount.current = false;
-      return;
-    }
-    mutate();
-  }, [pageUrl]);
-
-  const queueUpdateListener = useCallback(() => {
+ const queueUpdateListener = useCallback(() => {
     mutate();
   }, []);
 
