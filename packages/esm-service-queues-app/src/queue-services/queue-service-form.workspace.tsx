@@ -41,12 +41,12 @@ const createQueueServiceSchema = (t: TFunction) =>
   });
 
 type QueueServiceFormData = z.infer<ReturnType<typeof createQueueServiceSchema>>;
-const QueueServiceSchema = createQueueServiceSchema(t);
 
 const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const { queueConcepts } = useServiceConcepts();
   const { queueLocations } = useQueueLocations();
+  const QueueServiceSchema = createQueueServiceSchema(t);
 
   const {
     control,
