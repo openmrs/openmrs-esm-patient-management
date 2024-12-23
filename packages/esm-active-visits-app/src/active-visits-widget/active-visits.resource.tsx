@@ -11,6 +11,7 @@ import {
   parseDate,
   restBaseUrl,
   useConfig,
+  useOpenmrsFetchAll,
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -31,39 +32,18 @@ export function useActiveVisits() {
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime,' +
     'encounters:(encounterDatetime,obs:(uuid,concept:(uuid,display),value)))';
 
-  const getUrl = (pageIndex, previousPageData: FetchResponse<VisitResponse>) => {
-    if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
-      return null;
-    }
-
+  const getUrl = () => {
     let url = `${restBaseUrl}/visit?v=${customRepresentation}&`;
     let urlSearchParams = new URLSearchParams();
-
     urlSearchParams.append('includeInactive', 'false');
     urlSearchParams.append('totalCount', 'true');
     urlSearchParams.append('location', `${sessionLocation}`);
-
-    if (pageIndex) {
-      urlSearchParams.append('startIndex', `${pageIndex * 50}`);
-    }
-
     return url + urlSearchParams.toString();
   };
 
-  const {
-    data,
-    error,
-    isLoading,
-    isValidating,
-    size: pageNumber,
-    setSize,
-  } = useSWRInfinite<FetchResponse<VisitResponse>, Error>(sessionLocation ? getUrl : null, openmrsFetch);
-
-  useEffect(() => {
-    if (data && data?.[pageNumber - 1]?.data?.links?.some((link) => link.rel === 'next')) {
-      setSize((currentSize) => currentSize + 1);
-    }
-  }, [data, pageNumber, setSize]);
+  const { data, error, isLoading, isValidating, totalCount } = useOpenmrsFetchAll<Visit>(
+    sessionLocation ? getUrl() : null,
+  );
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => {
     // create base object
@@ -133,16 +113,14 @@ export function useActiveVisits() {
     return activeVisits;
   };
 
-  const formattedActiveVisits: Array<ActiveVisit> = data
-    ? [].concat(...data?.map((res) => res?.data?.results?.map(mapVisitProperties)))
-    : [];
+  const formattedActiveVisits: Array<ActiveVisit> = data ? [].concat(...data?.map(mapVisitProperties)) : [];
 
   return {
     activeVisits: formattedActiveVisits,
     error,
     isLoading,
     isValidating,
-    totalResults: data?.[0]?.data?.totalCount ?? 0,
+    totalResults: !isNaN(totalCount) ? totalCount : 0,
   };
 }
 
