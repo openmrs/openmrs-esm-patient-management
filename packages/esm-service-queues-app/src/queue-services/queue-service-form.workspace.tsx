@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,8 +22,6 @@ import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
-import { t } from 'i18next';
-import type { TFunction } from 'i18next';
 
 const createQueueServiceSchema = (t: TFunction) =>
   z.object({
@@ -32,12 +31,18 @@ const createQueueServiceSchema = (t: TFunction) =>
       })
       .trim()
       .min(1, t('queueNameRequired', 'Queue name is required')),
-    queueConcept: z.string({
-      required_error: t('queueConceptRequired', 'Queue concept is required'),
-    }),
-    userLocation: z.string({
-      required_error: t('queueLocationRequired', 'Queue location is required'),
-    }),
+    queueConcept: z
+      .string({
+        required_error: t('queueConceptRequired', 'Queue concept is required'),
+      })
+      .trim()
+      .min(1, t('queueConceptRequired', 'Queue concept is required')),
+    userLocation: z
+      .string({
+        required_error: t('queueLocationRequired', 'Queue location is required'),
+      })
+      .trim()
+      .min(1, t('queueLocationRequired', 'Queue location is required')),
   });
 
 type QueueServiceFormData = z.infer<ReturnType<typeof createQueueServiceSchema>>;
@@ -50,7 +55,6 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
 
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<QueueServiceFormData>({
@@ -66,9 +70,9 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
     saveQueue(data.queueName, data.queueConcept, '', data.userLocation)
       .then(() => {
         showSnackbar({
-          title: t('addQueue', 'Add queue'),
+          title: t('queueServiceCreated', 'Queue service created'),
           kind: 'success',
-          subtitle: t('queueAddedSuccessfully', 'Queue added successfully'),
+          subtitle: t('queueServiceCreatedSuccessfully', 'Queue service created successfully'),
         });
         closeWorkspace();
         mutate(`${restBaseUrl}/queue?${data.userLocation}`);
@@ -115,12 +119,14 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
                   {...field}
                   labelText={t('selectServiceType', 'Select a service type')}
                   id="queueConcept"
+                  disabled={queueConcepts.length === 0}
                   invalid={!!errors?.queueConcept}
-                  invalidText={errors?.queueConcept?.message}>
-                  {!field.value && <SelectItem text={t('selectServiceType', 'Select a service type')} value="" />}
-                  {queueConcepts.length === 0 && (
-                    <SelectItem text={t('noServicesAvailable', 'No services available')} value="" />
-                  )}
+                  invalidText={
+                    errors?.queueConcept?.message ||
+                    (queueConcepts.length === 0 ? t('noServicesAvailable', 'No services available') : '')
+                  }>
+                  <SelectItem text={t('selectServiceType', 'Select a service type')} value="" />
+
                   {queueConcepts?.length > 0 &&
                     queueConcepts.map((concept) => (
                       <SelectItem key={concept.uuid} text={concept.display} value={concept.uuid}>
