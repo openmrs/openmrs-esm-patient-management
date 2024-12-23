@@ -4,18 +4,17 @@ import type { TFunction } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import {
   Button,
   ButtonSet,
   Column,
   Form,
+  InlineLoading,
   Layer,
   Select,
   SelectItem,
   Stack,
   TextInput,
-  InlineLoading,
 } from '@carbon/react';
 import { mutate } from 'swr';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
@@ -31,7 +30,7 @@ const createQueueServiceSchema = (t: TFunction) =>
       })
       .trim()
       .min(1, t('queueNameRequired', 'Queue name is required')),
-    queueConcept: z
+    queueServiceType: z
       .string({
         required_error: t('queueConceptRequired', 'Queue concept is required'),
       })
@@ -51,6 +50,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
   const { t } = useTranslation();
   const { queueConcepts } = useServiceConcepts();
   const { queueLocations } = useQueueLocations();
+
   const QueueServiceSchema = createQueueServiceSchema(t);
 
   const {
@@ -61,31 +61,34 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
     resolver: zodResolver(QueueServiceSchema),
     defaultValues: {
       queueName: '',
-      queueConcept: '',
+      queueServiceType: '',
       userLocation: '',
     },
   });
 
-  const createQueue = (data: QueueServiceFormData) => {
-    saveQueue(data.queueName, data.queueConcept, '', data.userLocation)
-      .then(() => {
-        showSnackbar({
-          title: t('queueServiceCreated', 'Queue service created'),
-          kind: 'success',
-          subtitle: t('queueServiceCreatedSuccessfully', 'Queue service created successfully'),
-        });
-        closeWorkspace();
-        mutate(`${restBaseUrl}/queue?${data.userLocation}`);
-        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`);
-      })
-      .catch((error) => {
-        showSnackbar({
-          title: t('errorAddingQueue', 'Error adding queue'),
-          kind: 'error',
-          isLowContrast: false,
-          subtitle: error?.message,
-        });
+  const createQueue = async (data: QueueServiceFormData) => {
+    try {
+      await saveQueue(data.queueName, data.queueServiceType, '', data.userLocation);
+
+      showSnackbar({
+        title: t('queueServiceCreated', 'Queue service created'),
+        kind: 'success',
+        subtitle: t('queueServiceCreatedSuccessfully', 'Queue service created successfully'),
       });
+
+      closeWorkspace();
+      await Promise.all([
+        mutate(`${restBaseUrl}/queue?${data.userLocation}`),
+        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`),
+      ]);
+    } catch (error) {
+      showSnackbar({
+        title: t('errorCreatingQueueService', 'Error creating queue service'),
+        kind: 'error',
+        isLowContrast: false,
+        subtitle: error?.responseBody?.message || error?.message,
+      });
+    }
   };
 
   return (
@@ -108,25 +111,19 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
             />
           </Layer>
         </Column>
-
         <Column>
           <Layer className={styles.input}>
             <Controller
-              name="queueConcept"
+              name="queueServiceType"
               control={control}
               render={({ field }) => (
                 <Select
                   {...field}
                   labelText={t('selectServiceType', 'Select a service type')}
-                  id="queueConcept"
-                  disabled={queueConcepts.length === 0}
-                  invalid={!!errors?.queueConcept}
-                  invalidText={
-                    errors?.queueConcept?.message ||
-                    (queueConcepts.length === 0 ? t('noServicesAvailable', 'No services available') : '')
-                  }>
+                  id="queueServiceType"
+                  invalid={!!errors?.queueServiceType}
+                  invalidText={errors?.queueServiceType?.message}>
                   <SelectItem text={t('selectServiceType', 'Select a service type')} value="" />
-
                   {queueConcepts?.length > 0 &&
                     queueConcepts.map((concept) => (
                       <SelectItem key={concept.uuid} text={concept.display} value={concept.uuid}>
@@ -138,7 +135,6 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
             />
           </Layer>
         </Column>
-
         <Column>
           <Layer className={styles.input}>
             <Controller
@@ -146,13 +142,12 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
               control={control}
               render={({ field }) => (
                 <Select
-                  disabled={queueLocations.length === 0}
                   {...field}
                   id="location"
-                  invalid={errors?.userLocation}
+                  invalid={!!errors?.userLocation}
                   invalidText={errors?.userLocation?.message}
                   labelText={t('selectALocation', 'Select a location')}>
-                  {!field.value && <SelectItem text={t('selectALocation', 'Select a location')} value="" />}
+                  <SelectItem text={t('selectALocation', 'Select a location')} value="" />
                   {queueLocations?.length > 0 &&
                     queueLocations.map((location) => (
                       <SelectItem key={location.id} text={location.name} value={location.id}>
