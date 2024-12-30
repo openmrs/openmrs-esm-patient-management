@@ -188,7 +188,7 @@ export function useInitialFormValuesLocal(patientUuid: string): [FormValues, Dis
   return [initialFormValues, setInitialFormValues];
 }
 
-export function useInitialFormValueMpi(patientUuid: string): [FormValues, Dispatch<FormValues>] {
+export function useMpiInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { fieldConfigurations } = useConfig<RegistrationConfig>();
   const { isLoading: isLoadingMpiPatient, patient: mpiPatient } = useMpiPatient(patientUuid);
 
@@ -223,7 +223,7 @@ export function useInitialFormValueMpi(patientUuid: string): [FormValues, Dispat
       if (mpiPatient?.data?.identifier) {
         const identifiers = await getIdentifierFieldValuesFromFhirPatient(
           mpiPatient.data,
-          fieldConfigurations.identifier,
+          fieldConfigurations.identifierMappings,
         );
 
         const values = {

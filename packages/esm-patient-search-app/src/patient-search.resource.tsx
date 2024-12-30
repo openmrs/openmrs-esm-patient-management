@@ -86,9 +86,9 @@ export function useInfinitePatientSearch(
   const getExtUrl = useCallback(
     (
       page,
-      prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
+      prevPageData: FetchResponse<{ results: Array<fhir.Bundle>; link: Array<{ relation: 'prev' | 'next' }> }>,
     ) => {
-      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
+      if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
         return null;
       }
       let url = `${fhirBaseUrl}/Patient/$cr-search?name=${searchQuery}`;
@@ -127,19 +127,42 @@ export function useInfinitePatientSearch(
         : null
       : data?.flatMap((response) => response?.data?.results ?? []) ?? null;
 
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    const isMpiMode = searchMode === 'mpi';
+    const currentIsLoading = isMpiMode ? isLoadingMpi : isLoading;
+    const currentIsValidating = isMpiMode ? isValidatingMpi : isValidating;
+    const currentSize = isMpiMode ? mpiSize : size;
+    const currentSetSize = isMpiMode ? setMpiSize : setSize;
+    const currentError = isMpiMode ? mpiError : error;
+
+    return {
       data: mappedData,
-      isLoading,
-      fetchError: error,
-      hasMore: data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
-      isValidating,
-      setPage: setSize,
-      currentPage: size,
-      totalResults: data?.[0]?.data?.totalCount ?? 0,
-    }),
-    [mappedData, isLoading, error, data, isValidating, setSize, size],
-  );
+      isLoading: currentIsLoading,
+      fetchError: currentError,
+      hasMore: isMpiMode
+        ? mpiData?.at(-1)?.data?.link?.some((link) => link.relation === 'next') ?? false
+        : data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
+      isValidating: currentIsValidating,
+      setPage: currentSetSize,
+      currentPage: currentSize,
+      totalResults: isMpiMode ? mpiData?.[0]?.data?.total ?? 0 : data?.[0]?.data?.totalCount ?? 0,
+    };
+  }, [
+    mappedData,
+    isLoading,
+    isLoadingMpi,
+    error,
+    mpiError,
+    data,
+    mpiData,
+    isValidating,
+    isValidatingMpi,
+    setSize,
+    setMpiSize,
+    size,
+    mpiSize,
+    searchMode,
+  ]);
 }
 
 /**

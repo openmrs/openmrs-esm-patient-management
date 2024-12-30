@@ -112,7 +112,7 @@ jest.mock('./patient-registration.resource', () => ({
 jest.mock('./patient-registration-hooks', () => ({
   ...jest.requireActual('./patient-registration-hooks'),
   useInitialFormValuesLocal: jest.fn().mockReturnValue([{}, jest.fn()]),
-  useInitialFormValueMpi: jest.fn().mockReturnValue([{}, jest.fn()]),
+  useMpiInitialFormValues: jest.fn().mockReturnValue([{}, jest.fn()]),
   useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
   usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
 }));
@@ -182,8 +182,8 @@ const mockOpenmrsConfig: RegistrationConfig = {
         label: 'Female',
       },
     ],
-    identifier: [
-      { identifierTypeSystem: 'MPI OpenMRS ID', identifierTypeUuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f' },
+    identifierMappings: [
+      { fhirIdentifierSystem: 'MPI OpenMRS ID', openmrsIdentifierTypeUuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f' },
     ],
     address: {
       useAddressHierarchy: {

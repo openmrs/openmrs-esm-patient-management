@@ -68,7 +68,7 @@ export interface RegistrationConfig {
         month: number;
       };
     };
-    identifier: [{ identifierTypeSystem: string; identifierTypeUuid: string }];
+    identifierMappings: [{ fhirIdentifierSystem: string; openmrsIdentifierTypeUuid: string }];
     phone: {
       personAttributeUuid: string;
       validation?: {
@@ -352,14 +352,14 @@ export const esmPatientRegistrationSchema = {
         },
       },
     },
-    identifier: {
+    identifierMappings: {
       _type: Type.Array,
       _elements: {
-        identifierTypeSystem: {
+        fhirIdentifierSystem: {
           _type: Type.String,
           _description: 'Identifier system from the fhir server',
         },
-        identifierTypeUuid: {
+        openmrsIdentifierTypeUuid: {
           _type: Type.String,
           _default: null,
           _description: 'Identifier type uuid of OpenMRS to map the identifier system',

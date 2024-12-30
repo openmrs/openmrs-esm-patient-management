@@ -201,11 +201,11 @@ export async function getIdentifierFieldValuesFromFhirPatient(
 
   for (const identifier of patient.identifier) {
     for (const config of identifierConfig) {
-      if (config.identifierTypeSystem !== identifier.system) {
+      if (config.fhirIdentifierSystem !== identifier.system) {
         continue;
       }
 
-      const url = `${restBaseUrl}/patientidentifiertype/${config.identifierTypeUuid}`;
+      const url = `${restBaseUrl}/patientidentifiertype/${config.openmrsIdentifierTypeUuid}`;
 
       promises.push(
         openmrsFetch(url)

@@ -35,9 +35,9 @@ export function mapToOpenMRSPatient(fhirPatients: fhir.Bundle, nameTemplate: str
         deathDate: fhirPatient.deceasedDateTime,
         personName: {
           display: formatName(fhirPatient, nameTemplate),
-          givenName: fhirPatient.name[0].given[0],
-          familyName: fhirPatient.name[0].family,
-          middleName: fhirPatient.name[0].given[1],
+          givenName: fhirPatient?.name?.[0]?.given?.[0],
+          familyName: fhirPatient?.name?.[0]?.family,
+          middleName: fhirPatient?.name?.[0]?.given?.[1],
         },
       },
       attributes: [],
