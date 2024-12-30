@@ -9,6 +9,7 @@ import {
   createErrorHandler,
   interpolateUrl,
   showSnackbar,
+  useAppContext,
   useConfig,
   usePatient,
   usePatientPhoto,
@@ -19,7 +20,12 @@ import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
-import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import {
+  useInitialAddressFieldValues,
+  useMpiInitialFormValues,
+  useInitialFormValuesLocal,
+  usePatientUuidMap,
+} from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
 import { SectionWrapper } from './section/section-wrapper.component';
@@ -39,10 +45,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
+  const sourcePatientId = new URLSearchParams(search).get('sourceRecord');
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
+  const [initialFormValues, setInitialFormValues] = useInitialFormValuesLocal(uuidOfPatientToEdit);
+  const [initialMPIFormValues, setInitialMPIFormValues] = useMpiInitialFormValues(sourcePatientId);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
   const location = currentSession?.sessionLocation?.uuid;
@@ -52,6 +60,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
   const validationSchema = getValidationSchema(config);
+
+  useEffect(() => {
+    if (initialMPIFormValues) {
+      setInitialFormValues(initialMPIFormValues);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialMPIFormValues, setInitialMPIFormValues]);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
