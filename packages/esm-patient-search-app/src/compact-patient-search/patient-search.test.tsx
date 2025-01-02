@@ -5,6 +5,7 @@ import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
+import dayjs from 'dayjs';
 
 const defaultProps = {
   currentPage: 0,
@@ -62,6 +63,8 @@ describe('PatientSearch', () => {
   });
 
   it('renders a list of recently searched patients', () => {
+    const birthdate = '1990-01-01T00:00:00.000+0000';
+    const age = dayjs().diff(birthdate, 'years');
     const mockSearchResults: Array<SearchedPatient> = [
       {
         attributes: [],
@@ -89,9 +92,9 @@ describe('PatientSearch', () => {
           },
         ],
         person: {
-          age: 34,
+          age: age,
           addresses: [],
-          birthdate: '1990-01-01',
+          birthdate: birthdate,
           dead: false,
           deathDate: null,
           gender: 'M',
@@ -114,7 +117,7 @@ describe('PatientSearch', () => {
     });
 
     expect(
-      screen.getByRole('link', { name: /Smith, John Doe Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+      screen.getByRole('link', { name: new RegExp(`Smith, John Doe Male · ${age} yrs · OpenMRS ID 1000NLY`, 'i') }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
