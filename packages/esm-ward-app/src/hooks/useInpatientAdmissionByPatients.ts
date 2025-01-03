@@ -1,13 +1,10 @@
 import { restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type InpatientAdmission } from '../types';
-import useWardLocation from './useWardLocation';
 
 /**
- * fetches a list of inpatient admissions for the current ward location
+ * fetches a list of inpatient admissions (in any location) for the given patients
  */
-export function useInpatientAdmission() {
-  const { location } = useWardLocation();
-
+export function useInpatientAdmissionByPatients(patientUuids: string[]) {
   // prettier-ignore
   const customRepresentation =
     'custom:(visit,' +
@@ -16,11 +13,12 @@ export function useInpatientAdmission() {
     'encounterAssigningToCurrentInpatientLocation:(encounterDatetime),' +
     'currentInpatientRequest:(dispositionLocation,dispositionType,disposition:(uuid,display),dispositionEncounter:(uuid,display),dispositionObsGroup:(uuid,display),visit:(uuid),patient:(uuid)),' +
     'firstAdmissionOrTransferEncounter:(encounterDatetime),' +
+    'currentInpatientLocation' + 
     ')';
 
   return useOpenmrsFetchAll<InpatientAdmission>(
-    location
-      ? `${restBaseUrl}/emrapi/inpatient/admission?currentInpatientLocation=${location.uuid}&v=${customRepresentation}`
+    patientUuids?.length > 0
+      ? `${restBaseUrl}/emrapi/inpatient/admission?patients=${patientUuids.join(',')}&v=${customRepresentation}`
       : null,
   );
 }

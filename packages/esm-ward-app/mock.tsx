@@ -35,6 +35,7 @@ const mockInpatientAdmissionResponse = jest.mocked(useInpatientAdmission).mockRe
   error: undefined,
   mutate: jest.fn(),
   totalCount: mockInpatientAdmissions.length,
+  nextUri: null,
 });
 
 const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturnValue({
@@ -46,6 +47,7 @@ const mockInpatientRequestResponse = jest.mocked(useInpatientRequest).mockReturn
   error: undefined,
   mutate: jest.fn(),
   totalCount: mockInpatientRequests.length,
+  nextUri: null,
 });
 
 export const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).mockReturnValue({
