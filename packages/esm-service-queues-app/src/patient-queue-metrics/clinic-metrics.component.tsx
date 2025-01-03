@@ -67,7 +67,7 @@ function ClinicMetrics() {
             itemToString={(item) =>
               item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
             }
-            label=""
+            label={t('all', 'All')}
             onChange={handleServiceChange}
             size={isDesktop(layout) ? 'sm' : 'lg'}
             titleText=""
