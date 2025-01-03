@@ -78,16 +78,13 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
     <>
       <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
       <ModalBody>
-        <Stack gap={4}>
-          <h5>{queueEntry.display}</h5>
-          {modalInstruction}
-        </Stack>
+        <p>{modalInstruction}</p>
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={isSubmitting} onClick={submitForm}>
+        <Button kind="danger" disabled={isSubmitting} onClick={submitForm}>
           {submitButtonText}
         </Button>
       </ModalFooter>
