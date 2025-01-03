@@ -54,7 +54,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
         <p className={styles.subHeading} id="subHeading">
           {t(
             'clearAllQueueEntriesWarningMessage',
-            'Clearing all queue entries will remove  all the patients from the queues',
+            'Clearing all queue entries will remove all the patients from the queues',
           )}
         </p>
       </ModalBody>
