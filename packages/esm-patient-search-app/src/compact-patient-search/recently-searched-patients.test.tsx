@@ -1,11 +1,11 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { PatientSearchContext } from '../patient-search-context';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import RecentlySearchedPatients from './recently-searched-patients.component';
-import dayjs from 'dayjs';
 
 const defaultProps = {
   currentPage: 0,
