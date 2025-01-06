@@ -154,5 +154,17 @@
       "title": "cancelAdmissionRequest",
       "type": "cancel-admission-request"
     }
+  ],
+  "workspaceGroups": [
+    {
+      "name": "ward-patient",
+      "members": [
+        "ward-patient-workspace",
+        "ward-patient-notes-workspace",
+        "patient-transfer-swap-workspace",
+        "patient-discharge-workspace",
+        "ward-patient-clinical-forms-workspace"
+      ]
+    }
   ]
 }
