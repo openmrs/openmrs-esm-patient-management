@@ -269,7 +269,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 onClose={() => setShowErrorNotification(false)}
                 role="alert"
                 style={{ minWidth: '100%', margin: '0', padding: '0' }}
-                subtitle={t('pleaseFillField', formStateError) + '.'}
+                subtitle={formStateError}
                 title={t('error', 'Error')}
               />
             )}

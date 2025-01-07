@@ -10,17 +10,27 @@ import {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useWardLocation from '../hooks/useWardLocation';
-import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../types';
+import type { DispositionType, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../types';
 import { useAdmitPatient } from '../ward.resource';
 
-interface AdmissionPatientButtonProps {
+interface AdmitPatientButtonProps {
   wardPatient: WardPatient;
+
+  /**
+   * whether to create an admit or transfer encounter for the given patient
+   */
+  dispositionType: DispositionType;
   onAdmitPatientSuccess();
+  disabled?: boolean;
 }
 
-const AdmissionPatientButton: React.FC<AdmissionPatientButtonProps> = ({ wardPatient, onAdmitPatientSuccess }) => {
-  const { patient, inpatientRequest, bed } = wardPatient ?? {};
-  const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
+const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
+  wardPatient,
+  onAdmitPatientSuccess,
+  disabled,
+  dispositionType,
+}) => {
+  const { patient, bed } = wardPatient ?? {};
   const { t } = useTranslation();
   const { location } = useWardLocation();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
@@ -32,7 +42,7 @@ const AdmissionPatientButton: React.FC<AdmissionPatientButtonProps> = ({ wardPat
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
-  // If bed management module is installed and the patient does not currently assigned a bed,
+  // If bed management module is installed and the patient is not currently assigned a bed,
   // open the next form for bed selection. If not, admit patient directly
   // (Note that it is possible, albeit an edge case, for a patient to have a bed assigned while not admitted)
   const onAdmit = () => {
@@ -67,16 +77,13 @@ const AdmissionPatientButton: React.FC<AdmissionPatientButtonProps> = ({ wardPat
     }
   };
 
+  const disabledButton = isLoadingEmrConfiguration || errorFetchingEmrConfiguration || disabled;
   return (
-    <Button
-      kind="ghost"
-      renderIcon={ArrowRightIcon}
-      size={responsiveSize}
-      disabled={isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
-      onClick={onAdmit}>
-      {t('admitPatient', 'Admit patient')}
+    <Button kind="ghost" renderIcon={ArrowRightIcon} size={responsiveSize} disabled={disabledButton} onClick={onAdmit}>
+      {(dispositionType == 'ADMIT' || disabledButton) && t('admitPatient', 'Admit patient')}
+      {dispositionType == 'TRANSFER' && t('transferPatient', 'Transfer patient')}
     </Button>
   );
 };
 
-export default AdmissionPatientButton;
+export default AdmitPatientButton;
