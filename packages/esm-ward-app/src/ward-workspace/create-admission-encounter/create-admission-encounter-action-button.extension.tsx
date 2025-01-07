@@ -5,6 +5,10 @@ import { type CreateAdmissionEncounterWorkspaceProps } from './create-admission-
 
 function CreateAdmissionRequestActionButton() {
   const { t } = useTranslation();
+
+  // TODO: this is an attempt to save the previous search term for the 
+  // "Back to patient search" button, but it doesn't work. See:
+  // https://openmrs.atlassian.net/browse/O3-4300
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // See PatientSearchWorkspaceProps in patient-search-app
