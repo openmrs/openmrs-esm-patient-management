@@ -35,6 +35,13 @@ function ClinicMetrics() {
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
   const { waitTime } = useAverageWaitTime(currentService?.serviceUuid, '');
 
+  const defaultServiceItem = {
+    display: `${t('all', 'All')}`,
+    uuid: '',
+  };
+
+  const serviceItems = [defaultServiceItem, ...(services ?? [])];
+
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem.display);
     if (selectedItem.uuid == undefined) {
@@ -63,11 +70,12 @@ function ClinicMetrics() {
           locationUuid={currentQueueLocation}>
           <Dropdown
             id="inline"
-            items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
+            initialSelectedItem={defaultServiceItem}
+            items={serviceItems}
             itemToString={(item) =>
               item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
             }
-            label={t('all', 'All')}
+            label=""
             onChange={handleServiceChange}
             size={isDesktop(layout) ? 'sm' : 'lg'}
             titleText=""
