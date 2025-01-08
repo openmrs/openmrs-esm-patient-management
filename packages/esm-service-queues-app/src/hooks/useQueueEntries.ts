@@ -23,7 +23,7 @@ export function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCrit
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
   searchParam.append('totalCount', 'true');
- 
+
   if (searchCriteria) {
     for (let [key, value] of Object.entries(searchCriteria)) {
       if (value != null) {
@@ -31,9 +31,11 @@ export function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCrit
       }
     }
   }
- 
+
   return `${queueEntryBaseUrl}?${searchParam.toString()}`;
 }
+
+let queueEntryMutates: ReturnType<typeof useQueueEntries>['mutate'][] = [];
 
 export function useMutateQueueEntries() {
   const { mutate } = useSWRConfig();
@@ -41,12 +43,11 @@ export function useMutateQueueEntries() {
   return {
     mutateQueueEntries: () => {
       return mutate((key) => {
-        return (
-          typeof key === 'string' &&
-          (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
-        );
+        return typeof key === 'string' && key.includes(`${restBaseUrl}/visit-queue-entry`);
       }).then(() => {
-        window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+        for (const mutateQueueEntry of queueEntryMutates) {
+          mutateQueueEntry();
+        }
       });
     },
   };
@@ -64,16 +65,12 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     setPageUrl(getInitialUrl(rep, searchCriteria));
   }, [searchCriteria, rep]);
 
- const queueUpdateListener = useCallback(() => {
-    mutate();
-  }, []);
-
   useEffect(() => {
-    window.addEventListener('queue-entry-updated', queueUpdateListener);
+    queueEntryMutates.push(mutate);
     return () => {
-      window.removeEventListener('queue-entry-updated', queueUpdateListener);
+      queueEntryMutates = queueEntryMutates.filter((mutateQueueEntry) => mutate != mutateQueueEntry);
     };
-  }, [queueUpdateListener]);
+  }, [mutate]);
 
   return {
     queueEntries: data,
