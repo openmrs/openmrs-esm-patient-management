@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-active-visits-app",
-  "version": "8.0.2",
+  "version": "8.1.1",
   "description": "Active visits widget microfrontend for O3",
   "browser": "dist/openmrs-esm-active-visits-app.js",
   "main": "src/index.ts",
@@ -41,7 +41,7 @@
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-framework": "6.x",
     "dayjs": "1.x",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",

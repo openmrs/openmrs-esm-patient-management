@@ -12,7 +12,12 @@ export function useServiceConcepts() {
   };
 }
 
-export function saveQueue(queueName: string, queueConcept: string, queueDescription: string, queueLocation: string) {
+export function saveQueue(
+  queueName: string,
+  queueServiceType: string,
+  queueDescription?: string,
+  queueLocation?: string,
+) {
   const abortController = new AbortController();
 
   return openmrsFetch(`${restBaseUrl}/queue`, {
@@ -24,7 +29,7 @@ export function saveQueue(queueName: string, queueConcept: string, queueDescript
     body: {
       name: queueName,
       description: queueDescription,
-      service: { uuid: queueConcept },
+      service: { uuid: queueServiceType },
       location: {
         uuid: queueLocation,
       },

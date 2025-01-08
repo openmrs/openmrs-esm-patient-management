@@ -210,7 +210,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={modalTitle} />
+      <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>

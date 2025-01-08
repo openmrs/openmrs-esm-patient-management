@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
 import { type BedType, type BedFormData } from '../types';
+import styles from '../modals.scss';
 
 interface BedAdministrationFormProps {
   allLocations: Location[];
@@ -115,7 +116,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   return (
     // TODO: Port this over to the modal system or create individual modals for each form
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+      <ModalHeader className={styles.modalHeader} title={headerTitle} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -268,7 +269,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 onClose={() => setShowErrorNotification(false)}
                 role="alert"
                 style={{ minWidth: '100%', margin: '0', padding: '0' }}
-                subtitle={t('pleaseFillField', formStateError) + '.'}
+                subtitle={formStateError}
                 title={t('error', 'Error')}
               />
             )}

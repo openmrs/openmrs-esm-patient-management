@@ -47,7 +47,7 @@
   "newPatientListNameLabel": "列表名称",
   "nextPage": "下一页",
   "noMatchingLists": "没有匹配的列表可显示",
-  "noMatchingListsFound": "No matching lists found",
+  "noMatchingListsFound": "未找到匹配列表",
   "noMatchingPatients": "没有匹配的患者可显示",
   "noOfPatients": "患者数量",
   "noPatientsInList": "该列表中没有患者",
@@ -76,7 +76,7 @@
   "successfullyAdded": "成功添加",
   "systemDefined": "系统定义",
   "systemLists": "系统列表",
-  "trySearchingForADifferentList": "Try searching for a different list",
+  "trySearchingForADifferentList": "尝试搜索不同的列表",
   "unstarList": "取消星标",
   "updated": "已更新",
   "userDefined": "用户定义"

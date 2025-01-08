@@ -36,7 +36,7 @@ $openmrs-background-grey: #ededed;
   display: flex;
   flex-flow: row wrap;
   gap: layout.$spacing-05;
-  align-items: center;
+  align-items: start;
 }
 
 .dateTimeFields {
