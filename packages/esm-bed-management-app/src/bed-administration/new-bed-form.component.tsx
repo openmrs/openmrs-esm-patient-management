@@ -11,9 +11,10 @@ interface NewBedFormProps {
   mutate: () => void;
   onModalChange: (showModal: boolean) => void;
   showModal: boolean;
+  defaultLocation?: { display: string; uuid: string };
 }
 
-const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate }) => {
+const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate, defaultLocation }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
@@ -28,10 +29,7 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
     column: 0,
     description: '',
     id: 0,
-    location: {
-      display: '',
-      uuid: '',
-    },
+    location: defaultLocation || { display: '', uuid: '' },
     row: 0,
     status: null,
     uuid: '',
