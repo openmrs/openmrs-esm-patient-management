@@ -10,11 +10,14 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import useQueueServices from '../hooks/useQueueService';
 import styles from './clinic-metrics.scss';
+import { type Concept } from '../types';
 
 export interface Service {
   uuid: string;
   display: string;
 }
+
+type ServiceListItem = Service | Concept;
 
 function ClinicMetrics() {
   const { t } = useTranslation();
@@ -35,12 +38,12 @@ function ClinicMetrics() {
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
   const { waitTime } = useAverageWaitTime(currentService?.serviceUuid, '');
 
-  const defaultServiceItem = {
+  const defaultServiceItem: Service = {
     display: `${t('all', 'All')}`,
     uuid: '',
   };
 
-  const serviceItems = [defaultServiceItem, ...(services ?? [])];
+  const serviceItems: ServiceListItem[] = [defaultServiceItem, ...(services ?? [])];
 
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem.display);
