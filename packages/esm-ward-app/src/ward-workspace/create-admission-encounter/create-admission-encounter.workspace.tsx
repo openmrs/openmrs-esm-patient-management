@@ -96,6 +96,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
               <InlineNotification
                 kind="warning"
                 lowContrast={true}
+                hideCloseButton={true}
                 title={t('patientAlreadyAdmittedToCurrentLocation', 'Patient already admitted to current location')}
               />
             )}
@@ -103,6 +104,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
               <InlineNotification
                 kind="warning"
                 lowContrast={true}
+                hideCloseButton={true}
                 title={t(
                   'patientCurrentlyAdmittedToOtherLocation',
                   'Patient currently admitted to location {{location}}',
@@ -116,6 +118,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
               <InlineNotification
                 kind="warning"
                 lowContrast={true}
+                hideCloseButton={true}
                 title={t(
                   'patientHasPendingAdmissionRequest',
                   'Patient already has a pending admission request to location {{location}}',
