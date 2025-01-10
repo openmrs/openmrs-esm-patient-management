@@ -25,6 +25,10 @@
   grid-column: span 2;
 }
 
+.tablist {
+  padding: 0 layout.$spacing-05;
+}
+
 .tab {
   min-width: 8.875rem;
 
