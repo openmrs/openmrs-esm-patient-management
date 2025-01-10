@@ -3,7 +3,7 @@ import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
 import rootComponent from './root.component';
-import addPatientLinkComponent from './add-patient-link';
+import addPatientLinkComponent from './add-patient-link.component';
 import editPatientDetailsButtonComponent from './widgets/edit-patient-details-button.component';
 import { PatientPhotoExtension } from './patient-photo.extension';
 
