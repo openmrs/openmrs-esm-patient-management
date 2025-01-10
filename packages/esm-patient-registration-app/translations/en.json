@@ -1,4 +1,5 @@
 {
+  "addPatient": "Add Patient",
   "addRelationshipButtonText": "Add Relationship",
   "addressHeader": "Address",
   "allFieldsRequiredText": "All fields are required unless marked optional",
