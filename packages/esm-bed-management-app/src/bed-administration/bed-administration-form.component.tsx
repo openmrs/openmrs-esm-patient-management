@@ -86,6 +86,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     handleSubmit,
     control,
     formState: { isDirty },
+    setValue
   } = useForm<BedAdministrationData>({
     mode: 'all',
     resolver: zodResolver(BedAdministrationSchema),
@@ -203,7 +204,15 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     items={allLocations}
                     itemToString={(location) => location?.display ?? ''}
                     label={t('location', 'Location')}
-                    onBlur={onBlur}
+                    /*
+                      TODO: ComboBox bug does not trigger onChange below @carbon/react version 1.72 (https://github.com/carbon-design-system/carbon/issues/18145#issuecomment-2521936772)
+                      onBlur shall be refactored to onBlur={onBlur}
+                    */
+                    onBlur={(event) => {
+                      const selectedLocation = allLocations.find((element) => element.display === event.target.value);
+                      setValue('location', { display: selectedLocation.display, uuid: selectedLocation.uuid });
+                      onBlur();
+                    }}
                     onChange={({ selectedItem }) => onChange(selectedItem)}
                     placeholder={t('selectBedLocation', 'Select a bed location')}
                     ref={ref}
@@ -232,8 +241,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     {occupancyStatuses.map((occupancyStatus, index) => (
                       <SelectItem
                         key={`occupancyStatus-${index}`}
-                        text={t('occupancyStatus', `${occupancyStatus}`)}
-                        value={t('occupancyStatus', `${occupancyStatus}`)}
+                        text={t(`occupancyStatus${occupancyStatus}`, `${occupancyStatus}`)}
+                        value={t(`occupancyStatus${occupancyStatus}`, `${occupancyStatus}`)}
                       />
                     ))}
                   </Select>
