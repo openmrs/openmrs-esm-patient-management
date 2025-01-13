@@ -87,22 +87,19 @@
       "component": "admissionRequestWorkspace",
       "title": "admissionRequests",
       "type": "pending-admission-requests",
-      "width": "wider",
-      "groups": ["ward-patient-admission-requests"]
+      "width": "wider"
     },{
       "name": "create-admission-encounter-workspace",
       "component": "createAdmissionEncounterWorkspace",
       "title": "admitPatient",
       "type": "patient-search-workspace",
-      "width": "wider",
-      "groups": ["ward-patient-admission-requests"]
+      "width": "wider"
     },
     {
       "name": "ward-patient-notes-workspace",
       "component": "wardPatientNotesWorkspace",
       "type": "ward-patient-notes",
-      "title": "inpatientNotesWorkspaceTitle",
-      "groups": ["ward-patient"]
+      "title": "inpatientNotesWorkspaceTitle"
 
     },
     {
@@ -116,15 +113,13 @@
       "component": "wardPatientWorkspace",
       "type": "ward",
       "title": "Ward patient",
-      "width": "extra-wide",
-      "groups": ["ward-patient"]
+      "width": "extra-wide"
     },
     {
       "name": "patient-transfer-swap-workspace",
       "component": "patientTransferAndSwapWorkspace",
       "title": "transfers",
-      "type": "transfer-swap-bed-form",
-      "groups": ["ward-patient"]
+      "type": "transfer-swap-bed-form"
 
     },
     {
@@ -137,22 +132,39 @@
       "name": "patient-discharge-workspace",
       "component": "patientDischargeWorkspace",
       "title": "discharge",
-      "type": "ward-patient-discharge",
-      "groups": ["ward-patient"]
+      "type": "ward-patient-discharge"
     },
     {
       "name": "ward-patient-clinical-forms-workspace",
       "component": "patientClinicalFormsWorkspace",
       "title": "clinicalForms",
       "type": "ward-patient-clinical-forms",
-      "width": "wider",
-      "groups": ["ward-patient"]
+      "width": "wider"
     },
     {
       "name": "cancel-admission-request-workspace",
       "component": "cancelAdmissionRequestWorkspace",
       "title": "cancelAdmissionRequest",
       "type": "cancel-admission-request"
+    }
+  ],
+  "workspaceGroups": [
+    {
+      "name": "ward-patient",
+      "members": [
+        "ward-patient-workspace",
+        "ward-patient-notes-workspace",
+        "patient-transfer-swap-workspace",
+        "patient-discharge-workspace",
+        "ward-patient-clinical-forms-workspace"
+      ]
+    },
+    {
+      "name": "ward-patient-admission-requests",
+      "members": [
+        "admission-requests-workspace",
+        "create-admission-encounter-workspace"
+      ]
     }
   ]
 }
