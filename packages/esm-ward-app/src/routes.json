@@ -79,6 +79,11 @@
       "component": "maternalWardView",
       "name": "maternal-ward",
       "slot": "maternal-ward"
+    },
+    {
+      "component": "wardPatientWorkspaceBanner",
+      "name": "ward-patient-workspace-banner",
+      "slot": "ward-workspace-patient-banner-slot"
     }
   ],
   "workspaces": [
