@@ -11,8 +11,8 @@ export default function Root() {
 
   return (
     <HeaderGlobalAction
-      aria-label={t('addPatient', 'Add Patient')}
-      aria-labelledby={t('addPatient', 'Add Patient')}
+      aria-label={t('addPatient', 'Add patient')}
+      aria-labelledby={t('addPatient', 'Add patient')}
       enterDelayMs={500}
       name="AddPatientIcon"
       onClick={addPatient}
