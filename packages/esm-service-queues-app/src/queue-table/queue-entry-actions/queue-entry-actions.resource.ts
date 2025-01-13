@@ -1,4 +1,4 @@
-import { openmrsFetch, restBaseUrl, type Location } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, type Location } from '@openmrs/esm-framework';
 import { type Concept, type QueueEntry } from '../../types';
 
 // see QueueEntryTransition.java in openmrs-module-queue
@@ -20,7 +20,10 @@ interface TransitionQueueEntryParams {
  * @param abortController
  * @returns
  */
-export function transitionQueueEntry(params: TransitionQueueEntryParams, abortController?: AbortController) {
+export function transitionQueueEntry(
+  params: TransitionQueueEntryParams,
+  abortController?: AbortController,
+): Promise<FetchResponse<QueueEntry>> {
   return openmrsFetch(`${restBaseUrl}/queue-entry/transition`, {
     method: 'POST',
     headers: {
