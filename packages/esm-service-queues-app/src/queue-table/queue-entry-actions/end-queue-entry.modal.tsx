@@ -11,18 +11,12 @@ interface EndQueueEntryModalProps {
 
 const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
+  const patient = queueEntry.display;
+  const queue = queueEntry.queue.display;
   const modalInstruction = (
-    <Trans
-      i18nKey="confirmRemovePatientFromQueue"
-      defaults="Are you sure you want to remove <strong>{patient}</strong> from {queue}?"
-      values={{
-        patient: queueEntry.display,
-        queue: queueEntry.queue.display,
-      }}
-      components={{
-        strong: <strong />,
-      }}
-    />
+    <Trans i18nKey="confirmRemovePatientFromQueue">
+      Are you sure you want to remove <strong>{{ patient } as any}</strong> from {{ queue }}?
+    </Trans>
   );
 
   return (
