@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   InlineLoading,
   MultiSelect,
@@ -34,6 +32,7 @@ import {
   useSession,
   type DefaultWorkspaceProps,
   type FetchResponse,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
@@ -613,32 +612,26 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     control={control}
                     render={({ field: { onChange, value } }) => (
                       <ResponsiveWrapper>
-                        <DatePicker
-                          datePickerType="range"
-                          dateFormat={datePickerFormat}
-                          value={[value.startDate, value.recurringPatternEndDate]}
-                          onChange={([startDate, endDate]) => {
+                        <OpenmrsDatePicker
+                          value={watch('appointmentDateTime').startDateText}
+                          onChange={(startDate) => {
+                            const endDate = watch('appointmentDateTime').recurringPatternEndDateText;
                             onChange({
                               startDate: new Date(startDate),
                               recurringPatternEndDate: new Date(endDate),
                               recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
                               startDateText: dayjs(new Date(startDate)).format(dateFormat),
                             });
-                          }}>
-                          <DatePickerInput
-                            id="startDatePickerInput"
-                            labelText={t('startDate', 'Start date')}
-                            style={{ width: '100%' }}
-                            value={watch('appointmentDateTime').startDateText}
-                          />
-                          <DatePickerInput
-                            id="endDatePickerInput"
-                            labelText={t('endDate', 'End date')}
-                            style={{ width: '100%' }}
-                            placeholder={datePickerPlaceHolder}
-                            value={watch('appointmentDateTime').recurringPatternEndDateText}
-                          />
-                        </DatePicker>
+                          }}
+                          id="startDatePickerInput"
+                          labelText={t('startDate', 'Start date')}
+                        />
+
+                        <OpenmrsDatePicker
+                          id="endDatePickerInput"
+                          labelText={t('endDate', 'End date')}
+                          value={watch('appointmentDateTime').recurringPatternEndDateText}
+                        />
                       </ResponsiveWrapper>
                     )}
                   />
@@ -737,23 +730,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     name="appointmentDateTime"
                     control={control}
                     render={({ field: { onChange, value, ref } }) => (
-                      <DatePicker
-                        datePickerType="single"
-                        dateFormat={datePickerFormat}
+                      <OpenmrsDatePicker
                         value={value?.startDate}
-                        onChange={([date]) => {
+                        onChange={(date) => {
                           if (date) {
                             onChange({ ...value, startDate: date });
                           }
-                        }}>
-                        <DatePickerInput
-                          id="datePickerInput"
-                          labelText={t('date', 'Date')}
-                          style={{ width: '100%' }}
-                          placeholder={datePickerPlaceHolder}
-                          ref={ref}
-                        />
-                      </DatePicker>
+                        }}
+                        id="datePickerInput"
+                        labelText={t('date', 'Date')}
+                        ref={ref}
+                      />
                     )}
                   />
                 </ResponsiveWrapper>
@@ -844,22 +831,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               control={control}
               render={({ field: { onChange, value, ref } }) => (
                 <div style={{ width: '100%' }}>
-                  <DatePicker
-                    datePickerType="single"
-                    dateFormat={datePickerFormat}
+                  <OpenmrsDatePicker
                     invalid={!!errors?.dateAppointmentScheduled}
                     invalidText={errors?.dateAppointmentScheduled?.message}
                     maxDate={new Date().toISOString()}
-                    onChange={([date]) => onChange(date)}
-                    value={value}>
-                    <DatePickerInput
-                      id="dateAppointmentScheduledPickerInput"
-                      labelText={t('dateScheduledDetail', 'Date appointment issued')}
-                      style={{ width: '100%' }}
-                      placeholder={datePickerPlaceHolder}
-                      ref={ref}
-                    />
-                  </DatePicker>
+                    onChange={(date) => onChange(date)}
+                    value={value}
+                    id="dateAppointmentScheduledPickerInput"
+                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    ref={ref}
+                  />
                 </div>
               )}
             />
