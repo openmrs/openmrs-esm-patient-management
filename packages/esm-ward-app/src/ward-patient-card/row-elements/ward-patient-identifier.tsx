@@ -23,7 +23,12 @@ const WardPatientIdentifier: React.FC<WardPatientIdentifierProps> = ({ id, patie
   }));
 
   return (
-    <PatientBannerPatientIdentifiers identifiers={fhirIdentifiers} showIdentifierLabel={config?.showIdentifierLabel} />
+    <div>
+      <PatientBannerPatientIdentifiers
+        identifiers={fhirIdentifiers}
+        showIdentifierLabel={config?.showIdentifierLabel}
+      />
+    </div>
   );
 };
 

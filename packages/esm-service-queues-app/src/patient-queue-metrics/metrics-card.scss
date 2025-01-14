@@ -46,10 +46,16 @@
 .headerLabelContainer {
   display: flex;
   height: layout.$spacing-07;
+  align-items: center;
 
   :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
-    margin-top: -(layout.$spacing-04);
+
+    label {
+      @include type.type-style('heading-compact-01');
+      color: $text-02;
+      margin-right: layout.$spacing-03;
+    }
   }
 
   :global(.cds--list-box__menu-icon) {

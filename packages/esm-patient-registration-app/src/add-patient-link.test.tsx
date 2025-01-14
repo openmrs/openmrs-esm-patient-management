@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
-import Root from './add-patient-link';
+import Root from './add-patient-link.extension';
 
 const mockNavigate = jest.mocked(navigate);
 
