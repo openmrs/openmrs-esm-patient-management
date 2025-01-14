@@ -9,6 +9,7 @@ import {
   useConfig,
   useLocations,
   useSession,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockUseAppointmentServiceData, mockSession, mockLocations, mockProviders } from '__mocks__';
@@ -16,6 +17,7 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
 import AppointmentForm from './appointments-form.component';
+import dayjs from 'dayjs';
 
 const defaultProps = {
   context: 'creating',
@@ -33,6 +35,25 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseProviders = jest.mocked(useProviders);
 const mockUseSession = jest.mocked(useSession);
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        aria-label={labelText.toString()}
+        id={id}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value).toDate());
+        }}
+        type="text"
+        // @ts-ignore
+        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+      />
+    </>
+  );
+});
 
 jest.mock('./appointments-form.resource', () => ({
   ...jest.requireActual('./appointments-form.resource'),
