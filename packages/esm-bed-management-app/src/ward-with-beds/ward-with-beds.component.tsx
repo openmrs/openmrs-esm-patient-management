@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
 import { navigate, usePagination } from '@openmrs/esm-framework';
-import { useBedsForLocation, useLocationName, useBedsGroupedByLocation } from '../summary/summary.resource';
+import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
 import NewBedForm from '../bed-administration/new-bed-form.component';
 import Header from '../header/header.component';
 import styles from './ward-with-beds.scss';
@@ -118,17 +118,17 @@ const WardWithBeds: React.FC = () => {
               }>
               <span>Return to summary</span>
             </Button>
-            <span className={styles.backgroundDataFetchingIndicator}>
+            <span>
               <span>{isValidating ? <InlineLoading /> : null}</span>
             </span>
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               onClick={() => setShowAddBedModal(true)}>
-              {t('addBed', 'Add bed')}
+              <span>{t('addBed', 'Add bed')}</span>
             </Button>
           </div>
-          <div className={styles.widgetCard}>
+          <div>
             {showAddBedModal ? (
               <NewBedForm
                 mutate={mutate}

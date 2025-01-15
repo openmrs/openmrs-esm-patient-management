@@ -92,7 +92,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id} data-testid={cell.id}>
-                          {cell.value}
+                          {1}
                         </TableCell>
                       ))}
                     </TableExpandRow>
@@ -117,9 +117,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   ) : (
     <div className={styles.encounterEmptyState}>
       <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
-      <p className={classNames(styles.bodyLong01, styles.text02)}>
-        {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
-      </p>
+      <p className={classNames(styles.bodyLong01, styles.text02)}>'Hello'</p>
     </div>
   );
 };
