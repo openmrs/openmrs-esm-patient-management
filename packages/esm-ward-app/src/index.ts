@@ -111,7 +111,7 @@ export const createAdmissionEncounterWorkspaceSideRailIcon = getAsyncLifecycle(
 export const createAdmissionEncounterWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/create-admission-encounter/create-admission-encounter.workspace'),
   options,
-)
+);
 
 export const defaultWardView = getAsyncLifecycle(
   () => import('./ward-view/default-ward/default-ward-view.component'),
@@ -120,6 +120,11 @@ export const defaultWardView = getAsyncLifecycle(
 
 export const maternalWardView = getAsyncLifecycle(
   () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  options,
+);
+
+export const wardPatientWorkspaceBanner = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-banner/patient-banner.component'),
   options,
 );
 
