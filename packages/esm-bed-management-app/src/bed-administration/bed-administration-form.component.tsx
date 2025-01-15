@@ -205,8 +205,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     itemToString={(location) => location?.display ?? ''}
                     label={t('location', 'Location')}
                     /*
-                      TODO: ComboBox bug does not trigger onChange below @carbon/react version 1.72 (https://github.com/carbon-design-system/carbon/issues/18145#issuecomment-2521936772)
-                      onBlur shall be refactored to onBlur={onBlur}
+                      TODO: onBlur shall be refactored to onBlur={onBlur} if esm-core has @carbon/react version 1.72+
+                      (ComboBox bug does not trigger onChange below mentioned version in production build - see https://github.com/carbon-design-system/carbon/issues/18145#issuecomment-2521936772)
                     */
                     onBlur={(event) => {
                       const selectedLocation = allLocations.find((element) => element.display === event.target.value);
