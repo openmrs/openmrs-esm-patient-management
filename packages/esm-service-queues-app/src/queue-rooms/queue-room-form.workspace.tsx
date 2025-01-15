@@ -1,164 +1,170 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Column,
-  Form,
-  Layer,
-  Stack,
-  TextInput,
-  Select,
-  SelectItem,
-  ButtonSet,
-  Button,
-  InlineNotification,
-} from '@carbon/react';
+import { Column, Form, Layer, Stack, TextInput, Select, SelectItem, ButtonSet, Button } from '@carbon/react';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { saveQueueRoom } from './queue-room.resource';
 import styles from './queue-room-form.scss';
 import { useQueues } from '../hooks/useQueues';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import type { TFunction } from 'react-i18next';
+
+const createQueueRoomSchema = (t: TFunction) =>
+  z.object({
+    queueRoomName: z
+      .string({
+        required_error: t('missingQueueRoomName', 'Missing queue room name'),
+      })
+      .trim()
+      .min(1, t('missingQueueRoomName', 'Missing queue room name')),
+    queueRoomService: z
+      .string({
+        required_error: t('missingQueueRoomService', 'Missing queue room service'),
+      })
+      .trim()
+      .min(1, t('missingQueueRoomService', 'Missing queue room service')),
+    selectedQueueLocation: z
+      .string({
+        required_error: t('queueLocationRequired', 'Queue location is required'),
+      })
+      .trim()
+      .min(1, t('queueLocationRequired', 'Queue location is required')),
+  });
+
+type QueueRoomFormData = z.infer<ReturnType<typeof createQueueRoomSchema>>;
 
 const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [queueRoomName, setQueueRoomName] = useState('');
-  const [queueRoomService, setQueueRoomService] = useState('');
-  const [isMissingRoomName, setMissingRoomName] = useState(false);
-  const [isMissingQueueRoomService, setMissingQueueRoomService] = useState(false);
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<QueueRoomFormData>({
+    resolver: zodResolver(createQueueRoomSchema(t)),
+    defaultValues: {
+      queueRoomName: '',
+      queueRoomService: '',
+      selectedQueueLocation: '',
+    },
+  });
+
+  const selectedQueueLocation = watch('selectedQueueLocation');
   const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
 
-  const createQueueRoom = useCallback(
-    (event) => {
-      event.preventDefault();
+  const onSubmit = async (data: QueueRoomFormData) => {
+    try {
+      // here doubt why queueName twice // name: string, description: string, queueUuid: string
+      const response = await saveQueueRoom(data.queueRoomName, data.queueRoomName, data.queueRoomService);
 
-      if (!queueRoomName) {
-        setMissingRoomName(true);
-        return;
+      if (response.status === 201) {
+        showSnackbar({
+          title: t('addQueueRoom', 'Add queue room'),
+          kind: 'success',
+          subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
+        });
+        closeWorkspace();
+        mutate(`${restBaseUrl}/queueroom`);
       }
-      if (!queueRoomService) {
-        setMissingQueueRoomService(true);
-        return;
-      }
-
-      setMissingRoomName(false);
-      setMissingQueueRoomService(false);
-
-      saveQueueRoom(queueRoomName, queueRoomName, queueRoomService).then(
-        ({ status }) => {
-          if (status === 201) {
-            showSnackbar({
-              title: t('addQueueRoom', 'Add queue room'),
-              kind: 'success',
-              subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
-            });
-            closeWorkspace();
-            mutate(`${restBaseUrl}/queueroom`);
-          }
-        },
-        (error) => {
-          showSnackbar({
-            title: t('errorAddingQueueRoom', 'Error adding queue room'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: error?.message,
-          });
-        },
-      );
-    },
-    [queueRoomName, queueRoomService, t, closeWorkspace],
-  );
+    } catch (error) {
+      showSnackbar({
+        title: t('errorAddingQueueRoom', 'Error adding queue room'),
+        kind: 'error',
+        isLowContrast: false,
+        subtitle: error?.message,
+      });
+    }
+  };
 
   return (
-    <Form onSubmit={createQueueRoom} className={styles.form}>
+    <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Layer className={styles.input}>
-            <TextInput
-              id="queueRoomName"
-              invalidText="Required"
-              labelText={t('queueRoomName', 'Queue room name')}
-              onChange={(event) => setQueueRoomName(event.target.value)}
-              value={queueRoomName}
+            <Controller
+              control={control}
+              name="queueRoomName"
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  id="queueRoomName"
+                  invalidText={errors.queueRoomName?.message}
+                  invalid={!!errors.queueRoomName}
+                  labelText={t('queueRoomName', 'Queue room name')}
+                />
+              )}
             />
-            {isMissingRoomName && (
-              <section>
-                <InlineNotification
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast={true}
-                  title={t('missingQueueRoomName', 'Missing queue room name')}
-                  subtitle={t('addQueueRoomName', 'Please add a queue room name')}
-                />
-              </section>
-            )}
           </Layer>
         </Column>
 
         <Column>
           <Layer className={styles.input}>
-            <section className={styles.section}>
-              <Select
-                labelText={t('selectQueueLocation', 'Select a queue location')}
-                id="location"
-                invalidText="Required"
-                value={selectedQueueLocation}
-                onChange={(event) => {
-                  setSelectedQueueLocation(event.target.value);
-                }}>
-                {!selectedQueueLocation ? (
+            <Controller
+              name="selectedQueueLocation"
+              control={control}
+              render={({ field: { onChange, value, ...field } }) => (
+                <Select
+                  {...field}
+                  value={value || ''}
+                  onChange={(e) => {
+                    onChange(e.target.value);
+                  }}
+                  labelText={t('selectQueueLocation', 'Select a queue location')}
+                  id="location"
+                  invalidText={errors.selectedQueueLocation?.message}
+                  invalid={!!errors.selectedQueueLocation}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                ) : null}
-                {queueLocations?.length > 0 &&
-                  queueLocations.map((location) => (
-                    <SelectItem key={location.id} text={location.name} value={location.id}>
-                      {location.name}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </section>
+                  {queueLocations.length > 0 &&
+                    queueLocations?.map((location) => (
+                      <SelectItem key={location.id} text={location.name} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
+            />
           </Layer>
         </Column>
 
         <Column>
           <Layer className={styles.input}>
-            <section className={styles.section}>
-              <Select
-                labelText={t('selectService', 'Select a service')}
-                id="service"
-                invalidText="Required"
-                value={queueRoomService}
-                onChange={(event) => setQueueRoomService(event.target.value)}>
-                {!queueRoomService ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
-                {queues?.length > 0 &&
-                  queues.map((service) => (
-                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                      {service.display}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </section>
-            {isMissingQueueRoomService && (
-              <section>
-                <InlineNotification
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast={true}
-                  title={t('missingQueueRoomService', 'Missing queue room service')}
-                  subtitle={t('addQueueRoomService', 'Please add a queue room service')}
-                />
-              </section>
-            )}
+            <Controller
+              name="queueRoomService"
+              control={control}
+              render={({ field: { onChange, value, ...field } }) => (
+                <Select
+                  {...field}
+                  value={value || ''}
+                  onChange={(e) => {
+                    onChange(e.target.value);
+                  }}
+                  labelText={t('selectService', 'Select a service')}
+                  id="service"
+                  invalidText={errors.queueRoomService?.message}
+                  invalid={!!errors.queueRoomService}>
+                  <SelectItem text={t('selectService', 'Select a service')} value="" />
+                  {queues.length > 0 &&
+                    queues?.map((service) => (
+                      <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                        {service.display}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
+            />
           </Layer>
         </Column>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
+        <Button className={styles.button} kind="primary" type="submit" disabled={isSubmitting}>
           {t('save', 'Save')}
         </Button>
       </ButtonSet>
