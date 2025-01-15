@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
@@ -20,6 +21,8 @@ const defaultProps = {
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 describe('RecentlySearchedPatients', () => {
+  const birthdate = '1990-01-01T00:00:00.000+0000';
+  const age = dayjs().diff(birthdate, 'years');
   const mockSearchResults: Array<SearchedPatient> = [
     {
       attributes: [],
@@ -47,9 +50,9 @@ describe('RecentlySearchedPatients', () => {
         },
       ],
       person: {
-        age: 34,
+        age,
         addresses: [],
-        birthdate: '1990-01-01',
+        birthdate,
         dead: false,
         deathDate: null,
         gender: 'M',
@@ -114,7 +117,7 @@ describe('RecentlySearchedPatients', () => {
     });
 
     expect(
-      screen.getByRole('link', { name: /Smith, John Doe Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+      screen.getByRole('link', { name: new RegExp(`Smith, John Doe Male · ${age} yrs · OpenMRS ID 1000NLY`, 'i') }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',

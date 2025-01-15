@@ -101,10 +101,11 @@ test('Register an unknown patient', async ({ api, page }) => {
     await page.getByRole('tab', { name: /no/i }).nth(1).click();
   });
 
-  await test.step('And then I fill in 25 as the estimated age in years', async () => {
+  const estimatedAge = 25;
+  await test.step(`And then I fill in ${estimatedAge} as the estimated age in years`, async () => {
     const estimatedAgeField = page.getByLabel(/estimated age in years/i);
     await estimatedAgeField.clear();
-    await estimatedAgeField.fill('25');
+    await estimatedAgeField.fill('' + estimatedAge);
   });
 
   await test.step('And I click on the submit button', async () => {
@@ -123,12 +124,13 @@ test('Register an unknown patient', async ({ api, page }) => {
 
   await test.step("And I should see the newly registered patient's details displayed in the patient banner", async () => {
     const patientBanner = page.locator('header[aria-label="patient banner"]');
+    const expectedBirthYear = new Date().getFullYear() - estimatedAge;
 
     await expect(patientBanner).toBeVisible();
     await expect(patientBanner.getByText('Unknown Unknown')).toBeVisible();
     await expect(patientBanner.getByText(/female/i)).toBeVisible();
     await expect(patientBanner.getByText(/25 yrs/i)).toBeVisible();
-    await expect(patientBanner.getByText(/01-Jan-1999/i)).toBeVisible();
+    await expect(patientBanner.getByText(new RegExp(`01-Jan-${expectedBirthYear}`, 'i'))).toBeVisible();
     await expect(patientBanner.getByText(/OpenMRS ID/i)).toBeVisible();
   });
 });

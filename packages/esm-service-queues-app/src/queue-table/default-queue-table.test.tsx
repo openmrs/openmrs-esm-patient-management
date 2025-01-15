@@ -1,20 +1,19 @@
-import React from 'react';
-import { of } from 'rxjs';
+import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
-import { useConfig, useSession, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import {
-  mockServices,
-  mockSession,
+  mockLocationSurgery,
+  mockLocationTriage,
   mockQueueEntries,
   mockQueueRooms,
-  mockLocationTriage,
-  mockLocationSurgery,
+  mockServices,
+  mockSession,
 } from '__mocks__';
+import React from 'react';
 import { renderWithSwr } from 'tools';
-import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { type ConfigObject, configSchema } from '../config-schema';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
+import { useQueueEntries } from '../hooks/useQueueEntries';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -42,11 +41,6 @@ jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => (
 jest.mock('../hooks/useQueueEntries', () => ({
   ...jest.requireActual('../hooks/useQueueEntries'),
   useQueueEntries: jest.fn(),
-}));
-
-jest.mock('../helpers/helpers', () => ({
-  ...jest.requireActual('../helpers/helpers'),
-  getSelectedServiceName: jest.fn().mockReturnValue(of({ serviceName: 'All' })),
 }));
 
 describe('DefaultQueueTable', () => {

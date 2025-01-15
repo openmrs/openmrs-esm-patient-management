@@ -33,7 +33,9 @@
     {
       "name": "patient-search-workspace",
       "component": "patientSearchWorkspace",
-      "title": "searchPatient"
+      "title": "searchPatient",
+      "type": "patient-search-workspace",
+      "groups": ["ward-patient-admission-requests"]
     }
   ]
 }

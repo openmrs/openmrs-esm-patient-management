@@ -42,7 +42,7 @@ const MetricsHeader = () => {
         menuAlignment="bottom-end"
         onClick={navigateToQueueScreen}
         size={isDesktop(layout) ? 'sm' : 'lg'}
-        tooltipAlignment="top-end">
+        tooltipAlignment="left">
         <UserHasAccess privilege="Emr: View Legacy Interface">
           <MenuItem
             label={t('addNewService', 'Add new service')}

@@ -2,6 +2,9 @@ import { restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type InpatientAdmission } from '../types';
 import useWardLocation from './useWardLocation';
 
+/**
+ * fetches a list of inpatient admissions for the current ward location
+ */
 export function useInpatientAdmission() {
   const { location } = useWardLocation();
 
