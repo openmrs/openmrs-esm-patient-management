@@ -242,7 +242,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                       <SelectItem
                         key={`occupancyStatus-${index}`}
                         text={t(`occupancyStatus${occupancyStatus}`, `${occupancyStatus}`)}
-                        value={t(`occupancyStatus${occupancyStatus}`, `${occupancyStatus}`)}
+                        value={occupancyStatus}
                       />
                     ))}
                   </Select>
