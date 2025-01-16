@@ -38,7 +38,7 @@ const WardWithBeds: React.FC = () => {
   const tableHeaders = [
     {
       id: 0,
-      header: 'ID',
+      header: 'praneeth',
       key: 'id',
     },
     {
@@ -154,7 +154,7 @@ const WardWithBeds: React.FC = () => {
                 setPageSize(pageSize);
               }}
               pageSizes={[10, 20, 30, 40, 50]}
-              totalItems={paginatedData?.length}
+              totalItems={bedsData?.length}
             />
           </div>
         </>
