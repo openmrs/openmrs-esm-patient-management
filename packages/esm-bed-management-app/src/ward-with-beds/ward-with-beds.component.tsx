@@ -118,9 +118,7 @@ const WardWithBeds: React.FC = () => {
               }>
               <span>Return to summary</span>
             </Button>
-            <span>
-              <span>{isValidating ? <InlineLoading /> : null}</span>
-            </span>
+            <span>{isValidating ? <InlineLoading /> : null}</span>
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
