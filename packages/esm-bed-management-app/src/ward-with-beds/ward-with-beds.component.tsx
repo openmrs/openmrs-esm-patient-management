@@ -38,7 +38,7 @@ const WardWithBeds: React.FC = () => {
   const tableHeaders = [
     {
       id: 0,
-      header: 'praneeth',
+      header: 'ID',
       key: 'id',
     },
     {
