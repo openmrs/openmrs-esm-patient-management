@@ -10,11 +10,11 @@ export function mapToOpenMRSPatient(fhirPatients: fhir.Bundle, nameTemplate: str
     return [];
   }
   //Consider patient // https://github.com/openmrs/openmrs-esm-core/blob/main/packages/framework/esm-api/src/types/patient-resource.ts
-  const pts: Array<SearchedPatient> = [];
+  const omrsPatients: Array<SearchedPatient> = [];
 
   fhirPatients.entry.forEach((pt, index) => {
     let fhirPatient = pt.resource as fhir.Patient;
-    pts.push({
+    omrsPatients.push({
       externalId: fhirPatient.id,
       uuid: null,
       identifiers: null,
@@ -44,7 +44,7 @@ export function mapToOpenMRSPatient(fhirPatients: fhir.Bundle, nameTemplate: str
     });
   });
 
-  return pts;
+  return omrsPatients;
 }
 
 export function checkDeceased(fhirPatient: fhir.Patient): boolean | null {

@@ -65,8 +65,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     if (initialMPIFormValues) {
       setInitialFormValues(initialMPIFormValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialMPIFormValues, setInitialMPIFormValues]);
+  }, [initialMPIFormValues, setInitialFormValues]);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
