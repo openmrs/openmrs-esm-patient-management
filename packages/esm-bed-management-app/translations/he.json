@@ -54,6 +54,8 @@
   "no": "No",
   "No data": "No data to display",
   "noDataToDisplay": "אין נתונים להצגה",
+  "occupancyStatusAvailable": "Available",
+  "occupancyStatusOccupied": "Occupied",
   "occupancyStatus": "Occupied",
   "or": "or",
   "pleaseFillField": "",

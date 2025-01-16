@@ -175,7 +175,7 @@ const WardWithBeds: React.FC = () => {
                 setPageSize(pageSize);
               }}
               pageSizes={[10, 20, 30, 40, 50]}
-              totalItems={paginatedData?.length}
+              totalItems={bedsData?.length}
             />
           </div>
         </>
