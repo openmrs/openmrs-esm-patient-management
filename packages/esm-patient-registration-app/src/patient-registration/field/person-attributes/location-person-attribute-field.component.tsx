@@ -25,7 +25,7 @@ export function LocationPersonAttributeField({
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
   const [field, meta, { setValue }] = useField(`attributes.${personAttributeType.uuid}`);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
   const { locations, isLoading, loadingNewData } = useLocations(locationTag || null, searchQuery);
   const prevLocationOptions = useRef([]);
 

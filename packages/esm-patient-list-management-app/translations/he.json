@@ -47,7 +47,7 @@
   "newPatientListNameLabel": "שם הרשימה",
   "nextPage": "עמוד הבא",
   "noMatchingLists": "אין רשימות תואמות להצגה",
-  "noMatchingListsFound": "No matching lists found",
+  "noMatchingListsFound": "לא נמצאו רשימות מתאימות",
   "noMatchingPatients": "אין מטופלים תואמים להצגה",
   "noOfPatients": "מספר מטופלים",
   "noPatientsInList": "אין מטופלים ברשימה זו",
@@ -76,7 +76,7 @@
   "successfullyAdded": "נוסף בהצלחה",
   "systemDefined": "הוגדר על ידי המערכת",
   "systemLists": "רשימות מערכת",
-  "trySearchingForADifferentList": "Try searching for a different list",
+  "trySearchingForADifferentList": "נא לנסות לחפש רשימה אחרת",
   "unstarList": "Unstar list",
   "updated": "עודכן",
   "userDefined": "הוגדר על ידי המשתמש"

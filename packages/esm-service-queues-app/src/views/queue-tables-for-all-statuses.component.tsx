@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { InlineNotification, Search, SkeletonText } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -7,9 +7,9 @@ import type { Concept, Queue, QueueEntry } from '../types';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useColumns } from '../queue-table/cells/columns.resource';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
+import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
-import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from '../queue-table/queue-table.scss';
 
 interface QueueTablesForAllStatusesProps {
@@ -58,7 +58,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
                   size: isDesktop(layout) ? 'sm' : 'lg',
                 },
                 selectPatientAction: (selectedPatientUuid) => {
-                  launchWorkspace('service-queues-patient-search', {
+                  launchWorkspace('create-queue-entry-workspace', {
                     selectedPatientUuid,
                     currentServiceQueueUuid: selectedQueue.uuid,
                   });
@@ -95,7 +95,7 @@ interface QueueTablesByStatusProps {
 function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
   const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
+  const allowedStatuses = [...selectedQueue.allowedStatuses].reverse();
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;
@@ -154,19 +154,16 @@ function QueueTableForQueueAndStatus({
   }
 
   // filters queue entries based on which status table we want to show and search term inputted by user
-  const filterQueueEntries = useCallback(
-    (queueEntries: QueueEntry[], searchTerm: string, statucUuid: string) => {
-      const searchTermLowercase = searchTerm.toLowerCase();
-      return queueEntries.filter((queueEntry) => {
-        const match = columns.some((column) => {
-          const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
-          return columnSearchTerm?.includes(searchTermLowercase);
-        });
-        return queueEntry.status.uuid == statucUuid && match;
+  const filterQueueEntries = (queueEntries: QueueEntry[], searchTerm: string, statusUuid: string) => {
+    const searchTermLowercase = searchTerm.toLowerCase();
+    return queueEntries.filter((queueEntry) => {
+      const match = columns?.some((column) => {
+        const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
+        return columnSearchTerm?.includes(searchTermLowercase);
       });
-    },
-    [queueEntries, searchTerm, columns],
-  );
+      return queueEntry.status.uuid == statusUuid && match;
+    });
+  };
 
   const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
   return (

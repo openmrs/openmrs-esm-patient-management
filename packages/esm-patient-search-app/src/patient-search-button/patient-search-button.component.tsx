@@ -1,7 +1,7 @@
+import React, { useCallback, useEffect } from 'react';
 import { Button } from '@carbon/react';
 import { Search } from '@carbon/react/icons';
 import { launchWorkspace } from '@openmrs/esm-framework';
-import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type PatientSearchWorkspaceProps } from '../patient-search-workspace/patient-search.workspace';
 
@@ -37,7 +37,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const launchPatientSearchWorkspace = () => {
+  const launchPatientSearchWorkspace = useCallback(() => {
     const workspaceProps: PatientSearchWorkspaceProps = {
       handleSearchTermUpdated: searchQueryUpdatedAction,
       initialQuery: searchQuery,
@@ -47,13 +47,13 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
       ...workspaceProps,
       workspaceTitle: overlayHeader,
     });
-  };
+  }, [overlayHeader, searchQuery, searchQueryUpdatedAction, selectPatientAction]);
 
   useEffect(() => {
     if (isOpen) {
       launchPatientSearchWorkspace();
     }
-  }, [isOpen]);
+  }, [isOpen, launchPatientSearchWorkspace]);
 
   return (
     <Button

@@ -1,3 +1,7 @@
+import React, { useContext, useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import { Controller, useController, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -31,12 +35,15 @@ import {
   type DefaultWorkspaceProps,
   type FetchResponse,
 } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
-import React, { useContext, useEffect, useState } from 'react';
-import { Controller, useController, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
+import {
+  checkAppointmentConflict,
+  saveAppointment,
+  saveRecurringAppointments,
+  useAppointmentService,
+  useMutateAppointments,
+} from './appointments-form.resource';
 import {
   appointmentLocationTagName,
   dateFormat,
@@ -45,24 +52,11 @@ import {
   moduleName,
   weekDays,
 } from '../constants';
-import SelectedDateContext from '../hooks/selectedDateContext';
 import { useProviders } from '../hooks/useProviders';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
+import SelectedDateContext from '../hooks/selectedDateContext';
 import Workload from '../workload/workload.component';
-import {
-  checkAppointmentConflict,
-  saveAppointment,
-  saveRecurringAppointments,
-  useAppointmentService,
-  useMutateAppointments,
-} from './appointments-form.resource';
 import styles from './appointments-form.scss';
-
-const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
-
-function isValidTime(timeStr) {
-  return timeStr.match(new RegExp(time12HourFormatRegexPattern));
-}
 
 interface AppointmentsFormProps {
   appointment?: Appointment;
@@ -70,6 +64,10 @@ interface AppointmentsFormProps {
   patientUuid?: string;
   context: string;
 }
+
+const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+
+const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
 
 const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> = ({
   appointment,
@@ -127,7 +125,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const defaultDuration =
     appointment?.startDateTime && appointment?.endDateTime
       ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
-      : null;
+      : undefined;
 
   // t('durationErrorMessage', 'Duration should be greater than zero')
   const appointmentsFormSchema = z
@@ -156,7 +154,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       recurringPatternPeriod: z.number(),
       recurringPatternDaysOfWeek: z.array(z.string()),
       selectedDaysOfWeekText: z.string().optional(),
-      startTime: z.string().refine((value) => isValidTime(value)),
+      startTime: z.string().refine((value) => isValidTime(value), {
+        message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
+      }),
       timeFormat: z.enum(['AM', 'PM']),
       appointmentDateTime: z.object({
         startDate: z.date(),
@@ -220,7 +220,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     watch,
     handleSubmit,
     reset,
-    formState: { isDirty },
+    formState: { errors, isDirty },
   } = useForm<AppointmentFormData>({
     mode: 'all',
     resolver: zodResolver(appointmentsFormSchema),
@@ -251,7 +251,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     },
   });
 
-  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
 
   // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
@@ -277,14 +277,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       return;
     }
     promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing, isSuccessful]);
+  }, [isDirty, promptBeforeClosing, isSuccessful, reset, closeWorkspace]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
     setValue('appointmentDateTime', { ...appointmentDate, startDate: date });
   };
 
-  const handleMultiselectChange = (e) => {
+  const handleSelectChange = (e) => {
     setValue(
       'selectedDaysOfWeekText',
       (() => {
@@ -354,7 +354,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       appointmentRequest: appointmentPayload,
       recurringPattern: constructRecurringPattern(data),
     };
+
     const abortController = new AbortController();
+
     (isRecurringAppointment
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
       : saveAppointment(appointmentPayload, abortController)
@@ -458,15 +460,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     };
   };
 
-  const onError = (error) => console.error(error);
-
   if (isLoading)
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
   return (
-    <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
+    <Form onSubmit={handleSubmit(handleSaveAppointment)}>
       <Stack gap={4}>
         {patient && (
           <ExtensionSlot
@@ -484,16 +484,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             <Controller
               name="location"
               control={control}
-              render={({ field: { onChange, value, onBlur, ref }, fieldState }) => (
+              render={({ field: { onChange, value, onBlur, ref } }) => (
                 <Select
                   id="location"
+                  invalid={!!errors?.location}
+                  invalidText={errors?.location?.message}
                   labelText={t('selectALocation', 'Select a location')}
                   onChange={onChange}
                   onBlur={onBlur}
-                  value={value}
                   ref={ref}
-                  invalid={!!fieldState?.error?.message}
-                  invalidText={fieldState?.error?.message}>
+                  value={value}>
                   <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
                   {locations?.length > 0 &&
                     locations.map((location) => (
@@ -512,10 +512,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             <Controller
               name="selectedService"
               control={control}
-              render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
+              render={({ field: { onBlur, onChange, value, ref } }) => (
                 <Select
                   id="service"
+                  invalid={!!errors?.selectedService}
+                  invalidText={errors?.selectedService?.message}
                   labelText={t('selectService', 'Select a service')}
+                  onBlur={onBlur}
                   onChange={(event) => {
                     if (context === 'creating') {
                       setValue(
@@ -534,11 +537,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     }
                     onChange(event);
                   }}
-                  onBlur={onBlur}
-                  value={value}
                   ref={ref}
-                  invalid={!!fieldState?.error?.message}
-                  invalidText={fieldState?.error?.message}>
+                  value={value}>
                   <SelectItem text={t('chooseService', 'Select service')} value="" />
                   {services?.length > 0 &&
                     services.map((service) => (
@@ -557,17 +557,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             <Controller
               name="appointmentType"
               control={control}
-              render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
+              render={({ field: { onBlur, onChange, value, ref } }) => (
                 <Select
                   disabled={!appointmentTypes?.length}
                   id="appointmentType"
+                  invalid={!!errors?.appointmentType}
+                  invalidText={errors?.appointmentType?.message}
                   labelText={t('selectAppointmentType', 'Select the type of appointment')}
-                  onChange={onChange}
-                  value={value}
-                  ref={ref}
                   onBlur={onBlur}
-                  invalid={!!fieldState?.error?.message}
-                  invalidText={fieldState?.error?.message}>
+                  onChange={onChange}
+                  ref={ref}
+                  value={value}>
                   <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                   {appointmentTypes?.length > 0 &&
                     appointmentTypes.map((appointmentType, index) => (
@@ -645,7 +645,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                 </ResponsiveWrapper>
 
                 {!isAllDayAppointment && (
-                  <TimeAndDuration isTablet={isTablet} control={control} services={services} watch={watch} t={t} />
+                  <TimeAndDuration control={control} errors={errors} services={services} watch={watch} t={t} />
                 )}
 
                 <ResponsiveWrapper>
@@ -697,20 +697,20 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                       render={({ field: { onChange } }) => (
                         <MultiSelect
                           className={styles.weekSelect}
-                          label={getValues('selectedDaysOfWeekText')}
                           id="daysOfWeek"
+                          initialSelectedItems={weekDays.filter((i) =>
+                            getValues('recurringPatternDaysOfWeek').includes(i.id),
+                          )}
                           items={weekDays}
                           itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
+                          label={getValues('selectedDaysOfWeekText')}
+                          onChange={(e) => {
+                            onChange(e);
+                            handleSelectChange(e);
+                          }}
                           selectionFeedback="top-after-reopen"
                           sortItems={(items) => {
                             return items.sort((a, b) => a.order > b.order);
-                          }}
-                          initialSelectedItems={weekDays.filter((i) => {
-                            return getValues('recurringPatternDaysOfWeek').includes(i.id);
-                          })}
-                          onChange={(e) => {
-                            onChange(e);
-                            handleMultiselectChange(e);
                           }}
                         />
                       )}
@@ -759,7 +759,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                 </ResponsiveWrapper>
 
                 {!isAllDayAppointment && (
-                  <TimeAndDuration isTablet={isTablet} control={control} services={services} watch={watch} t={t} />
+                  <TimeAndDuration control={control} services={services} watch={watch} t={t} errors={errors} />
                 )}
               </div>
             )}
@@ -770,9 +770,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
           <section className={styles.formGroup}>
             <ResponsiveWrapper>
               <Workload
-                selectedService={watch('selectedService')}
                 appointmentDate={watch('appointmentDateTime').startDate}
                 onWorkloadDateChange={handleWorkloadDateChange}
+                selectedService={watch('selectedService')}
               />
             </ResponsiveWrapper>
           </section>
@@ -785,11 +785,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               <Controller
                 name="appointmentStatus"
                 control={control}
-                render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
+                render={({ field: { onBlur, onChange, value, ref } }) => (
                   <Select
                     id="appointmentStatus"
-                    invalid={!!fieldState?.error?.message}
-                    invalidText={fieldState?.error?.message}
+                    invalid={!!errors?.appointmentStatus}
+                    invalidText={errors?.appointmentStatus?.message}
                     labelText={t('selectAppointmentStatus', 'Select status')}
                     onChange={onChange}
                     value={value}
@@ -842,16 +842,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             <Controller
               name="dateAppointmentScheduled"
               control={control}
-              render={({ field: { onChange, value, ref }, fieldState }) => (
+              render={({ field: { onChange, value, ref } }) => (
                 <div style={{ width: '100%' }}>
                   <DatePicker
                     datePickerType="single"
                     dateFormat={datePickerFormat}
-                    value={value}
+                    invalid={!!errors?.dateAppointmentScheduled}
+                    invalidText={errors?.dateAppointmentScheduled?.message}
                     maxDate={new Date().toISOString()}
                     onChange={([date]) => onChange(date)}
-                    invalid={!!fieldState?.error?.message}
-                    invalidText={fieldState?.error?.message}>
+                    value={value}>
                     <DatePickerInput
                       id="dateAppointmentScheduledPickerInput"
                       labelText={t('dateScheduledDetail', 'Date appointment issued')}
@@ -860,7 +860,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                       ref={ref}
                     />
                   </DatePicker>
-                  {fieldState?.error?.message && <div className={styles.errorMessage}>{fieldState.error.message}</div>}
                 </div>
               )}
             />
@@ -900,7 +899,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   );
 };
 
-function TimeAndDuration({ isTablet, t, watch, control, services }) {
+function TimeAndDuration({ t, watch, control, services, errors }) {
   const defaultDuration = services?.find((service) => service.name === watch('selectedService'))?.durationMins || null;
 
   return (
@@ -913,12 +912,14 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
             <TimePicker
               id="time-picker"
               pattern={time12HourFormatRegexPattern}
-              invalid={!isValidTime(value)}
-              invalidText={t('invalidTime', 'Invalid time')}
-              onChange={(event) => onChange(event.target.value)}
-              value={value}
+              invalid={!!errors?.startTime}
+              invalidText={errors?.startTime?.message}
+              labelText={t('time', 'Time')}
+              onChange={(event) => {
+                onChange(event.target.value);
+              }}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
-              labelText={t('time', 'Time')}>
+              value={value}>
               <Controller
                 name="timeFormat"
                 control={control}
@@ -941,22 +942,21 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
         <Controller
           name="duration"
           control={control}
-          defaultValue={defaultDuration}
-          render={({ field: { onChange, onBlur, value, ref }, fieldState }) => (
+          render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
-              hideSteppers
               disableWheel
+              hideSteppers
               id="duration"
-              min={0}
-              max={1440}
+              invalid={!!errors?.duration}
+              invalidText={errors?.duration?.message}
               label={t('durationInMinutes', 'Duration (minutes)')}
-              invalidText={t('invalidNumber', 'Number is not valid')}
-              size="md"
+              max={1440}
+              min={0}
               onBlur={onBlur}
               onChange={(event) => onChange(Number(event.target.value))}
-              value={value}
               ref={ref}
-              invalid={fieldState?.error?.message}
+              size="md"
+              value={value}
             />
           )}
         />

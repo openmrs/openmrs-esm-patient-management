@@ -7,17 +7,18 @@ import {
   ComposedModal,
   Form,
   FormGroup,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
   Stack,
   TextArea,
   TextInput,
-  InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedType, BedTypeData } from '../types';
+import styles from '../modals.scss';
 
 const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -26,13 +27,13 @@ const BedTypeAdministrationSchema = z.object({
 });
 
 interface BedAdministrationFormProps {
-  showModal: boolean;
-  onModalChange: (showModal: boolean) => void;
-  availableBedTypes: Array<BedType>;
   allLocations: Location[];
-  handleCreateQuestion?: (formData: BedTypeData) => void;
+  availableBedTypes: Array<BedType>;
+  handleSubmission?: (formData: BedTypeData) => void;
   headerTitle: string;
   initialData: BedTypeData;
+  onModalChange: (showModal: boolean) => void;
+  showModal: boolean;
 }
 
 interface ErrorType {
@@ -40,11 +41,11 @@ interface ErrorType {
 }
 
 const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
-  showModal,
-  onModalChange,
-  handleCreateQuestion,
+  handleSubmission,
   headerTitle,
   initialData,
+  onModalChange,
+  showModal,
 }) => {
   const { t } = useTranslation();
 
@@ -69,7 +70,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     const result = BedTypeAdministrationSchema.safeParse(formData);
     if (result.success) {
       setShowErrorNotification(false);
-      handleCreateQuestion(formData);
+      handleSubmission?.(formData);
     }
   };
 
@@ -80,7 +81,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
 
   return (
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+      <ModalHeader className={styles.modalHeader} title={headerTitle} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -92,9 +93,9 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedName"
-                      labelText={t('bedName', 'Bed Name')}
-                      placeholder={t('bedTypePlaceholder', '')}
                       invalidText={fieldState.error?.message}
+                      labelText={t('bedName', 'Bed name')}
+                      placeholder={t('bedTypePlaceholder', '')}
                       {...field}
                     />
                   </>
@@ -106,15 +107,13 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 name="displayName"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <>
-                    <TextInput
-                      id="displayName"
-                      labelText={t('displayName', 'Display Name')}
-                      placeholder={t('displayNamePlaceholder', '')}
-                      invalidText={fieldState.error?.message}
-                      {...field}
-                    />
-                  </>
+                  <TextInput
+                    id="displayName"
+                    invalidText={fieldState.error?.message}
+                    labelText={t('displayName', 'Display name')}
+                    placeholder={t('displayNamePlaceholder', '')}
+                    {...field}
+                  />
                 )}
               />
             </FormGroup>
@@ -123,29 +122,27 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 name="description"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <>
-                    <TextArea
-                      rows={2}
-                      id="description"
-                      invalidText={fieldState?.error?.message}
-                      labelText={t('description', 'Description')}
-                      {...field}
-                      placeholder={t('description', 'Enter the bed description')}
-                    />
-                  </>
+                  <TextArea
+                    rows={2}
+                    id="description"
+                    invalidText={fieldState?.error?.message}
+                    labelText={t('description', 'Description')}
+                    {...field}
+                    placeholder={t('enterBedDescription', 'Enter the bed description')}
+                  />
                 )}
               />
             </FormGroup>
 
             {showErrorNotification && (
               <InlineNotification
-                lowContrast
-                title={t('error', 'Error')}
-                style={{ minWidth: '100%', margin: '0', padding: '0' }}
-                role="alert"
                 kind="error"
-                subtitle={t('pleaseFillField', formStateError) + '.'}
+                lowContrast
                 onClose={() => setShowErrorNotification(false)}
+                role="alert"
+                style={{ minWidth: '100%', margin: '0', padding: '0' }}
+                subtitle={t('pleaseFillField', formStateError) + '.'}
+                title={t('error', 'Error')}
               />
             )}
           </Stack>

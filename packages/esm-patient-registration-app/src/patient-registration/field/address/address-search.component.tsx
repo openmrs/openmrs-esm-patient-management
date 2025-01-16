@@ -14,8 +14,11 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
   const separator = ' > ';
   const searchBox = useRef(null);
   const wrapper = useRef(null);
-  const [searchString, setSearchString] = useState<string>('');
-  const { addresses, isLoading, error } = useAddressHierarchy(searchString, separator);
+
+  const [searchString, setSearchString] = useState('');
+
+  const { addresses } = useAddressHierarchy(searchString, separator);
+
   const addressOptions: Array<string> = useMemo(() => {
     const options: Set<string> = new Set();
     addresses.forEach((address) => {

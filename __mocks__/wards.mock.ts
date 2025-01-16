@@ -78,5 +78,6 @@ export const mockInpatientAdmissions: InpatientAdmission[] = [
     encounterAssigningToCurrentInpatientLocation: null,
     currentInpatientRequest: null,
     firstAdmissionOrTransferEncounter: null,
+    currentInpatientLocation: mockLocationInpatientWard,
   },
 ];

@@ -1,166 +1,162 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'react-i18next';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Button,
+  ButtonSet,
   Column,
   Form,
+  InlineLoading,
   Layer,
-  Stack,
-  TextInput,
   Select,
   SelectItem,
-  ButtonSet,
-  Button,
-  InlineNotification,
+  Stack,
+  TextInput,
 } from '@carbon/react';
 import { mutate } from 'swr';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
+
+const createQueueServiceSchema = (t: TFunction) =>
+  z.object({
+    queueName: z
+      .string({
+        required_error: t('queueNameRequired', 'Queue name is required'),
+      })
+      .trim()
+      .min(1, t('queueNameRequired', 'Queue name is required')),
+    queueServiceType: z
+      .string({
+        required_error: t('queueConceptRequired', 'Queue concept is required'),
+      })
+      .trim()
+      .min(1, t('queueConceptRequired', 'Queue concept is required')),
+    userLocation: z
+      .string({
+        required_error: t('queueLocationRequired', 'Queue location is required'),
+      })
+      .trim()
+      .min(1, t('queueLocationRequired', 'Queue location is required')),
+  });
+
+type QueueServiceFormData = z.infer<ReturnType<typeof createQueueServiceSchema>>;
 
 const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const { queueConcepts } = useServiceConcepts();
-  const [queueName, setQueueName] = useState('');
-  const [queueConcept, setQueueConcept] = useState('');
-  const [isMissingName, setMissingName] = useState(false);
-  const [isMissingQueue, setMissingQueue] = useState(false);
-  const [isMissingLocation, setMissingLocation] = useState(false);
-  const [userLocation, setUserLocation] = useState('');
   const { queueLocations } = useQueueLocations();
 
-  const createQueue = useCallback(
-    (event) => {
-      event.preventDefault();
+  const QueueServiceSchema = createQueueServiceSchema(t);
 
-      if (!queueName) {
-        setMissingName(true);
-        return;
-      }
-      if (!queueConcept) {
-        setMissingQueue(true);
-        return;
-      }
-      if (!userLocation) {
-        setMissingLocation(true);
-        return;
-      }
-
-      setMissingName(false);
-      setMissingQueue(false);
-      setMissingLocation(false);
-
-      saveQueue(queueName, queueConcept, queueName, userLocation).then(
-        ({ status }) => {
-          if (status === 201) {
-            showSnackbar({
-              title: t('addQueue', 'Add queue'),
-              kind: 'success',
-              subtitle: t('queueAddedSuccessfully', 'Queue added successfully'),
-            });
-            closeWorkspace();
-            mutate(`${restBaseUrl}/queue?${userLocation}`);
-            mutate(`${restBaseUrl}/queue?location=${userLocation}`);
-          }
-        },
-        (error) => {
-          showSnackbar({
-            title: t('errorAddingQueue', 'Error adding queue'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: error?.message,
-          });
-        },
-      );
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<QueueServiceFormData>({
+    resolver: zodResolver(QueueServiceSchema),
+    defaultValues: {
+      queueName: '',
+      queueServiceType: '',
+      userLocation: '',
     },
-    [queueName, queueConcept, userLocation, t, closeWorkspace],
-  );
+  });
+
+  const createQueue = async (data: QueueServiceFormData) => {
+    try {
+      await saveQueue(data.queueName, data.queueServiceType, '', data.userLocation);
+
+      showSnackbar({
+        title: t('queueServiceCreated', 'Queue service created'),
+        kind: 'success',
+        subtitle: t('queueServiceCreatedSuccessfully', 'Queue service created successfully'),
+      });
+
+      closeWorkspace();
+      await Promise.all([
+        mutate(`${restBaseUrl}/queue?${data.userLocation}`),
+        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`),
+      ]);
+    } catch (error) {
+      showSnackbar({
+        title: t('errorCreatingQueueService', 'Error creating queue service'),
+        kind: 'error',
+        isLowContrast: false,
+        subtitle: error?.responseBody?.message || error?.message,
+      });
+    }
+  };
 
   return (
-    <Form onSubmit={createQueue} className={styles.form}>
-      <Stack gap={4} className={styles.grid}>
+    <Form onSubmit={handleSubmit(createQueue)} className={styles.form}>
+      <Stack gap={5} className={styles.grid}>
         <Column>
           <Layer className={styles.input}>
-            <TextInput
-              id="queueName"
-              invalidText="Required"
-              labelText={t('queueName', 'Queue name')}
-              onChange={(event) => setQueueName(event.target.value)}
-              value={queueName}
+            <Controller
+              name="queueName"
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  id="queueName"
+                  invalidText={errors.queueName?.message}
+                  invalid={!!errors.queueName}
+                  labelText={t('queueName', 'Queue name')}
+                />
+              )}
             />
-            {isMissingName && (
-              <section>
-                <InlineNotification
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast={true}
-                  title={t('missingQueueName', 'Missing queue name')}
-                  subtitle={t('addQueueName', 'Please add a queue name')}
-                />
-              </section>
-            )}
           </Layer>
         </Column>
-
         <Column>
           <Layer className={styles.input}>
-            <Select
-              labelText={t('selectServiceType', 'Select a service type')}
-              id="queueConcept"
-              invalidText="Required"
-              value={queueConcept}
-              onChange={(event) => setQueueConcept(event.target.value)}>
-              {!queueConcept && <SelectItem text={t('selectServiceType', 'Select a service type')} />}
-              {queueConcepts.length === 0 && <SelectItem text={t('noServicesAvailable', 'No services available')} />}
-              {queueConcepts?.length > 0 &&
-                queueConcepts.map((concept) => (
-                  <SelectItem key={concept.uuid} text={concept.display} value={concept.uuid}>
-                    {concept.display}
-                  </SelectItem>
-                ))}
-            </Select>
-            {isMissingQueue && (
-              <section>
-                <InlineNotification
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast={true}
-                  title={t('missingService', 'Missing service')}
-                  subtitle={t('selectServiceType', 'Select a service type')}
-                />
-              </section>
-            )}
+            <Controller
+              name="queueServiceType"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelText={t('selectServiceType', 'Select a service type')}
+                  id="queueServiceType"
+                  invalid={!!errors?.queueServiceType}
+                  invalidText={errors?.queueServiceType?.message}>
+                  <SelectItem text={t('selectServiceType', 'Select a service type')} value="" />
+                  {queueConcepts?.length > 0 &&
+                    queueConcepts.map((concept) => (
+                      <SelectItem key={concept.uuid} text={concept.display} value={concept.uuid}>
+                        {concept.display}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
+            />
           </Layer>
         </Column>
-
         <Column>
           <Layer className={styles.input}>
-            <Select
-              labelText={t('selectALocation', 'Select a location')}
-              id="location"
-              invalidText="Required"
-              value={userLocation}
-              onChange={(event) => setUserLocation(event.target.value)}>
-              {!userLocation && <SelectItem text={t('selectALocation', 'Select a location')} />}
-              {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
-              {queueLocations?.length > 0 &&
-                queueLocations.map((location) => (
-                  <SelectItem key={location.id} text={location.name} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-            </Select>
-            {isMissingLocation && (
-              <section>
-                <InlineNotification
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast={true}
-                  title={t('missingLocation', 'Missing location')}
-                  subtitle={t('pleaseSelectLocation', 'Please select a location')}
-                />
-              </section>
-            )}
+            <Controller
+              name="userLocation"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  id="location"
+                  invalid={!!errors?.userLocation}
+                  invalidText={errors?.userLocation?.message}
+                  labelText={t('selectALocation', 'Select a location')}>
+                  <SelectItem text={t('selectALocation', 'Select a location')} value="" />
+                  {queueLocations?.length > 0 &&
+                    queueLocations.map((location) => (
+                      <SelectItem key={location.id} text={location.name} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
+            />
           </Layer>
         </Column>
       </Stack>
@@ -168,8 +164,12 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
-          {t('save', 'Save')}
+        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            <span>{t('save', 'Save')}</span>
+          )}
         </Button>
       </ButtonSet>
     </Form>

@@ -87,8 +87,29 @@ export const patientClinicalFormsWorkspace = getAsyncLifecycle(
   options,
 );
 
+// t('cancelAdmissionRequest', 'Cancel admission request')
+export const cancelAdmissionRequestWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/cancel-admission-request-workspace/cancel-admission-request.workspace'),
+  options,
+);
+
 export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
   () => import('./action-menu-buttons/clinical-forms-workspace-siderail.component'),
+  options,
+);
+
+export const admissionRequestsWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./ward-workspace/admission-request-workspace/admission-requests-action-button.extension'),
+  options,
+);
+
+export const createAdmissionEncounterWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./ward-workspace/create-admission-encounter/create-admission-encounter-action-button.extension'),
+  options,
+);
+
+export const createAdmissionEncounterWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/create-admission-encounter/create-admission-encounter.workspace'),
   options,
 );
 
@@ -102,6 +123,11 @@ export const maternalWardView = getAsyncLifecycle(
   options,
 );
 
+export const wardPatientWorkspaceBanner = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-banner/patient-banner.component'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
@@ -110,11 +136,5 @@ export function startupApp() {
     'bedmanagement-module',
     'Bed management module',
     'Enables features related to bed management / assignment. Requires the backend bed management module to be installed.',
-  );
-
-  registerFeatureFlag(
-    'ward-view-vertical-tiling',
-    'Ward view vertical tiling',
-    'Enable tiling of bed cards vertically in the ward view.',
   );
 }

@@ -1,5 +1,9 @@
-import { type Patient, type PersonAddress } from '@openmrs/esm-framework';
+import type { Patient, PersonAddress } from '@openmrs/esm-framework';
 import { mockAddress } from './address.mock';
+import dayjs from 'dayjs';
+
+const birthdate = '2000-01-01T00:00:00.000+0000';
+const age = dayjs().diff(birthdate, 'years');
 
 /* Patients as returned by `usePatient` and the service queues endpoints */
 export const mockPatientAlice: Patient = {
@@ -10,8 +14,8 @@ export const mockPatientAlice: Patient = {
     uuid: '00000000-0001-0000-0000-000000000000',
     display: 'Alice Johnson',
     gender: 'F',
-    age: 24,
-    birthdate: '2000-01-01T00:00:00.000+0000',
+    age: age,
+    birthdate: birthdate,
     birthdateEstimated: false,
     dead: false,
     deathDate: null,
@@ -40,8 +44,8 @@ export const mockPatientBrian: Patient = {
     uuid: '00000000-0001-0000-0000-000000000000',
     display: 'Brian Johnson',
     gender: 'M',
-    age: 24,
-    birthdate: '2000-01-01T00:00:00.000+0000',
+    age: age,
+    birthdate: birthdate,
     birthdateEstimated: false,
     dead: false,
     deathDate: null,

@@ -96,7 +96,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         });
       }
     },
-    [config.search.patientChartUrl, user, currentLocation],
+    [addViewedPatientAndCloseSearchResults, config.search.patientChartUrl],
   );
   const focusedResult = useArrowNavigation(
     !recentPatients ? searchedPatients?.length ?? 0 : recentPatients?.length ?? 0,
@@ -134,7 +134,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         subtitle: errorFetchingUserProperties?.message,
       });
     }
-  }, [fetchError, errorFetchingUserProperties]);
+  }, [fetchError, errorFetchingUserProperties, t]);
 
   const handleSubmit = useCallback(
     (debouncedSearchTerm) => {

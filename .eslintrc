@@ -2,17 +2,24 @@
   "env": {
     "node": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:jest-dom/recommended",
-    "plugin:testing-library/react"
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:jest-dom/recommended"],
+  "overrides": [
+    {
+      "files": ["**/*.test.tsx"],
+      "extends": ["plugin:testing-library/react"]
+    },
+    {
+      "files": ["e2e/**/*.spec.ts"],
+      "extends": ["plugin:playwright/recommended"],
+      "rules": {
+        "testing-library/prefer-screen-queries": "off"
+      }
+    }
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "jest-dom", "react-hooks", "testing-library"],
+  "plugins": ["@typescript-eslint", "import", "jest-dom", "react-hooks", "testing-library"],
   "rules": {
-    "react-hooks/rules-of-hooks": "error",
-    // Disabling these rules for now just to keep the diff small. I'll enable them one by one as we go.
+    // Disabling these rules for now just to keep the diff small. We'll enable them one by one as we go.
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
@@ -31,7 +38,7 @@
         "fixStyle": "inline-type-imports"
       }
     ],
-    "prefer-const": "off",
+    "import/no-duplicates": "error",
     "no-console": [
       "error",
       {
@@ -68,36 +75,9 @@
           }
         ]
       }
-    ]
-  },
-  "overrides": [
-    {
-      "files": ["**/e2e/**"],
-      "rules": {
-        "testing-library/await-async-events": "off",
-        "testing-library/await-async-query": "off",
-        "testing-library/await-async-utils": "off",
-        "testing-library/no-await-sync-events": "off",
-        "testing-library/no-await-sync-queries": "off",
-        "testing-library/no-container": "off",
-        "testing-library/no-debugging-utils": "off",
-        "testing-library/no-dom-import": "off",
-        "testing-library/no-global-regexp-flag-in-query": "off",
-        "testing-library/no-manual-cleanup": "off",
-        "testing-library/no-node-access": "off",
-        "testing-library/no-promise-in-fire-event": "off",
-        "testing-library/no-render-in-lifecycle": "off",
-        "testing-library/no-unnecessary-act": "off",
-        "testing-library/no-wait-for-multiple-assertions": "off",
-        "testing-library/no-wait-for-side-effects": "off",
-        "testing-library/no-wait-for-snapshot": "off",
-        "testing-library/prefer-find-by": "off",
-        "testing-library/prefer-implicit-assert": "off",
-        "testing-library/prefer-presence-queries": "off",
-        "testing-library/prefer-query-by-disappearance": "off",
-        "testing-library/prefer-screen-queries": "off",
-        "testing-library/render-result-naming-convention": "off"
-      }
-    }
-  ]
+    ],
+    "prefer-const": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
 }

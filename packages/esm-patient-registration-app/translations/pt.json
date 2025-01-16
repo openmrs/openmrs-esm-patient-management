@@ -1,4 +1,5 @@
 {
+  "addPatient": "Add patient",
   "addRelationshipButtonText": "Adicionar Relacionamento",
   "addressHeader": "Endereço",
   "allFieldsRequiredText": "Todos os campos são obrigatórios, a menos que estejam marcados como opcionais",
@@ -45,7 +46,7 @@
   "editPatientDetailsBreadcrumb": "Alterar detalhes do utente",
   "enterNonCodedCauseOfDeath": "Insira a causa de óbito não codificada",
   "error": "Erro",
-  "errorFetchingCodedCausesOfDeath": "Erro ao buscar causas de óbito",
+  "errorFetchingCodedCausesOfDeath": "Erro ao buscar causas de óbito codificadas.",
   "errorFetchingOrderedFields": "Ocorreu um erro ao buscar campos solicitados para hierarquia de endereços",
   "estimatedAgeInMonthsLabelText": "Idade estimada em meses",
   "estimatedAgeInYearsLabelText": "Idade estimada em anos",

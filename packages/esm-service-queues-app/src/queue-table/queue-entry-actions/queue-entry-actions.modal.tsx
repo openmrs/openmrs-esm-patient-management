@@ -198,13 +198,19 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       );
     }
     return null;
-  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat, t]);
+  }, [
+    formState.transitionDate,
+    formState.transitionTime,
+    formState.transitionTimeFormat,
+    queueEntry.previousQueueEntry?.startedAt,
+    t,
+  ]);
 
   const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
 
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={modalTitle} />
+      <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>

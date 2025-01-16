@@ -13,7 +13,6 @@ const WardView: React.FC<{}> = () => {
   const { t } = useTranslation();
 
   const locationUuid = location?.uuid;
-  const isVertical = useFeatureFlag('ward-view-vertical-tiling');
   const wardConfig = useWardConfig(locationUuid);
 
   if (isLoadingLocation) {
@@ -27,7 +26,7 @@ const WardView: React.FC<{}> = () => {
   const wardId = wardConfig.id;
 
   return (
-    <div className={classNames(styles.wardView, { [styles.verticalTiling]: isVertical })}>
+    <div className={classNames(styles.wardView, styles.verticalTiling)}>
       <ExtensionSlot name={wardId} />
     </div>
   );

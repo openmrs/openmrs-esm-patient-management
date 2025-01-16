@@ -200,10 +200,13 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
   return result;
 }
 
-export const filterOutUndefinedPatientIdentifiers = (patientIdentifiers) =>
+type IdentifierMap = { [identifierFieldName: string]: PatientIdentifierValue };
+export const filterOutUndefinedPatientIdentifiers = (patientIdentifiers: IdentifierMap): IdentifierMap =>
   Object.fromEntries(
-    Object.entries<PatientIdentifierValue>(patientIdentifiers).filter(
-      ([key, value]) => value.identifierValue !== undefined,
+    Object.entries(patientIdentifiers).filter(
+      ([key, value]) =>
+        (value.autoGeneration && value.selectedSource.autoGenerationOption.manualEntryEnabled) ||
+        value.identifierValue !== undefined,
     ),
   );
 

@@ -1,43 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type Patient } from './patient-operations';
-
-export interface CohortType {
-  uuid: string;
-  name: string;
-  description: string;
-  display: string;
-  links: { rel: string; uri: string; resourceAlias: string }[];
-  resourceVersion: string;
-}
-
-export interface Cohort {
-  uuid: string;
-  name: string;
-  description: string;
-  attributes: any[];
-  links: any[];
-  location: any;
-  groupCohort: boolean | null;
-  startDate: Date;
-  endDate: Date;
-  voidReason: string | null;
-  voided: boolean;
-  isStarred?: boolean;
-  type?: string;
-  size: number;
-  cohortType?: CohortType;
-  resourceVersion: string;
-}
-
-export interface CohortMember {
-  attributes: Array<any>;
-  description: string;
-  endDate: string;
-  startDate: string;
-  name: string;
-  uuid: string;
-  patient: Patient;
-}
+import { type Cohort, type CohortMember } from '../types';
 
 export const generateRandomCohort = async (api: APIRequestContext): Promise<Cohort> => {
   const cohortRes = await api.post('cohortm/cohort', {

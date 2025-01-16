@@ -74,7 +74,7 @@ function QueueTable({
 
   useEffect(() => {
     goTo(1);
-  }, [queueEntries]);
+  }, [goTo, queueEntries]);
 
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
@@ -135,11 +135,11 @@ function QueueTable({
                   return (
                     <React.Fragment key={row.id}>
                       <Row {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
+                        {row.cells.map((cell, i) => (
                           <TableCell
                             key={cell.id}
                             className={classNames({
-                              'cds--table-column-menu': cell?.id?.split(':')?.[1] === 'actions',
+                              'cds--table-column-menu': columns[i].key.includes('actions'),
                             })}>
                             {cell.value}
                           </TableCell>

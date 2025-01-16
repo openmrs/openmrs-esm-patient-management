@@ -8,7 +8,7 @@ export * from './identifiers.mock';
 export * from './locations.mock';
 export * from './metrics.mock';
 export * from './patient.mock';
-export * from './patient-visits.mock';
+export * from './patient-appointments.mock';
 export * from './patient-registration.mock';
 export * from './queue-entry.mock';
 export * from './queue-rooms.mock';

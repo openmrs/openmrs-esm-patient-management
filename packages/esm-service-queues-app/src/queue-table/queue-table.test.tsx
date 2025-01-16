@@ -3,7 +3,7 @@ import React from 'react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { mockPriorityNonUrgent, mockQueueEntries, mockSession } from '__mocks__';
+import { mockPriorityNonUrgent, mockPriorityUrgent, mockQueueEntries, mockSession } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import QueueTable from './queue-table.component';
 
@@ -176,6 +176,11 @@ describe('QueueTable', () => {
                   color: 'blue',
                   style: 'bold',
                 },
+                {
+                  conceptUuid: mockPriorityUrgent.uuid,
+                  color: 'orange',
+                  style: null,
+                },
               ],
               statusConfigs: [],
               visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
@@ -200,6 +205,10 @@ describe('QueueTable', () => {
     const firstRow = rows[1];
     const cells = within(firstRow).getAllByRole('cell');
     expect(cells[1].childNodes[0]).toHaveClass('bold');
+
+    const secondRow = rows[2];
+    const secondCells = within(secondRow).getAllByRole('cell');
+    expect(secondCells[1].childNodes[0]).toHaveClass('orange');
   });
 
   it('uses the visitQueueNumberAttributeUuid defined at the top level', () => {

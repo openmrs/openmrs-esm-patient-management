@@ -37,12 +37,12 @@ const MetricsHeader = () => {
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{metricsTitle}</span>
       <ComboButton
-        label={queueScreenText}
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        menuAlignment="bottom-end"
         className={styles.comboBtn}
-        tooltipAlignment="top-right"
-        onClick={navigateToQueueScreen}>
+        label={queueScreenText}
+        menuAlignment="bottom-end"
+        onClick={navigateToQueueScreen}
+        size={isDesktop(layout) ? 'sm' : 'lg'}
+        tooltipAlignment="left">
         <UserHasAccess privilege="Emr: View Legacy Interface">
           <MenuItem
             label={t('addNewService', 'Add new service')}

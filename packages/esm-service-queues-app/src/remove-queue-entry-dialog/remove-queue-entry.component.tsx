@@ -5,8 +5,8 @@ import { parseDate, showSnackbar, useVisit } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
 import { startOfDay } from '../constants';
 import { useCheckedInAppointments, endQueueEntry } from './remove-queue-entry.resource';
-import styles from './remove-queue-entry.scss';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
+import styles from './remove-queue-entry.scss';
 
 interface RemoveQueueEntryDialogProps {
   queueEntry: MappedQueueEntry;
@@ -56,11 +56,23 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
           subtitle: error?.message,
         });
       });
-  }, [appointments, currentVisit, queueEntry]);
+  }, [
+    appointments,
+    closeModal,
+    currentVisit?.location?.uuid,
+    currentVisit?.startDatetime,
+    currentVisit?.visitType?.uuid,
+    mutateQueueEntries,
+    queueEntry?.queue?.uuid,
+    queueEntry?.queueEntryUuid,
+    queueEntry?.visitUuid,
+    t,
+  ]);
 
   return (
-    <div>
+    <>
       <ModalHeader
+        className={styles.modalHeader}
         closeModal={closeModal}
         label={t('serviceQueue', 'Service queue')}
         title={t('removeFromQueueAndEndVisit', 'Remove patient from queue and end active visit?')}
@@ -81,7 +93,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
           {t('endVisit', 'End visit')}
         </Button>
       </ModalFooter>
-    </div>
+    </>
   );
 };
 

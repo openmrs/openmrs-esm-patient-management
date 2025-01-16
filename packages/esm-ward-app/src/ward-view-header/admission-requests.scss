@@ -31,14 +31,14 @@
 }
 
 .blackBackground {
-  background-color: black;
+  background-color: #393939;
   color: white;
 }
 
 .lightBlueBackground {
-  background-color: white;
-  border-left:4px solid $color-blue-60-2;
-  color: black;
+  background-color: $color-blue-10;
+  border-left: 4px solid $color-blue-60-2;
+  color: #393939;
 }
 
 .content {

@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { deletePatient, generateRandomPatient, getPatient, type Patient } from '../commands';
-import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
+import { deletePatient, generateRandomPatient, getPatient } from '../commands';
+import { RegistrationAndEditPage } from '../pages';
+import { type Patient, type PatientRegistrationFormValues } from '../types';
 
 let patient: Patient;
 

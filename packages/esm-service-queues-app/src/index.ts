@@ -10,7 +10,7 @@ import outpatientSideNavComponent from './side-menu/side-menu.component';
 import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
-import VisitFormQueueFields from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
+import VisitFormQueueFields from './create-queue-entry/queue-fields/visit-form-queue-fields.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -60,14 +60,6 @@ export const clearAllQueueEntries = getAsyncLifecycle(
   () => import('./clear-queue-entries-dialog/clear-queue-entries-dialog.component'),
   {
     featureName: 'clear all queue entries and end visits',
-    moduleName,
-  },
-);
-
-export const addVisitToQueueModal = getAsyncLifecycle(
-  () => import('./add-patient-toqueue/add-patient-toqueue-dialog.component'),
-  {
-    featureName: 'add visit to queue',
     moduleName,
   },
 );
@@ -157,11 +149,13 @@ export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
 
 export const visitFormQueueFields = getSyncLifecycle(VisitFormQueueFields, options);
 
-// t('searchPatient', 'Search Patient')
-export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
-  featureName: 'service-queues-patient-search',
-  moduleName,
-});
+export const createQueueEntryWorkspace = getAsyncLifecycle(
+  () => import('./create-queue-entry/create-queue-entry.workspace'),
+  {
+    featureName: 'create-queue-entry-workspace',
+    moduleName,
+  },
+);
 
 export const activeVisitsRowActions = getAsyncLifecycle(
   () => import('./active-visits/active-visits-row-actions.component'),

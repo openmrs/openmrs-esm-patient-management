@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-ward-app",
-  "version": "8.0.2",
+  "version": "8.1.1",
   "description": "Ward and bed management module for O3",
   "browser": "dist/openmrs-esm-ward-app.js",
   "main": "src/index.ts",
@@ -37,11 +37,11 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
   },
   "dependencies": {
-    "@carbon/react": "~1.37.0",
+    "@carbon/react": "^1.71.0",
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-framework": "6.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
     "react-router-dom": "6.x",

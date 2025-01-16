@@ -1,4 +1,5 @@
 {
+  "addPatient": "Add patient",
   "addRelationshipButtonText": "添加关系",
   "addressHeader": "地址",
   "allFieldsRequiredText": "所有字段都是必填的，除非标记为可选。",
@@ -60,7 +61,7 @@
   "givenNameLabelText": "名字",
   "givenNameRequired": "名字是必填项",
   "identifierValueRequired": "ID标识是必填项",
-  "idFieldLabelText": "ID",
+  "idFieldLabelText": "Identifiers",
   "IDInstructions": "选择您想为该患者添加的ID标识：",
   "invalidEmail": "Invalid email",
   "invalidInput": "输入无效",

@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import PatientSearchBar from './patient-search-bar.component';
 
 describe('PatientSearchBar', () => {
-  it('should render', () => {
+  it('renders a search input', () => {
     render(<PatientSearchBar onClear={jest.fn()} onSubmit={jest.fn()} />);
 
     const searchInput = screen.getByPlaceholderText('Search for a patient by name or identifier number');
@@ -12,7 +12,7 @@ describe('PatientSearchBar', () => {
     expect(searchInput).toBeInTheDocument();
   });
 
-  it('displays initial search term', () => {
+  it('displays the initial search term', () => {
     const initialSearchTerm = 'John Doe';
     render(<PatientSearchBar initialSearchTerm={initialSearchTerm} onClear={jest.fn()} onSubmit={jest.fn()} />);
 
@@ -23,7 +23,7 @@ describe('PatientSearchBar', () => {
     expect(searchInput.value).toBe(initialSearchTerm);
   });
 
-  it('calls onChange callback on input change', async () => {
+  it('calls the onChange callback on input change', async () => {
     const user = userEvent.setup();
     const onChangeMock = jest.fn();
 
@@ -36,7 +36,7 @@ describe('PatientSearchBar', () => {
     expect(onChangeMock).toHaveBeenCalledWith('New Value');
   });
 
-  it('calls onClear callback on clear button click', async () => {
+  it('calls the onClear callback on clear button click', async () => {
     const user = userEvent.setup();
     const onClearMock = jest.fn();
 
@@ -49,7 +49,7 @@ describe('PatientSearchBar', () => {
     expect(onClearMock).toHaveBeenCalled();
   });
 
-  it('calls onSubmit callback on form submission', async () => {
+  it('calls the onSubmit callback on form submission', async () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
 

@@ -114,11 +114,10 @@
 
 .wardPatientBedNumber {
   @include type.type-style('heading-compact-01');
-  border-radius: 50%;
+  border-radius: 50vh;
   color: $ui-02;
   background-color: $color-blue-60-2;
-  padding: layout.$spacing-04;
-  width: layout.$spacing-04;
+  padding: layout.$spacing-04 layout.$spacing-03;
   height: layout.$spacing-04;
   display: flex;
   justify-content: center;
@@ -143,6 +142,12 @@
   background-color: $color-blue-60-2;
   margin-left: layout.$spacing-03;
   margin-right: layout.$spacing-02;
+}
+
+.cancelTransferRequestButton {
+  fill: $ui-03;
+  margin-left: layout.$spacing-02;
+  z-index: 2;
 }
 
 .chemistryReferenceIcon {

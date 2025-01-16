@@ -45,6 +45,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
   return (
     <div>
       <ModalHeader
+        className={styles.modalHeader}
         closeModal={closeModal}
         label={t('serviceQueue', 'Service queue')}
         title={t('clearAllQueueEntries', 'Clear all queue entries?')}

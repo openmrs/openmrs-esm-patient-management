@@ -4,6 +4,7 @@ import first from 'lodash-es/first';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentSummary } from '../types';
 import { omrsDateFormat } from '../constants';
+
 interface AppointmentCount {
   date: string;
   count: number;
@@ -40,6 +41,7 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
   const { data } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
   const results = first(data?.data?.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));
   const appointmentCountMap = results?.appointmentCountMap;
+
   return Object.entries(appointmentCountMap ?? [])
     .map(([key, value]) => ({
       date: key,
@@ -47,6 +49,7 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
     }))
     .sort((dateA, dateB) => new Date(dateA.date).getTime() - new Date(dateB.date).getTime());
 };
+
 export const useMonthlyCalendarDistribution = (
   serviceUuid: string,
   distributionType: 'month' | 'week',

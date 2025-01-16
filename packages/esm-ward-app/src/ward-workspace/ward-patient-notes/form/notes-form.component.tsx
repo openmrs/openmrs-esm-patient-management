@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Column, Form, InlineLoading, InlineNotification, Row, Stack, TextArea } from '@carbon/react';
 import {
-  createErrorHandler,
   type DefaultWorkspaceProps,
   type PatientUuid,
   ResponsiveWrapper,
@@ -13,12 +12,16 @@ import {
   translateFrom,
   useSession,
 } from '@openmrs/esm-framework';
-import { savePatientNote } from '../notes.resource';
-import styles from './notes-form.scss';
 import { moduleName } from '../../../constant';
+import { savePatientNote } from '../notes.resource';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
+import styles from './notes-form.scss';
 
 type NotesFormData = z.infer<typeof noteFormSchema>;
+
+interface PatientNotesFormProps extends DefaultWorkspaceProps {
+  patientUuid: PatientUuid;
+}
 
 const noteFormSchema = z.object({
   wardClinicalNote: z.string().refine((val) => val.trim().length > 0, {
@@ -26,10 +29,6 @@ const noteFormSchema = z.object({
     message: translateFrom(moduleName, 'clinicalNoteErrorMessage', 'Clinical note is required'),
   }),
 });
-
-interface PatientNotesFormProps extends DefaultWorkspaceProps {
-  patientUuid: PatientUuid;
-}
 
 const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   closeWorkspaceWithSavedChanges,
@@ -39,8 +38,9 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { t } = useTranslation();
   const session = useSession();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rows, setRows] = useState<number>();
+  const [rows, setRows] = useState(0);
 
   const {
     control,
@@ -93,26 +93,31 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
           closeWorkspaceWithSavedChanges();
           showSnackbar({
             isLowContrast: true,
-            subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
             kind: 'success',
+            subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
             title: t('visitNoteSaved', 'Patient note saved'),
           });
         })
         .catch((err) => {
-          createErrorHandler();
-
           showSnackbar({
-            title: t('patientNoteSaveError', 'Error saving patient note'),
-            kind: 'error',
             isLowContrast: false,
+            kind: 'error',
             subtitle: err?.message,
+            title: t('patientNoteSaveError', 'Error saving patient note'),
           });
         })
-        .finally(() => {
-          setIsSubmitting(false);
-        });
+        .finally(() => setIsSubmitting(false));
     },
-    [emrConfiguration, patientUuid, locationUuid, providerUuid],
+    [
+      closeWorkspaceWithSavedChanges,
+      emrConfiguration?.clinicianEncounterRole.uuid,
+      emrConfiguration?.consultFreeTextCommentsConcept.uuid,
+      emrConfiguration?.inpatientNoteEncounterType.uuid,
+      locationUuid,
+      patientUuid,
+      providerUuid,
+      t,
+    ],
   );
 
   const onError = (errors) => console.error(errors);
@@ -146,19 +151,19 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
                 <ResponsiveWrapper>
                   <TextArea
                     id="additionalNote"
-                    rows={rows}
-                    labelText={t('clinicalNoteLabel', 'Write your notes')}
-                    placeholder={t('wardClinicalNotePlaceholder', 'Write any notes here')}
-                    value={value}
-                    onBlur={onBlur}
                     invalid={!!errors.wardClinicalNote}
                     invalidText={errors.wardClinicalNote?.message}
+                    labelText={t('clinicalNoteLabel', 'Write your notes')}
+                    onBlur={onBlur}
                     onChange={(event) => {
                       onChange(event);
-                      const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                      const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
+                      const textAreaLineHeight = 24; // This is the default line height for Carbon's TextArea component
+                      const newRows = Math.ceil(event.target.scrollHeight / textAreaLineHeight);
                       setRows(newRows);
                     }}
+                    placeholder={t('wardClinicalNotePlaceholder', 'Write any notes here')}
+                    rows={rows}
+                    value={value}
                   />
                 </ResponsiveWrapper>
               )}
@@ -167,9 +172,9 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
         </Row>
       </Stack>
       <Button
-        kind="primary"
         className={styles.saveButton}
         disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
+        kind="primary"
         type="submit">
         {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
       </Button>

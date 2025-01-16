@@ -1,15 +1,13 @@
-import { Button, ButtonSet, Form, InlineNotification } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
-import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, ButtonSet, Form, InlineNotification } from '@carbon/react';
+import classNames from 'classnames';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
-import useWardLocation from '../../hooks/useWardLocation';
-import type { BedLayout, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { assignPatientToBed, createEncounter, removePatientFromBed } from '../../ward.resource';
+import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import { assignPatientToBed, useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import BedSelector from '../bed-selector.component';
 import styles from './patient-transfer-swap.scss';
 
@@ -21,10 +19,9 @@ export default function PatientBedSwapForm({
   const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
+    useCreateEncounter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { currentProvider } = useSession();
-  const { location } = useWardLocation();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
 
@@ -50,35 +47,16 @@ export default function PatientBedSwapForm({
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
     return () => promptBeforeClosing(null);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
-  const getBedInformation = useCallback(
-    (bed: BedLayout) => {
-      const patients = bed.patients.map((bedPatient) => bedPatient?.person?.preferredName?.display);
-      const bedNumber = bed.bedNumber;
-      return [bedNumber, ...(patients.length ? patients : [t('empty', 'Empty')])].join(' · ');
-    },
-    [t],
-  );
-
-  const beds = wardPatientGroupDetails?.bedLayouts ?? [];
+  const beds = useMemo(() => wardPatientGroupDetails?.bedLayouts ?? [], [wardPatientGroupDetails]);
 
   const onSubmit = useCallback(
     (values: FormValues) => {
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
+      setIsSubmitting(true);
       setShowErrorNotifications(false);
-      createEncounter({
-        patient: patient.uuid,
-        encounterType: emrConfiguration.transferWithinHospitalEncounterType.uuid,
-        location: location?.uuid,
-        encounterProviders: [
-          {
-            provider: currentProvider?.uuid,
-            encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
-          },
-        ],
-        obs: [],
-      })
+      createEncounter(patient, emrConfiguration.bedAssignmentEncounterType)
         .then(async (response) => {
           if (response.ok) {
             if (bedSelected) {
@@ -132,7 +110,7 @@ export default function PatientBedSwapForm({
           closeWorkspaceWithSavedChanges();
         });
     },
-    [setShowErrorNotifications, patient, emrConfiguration, currentProvider, location, beds, wardPatientGroupDetails],
+    [beds, createEncounter, patient, emrConfiguration, t, wardPatientGroupDetails, closeWorkspaceWithSavedChanges],
   );
 
   const onError = useCallback(() => {

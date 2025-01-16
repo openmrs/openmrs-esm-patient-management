@@ -1,13 +1,11 @@
 import React, { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
 import type { Appointment } from '../types';
-import styles from './patient-appointments-action-menu.scss';
-
 import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
+import styles from './patient-appointments-action-menu.scss';
 
 interface appointmentsActionMenuProps {
   appointment: Appointment;
@@ -32,7 +30,7 @@ export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appo
         appointment,
       });
     }
-  }, [appointment, t]);
+  }, [appointment, patientAppointmentContext, t]);
 
   const launchCancelAppointmentDialog = () => {
     const dispose = showModal('patient-appointment-cancel-confirmation-dialog', {

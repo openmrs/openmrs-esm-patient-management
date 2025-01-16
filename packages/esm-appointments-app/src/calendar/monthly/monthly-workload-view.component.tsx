@@ -25,7 +25,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       events?.find(
         (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),
       ),
-    [events],
+    [dateTime, events],
   );
 
   const visibleServices = useMemo(() => {
@@ -34,7 +34,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       return currentData.services.slice(0, layout === 'small-desktop' ? 2 : 4);
     }
     return [];
-  }, [currentData, showAllServices, layout, currentData]);
+  }, [currentData, showAllServices, layout]);
 
   const hasHiddenServices = useMemo(() => {
     if (currentData?.services) {
@@ -42,7 +42,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       return layout === 'small-desktop' ? currentData.services.length > 2 : currentData.services.length > 4;
     }
     return false;
-  }, [layout, currentData, currentData]);
+  }, [currentData?.services, layout, showAllServices]);
 
   const navigateToAppointmentsByDate = (serviceUuid: string) => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
@@ -61,8 +61,8 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
             },
       )}>
       {isSameMonth(dateTime, dayjs(selectedDate)) && (
-        <p>
-          <div className={classNames(styles.totals)}>
+        <div>
+          <span className={classNames(styles.totals)}>
             {currentData?.services ? (
               <div role="button" tabIndex={0}>
                 <User size={16} />
@@ -72,7 +72,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               <div />
             )}
             <b className={styles.calendarDate}>{dateTime.format('D')}</b>
-          </div>
+          </span>
           {currentData?.services && (
             <div className={styles.currentData}>
               {visibleServices.map(({ serviceName, serviceUuid, count }, i) => (
@@ -100,7 +100,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               )}
             </div>
           )}
-        </p>
+        </div>
       )}
     </div>
   );

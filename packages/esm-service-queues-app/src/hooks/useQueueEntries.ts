@@ -1,9 +1,9 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import isEqual from 'lodash-es/isEqual';
+import useSWR from 'swr';
+import { useSWRConfig } from 'swr/_internal';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
-import useSWR from 'swr';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSWRConfig } from 'swr/_internal';
-import isEqual from 'lodash-es/isEqual';
 
 type QueueEntryResponse = FetchResponse<{
   results: Array<QueueEntry>;
@@ -79,14 +79,15 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   // for it yet. Next it returns stale data again, this time with `isValidating` set to true. At this
   // point we say we are no longer waiting for mutate. Finally, it returns fresh data with `isValidating`
   // again set to false. We may then update the data array and move on to the next page.
-  const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
-  const [totalCount, setTotalCount] = useState<number>();
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [currentSearchCriteria, setCurrentSearchCriteria] = useState(searchCriteria);
-  const [currentRep, setCurrentRep] = useState(rep);
-  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(currentRep, currentSearchCriteria));
-  const [error, setError] = useState<Error>();
   const { mutateQueueEntries } = useMutateQueueEntries();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentRep, setCurrentRep] = useState(rep);
+  const [currentSearchCriteria, setCurrentSearchCriteria] = useState(searchCriteria);
+  const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
+  const [error, setError] = useState<Error | undefined>(undefined);
+  const [pageUrl, setPageUrl] = useState(getInitialUrl(currentRep, currentSearchCriteria));
+  const [totalCount, setTotalCount] = useState(0);
   const [waitingForMutate, setWaitingForMutate] = useState(false);
 
   const refetchAllData = useCallback(
@@ -111,7 +112,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
       }
       refetchAllData(rep, searchCriteria);
     }
-  }, [searchCriteria, currentSearchCriteria, setCurrentSearchCriteria, currentRep, rep]);
+  }, [currentRep, currentSearchCriteria, refetchAllData, rep, searchCriteria, setCurrentSearchCriteria]);
 
   const { data: pageData, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
 

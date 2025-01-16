@@ -1,4 +1,5 @@
 import React, { type ReactElement } from 'react';
+import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import { type RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
@@ -16,6 +17,16 @@ const swrWrapper = ({ children }) => {
 
 const renderWithSwr = (ui: ReactElement, options?: Omit<RenderOptions, 'queries'>) =>
   render(ui, { wrapper: swrWrapper, ...options });
+
+const renderWithRouter = (component: React.ReactElement, initialRoute = '/') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path="/" element={component} />
+      </Routes>
+    </MemoryRouter>,
+  );
+};
 
 function waitForLoadingToFinish() {
   return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
@@ -108,11 +119,12 @@ const mockPatientWithoutFormattedName = {
 const patientChartBasePath = `/patient/${mockPatient.id}/chart`;
 
 export {
-  renderWithSwr,
-  waitForLoadingToFinish,
   getByTextWithMarkup,
   mockPatient,
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,
+  renderWithSwr,
+  renderWithRouter,
+  waitForLoadingToFinish,
 };

@@ -4,19 +4,19 @@ import { render, screen } from '@testing-library/react';
 import { useConceptAnswers } from '../field.resource';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 
-jest.mock('formik', () => ({
-  ...jest.requireActual('formik'),
-}));
-
-jest.mock('../field.resource');
-
 const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
+
+jest.mock('../field.resource', () => ({
+  ...jest.requireActual('../field.resource'),
+  useConceptAnswers: jest.fn(),
+}));
 
 describe('CodedPersonAttributeField', () => {
   const conceptAnswers = [
     { uuid: '1', display: 'Option 1' },
     { uuid: '2', display: 'Option 2' },
   ];
+
   const personAttributeType = {
     format: 'org.openmrs.Concept',
     display: 'Referred by',
@@ -24,26 +24,35 @@ describe('CodedPersonAttributeField', () => {
     name: '',
     description: '',
   };
+
   const answerConceptSetUuid = '6682d17f-0777-45e4-a39b-93f77eb3531c';
+  let consoleSpy: jest.SpyInstance;
 
   beforeEach(() => {
     mockUseConceptAnswers.mockReturnValue({
       data: conceptAnswers,
       isLoading: false,
+      error: null,
     });
+
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('shows error if there is no concept answer set provided', () => {
+  afterEach(() => {
+    consoleSpy.mockRestore();
+  });
+
+  it('renders an error if there is no concept answer set provided', () => {
     expect(() => {
       render(
         <Formik initialValues={{}} onSubmit={() => {}}>
           <Form>
             <CodedPersonAttributeField
-              id="attributeId"
-              personAttributeType={personAttributeType}
               answerConceptSetUuid={null}
-              label={personAttributeType.display}
               customConceptAnswers={[]}
+              id="attributeId"
+              label={personAttributeType.display}
+              personAttributeType={personAttributeType}
               required={false}
             />
           </Form>
@@ -52,11 +61,13 @@ describe('CodedPersonAttributeField', () => {
     }).toThrow(expect.stringMatching(/has been defined without an answer concept set UUID/i));
   });
 
-  it('shows error if the concept answer set does not have any concept answers', () => {
+  it('renders an error if the concept answer set does not have any concept answers', () => {
     mockUseConceptAnswers.mockReturnValue({
       data: [],
       isLoading: false,
+      error: null,
     });
+
     expect(() => {
       render(
         <Formik initialValues={{}} onSubmit={() => {}}>

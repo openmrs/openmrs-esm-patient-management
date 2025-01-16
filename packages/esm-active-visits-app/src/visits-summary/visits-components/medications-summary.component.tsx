@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
-import { type OrderItem, getDosage } from '../visit.resource';
+import { type OrderItem } from '../../types';
 import styles from '../visit-detail-overview.scss';
 
 interface MedicationSummaryProps {

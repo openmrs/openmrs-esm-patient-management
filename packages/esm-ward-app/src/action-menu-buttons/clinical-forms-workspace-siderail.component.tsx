@@ -29,7 +29,7 @@ const ClinicalFormsWorkspaceSideRailIcon: React.FC = () => {
       label={t('clinicalForms', 'Clinical forms')}
       iconDescription={t('clinicalForms', 'Clinical forms')}
       handler={launchPatientWorkspaceCb}
-      type="ward-patient-clinical-form"
+      type="ward-patient-clinical-forms"
     />
   );
 };

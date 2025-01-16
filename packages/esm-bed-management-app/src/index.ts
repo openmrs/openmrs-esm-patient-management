@@ -2,7 +2,7 @@ import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle } from '@openmr
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel-link.component';
 
-const moduleName = '@ugandaemr/esm-bed-management-app';
+const moduleName = '@openmrs/esm-bed-management-app';
 
 const options = {
   featureName: 'bed-management',
@@ -22,6 +22,7 @@ export const adminCardLink = getAsyncLifecycle(() => import('./admin-card-link.c
 export const summaryLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'bed-management',
+    // t('summary', 'Summary')
     title: 'Summary',
   }),
   options,
@@ -29,23 +30,27 @@ export const summaryLeftPanelLink = getSyncLifecycle(
 
 export const adminLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'administration',
-    title: 'Ward Allocation',
+    name: 'bed-administration',
+    // t('wardAllocation', 'Ward allocation')
+    title: 'Ward allocation',
   }),
   options,
 );
 
 export const bedTypeLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'bed-type',
-    title: 'Bed Type',
+    name: 'bed-types',
+    // t('bedTypes', 'Bed types')
+    title: 'Bed types',
   }),
   options,
 );
+
 export const bedTagLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'bed-tag',
-    title: 'Bed Tag',
+    name: 'bed-tags',
+    // t('bedTags', 'Bed tags')
+    title: 'Bed tags',
   }),
   options,
 );

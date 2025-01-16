@@ -14,6 +14,9 @@ const defaultRep =
     'dispositionObsGroup,' +
     'visit)';
 
+/**
+ * fetches a list of pending inpatient requests for the current ward location
+ */
 export function useInpatientRequest(
   dispositionType: Array<DispositionType> = ['ADMIT', 'TRANSFER'],
   rep: string = defaultRep,
