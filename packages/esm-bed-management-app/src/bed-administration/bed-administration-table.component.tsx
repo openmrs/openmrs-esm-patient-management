@@ -68,8 +68,8 @@ const BedAdministrationTable: React.FC = () => {
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
   const filteredData = useMemo(() => {
-    const flatendData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
-    return filterOption === 'ALL' ? flatendData : flatendData.filter((bed) => bed.status === filterOption);
+    const flattenedData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
+    return filterOption === 'ALL' ? flattenedData : flattenedData.filter((bed) => bed.status === filterOption);
   }, [bedsGroupedByLocation, filterOption]);
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, currentPage, goTo } = usePagination(filteredData, pageSize);
