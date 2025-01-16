@@ -67,14 +67,12 @@ const BedAdministrationTable: React.FC = () => {
 
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
-
+  const filteredData = useMemo(() => {
+    const flattenedData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
+    return filterOption === 'ALL' ? flattenedData : flattenedData.filter((bed) => bed.status === filterOption);
+  }, [bedsGroupedByLocation, filterOption]);
   const [pageSize, setPageSize] = useState(10);
-  const { results, currentPage, totalPages, goTo } = usePagination(
-    filterOption === 'ALL'
-      ? bedsGroupedByLocation
-      : bedsGroupedByLocation.flat().filter((bed) => bed.status === filterOption) ?? [],
-    pageSize,
-  );
+  const { results: paginatedData, currentPage, goTo } = usePagination(filteredData, pageSize);
 
   const tableHeaders = [
     {
@@ -100,7 +98,7 @@ const BedAdministrationTable: React.FC = () => {
   ];
 
   const tableRows = useMemo(() => {
-    return results.flat().map((bed) => ({
+    return paginatedData.flat().map((bed) => ({
       id: bed.uuid,
       bedNumber: bed.bedNumber,
       location: bed.location.display,
@@ -126,7 +124,7 @@ const BedAdministrationTable: React.FC = () => {
         </>
       ),
     }));
-  }, [responsiveSize, results, t]);
+  }, [responsiveSize, paginatedData, t]);
 
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
@@ -154,7 +152,7 @@ const BedAdministrationTable: React.FC = () => {
     <>
       <Header title={t('wardAllocation', 'Ward allocation')} />
       <div className={styles.flexContainer}>
-        {results?.length ? (
+        {paginatedData?.length ? (
           <div className={styles.filterContainer}>
             <Dropdown
               id="occupancyStatus"
@@ -188,7 +186,7 @@ const BedAdministrationTable: React.FC = () => {
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedsGroupedByLocation ? <InlineLoading /> : null}</span>
           </span>
-          {results?.length ? (
+          {paginatedData?.length ? (
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
@@ -241,11 +239,14 @@ const BedAdministrationTable: React.FC = () => {
                 forwardText="Next page"
                 page={currentPage}
                 pageNumberText="Page Number"
-                pageSize={totalPages}
+                pageSize={pageSize}
                 pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={bedsGroupedByLocation.length}
-                onChange={({ pageSize, page }) => {
-                  setPageSize(pageSize);
+                totalItems={filteredData.length}
+                onChange={({ pageSize: newPageSize, page }) => {
+                  if (newPageSize !== pageSize) {
+                    setPageSize(newPageSize);
+                    goTo(1);
+                  }
                   if (page !== currentPage) {
                     goTo(page);
                   }

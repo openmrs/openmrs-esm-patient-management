@@ -161,7 +161,10 @@
         "ward-patient-notes-workspace",
         "patient-transfer-swap-workspace",
         "patient-discharge-workspace",
-        "ward-patient-clinical-forms-workspace"
+        "ward-patient-clinical-forms-workspace",
+        "add-drug-order",
+        "order-basket",
+        "add-lab-order"
       ]
     },
     {
