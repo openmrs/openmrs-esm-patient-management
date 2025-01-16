@@ -54,6 +54,8 @@
   "no": "No",
   "No data": "No data to display",
   "noDataToDisplay": "No data to display",
+  "occupancyStatusAvailable": "Available",
+  "occupancyStatusOccupied": "Occupied",
   "occupancyStatus": "Occupied",
   "or": "or",
   "pleaseFillField": "",

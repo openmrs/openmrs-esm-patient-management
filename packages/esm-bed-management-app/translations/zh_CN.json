@@ -54,6 +54,8 @@
   "no": "否",
   "No data": "没有可显示的数据",
   "noDataToDisplay": "没有可显示的数据",
+  "occupancyStatusAvailable": "Available",
+  "occupancyStatusOccupied": "Occupied",
   "occupancyStatus": "已占用",
   "or": "或",
   "pleaseFillField": "",

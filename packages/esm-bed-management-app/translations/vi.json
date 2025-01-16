@@ -54,6 +54,8 @@
   "no": "Số",
   "No data": "Không có dữ liệu hiển thị",
   "noDataToDisplay": "No data to display",
+  "occupancyStatusAvailable": "Available",
+  "occupancyStatusOccupied": "Occupied",
   "occupancyStatus": "Đã sử dụng",
   "or": "hoặc",
   "pleaseFillField": "",
