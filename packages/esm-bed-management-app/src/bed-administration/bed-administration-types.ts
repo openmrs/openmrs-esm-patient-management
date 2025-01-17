@@ -3,7 +3,6 @@ export interface BedAdministrationData {
   bedId: string;
   bedRow: string;
   bedType: string;
-  description: string;
   location: {
     display: string;
     uuid: string;

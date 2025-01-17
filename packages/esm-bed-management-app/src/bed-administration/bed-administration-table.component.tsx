@@ -19,7 +19,7 @@ import {
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
 import { ErrorState, isDesktop as desktopLayout, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import type { BedFormData } from '../types';
+import type { BedWithLocation } from '../types';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import EditBedForm from './edit-bed-form.component';
@@ -44,7 +44,7 @@ const BedAdministrationTable: React.FC = () => {
   } = useBedsGroupedByLocation();
   const [showAddBedModal, setShowAddBedModal] = useState(false);
   const [showEditBedModal, setShowEditBedModal] = useState(false);
-  const [editData, setEditData] = useState<BedFormData>();
+  const [editData, setEditData] = useState<BedWithLocation>();
   const [filterOption, setFilterOption] = useState('ALL');
 
   function CustomTag({ condition }: { condition: boolean }) {

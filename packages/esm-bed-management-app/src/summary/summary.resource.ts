@@ -46,9 +46,8 @@ export const useBedsForLocation = (locationUuid: string) => {
   );
 
   const mappedBedData: MappedBedData = (data?.data?.results ?? []).map((bed) => ({
-    description: bed.bedType?.description,
     id: bed.id,
-    name: bed.bedType?.displayName,
+    type: bed.bedType?.displayName,
     number: bed.bedNumber,
     status: bed.status,
     uuid: bed.uuid,

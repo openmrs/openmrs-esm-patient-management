@@ -36,33 +36,28 @@ const WardWithBeds: React.FC = () => {
   const { results: paginatedData, goTo, currentPage } = usePagination(bedsData, pageSize);
 
   if (isLoadingBeds) {
-    <p>Loading...</p>;
+    <p>{t('loading', 'Loading...')}</p>;
   }
 
   const tableHeaders = [
     {
       id: 0,
-      header: 'ID',
+      header: t('id', 'ID'),
       key: 'id',
     },
     {
       id: 1,
-      header: 'Number',
+      header: t('number', 'Number'),
       key: 'number',
     },
     {
       id: 2,
-      header: 'Name',
-      key: 'name',
+      header: t('type', 'Type'),
+      key: 'type',
     },
     {
       id: 3,
-      header: 'Description',
-      key: 'description',
-    },
-    {
-      id: 4,
-      header: 'Occupied',
+      header: t('occupied', 'Occupied'),
       key: 'occupied',
     },
   ];
@@ -89,8 +84,7 @@ const WardWithBeds: React.FC = () => {
     return paginatedData?.map((bed) => ({
       id: bed.id,
       number: bed.number,
-      name: bed.name,
-      description: bed.description,
+      type: bed.type,
       occupied: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
     }));
   }, [paginatedData]);
@@ -116,7 +110,7 @@ const WardWithBeds: React.FC = () => {
                   to: `${window.getOpenmrsSpaBase()}bed-management`,
                 })
               }>
-              <span>Return to summary</span>
+              <span>{t('returnToSummary', 'Return to summary')}</span>
             </Button>
             <span>{isValidating ? <InlineLoading /> : null}</span>
             <Button
@@ -164,11 +158,11 @@ const WardWithBeds: React.FC = () => {
               )}
             </DataTable>
             <Pagination
-              backwardText="Previous page"
-              forwardText="Next page"
-              itemsPerPageText="Items per page:"
+              backwardText={t('previousPage', 'Previous page')}
+              forwardText={t('nextPage', 'Next page')}
+              itemsPerPageText={t('itemsPerPage', 'Items per page:')}
               page={currentPage}
-              pageNumberText="Page Number"
+              pageNumberText={t('pageNumber', 'Page Number')}
               pageSize={pageSize}
               onChange={({ page, pageSize }) => {
                 goTo(page);
