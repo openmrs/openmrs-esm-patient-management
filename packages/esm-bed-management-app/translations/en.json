@@ -61,6 +61,8 @@
   "noDataToDisplay": "No data to display",
   "number": "Number",
   "occupancyStatus": "Occupied",
+  "occupancyStatusAvailable": "Available",
+  "occupancyStatusOccupied": "Occupied",
   "occupied": "Occupied",
   "or": "or",
   "pageNumber": "Page Number",

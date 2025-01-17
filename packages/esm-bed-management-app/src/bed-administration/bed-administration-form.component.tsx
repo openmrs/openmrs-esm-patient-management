@@ -26,13 +26,11 @@ import { type BedAdministrationData } from './bed-administration-types';
 import type { BedType, BedWithLocation } from '../types';
 import styles from '../modals.scss';
 
-{
-  /**
-   * Adds translation for occupancy status options
-   * t('occupancyStatusAvailable', 'Available')
-   * t('occupancyStatusOccupied', 'Occupied')
-   */
-}
+/**
+ * Adds translation for occupancy status options
+ * t('occupancyStatusAvailable', 'Available')
+ * t('occupancyStatusOccupied', 'Occupied')
+ */
 
 interface BedAdministrationFormProps {
   allLocations: Location[];
