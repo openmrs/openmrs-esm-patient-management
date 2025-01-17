@@ -22,14 +22,9 @@
   row-gap: layout.$spacing-01;
 }
 
-.dropdown {
-  :global(.cds--list-box__field) {
-    width: 14rem;
-    overflow: hidden;
-  }
-
-  :global(.cds--dropdown--inline .cds--list-box__menu) {
-    left: -(layout.$spacing-10);
+.menuButton {
+  :global(.cds--btn--ghost) {
+    color: colors.$gray-80;
   }
 }
 

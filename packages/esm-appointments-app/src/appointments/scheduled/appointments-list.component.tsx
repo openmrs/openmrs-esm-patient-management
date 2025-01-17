@@ -4,7 +4,7 @@ import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 
 interface AppointmentsListProps {
-  appointmentServiceType?: string;
+  appointmentServiceType?: string[];
   status?: string;
   title: string;
   date: string;
