@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
@@ -59,21 +59,6 @@ const numberInString = z.string().transform((val, ctx) => {
   return val;
 });
 
-const BedAdministrationSchema = z.object({
-  bedColumn: numberInString,
-  bedId: z.string().max(255),
-  bedRow: numberInString,
-  bedType: z.string().refine((value) => value != '', {
-    message: translateFrom(moduleName, 'invalidBedType', 'Please select a valid bed type'),
-  }),
-  location: z.object({ display: z.string(), uuid: z.string() }).refine((value) => value.display != '', {
-    message: translateFrom(moduleName, 'invalidLocation', 'Please select a valid location'),
-  }),
-  occupancyStatus: z.string().refine((value) => value != '', {
-    message: translateFrom(moduleName, 'invalidOccupancyStatus', 'Please select a valid occupied status'),
-  }),
-});
-
 const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   allLocations,
   availableBedTypes,
@@ -89,6 +74,30 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   const [selectedBedType] = useState(initialData.bedType?.name ?? '');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
+
+  const BedAdministrationSchema = useMemo(
+    () =>
+      z.object({
+        bedId: z
+          .string()
+          .max(255)
+          .refine((value) => value !== '', {
+            message: t('invalidBedId', 'Bed ID cannot be empty'),
+          }),
+        bedRow: numberInString,
+        bedColumn: numberInString,
+        location: z.object({ display: z.string(), uuid: z.string() }).refine((value) => value.display != '', {
+          message: t('invalidLocation', 'Please select a valid location'),
+        }),
+        occupancyStatus: z.string().refine((value) => value != '', {
+          message: t('invalidOccupancyStatus', 'Please select a valid occupied status'),
+        }),
+        bedType: z.string().refine((value) => value != '', {
+          message: t('invalidBedType', 'Please select a valid bed type'),
+        }),
+      }),
+    [t],
+  );
 
   const {
     handleSubmit,
