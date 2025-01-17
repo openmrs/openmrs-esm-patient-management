@@ -103,10 +103,6 @@ export interface BedType {
   resourceVersion: string;
 }
 
-export interface BedFormData extends BedWithLocation {
-  description: string;
-}
-
 export interface BedTypeData {
   uuid: string;
   name: string;
@@ -159,8 +155,7 @@ export type AdmissionLocation = {
 export type MappedBedData = Array<{
   id: number;
   number: string;
-  name: string;
-  description: string;
+  type: string;
   status: string;
   uuid: string;
 }>;

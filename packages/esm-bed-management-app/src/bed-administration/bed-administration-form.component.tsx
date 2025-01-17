@@ -17,13 +17,13 @@ import {
   Select,
   SelectItem,
   Stack,
-  TextArea,
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
+import { getCoreTranslation, translateFrom, type Location } from '@openmrs/esm-framework';
+import { moduleName } from '../index';
 import { type BedAdministrationData } from './bed-administration-types';
-import { type BedType, type BedFormData } from '../types';
+import type { BedType, BedWithLocation } from '../types';
 import styles from '../modals.scss';
 
 interface BedAdministrationFormProps {
@@ -31,7 +31,7 @@ interface BedAdministrationFormProps {
   availableBedTypes: Array<BedType>;
   handleCreateBed?: (formData: BedAdministrationData) => void;
   headerTitle: string;
-  initialData: BedFormData;
+  initialData: BedWithLocation;
   occupancyStatuses: string[];
   onModalChange: (showModal: boolean) => void;
   showModal: boolean;
@@ -46,8 +46,7 @@ const numberInString = z.string().transform((val, ctx) => {
   if (isNaN(parsed) || parsed < 1) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      // TODO: Translate this message
-      message: 'Please enter a valid number',
+      message: translateFrom(moduleName, 'invalidNumber', 'Please enter a valid number'),
     });
     return z.NEVER;
   }
@@ -58,12 +57,15 @@ const BedAdministrationSchema = z.object({
   bedColumn: numberInString,
   bedId: z.string().max(255),
   bedRow: numberInString,
-  bedType: z.string().refine((value) => value != '', 'Please select a valid bed type'),
-  description: z.string().max(255),
-  location: z
-    .object({ display: z.string(), uuid: z.string() })
-    .refine((value) => value.display != '', 'Please select a valid location'),
-  occupancyStatus: z.string().refine((value) => value != '', 'Please select a valid occupied status'),
+  bedType: z.string().refine((value) => value != '', {
+    message: translateFrom(moduleName, 'invalidBedType', 'Please select a valid bed type'),
+  }),
+  location: z.object({ display: z.string(), uuid: z.string() }).refine((value) => value.display != '', {
+    message: translateFrom(moduleName, 'invalidLocation', 'Please select a valid location'),
+  }),
+  occupancyStatus: z.string().refine((value) => value != '', {
+    message: translateFrom(moduleName, 'invalidOccupancyStatus', 'Please select a valid occupied status'),
+  }),
 });
 
 const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
@@ -86,7 +88,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     handleSubmit,
     control,
     formState: { isDirty },
-    setValue
+    setValue,
   } = useForm<BedAdministrationData>({
     mode: 'all',
     resolver: zodResolver(BedAdministrationSchema),
@@ -95,7 +97,6 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
       bedId: initialData.bedNumber ?? '',
       bedRow: initialData.row.toString() ?? '0',
       bedType: initialData.bedType?.name ?? '',
-      description: initialData.bedType?.description ?? '',
       location: initialData.location ?? {},
       occupancyStatus: capitalize(initialData.status) ?? occupancyStatus,
     },
@@ -141,25 +142,6 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
 
             <FormGroup>
               <Controller
-                name="description"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <>
-                    <TextArea
-                      id="description"
-                      invalidText={fieldState?.error?.message}
-                      labelText={t('bedDescription', 'Bed description')}
-                      placeholder={t('enterBedDescription', 'Enter the bed description')}
-                      rows={2}
-                      {...field}
-                    />
-                  </>
-                )}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Controller
                 name="bedRow"
                 control={control}
                 render={({ fieldState, field }) => (
@@ -167,8 +149,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     hideSteppers
                     id="bedRow"
                     invalidText={fieldState?.error?.message}
-                    label="Bed row"
-                    labelText="Bed row"
+                    label={t('bedRow', 'Bed row')}
+                    labelText={t('bedRow', 'Bed row')}
                     {...field}
                   />
                 )}
@@ -183,8 +165,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                   <NumberInput
                     hideSteppers
                     id="bedColumn"
-                    label="Bed column"
-                    labelText="Bed column"
+                    label={t('bedColumn', 'Bed column')}
+                    labelText={t('bedColumn', 'Bed column')}
                     invalidText={fieldState.error?.message}
                     {...field}
                   />
@@ -210,7 +192,9 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     */
                     onBlur={(event) => {
                       const selectedLocation = allLocations.find((element) => element.display === event.target.value);
-                      setValue('location', { display: selectedLocation.display, uuid: selectedLocation.uuid });
+                      if (selectedLocation)
+                        setValue('location', { display: selectedLocation.display, uuid: selectedLocation.uuid });
+                      else setValue('location', { display: '', uuid: '' });
                       onBlur();
                     }}
                     onChange={({ selectedItem }) => onChange(selectedItem)}

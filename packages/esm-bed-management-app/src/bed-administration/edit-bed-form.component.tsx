@@ -2,13 +2,13 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
-import { type BedFormData } from '../types';
+import { type BedWithLocation } from '../types';
 import { editBed, useBedType } from './bed-administration.resource';
 import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
 import BedAdministrationForm from './bed-administration-form.component';
 
 interface EditBedFormProps {
-  editData: BedFormData;
+  editData: BedWithLocation;
   mutate: () => void;
   onModalChange: (showModal: boolean) => void;
   showModal: boolean;
@@ -31,7 +31,6 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
         bedId = editData.bedNumber,
         bedRow = editData.row.toString(),
         bedType = editData.bedType.name,
-        description = editData.description,
         location: { uuid: bedLocation = editData.location.uuid },
         occupancyStatus = editData.status,
       } = formData;
@@ -40,7 +39,6 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
         bedNumber: bedId,
         bedType,
         column: parseInt(bedColumn),
-        description,
         locationUuid: bedLocation,
         row: parseInt(bedRow),
         status: occupancyStatus.toUpperCase(),
