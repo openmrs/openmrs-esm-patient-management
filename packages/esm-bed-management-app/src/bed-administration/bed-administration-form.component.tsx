@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
@@ -20,8 +20,7 @@ import {
   TextInput,
 } from '@carbon/react';
 import { type TFunction, useTranslation } from 'react-i18next';
-import { getCoreTranslation, translateFrom, type Location } from '@openmrs/esm-framework';
-import { moduleName } from '../index';
+import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
 import type { BedType, BedWithLocation } from '../types';
 import styles from '../modals.scss';
