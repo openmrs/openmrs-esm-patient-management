@@ -40,7 +40,7 @@ export const useLocationsWithAdmissionTag = () => {
 export const useBedsForLocation = (locationUuid: string) => {
   const apiUrl = `${restBaseUrl}/bed?locationUuid=${locationUuid}&v=full`;
 
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<Bed> } }, Error>(
+  const { data, isLoading, error, mutate, isValidating } = useSWR<{ data: { results: Array<Bed> } }, Error>(
     locationUuid ? apiUrl : null,
     openmrsFetch,
   );
@@ -59,8 +59,10 @@ export const useBedsForLocation = (locationUuid: string) => {
       bedsData: mappedBedData,
       errorLoadingBeds: error,
       isLoadingBeds: isLoading,
+      mutate,
+      isValidating,
     }),
-    [mappedBedData, isLoading, error],
+    [mappedBedData, isLoading, error, mutate, isValidating],
   );
 
   return results;
