@@ -19,7 +19,7 @@ import {
   Stack,
   TextInput,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { getCoreTranslation, translateFrom, type Location } from '@openmrs/esm-framework';
 import { moduleName } from '../index';
 import { type BedAdministrationData } from './bed-administration-types';
@@ -47,17 +47,39 @@ interface ErrorType {
   message: string;
 }
 
-const numberInString = z.string().transform((val, ctx) => {
-  const parsed = parseInt(val);
-  if (isNaN(parsed) || parsed < 1) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: translateFrom(moduleName, 'invalidNumber', 'Please enter a valid number'),
-    });
-    return z.NEVER;
-  }
-  return val;
-});
+const createSchema = (t: TFunction) => {
+  const numberInString = z.string().transform((val, ctx) => {
+    const parsed = parseInt(val);
+    if (isNaN(parsed) || parsed < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t('invalidNumber', 'Please enter a valid number'),
+      });
+      return z.NEVER;
+    }
+    return val;
+  });
+
+  return z.object({
+    bedId: z
+      .string()
+      .max(255)
+      .refine((value) => value !== '', {
+        message: t('invalidBedId', 'Bed ID cannot be empty'),
+      }),
+    bedRow: numberInString,
+    bedColumn: numberInString,
+    location: z.object({ display: z.string(), uuid: z.string() }).refine((value) => value.display != '', {
+      message: t('invalidLocation', 'Please select a valid location'),
+    }),
+    occupancyStatus: z.string().refine((value) => value != '', {
+      message: t('invalidOccupancyStatus', 'Please select a valid occupied status'),
+    }),
+    bedType: z.string().refine((value) => value != '', {
+      message: t('invalidBedType', 'Please select a valid bed type'),
+    }),
+  });
+};
 
 const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   allLocations,
@@ -75,29 +97,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
 
-  const BedAdministrationSchema = useMemo(
-    () =>
-      z.object({
-        bedId: z
-          .string()
-          .max(255)
-          .refine((value) => value !== '', {
-            message: t('invalidBedId', 'Bed ID cannot be empty'),
-          }),
-        bedRow: numberInString,
-        bedColumn: numberInString,
-        location: z.object({ display: z.string(), uuid: z.string() }).refine((value) => value.display != '', {
-          message: t('invalidLocation', 'Please select a valid location'),
-        }),
-        occupancyStatus: z.string().refine((value) => value != '', {
-          message: t('invalidOccupancyStatus', 'Please select a valid occupied status'),
-        }),
-        bedType: z.string().refine((value) => value != '', {
-          message: t('invalidBedType', 'Please select a valid bed type'),
-        }),
-      }),
-    [t],
-  );
+  const BedAdministrationSchema = createSchema(t);
 
   const {
     handleSubmit,

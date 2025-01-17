@@ -52,6 +52,7 @@
   "invalidBedId": "Bed ID cannot be empty",
   "invalidBedType": "Please select a valid bed type",
   "invalidLocation": "Please select a valid location",
+  "invalidNumber": "Please enter a valid number",
   "invalidOccupancyStatus": "Please select a valid occupied status",
   "itemsPerPage": "Items per page:",
   "loading": "Loading...",
