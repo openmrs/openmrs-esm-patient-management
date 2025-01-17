@@ -44,6 +44,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
             const dispose = showModal('end-queue-entry-modal', {
               closeModal: () => dispose(),
               queueEntry,
+              size: 'sm',
             });
           }}
           itemText={t('removePatient', 'Remove patient')}

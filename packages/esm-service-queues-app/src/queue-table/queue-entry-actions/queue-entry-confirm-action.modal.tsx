@@ -77,9 +77,7 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
   return (
     <>
       <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
-      <ModalBody>
-        <p>{modalInstruction}</p>
-      </ModalBody>
+      <ModalBody>{modalInstruction}</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
