@@ -95,7 +95,7 @@ interface QueueTablesByStatusProps {
 function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
   const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
+  const allowedStatuses = [...selectedQueue.allowedStatuses].reverse();
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;
