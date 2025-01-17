@@ -34,10 +34,12 @@ export default function LocationSelector({ paginationSize = 15, ...props }: Loca
       criteria.push(['name:contains', debouncedSearchTerm]);
     }
     if (emrConfiguration) {
+      // limit to locations tagged as transfer locations
       criteria.push(['_tag', emrConfiguration.supportsTransferLocationTag.name]);
     }
     if (ancestorLocation) {
-      criteria.push(['below', ancestorLocation.uuid]);
+      // limit to locations that are "part of" the facility where the patient has an active visit
+      criteria.push(['partof:below', ancestorLocation.uuid]);
     }
     return criteria;
   }, [debouncedSearchTerm, emrConfiguration, ancestorLocation]);
