@@ -1,7 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { DatePicker, DatePickerInput, Dropdown } from '@carbon/react';
+import { 
+  DatePicker, 
+  DatePickerInput,
+  MenuItemSelectable,
+  MenuItemDivider,
+  MenuItemGroup,
+  MenuButton
+} from '@carbon/react';
 import { PageHeader, PageHeaderContent, AppointmentsPictogram } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
@@ -10,7 +17,7 @@ import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
-  appointmentServiceType?: string;
+  appointmentServiceType?: string[];
   onChange?: (evt) => void;
 }
 
@@ -18,6 +25,43 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   const { t } = useTranslation();
   const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
   const { serviceTypes } = useAppointmentServices();
+  
+  const items = [{ name: 'All', uuid: '' }, ...serviceTypes];
+  const [selectedItems, setSelectedItems] = useState([items[0]]);
+
+  const handleMenuItemChange = (itemUuid: string) => {
+    if (itemUuid === '') {
+      setSelectedItems([items[0]]);
+      onChange?.('');
+    } else {
+      let updatedSelectedItems;
+      const isAlreadySelected = selectedItems.some((item) => item.uuid === itemUuid);
+  
+      if (isAlreadySelected) {
+        updatedSelectedItems = selectedItems.filter((item) => item.uuid !== itemUuid);
+      } else {
+        updatedSelectedItems = selectedItems.filter((item) => item.uuid !== '').concat(
+          items.find((item) => item.uuid === itemUuid)!
+        );
+      }
+
+      if (updatedSelectedItems.length === 0) {
+        updatedSelectedItems = [items[0]]; 
+        onChange?.(''); 
+      } else {
+        const selectedUuids = updatedSelectedItems.map((item) => item.uuid);
+        onChange?.(selectedUuids);
+      }
+  
+      setSelectedItems(updatedSelectedItems);
+    }
+  };
+  
+  
+
+  useEffect(() => {
+    onChange?.('');
+  }, [])
 
   return (
     <PageHeader className={styles.header} data-testid="appointments-header">
@@ -37,22 +81,31 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
           />
         </DatePicker>
         {typeof onChange === 'function' && (
-          <Dropdown
-            aria-label={t('selectServiceType', 'Select service type')}
-            className={styles.dropdown}
-            direction="bottom"
-            id="serviceDropdown"
-            items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
-            itemToString={(item) => (item ? item.name : '')}
-            label={t('selectServiceType', 'Select service type')}
-            onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
-            selectedItem={
-              serviceTypes.find((service) => service.uuid === appointmentServiceType) || { name: 'All', uuid: '' }
-            }
+          <MenuButton
+            label={t('filterByServiceType', 'Filter by service type')}
+            kind="ghost"
             size="sm"
-            titleText={t('view', 'View')}
-            type="inline"
-          />
+            menuAlignment="bottom-end"
+            className={styles.menuButton}
+          >
+            <MenuItemGroup
+              aria-label={t('filterByServiceType', 'Filter by service type')}
+              id="serviceMenu"
+            >
+              {items.map((item) => (
+                <React.Fragment key={item.uuid}>
+                  <MenuItemSelectable
+                    key={item.uuid}
+                    label={item.name}
+                    defaultSelected={selectedItems.some((selectedItem) => selectedItem.uuid === item.uuid)}
+                    onChange={() => handleMenuItemChange(item.uuid)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <MenuItemDivider />
+                </React.Fragment>
+              ))}
+            </MenuItemGroup>
+          </MenuButton>
         )}
       </div>
     </PageHeader>
