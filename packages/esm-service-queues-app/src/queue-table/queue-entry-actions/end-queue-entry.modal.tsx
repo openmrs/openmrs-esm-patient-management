@@ -35,7 +35,7 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
             endedAt: new Date().toISOString(),
           }),
       }}
-      isRemovePatient={true}
+      isRemovingPatientFromQueue
     />
   );
 };
