@@ -3,7 +3,7 @@ import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
@@ -44,7 +44,8 @@ export const DobField: React.FC = () => {
   );
 
   const onDateChange = useCallback(
-    (birthdate: Date) => {
+    (e: { target: { value: any } }) => {
+      let birthdate: Date = e.target.value;
       setFieldValue('birthdate', birthdate);
     },
     [setFieldValue],
@@ -99,10 +100,11 @@ export const DobField: React.FC = () => {
       <Layer>
         {!dobUnknown ? (
           <div className={styles.dobField}>
-            <OpenmrsDatePicker
+            <TextInput
               id="birthdate"
               {...birthdate}
               onChange={onDateChange}
+              type="date"
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of birth')}
               isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
