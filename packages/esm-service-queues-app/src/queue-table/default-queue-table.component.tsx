@@ -133,13 +133,18 @@ function QueueTableSection() {
     });
   }, [columns, queueEntries, searchTerm]);
 
-  return !isLoading ? (
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
+  return (
     <QueueTable
-      queueEntries={filteredQueueEntries ?? []}
+      ExpandedRow={QueueTableExpandedRow}
+      isLoading={isLoading}
       isValidating={isValidating}
+      queueEntries={filteredQueueEntries ?? []}
       queueUuid={null}
       statusUuid={null}
-      ExpandedRow={QueueTableExpandedRow}
       tableFilters={
         <>
           <QueueDropdownFilter /> <StatusDropdownFilter />
@@ -153,8 +158,6 @@ function QueueTableSection() {
         </>
       }
     />
-  ) : (
-    <DataTableSkeleton role="progressbar" />
   );
 }
 
