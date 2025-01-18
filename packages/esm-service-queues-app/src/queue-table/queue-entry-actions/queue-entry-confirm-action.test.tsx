@@ -109,14 +109,14 @@ describe('EndQueueEntryModal', () => {
 
     renderWithSwr(<EndQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    const submitButton = screen.getByRole('button', { name: /Remove patient/ });
+    const submitButton = screen.getByRole('button', { name: /Remove/ });
     expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     expect(showSnackbar).toHaveBeenCalledWith({
       isLowContrast: true,
       kind: 'success',
-      subtitle: 'Paient removed from queue successfully',
+      subtitle: 'Patient removed from queue successfully',
       title: 'Patient removed',
     });
   });

@@ -44,6 +44,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
             const dispose = showModal('end-queue-entry-modal', {
               closeModal: () => dispose(),
               queueEntry,
+              size: 'sm',
             });
           }}
           itemText={t('removePatient', 'Remove patient')}
@@ -58,6 +59,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
               const dispose = showModal('void-queue-entry-modal', {
                 closeModal: () => dispose(),
                 queueEntry,
+                size: 'sm',
               });
             }}
             itemText={t('delete', 'Delete')}
@@ -72,6 +74,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
               const dispose = showModal('undo-transition-queue-entry-modal', {
                 closeModal: () => dispose(),
                 queueEntry,
+                size: 'sm',
               });
             }}
             itemText={t('undoTransition', 'Undo transition')}
