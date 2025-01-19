@@ -48,14 +48,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
         closeWorkspaceWithSavedChanges();
         wardPatientGroupDetails.mutate();
       });
-  }, [
-    createEncounter,
-    wardPatient,
-    emrConfiguration,
-    t,
-    closeWorkspaceWithSavedChanges,
-    wardPatientGroupDetails,
-  ]);
+  }, [createEncounter, wardPatient, emrConfiguration, t, closeWorkspaceWithSavedChanges, wardPatientGroupDetails]);
 
   if (!wardPatientGroupDetails) return <></>;
   return (

@@ -2,7 +2,6 @@ import { openmrsFetch, restBaseUrl, type FetchResponse, type Patient } from '@op
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
-
 // prettier-ignore
 const defaultRep =
   'custom:(' +

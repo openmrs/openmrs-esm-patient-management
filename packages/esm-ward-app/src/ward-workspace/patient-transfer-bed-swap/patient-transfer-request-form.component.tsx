@@ -156,7 +156,11 @@ export default function PatientTransferForm({
             hideCloseButton
           />
         </div>
-        <AdmitPatientButton wardPatient={wardPatient} dispositionType={'ADMIT'} onAdmitPatientSuccess={closeWorkspaceWithSavedChanges} />
+        <AdmitPatientButton
+          wardPatient={wardPatient}
+          dispositionType={'ADMIT'}
+          onAdmitPatientSuccess={closeWorkspaceWithSavedChanges}
+        />
       </div>
     );
   }
