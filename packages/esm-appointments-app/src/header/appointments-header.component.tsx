@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { DatePicker, DatePickerInput, Dropdown } from '@carbon/react';
-import { PageHeader, PageHeaderContent, AppointmentsPictogram } from '@openmrs/esm-framework';
+import { Dropdown } from '@carbon/react';
+import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import SelectedDateContext from '../hooks/selectedDateContext';
@@ -23,19 +23,12 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
     <PageHeader className={styles.header} data-testid="appointments-header">
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
-        <DatePicker
-          dateFormat="d-M-Y"
-          datePickerType="single"
-          onChange={([date]) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
-          value={dayjs(selectedDate).format('DD MMM YYYY')}>
-          <DatePickerInput
-            style={{ cursor: 'pointer', backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
-            id="appointment-date-picker"
-            labelText=""
-            placeholder="DD-MMM-YYYY"
-            type="text"
-          />
-        </DatePicker>
+        <OpenmrsDatePicker
+          id="appointment-date-picker"
+          labelText=""
+          onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
+          value={dayjs(selectedDate).format('DD MMM YYYY')}
+        />
         {typeof onChange === 'function' && (
           <Dropdown
             aria-label={t('selectServiceType', 'Select service type')}

@@ -4,8 +4,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   Form,
   Layer,
@@ -22,6 +20,7 @@ import {
   toOmrsIsoString,
   useLayoutType,
   useVisitTypes,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { datePickerFormat, datePickerPlaceHolder } from '../constants';
 import styles from './queue-linelist-filter.scss';
@@ -129,18 +128,17 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
             <Column md={2}>
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
               <Layer>
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
-                  value={returnDate}
-                  onChange={([date]) => setReturnDate(date)}>
-                  <DatePickerInput
-                    id="returnDate"
-                    placeholder={datePickerPlaceHolder}
-                    labelText={t('date', 'Date')}
-                    type="date"
-                  />
-                </DatePicker>
+                <OpenmrsDatePicker
+                  {...{
+                    dateFormat: datePickerFormat,
+                    value: returnDate,
+                    onChange: (date) => setReturnDate(date),
+                    id: 'returnDate',
+                    placeholder: datePickerPlaceHolder,
+                    labelText: t('date', 'Date'),
+                    type: 'date',
+                  }}
+                />
               </Layer>
               <Button
                 kind="ghost"
