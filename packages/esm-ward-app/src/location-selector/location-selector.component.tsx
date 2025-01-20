@@ -10,6 +10,7 @@ import {
   ResponsiveWrapper,
   useDebounce,
   useLayoutType,
+  type Location,
 } from '@openmrs/esm-framework';
 import useEmrConfiguration from '../hooks/useEmrConfiguration';
 import useLocations from '../hooks/useLocations';
@@ -17,10 +18,12 @@ import styles from './location-selector.scss';
 
 interface LocationSelectorProps extends RadioButtonGroupProps {
   paginationSize?: number;
+  ancestorLocation?: Location;
 }
 
 export default function LocationSelector({ paginationSize = 15, ...props }: LocationSelectorProps) {
   const { t } = useTranslation();
+  const { ancestorLocation } = props;
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
   const isTablet = !isDesktop(useLayoutType());
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,10 +34,15 @@ export default function LocationSelector({ paginationSize = 15, ...props }: Loca
       criteria.push(['name:contains', debouncedSearchTerm]);
     }
     if (emrConfiguration) {
+      // limit to locations tagged as transfer locations
       criteria.push(['_tag', emrConfiguration.supportsTransferLocationTag.name]);
     }
+    if (ancestorLocation) {
+      // limit to locations that are "part of" the facility where the patient has an active visit
+      criteria.push(['partof:below', ancestorLocation.uuid]);
+    }
     return criteria;
-  }, [debouncedSearchTerm, emrConfiguration]);
+  }, [debouncedSearchTerm, emrConfiguration, ancestorLocation]);
   const {
     data: locations,
     isLoading,
