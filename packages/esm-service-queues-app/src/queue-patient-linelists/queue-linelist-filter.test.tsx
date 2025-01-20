@@ -1,13 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
 import QueueLinelistFilter from './queue-linelist-filter.workspace';
 import dayjs from 'dayjs';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 
 const workspaceProps = {
   closeWorkspace: jest.fn(),
@@ -16,9 +17,8 @@ const workspaceProps = {
   setTitle: jest.fn(),
 };
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  OpenmrsDatePicker: jest.fn(({ id, labelText, value, onChange }) => (
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
+  return (
     <>
       <label htmlFor={id}>{labelText}</label>
       <input
@@ -32,8 +32,8 @@ jest.mock('@openmrs/esm-framework', () => ({
         value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
       />
     </>
-  )),
-}));
+  );
+});
 
 describe('QueueLinelistFilter', () => {
   beforeEach(() => {
