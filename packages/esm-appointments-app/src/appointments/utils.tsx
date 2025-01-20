@@ -73,8 +73,8 @@ export function useAppointmentSearchResults(data: Appointment[], searchString: s
   }, [searchString, data]);
 }
 
-export function filterByServiceType(appointmentList: any[], appointmentServiceType: string) {
+export function filterByServiceType(appointmentList: any[], appointmentServiceType: string[]) {
   return appointmentServiceType
-    ? appointmentList.filter(({ service }) => service?.uuid === appointmentServiceType)
+    ? appointmentList.filter(({ service }) => appointmentServiceType.includes(service.uuid))
     : appointmentList;
 }

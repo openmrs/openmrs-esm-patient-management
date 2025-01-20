@@ -8,7 +8,7 @@ import UnscheduledAppointments from './unscheduled/unscheduled-appointments.comp
 import styles from './appointment-tabs.scss';
 
 interface AppointmentTabsProps {
-  appointmentServiceType: string;
+  appointmentServiceType: string[];
 }
 
 const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceType }) => {

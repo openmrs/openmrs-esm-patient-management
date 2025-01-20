@@ -61,7 +61,7 @@ export function useAllAppointmentsByDate() {
   };
 }
 
-export const useScheduledAppointment = (serviceUuid: string) => {
+export const useScheduledAppointment = (serviceUuid: string[]) => {
   const { selectedDate } = useContext(SelectedDateContext);
   const url = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
 
@@ -70,7 +70,7 @@ export const useScheduledAppointment = (serviceUuid: string) => {
   }>(url, openmrsFetch);
 
   const totalScheduledAppointments = !isEmpty(serviceUuid)
-    ? data?.data?.filter((appt) => appt?.service?.uuid === serviceUuid)?.length ?? 0
+    ? data?.data?.filter((appt) => serviceUuid.includes(appt?.service?.uuid))?.length ?? 0
     : data?.data?.length ?? 0;
 
   return {
