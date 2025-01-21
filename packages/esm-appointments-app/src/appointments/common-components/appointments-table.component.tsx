@@ -153,7 +153,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                   noToday: true,
                 })
               : null;
-            exportAppointmentsToSpreadsheet(appointments, `${tableHeading}_appointments_${date}`);
+            exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
           }}>
           {t('download', 'Download')}
         </Button>

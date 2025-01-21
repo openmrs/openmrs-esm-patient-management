@@ -7,14 +7,22 @@ import { moduleName } from '../constants';
 /**
  * Exports the provided appointments as an Excel spreadsheet.
  * @param {Array<Appointment>} appointments - The list of appointments to export.
+ * @param {Array} rowData - The current rows of the table as rendered in the UI.
  * @param {string} [fileName] - The name of the downloaded file
  */
-export async function exportAppointmentsToSpreadsheet(appointments: Array<Appointment>, fileName = 'Appointments') {
+export async function exportAppointmentsToSpreadsheet(
+  appointments: Array<Appointment>,
+  rowData: Array<any>,
+  fileName = 'Appointments',
+) {
   const config = await getConfig<ConfigObject>(moduleName);
   const includePhoneNumbers = config.includePhoneNumberInExcelSpreadsheet ?? false;
 
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
+      const tableRow = rowData.find((row) => row.id === appointment.uuid);
+      const renderedIdentifier = tableRow?.identifier ?? appointment.patient.identifier;
+
       const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
       const phoneNumber =
         includePhoneNumbers && patientInfo?.telecom
@@ -25,7 +33,7 @@ export async function exportAppointmentsToSpreadsheet(appointments: Array<Appoin
         'Patient name': appointment.patient.name,
         Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
         Age: appointment.patient.age,
-        Identifier: appointment.patient.identifier ?? '--',
+        Identifier: renderedIdentifier,
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
         ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
