@@ -1,15 +1,9 @@
+import React, { type ReactNode } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Button, InlineNotification } from '@carbon/react';
 import { Movement } from '@carbon/react/icons';
-import {
-  ArrowRightIcon,
-  isDesktop,
-  launchWorkspace,
-  launchWorkspaceGroup,
-  useAppContext,
-  useLayoutType,
-} from '@openmrs/esm-framework';
-import React, { type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+import { ArrowRightIcon, isDesktop, launchWorkspaceGroup, useAppContext, useLayoutType } from '@openmrs/esm-framework';
 import { type WardViewContext } from '../types';
 import styles from './admission-requests.scss';
 
@@ -39,9 +33,10 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
 
   return (
     <div
-      className={`${styles.admissionRequestsContainer} ${
-        inpatientRequests?.length ? styles.blackBackground : styles.lightBlueBackground
-      }`}>
+      className={classNames(styles.admissionRequestsContainer, {
+        [styles.blackBackground]: inpatientRequests?.length,
+        [styles.lightBlueBackground]: !inpatientRequests?.length,
+      })}>
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
         {t('admissionRequestsCount', '{{count}} admission request', {

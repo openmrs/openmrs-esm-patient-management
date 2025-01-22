@@ -1,8 +1,8 @@
+import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, InlineNotification } from '@carbon/react';
 import { Exit } from '@carbon/react/icons';
 import { ExtensionSlot, showSnackbar, useAppContext } from '@openmrs/esm-framework';
-import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { type WardPatientWorkspaceProps, type WardViewContext } from '../../types';
 import { removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
