@@ -37,7 +37,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const { t } = useTranslation();
   const { concepts } = useConfig<ConfigObject>();
   const { allowedPriorities, allowedStatuses } = queueEntry.queue ?? {};
-  const userPriority = queueEntry.priority.toString();
+  const currentPriority = queueEntry.priorityUuid;
 
   const schema = useMemo(
     () =>
@@ -58,7 +58,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
     formState: { isSubmitting, errors },
     getValues,
   } = useForm<ChangeStatusForm>({
-    defaultValues: { priority: userPriority },
+    defaultValues: { priority: currentPriority || allowedPriorities[1]?.uuid },
     resolver: zodResolver(schema),
   });
 
@@ -231,7 +231,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                     <>
                       <ContentSwitcher
                         size="sm"
-                        selectedIndex={allowedPriorities?.findIndex((priority) => priority.display === userPriority)}
+                        selectedIndex={allowedPriorities?.findIndex((priority) => priority.uuid === currentPriority)}
                         onChange={(event) => {
                           onChange(event.name as any);
                         }}>
