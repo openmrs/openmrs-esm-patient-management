@@ -4,6 +4,12 @@ import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
 
+type RowData = {
+  id: string; // Corresponds to the UUID of an appointment
+  identifier?: string; // Optional identifier property
+  [key: string]: any; // Allow for other dynamic properties
+};
+
 /**
  * Exports the provided appointments as an Excel spreadsheet.
  * @param {Array<Appointment>} appointments - The list of appointments to export.
@@ -12,7 +18,7 @@ import { moduleName } from '../constants';
  */
 export async function exportAppointmentsToSpreadsheet(
   appointments: Array<Appointment>,
-  rowData: Array<any>,
+  rowData: Array<RowData>,
   fileName = 'Appointments',
 ) {
   const config = await getConfig<ConfigObject>(moduleName);
@@ -21,7 +27,7 @@ export async function exportAppointmentsToSpreadsheet(
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
       const tableRow = rowData.find((row) => row.id === appointment.uuid);
-      const renderedIdentifier = tableRow?.identifier ?? appointment.patient.identifier;
+      const identifier = tableRow?.identifier ?? appointment.patient.identifier;
 
       const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
       const phoneNumber =
@@ -33,7 +39,7 @@ export async function exportAppointmentsToSpreadsheet(
         'Patient name': appointment.patient.name,
         Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
         Age: appointment.patient.age,
-        Identifier: renderedIdentifier,
+        Identifier: identifier,
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
         ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
