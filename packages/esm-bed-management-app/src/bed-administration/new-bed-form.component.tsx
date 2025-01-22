@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { type BedFormData } from '../types';
+import { type BedWithLocation } from '../types';
 import { type BedAdministrationData } from './bed-administration-types';
 import { saveBed, useBedType } from './bed-administration.resource';
 import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
@@ -11,9 +11,10 @@ interface NewBedFormProps {
   mutate: () => void;
   onModalChange: (showModal: boolean) => void;
   showModal: boolean;
+  defaultLocation?: { display: string; uuid: string };
 }
 
-const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate }) => {
+const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate, defaultLocation }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
@@ -22,16 +23,12 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
   const occupancyStatuses = ['Available', 'Occupied'];
   const availableBedTypes = bedTypes ? bedTypes : [];
 
-  const initialData: BedFormData = {
+  const initialData: BedWithLocation = {
     bedNumber: '',
     bedType: null,
     column: 0,
-    description: '',
     id: 0,
-    location: {
-      display: '',
-      uuid: '',
-    },
+    location: defaultLocation || { display: '', uuid: '' },
     row: 0,
     status: null,
     uuid: '',
@@ -39,12 +36,11 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
 
   const handleCreateBed = useCallback(
     (formData: BedAdministrationData) => {
-      const { bedId, description, occupancyStatus, bedRow, bedColumn, location, bedType } = formData;
+      const { bedId, occupancyStatus, bedRow, bedColumn, location, bedType } = formData;
 
       const bedObject = {
         bedNumber: bedId,
         bedType,
-        description,
         status: occupancyStatus.toUpperCase(),
         row: parseInt(bedRow.toString()),
         column: parseInt(bedColumn.toString()),
