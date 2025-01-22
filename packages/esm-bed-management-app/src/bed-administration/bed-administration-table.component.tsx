@@ -119,7 +119,7 @@ const BedAdministrationTable: React.FC = () => {
             iconDescription={t('editBed', 'Edit bed')}
             hasIconOnly
             size={responsiveSize}
-            tooltipAlignment="start"
+            tooltipPosition="right"
           />
         </>
       ),
