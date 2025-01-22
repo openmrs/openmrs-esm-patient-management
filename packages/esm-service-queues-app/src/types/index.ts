@@ -318,7 +318,6 @@ export interface MappedQueueEntry {
   patientUuid: string;
   queue: Queue;
   priority: Concept;
-  priorityUuid: string;
   priorityComment: string;
   status: Concept;
   visitType: string;

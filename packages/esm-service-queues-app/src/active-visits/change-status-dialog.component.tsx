@@ -20,7 +20,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { type MappedQueueEntry } from '../types';
+import { type Queue } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../hooks/useQueues';
 import { updateQueueEntry } from './active-visits-table.resource';
@@ -29,8 +29,31 @@ import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations
 import styles from './change-status-dialog.scss';
 
 interface ChangeStatusDialogProps {
-  queueEntry: MappedQueueEntry;
+  queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
+}
+//it's copied from openmrs-esm-patient-chart/packages/esm-patient-chart-app/src/visit/queue-entry/queue.resource.tsx
+
+type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
+type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
+type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
+
+interface MappedVisitQueueEntry {
+  id: string;
+  name: string;
+  patientUuid: string;
+  priority: MappedQueuePriority;
+  priorityUuid: string;
+  patientAge: string;
+  patientSex: string;
+  service: string;
+  status: QueueStatus;
+  statusUuid: string;
+  visitUuid: string;
+  visitType: string;
+  queue: Queue;
+  queueEntryUuid: string;
+  queueLocation: string;
 }
 
 const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
@@ -58,7 +81,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
     formState: { isSubmitting, errors },
     getValues,
   } = useForm<ChangeStatusForm>({
-    defaultValues: { priority: currentPriority || allowedPriorities[1]?.uuid },
+    defaultValues: { priority: currentPriority ?? concepts.defaultPriorityConceptUuid },
     resolver: zodResolver(schema),
   });
 
