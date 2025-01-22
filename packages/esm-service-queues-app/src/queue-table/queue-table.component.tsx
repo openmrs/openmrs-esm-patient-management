@@ -76,7 +76,7 @@ function QueueTable({
     goTo(1);
   }, [goTo, queueEntries]);
 
-  const rowsData =
+  const rows =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
       columns.forEach(({ key, CellComponent }) => {
@@ -97,7 +97,7 @@ function QueueTable({
     <DataTable
       data-floating-menu-container
       overflowMenuOnHover={isDesktop(layout)}
-      rows={rowsData}
+      rows={rows}
       headers={columns}
       size={responsiveSize}
       useZebraStyles>
@@ -106,9 +106,9 @@ function QueueTable({
           <TableContainer className={styles.tableContainer}>
             <div className={styles.toolbarContainer}>
               {isValidating ? (
-                <span>
+                <div className={styles.loaderContainer}>
                   <InlineLoading />
-                </span>
+                </div>
               ) : null}
 
               {tableFilters && (
@@ -135,11 +135,11 @@ function QueueTable({
                   return (
                     <React.Fragment key={row.id}>
                       <Row {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
+                        {row.cells.map((cell, i) => (
                           <TableCell
                             key={cell.id}
                             className={classNames({
-                              'cds--table-column-menu': cell?.id?.split(':')?.[1] === 'actions',
+                              'cds--table-column-menu': columns[i].key.includes('actions'),
                             })}>
                             {cell.value}
                           </TableCell>

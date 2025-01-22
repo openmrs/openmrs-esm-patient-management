@@ -1,15 +1,15 @@
-import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
-import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import LocationSelector from '../../location-selector/location-selector.component';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
 import AdmitPatientButton from '../admit-patient-button.component';
+import LocationSelector from '../../location-selector/location-selector.component';
 import styles from './patient-transfer-swap.scss';
 
 export default function PatientTransferForm({
@@ -156,7 +156,11 @@ export default function PatientTransferForm({
             hideCloseButton
           />
         </div>
-        <AdmitPatientButton wardPatient={wardPatient} dispositionType={'ADMIT'} onAdmitPatientSuccess={closeWorkspaceWithSavedChanges} />
+        <AdmitPatientButton
+          wardPatient={wardPatient}
+          dispositionType={'ADMIT'}
+          onAdmitPatientSuccess={closeWorkspaceWithSavedChanges}
+        />
       </div>
     );
   }

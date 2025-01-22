@@ -11,19 +11,34 @@
   border: 1px solid colors.$gray-20;
 }
 
+.tableSection {
+  background: colors.$gray-10;
+}
+
 .headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: layout.$spacing-05;
-  background-color: $ui-background;
+  background-color: colors.$gray-10;
 }
 
 .headerButtons {
   display: flex;
-  justify-content: space-between;
+
   .filterSearch {
     margin-left: layout.$spacing-05;
+  }
+}
+
+.loaderContainer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+
+  :global(.cds--inline-loading) {
+    justify-content: end;
   }
 }
 
@@ -65,7 +80,7 @@
 
 .statusTableContainer {
   padding: layout.$spacing-05;
-  background-color: $ui-01;
+  background-color: colors.$gray-10;
 }
 
 .statusTableHeader {
@@ -77,9 +92,9 @@
 }
 
 .tableContainer {
-  background-color: $ui-01;
+  background-color: colors.$gray-10;
   // margin: 0 layout.$spacing-05;
-  padding: 0;
+  padding: 0 1rem;
 
   a {
     text-decoration: none;
@@ -105,6 +120,7 @@
   }
 
   :global(.cds--table-toolbar) {
+    flex: 3;
     position: static;
     overflow: visible;
   }
@@ -193,11 +209,13 @@ html[dir='rtl'] {
 
 .tileContainer {
   border-top: 1px solid $ui-03;
-  padding: layout.$spacing-07 0;
+  padding: layout.$spacing-07 layout.$spacing-05;
+  background: white;
+  margin: 0 layout.$spacing-05;
 }
 
 .tile {
-  background-color: $ui-01;
+  background-color: colors.$gray-10;
   margin: auto;
   width: fit-content;
 }

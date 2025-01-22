@@ -1,12 +1,12 @@
-import { ActionMenuButton, AddIcon, launchWorkspace } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ActionMenuButton, AddIcon, launchWorkspace } from '@openmrs/esm-framework';
 import { type CreateAdmissionEncounterWorkspaceProps } from './create-admission-encounter.workspace';
 
 function CreateAdmissionRequestActionButton() {
   const { t } = useTranslation();
 
-  // TODO: this is an attempt to save the previous search term for the 
+  // TODO: this is an attempt to save the previous search term for the
   // "Back to patient search" button, but it doesn't work. See:
   // https://openmrs.atlassian.net/browse/O3-4300
   const [searchTerm, setSearchTerm] = useState<string>('');
