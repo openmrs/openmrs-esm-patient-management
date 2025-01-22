@@ -1,24 +1,40 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Button,
+  ButtonSet,
+  Form,
+  InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
+  Stack,
+  TextArea,
+} from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import { Button, ButtonSet, Form, InlineNotification, RadioButton, RadioButtonGroup, TextArea } from '@carbon/react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import useWardLocation from '../../hooks/useWardLocation';
+import LocationSelector from '../../location-selector/location-selector.component';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
-import AdmitPatientButton from '../admit-patient-button.component';
-import LocationSelector from '../../location-selector/location-selector.component';
 import styles from './patient-transfer-swap.scss';
 
-export default function PatientTransferForm({
+/**
+ * Form to fill out for:
+ * - an admitted patient without pending transfer request, to initiate a transfer request for a patient
+ * - an admitted patient with pending transfer request, to create a request to transfer elsewhere
+ * - an un-admitted patient, to create a request to admit
+ */
+export default function PatientAdmitOrTransferForm({
   closeWorkspaceWithSavedChanges,
   wardPatient,
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
-  const { patient, inpatientAdmission } = wardPatient ?? {};
+  const { location } = useWardLocation();
+  const { patient, inpatientRequest } = wardPatient ?? {};
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -28,7 +44,7 @@ export default function PatientTransferForm({
     [emrConfiguration],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const isAdmitted = inpatientAdmission != null;
+  const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
 
   const zodSchema = useMemo(
     () =>
@@ -141,34 +157,11 @@ export default function PatientTransferForm({
   if (!wardPatientGroupDetails) {
     return <></>;
   }
-  if (!isAdmitted) {
-    return (
-      <div className={styles.workspaceContent}>
-        <div className={styles.formError}>
-          <InlineNotification
-            kind="info"
-            title={t('unableToTransferPatient', 'Unable to transfer patient')}
-            subtitle={t(
-              'unableToTransferPatientNotYetAdmitted',
-              'This patient is not admitted to this ward. Admit this patient before transferring them to a different location.',
-            )}
-            lowContrast
-            hideCloseButton
-          />
-        </div>
-        <AdmitPatientButton
-          wardPatient={wardPatient}
-          dispositionType={'ADMIT'}
-          onAdmitPatientSuccess={closeWorkspaceWithSavedChanges}
-        />
-      </div>
-    );
-  }
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
       className={classNames(styles.formContainer, styles.workspaceContent)}>
-      <div>
+      <Stack gap={4}>
         {errorFetchingEmrConfiguration && (
           <div className={styles.formError}>
             <InlineNotification
@@ -182,6 +175,25 @@ export default function PatientTransferForm({
               hideCloseButton
             />
           </div>
+        )}
+        {currentAdmission ? (
+          inpatientRequest && (
+            <InlineNotification
+              kind="info"
+              lowContrast={true}
+              hideCloseButton={true}
+              title={t('patientCurrentlyAdmittedToWardLocation', 'Patient currently admitted to {{wardLocation}}', {
+                wardLocation: currentAdmission.currentInpatientLocation.display,
+              })}
+            />
+          )
+        ) : (
+          <InlineNotification
+            kind="info"
+            lowContrast={true}
+            hideCloseButton={true}
+            title={t('patientCurrentlyNotAdmitted', 'Patient currently not admitted')}
+          />
         )}
         <div className={styles.field}>
           <h2 className={styles.productiveHeading02}>{t('selectALocation', 'Select a location')}</h2>
@@ -234,7 +246,7 @@ export default function PatientTransferForm({
             ))}
           </div>
         )}
-      </div>
+      </Stack>
       <ButtonSet className={styles.buttonSet}>
         <Button size="xl" kind="secondary" onClick={closeWorkspaceWithSavedChanges}>
           {t('cancel', 'Cancel')}

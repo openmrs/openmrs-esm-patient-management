@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { WardPatientWorkspaceProps } from '../../types';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import PatientAdmitOrTransferForm from './patient-admit-or-transfer-request-form.component';
 import PatientBedSwapForm from './patient-bed-swap-form.component';
-import PatientTransferForm from './patient-transfer-request-form.component';
 import styles from './patient-transfer-swap.scss';
 
 const TransferSection = {
@@ -38,7 +38,7 @@ export default function PatientTransferAndSwapWorkspace(props: WardPatientWorksp
       )}
       <div className={styles.workspaceForm}>
         {selectedSection === TransferSection.TRANSFER ? (
-          <PatientTransferForm {...props} />
+          <PatientAdmitOrTransferForm {...props} />
         ) : (
           <PatientBedSwapForm {...props} />
         )}

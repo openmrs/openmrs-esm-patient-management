@@ -34,11 +34,11 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   const { t } = useTranslation();
   const { location } = useWardLocation();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
-  const { WardPatientHeader, wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
+  const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { admitPatient, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useAdmitPatient();
 
   const launchPatientAdmissionForm = () =>
-    launchWorkspace<WardPatientWorkspaceProps>('admit-patient-form-workspace', { wardPatient, WardPatientHeader });
+    launchWorkspace<WardPatientWorkspaceProps>('admit-patient-form-workspace', { wardPatient });
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
