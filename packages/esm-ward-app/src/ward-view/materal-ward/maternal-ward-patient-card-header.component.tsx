@@ -1,13 +1,13 @@
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
 import { type WardPatientCardType } from '../../types';
-import WardPatientAge from '../../ward-patient-card/row-elements/ward-patient-age';
-import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-patient-bed-number';
-import WardPatientAddress from '../../ward-patient-card/row-elements/ward-patient-header-address';
-import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier';
-import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
-import WardPatientObs from '../../ward-patient-card/row-elements/ward-patient-obs';
-import WardPatientTimeSinceAdmission from '../../ward-patient-card/row-elements/ward-patient-time-since-admission';
+import WardPatientAge from '../../ward-patient-card/row-elements/ward-patient-age.component';
+import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-patient-bed-number.component';
+import WardPatientAddress from '../../ward-patient-card/row-elements/ward-patient-header-address.component';
+import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
+import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
+import WardPatientObs from '../../ward-patient-card/row-elements/ward-patient-obs.component';
+import WardPatientTimeSinceAdmission from '../../ward-patient-card/row-elements/ward-patient-time-since-admission.component';
 import styles from '../../ward-patient-card/ward-patient-card.scss';
 
 const MaternalWardPatientCardHeader: WardPatientCardType = ({ wardPatient }) => {

@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, type ReactNode } from 'react';
+import React, { type ReactNode, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
 import { type WardViewContext } from '../types';
 import useWardLocation from '../hooks/useWardLocation';
-import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
+import EmptyBedSkeleton from '../beds/empty-bed-skeleton.component';
 import styles from './ward-view.scss';
 
 const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardUnassignedPatients: ReactNode }) => {
