@@ -1,32 +1,25 @@
 import React from 'react';
 import { type VisitAttributeQueueNumberColumnConfig } from '../../config-schema';
-import { type QueueTableColumnFunction, type QueueEntry, type QueueTableCellComponentProps } from '../../types';
-import { InlineNotification } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
+import { type QueueTableColumnFunction, type QueueEntry } from '../../types';
 
 export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction = (
   key,
   header,
   { visitQueueNumberAttributeUuid }: VisitAttributeQueueNumberColumnConfig,
 ) => {
+  if (!visitQueueNumberAttributeUuid) {
+    console.error(
+      'No visit queue number attribute is configured, but the queue is configured to display the queue number.',
+    );
+    return null;
+  }
+
   function getVisitQueueNumber(queueEntry: QueueEntry) {
     return queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)?.value;
   }
 
-  const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-    const { t } = useTranslation();
-
-    return (
-      <>
-        {visitQueueNumberAttributeUuid ? (
-          <span>{getVisitQueueNumber(queueEntry)}</span>
-        ) : (
-          <InlineNotification lowContrast hideCloseButton>
-            {t('visitQueueNumberAttributeUuid not configured', 'visitQueueNumberAttributeUuid not configured')}
-          </InlineNotification>
-        )}
-      </>
-    );
+  const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: { queueEntry: QueueEntry }) => {
+    return <span>{getVisitQueueNumber(queueEntry)}</span>;
   };
 
   return {
