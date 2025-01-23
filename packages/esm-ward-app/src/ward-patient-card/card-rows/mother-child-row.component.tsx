@@ -4,7 +4,7 @@ import { BabyIcon, MotherIcon, type Patient, useAppContext } from '@openmrs/esm-
 import { type InpatientAdmission, type MaternalWardViewContext } from '../../types';
 import { type MaternalWardPatientCardProps } from '../../ward-view/materal-ward/maternal-ward-patient-card.component';
 import WardPatientAge from '../row-elements/ward-patient-age.component';
-import WardPatientIdentifier from '../row-elements/ward-patient-identifier.scss';
+import WardPatientIdentifier from '../row-elements/ward-patient-identifier.component';
 import WardPatientLocation from '../row-elements/ward-patient-location.component';
 import WardPatientName from '../row-elements/ward-patient-name.component';
 import wardPatientCardStyles from '../ward-patient-card.scss';
