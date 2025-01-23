@@ -49,7 +49,7 @@
   "manage": "Gérer",
   "motherChildBedShare": "Mère / Enfant",
   "nextPage": "Page suivante",
-  "noBed": "Aucun lit",
+  "noBed": "Sans lit",
   "noBedsConfigured": "Aucun lit configuré pour cette unité",
   "noBedsConfiguredForLocation": "Aucun lit configuré pour {{location}}",
   "noLocationsFound": "Aucune unité trouvée",
@@ -78,7 +78,7 @@
   "patientUnassignedFromBed": "Lit libéré",
   "patientUnassignedFromBedDetail": "{{patientName}} n'est plus attribué au lit",
   "patientWasDischarged": "Patient sorti",
-  "pendingOut": "Pending out",
+  "pendingOut": "En attente de sortie",
   "pendingOutMetricValue": "{{ metricValue }}",
   "pleaseSelectBed": "Veuillez sélectionner un lit",
   "pleaseSelectTransferLocation": "Veuillez sélectionner l'unité de transfert",
@@ -105,5 +105,5 @@
   "unknown": "Inconnu",
   "visitNoteSaved": "Note enregistrée",
   "wardClinicalNotePlaceholder": "Indiquez les notes ici",
-  "wards": "Unités"
+  "wards": "Admissions"
 }
