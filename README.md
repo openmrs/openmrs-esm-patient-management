@@ -55,6 +55,12 @@ You could provide `yarn start` with as many `sources` arguments as you require. 
 yarn start --sources 'packages/esm-patient-search-app' --sources 'packages/esm-patient-registration-app'
 ```
 
+To run an app locally with the same [configuration that is set in the reference application](https://github.com/openmrs/openmrs-distro-referenceapplication/blob/main/frontend/config-core_demo.json), use:
+
+```bash
+yarn start --config-url /openmrs/spa/config-core_demo.json --sources 'packages/esm-<insert-package-name>-app'
+```
+
 ## Troubleshooting
 
 If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in the reference application, you likely have outdated versions of core libraries. To update core libraries, run the following commands:
