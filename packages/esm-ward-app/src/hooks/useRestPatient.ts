@@ -1,7 +1,6 @@
-import { openmrsFetch, restBaseUrl, type FetchResponse, type Patient } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-
+import { openmrsFetch, restBaseUrl, type FetchResponse, type Patient } from '@openmrs/esm-framework';
 
 // prettier-ignore
 const defaultRep =

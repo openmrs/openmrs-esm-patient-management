@@ -16,14 +16,6 @@ import {
   expectedAppointmentsPanelConfigSchema,
   missedAppointmentsPanelConfigSchema,
 } from './scheduled-appointments-config-schema';
-import rootComponent from './root.component';
-import appointmentsDashboardComponent from './appointments.component';
-import homeAppointmentsComponent from './home/home-appointments.component';
-import appointmentsListComponent from './appointments/scheduled/appointments-list.component';
-import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
-import appointmentsFormComponent from './form/appointments-form.component';
-import patientSearch from './patient-search/patient-search.component';
-export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-appointments-app';
 
@@ -31,6 +23,8 @@ const options = {
   featureName: 'appointments',
   moduleName,
 };
+
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
   const appointmentsBasePath = `${window.spaBase}/home/appointments`;
@@ -58,7 +52,7 @@ export function startupApp() {
   ]);
 }
 
-export const root = getSyncLifecycle(rootComponent, options);
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
 export const appointmentsDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
@@ -67,17 +61,23 @@ export const appointmentsCalendarDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const appointmentsDashboard = getSyncLifecycle(appointmentsDashboardComponent, options);
+export const appointmentsDashboard = getAsyncLifecycle(() => import('./appointments.component'), options);
 
-export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, options);
+export const homeAppointments = getAsyncLifecycle(() => import('./home/home-appointments.component'), options);
 
-export const appointmentsList = getSyncLifecycle(appointmentsListComponent, options);
+export const appointmentsList = getAsyncLifecycle(
+  () => import('./appointments/scheduled/appointments-list.component'),
+  options,
+);
 
-export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
+export const earlyAppointments = getAsyncLifecycle(
+  () => import('./appointments/scheduled/early-appointments.component'),
+  options,
+);
 
-export const appointmentsForm = getSyncLifecycle(appointmentsFormComponent, options);
+export const appointmentsForm = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
 
-export const searchPatient = getSyncLifecycle(patientSearch, options);
+export const searchPatient = getAsyncLifecycle(() => import('./patient-search/patient-search.component'), options);
 
 // t('Appointments', 'Appointments')
 export const patientAppointmentsSummaryDashboardLink = getAsyncLifecycle(async () => {
