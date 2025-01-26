@@ -58,7 +58,9 @@ describe('AddProviderQueueRoom', () => {
   it('renders the form fields', () => {
     renderAddProviderQueueRoom();
 
-    expect(screen.getByText('Select a room')).toBeInTheDocument();
+    const selectElement = screen.getAllByText('Select a room');
+    expect(selectElement[0]).toBeInTheDocument();
+    expect(selectElement[1]).toBeInTheDocument();
     expect(screen.getByLabelText('Retain location')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.getByText('Save')).toBeInTheDocument();
