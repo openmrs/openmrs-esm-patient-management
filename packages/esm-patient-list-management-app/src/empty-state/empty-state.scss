@@ -12,7 +12,7 @@
 }
 
 .content {
-  @include type.type-style('body-compact-02');
+  @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
