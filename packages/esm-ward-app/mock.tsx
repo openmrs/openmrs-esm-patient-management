@@ -1,4 +1,9 @@
-import { mockAdmissionLocation, mockInpatientAdmissions, mockInpatientRequests } from '__mocks__';
+import {
+  mockAdmissionLocation,
+  mockInpatientAdmissions,
+  mockInpatientRequests,
+  mockLocationInpatientWard,
+} from '__mocks__';
 import { useAdmissionLocation } from './src/hooks/useAdmissionLocation';
 import { useInpatientAdmission } from './src/hooks/useInpatientAdmission';
 import { createAndGetWardPatientGrouping } from './src/ward-view/ward-view.resource';
@@ -54,7 +59,13 @@ export const mockWardPatientGroupDetails = jest.mocked(useWardPatientGrouping).m
   admissionLocationResponse: mockAdmissionLocationResponse(),
   inpatientAdmissionResponse: mockInpatientAdmissionResponse(),
   inpatientRequestResponse: mockInpatientRequestResponse(),
-  ...createAndGetWardPatientGrouping(mockInpatientAdmissions, mockAdmissionLocation, mockInpatientRequests),
+  ...createAndGetWardPatientGrouping(
+    mockInpatientAdmissions,
+    mockAdmissionLocation,
+    mockInpatientRequests,
+    [],
+    mockLocationInpatientWard,
+  ),
   isLoading: false,
   mutate: jest.fn(),
 });

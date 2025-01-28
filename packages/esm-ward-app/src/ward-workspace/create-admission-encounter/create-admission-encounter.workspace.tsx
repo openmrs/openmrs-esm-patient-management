@@ -105,13 +105,9 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
                 kind="warning"
                 lowContrast={true}
                 hideCloseButton={true}
-                title={t(
-                  'patientCurrentlyAdmittedToOtherLocation',
-                  'Patient currently admitted to location {{location}}',
-                  {
-                    location: inpatientAdmissions[0].currentInpatientLocation.display,
-                  },
-                )}
+                title={t('patientCurrentlyAdmittedToWardLocation', 'Patient currently admitted to {{wardLocation}}', {
+                  wardLocation: inpatientAdmissions[0].currentInpatientLocation.display,
+                })}
               />
             )}
             {inpatientRequests[0] && (
