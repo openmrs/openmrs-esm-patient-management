@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -29,7 +29,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   const items = [{ name: 'All', uuid: '' }, ...serviceTypes];
   const [selectedItems, setSelectedItems] = useState([items[0]]);
 
-  const handleMenuItemChange = (itemUuid: string) => {
+  const handleMenuItemChange = useCallback((itemUuid: string) => {
     if (itemUuid === '') {
       setSelectedItems([items[0]]);
       onChange?.('');
@@ -55,13 +55,13 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   
       setSelectedItems(updatedSelectedItems);
     }
-  };
+  }, [items, selectedItems, onChange, setSelectedItems]);
   
   
 
   useEffect(() => {
     onChange?.('');
-  }, [])
+  }, [onChange])
 
   return (
     <PageHeader className={styles.header} data-testid="appointments-header">
@@ -92,16 +92,15 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
               aria-label={t('filterByServiceType', 'Filter by service type')}
               id="serviceMenu"
             >
-              {items.map((item) => (
+              {items.map((item, i) => (
                 <React.Fragment key={item.uuid}>
                   <MenuItemSelectable
-                    key={item.uuid}
                     label={item.name}
                     defaultSelected={selectedItems.some((selectedItem) => selectedItem.uuid === item.uuid)}
                     onChange={() => handleMenuItemChange(item.uuid)}
                     onClick={(e) => e.stopPropagation()}
                   />
-                  <MenuItemDivider />
+                  {i < items.length - 1 && <MenuItemDivider />}
                 </React.Fragment>
               ))}
             </MenuItemGroup>
