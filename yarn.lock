@@ -1901,15 +1901,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:^3.3.1":
-  version: 3.3.4
-  resolution: "@hookform/resolvers@npm:3.3.4"
-  peerDependencies:
-    react-hook-form: ^7.0.0
-  checksum: 10/0845e15f53b515ab5dc8d970d4ee7f47bbdfc4f4391bc166361535482d96b6ae3d1812669107fca05bf8687fa5447e3ed65f2eee3e349759b23b229ca978f917
-  languageName: node
-  linkType: hard
-
 "@hookform/resolvers@npm:^3.9.1":
   version: 3.9.1
   resolution: "@hookform/resolvers@npm:3.9.1"
@@ -2025,7 +2016,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@internationalized/date@npm:^3.5.4, @internationalized/date@npm:^3.5.5":
+"@internationalized/date@npm:^3.5.5":
   version: 3.5.5
   resolution: "@internationalized/date@npm:3.5.5"
   dependencies:
@@ -3010,6 +3001,7 @@ __metadata:
   resolution: "@openmrs/esm-active-visits-app@workspace:packages/esm-active-visits-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.74.0"
   peerDependencies:
@@ -3077,14 +3069,21 @@ __metadata:
   resolution: "@openmrs/esm-appointments-app@workspace:packages/esm-appointments-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    "@hookform/resolvers": "npm:^3.9.1"
+    "@openmrs/esm-patient-common-lib": "npm:next"
+    classnames: "npm:^2.3.2"
     formik: "npm:^2.2.9"
     lodash-es: "npm:^4.17.15"
+    react-hook-form: "npm:^7.54.0"
     webpack: "npm:^5.74.0"
+    xlsx: "npm:^0.18.5"
     yup: "npm:^0.32.11"
+    zod: "npm:^3.24.1"
   peerDependencies:
     "@openmrs/esm-framework": 6.x
     "@openmrs/esm-patient-common-lib": 9.x
     react: 18.x
+    react-dom: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     swr: 2.x
@@ -3096,8 +3095,12 @@ __metadata:
   resolution: "@openmrs/esm-bed-management-app@workspace:packages/esm-bed-management-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    "@hookform/resolvers": "npm:^3.9.1"
+    classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
+    react-hook-form: "npm:^7.54.0"
     webpack: "npm:^5.74.0"
+    zod: "npm:^3.24.1"
   peerDependencies:
     "@openmrs/esm-framework": 6.x
     dayjs: 1.x
@@ -3273,8 +3276,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/esm-patient-common-lib@npm:next":
-  version: 9.1.1-pre.6594
-  resolution: "@openmrs/esm-patient-common-lib@npm:9.1.1-pre.6594"
+  version: 9.1.1-pre.6664
+  resolution: "@openmrs/esm-patient-common-lib@npm:9.1.1-pre.6664"
   dependencies:
     "@carbon/react": "npm:^1.12.0"
     lodash-es: "npm:^4.17.21"
@@ -3283,7 +3286,7 @@ __metadata:
     "@openmrs/esm-framework": 6.x
     react: 18.x
     single-spa: 6.x
-  checksum: 10/aff837da24862e87ae5b3bce7b002191d646c4159f0412044637305e9ee8cc6ade1aa77f876b9b8850e5986c097c61893fc5914439de0bf1cf23f934d2b365ce
+  checksum: 10/375d07b63d1199cf0bf559236d7d46ee14bbbb364fe0b8f559786e44415a6b8dbb5d604729c73a33450ced9c818e9f99f88a2ce535a64d5241c33ed28a712492
   languageName: node
   linkType: hard
 
@@ -3292,6 +3295,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-list-management-app@workspace:packages/esm-patient-list-management-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
     dexie: "npm:^3.0.3"
     fuzzy: "npm:^0.1.3"
     lodash-es: "npm:^4.17.15"
@@ -3311,10 +3315,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.11.6"
     "@carbon/react": "npm:^1.71.0"
-    "@hookform/resolvers": "npm:^3.3.1"
-    "@internationalized/date": "npm:^3.5.4"
     "@openmrs/esm-framework": "npm:next"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     "@playwright/test": "npm:1.49.0"
     "@swc/core": "npm:^1.2.165"
     "@swc/jest": "npm:^0.2.29"
@@ -3333,7 +3334,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.13.2"
     "@typescript-eslint/parser": "npm:^6.13.2"
     babel-preset-minify: "npm:^0.5.1"
-    classnames: "npm:^2.3.2"
     concurrently: "npm:^5.3.0"
     cross-env: "npm:^7.0.3"
     css-loader: "npm:^6.8.1"
@@ -3357,7 +3357,6 @@ __metadata:
     prettier: "npm:^3.1.1"
     react: "npm:^18.1.0"
     react-dom: "npm:^18.1.0"
-    react-hook-form: "npm:^7.46.2"
     react-i18next: "npm:^11.18.6"
     react-router-dom: "npm:^6.3.0"
     sass: "npm:^1.29.0"
@@ -3370,8 +3369,6 @@ __metadata:
     webpack: "npm:^5.74.0"
     webpack-cli: "npm:^4.10.0"
     webpack-dev-server: "npm:^4.15.1"
-    xlsx: "npm:^0.18.5"
-    zod: "npm:^3.22.2"
   languageName: unknown
   linkType: soft
 
@@ -3380,6 +3377,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
     formik: "npm:^2.1.5"
     lodash-es: "npm:^4.17.15"
     uuid: "npm:^8.3.2"
@@ -3400,7 +3398,9 @@ __metadata:
   resolution: "@openmrs/esm-patient-search-app@workspace:packages/esm-patient-search-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
+    react-hook-form: "npm:^7.54.0"
     webpack: "npm:^5.74.0"
   peerDependencies:
     "@openmrs/esm-framework": 6.x
@@ -3459,6 +3459,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.71.0"
     "@hookform/resolvers": "npm:^3.9.1"
+    classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
     react-hook-form: "npm:^7.54.0"
     webpack: "npm:^5.74.0"
@@ -3546,8 +3547,11 @@ __metadata:
   resolution: "@openmrs/esm-ward-app@workspace:packages/esm-ward-app"
   dependencies:
     "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
+    react-hook-form: "npm:^7.54.0"
     webpack: "npm:^5.74.0"
+    zod: "npm:^3.24.1"
   peerDependencies:
     "@openmrs/esm-framework": 6.x
     react: ^18.1.0
@@ -15708,15 +15712,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:^7.46.2":
-  version: 7.50.0
-  resolution: "react-hook-form@npm:7.50.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17 || ^18
-  checksum: 10/3b85cc179053af72a2734f2e77767de8f9b3ecbefeee282b73e81141c4b7bb97308ec00da61fdc25a28299a2defb74bff66417bb85a66357f5ceddba7b697ae7
-  languageName: node
-  linkType: hard
-
 "react-hook-form@npm:^7.54.0":
   version: 7.54.2
   resolution: "react-hook-form@npm:7.54.2"
@@ -19414,13 +19409,6 @@ __metadata:
     property-expr: "npm:^2.0.4"
     toposort: "npm:^2.0.2"
   checksum: 10/a1f529c51d54b2f2f9a326bf65eb6cb6ceaa16f1a5d5d1f631d15f5db3b48c0f3e4852028384a628f2305d9a8f64080d10029fe4c6b19116efd528fe00afed6e
-  languageName: node
-  linkType: hard
-
-"zod@npm:^3.22.2":
-  version: 3.22.4
-  resolution: "zod@npm:3.22.4"
-  checksum: 10/73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
   languageName: node
   linkType: hard
 

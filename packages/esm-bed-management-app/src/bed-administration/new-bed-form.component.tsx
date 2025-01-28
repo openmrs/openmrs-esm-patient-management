@@ -61,7 +61,7 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
           showSnackbar({
             title: t('errorCreatingForm', 'Error creating bed'),
             kind: 'error',
-            subtitle: error?.message,
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
         .finally(() => {

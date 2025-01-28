@@ -2,7 +2,7 @@ import React from 'react';
 import { type ObsElementConfig } from '../../config-schema';
 import { type WardPatient } from '../../types';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
-import WardPatientObs from '../row-elements/ward-patient-obs';
+import WardPatientObs from '../row-elements/ward-patient-obs.component';
 import styles from '../ward-patient-card.scss';
 
 interface AdmissionRequestNoteRowProps {

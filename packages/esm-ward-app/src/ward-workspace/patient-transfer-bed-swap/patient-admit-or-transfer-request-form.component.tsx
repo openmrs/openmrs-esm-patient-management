@@ -33,8 +33,7 @@ export default function PatientAdmitOrTransferForm({
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
-  const { location } = useWardLocation();
-  const { patient, inpatientRequest } = wardPatient ?? {};
+  const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -201,7 +200,12 @@ export default function PatientAdmitOrTransferForm({
             name="location"
             control={control}
             render={({ field, fieldState: { error } }) => (
-              <LocationSelector {...field} invalid={!!error?.message} invalidText={error?.message} />
+              <LocationSelector
+                {...field}
+                invalid={!!error?.message}
+                invalidText={error?.message}
+                ancestorLocation={visit?.location}
+              />
             )}
           />
         </div>

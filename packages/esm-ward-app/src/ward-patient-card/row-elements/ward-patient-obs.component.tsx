@@ -1,13 +1,13 @@
-import { SkeletonText } from '@carbon/react';
-import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
+import { getObsEncounterString, obsCustomRepresentation } from './ward-patient-obs.resource';
+import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
+import { SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type ObsElementConfig } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
-import styles from '../ward-patient-card.scss';
-import { getObsEncounterString, obsCustomRepresentation } from './ward-patient-obs.resource';
-import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
+import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip.component';
+import styles from '../ward-patient-card.scss';
 
 export interface WardPatientObsProps {
   id: string;
