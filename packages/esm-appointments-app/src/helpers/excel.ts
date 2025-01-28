@@ -7,8 +7,7 @@ import { moduleName } from '../constants';
 type RowData = {
   id: string; // Corresponds to the UUID of an appointment
   identifier?: string; // Optional identifier property
-  [key: string]: any; // Allow for other dynamic properties
-};
+} & Record<string, unknown>; // Allow for other dynamic properties
 
 /**
  * Exports the provided appointments as an Excel spreadsheet.
@@ -26,8 +25,8 @@ export async function exportAppointmentsToSpreadsheet(
 
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
-      const tableRow = rowData.find((row) => row.id === appointment.uuid);
-      const identifier = tableRow?.identifier ?? appointment.patient.identifier;
+      const matchingAppointment = rowData.find((row) => row.id === appointment.uuid);
+      const identifier = matchingAppointment?.identifier ?? appointment.patient.identifier;
 
       const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
       const phoneNumber =
