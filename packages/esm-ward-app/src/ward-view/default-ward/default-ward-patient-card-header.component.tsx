@@ -1,14 +1,14 @@
-import classNames from 'classnames';
 import React from 'react';
-import WardPatientAge from '../../ward-patient-card/row-elements/ward-patient-age';
-import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-patient-bed-number';
-import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier';
-import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name';
-import WardPatientTimeOnWard from '../../ward-patient-card/row-elements/ward-patient-time-on-ward';
-import WardPatientTimeSinceAdmission from '../../ward-patient-card/row-elements/ward-patient-time-since-admission';
-import styles from '../../ward-patient-card/ward-patient-card.scss';
 import { type WardPatientCardType } from '../../types';
+import classNames from 'classnames';
+import WardPatientAge from '../../ward-patient-card/row-elements/ward-patient-age.component';
+import WardPatientBedNumber from '../../ward-patient-card/row-elements/ward-patient-bed-number.component';
+import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
+import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
+import WardPatientTimeOnWard from '../../ward-patient-card/row-elements/ward-patient-time-on-ward.component';
+import WardPatientTimeSinceAdmission from '../../ward-patient-card/row-elements/ward-patient-time-since-admission.component';
 import WardPatientGender from '../../ward-patient-card/row-elements/ward-patient-gender.component';
+import styles from '../../ward-patient-card/ward-patient-card.scss';
 
 const DefaultWardPatientCardHeader: WardPatientCardType = ({ wardPatient }) => {
   const { patient, bed, inpatientAdmission } = wardPatient;

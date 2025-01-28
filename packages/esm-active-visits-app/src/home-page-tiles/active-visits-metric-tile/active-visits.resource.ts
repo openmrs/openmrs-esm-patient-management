@@ -11,6 +11,7 @@ export default function useActiveVisits() {
     let url = `${restBaseUrl}/visit?v=${customRepresentation}&`;
     let urlSearchParams = new URLSearchParams();
 
+    urlSearchParams.append('includeParentLocations', 'true');
     urlSearchParams.append('includeInactive', 'false');
     urlSearchParams.append('totalCount', 'true');
     urlSearchParams.append('location', `${sessionLocation}`);

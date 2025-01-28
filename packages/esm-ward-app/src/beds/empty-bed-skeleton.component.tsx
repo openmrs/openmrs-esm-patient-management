@@ -1,7 +1,7 @@
-import { SkeletonIcon } from '@carbon/react';
 import React from 'react';
+import { SkeletonIcon } from '@carbon/react';
+import WardPatientSkeletonText from '../ward-patient-card/row-elements/ward-patient-skeleton-text.component';
 import styles from './ward-bed.scss';
-import WardPatientSkeletonText from '../ward-patient-card/row-elements/ward-patient-skeleton-text';
 
 const EmptyBedSkeleton = () => {
   return (

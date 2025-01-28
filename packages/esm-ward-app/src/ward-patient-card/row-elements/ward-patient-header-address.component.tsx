@@ -1,5 +1,5 @@
-import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
+import { type Patient } from '@openmrs/esm-framework';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
 
 export interface WardPatientAddressProps {
@@ -9,7 +9,7 @@ export interface WardPatientAddressProps {
 
 const WardPatientAddress: React.FC<WardPatientAddressProps> = ({ patient, id }) => {
   const preferredAddress = patient?.person?.preferredAddress;
-  const config = useElementConfig("patientAddress", id);
+  const config = useElementConfig('patientAddress', id);
 
   return (
     <>
