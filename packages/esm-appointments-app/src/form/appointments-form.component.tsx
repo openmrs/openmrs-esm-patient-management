@@ -901,7 +901,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
 
 function TimeAndDuration({ t, watch, control, services, errors }) {
   const defaultDuration = services?.find((service) => service.name === watch('selectedService'))?.durationMins || null;
-  const formatNumber = (value) => (!value ? '0' : String(value));
+
   return (
     <>
       <ResponsiveWrapper>
@@ -953,13 +953,10 @@ function TimeAndDuration({ t, watch, control, services, errors }) {
               max={1440}
               min={0}
               onBlur={onBlur}
-              onChange={(event) => {
-                const formattedValue = formatNumber(event.target.value);
-                onChange(Number(formattedValue));
-              }}
+              onChange={(event) => onChange(event.target.value === '' ? null : Number(event.target.value))}
               ref={ref}
               size="md"
-              value={value ? formatNumber(value) : 0}
+              value={value}
             />
           )}
         />
