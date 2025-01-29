@@ -5,9 +5,12 @@ import {
   Checkbox,
   Dropdown,
   Form,
+  InlineLoading,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
+  Stack,
   Select,
   SelectItem,
 } from '@carbon/react';
@@ -86,7 +89,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
   });
 
   const { queueLocations } = useQueueLocations();
-  const { rooms } = useQueueRooms(currentLocationUuid, currentService?.serviceUuid);
+  const { rooms, error: errorFetchingQueueRooms } = useQueueRooms(currentLocationUuid, currentService?.serviceUuid);
   const { services } = useQueueServices();
 
   const handleServiceChange = useCallback(({ selectedItem }) => {
@@ -163,114 +166,130 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
 
   return (
     <div>
-      <ModalHeader
-        className={styles.modalHeader}
-        closeModal={closeModal}
-        title={t('addAProviderQueueRoom', 'Add a provider queue room?')}
-      />
-      <ModalBody>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <section className={styles.section}>
-            <Controller
-              control={control}
-              name="queueLocationUuid"
-              render={({ field }) => (
-                <Dropdown
-                  {...field}
-                  aria-label={t('selectQueueLocation', 'Select a queue location')}
-                  id="queueLocation"
-                  initialSelectedItem={{ uuid: currentLocationUuid, name: currentLocationName }}
-                  items={queueLocations ?? []}
-                  itemToString={(item) => (item ? item.name : '')}
-                  label="Queue location"
-                  onChange={(e) => {
-                    if (!e.selectedItem) {
-                      return;
-                    }
-                    field.onChange(e.selectedItem?.id);
-                    handleQueueLocationChange(e);
-                  }}
-                  invalid={!!errors.queueLocationUuid}
-                  invalidText={errors.queueLocationUuid?.message}
-                  titleText={t('queueLocation', 'Queue location')}
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <ModalHeader
+          className={styles.modalHeader}
+          closeModal={closeModal}
+          title={t('addAProviderQueueRoom', 'Add provider queue room')}
+        />
+        <ModalBody>
+          <Stack gap={4}>
+            <section>
+              <Controller
+                control={control}
+                name="queueLocationUuid"
+                render={({ field }) => (
+                  <Dropdown
+                    {...field}
+                    aria-label={t('queueLocation', 'Queue location')}
+                    id="queueLocation"
+                    initialSelectedItem={{ uuid: currentLocationUuid, name: currentLocationName }}
+                    items={queueLocations ?? []}
+                    itemToString={(item) => (item ? item.name : '')}
+                    label="Queue location"
+                    onChange={(e) => {
+                      if (!e.selectedItem) {
+                        return;
+                      }
+                      field.onChange(e.selectedItem?.id);
+                      handleQueueLocationChange(e);
+                    }}
+                    invalid={!!errors.queueLocationUuid}
+                    invalidText={errors.queueLocationUuid?.message}
+                    titleText={t('queueLocation', 'Queue location')}
+                  />
+                )}
+              />
+            </section>
+
+            <section>
+              <Controller
+                control={control}
+                name="queueProviderMapUuid"
+                render={({ field }) => (
+                  <Dropdown
+                    {...field}
+                    aria-label={t('queueService', 'Queue service')}
+                    id="service"
+                    initialSelectedItem={{
+                      uuid: currentService?.serviceUuid,
+                      display: currentService?.serviceDisplay,
+                    }}
+                    items={services ?? []}
+                    itemToString={(item) => (item ? item.display : '')}
+                    label="Service"
+                    onChange={(e) => {
+                      field.onChange(e.selectedItem?.uuid);
+                      handleServiceChange(e);
+                    }}
+                    titleText={t('queueService', 'Queue service')}
+                  />
+                )}
+              />
+            </section>
+
+            <section>
+              <Controller
+                control={control}
+                name="queueRoomUuid"
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    disabled={errorFetchingQueueRooms}
+                    id="room"
+                    invalidText={errors.queueRoomUuid?.message}
+                    invalid={!!errors.queueRoomUuid}
+                    labelText={t('queueRoom', 'Queue room')}
+                    onChange={(event) => {
+                      field.onChange(event.target.value);
+                    }}>
+                    <SelectItem text={t('queueRoom', 'Queue room')} value="" />
+                    {rooms?.length > 0 &&
+                      rooms?.map((room) => <SelectItem key={room.uuid} text={room.display} value={room.uuid} />)}
+                  </Select>
+                )}
+              />
+              {errorFetchingQueueRooms && (
+                <InlineNotification
+                  className={styles.errorNotification}
+                  kind="error"
+                  onClick={() => {}}
+                  subtitle={''}
+                  title={t('errorFetchingQueueRooms', 'Error fetching queue rooms')}
                 />
               )}
-            />
-          </section>
+            </section>
 
-          <section className={styles.section}>
-            <Controller
-              control={control}
-              name="queueProviderMapUuid"
-              render={({ field }) => (
-                <Dropdown
-                  {...field}
-                  aria-label={t('selectService', 'Select a service')}
-                  id="service"
-                  initialSelectedItem={{
-                    uuid: currentService?.serviceUuid,
-                    display: currentService?.serviceDisplay,
-                  }}
-                  items={services ?? []}
-                  itemToString={(item) => (item ? item.display : '')}
-                  label="Service"
-                  onChange={(e) => {
-                    field.onChange(e.selectedItem?.uuid);
-                    handleServiceChange(e);
-                  }}
-                  titleText={t('queueService', 'Queue service')}
-                />
-              )}
-            />
-          </section>
-
-          <section className={styles.section}>
-            <Controller
-              control={control}
-              name="queueRoomUuid"
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  id="room"
-                  invalidText={errors.queueRoomUuid?.message}
-                  invalid={!!errors.queueRoomUuid}
-                  labelText={t('selectRoom', 'Select a room')}
-                  onChange={(event) => {
-                    field.onChange(event.target.value);
-                  }}>
-                  <SelectItem text={t('chooseRoom', 'Select a room')} value="" />
-                  {rooms?.length > 0 &&
-                    rooms?.map((room) => <SelectItem key={room.uuid} text={room.display} value={room.uuid} />)}
-                </Select>
-              )}
-            />
-          </section>
-
-          <section className={styles.section}>
-            <Controller
-              control={control}
-              name="currentIsPermanentProviderQueueRoom"
-              render={({ field }) => (
-                <Checkbox
-                  checked={field.value}
-                  className={styles.checkbox}
-                  id="retainLocation"
-                  labelText={t('retainLocation', 'Retain location')}
-                  onChange={handleRetainLocation}
-                />
-              )}
-            />
-          </section>
-        </Form>
-      </ModalBody>
-      <ModalFooter>
-        <Button kind="secondary" onClick={closeModal}>
-          {t('cancel', 'Cancel')}
-        </Button>
-        <Button onClick={onSubmit} disabled={isSubmitting}>
-          {t('save', 'Save')}
-        </Button>
-      </ModalFooter>
+            <section>
+              <Controller
+                control={control}
+                name="currentIsPermanentProviderQueueRoom"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    className={styles.checkbox}
+                    id="retainLocation"
+                    labelText={t('retainLocation', 'Retain location')}
+                    onChange={handleRetainLocation}
+                  />
+                )}
+              />
+            </section>
+          </Stack>
+        </ModalBody>
+        <ModalFooter>
+          <Button kind="secondary" onClick={closeModal}>
+            {t('cancel', 'Cancel')}
+          </Button>
+          <Button disabled={isSubmitting} kind="primary" type="submit">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{t('save', 'Save')}</span>
+            )}
+          </Button>
+        </ModalFooter>
+      </Form>
     </div>
   );
 };
