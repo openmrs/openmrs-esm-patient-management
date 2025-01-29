@@ -56,7 +56,6 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
             'clearAllQueueEntriesWarningMessage',
             'Clearing all queue entries will remove all the patients from the queues',
           )}
-          .
         </p>
       </ModalBody>
       <ModalFooter>

@@ -10,7 +10,7 @@ interface QueueEntryUndoActionsModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
   modalParams: ModalParams;
-  isRemovingPatientFromQueue?: boolean;
+  isRemovingPatientFromQueue?: Boolean;
 }
 
 interface ModalParams {
