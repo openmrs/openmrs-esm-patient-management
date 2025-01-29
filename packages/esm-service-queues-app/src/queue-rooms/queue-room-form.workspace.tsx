@@ -1,6 +1,17 @@
 import React from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
-import { Column, Form, Layer, Stack, TextInput, Select, SelectItem, ButtonSet, Button } from '@carbon/react';
+import {
+  Column,
+  Form,
+  Layer,
+  Stack,
+  TextInput,
+  Select,
+  SelectItem,
+  ButtonSet,
+  Button,
+  InlineLoading,
+} from '@carbon/react';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
@@ -26,7 +37,7 @@ const createQueueRoomSchema = (t: TFunction) =>
       })
       .trim()
       .min(1, t('missingQueueRoomService', 'Missing queue room service')),
-    selectedQueueLocation: z
+    queueLocation: z
       .string({
         required_error: t('queueLocationRequired', 'Queue location is required'),
       })
@@ -49,12 +60,11 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
     defaultValues: {
       queueRoomName: '',
       queueRoomService: '',
-      selectedQueueLocation: '',
+      queueLocation: '',
     },
   });
-  const ButtonSetStyle = classNames(isTablet ? styles.tablet : styles.desktop);
 
-  const watchedQueueLocationId = watch('selectedQueueLocation');
+  const watchedQueueLocationId = watch('queueLocation');
   const { queues } = useQueues(watchedQueueLocationId);
   const { queueLocations } = useQueueLocations();
 
@@ -104,7 +114,7 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
         <Column>
           <Layer className={styles.input}>
             <Controller
-              name="selectedQueueLocation"
+              name="queueLocation"
               control={control}
               render={({ field: { onChange, value, ...field } }) => (
                 <Select
@@ -113,11 +123,11 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
                   onChange={(e) => {
                     onChange(e.target.value);
                   }}
-                  labelText={t('selectQueueLocation', 'Select a queue location')}
+                  labelText={t('queueLocation', 'Queue location')}
                   id="location"
-                  invalidText={errors.selectedQueueLocation?.message}
-                  invalid={!!errors.selectedQueueLocation}>
-                  <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+                  invalidText={errors.queueLocation?.message}
+                  invalid={!!errors.queueLocation}>
+                  <SelectItem text={t('queueLocation', 'Queue location')} value="" />
                   {queueLocations.length > 0 &&
                     queueLocations?.map((location) => (
                       <SelectItem key={location.id} text={location.name} value={location.id}>
@@ -142,11 +152,11 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
                   onChange={(e) => {
                     onChange(e.target.value);
                   }}
-                  labelText={t('selectService', 'Select a service')}
+                  labelText={t('queueRoomService', 'Queue Room service')}
                   id="service"
                   invalidText={errors.queueRoomService?.message}
                   invalid={!!errors.queueRoomService}>
-                  <SelectItem text={t('selectService', 'Select a service')} value="" />
+                  <SelectItem text={t('queueRoomService', 'Queue Room service')} value="" />
                   {queues.length > 0 &&
                     queues?.map((service) => (
                       <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
@@ -159,12 +169,16 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
           </Layer>
         </Column>
       </Stack>
-      <ButtonSet className={ButtonSetStyle}>
+      <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit" disabled={isSubmitting}>
-          {t('save', 'Save')}
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            <span>{t('save', 'Save')}</span>
+          )}{' '}
         </Button>
       </ButtonSet>
     </Form>
