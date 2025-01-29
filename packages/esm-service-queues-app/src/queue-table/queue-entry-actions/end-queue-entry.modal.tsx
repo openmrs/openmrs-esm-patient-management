@@ -26,7 +26,7 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
       modalParams={{
         modalTitle: t('removePatientFromQueue', 'Remove patient from queue?'),
         modalInstruction,
-        submitButtonText: t('removePatient', 'Remove'),
+        submitButtonText: t('remove', 'Remove'),
         submitSuccessTitle: t('patientRemoved', 'Patient removed'),
         submitSuccessText: t('patientRemovedSuccessfully', 'Patient removed from queue successfully'),
         submitFailureTitle: t('patientRemovedFailed', 'Error removing patient from queue'),
