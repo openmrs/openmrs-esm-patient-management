@@ -32,9 +32,9 @@ describe('QueueRoomForm', () => {
   it('renders the form with queue room elements', () => {
     render(<QueueRoomForm {...workspaceProps} />);
 
-    expect(screen.getByLabelText('Queue room name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select a queue location')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Queue room name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/queue room service/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/queue location/i)).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.getByText('Save')).toBeInTheDocument();
   });
