@@ -109,12 +109,12 @@ describe('AddProviderQueueRoom', () => {
   it('should render all form fields with correct labels and initial state', () => {
     renderAddProviderQueueRoom();
 
-    expect(screen.getByRole('heading', { name: /add a provider queue room/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /add provider queue room/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /select a queue location/i })).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /select a service/i })).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /select a room/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /queue location/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /queue service/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /queue room/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /retain location/i })).toBeInTheDocument();
   });
 
@@ -122,7 +122,7 @@ describe('AddProviderQueueRoom', () => {
     const user = userEvent.setup();
     renderAddProviderQueueRoom();
 
-    const queueRoomDropdown = screen.getByRole('combobox', { name: /select a room/i });
+    const queueRoomDropdown = screen.getByRole('combobox', { name: /queue room/i });
     await user.click(queueRoomDropdown);
     await user.click(screen.getByText('Room 1'));
 
@@ -143,9 +143,9 @@ describe('AddProviderQueueRoom', () => {
     renderAddProviderQueueRoom();
 
     const submitButton = screen.getByRole('button', { name: /save/i });
-    const queueLocationDropdown = screen.getByRole('combobox', { name: /select a queue location/i });
-    const queueRoomDropdown = screen.getByRole('combobox', { name: /select a room/i });
-    const queueServiceDropdown = screen.getByRole('combobox', { name: /select a service/i });
+    const queueLocationDropdown = screen.getByRole('combobox', { name: /queue location/i });
+    const queueRoomDropdown = screen.getByRole('combobox', { name: /queue room/i });
+    const queueServiceDropdown = screen.getByRole('combobox', { name: /queue service/i });
 
     await user.click(queueRoomDropdown);
     await user.click(screen.getByText('Room 1'));
