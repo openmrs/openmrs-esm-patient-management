@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { Column, Form, Layer, Stack, TextInput, Select, SelectItem, ButtonSet, Button } from '@carbon/react';
 import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
@@ -10,7 +10,7 @@ import { useQueues } from '../hooks/useQueues';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import type { TFunction } from 'react-i18next';
+import classNames from 'classnames';
 
 const createQueueRoomSchema = (t: TFunction) =>
   z.object({
@@ -52,25 +52,24 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
       selectedQueueLocation: '',
     },
   });
+  const ButtonSetStyle = classNames(isTablet ? styles.tablet : styles.desktop);
 
-  const selectedQueueLocation = watch('selectedQueueLocation');
-  const { queues } = useQueues(selectedQueueLocation);
+  const watchedQueueLocationId = watch('selectedQueueLocation');
+  const { queues } = useQueues(watchedQueueLocationId);
   const { queueLocations } = useQueueLocations();
 
   const onSubmit = async (data: QueueRoomFormData) => {
     try {
       // here doubt why queueName twice // name: string, description: string, queueUuid: string
-      const response = await saveQueueRoom(data.queueRoomName, data.queueRoomName, data.queueRoomService);
+      await saveQueueRoom(data.queueRoomName, data.queueRoomName, data.queueRoomService);
 
-      if (response.status === 201) {
-        showSnackbar({
-          title: t('addQueueRoom', 'Add queue room'),
-          kind: 'success',
-          subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
-        });
-        closeWorkspace();
-        mutate(`${restBaseUrl}/queueroom`);
-      }
+      showSnackbar({
+        title: t('addQueueRoom', 'Add queue room'),
+        kind: 'success',
+        subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
+      });
+      closeWorkspace();
+      await mutate(`${restBaseUrl}/queueroom`);
     } catch (error) {
       showSnackbar({
         title: t('errorAddingQueueRoom', 'Error adding queue room'),
@@ -160,7 +159,7 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
           </Layer>
         </Column>
       </Stack>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+      <ButtonSet className={ButtonSetStyle}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
