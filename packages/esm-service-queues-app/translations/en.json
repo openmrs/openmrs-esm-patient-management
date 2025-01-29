@@ -166,6 +166,7 @@
   "refills": "Refills",
   "removeFromQueueAndEndVisit": "Remove patient from queue and end active visit",
   "removePatient": "Remove",
+  "remove": "Remove",
   "removePatientFromQueue": "Remove patient from queue?",
   "removeQueueEntryError": "Error removing queue entry",
   "requeue": "Requeue",
