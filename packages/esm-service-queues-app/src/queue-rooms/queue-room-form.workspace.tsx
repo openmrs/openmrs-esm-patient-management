@@ -27,16 +27,16 @@ const createQueueRoomSchema = (t: TFunction) =>
   z.object({
     queueRoomName: z
       .string({
-        required_error: t('missingQueueRoomName', 'Missing queue room name'),
+        required_error: t('queueRoomNameIsRequired', 'Queue room name is required'),
       })
       .trim()
-      .min(1, t('missingQueueRoomName', 'Missing queue room name')),
+      .min(1, t('queueRoomNameIsRequired', 'Queue room name is required')),
     queueRoomService: z
       .string({
-        required_error: t('missingQueueRoomService', 'Missing queue room service'),
+        required_error: t('queueRoomServiceIsRequired', 'Queue room service is required'),
       })
       .trim()
-      .min(1, t('missingQueueRoomService', 'Missing queue room service')),
+      .min(1, t('queueRoomServiceIsRequired', 'Queue room service is required')),
     queueLocation: z
       .string({
         required_error: t('queueLocationRequired', 'Queue location is required'),
@@ -70,7 +70,6 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
 
   const onSubmit = async (data: QueueRoomFormData) => {
     try {
-      // here doubt why queueName twice // name: string, description: string, queueUuid: string
       await saveQueueRoom(data.queueRoomName, data.queueRoomName, data.queueRoomService);
 
       showSnackbar({
@@ -120,20 +119,17 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
                 <Select
                   {...field}
                   value={value || ''}
-                  onChange={(e) => {
-                    onChange(e.target.value);
-                  }}
+                  onChange={(e) => onChange(e.target.value)}
                   labelText={t('queueLocation', 'Queue location')}
                   id="location"
                   invalidText={errors.queueLocation?.message}
                   invalid={!!errors.queueLocation}>
-                  <SelectItem text={t('queueLocation', 'Queue location')} value="" />
-                  {queueLocations.length > 0 &&
-                    queueLocations?.map((location) => (
-                      <SelectItem key={location.id} text={location.name} value={location.id}>
-                        {location.name}
-                      </SelectItem>
-                    ))}
+                  <SelectItem text={t('selectQueueRoomLocation', 'Select a queue room location')} value="" />
+                  {queueLocations?.map((location) => (
+                    <SelectItem key={location.id} text={location.name} value={location.id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
                 </Select>
               )}
             />
@@ -152,17 +148,16 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
                   onChange={(e) => {
                     onChange(e.target.value);
                   }}
-                  labelText={t('queueRoomService', 'Queue Room service')}
+                  labelText={t('queueRoomService', 'Queue room service')}
                   id="service"
                   invalidText={errors.queueRoomService?.message}
                   invalid={!!errors.queueRoomService}>
-                  <SelectItem text={t('queueRoomService', 'Queue Room service')} value="" />
-                  {queues.length > 0 &&
-                    queues?.map((service) => (
-                      <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                        {service.display}
-                      </SelectItem>
-                    ))}
+                  <SelectItem text={t('selectQueueRoomService', 'Select a queue room service')} value="" />
+                  {queues?.map((service) => (
+                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                      {service.display}
+                    </SelectItem>
+                  ))}
                 </Select>
               )}
             />

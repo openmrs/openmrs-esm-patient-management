@@ -161,7 +161,7 @@ describe('AddProviderQueueRoom', () => {
       isLowContrast: true,
       kind: 'success',
       subtitle: 'Queue room updated successfully',
-      title: 'Update room',
+      title: 'Queue room updated',
     });
   });
 });
