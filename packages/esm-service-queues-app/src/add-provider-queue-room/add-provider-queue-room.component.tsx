@@ -1,5 +1,8 @@
 import React, { useCallback } from 'react';
 import { type TFunction, useTranslation } from 'react-i18next';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Button,
   Checkbox,
@@ -10,11 +13,11 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Stack,
   Select,
   SelectItem,
+  Stack,
 } from '@carbon/react';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
@@ -35,9 +38,6 @@ import {
 } from '../helpers/helpers';
 import useQueueServices from '../hooks/useQueueService';
 import styles from './add-provider-queue-room.scss';
-import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 interface AddProviderQueueRoomProps {
   closeModal: () => void;
@@ -93,7 +93,9 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
   const { services } = useQueueServices();
 
   const handleServiceChange = useCallback(({ selectedItem }) => {
-    if (!selectedItem) return;
+    if (!selectedItem) {
+      return;
+    }
 
     localStorage.setItem('queueServiceName', selectedItem.name);
     localStorage.setItem('queueService', selectedItem.uuid);
@@ -178,6 +180,8 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
                     aria-label={t('queueLocation', 'Queue location')}
                     id="queueLocation"
                     initialSelectedItem={queueLocations?.find((location) => location.id === currentLocationUuid)}
+                    invalid={!!errors.queueLocationUuid}
+                    invalidText={errors.queueLocationUuid?.message}
                     items={queueLocations ?? []}
                     itemToString={(item) => item?.name ?? ''}
                     label={t('queueLocation', 'Queue location')}
@@ -188,8 +192,6 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
                       field.onChange(e.selectedItem?.id);
                       handleQueueLocationChange(e);
                     }}
-                    invalid={!!errors.queueLocationUuid}
-                    invalidText={errors.queueLocationUuid?.message}
                     titleText={t('queueLocation', 'Queue location')}
                   />
                 )}
@@ -206,11 +208,11 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
                     aria-label={t('queueService', 'Queue service')}
                     id="queueService"
                     initialSelectedItem={{
-                      uuid: currentService?.serviceUuid,
                       display: currentService?.serviceDisplay,
+                      uuid: currentService?.serviceUuid,
                     }}
-                    items={services ?? []}
                     itemToString={(item) => item?.display ?? ''}
+                    items={services ?? []}
                     label={t('queueService', 'Queue service')}
                     onChange={({ selectedItem }) => {
                       const value = selectedItem?.uuid ?? '';
@@ -232,8 +234,8 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
                     {...field}
                     disabled={errorFetchingQueueRooms}
                     id="queueRoom"
-                    invalidText={errors.queueRoomUuid?.message}
                     invalid={!!errors.queueRoomUuid}
+                    invalidText={errors.queueRoomUuid?.message}
                     labelText={t('queueRoom', 'Queue room')}
                     onChange={(event) => field.onChange(event.target.value)}>
                     <SelectItem text={t('selectQueueRoom', 'Select a queue room')} value="" />
@@ -262,9 +264,9 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
                     className={styles.checkbox}
                     id="permanentLocation"
                     labelText={t('retainLocation', 'Retain location')}
-                    onChange={(event, { checked }) => {
+                    onChange={(_, { checked }) => {
                       field.onChange(checked);
-                      handleRetainLocation(event);
+                      handleRetainLocation(checked);
                     }}
                   />
                 )}
@@ -274,13 +276,13 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t('cancel', 'Cancel')}
+            {getCoreTranslation('cancel', 'Cancel')}
           </Button>
           <Button disabled={isSubmitting} kind="primary" type="submit">
             {isSubmitting ? (
               <InlineLoading description={t('saving', 'Saving') + '...'} />
             ) : (
-              <span>{t('save', 'Save')}</span>
+              <span>{getCoreTranslation('save', 'Save')}</span>
             )}
           </Button>
         </ModalFooter>
