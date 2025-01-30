@@ -86,7 +86,7 @@ export const patientAppointmentsSummaryDashboardLink = getAsyncLifecycle(async (
 }, options);
 
 export const patientAppointmentsDetailedSummary = getAsyncLifecycle(
-  () => import('./patient-appointments/patient-appointments-detailed-summary.component'),
+  () => import('./patient-appointments/patient-appointments-detailed-summary.extension'),
   options,
 );
 

@@ -83,9 +83,10 @@
       "meta": {
         "columns": 1,
         "columnSpan": 1,
+        "hideDashboardTitle": true,
+        "path": "Appointments",
         "slot": "patient-chart-appointments-dashboard-slot",
-        "title": "Appointments",
-        "path": "Appointments"
+        "title": "Appointments"
       }
     },
     {
