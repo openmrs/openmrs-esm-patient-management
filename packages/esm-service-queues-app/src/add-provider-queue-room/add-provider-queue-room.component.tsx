@@ -1,18 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useCallback } from 'react';
+import { type TFunction, useTranslation } from 'react-i18next';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Button,
   Checkbox,
   Dropdown,
   Form,
+  InlineLoading,
   InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
   Select,
   SelectItem,
+  Stack,
 } from '@carbon/react';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
@@ -39,194 +44,249 @@ interface AddProviderQueueRoomProps {
   providerUuid: string;
 }
 
+const createProviderQueueRoomSchema = (t: TFunction) =>
+  z.object({
+    queueLocationUuid: z
+      .string({
+        required_error: t('queueLocationIsRequired', 'Queue location is required'),
+      })
+      .trim()
+      .min(1, t('queueLocationIsRequired', 'Queue location is required')),
+    queueProviderMapUuid: z.string(),
+    queueRoomUuid: z
+      .string({
+        required_error: t('queueRoomIsRequired', 'Queue room is required'),
+      })
+      .trim()
+      .min(1, t('queueRoomIsRequired', 'Queue room is required')),
+    currentIsPermanentProviderQueueRoom: z.boolean().or(z.string()),
+  });
+
+type ProviderQueueRoomData = z.infer<ReturnType<typeof createProviderQueueRoomSchema>>;
+
 const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal, providerUuid }) => {
   const { t } = useTranslation();
-  const { providerRoom } = useProvidersQueueRoom(providerUuid);
-  const currentIsPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom() ?? false;
+  const { providerRoom, mutate } = useProvidersQueueRoom(providerUuid);
+  const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom() ?? false;
   const currentLocationName = useSelectedQueueLocationName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const currentService = useSelectedService();
 
-  const [isMissingQueueRoom, setIsMissingQueueRoom] = useState(false);
-  const [queueProviderMapUuid, setQueueProviderMapUuid] = useState('');
-  const [queueRoomUuid, setQueueRoomUuid] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+  } = useForm<ProviderQueueRoomData>({
+    mode: 'all',
+    resolver: zodResolver(createProviderQueueRoomSchema(t)),
+    defaultValues: {
+      queueLocationUuid: currentLocationUuid ?? '',
+      queueProviderMapUuid: providerRoom?.[0]?.uuid ?? '',
+      queueRoomUuid: providerRoom?.[0]?.queueRoom?.uuid ?? '',
+      currentIsPermanentProviderQueueRoom: isPermanentProviderQueueRoom ?? false,
+    },
+  });
 
-  useEffect(() => {
-    if (providerRoom?.length > 0) {
-      setQueueRoomUuid(providerRoom?.[0].queueRoom?.uuid);
-      setQueueProviderMapUuid(providerRoom?.[0].uuid);
-    }
-  }, [providerRoom]);
-
-  const { mutate } = useProvidersQueueRoom(providerUuid);
   const { queueLocations } = useQueueLocations();
-  const { rooms } = useQueueRooms(currentLocationUuid, currentService?.serviceUuid);
+  const { rooms, error: errorFetchingQueueRooms } = useQueueRooms(currentLocationUuid, currentService?.serviceUuid);
   const { services } = useQueueServices();
 
-  const handleServiceChange = ({ selectedItem }) => {
+  const handleServiceChange = useCallback(({ selectedItem }) => {
+    if (!selectedItem) {
+      return;
+    }
+
     localStorage.setItem('queueServiceName', selectedItem.name);
     localStorage.setItem('queueService', selectedItem.uuid);
     updateSelectedService(selectedItem.uuid, selectedItem.name);
-  };
+  }, []);
 
-  const handleQueueLocationChange = ({ selectedItem }) => {
-    localStorage.setItem('queueLocationUuid', selectedItem.id);
-    localStorage.setItem('queueLocationName', selectedItem.name);
-    updateSelectedQueueLocationName(selectedItem.name);
-    updateSelectedQueueLocationUuid(selectedItem.id);
-  };
+  const handleQueueLocationChange = useCallback(
+    ({ selectedItem }) => {
+      if (!selectedItem) {
+        return;
+      }
 
-  const handleRetainLocation = (e) => {
-    localStorage.setItem('isPermanentProviderQueueRoom', JSON.parse(e.target.checked));
-    updateIsPermanentProviderQueueRoom(JSON.parse(e.target.checked));
-  };
+      localStorage.setItem('queueLocationUuid', selectedItem.id);
+      localStorage.setItem('queueLocationName', selectedItem.name);
+      updateSelectedQueueLocationName(selectedItem.name);
+      updateSelectedQueueLocationUuid(selectedItem.id);
+      setValue('queueLocationUuid', selectedItem.id);
+    },
+    [setValue],
+  );
 
-  const onSubmit = useCallback(() => {
-    if (!queueRoomUuid) {
-      setIsMissingQueueRoom(true);
-      return;
-    }
-    setIsMissingQueueRoom(false);
+  const handleRetainLocation = useCallback((isChecked: boolean) => {
+    localStorage.setItem('isPermanentProviderQueueRoom', String(isChecked));
+    updateIsPermanentProviderQueueRoom(isChecked);
+  }, []);
 
-    if (providerRoom?.length > 0) {
-      updateProviderToQueueRoom(queueProviderMapUuid, queueRoomUuid, providerUuid).then(
-        () => {
+  const onSubmit = useCallback(
+    async (data: ProviderQueueRoomData) => {
+      try {
+        if (providerRoom?.length) {
+          await updateProviderToQueueRoom(data.queueProviderMapUuid, data.queueRoomUuid, providerUuid);
           showSnackbar({
             isLowContrast: true,
-            title: t('updateRoom', 'Update room'),
+            title: t('queueRoomUpdated', 'Queue room updated'),
             kind: 'success',
             subtitle: t('queueRoomUpdatedSuccessfully', 'Queue room updated successfully'),
           });
-          closeModal();
-          localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
-          updatedSelectedQueueRoomTimestamp(new Date());
-          mutate();
-        },
-        (error) => {
-          showSnackbar({
-            title: t('queueRoomAddFailed', 'Error adding queue room'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: error?.message,
-          });
-          closeModal();
-        },
-      );
-    } else {
-      addProviderToQueueRoom(queueRoomUuid, providerUuid).then(
-        () => {
+        } else {
+          await addProviderToQueueRoom(data.queueRoomUuid, providerUuid);
           showSnackbar({
             isLowContrast: true,
-            title: t('addRoom', 'Add room'),
+            title: t('queueRoomAdded', 'Queue room added'),
             kind: 'success',
             subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
           });
-          closeModal();
-          localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
-          updatedSelectedQueueRoomTimestamp(new Date());
-          mutate();
-        },
-        (error) => {
-          showSnackbar({
-            title: t('queueRoomAddFailed', 'Error adding queue room'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: error?.message,
-          });
-        },
-      );
-    }
-  }, [queueRoomUuid, providerRoom?.length, queueProviderMapUuid, providerUuid, t, closeModal, mutate]);
+        }
+
+        const timestamp = new Date().toString();
+        localStorage.setItem('lastUpdatedQueueRoomTimestamp', timestamp);
+        updatedSelectedQueueRoomTimestamp(new Date());
+        await mutate();
+        closeModal();
+      } catch (error) {
+        showSnackbar({
+          title: t('queueRoomAddFailed', 'Error adding queue room'),
+          kind: 'error',
+          isLowContrast: false,
+          subtitle: error?.message,
+        });
+      }
+    },
+    [closeModal, mutate, providerUuid, providerRoom, t],
+  );
 
   return (
     <div>
-      <ModalHeader
-        className={styles.modalHeader}
-        closeModal={closeModal}
-        title={t('addAProviderQueueRoom', 'Add a provider queue room?')}
-      />
-      <ModalBody>
-        <Form onSubmit={onSubmit}>
-          <section className={styles.section}>
-            <Dropdown
-              aria-label={t('selectQueueLocation', 'Select a queue location')}
-              id="queueLocation"
-              initialSelectedItem={{ uuid: currentLocationUuid, name: currentLocationName }}
-              items={queueLocations}
-              itemToString={(item) => (item ? item.name : '')}
-              label=""
-              onChange={handleQueueLocationChange}
-              size="md"
-              titleText={t('queueLocation', 'Queue location')}
-              type="default"
-            />
-          </section>
-
-          <section className={styles.section}>
-            <Dropdown
-              aria-label={t('selectService', 'Select a service')}
-              id="service"
-              initialSelectedItem={{ uuid: currentService?.serviceUuid, display: currentService?.serviceDisplay }}
-              items={services ?? []}
-              itemToString={(item) => (item ? item.display : '')}
-              label=""
-              onChange={handleServiceChange}
-              size="md"
-              titleText={t('queueService', 'Queue service')}
-              type="default"
-            />
-          </section>
-
-          <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('queueRoom', 'Queue room')}</div>
-            <div className={styles.filterContainer}>
-              <Select
-                id="service"
-                invalidText="Required"
-                labelText={t('selectRoom', 'Select a room')}
-                onChange={(event) => {
-                  setQueueRoomUuid(event.target.value);
-                  localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
-                }}
-                value={queueRoomUuid}>
-                {!queueRoomUuid ? <SelectItem text={t('chooseRoom', 'Select a room')} value="" /> : null}
-                {rooms?.length > 0 &&
-                  rooms.map((room) => (
-                    <SelectItem key={room.uuid} text={room.display} value={room.uuid}>
-                      {room.display}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </div>
-          </section>
-          {isMissingQueueRoom && (
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <ModalHeader
+          className={styles.modalHeader}
+          closeModal={closeModal}
+          title={t('addAProviderQueueRoom', 'Add provider queue room')}
+        />
+        <ModalBody>
+          <Stack gap={4}>
             <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingQueueRoom', 'Please select a queue room')}
+              <Controller
+                control={control}
+                name="queueLocationUuid"
+                render={({ field }) => (
+                  <Dropdown
+                    {...field}
+                    aria-label={t('queueLocation', 'Queue location')}
+                    id="queueLocation"
+                    initialSelectedItem={queueLocations?.find((location) => location.id === currentLocationUuid)}
+                    invalid={!!errors.queueLocationUuid}
+                    invalidText={errors.queueLocationUuid?.message}
+                    items={queueLocations ?? []}
+                    itemToString={(item) => item?.name ?? ''}
+                    label={t('queueLocation', 'Queue location')}
+                    onChange={(e) => {
+                      if (!e.selectedItem) {
+                        return;
+                      }
+                      field.onChange(e.selectedItem?.id);
+                      handleQueueLocationChange(e);
+                    }}
+                    titleText={t('queueLocation', 'Queue location')}
+                  />
+                )}
               />
             </section>
-          )}
 
-          <section className={styles.section}>
-            <Checkbox
-              checked={currentIsPermanentProviderQueueRoom}
-              className={styles.checkbox}
-              id="retainLocation"
-              labelText={t('retainLocation', 'Retain location')}
-              onChange={handleRetainLocation}
-            />
-          </section>
-        </Form>
-      </ModalBody>
-      <ModalFooter>
-        <Button kind="secondary" onClick={closeModal}>
-          {t('cancel', 'Cancel')}
-        </Button>
-        <Button onClick={onSubmit}>{t('save', 'Save')}</Button>
-      </ModalFooter>
+            <section>
+              <Controller
+                control={control}
+                name="queueProviderMapUuid"
+                render={({ field }) => (
+                  <Dropdown
+                    {...field}
+                    aria-label={t('queueService', 'Queue service')}
+                    id="queueService"
+                    initialSelectedItem={{
+                      display: currentService?.serviceDisplay,
+                      uuid: currentService?.serviceUuid,
+                    }}
+                    itemToString={(item) => item?.display ?? ''}
+                    items={services ?? []}
+                    label={t('queueService', 'Queue service')}
+                    onChange={({ selectedItem }) => {
+                      const value = selectedItem?.uuid ?? '';
+                      field.onChange(value);
+                      handleServiceChange({ selectedItem });
+                    }}
+                    titleText={t('queueService', 'Queue service')}
+                  />
+                )}
+              />
+            </section>
+
+            <section>
+              <Controller
+                control={control}
+                name="queueRoomUuid"
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    disabled={errorFetchingQueueRooms}
+                    id="queueRoom"
+                    invalid={!!errors.queueRoomUuid}
+                    invalidText={errors.queueRoomUuid?.message}
+                    labelText={t('queueRoom', 'Queue room')}
+                    onChange={(event) => field.onChange(event.target.value)}>
+                    <SelectItem text={t('selectQueueRoom', 'Select a queue room')} value="" />
+                    {rooms?.map((room) => <SelectItem key={room.uuid} text={room.display} value={room.uuid} />)}
+                  </Select>
+                )}
+              />
+              {errorFetchingQueueRooms && (
+                <InlineNotification
+                  className={styles.errorNotification}
+                  kind="error"
+                  onClick={() => {}}
+                  subtitle={errorFetchingQueueRooms}
+                  title={t('errorFetchingQueueRooms', 'Error fetching queue rooms')}
+                />
+              )}
+            </section>
+
+            <section>
+              <Controller
+                control={control}
+                name="currentIsPermanentProviderQueueRoom"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={Boolean(field.value)}
+                    className={styles.checkbox}
+                    id="permanentLocation"
+                    labelText={t('retainLocation', 'Retain location')}
+                    onChange={(_, { checked }) => {
+                      field.onChange(checked);
+                      handleRetainLocation(checked);
+                    }}
+                  />
+                )}
+              />
+            </section>
+          </Stack>
+        </ModalBody>
+        <ModalFooter>
+          <Button kind="secondary" onClick={closeModal}>
+            {getCoreTranslation('cancel', 'Cancel')}
+          </Button>
+          <Button disabled={isSubmitting} kind="primary" type="submit">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{getCoreTranslation('save', 'Save')}</span>
+            )}
+          </Button>
+        </ModalFooter>
+      </Form>
     </div>
   );
 };
