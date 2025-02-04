@@ -1,14 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { 
-  DatePicker, 
-  DatePickerInput,
-  MenuItemSelectable,
-  MenuItemDivider,
-  MenuItemGroup,
-  MenuButton
-} from '@carbon/react';
+import { DatePicker, DatePickerInput, MultiSelect } from '@carbon/react';
 import { PageHeader, PageHeaderContent, AppointmentsPictogram } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
@@ -25,43 +18,26 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   const { t } = useTranslation();
   const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
   const { serviceTypes } = useAppointmentServices();
-  
-  const items = [{ name: 'All', uuid: '' }, ...serviceTypes];
-  const [selectedItems, setSelectedItems] = useState([items[0]]);
 
-  const handleMenuItemChange = useCallback((itemUuid: string) => {
-    if (itemUuid === '') {
-      setSelectedItems([items[0]]);
-      onChange?.('');
-    } else {
-      let updatedSelectedItems;
-      const isAlreadySelected = selectedItems.some((item) => item.uuid === itemUuid);
-  
-      if (isAlreadySelected) {
-        updatedSelectedItems = selectedItems.filter((item) => item.uuid !== itemUuid);
-      } else {
-        updatedSelectedItems = selectedItems.filter((item) => item.uuid !== '').concat(
-          items.find((item) => item.uuid === itemUuid)!
-        );
-      }
+  const items = [...serviceTypes];
+  const [selectedItems, setSelectedItems] = useState([]);
 
-      if (updatedSelectedItems.length === 0) {
-        updatedSelectedItems = [items[0]]; 
-        onChange?.(''); 
+  const handleMultiSelectChange = useCallback(
+    ({ selectedItems }) => {
+      const selectedUuids = selectedItems.map((item) => item.id);
+      if (selectedUuids.length === 0) {
+        setSelectedItems([]);
       } else {
-        const selectedUuids = updatedSelectedItems.map((item) => item.uuid);
+        setSelectedItems(selectedUuids);
         onChange?.(selectedUuids);
       }
-  
-      setSelectedItems(updatedSelectedItems);
-    }
-  }, [items, selectedItems, onChange, setSelectedItems]);
-  
-  
+    },
+    [onChange],
+  );
 
   useEffect(() => {
     onChange?.('');
-  }, [onChange])
+  }, [onChange]);
 
   return (
     <PageHeader className={styles.header} data-testid="appointments-header">
@@ -81,30 +57,15 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
           />
         </DatePicker>
         {typeof onChange === 'function' && (
-          <MenuButton
+          <MultiSelect
+            id="serviceTypeMultiSelect"
             label={t('filterByServiceType', 'Filter by service type')}
-            kind="ghost"
-            size="sm"
-            menuAlignment="bottom-end"
-            className={styles.menuButton}
-          >
-            <MenuItemGroup
-              aria-label={t('filterByServiceType', 'Filter by service type')}
-              id="serviceMenu"
-            >
-              {items.map((item, i) => (
-                <React.Fragment key={item.uuid}>
-                  <MenuItemSelectable
-                    label={item.name}
-                    defaultSelected={selectedItems.some((selectedItem) => selectedItem.uuid === item.uuid)}
-                    onChange={() => handleMenuItemChange(item.uuid)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  {i < items.length - 1 && <MenuItemDivider />}
-                </React.Fragment>
-              ))}
-            </MenuItemGroup>
-          </MenuButton>
+            items={items.map((item) => ({ id: item.uuid, label: item.name }))}
+            itemToString={(item) => (item ? item.label : '')}
+            onChange={handleMultiSelectChange}
+            initialSelectedItems={items.length > 0 ? [items[0]] : []}
+            type="inline"
+          />
         )}
       </div>
     </PageHeader>
