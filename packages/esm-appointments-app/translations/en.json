@@ -89,6 +89,7 @@
   "endTime": "End Time",
   "errorCreatingAppointmentService": "Error creating appointment service",
   "expected": "Expected",
+  "filterByServiceType": "Filter by service type",
   "filterTable": "Filter table",
   "gender": "Gender",
   "highestServiceVolume": "Highest volume service: {{time}}",
@@ -143,7 +144,6 @@
   "selectOption": "Select an option",
   "selectProvider": "Select a provider",
   "selectService": "Select a service",
-  "selectServiceType": "Select service type",
   "service": "Service",
   "serviceName": "Service name",
   "serviceType": "Service Type",
@@ -161,7 +161,6 @@
   "upcoming": "Upcoming",
   "upcomingAppointments": "Upcoming appointments",
   "updateError": "Error updating upcoming appointment",
-  "view": "View",
   "vitals": "Vitals",
   "week": "Week",
   "yes": "Yes"
