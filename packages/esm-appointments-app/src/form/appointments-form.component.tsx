@@ -211,7 +211,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
 
   const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
     ? new Date(appointment?.dateAppointmentScheduled)
-    : new Date();
+    : appointment?.endDateTime
+      ? new Date(appointment?.endDateTime)
+      : new Date();
 
   const {
     control,
