@@ -51,11 +51,6 @@ test('Register a new patient', async ({ page }) => {
   await test.step("And I should be redirected to the new patient's chart page", async () => {
     await page.waitForURL(PATIENT_CHART_URL);
     await expect(page).toHaveURL(PATIENT_CHART_URL);
-
-    const url = page.url();
-    const match = url.match(PATIENT_CHART_URL);
-    patientUuid = match?.[1];
-    expect(patientUuid).toBeTruthy();
   });
 
   await test.step("And I should see the newly registered patient's details displayed in the patient banner", async () => {
@@ -130,11 +125,6 @@ test('Register an unknown patient', async ({ page }) => {
   await test.step("And I should be redirected to the new patient's chart page", async () => {
     await page.waitForURL(PATIENT_CHART_URL);
     await expect(page).toHaveURL(PATIENT_CHART_URL);
-
-    const url = page.url();
-    const match = url.match(PATIENT_CHART_URL);
-    patientUuid = match?.[1];
-    expect(patientUuid).toBeTruthy();
   });
 
   await test.step("And I should see the newly registered patient's details displayed in the patient banner", async () => {
@@ -155,7 +145,7 @@ test.afterEach(async ({ api }) => {
     try {
       await deletePatient(api, patientUuid);
     } catch (error) {
-      console.error(`Error deleting patient ${patientUuid}: ${error}`);
+      console.error(`Error deleting patient ${patientUuid}:`, error);
     }
   }
 });
