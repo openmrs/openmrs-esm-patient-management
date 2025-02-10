@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
 import QueueLinelistFilter from './queue-linelist-filter.workspace';
+import dayjs from 'dayjs';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseVisitTypes = jest.mocked(useVisitTypes);

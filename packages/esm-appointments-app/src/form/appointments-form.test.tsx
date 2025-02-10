@@ -16,6 +16,7 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
 import AppointmentForm from './appointments-form.component';
+import dayjs from 'dayjs';
 
 const defaultProps = {
   context: 'creating',
