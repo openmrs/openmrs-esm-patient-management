@@ -9,7 +9,7 @@ import styles from './appointments-metrics.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
 
 interface AppointmentMetricsProps {
-  appointmentServiceType: string;
+  appointmentServiceType: string[];
 }
 
 const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceType }) => {
@@ -27,10 +27,10 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
 
   const filteredArrivedAppointments = appointmentServiceType
-    ? arrivedAppointments.filter(({ service }) => service.uuid === appointmentServiceType)
+    ? arrivedAppointments.filter(({ service }) => appointmentServiceType.includes(service.uuid))
     : arrivedAppointments;
   const filteredPendingAppointments = appointmentServiceType
-    ? pendingAppointments.filter(({ service }) => service.uuid === appointmentServiceType)
+    ? pendingAppointments.filter(({ service }) => appointmentServiceType.includes(service.uuid))
     : pendingAppointments;
 
   if (error) {
