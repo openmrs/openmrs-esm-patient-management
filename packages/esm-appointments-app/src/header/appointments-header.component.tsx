@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { DatePicker, DatePickerInput, MultiSelect } from '@carbon/react';
@@ -19,25 +19,21 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
   const { serviceTypes } = useAppointmentServices();
 
-  const items = [...serviceTypes];
   const [selectedItems, setSelectedItems] = useState([]);
 
   const handleMultiSelectChange = useCallback(
     ({ selectedItems }) => {
       const selectedUuids = selectedItems.map((item) => item.id);
-      if (selectedUuids.length === 0) {
-        setSelectedItems([]);
-      } else {
-        setSelectedItems(selectedUuids);
-        onChange?.(selectedUuids);
-      }
+      setSelectedItems(selectedUuids);
+      onChange?.(selectedUuids);
     },
     [onChange],
   );
 
-  useEffect(() => {
-    onChange?.('');
-  }, [onChange]);
+  const serviceTypeOptions = useMemo(
+    () => serviceTypes?.map((item) => ({ id: item.uuid, label: item.name })) ?? [],
+    [serviceTypes],
+  );
 
   return (
     <PageHeader className={styles.header} data-testid="appointments-header">
@@ -59,11 +55,11 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
         {typeof onChange === 'function' && (
           <MultiSelect
             id="serviceTypeMultiSelect"
-            label={t('filterByServiceType', 'Filter by service type')}
-            items={items.map((item) => ({ id: item.uuid, label: item.name }))}
+            label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
+            items={serviceTypeOptions}
             itemToString={(item) => (item ? item.label : '')}
             onChange={handleMultiSelectChange}
-            initialSelectedItems={items.length > 0 ? [items[0]] : []}
+            initialSelectedItems={serviceTypeOptions.length > 0 ? [serviceTypeOptions[0].id] : []}
             type="inline"
           />
         )}

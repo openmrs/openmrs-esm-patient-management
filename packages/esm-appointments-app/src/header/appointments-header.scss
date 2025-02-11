@@ -22,12 +22,6 @@
   row-gap: layout.$spacing-01;
 }
 
-.menuButton {
-  :global(.cds--btn--ghost) {
-    color: colors.$gray-80;
-  }
-}
-
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .date-and-location {

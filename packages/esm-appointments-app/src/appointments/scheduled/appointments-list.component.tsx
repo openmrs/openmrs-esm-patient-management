@@ -27,7 +27,14 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   const activeAppointments = filterCancelled
     ? appointments.filter((appointment) => appointment.status !== 'Cancelled')
     : appointments;
-  return <AppointmentsTable appointments={activeAppointments} isLoading={isLoading} tableHeading={title} />;
+  return (
+    <AppointmentsTable
+      appointments={activeAppointments}
+      isLoading={isLoading}
+      tableHeading={title}
+      hasActiveFilters={appointmentServiceType?.length > 0 || filterCancelled}
+    />
+  );
 };
 
 export default AppointmentsList;
