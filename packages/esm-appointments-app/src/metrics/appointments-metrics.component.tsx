@@ -46,7 +46,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
       <MetricsHeader />
       <section className={styles.cardContainer}>
         <MetricsCard
-          label={t('patients', 'Patients')}
+          label={t('appointments', 'Appointments')}
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
