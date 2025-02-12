@@ -1,12 +1,13 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useField } from 'formik';
-import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
+import { PhotoComponent } from '../photo/photo-field.component';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 const containsNoNumbers = /^([^0-9]*)$/;
@@ -40,19 +41,6 @@ export const NameField = () => {
   );
 
   const isPatientUnknown = isPatientUnknownValue === 'true';
-
-  const onCapturePhoto = useCallback(
-    (dataUri: string, photoDateTime: string) => {
-      if (setCapturePhotoProps) {
-        setCapturePhotoProps({
-          imageData: dataUri,
-          dateTime: photoDateTime,
-        });
-        setFieldTouched('photo', true, false);
-      }
-    },
-    [setCapturePhotoProps, setFieldTouched],
-  );
 
   const toggleNameKnown = (e) => {
     if (e.name === 'known') {
@@ -102,13 +90,7 @@ export const NameField = () => {
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
       <div className={styles.grid}>
-        {displayCapturePhoto && (
-          <ExtensionSlot
-            className={styles.photoExtension}
-            name="capture-patient-photo-slot"
-            state={{ onCapturePhoto, initialState: currentPhoto }}
-          />
-        )}
+        {displayCapturePhoto && <PhotoComponent></PhotoComponent>}
 
         <div className={styles.nameField}>
           {(allowUnidentifiedPatients || isPatientUnknown) && (
