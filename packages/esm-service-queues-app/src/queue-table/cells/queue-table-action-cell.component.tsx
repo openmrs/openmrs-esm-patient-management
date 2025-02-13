@@ -18,6 +18,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
           const dispose = showModal('transition-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
+            size: 'sm',
           });
         }}
         size={isDesktop(layout) ? 'sm' : 'lg'}>

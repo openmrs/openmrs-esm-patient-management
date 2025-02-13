@@ -4,8 +4,7 @@ import {
   Button,
   Checkbox,
   ContentSwitcher,
-  DatePicker,
-  DatePickerInput,
+  Dropdown,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -16,9 +15,8 @@ import {
   SelectItem,
   Stack,
   Switch,
+  Tag,
   TextArea,
-  TimePicker,
-  TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
@@ -122,7 +120,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   };
 
   const setPriorityComment = (prioritycomment: string) => {
-    setFormState({ ...formState, prioritycomment });
+    setFormState((prevState) => ({ ...prevState, prioritycomment }));
   };
 
   const setTransitionDate = (transitionDate: Date) => {
@@ -145,7 +143,15 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
 
-    submitAction(queueEntry, formState)
+    const updatedState = { ...formState };
+
+    if (updatedState.selectedPriority === priorities[0]?.uuid) {
+      updatedState.prioritycomment = '';
+    }
+
+    setFormState(updatedState);
+
+    submitAction(queueEntry, updatedState)
       .then(({ status }) => {
         if (status === 200) {
           showSnackbar({
@@ -214,33 +220,60 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>
-            <h5>{queueEntry.display}</h5>
-            <p>{modalInstruction}</p>
+            {isTransition ? (
+              <p>{modalInstruction}</p>
+            ) : (
+              <>
+                <h5>{queueEntry.display}</h5>
+                <p>{modalInstruction}</p>
+              </>
+            )}
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
-              <Select
-                labelText={t('selectQueue', 'Select a queue')}
-                id="queue"
-                invalidText="Required"
-                value={formState.selectedQueue}
-                onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-                {queues?.map(({ uuid, display, location }) => (
-                  <SelectItem
-                    key={uuid}
-                    text={
-                      uuid == queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: `${display} - ${location?.display}`,
-                            interpolation: { escapeValue: false },
-                          })
-                        : `${display} - ${location?.display}`
-                    }
-                    value={uuid}
-                  />
-                ))}
-              </Select>
+              {queues.length <= 8 ? (
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  legendText={t('selectQueue', 'Select a queue')}
+                  id="queue"
+                  invalidText="Required"
+                  valueSelected={formState.selectedQueue}
+                  orientation="vertical"
+                  onChange={(uuid) => setSelectedQueueUuid(uuid)}>
+                  {queues?.map(({ uuid, display, location }) => (
+                    <RadioButton
+                      key={uuid}
+                      labelText={
+                        uuid == queueEntry.queue.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: `${display}`,
+                              interpolation: { escapeValue: false },
+                            })
+                          : `${display}`
+                      }
+                      value={uuid}
+                    />
+                  ))}
+                </RadioButtonGroup>
+              ) : (
+                <Dropdown
+                  titleText={t('selectQueue', 'Select a queue')}
+                  id="queue"
+                  label={selectedQueue.display}
+                  initialSelectedItem={selectedQueue}
+                  value={formState.selectedQueue}
+                  items={queues}
+                  itemToString={(item) =>
+                    item.uuid == queueEntry.queue.uuid
+                      ? t('currentValueFormatted', '{{value}} (Current)', {
+                          value: `${item.display}`,
+                          interpolation: { escapeValue: false },
+                        })
+                      : `${item.display}`
+                  }
+                  onChange={({ selectedItem }) => setSelectedQueueUuid(selectedItem.uuid)}
+                />
+              )}
             </section>
-
             <section>
               <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
               {hasNoStatusesConfigured ? (
@@ -275,7 +308,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 </RadioButtonGroup>
               )}
             </section>
-
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
               {hasNoPrioritiesConfigured ? (
@@ -287,89 +319,52 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   title={t('noPrioritiesConfigured', 'No priorities configured')}
                 />
               ) : (
-                <ContentSwitcher
-                  size="sm"
-                  selectedIndex={selectedPriorityIndex}
-                  onChange={(event) => {
-                    setSelectedPriorityUuid(event.name as string);
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  valueSelected={formState.selectedPriority}
+                  onChange={(uuid) => {
+                    setSelectedPriorityUuid(uuid);
                   }}>
                   {priorities?.map(({ uuid, display }) => (
-                    <Switch
-                      role="radio"
-                      name={uuid}
-                      text={
-                        uuid == queueEntry.priority.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', {
-                              value: display,
-                              interpolation: { escapeValue: false },
-                            })
-                          : display
-                      }
+                    <RadioButton
+                      classNames={styles.radioButton}
                       key={uuid}
+                      name={display}
+                      labelText={
+                        <Tag
+                          className={`${priorities.findIndex((p) => p.uuid === uuid) === 1 ? styles.orange : ''}`}
+                          role="radio"
+                          key={uuid}
+                          value={uuid}
+                          type={(() => {
+                            const index = priorities.findIndex((p) => p.uuid === uuid);
+                            return index === 0 ? 'green' : index === 2 ? 'red' : '';
+                          })()}>
+                          {uuid == queueEntry.priority.uuid
+                            ? t('currentValueFormatted', '{{value}} (Current)', {
+                                value: display,
+                                interpolation: { escapeValue: false },
+                              })
+                            : display}
+                        </Tag>
+                      }
                       value={uuid}
                     />
                   ))}
-                </ContentSwitcher>
+                </RadioButtonGroup>
               )}
             </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
-              <TextArea
-                labelText=""
-                value={formState.prioritycomment}
-                onChange={(e) => setPriorityComment(e.target.value)}
-                placeholder={t('enterCommentHere', 'Enter comment here')}
-              />
-            </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('timeOfTransition', 'Time of transition')}</div>
-              <Checkbox
-                labelText={t('modifyDefaultValue', 'Modify default value')}
-                id={'modifyTransitionTime'}
-                checked={formState.modifyDefaultTransitionDateTime}
-                onChange={(_, { checked }) => {
-                  setModifyDefaultTransitionDateTime(checked);
-                }}
-              />
-              <div className={styles.dateTimeFields}>
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
-                  value={formState.transitionDate}
-                  maxDate={new Date().setHours(23, 59, 59, 59)}
-                  onChange={([date]) => {
-                    setTransitionDate(date);
-                  }}>
-                  <DatePickerInput
-                    id="datePickerInput"
-                    labelText={t('date', 'Date')}
-                    placeholder={datePickerPlaceHolder}
-                    disabled={!formState.modifyDefaultTransitionDateTime}
-                  />
-                </DatePicker>
-
-                <TimePicker
-                  labelText={t('time', 'Time')}
-                  onChange={(event) => setTransitionTime(event.target.value)}
-                  pattern={time12HourFormatRegexPattern}
-                  value={formState.transitionTime}
-                  invalid={timeInvalidMessage != null}
-                  invalidText={timeInvalidMessage}
-                  disabled={!formState.modifyDefaultTransitionDateTime}>
-                  <TimePickerSelect
-                    id="visitStartTimeSelect"
-                    onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
-                    value={formState.transitionTimeFormat}
-                    labelText={t('time', 'Time')}
-                    aria-label={t('time', 'Time')}>
-                    <SelectItem value="AM" text="AM" />
-                    <SelectItem value="PM" text="PM" />
-                  </TimePickerSelect>
-                </TimePicker>
-              </div>
-            </section>
+            {selectedPriorityIndex > 0 && (
+              <section className={styles.section}>
+                <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+                <TextArea
+                  labelText=""
+                  value={formState.prioritycomment}
+                  onChange={(e) => setPriorityComment(e.target.value)}
+                  placeholder={t('enterCommentHere', 'Enter comment here')}
+                />
+              </section>
+            )}
           </Stack>
         </div>
       </ModalBody>
