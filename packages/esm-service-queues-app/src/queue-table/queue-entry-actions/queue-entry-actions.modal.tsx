@@ -20,7 +20,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
-import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
+import { time12HourFormatRegexPattern } from '../../constants';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';

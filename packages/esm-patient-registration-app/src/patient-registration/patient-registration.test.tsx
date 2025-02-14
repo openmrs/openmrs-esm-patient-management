@@ -1,12 +1,10 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
-  OpenmrsDatePicker,
   showSnackbar,
   useConfig,
   usePatient,
@@ -227,12 +225,16 @@ const fillRequiredFields = async () => {
   const demographicsSection = await screen.findByLabelText('Demographics Section');
   const givenNameInput = within(demographicsSection).getByLabelText(/first/i) as HTMLInputElement;
   const familyNameInput = within(demographicsSection).getByLabelText(/family/i) as HTMLInputElement;
-  const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i) as HTMLInputElement;
+  const dateOfBirthInput = within(demographicsSection).getByTestId('birthdate') as HTMLInputElement;
+  const dateOfBirthDayInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /day/i });
+  const dateOfBirthMonthInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /month/i });
+  const dateOfBirthYearInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /year/i });
   const genderInput = within(demographicsSection).getByLabelText(/Male/) as HTMLSelectElement;
   await user.type(givenNameInput, 'Paul');
   await user.type(familyNameInput, 'Gaihre');
-  await user.clear(dateOfBirthInput);
-  await user.type(dateOfBirthInput, '02/08/1993');
+  await user.type(dateOfBirthDayInput, '02');
+  await user.type(dateOfBirthMonthInput, '08');
+  await user.type(dateOfBirthYearInput, '1993');
   await user.click(genderInput);
 };
 
@@ -318,7 +320,6 @@ describe('Registering a new patient', () => {
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
-  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
   it.skip('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
