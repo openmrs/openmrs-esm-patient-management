@@ -21,7 +21,6 @@ import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
 import { useInitialFormValues } from './patient-registration-hooks';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockSaveEncounter = jest.mocked(saveEncounter);
 const mockSavePatient = savePatient as jest.Mock;
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -108,22 +107,6 @@ jest.mock('./patient-registration-hooks', () => ({
   useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
   usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
 }));
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 const mockResourcesContextValue = {
   addressTemplate: mockedAddressTemplate as AddressTemplate,
@@ -282,11 +265,11 @@ describe('Registering a new patient', () => {
     expect(within(demographicSection).getByLabelText(/first name/i)).toBeInTheDocument();
     expect(within(demographicSection).getByLabelText(/middle name \(optional\)/i)).toBeInTheDocument();
     expect(within(demographicSection).getByLabelText(/family name/i)).toBeInTheDocument();
-    expect(within(demographicSection).getByLabelText(/date of birth/i)).toBeInTheDocument();
+
     expect(within(demographicSection).getByRole('radio', { name: /^male$/i })).toBeInTheDocument();
     expect(within(demographicSection).getByRole('radio', { name: /^female$/i })).toBeInTheDocument();
     expect(within(demographicSection).getByText(/date of birth known\?/i)).toBeInTheDocument();
-    expect(within(demographicSection).getByLabelText(/date of birth/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByTestId('birthdate')).toBeInTheDocument();
 
     expect(within(contactSection).getByRole('heading', { name: /address/i })).toBeInTheDocument();
 
@@ -491,7 +474,14 @@ describe('Updating an existing patient record', () => {
 
     expect(screen.getByLabelText(/first name/i)).toHaveValue(mockPatient.name[0].given[0]);
     expect(screen.getByLabelText(/family name/i)).toHaveValue(mockPatient.name[0].family);
-    expect(screen.getByLabelText(/date of birth/i)).toHaveValue('04/04/1972');
+    const dobField = screen.getByTestId('birthdate');
+    const dobDayField = within(dobField).getByRole('spinbutton', { name: /day/i });
+    const dobMonthField = within(dobField).getByRole('spinbutton', { name: /month/i });
+    const dobYearField = within(dobField).getByRole('spinbutton', { name: /year/i });
+    expect(dobDayField.innerHTML).toBe('04');
+    expect(dobMonthField.innerHTML).toBe('04');
+    expect(dobYearField.innerHTML).toBe('1972');
+    // expect(screen.getByLabelText(/birthdate/i)).toHaveValue('04/04/1972');
     expect(
       screen.getByRole('radio', {
         name: /^male$/i,

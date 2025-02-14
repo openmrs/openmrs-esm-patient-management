@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
@@ -9,28 +8,12 @@ import { ObsField } from './obs-field.component';
 import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
 import { mockOpenmrsId, mockPatient } from '__mocks__';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConcept = jest.mocked(useConcept);
 const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
 jest.mock('../field.resource');
 
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 const useConceptMockImpl = (uuid: string) => {
   let data;
   if (uuid == 'weight-uuid') {

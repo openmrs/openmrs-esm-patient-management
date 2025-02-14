@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { Formik, Form } from 'formik';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,24 +8,7 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { DobField } from './dob.component';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 describe('Dob', () => {
   beforeEach(() => {
@@ -53,6 +35,7 @@ describe('Dob', () => {
               inEditMode: false,
               setFieldValue: () => {},
               setCapturePhotoProps: (value) => {},
+              setFieldTouched: () => {},
               currentPhoto: '',
               isOffline: false,
               initialFormValues: initialFormValues,
@@ -69,7 +52,7 @@ describe('Dob', () => {
     expect(screen.getByRole('tab', { name: /yes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /yes/i })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: /no/i })).toHaveAttribute('aria-selected', 'false');
-    expect(screen.getByRole('textbox', { name: /date of birth/i })).toBeInTheDocument();
+    expect(screen.getByTestId('birthdate')).toBeInTheDocument();
   });
 
   // TODO O3-3482: Fix this test case.
@@ -91,6 +74,7 @@ describe('Dob', () => {
               currentPhoto: '',
               isOffline: false,
               initialFormValues: initialFormValues,
+              setFieldTouched: () => {},
             }}>
             <DobField />
           </PatientRegistrationContext.Provider>
