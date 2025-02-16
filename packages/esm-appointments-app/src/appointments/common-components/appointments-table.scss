@@ -131,3 +131,29 @@ html[dir='rtl'] {
     }
   }
 }
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: layout.$spacing-05 0;
+  padding: layout.$spacing-08 0;
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+  width: fit-content;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
