@@ -14,8 +14,19 @@ describe('PatientSearchRootComponent', () => {
         disableTabletSearchOnKeyUp: false,
         patientChartUrl: '',
         showRecentlySearchedPatients: false,
+        searchFilterFields: {
+          gender: {
+            enabled: true,
+          },
+          dateOfBirth: {
+            enabled: true,
+          },
+          age: {
+            enabled: true,
+          },
+        },
       },
-    });
+    } as PatientSearchConfig);
   });
 
   afterAll(() => {
@@ -28,7 +39,13 @@ describe('PatientSearchRootComponent', () => {
     window.history.pushState({}, 'Patient Search', 'openmrs/spa/search');
     render(<PatientSearchRootComponent />);
 
-    const patientSearchPage = screen.getByText('Search results');
-    expect(patientSearchPage).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /refine search/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /any/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^male$/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /female/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /other/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /unknown/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /apply/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reset fields/i })).toBeInTheDocument();
   });
 });

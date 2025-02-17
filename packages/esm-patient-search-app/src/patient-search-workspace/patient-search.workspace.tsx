@@ -14,7 +14,7 @@ export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
  * The workspace allows other apps to include patient search functionality.
  */
 const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
-  initialQuery = '',
+  initialQuery,
   handleSearchTermUpdated,
   nonNavigationSelectPatientAction,
   patientClickSideEffect,
