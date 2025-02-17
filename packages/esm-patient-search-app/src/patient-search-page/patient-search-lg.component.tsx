@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
@@ -12,7 +12,8 @@ import {
 } from './patient-search-views.component';
 import type { SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
-
+import { inferModeFromSearchParams } from '../mpi/utils';
+import { useSearchParams } from '../hooks/useSearchParams';
 interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
@@ -33,6 +34,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
   const totalResults = searchResults.length;
+  const searchParams = useSearchParams();
+  const searchMode = inferModeFromSearchParams(searchParams);
 
   const { results, goTo, totalPages, currentPage, showNextButton, paginated } = usePagination(
     searchResults,
@@ -45,23 +48,25 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
 
   const searchResultsView = useMemo(() => {
     if (!query) {
-      return <EmptyState inTabletOrOverlay={inTabletOrOverlay} />;
+      return <EmptyState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
     }
 
     if (isLoading) {
-      return <LoadingState inTabletOrOverlay={inTabletOrOverlay} />;
+      return <LoadingState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
     }
 
     if (fetchError) {
-      return <ErrorState inTabletOrOverlay={inTabletOrOverlay} />;
+      return <ErrorState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
     }
 
     if (results?.length === 0) {
-      return <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} />;
+      return (
+        <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} searchMode={searchMode} />
+      );
     }
 
-    return <PatientSearchResults searchResults={results} />;
-  }, [query, isLoading, inTabletOrOverlay, results, fetchError]);
+    return <PatientSearchResults searchResults={results} searchTerm={query} searchMode={searchMode} />;
+  }, [query, isLoading, inTabletOrOverlay, results, fetchError, searchMode]);
 
   return (
     <div
