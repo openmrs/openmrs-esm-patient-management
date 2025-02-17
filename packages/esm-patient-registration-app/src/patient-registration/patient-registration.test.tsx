@@ -1,12 +1,10 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
-  OpenmrsDatePicker,
   showSnackbar,
   useConfig,
   usePatient,
@@ -21,7 +19,6 @@ import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
 import { useInitialFormValues } from './patient-registration-hooks';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockSaveEncounter = jest.mocked(saveEncounter);
 const mockSavePatient = savePatient as jest.Mock;
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -108,22 +105,6 @@ jest.mock('./patient-registration-hooks', () => ({
   useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
   usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
 }));
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 const mockResourcesContextValue = {
   addressTemplate: mockedAddressTemplate as AddressTemplate,
@@ -244,12 +225,16 @@ const fillRequiredFields = async () => {
   const demographicsSection = await screen.findByLabelText('Demographics Section');
   const givenNameInput = within(demographicsSection).getByLabelText(/first/i) as HTMLInputElement;
   const familyNameInput = within(demographicsSection).getByLabelText(/family/i) as HTMLInputElement;
-  const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i) as HTMLInputElement;
+  const dateOfBirthInput = within(demographicsSection).getByTestId('birthdate') as HTMLInputElement;
+  const dateOfBirthDayInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /day/i });
+  const dateOfBirthMonthInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /month/i });
+  const dateOfBirthYearInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /year/i });
   const genderInput = within(demographicsSection).getByLabelText(/Male/) as HTMLSelectElement;
   await user.type(givenNameInput, 'Paul');
   await user.type(familyNameInput, 'Gaihre');
-  await user.clear(dateOfBirthInput);
-  await user.type(dateOfBirthInput, '02/08/1993');
+  await user.type(dateOfBirthDayInput, '02');
+  await user.type(dateOfBirthMonthInput, '08');
+  await user.type(dateOfBirthYearInput, '1993');
   await user.click(genderInput);
 };
 
@@ -282,11 +267,11 @@ describe('Registering a new patient', () => {
     expect(within(demographicSection).getByLabelText(/first name/i)).toBeInTheDocument();
     expect(within(demographicSection).getByLabelText(/middle name \(optional\)/i)).toBeInTheDocument();
     expect(within(demographicSection).getByLabelText(/family name/i)).toBeInTheDocument();
-    expect(within(demographicSection).getByLabelText(/date of birth/i)).toBeInTheDocument();
+
     expect(within(demographicSection).getByRole('radio', { name: /^male$/i })).toBeInTheDocument();
     expect(within(demographicSection).getByRole('radio', { name: /^female$/i })).toBeInTheDocument();
     expect(within(demographicSection).getByText(/date of birth known\?/i)).toBeInTheDocument();
-    expect(within(demographicSection).getByLabelText(/date of birth/i)).toBeInTheDocument();
+    expect(within(demographicSection).getByTestId('birthdate')).toBeInTheDocument();
 
     expect(within(contactSection).getByRole('heading', { name: /address/i })).toBeInTheDocument();
 
@@ -335,7 +320,6 @@ describe('Registering a new patient', () => {
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
-  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
   it.skip('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
@@ -491,7 +475,14 @@ describe('Updating an existing patient record', () => {
 
     expect(screen.getByLabelText(/first name/i)).toHaveValue(mockPatient.name[0].given[0]);
     expect(screen.getByLabelText(/family name/i)).toHaveValue(mockPatient.name[0].family);
-    expect(screen.getByLabelText(/date of birth/i)).toHaveValue('04/04/1972');
+    const dobField = screen.getByTestId('birthdate');
+    const dobDayField = within(dobField).getByRole('spinbutton', { name: /day/i });
+    const dobMonthField = within(dobField).getByRole('spinbutton', { name: /month/i });
+    const dobYearField = within(dobField).getByRole('spinbutton', { name: /year/i });
+    expect(dobDayField.innerHTML).toBe('04');
+    expect(dobMonthField.innerHTML).toBe('04');
+    expect(dobYearField.innerHTML).toBe('1972');
+    // expect(screen.getByLabelText(/birthdate/i)).toHaveValue('04/04/1972');
     expect(
       screen.getByRole('radio', {
         name: /^male$/i,

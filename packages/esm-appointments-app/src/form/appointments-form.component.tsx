@@ -24,6 +24,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ExtensionSlot,
+  OpenmrsDatePicker,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
@@ -736,24 +737,24 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value, ref } }) => (
-                      <DatePicker
-                        datePickerType="single"
-                        dateFormat={datePickerFormat}
-                        value={value?.startDate}
-                        onChange={([date]) => {
-                          if (date) {
-                            onChange({ ...value, startDate: date });
-                          }
-                        }}>
-                        <DatePickerInput
-                          id="datePickerInput"
-                          labelText={t('date', 'Date')}
-                          style={{ width: '100%' }}
-                          placeholder={datePickerPlaceHolder}
-                          ref={ref}
-                        />
-                      </DatePicker>
+                    render={({ field, fieldState }) => (
+                      <OpenmrsDatePicker
+                        {...field}
+                        value={field.value.startDate}
+                        onChange={(date) => {
+                          field.onChange({
+                            ...field.value,
+                            startDate: date,
+                          });
+                        }}
+                        id="datePickerInput"
+                        data-testid="datePickerInput"
+                        labelText={t('date', 'Date')}
+                        style={{ width: '100%' }}
+                        invalid={Boolean(fieldState?.error?.message)}
+                        invalidText={fieldState?.error?.message}
+                        // minDate={new Date()}
+                      />
                     )}
                   />
                 </ResponsiveWrapper>
@@ -842,24 +843,18 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             <Controller
               name="dateAppointmentScheduled"
               control={control}
-              render={({ field: { onChange, value, ref } }) => (
+              render={({ field, fieldState }) => (
                 <div style={{ width: '100%' }}>
-                  <DatePicker
-                    datePickerType="single"
-                    dateFormat={datePickerFormat}
-                    invalid={!!errors?.dateAppointmentScheduled}
-                    invalidText={errors?.dateAppointmentScheduled?.message}
-                    maxDate={new Date().toISOString()}
-                    onChange={([date]) => onChange(date)}
-                    value={value}>
-                    <DatePickerInput
-                      id="dateAppointmentScheduledPickerInput"
-                      labelText={t('dateScheduledDetail', 'Date appointment issued')}
-                      style={{ width: '100%' }}
-                      placeholder={datePickerPlaceHolder}
-                      ref={ref}
-                    />
-                  </DatePicker>
+                  <OpenmrsDatePicker
+                    {...field}
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
+                    maxDate={new Date()}
+                    id="dateAppointmentScheduledPickerInput"
+                    data-testid="dateAppointmentScheduledPickerInput"
+                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    style={{ width: '100%' }}
+                  />
                 </div>
               )}
             />
