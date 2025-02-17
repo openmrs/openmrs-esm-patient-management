@@ -73,16 +73,24 @@ test('Manage patients in a list', async ({ api, page }) => {
     await patientListPage.goto(cohort.uuid);
   });
 
-  await test.step('Then I should be able to add and remove patients from that list', async () => {
+  await test.step('Then I should be able to add a patient to the list', async () => {
     // Add a patient to the list
     cohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
     await patientListPage.goto(cohort.uuid);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
 
-    // Remove a patient from the list
-    await removePatientFromCohort(api, cohortMember.uuid);
-    await patientListPage.goto(cohort.uuid);
+  await test.step('And then I should be able to remove a patient from the list', async () => {
+    await page.getByLabel(/remove from list/i).click();
+  });
+
+  await test.step("And then I click the 'Remove from list' to confirm", async () => {
+    await page.getByRole('button', { name: 'danger Remove from list' }).click();
+  });
+
+  await test.step('And then I should see a success message', async () => {
+    await expect(page.getByText(/patient removed from list/i)).toBeVisible();
     await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
     cohortMember = null;
   });
