@@ -85,7 +85,7 @@ test('Manage patients in a list', async ({ api, page }) => {
     await page.getByLabel(/remove from list/i).click();
   });
 
-  await test.step("And then I click the 'Remove from list' to confirm", async () => {
+  await test.step("Then I click the 'Remove from list' in the delete modal to confirm the action", async () => {
     await page.getByRole('button', { name: 'danger Remove from list' }).click();
   });
 
