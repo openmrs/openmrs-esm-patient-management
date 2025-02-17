@@ -82,7 +82,7 @@ test('Manage patients in a list', async ({ api, page }) => {
   });
 
   await test.step('And when I click on the bin icon to remove the patient from the list', async () => {
-    await page.getByLabel(/remove from list/i).click();
+    await page.getByRole('button', { name: /remove from list/i }).click();
   });
 
   await test.step("Then I click the 'Remove from list' in the delete modal to confirm the action", async () => {
