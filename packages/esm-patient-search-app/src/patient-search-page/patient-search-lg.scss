@@ -31,18 +31,10 @@
   align-self: center;
 }
 
-.results {
-  border: 1px solid $ui-03;
-}
-
 .emptySearchResultsTile {
   text-align: center;
   margin: 0;
   padding: layout.$spacing-08 0;
-}
-
-.paddedEmptySearchResultsTile {
-  margin: 0 layout.$spacing-05;
 }
 
 .emptyResultText {
