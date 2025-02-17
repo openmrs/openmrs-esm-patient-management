@@ -81,7 +81,7 @@ test('Manage patients in a list', async ({ api, page }) => {
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
   });
 
-  await test.step('And then I should be able to remove a patient from the list', async () => {
+  await test.step('And when I click on the bin icon to remove the patient from the list', async () => {
     await page.getByLabel(/remove from list/i).click();
   });
 
