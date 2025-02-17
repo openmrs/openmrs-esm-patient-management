@@ -2,15 +2,6 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadc
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
-import rootComponent from './root.component';
-import queueTableByStatusMenuComponent from './queue-table/queue-table-by-status-menu.component';
-import appointmentListComponent from './queue-patient-linelists/scheduled-appointments-table.component';
-import queueListComponent from './queue-patient-linelists/queue-services-table.component';
-import outpatientSideNavComponent from './side-menu/side-menu.component';
-import homeDashboardComponent from './home.component';
-import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
-import pastVisitSummaryComponent from './past-visit/past-visit.component';
-import VisitFormQueueFields from './create-queue-entry/queue-fields/visit-form-queue-fields.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -21,19 +12,28 @@ const options = {
   moduleName,
 };
 
-export const root = getSyncLifecycle(rootComponent, options);
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-export const queueTableByStatusMenu = getSyncLifecycle(queueTableByStatusMenuComponent, options);
+export const queueTableByStatusMenu = getAsyncLifecycle(
+  () => import('./queue-table/queue-table-by-status-menu.component'),
+  options,
+);
 
-export const appointmentsList = getSyncLifecycle(appointmentListComponent, options);
+export const appointmentsList = getAsyncLifecycle(
+  () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
+  options,
+);
 
-export const queueList = getSyncLifecycle(queueListComponent, options);
+export const queueList = getAsyncLifecycle(
+  () => import('./queue-patient-linelists/queue-services-table.component'),
+  options,
+);
 
-export const outpatientSideNav = getSyncLifecycle(outpatientSideNavComponent, options);
+export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const homeDashboard = getSyncLifecycle(homeDashboardComponent, options);
+export const homeDashboard = getAsyncLifecycle(() => import('./home.component'), options);
 
 export const editQueueEntryStatusModal = getAsyncLifecycle(
   () => import('./active-visits/change-status-dialog.component'),
@@ -43,7 +43,7 @@ export const editQueueEntryStatusModal = getAsyncLifecycle(
   },
 );
 
-export const patientInfoBannerSlot = getSyncLifecycle(patientInfoBannerSlotComponent, {
+export const patientInfoBannerSlot = getAsyncLifecycle(() => import('./patient-info/patient-info.component'), {
   featureName: 'patient info slot',
   moduleName,
 });
@@ -72,7 +72,7 @@ export const transitionQueueEntryStatusModal = getAsyncLifecycle(
   },
 );
 
-export const pastVisitSummary = getSyncLifecycle(pastVisitSummaryComponent, options);
+export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
 export const addProviderToRoomModal = getAsyncLifecycle(
   () => import('./add-provider-queue-room/add-provider-queue-room.component'),
@@ -147,7 +147,10 @@ export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   },
 );
 
-export const visitFormQueueFields = getSyncLifecycle(VisitFormQueueFields, options);
+export const visitFormQueueFields = getAsyncLifecycle(
+  () => import('./create-queue-entry/queue-fields/visit-form-queue-fields.extension'),
+  options,
+);
 
 export const createQueueEntryWorkspace = getAsyncLifecycle(
   () => import('./create-queue-entry/create-queue-entry.workspace'),

@@ -100,7 +100,7 @@ function QueueTable({
       rows={rows}
       headers={columns}
       size={responsiveSize}
-      useZebraStyles>
+      useZebraStyles={columns?.length > 1}>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
         <>
           <TableContainer className={styles.tableContainer}>
@@ -117,7 +117,7 @@ function QueueTable({
                 </TableToolbar>
               )}
             </div>
-            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+            <Table {...getTableProps()} className={styles.queueTable}>
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
@@ -145,13 +145,15 @@ function QueueTable({
                           </TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && row.isExpanded && (
+                      {ExpandedRow && row.isExpanded ? (
                         <TableExpandedRow
-                          key={i}
                           className={styles.expandedActiveVisitRow}
-                          colSpan={headers.length + 1}>
+                          colSpan={headers.length + 2}
+                          key={i}>
                           <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
                         </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                       )}
                     </React.Fragment>
                   );

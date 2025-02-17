@@ -53,9 +53,15 @@ interface AppointmentsTableProps {
   appointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
+  hasActiveFilters?: boolean;
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading }) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
+  appointments,
+  isLoading,
+  tableHeading,
+  hasActiveFilters,
+}) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
@@ -111,6 +117,21 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" row={5} />;
+  }
+
+  if (hasActiveFilters && !appointments?.length) {
+    return (
+      <div className={styles.filterEmptyState}>
+        <Layer level={0}>
+          <Tile className={styles.filterEmptyStateTile}>
+            <p className={styles.filterEmptyStateContent}>
+              {t('noMatchingAppointments', 'No matching appointments found')}
+            </p>
+            <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+          </Tile>
+        </Layer>
+      </div>
+    );
   }
 
   if (!appointments?.length) {

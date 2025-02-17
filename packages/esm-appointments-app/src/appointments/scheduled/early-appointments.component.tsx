@@ -5,7 +5,7 @@ import AppointmentsTable from '../common-components/appointments-table.component
 import { useTranslation } from 'react-i18next';
 
 interface EarlyAppointmentsProps {
-  appointmentServiceType?: string;
+  appointmentServiceType?: string[];
   date: string;
 }
 
