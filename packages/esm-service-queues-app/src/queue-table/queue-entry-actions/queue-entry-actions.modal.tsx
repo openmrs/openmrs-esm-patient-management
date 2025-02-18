@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from 'react';
-import dayjs from 'dayjs';
+import React, { useState } from 'react';
 import {
   Button,
   Checkbox,
@@ -20,8 +19,6 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
-import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
-import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
@@ -38,10 +35,6 @@ interface FormState {
   selectedPriority: string;
   selectedStatus: string;
   prioritycomment: string;
-  modifyDefaultTransitionDateTime: boolean;
-  transitionDate: Date;
-  transitionTime: string;
-  transitionTimeFormat: amPm;
 }
 
 interface ModalParams {
@@ -77,16 +70,11 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     isTransition,
   } = modalParams;
 
-  const initialTransitionDate = isTransition ? new Date() : new Date(queueEntry.startedAt);
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
-    modifyDefaultTransitionDateTime: false,
-    transitionDate: initialTransitionDate,
-    transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
-    transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,22 +109,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   const setPriorityComment = (prioritycomment: string) => {
     setFormState((prevState) => ({ ...prevState, prioritycomment }));
-  };
-
-  const setTransitionDate = (transitionDate: Date) => {
-    setFormState({ ...formState, transitionDate });
-  };
-
-  const setTransitionTime = (transitionTime: string) => {
-    setFormState({ ...formState, transitionTime });
-  };
-
-  const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
-    setFormState({ ...formState, transitionTimeFormat });
-  };
-
-  const setModifyDefaultTransitionDateTime = (modifyDefaultTransitionDateTime) => {
-    setFormState({ ...formState, modifyDefaultTransitionDateTime });
   };
 
   const submitForm = (e) => {
@@ -177,40 +149,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         setIsSubmitting(false);
       });
   };
-
-  // non-null if the selected date+time is invalid
-  const timeInvalidMessage = useMemo(() => {
-    const now = new Date();
-    const startAtDate = new Date(formState.transitionDate);
-    const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
-    startAtDate.setHours(hour, minute, 0, 0);
-
-    const previousQueueEntryStartTimeStr = queueEntry.previousQueueEntry?.startedAt;
-    const previousQueueEntryStartTime = previousQueueEntryStartTimeStr
-      ? new Date(previousQueueEntryStartTimeStr)
-      : null;
-
-    if (startAtDate > now) {
-      return t('timeCannotBeInFuture', 'Time cannot be in the future');
-    }
-    if (startAtDate <= previousQueueEntryStartTime) {
-      return t(
-        'timeCannotBePriorToPreviousQueueEntry',
-        'Time cannot be before start of previous queue entry: {{time}}',
-        {
-          time: previousQueueEntryStartTime.toLocaleString(),
-          interpolation: { escapeValue: false },
-        },
-      );
-    }
-    return null;
-  }, [
-    formState.transitionDate,
-    formState.transitionTime,
-    formState.transitionTimeFormat,
-    queueEntry.previousQueueEntry?.startedAt,
-    t,
-  ]);
 
   const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
 
