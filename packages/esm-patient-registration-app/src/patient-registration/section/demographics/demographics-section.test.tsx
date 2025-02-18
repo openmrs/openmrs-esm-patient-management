@@ -8,24 +8,7 @@ import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 jest.mock('../../field/name/name-field.component', () => {
   return {
@@ -97,6 +80,6 @@ describe('Demographics section', () => {
 
   it('inputs corresponding to number of fields', async () => {
     const inputNames = await setupSection();
-    expect(inputNames.length).toBe(3);
+    expect(inputNames.length).toBe(2);
   });
 });
