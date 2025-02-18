@@ -1,32 +1,14 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { Formik, Form } from 'formik';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { DobField } from './dob.component';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 describe('Dob', () => {
   beforeEach(() => {
@@ -56,6 +38,7 @@ describe('Dob', () => {
               currentPhoto: '',
               isOffline: false,
               initialFormValues: initialFormValues,
+              setFieldTouched: () => {},
             }}>
             <DobField />
           </PatientRegistrationContext.Provider>
@@ -69,12 +52,25 @@ describe('Dob', () => {
     expect(screen.getByRole('tab', { name: /yes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /yes/i })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: /no/i })).toHaveAttribute('aria-selected', 'false');
-    expect(screen.getByRole('textbox', { name: /date of birth/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /date of birth/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /day, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /month, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /year, date of birth/i,
+      }),
+    ).toBeInTheDocument();
   });
 
-  // TODO O3-3482: Fix this test case.
-  // Disabling this test case for now as it doesn't work as expected when mocking the date picker
-  it.skip('typing in the date picker input sets the date of birth', async () => {
+  it('typing in the date picker input sets the date of birth', async () => {
     const user = userEvent.setup();
 
     render(
@@ -91,6 +87,7 @@ describe('Dob', () => {
               currentPhoto: '',
               isOffline: false,
               initialFormValues: initialFormValues,
+              setFieldTouched: () => {},
             }}>
             <DobField />
           </PatientRegistrationContext.Provider>
@@ -98,10 +95,32 @@ describe('Dob', () => {
       </Formik>,
     );
 
-    const dateInput = screen.getByLabelText(/Date of birth/i);
-    expect(dateInput).toBeInTheDocument();
+    const dateOfBirthInput = screen.getByRole('group', { name: /date of birth/i });
+    expect(dateOfBirthInput).toBeInTheDocument();
 
-    await user.type(dateInput, '10/10/2022');
-    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
+    const dateInput = screen.getByRole('spinbutton', {
+      name: /day, date of birth/i,
+    });
+    expect(dateInput).toBeInTheDocument();
+    const monthInput = screen.getByRole('spinbutton', {
+      name: /month, date of birth/i,
+    });
+    expect(monthInput).toBeInTheDocument();
+    const yearInput = screen.getByRole('spinbutton', {
+      name: /year, date of birth/i,
+    });
+    expect(yearInput).toBeInTheDocument();
+    // FIXME: When typing in the year the month and date inputs revert back to the placeholders
+    // and the display becomes dd/mm/2022
+    // which is why they are tested in three seperate steps rather than altogther
+    await user.clear(dateInput);
+    await user.type(dateInput, '10');
+    expect(dateInput).toHaveTextContent('10');
+    await user.clear(monthInput);
+    await user.type(monthInput, '10');
+    expect(monthInput).toHaveTextContent('10');
+    await user.clear(yearInput);
+    await user.type(yearInput, '2022');
+    expect(yearInput).toHaveTextContent('2022');
   });
 });
