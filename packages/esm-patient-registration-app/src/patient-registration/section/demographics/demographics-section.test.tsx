@@ -1,31 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import dayjs from 'dayjs';
 import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
-import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 jest.mock('../../field/name/name-field.component', () => {
   return {
@@ -85,6 +67,7 @@ describe('Demographics section', () => {
               currentPhoto: 'TEST',
               isOffline: true,
               setCapturePhotoProps: (value) => {},
+              setFieldTouched: () => {},
             }}>
             <DemographicsSection fields={['name', 'gender', 'dob']} />
           </PatientRegistrationContext.Provider>
@@ -95,8 +78,40 @@ describe('Demographics section', () => {
     return allInputs.map((input) => input.name);
   };
 
-  it('inputs corresponding to number of fields', async () => {
+  it('renders demographics fields and date of birth inputs', async () => {
     const inputNames = await setupSection();
-    expect(inputNames.length).toBe(3);
+    expect(inputNames.length).toBe(2);
+
+    expect(screen.getByText(/date of birth known\?/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', {
+        name: /yes/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', {
+        name: /no/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('group', {
+        name: /date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /day, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /month, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /year, date of birth/i,
+      }),
+    ).toBeInTheDocument();
   });
 });
