@@ -78,11 +78,10 @@ describe('Demographics section', () => {
     return allInputs.map((input) => input.name);
   };
 
-  it('inputs corresponding to number of fields', async () => {
+  it('renders demographics fields and date of birth inputs', async () => {
     const inputNames = await setupSection();
     expect(inputNames.length).toBe(2);
 
-    //test for date of birth related elements to be visible
     expect(screen.getByText(/date of birth known\?/i)).toBeInTheDocument();
     expect(
       screen.getByRole('tab', {

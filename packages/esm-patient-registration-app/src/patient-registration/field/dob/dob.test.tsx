@@ -112,7 +112,7 @@ describe('Dob', () => {
     expect(yearInput).toBeInTheDocument();
     // FIXME: When typing in the year the month and date inputs revert back to the placeholders
     // and the display becomes dd/mm/2022
-    // which is why they are tested in three seperate steps rather than altogther
+    // which is why they are tested in three separate steps rather than altogether
     await user.clear(dateInput);
     await user.type(dateInput, '10');
     expect(dateInput).toHaveTextContent('10');
