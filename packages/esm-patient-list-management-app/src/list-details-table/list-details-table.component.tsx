@@ -364,6 +364,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         </div>
         {showConfirmationModal && (
           <Modal
+            className={styles.modal}
             open
             danger
             modalHeading={t(
