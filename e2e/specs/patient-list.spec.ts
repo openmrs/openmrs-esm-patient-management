@@ -73,17 +73,28 @@ test('Manage patients in a list', async ({ api, page }) => {
     await patientListPage.goto(cohort.uuid);
   });
 
-  await test.step('Then I should be able to add and remove patients from that list', async () => {
+  await test.step('Then I should be able to add a patient to the list', async () => {
     // Add a patient to the list
     cohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
     await patientListPage.goto(cohort.uuid);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
 
-    // Remove a patient from the list
-    await removePatientFromCohort(api, cohortMember.uuid);
-    await patientListPage.goto(cohort.uuid);
-    await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
+  await test.step('And when I click on the bin icon to remove the patient from the list', async () => {
+    await page.getByRole('button', { name: /remove from list/i }).click();
+  });
+
+  await test.step("Then I click the 'Remove from list' in the delete modal to confirm the action", async () => {
+    await page.getByRole('button', { name: 'danger Remove from list' }).click();
+  });
+
+  await test.step('And then I should see a success message', async () => {
+    await expect(page.getByText(/patient removed from list/i)).toBeVisible();
+  });
+
+  await test.step('And then the patient count should update to zero', async () => {
+    await expect(page.getByText(/0 patients/)).toBeVisible();
     cohortMember = null;
   });
 });
