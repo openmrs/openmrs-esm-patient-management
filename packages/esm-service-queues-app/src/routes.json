@@ -130,7 +130,8 @@
       "name": "create-queue-entry-workspace",
       "title": "addPatientToQueue",
       "component": "createQueueEntryWorkspace",
-      "type": "service-queues"
+      "type": "service-queues",
+      "width": "wider"
     }
   ]
 }
