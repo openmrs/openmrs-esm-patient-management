@@ -31,11 +31,12 @@
   ],
   "workspaces": [
     {
-      "name": "patient-search-workspace",
       "component": "patientSearchWorkspace",
+      "groups": ["ward-patient-admission-requests"],
+      "name": "patient-search-workspace",
       "title": "searchPatient",
       "type": "patient-search-workspace",
-      "groups": ["ward-patient-admission-requests"]
+      "width": "wider"
     }
   ]
 }
