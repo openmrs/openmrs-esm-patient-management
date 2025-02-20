@@ -1,9 +1,9 @@
+import React from 'react';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { PatientBannerPatientInfo, PatientPhoto, getPatientName } from '@openmrs/esm-framework';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { PatientBannerPatientInfo, PatientPhoto, getPatientName } from '@openmrs/esm-framework';
 import styles from './patient-appointments-header.scss';
 
 interface PatientAppointmentsHeaderProps {
@@ -16,13 +16,14 @@ const PatientAppointmentsHeader: React.FC<PatientAppointmentsHeaderProps> = ({ p
   const patientName = getPatientName(patient);
 
   return (
-    <div>
+    <header>
       <div className={styles.titleContainer}>
         <Button
+          className={styles.backButton}
+          iconDescription={t('back', 'Back')}
           kind="ghost"
           onClick={() => navigate(-1)}
           renderIcon={ArrowLeft}
-          iconDescription={t('back', 'Back')}
           size="lg">
           <span>{t('back', 'Back')}</span>
         </Button>
@@ -35,7 +36,7 @@ const PatientAppointmentsHeader: React.FC<PatientAppointmentsHeaderProps> = ({ p
         <PatientBannerPatientInfo patient={patient}></PatientBannerPatientInfo>
       </div>
       <div className={styles.divider}></div>
-    </div>
+    </header>
   );
 };
 
