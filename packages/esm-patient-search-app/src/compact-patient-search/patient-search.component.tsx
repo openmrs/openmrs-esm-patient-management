@@ -1,7 +1,7 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
-import type { PatientSearchResponse } from '../types';
+import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
@@ -15,8 +15,9 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
   ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
+
     const loadingIconRef = useCallback(
-      (node) => {
+      (node: HTMLDivElement | null) => {
         if (isValidating) {
           return;
         }
@@ -39,6 +40,14 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
       },
       [isValidating, hasMore, setPage],
     );
+
+    useEffect(() => {
+      return () => {
+        if (observer.current) {
+          observer.current.disconnect();
+        }
+      };
+    }, []);
 
     if (isLoading) {
       return (
