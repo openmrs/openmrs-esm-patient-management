@@ -183,10 +183,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       labelText={
                         uuid == queueEntry.queue.uuid
                           ? t('currentValueFormatted', '{{value}} (Current)', {
-                              value: `${display}`,
+                              value: `${display} - ${location?.display}`,
                               interpolation: { escapeValue: false },
                             })
-                          : `${display}`
+                          : `${display} - ${location?.display}`
                       }
                       value={uuid}
                     />
@@ -203,10 +203,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   itemToString={(item) =>
                     item.uuid == queueEntry.queue.uuid
                       ? t('currentValueFormatted', '{{value}} (Current)', {
-                          value: `${item.display}`,
+                          value: `${item.display} - ${item.location?.display}`,
                           interpolation: { escapeValue: false },
                         })
-                      : `${item.display}`
+                      : `${item.display} - ${item.location?.display}`
                   }
                   onChange={({ selectedItem }) => setSelectedQueueUuid(selectedItem.uuid)}
                 />
