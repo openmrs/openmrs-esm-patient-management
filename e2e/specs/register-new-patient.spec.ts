@@ -24,7 +24,6 @@ test('Register a new patient', async ({ page }) => {
     stateProvince: 'Pernambuco',
     cityVillage: 'Recife',
     phone: '5555551234',
-    email: 'johnnyronny@example.com',
   };
 
   await test.step('When I visit the registration page', async () => {
@@ -44,7 +43,7 @@ test('Register a new patient', async ({ page }) => {
     await patientRegistrationPage.familyNameInput().fill(formValues.familyName);
   });
 
-  await test.step('Then I check the sex radio button', async () => {
+  await test.step('And then I fill in the gender', async () => {
     await patientRegistrationPage.sexRadioButton(formValues.sex).check();
   });
 
@@ -55,18 +54,23 @@ test('Register a new patient', async ({ page }) => {
   });
 
   await test.step('And then I fill in the address', async () => {
+    await expect(patientRegistrationPage.addressHierarchySearchInput()).toBeVisible();
+    await expect(patientRegistrationPage.address1Input()).toBeVisible();
     await patientRegistrationPage.address1Input().fill(formValues.address1);
   });
 
   await test.step('Then I fill in the city/village', async () => {
+    await expect(patientRegistrationPage.cityVillageInput()).toBeVisible();
     await patientRegistrationPage.cityVillageInput().fill(formValues.cityVillage);
   });
 
   await test.step('Then I fill in the state/province', async () => {
+    await expect(patientRegistrationPage.stateProvinceInput()).toBeVisible();
     await patientRegistrationPage.stateProvinceInput().fill(formValues.stateProvince);
   });
 
   await test.step('Then I fill in the country', async () => {
+    await expect(patientRegistrationPage.countryInput()).toBeVisible();
     await patientRegistrationPage.countryInput().fill(formValues.country);
   });
 

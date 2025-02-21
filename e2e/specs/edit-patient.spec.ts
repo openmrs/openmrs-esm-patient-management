@@ -24,7 +24,6 @@ const formValues: PatientRegistrationFormValues = {
   stateProvince: 'Pernambuco',
   cityVillage: 'Recife',
   phone: '5555551234',
-  email: 'johnnyronny@example.com',
 };
 
 test('Edit a patient', async ({ page, api }) => {
@@ -49,7 +48,7 @@ test('Edit a patient', async ({ page, api }) => {
     await patientEditPage.familyNameInput().fill(formValues.familyName);
   });
 
-  await test.step('Then I check the sex radio button', async () => {
+  await test.step('And then I fill in the gender', async () => {
     await patientEditPage.sexRadioButton(formValues.sex).check();
   });
 
