@@ -13,6 +13,11 @@ export interface PatientSearchContextProps {
    * just before navigation (or after nonNavigationSelectPatientAction is called).
    */
   patientClickSideEffect?: ((patientUuid: string) => void) | (() => void);
+  /**
+   * A function to set the Search windown back on in the patient search work space
+   * on discarding the Start visit form
+   */
+  handleDiscardVisit?: () => void;
 }
 
 export const PatientSearchContext = createContext<PatientSearchContextProps>(null);

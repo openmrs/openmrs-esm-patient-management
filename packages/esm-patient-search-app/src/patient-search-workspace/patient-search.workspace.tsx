@@ -8,6 +8,7 @@ import AdvancedPatientSearchComponent from '../patient-search-page/advanced-pati
 export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
   initialQuery?: string;
   handleSearchTermUpdated?: (value: string) => void;
+  handleDiscardVisit?: () => void;
 }
 
 /**
@@ -18,6 +19,7 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
   handleSearchTermUpdated,
   nonNavigationSelectPatientAction,
   patientClickSideEffect,
+  handleDiscardVisit,
 }) => {
   const {
     search: { disableTabletSearchOnKeyUp },
@@ -37,7 +39,8 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
   );
 
   return (
-    <PatientSearchContext.Provider value={{ nonNavigationSelectPatientAction, patientClickSideEffect }}>
+    <PatientSearchContext.Provider
+      value={{ nonNavigationSelectPatientAction, patientClickSideEffect, handleDiscardVisit }}>
       <PatientSearchBar
         initialSearchTerm={initialQuery}
         onChange={(value) => !disableTabletSearchOnKeyUp && onSearchTermChange(value)}

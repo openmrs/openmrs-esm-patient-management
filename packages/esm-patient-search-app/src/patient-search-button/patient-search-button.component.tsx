@@ -12,6 +12,7 @@ interface PatientSearchButtonProps {
   searchQueryUpdatedAction?: (query: string) => {};
   buttonProps?: Object;
   isOpen?: boolean;
+  handleDiscardVisit?: () => void;
   searchQuery?: string;
 }
 
@@ -31,6 +32,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
   overlayHeader,
   selectPatientAction,
   searchQueryUpdatedAction,
+  handleDiscardVisit,
   buttonProps,
   isOpen = false,
   searchQuery = '',
@@ -42,12 +44,13 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
       handleSearchTermUpdated: searchQueryUpdatedAction,
       initialQuery: searchQuery,
       nonNavigationSelectPatientAction: selectPatientAction,
+      handleDiscardVisit,
     };
     launchWorkspace('patient-search-workspace', {
       ...workspaceProps,
       workspaceTitle: overlayHeader,
     });
-  }, [overlayHeader, searchQuery, searchQueryUpdatedAction, selectPatientAction]);
+  }, [overlayHeader, searchQuery, searchQueryUpdatedAction, selectPatientAction, handleDiscardVisit]);
 
   useEffect(() => {
     if (isOpen) {

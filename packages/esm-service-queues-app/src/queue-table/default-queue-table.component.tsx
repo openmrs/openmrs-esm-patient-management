@@ -43,6 +43,10 @@ function DefaultQueuePage() {
     closeWorkspace(serviceQueuesPatientSearchWorkspace);
   }, []);
 
+  const handleDiscardVisit = useCallback(() => {
+    setIsPatientSearchOpen(true);
+  }, []);
+
   return (
     <div className={styles.defaultQueuePage}>
       <Layer className={styles.tableSection}>
@@ -55,6 +59,7 @@ function DefaultQueuePage() {
               name="patient-search-button-slot"
               state={{
                 isOpen: isPatientSearchOpen,
+                handleDiscardVisit: handleDiscardVisit,
                 searchQuery: patientSearchQuery,
                 buttonText: t('addPatientToQueue', 'Add patient to queue'),
                 overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
