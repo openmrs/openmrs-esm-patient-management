@@ -78,7 +78,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
       <div className={styles.dropdownContainer}>
         {showLocationDropdown && (
           <Dropdown
-            aria-label={t('selectQueueLocation', 'Select queue location')}
+            aria-label={t('selectQueueLocation', 'Select a queue location')}
             className={styles.dropdown}
             id="queueLocationDropdown"
             label={currentQueueLocationName ?? t('all', 'All')}

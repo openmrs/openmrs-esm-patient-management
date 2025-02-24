@@ -63,3 +63,12 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-service-queues-app
+
+[o:openmrs:p:openmrs3:r:esm-ward-app]
+file_filter            = packages/esm-ward-app/translations/<lang>.json
+source_file            = packages/esm-ward-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+resource_name          = esm-ward-app

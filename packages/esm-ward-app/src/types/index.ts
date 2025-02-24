@@ -48,7 +48,6 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
-  WardPatientHeader: WardPatientCardType;
 }
 
 // server-side types defined in openmrs-module-bedmanagement:

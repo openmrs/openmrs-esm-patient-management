@@ -10,6 +10,7 @@ interface QueueEntryUndoActionsModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
   modalParams: ModalParams;
+  isRemovingPatientFromQueue?: boolean;
 }
 
 interface ModalParams {
@@ -27,6 +28,7 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
   queueEntry,
   closeModal,
   modalParams,
+  isRemovingPatientFromQueue,
 }) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
@@ -78,16 +80,20 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
     <>
       <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
       <ModalBody>
-        <Stack gap={4}>
-          <h5>{queueEntry.display}</h5>
-          {modalInstruction}
-        </Stack>
+        {isRemovingPatientFromQueue ? (
+          <p>{modalInstruction}</p>
+        ) : (
+          <Stack gap={4}>
+            <h5>{queueEntry.display}</h5>
+            <span>{modalInstruction}</span>
+          </Stack>
+        )}
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={isSubmitting} onClick={submitForm}>
+        <Button kind="danger" disabled={isSubmitting} onClick={submitForm}>
           {submitButtonText}
         </Button>
       </ModalFooter>

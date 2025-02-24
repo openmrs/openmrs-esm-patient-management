@@ -126,7 +126,17 @@ describe('AppointmentsTable', () => {
     const downloadButton = screen.getByRole('button', { name: /download/i });
     await user.click(downloadButton);
     expect(downloadButton).toBeInTheDocument();
-    expect(mockExportAppointmentsToSpreadsheet).toHaveBeenCalledWith(mockAppointments, expect.anything());
+    expect(mockExportAppointmentsToSpreadsheet).toHaveBeenCalledWith(
+      mockAppointments,
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
+          patientName: expect.anything(),
+          identifier: '100GEJ',
+        }),
+      ]),
+      expect.stringContaining('scheduled_appointments'),
+    );
   });
 });
 

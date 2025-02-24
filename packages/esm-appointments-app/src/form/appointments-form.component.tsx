@@ -953,7 +953,7 @@ function TimeAndDuration({ t, watch, control, services, errors }) {
               max={1440}
               min={0}
               onBlur={onBlur}
-              onChange={(event) => onChange(Number(event.target.value))}
+              onChange={(event) => onChange(event.target.value === '' ? null : Number(event.target.value))}
               ref={ref}
               size="md"
               value={value}

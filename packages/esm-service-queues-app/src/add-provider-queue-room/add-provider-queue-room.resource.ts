@@ -11,10 +11,9 @@ export function useQueueRooms(location: string, queueUuid: string) {
     location ? apiUrl : null,
     openmrsFetch,
   );
-
   return {
     rooms: data ? data?.data?.results : [],
-    error,
+    error: error?.message.replaceAll('[', '').replaceAll(']', '') ?? error?.message,
     isLoading,
   };
 }

@@ -1,10 +1,10 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
-import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockPriorityNonUrgent, mockPriorityUrgent, mockQueueEntries, mockSession } from '__mocks__';
-import { renderWithSwr } from 'tools';
 import QueueTable from './queue-table.component';
 
 const mockUseSession = jest.mocked(useSession);
@@ -67,9 +67,12 @@ const defaultProps = {
 };
 
 describe('QueueTable', () => {
+  let consoleSpy: jest.SpyInstance;
+
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession.data);
     mockUseConfig.mockReturnValue(configDefaults);
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('renders an empty table with default columns when there are no queue entries', () => {
@@ -202,13 +205,15 @@ describe('QueueTable', () => {
     });
 
     const rows = screen.queryAllByRole('row');
-    const firstRow = rows[1];
-    const cells = within(firstRow).getAllByRole('cell');
+    expect(rows).toHaveLength(5);
+
+    const briansRow = rows[1];
+    const alicesRow = rows[3];
+    const cells = within(briansRow).getAllByRole('cell');
     expect(cells[1].childNodes[0]).toHaveClass('bold');
 
-    const secondRow = rows[2];
-    const secondCells = within(secondRow).getAllByRole('cell');
-    expect(secondCells[1].childNodes[0]).toHaveClass('orange');
+    const alicesCells = within(alicesRow).getAllByRole('cell');
+    expect(alicesCells[1].childNodes[0]).toHaveClass('orange');
   });
 
   it('uses the visitQueueNumberAttributeUuid defined at the top level', () => {

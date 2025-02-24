@@ -30,7 +30,7 @@ describe('PatientSearchLaunch', () => {
 
   it('renders without errors', () => {
     render(<PatientSearchLaunch />);
-    expect(screen.getByRole('button', { name: 'Search Patient' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /search patient/i })).toBeInTheDocument();
   });
 
   it('toggles search input when search button is clicked', async () => {

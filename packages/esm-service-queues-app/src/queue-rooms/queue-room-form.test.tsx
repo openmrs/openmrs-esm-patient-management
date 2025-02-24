@@ -9,7 +9,7 @@ const mockUseLayoutType = jest.mocked(useLayoutType);
 jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
   ...jest.requireActual('../create-queue-entry/hooks/useQueueLocations'),
   useQueueLocations: jest.fn(() => ({
-    queueLocations: { uuid: 'e7786d9a-ab62-11ec-b909-0242ac120002', display: 'Location Test' },
+    queueLocations: [{ uuid: 'e7786d9a-ab62-11ec-b909-0242ac120002', display: 'Location Test' }],
   })),
 }));
 
@@ -32,9 +32,9 @@ describe('QueueRoomForm', () => {
   it('renders the form with queue room elements', () => {
     render(<QueueRoomForm {...workspaceProps} />);
 
-    expect(screen.getByLabelText('Queue room name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select a queue location')).toBeInTheDocument();
+    expect(screen.getByLabelText(/queue room name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/queue room service/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/queue location/i)).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.getByText('Save')).toBeInTheDocument();
   });
@@ -45,7 +45,7 @@ describe('QueueRoomForm', () => {
     render(<QueueRoomForm {...workspaceProps} />);
 
     await user.click(screen.getByText('Save'));
-    expect(screen.getByText('Missing queue room name')).toBeInTheDocument();
+    expect(screen.getByText('Queue room service is required')).toBeInTheDocument();
   });
 
   it('displays error notification if queue room service is missing on submission', async () => {
@@ -57,7 +57,7 @@ describe('QueueRoomForm', () => {
 
     await user.type(queueRoomNameInput, 'Room 123');
     await user.click(screen.getByText('Save'));
-    expect(screen.getByText('Missing queue room service')).toBeInTheDocument();
+    expect(screen.getByText('Queue room service is required')).toBeInTheDocument();
   });
 
   it('calls closePanel when Cancel button is clicked', async () => {

@@ -13,12 +13,17 @@ export function useInpatientAdmissionByPatients(patientUuids: string[]) {
     'encounterAssigningToCurrentInpatientLocation:(encounterDatetime),' +
     'currentInpatientRequest:(dispositionLocation,dispositionType,disposition:(uuid,display),dispositionEncounter:(uuid,display),dispositionObsGroup:(uuid,display),visit:(uuid),patient:(uuid)),' +
     'firstAdmissionOrTransferEncounter:(encounterDatetime),' +
-    'currentInpatientLocation' + 
+    'currentInpatientLocation,' + 
     ')';
 
+  const hasPatients = patientUuids?.length > 0;
+  const searchParams = new URLSearchParams();
+  searchParams.append('v', customRepresentation);
+  for (const uuid of patientUuids ?? []) {
+    searchParams.append('patients', uuid);
+  }
+
   return useOpenmrsFetchAll<InpatientAdmission>(
-    patientUuids?.length > 0
-      ? `${restBaseUrl}/emrapi/inpatient/admission?patients=${patientUuids.join(',')}&v=${customRepresentation}`
-      : null,
+    hasPatients ? `${restBaseUrl}/emrapi/inpatient/admission?${searchParams.toString()}` : null,
   );
 }

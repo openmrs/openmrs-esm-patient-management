@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Header } from '@carbon/react';
 import { ArrowLeft, Close } from '@carbon/react/icons';
@@ -13,21 +14,21 @@ interface OverlayProps {
 }
 
 const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup }) => {
-  const layout = useLayoutType();
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const isDesktopView = isDesktop(layout);
 
   return (
-    <div className={isDesktop(layout) ? styles.desktopOverlay : styles.tabletOverlay}>
-      {isDesktop(layout) ? (
+    <div className={classNames(isDesktopView ? styles.desktopOverlay : styles.tabletOverlay)}>
+      {isDesktopView ? (
         <div className={styles.desktopHeader}>
           <div className={styles.headerContent}>{header}</div>
-
           <Button
             className={styles.closeButton}
+            hasIconOnly
             iconDescription={t('close', 'Close')}
-            onClick={close}
             kind="primary"
-            hasIconOnly>
+            onClick={close}>
             <Close size={16} />
           </Button>
         </div>
@@ -35,10 +36,10 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
         <Header className={styles.tabletOverlayHeader} aria-label="Close overlay">
           <Button
             className={styles.closeButton}
+            hasIconOnly
             iconDescription={t('close', 'Close')}
-            onClick={close}
             kind="ghost"
-            hasIconOnly>
+            onClick={close}>
             <ArrowLeft size={16} />
           </Button>
           <div className={styles.headerContent}>{header}</div>
