@@ -1,9 +1,9 @@
-import { isDesktop, navigate, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { PatientSearchContext } from '../patient-search-context';
-import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
+import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-page.scss';
 
 interface PatientSearchPageComponentProps {}
@@ -11,6 +11,8 @@ interface PatientSearchPageComponentProps {}
 const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = () => {
   const [searchParams] = useSearchParams();
   const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const searchQuery = searchParams?.get('query') ?? '';
 
   // If a user directly falls on openmrs/spa/search?query= in a tablet view.
   // On clicking the <- on the overlay should take the user on the home page.
@@ -21,20 +23,18 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
     });
   }, []);
 
-  return isDesktop(layout) ? (
+  if (isTablet) {
+    return <PatientSearchOverlay onClose={handleCloseOverlay} query={searchQuery} />;
+  }
+
+  return (
     <div className={styles.patientSearchPage}>
       <div className={styles.patientSearchComponent}>
         <PatientSearchContext.Provider value={{}}>
-          <AdvancedPatientSearchComponent
-            query={searchParams?.get('query') ?? ''}
-            inTabletOrOverlay={!isDesktop(layout)}
-            stickyPagination
-          />
+          <AdvancedPatientSearchComponent inTabletOrOverlay={isTablet} query={searchQuery} stickyPagination />
         </PatientSearchContext.Provider>
       </div>
     </div>
-  ) : (
-    <PatientSearchOverlay onClose={handleCloseOverlay} query={searchParams?.get('query') ?? ''} />
   );
 };
 

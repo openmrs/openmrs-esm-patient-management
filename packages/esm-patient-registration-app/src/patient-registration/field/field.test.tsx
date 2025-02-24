@@ -1,32 +1,14 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
 import { type Resources, ResourcesContext } from '../../offline.resources';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
 import { PatientRegistrationContext } from '../patient-registration-context';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 const predefinedAddressTemplate = {
   uuid: 'test-address-template-uuid',
@@ -121,6 +103,7 @@ const initialContextValues = {
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: {} as FormValues,
+  setFieldTouched: jest.fn(),
 };
 
 describe('Field', () => {
@@ -266,6 +249,7 @@ describe('Field', () => {
       setInitialFormValues: jest.fn(),
       validationSchema: null,
       values: { identifiers: { openmrsID } } as unknown as FormValues,
+      setFieldTouched: jest.fn(),
     };
 
     render(

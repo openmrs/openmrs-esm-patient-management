@@ -1,28 +1,20 @@
 import React from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
+import { type SearchedPatient } from '../types';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
-import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
-
-interface CommonProps {
-  inTabletOrOverlay: boolean;
-}
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
 }
 
-export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
+export const EmptyState: React.FC = () => {
   const { t } = useTranslation();
   return (
     <Layer>
-      <Tile
-        className={classNames(styles.emptySearchResultsTile, {
-          [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
-        })}>
+      <Tile className={styles.emptySearchResultsTile}>
         <EmptyDataIllustration />
         <p className={styles.emptyResultText}>
           {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
@@ -35,12 +27,9 @@ export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
   );
 };
 
-export const LoadingState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
+export const LoadingState: React.FC = () => {
   return (
-    <div
-      className={classNames(styles.results, {
-        [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
-      })}>
+    <div className={styles.results}>
       <PatientBannerSkeleton />
       <PatientBannerSkeleton />
       <PatientBannerSkeleton />
@@ -50,17 +39,14 @@ export const LoadingState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
   );
 };
 
-export const ErrorState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
+export const ErrorState: React.FC = () => {
   const { t } = useTranslation();
   return (
     <Layer>
-      <Tile
-        className={classNames(styles.emptySearchResultsTile, {
-          [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
-        })}>
+      <Tile className={styles.emptySearchResultsTile}>
         <EmptyDataIllustration />
         <div>
-          <p className={styles.errorMessage}>{`${t('error', 'Error')}`}</p>
+          <p className={styles.errorMessage}>{t('error', 'Error')}</p>
           <p className={styles.errorCopy}>
             {t(
               'errorCopy',
@@ -73,31 +59,11 @@ export const ErrorState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
   );
 };
 
-export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
-  const { t } = useTranslation();
-  return (
-    <Layer>
-      <Tile
-        className={classNames(styles.emptySearchResultsTile, {
-          [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
-        })}>
-        <EmptyDataIllustration />
-        <p className={styles.emptyResultText}>
-          {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-        </p>
-        <p className={styles.actionText}>
-          <span>{t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}</span>
-        </p>
-      </Tile>
-    </Layer>
-  );
-};
-
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
   return (
-    <div className={styles.results} data-openmrs-role="Search Results">
-      {searchResults.map((patient, indx) => (
-        <PatientBanner key={indx} patientUuid={patient.uuid} patient={patient} />
+    <div data-openmrs-role="Search Results">
+      {searchResults.map((patient) => (
+        <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
       ))}
     </div>
   );

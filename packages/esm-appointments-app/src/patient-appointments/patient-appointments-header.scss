@@ -6,16 +6,27 @@
 }
 
 .patientAvatar {
-  width: layout.$spacing-11;
-  height: layout.$spacing-11;
+  width: 3.5rem;
+  height: 3.5rem;
   margin: layout.$spacing-05;
-  border-radius: 1px;
 }
 
 .divider {
   border: 0;
   border-top: 0.075rem solid colors.$gray-20;
   width: 100%;
+}
+
+.backButton {
+  svg {
+    order: 1;
+    margin-right: layout.$spacing-03;
+    margin-left: 0;
+  }
+
+  span {
+    order: 2;
+  }
 }
 
 // Overriding styles for RTL support

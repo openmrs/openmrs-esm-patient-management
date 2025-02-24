@@ -17,12 +17,16 @@
 }
 
 .patientBanner {
-  display: flex;
-  flex-direction: row;
+  text-decoration: none;
+  display: grid;
+  grid-template-columns: 5.5rem 1fr; // Matches 3.5rem avatar + 2×1rem margins
 }
 
 .patientPhoto {
+  width: 3.5rem;
+  height: 3.5rem;
   margin: layout.$spacing-05;
+  border-radius: 1px;
 }
 
 .backButton {
@@ -30,7 +34,6 @@
   display: flex;
   justify-content: flex-start;
   margin: layout.$spacing-03 0;
-  padding: 0;
   @include type.type-style('body-compact-01');
 
   button {
@@ -40,10 +43,17 @@
       order: 1;
       margin-right: layout.$spacing-03;
       margin-left: 0 !important;
+      fill: $color-blue-60-2 !important;
     }
 
     span {
       order: 2;
     }
+  }
+}
+
+.toggleContactDetailsButton {
+  > svg {
+    fill: $color-blue-60-2 !important;
   }
 }
