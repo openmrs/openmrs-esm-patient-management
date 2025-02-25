@@ -140,6 +140,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     return priorities.findIndex((p) => p.uuid === uuid);
   };
 
+  const setTransitionDate = (transitionDate: Date) => {
+    setFormState({ ...formState, transitionDate });
+  };
+
+  const setTransitionTime = (transitionTime: string) => {
+    setFormState({ ...formState, transitionTime });
+  };
+
+  const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
+    setFormState({ ...formState, transitionTimeFormat });
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -166,6 +178,39 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         setIsSubmitting(false);
       });
   };
+
+  // non-null if the selected date+time is invalid
+  const timeInvalidMessage = useMemo(() => {
+    const now = new Date();
+    const startAtDate = new Date(formState.transitionDate);
+    const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
+    startAtDate.setHours(hour, minute, 0, 0);
+
+    const previousQueueEntryStartTimeStr = queueEntry.previousQueueEntry?.startedAt;
+    const previousQueueEntryStartTime = previousQueueEntryStartTimeStr
+      ? new Date(previousQueueEntryStartTimeStr)
+      : null;
+
+    if (startAtDate > now) {
+      return t('timeCannotBeInFuture', 'Time cannot be in the future');
+    }
+    if (startAtDate <= previousQueueEntryStartTime) {
+      return t(
+        'timeCannotBePriorToPreviousQueueEntry',
+        'Time cannot be before start of previous queue entry: {{time}}',
+        {
+          time: previousQueueEntryStartTime.toLocaleString(),
+        },
+      );
+    }
+    return null;
+  }, [
+    formState.transitionDate,
+    formState.transitionTime,
+    formState.transitionTimeFormat,
+    queueEntry.previousQueueEntry?.startedAt,
+    t,
+  ]);
 
   // non-null if the selected date+time is invalid
   const timeInvalidMessage = useMemo(() => {
