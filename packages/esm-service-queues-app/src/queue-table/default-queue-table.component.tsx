@@ -58,6 +58,7 @@ function DefaultQueuePage() {
                 searchQuery: patientSearchQuery,
                 buttonText: t('addPatientToQueue', 'Add patient to queue'),
                 overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                handleBackToSearchList,
                 buttonProps: {
                   kind: 'secondary',
                   renderIcon: (props) => <Add size={16} {...props} />,
