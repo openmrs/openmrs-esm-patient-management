@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import {
   Button,
   Dropdown,
@@ -106,6 +107,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     setFormState((prevState) => ({ ...prevState, prioritycomment }));
   };
 
+  const findPriorityIndex = (uuid: string) => {
+    return priorities.findIndex((p) => p.uuid === uuid);
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -119,19 +124,15 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     setFormState(updatedState);
 
     submitAction(queueEntry, updatedState)
-      .then(({ status }) => {
-        if (status === 200) {
-          showSnackbar({
-            isLowContrast: true,
-            title: submitSuccessTitle,
-            kind: 'success',
-            subtitle: submitSuccessText,
-          });
-          mutateQueueEntries();
-          closeModal();
-        } else {
-          throw { message: t('unexpectedServerResponse', 'Unexpected Server Response') };
-        }
+      .then(() => {
+        showSnackbar({
+          isLowContrast: true,
+          title: submitSuccessTitle,
+          kind: 'success',
+          subtitle: submitSuccessText,
+        });
+        mutateQueueEntries();
+        closeModal();
       })
       .catch((error) => {
         showSnackbar({
@@ -145,7 +146,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       });
   };
 
-  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
+  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid === formState.selectedPriority);
 
   return (
     <>
@@ -179,7 +180,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                         uuid == queueEntry.queue.uuid
                           ? t('currentValueFormatted', '{{value}} (Current)', {
                               value: `${display} - ${location?.display}`,
-                              interpolation: { escapeValue: false },
                             })
                           : `${display} - ${location?.display}`
                       }
@@ -199,7 +199,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     item.uuid == queueEntry.queue.uuid
                       ? t('currentValueFormatted', '{{value}} (Current)', {
                           value: `${item.display} - ${item.location?.display}`,
-                          interpolation: { escapeValue: false },
                         })
                       : `${item.display} - ${item.location?.display}`
                   }
@@ -231,7 +230,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                         uuid == queueEntry.status.uuid
                           ? t('currentValueFormatted', '{{value}} (Current)', {
                               value: display,
-                              interpolation: { escapeValue: false },
                             })
                           : display
                       }
@@ -264,20 +262,19 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       name={display}
                       labelText={
                         <Tag
-                          className={`${priorities.findIndex((p) => p.uuid === uuid) === 1 && styles.orange} ${
-                            styles.tag
-                          }`}
+                          className={classNames(styles.tag, {
+                            [styles.orange]: findPriorityIndex(uuid) === 1,
+                          })}
                           role="radio"
                           key={uuid}
                           value={uuid}
                           type={(() => {
-                            const index = priorities.findIndex((p) => p.uuid === uuid);
+                            const index = findPriorityIndex(uuid);
                             return index === 0 ? 'green' : index === 2 ? 'red' : '';
                           })()}>
-                          {uuid == queueEntry.priority.uuid
+                          {uuid === queueEntry.priority.uuid
                             ? t('currentValueFormatted', '{{value}} (Current)', {
                                 value: display,
-                                interpolation: { escapeValue: false },
                               })
                             : display}
                         </Tag>

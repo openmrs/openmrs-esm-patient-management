@@ -24,7 +24,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({
         modalTitle: modalTitle || t('movePatient', 'Move {{patient}}', { patient: queueEntry.display }),
         modalInstruction: t(
           'transitionPatientStatusOrQueue',
-          'Select a new status or queue for patient to transition to.',
+          'Select a new status or queue for patient to transition to',
         ),
         submitButtonText: t('move', 'Move'),
         submitSuccessTitle: t('queueEntryTransitioned', 'Queue entry transitioned'),
