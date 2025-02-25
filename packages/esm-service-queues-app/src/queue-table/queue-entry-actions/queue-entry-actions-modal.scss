@@ -15,6 +15,11 @@
   }
 }
 
+.tag {
+  cursor: pointer;
+  margin: 0;
+}
+
 .orange {
   background-color: colors.$orange-20;
 }
@@ -31,10 +36,6 @@ section {
 
 .queueEntryActionModalBody {
   padding-bottom: layout.$spacing-05;
-}
-
-.dateTimeFields {
-  display: flex;
 }
 
 .modalHeader {

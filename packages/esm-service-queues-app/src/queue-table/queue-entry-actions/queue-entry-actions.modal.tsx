@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
   Button,
-  Checkbox,
-  ContentSwitcher,
   Dropdown,
   InlineNotification,
   ModalBody,
@@ -10,10 +8,7 @@ import {
   ModalHeader,
   RadioButton,
   RadioButtonGroup,
-  Select,
-  SelectItem,
   Stack,
-  Switch,
   Tag,
   TextArea,
 } from '@carbon/react';
@@ -265,12 +260,13 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   }}>
                   {priorities?.map(({ uuid, display }) => (
                     <RadioButton
-                      classNames={styles.radioButton}
                       key={uuid}
                       name={display}
                       labelText={
                         <Tag
-                          className={`${priorities.findIndex((p) => p.uuid === uuid) === 1 ? styles.orange : ''}`}
+                          className={`${priorities.findIndex((p) => p.uuid === uuid) === 1 && styles.orange} ${
+                            styles.tag
+                          }`}
                           role="radio"
                           key={uuid}
                           value={uuid}
