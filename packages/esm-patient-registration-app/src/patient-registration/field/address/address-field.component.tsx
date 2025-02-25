@@ -110,7 +110,7 @@ export const AddressComponent: React.FC = () => {
           style={{ margin: '0', minWidth: '100%' }}
           kind="error"
           lowContrast={true}
-          title={t('errorFetchingOrderedFields', 'Error occured fetching ordered fields for address hierarchy')}
+          title={t('errorFetchingOrderedFields', 'Error occurred fetching ordered fields for address hierarchy')}
         />
       </AddressComponentContainer>
     );
