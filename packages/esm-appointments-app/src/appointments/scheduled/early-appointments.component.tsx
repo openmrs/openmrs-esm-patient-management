@@ -5,7 +5,7 @@ import { useEarlyAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 
 interface EarlyAppointmentsProps {
-  appointmentServiceTypes?: string[];
+  appointmentServiceTypes?: Array<string>;
   date: string;
 }
 

@@ -18,7 +18,7 @@ import styles from './scheduled-appointments.scss';
 dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
-  appointmentServiceTypes?: string[];
+  appointmentServiceTypes?: Array<string>;
 }
 
 type DateType = 'pastDate' | 'today' | 'futureDate';
@@ -141,7 +141,7 @@ function ExtensionWrapper({
 }: {
   extension: ConnectedExtension;
   currentTab: string;
-  appointmentServiceTypes: string[];
+  appointmentServiceTypes: Array<string>;
   date: string;
   dateType: DateType;
   showExtensionTab: (extension: string) => void;

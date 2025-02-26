@@ -9,7 +9,7 @@ import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 
 interface AppointmentMetricsProps {
-  appointmentServiceTypes: string[];
+  appointmentServiceTypes: Array<string>;
 }
 
 const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceTypes }) => {

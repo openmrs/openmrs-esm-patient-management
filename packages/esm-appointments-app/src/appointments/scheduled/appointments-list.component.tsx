@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { filterByServiceType } from '../utils';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 
 interface AppointmentsListProps {
-  appointmentServiceTypes?: string[];
+  appointmentServiceTypes?: Array<string>;
   date: string;
   excludeCancelledAppointments?: boolean;
   status?: string;
@@ -27,9 +27,11 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
     }),
   );
 
-  const activeAppointments = excludeCancelledAppointments
-    ? appointmentsFilteredByServiceType.filter((appointment) => appointment.status !== 'Cancelled')
-    : appointmentsFilteredByServiceType;
+  const activeAppointments = useMemo(() => {
+    return excludeCancelledAppointments
+      ? appointmentsFilteredByServiceType.filter((appointment) => appointment.status !== 'Cancelled')
+      : appointmentsFilteredByServiceType;
+  }, [excludeCancelledAppointments, appointmentsFilteredByServiceType]);
 
   return (
     <AppointmentsTable
