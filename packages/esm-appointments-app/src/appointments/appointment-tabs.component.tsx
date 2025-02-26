@@ -8,10 +8,10 @@ import UnscheduledAppointments from './unscheduled/unscheduled-appointments.comp
 import styles from './appointment-tabs.scss';
 
 interface AppointmentTabsProps {
-  appointmentServiceType: string[];
+  appointmentServiceTypes: string[];
 }
 
-const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceType }) => {
+const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTypes }) => {
   const { t } = useTranslation();
   const { showUnscheduledAppointmentsTab } = useConfig<ConfigObject>();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -30,7 +30,7 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
           </TabList>
           <TabPanels>
             <TabPanel className={styles.tabPanel}>
-              <ScheduledAppointments appointmentServiceType={appointmentServiceType} />
+              <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
             </TabPanel>
             <TabPanel className={styles.tabPanel}>
               <UnscheduledAppointments />
@@ -38,7 +38,7 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
           </TabPanels>
         </Tabs>
       ) : (
-        <ScheduledAppointments appointmentServiceType={appointmentServiceType} />
+        <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
       )}
     </div>
   );

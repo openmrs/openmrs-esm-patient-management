@@ -4,35 +4,39 @@ import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 
 interface AppointmentsListProps {
-  appointmentServiceType?: string[];
+  appointmentServiceTypes?: string[];
+  date: string;
+  excludeCancelledAppointments?: boolean;
   status?: string;
   title: string;
-  date: string;
-  filterCancelled?: boolean;
 }
+
 const AppointmentsList: React.FC<AppointmentsListProps> = ({
-  appointmentServiceType,
+  appointmentServiceTypes,
+  date,
+  excludeCancelledAppointments = false,
   status,
   title,
-  date,
-  filterCancelled = false,
 }) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
 
-  const appointments = filterByServiceType(appointmentList, appointmentServiceType).map((appointment) => ({
-    id: appointment.uuid,
-    ...appointment,
-  }));
+  const appointmentsFilteredByServiceType = filterByServiceType(appointmentList, appointmentServiceTypes).map(
+    (appointment) => ({
+      id: appointment.uuid,
+      ...appointment,
+    }),
+  );
 
-  const activeAppointments = filterCancelled
-    ? appointments.filter((appointment) => appointment.status !== 'Cancelled')
-    : appointments;
+  const activeAppointments = excludeCancelledAppointments
+    ? appointmentsFilteredByServiceType.filter((appointment) => appointment.status !== 'Cancelled')
+    : appointmentsFilteredByServiceType;
+
   return (
     <AppointmentsTable
       appointments={activeAppointments}
+      hasActiveFilters={appointmentServiceTypes?.length > 0}
       isLoading={isLoading}
       tableHeading={title}
-      hasActiveFilters={appointmentServiceType?.length > 0 || filterCancelled}
     />
   );
 };
