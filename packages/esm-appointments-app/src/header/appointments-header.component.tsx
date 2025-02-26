@@ -55,8 +55,6 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
         {typeof onChange === 'function' && (
           <MultiSelect
             id="serviceTypeMultiSelect"
-            // TODO: Figure out why we need to set the initial selected items
-            initialSelectedItems={serviceTypeOptions.length > 0 ? [serviceTypeOptions[0].id] : []}
             items={serviceTypeOptions}
             itemToString={(item) => (item ? item.label : '')}
             label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
