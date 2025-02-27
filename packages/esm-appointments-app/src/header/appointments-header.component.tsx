@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { DatePicker, DatePickerInput, MultiSelect } from '@carbon/react';
@@ -10,11 +10,11 @@ import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
-  appointmentServiceType?: string[];
+  appointmentServiceTypes?: Array<string>;
   onChange?: (evt) => void;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointmentServiceType, onChange }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
   const { t } = useTranslation();
   const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
   const { serviceTypes } = useAppointmentServices();
@@ -55,11 +55,10 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
         {typeof onChange === 'function' && (
           <MultiSelect
             id="serviceTypeMultiSelect"
-            label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
             items={serviceTypeOptions}
             itemToString={(item) => (item ? item.label : '')}
+            label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
             onChange={handleMultiSelectChange}
-            initialSelectedItems={serviceTypeOptions.length > 0 ? [serviceTypeOptions[0].id] : []}
             type="inline"
           />
         )}
