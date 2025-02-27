@@ -10,7 +10,7 @@ import SelectedDateContext from './hooks/selectedDateContext';
 
 const Appointments: React.FC = () => {
   const { t } = useTranslation();
-  const [appointmentServiceTypes, setAppointmentServiceTypes] = useState<string[]>([]);
+  const [appointmentServiceTypes, setAppointmentServiceTypes] = useState<Array<string>>([]);
   const [selectedDate, setSelectedDate] = useState(dayjs().startOf('day').format(omrsDateFormat));
 
   const params = useParams();

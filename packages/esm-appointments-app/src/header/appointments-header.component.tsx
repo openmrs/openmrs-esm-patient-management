@@ -10,11 +10,11 @@ import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
-  appointmentServiceTypes?: string[];
+  appointmentServiceTypes?: Array<string>;
   onChange?: (evt) => void;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointmentServiceTypes, onChange }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
   const { t } = useTranslation();
   const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
   const { serviceTypes } = useAppointmentServices();
