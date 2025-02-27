@@ -62,6 +62,7 @@ interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
   patientUuid?: string;
+  handleAfterCreateAppointment?: (uuid: string) => void; 
   context: string;
 }
 
@@ -76,6 +77,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   context,
   closeWorkspace,
   promptBeforeClosing,
+  handleAfterCreateAppointment
 }) => {
   const { patient } = usePatient(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
@@ -361,8 +363,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
       : saveAppointment(appointmentPayload, abortController)
     ).then(
-      ({ status }) => {
+      ({ status, data }) => {
         if (status === 200) {
+          if (typeof handleAfterCreateAppointment === 'function') {
+            handleAfterCreateAppointment(data?.uuid);
+          }
           setIsSubmitting(false);
           setIsSuccessful(true);
           mutateAppointments();
