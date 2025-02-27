@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import styles from './appointment-details.scss';
-import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
+import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
 import { getGender } from '../../helpers';
 import { type Appointment } from '../../types';
-import { useTranslation } from 'react-i18next';
+import styles from './appointment-details.scss';
 
 interface AppointmentDetailsProps {
   appointment: Appointment;
@@ -21,6 +21,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
       setIsEnabledQuery(true);
     }
   }, [appointmentsCount, isLoading]);
+
   return (
     <div className={styles.appointmentDetailsContainer}>
       <p className={styles.title}>{appointment.service.name}</p>
