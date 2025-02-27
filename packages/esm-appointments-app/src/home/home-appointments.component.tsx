@@ -12,7 +12,7 @@ const HomeAppointments = () => {
     <div className={styles.container}>
       <AppointmentsList
         date={toOmrsIsoString(dayjs().startOf('day').toDate())}
-        filterCancelled
+        excludeCancelledAppointments
         title={t('todays', "Today's")}
       />
     </div>
