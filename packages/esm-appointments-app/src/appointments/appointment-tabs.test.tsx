@@ -11,7 +11,7 @@ describe('AppointmentTabs', () => {
   xit(`renders tabs showing different appointment lists`, async () => {
     mockOpenmrsFetch.mockResolvedValue({ ...mockAppointmentsData } as unknown as FetchResponse);
 
-    renderWithSwr(<AppointmentTabs appointmentServiceType="" />);
+    renderWithSwr(<AppointmentTabs appointmentServiceTypes={['service-type-uuid']} />);
 
     await waitForLoadingToFinish();
 
