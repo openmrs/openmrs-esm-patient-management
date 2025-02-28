@@ -1,23 +1,23 @@
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorState, formatDate, parseDate } from '@openmrs/esm-framework';
-import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
+import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointments } from '../hooks/useClinicalMetrics';
 import { useAppointmentList } from '../hooks/useAppointmentList';
+import SelectedDateContext from '../hooks/selectedDateContext';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
-import SelectedDateContext from '../hooks/selectedDateContext';
 
 interface AppointmentMetricsProps {
-  appointmentServiceType: string[];
+  appointmentServiceTypes: Array<string>;
 }
 
-const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceType }) => {
+const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceTypes }) => {
   const { t } = useTranslation();
 
   const { highestServiceLoad, error } = useClinicalMetrics();
   const { totalProviders } = useAllAppointmentsByDate();
-  const { totalScheduledAppointments } = useScheduledAppointment(appointmentServiceType);
+  const { totalScheduledAppointments } = useScheduledAppointments(appointmentServiceTypes);
 
   const { selectedDate } = useContext(SelectedDateContext);
   const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
@@ -26,11 +26,12 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   const { appointmentList: arrivedAppointments } = useAppointmentList('CheckedIn');
   const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
 
-  const filteredArrivedAppointments = appointmentServiceType
-    ? arrivedAppointments.filter(({ service }) => appointmentServiceType.includes(service.uuid))
+  const filteredArrivedAppointments = appointmentServiceTypes
+    ? arrivedAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
     : arrivedAppointments;
-  const filteredPendingAppointments = appointmentServiceType
-    ? pendingAppointments.filter(({ service }) => appointmentServiceType.includes(service.uuid))
+
+  const filteredPendingAppointments = appointmentServiceTypes
+    ? pendingAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
     : pendingAppointments;
 
   if (error) {
@@ -46,22 +47,22 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
       <MetricsHeader />
       <section className={styles.cardContainer}>
         <MetricsCard
+          count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
+          headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}
-          headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
-          count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
         />
         <MetricsCard
+          headerLabel={t('highestServiceVolume', 'Highest volume service: {{time}}', { time: formattedStartDate })}
           label={
             highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')
           }
           value={highestServiceLoad?.count ?? '--'}
-          headerLabel={t('highestServiceVolume', 'Highest volume service: {{time}}', { time: formattedStartDate })}
         />
         <MetricsCard
+          headerLabel={t('providersBooked', 'Providers booked: {{time}}', { time: formattedStartDate })}
           label={t('providers', 'Providers')}
           value={totalProviders}
-          headerLabel={t('providersBooked', 'Providers booked: {{time}}', { time: formattedStartDate })}
         />
       </section>
     </>
