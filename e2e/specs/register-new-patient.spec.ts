@@ -11,7 +11,6 @@ test('Register a new patient', async ({ page }) => {
   test.slow();
   const patientRegistrationPage = new RegistrationAndEditPage(page);
 
-  // TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
   const formValues: PatientRegistrationFormValues = {
     givenName: `Johnny`,
     middleName: 'Donny',
@@ -32,16 +31,55 @@ test('Register a new patient', async ({ page }) => {
     await patientRegistrationPage.waitUntilTheFormIsLoaded();
   });
 
-  await test.step('And then I fill the registration form with the data in `formValues` and then click the `Submit` button', async () => {
-    // Check for explicit visibility of address template fields
+  await test.step('And then I fill in the first name', async () => {
+    await patientRegistrationPage.givenNameInput().fill(formValues.givenName);
+  });
+
+  await test.step('Then I fill in the middle name', async () => {
+    await patientRegistrationPage.middleNameInput().fill(formValues.middleName);
+  });
+
+  await test.step('Then I fill in the family name', async () => {
+    await patientRegistrationPage.familyNameInput().fill(formValues.familyName);
+  });
+
+  await test.step('And then I fill in the gender', async () => {
+    await patientRegistrationPage.sexRadioButton(formValues.sex).check();
+  });
+
+  await test.step('Then I fill in the date of birth', async () => {
+    await patientRegistrationPage.birthdateDayInput().fill(formValues.birthdate.day);
+    await patientRegistrationPage.birthdateMonthInput().fill(formValues.birthdate.month);
+    await patientRegistrationPage.birthdateYearInput().fill(formValues.birthdate.year);
+  });
+
+  await test.step('And then I fill in the address', async () => {
     await expect(patientRegistrationPage.addressHierarchySearchInput()).toBeVisible();
     await expect(patientRegistrationPage.address1Input()).toBeVisible();
-    await expect(patientRegistrationPage.countryInput()).toBeVisible();
-    await expect(patientRegistrationPage.stateProvinceInput()).toBeVisible();
-    await expect(patientRegistrationPage.cityVillageInput()).toBeVisible();
+    await patientRegistrationPage.address1Input().fill(formValues.address1);
+  });
 
-    // Fill and submit the form
-    await patientRegistrationPage.fillPatientRegistrationForm(formValues);
+  await test.step('Then I fill in the city/village', async () => {
+    await expect(patientRegistrationPage.cityVillageInput()).toBeVisible();
+    await patientRegistrationPage.cityVillageInput().fill(formValues.cityVillage);
+  });
+
+  await test.step('Then I fill in the state/province', async () => {
+    await expect(patientRegistrationPage.stateProvinceInput()).toBeVisible();
+    await patientRegistrationPage.stateProvinceInput().fill(formValues.stateProvince);
+  });
+
+  await test.step('Then I fill in the country', async () => {
+    await expect(patientRegistrationPage.countryInput()).toBeVisible();
+    await patientRegistrationPage.countryInput().fill(formValues.country);
+  });
+
+  await test.step('Then I fill in the telephone number', async () => {
+    await patientRegistrationPage.phoneInput().fill(formValues.phone);
+  });
+
+  await test.step('And then I click the `Register Patient` button', async () => {
+    await patientRegistrationPage.createPatientButton().click();
   });
 
   await test.step('Then I should see a success notification', async () => {

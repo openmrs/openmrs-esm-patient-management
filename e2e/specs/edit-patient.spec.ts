@@ -11,7 +11,6 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 
-// TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
 const formValues: PatientRegistrationFormValues = {
   givenName: `Johnny`,
   middleName: 'Donny',
@@ -36,9 +35,51 @@ test('Edit a patient', async ({ page, api }) => {
     await patientEditPage.waitUntilTheFormIsLoaded();
   });
 
-  await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
+  await test.step('And then I fill in the first name', async () => {
     await expect(patientEditPage.givenNameInput()).not.toHaveValue('', { timeout: 2 * 60 * 1000 });
-    await patientEditPage.fillPatientRegistrationForm(formValues);
+    await patientEditPage.givenNameInput().fill(formValues.givenName);
+  });
+
+  await test.step('Then I fill in the middle name', async () => {
+    await patientEditPage.middleNameInput().fill(formValues.middleName);
+  });
+
+  await test.step('Then I fill in the last name', async () => {
+    await patientEditPage.familyNameInput().fill(formValues.familyName);
+  });
+
+  await test.step('And then I fill in the gender', async () => {
+    await patientEditPage.sexRadioButton(formValues.sex).check();
+  });
+
+  await test.step('Then I fill in the date of birth', async () => {
+    await patientEditPage.birthdateDayInput().fill(formValues.birthdate.day);
+    await patientEditPage.birthdateMonthInput().fill(formValues.birthdate.month);
+    await patientEditPage.birthdateYearInput().fill(formValues.birthdate.year);
+  });
+
+  await test.step('And then I fill in the address', async () => {
+    await patientEditPage.address1Input().fill(formValues.address1);
+  });
+
+  await test.step('Then I fill in the city/village', async () => {
+    await patientEditPage.cityVillageInput().fill(formValues.cityVillage);
+  });
+
+  await test.step('Then I fill in the state/province', async () => {
+    await patientEditPage.stateProvinceInput().fill(formValues.stateProvince);
+  });
+
+  await test.step('Then I fill in the country', async () => {
+    await patientEditPage.countryInput().fill(formValues.country);
+  });
+
+  await test.step('Then I fill in the telephone number', async () => {
+    await patientEditPage.phoneInput().fill(formValues.phone);
+  });
+
+  await test.step('And then I click the `Update patient` button', async () => {
+    await patientEditPage.createPatientButton().click();
   });
 
   await test.step("Then I should be redirected to the patient's chart page and the patient object should have updated information", async () => {
