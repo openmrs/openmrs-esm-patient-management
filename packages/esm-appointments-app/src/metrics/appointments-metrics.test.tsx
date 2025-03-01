@@ -18,7 +18,7 @@ jest.mock('../hooks/useClinicalMetrics', () => ({
     isLoading: mockProvidersCount.isLoading,
     error: mockProvidersCount.error,
   }),
-  useScheduledAppointment: jest.fn().mockReturnValue({
+  useScheduledAppointments: jest.fn().mockReturnValue({
     totalScheduledAppointments: mockAppointmentMetrics.totalAppointments,
   }),
   useAppointmentDate: jest.fn().mockReturnValue({
@@ -32,7 +32,7 @@ describe('Appointment metrics', () => {
       data: [],
     } as unknown as FetchResponse);
 
-    render(<AppointmentsMetrics appointmentServiceType="consultation-service-uuid" />);
+    render(<AppointmentsMetrics appointmentServiceTypes={['consultation-service-uuid']} />);
 
     await screen.findByText(/appointment metrics/i);
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();

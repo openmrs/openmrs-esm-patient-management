@@ -43,6 +43,11 @@ export const editQueueEntryStatusModal = getAsyncLifecycle(
   },
 );
 
+export const patientInfoBannerSlot = getAsyncLifecycle(() => import('./patient-info/patient-info.component'), {
+  featureName: 'patient info slot',
+  moduleName,
+});
+
 export const removeQueueEntry = getAsyncLifecycle(
   () => import('./remove-queue-entry-dialog/remove-queue-entry.component'),
   {
@@ -160,14 +165,6 @@ export const activeVisitsRowActions = getAsyncLifecycle(
   {
     featureName:
       'quick actions to queue, requeue and transfer patients. With overflow menu actions to edit patient and end visit',
-    moduleName,
-  },
-);
-
-export const patientBannerQueueEntryStatus = getAsyncLifecycle(
-  () => import('./patient-info/patient-banner-queue-entry-status.extension'),
-  {
-    featureName: 'patient-info-queue-entry-status',
     moduleName,
   },
 );

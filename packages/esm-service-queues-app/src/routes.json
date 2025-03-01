@@ -41,6 +41,10 @@
       "slot": "service-queues-dashboard-slot"
     },
     {
+      "name": "patient-info-banner-slot",
+      "component": "patientInfoBannerSlot"
+    },
+    {
       "name": "remove-queue-entry",
       "component": "removeQueueEntry"
     },
@@ -63,11 +67,6 @@
       "name": "visit-form-queue-fields",
       "component": "visitFormQueueFields",
       "slot":"visit-form-bottom-slot"
-    },
-    {
-      "name": "queue-patient-info-queue-entry-status",
-      "component": "patientBannerQueueEntryStatus",
-      "slot": "patient-banner-tags-slot"
     }
   ],
   "modals": [
