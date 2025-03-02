@@ -160,6 +160,7 @@ function QueueTableSection() {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('searchThisList', 'Search this list')}
             size={isDesktop(layout) ? 'sm' : 'lg'}
+            persistent
           />
           <ClearQueueEntries queueEntries={filteredQueueEntries} />
         </>
