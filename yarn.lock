@@ -3014,7 +3014,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-
 "@openmrs/esm-api@npm:6.1.1-pre.2721":
   version: 6.1.1-pre.2721
   resolution: "@openmrs/esm-api@npm:6.1.1-pre.2721"
@@ -3185,7 +3184,6 @@ __metadata:
     "@openmrs/esm-state": 6.x
     "@openmrs/esm-utils": 6.x
     single-spa: 6.x
-
   checksum: 10/c5965ce508739e7f72de4c61865fdac19968893ed9c19ecc5b5104a0ab3de5b741fa3160eeea4396584981de7305408509970e539b066d2ba895f0fc75eeda60
   languageName: node
   linkType: hard
