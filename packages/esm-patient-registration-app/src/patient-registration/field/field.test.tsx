@@ -103,7 +103,7 @@ const initialContextValues = {
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: {} as FormValues,
-  setFieldTouched: () => {},
+  setFieldTouched: jest.fn(),
 };
 
 describe('Field', () => {
@@ -249,7 +249,7 @@ describe('Field', () => {
       setInitialFormValues: jest.fn(),
       validationSchema: null,
       values: { identifiers: { openmrsID } } as unknown as FormValues,
-      setFieldTouched: () => {},
+      setFieldTouched: jest.fn(),
     };
 
     render(

@@ -39,6 +39,7 @@ describe('Dob', () => {
               currentPhoto: '',
               isOffline: false,
               initialFormValues: initialFormValues,
+              setFieldTouched: () => {},
             }}>
             <DobField />
           </PatientRegistrationContext.Provider>
@@ -52,12 +53,25 @@ describe('Dob', () => {
     expect(screen.getByRole('tab', { name: /yes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /yes/i })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: /no/i })).toHaveAttribute('aria-selected', 'false');
-    expect(screen.getByTestId('birthdate')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /date of birth/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /day, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /month, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /year, date of birth/i,
+      }),
+    ).toBeInTheDocument();
   });
 
-  // TODO O3-3482: Fix this test case.
-  // Disabling this test case for now as it doesn't work as expected when mocking the date picker
-  it.skip('typing in the date picker input sets the date of birth', async () => {
+  it('typing in the date picker input sets the date of birth', async () => {
     const user = userEvent.setup();
 
     render(
@@ -82,10 +96,32 @@ describe('Dob', () => {
       </Formik>,
     );
 
-    const dateInput = screen.getByLabelText(/Date of birth/i);
-    expect(dateInput).toBeInTheDocument();
+    const dateOfBirthInput = screen.getByRole('group', { name: /date of birth/i });
+    expect(dateOfBirthInput).toBeInTheDocument();
 
-    await user.type(dateInput, '10/10/2022');
-    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
+    const dateInput = screen.getByRole('spinbutton', {
+      name: /day, date of birth/i,
+    });
+    expect(dateInput).toBeInTheDocument();
+    const monthInput = screen.getByRole('spinbutton', {
+      name: /month, date of birth/i,
+    });
+    expect(monthInput).toBeInTheDocument();
+    const yearInput = screen.getByRole('spinbutton', {
+      name: /year, date of birth/i,
+    });
+    expect(yearInput).toBeInTheDocument();
+    // FIXME: When typing in the year the month and date inputs revert back to the placeholders
+    // and the display becomes dd/mm/2022
+    // which is why they are tested in three separate steps rather than altogether
+    await user.clear(dateInput);
+    await user.type(dateInput, '10');
+    expect(dateInput).toHaveTextContent('10');
+    await user.clear(monthInput);
+    await user.type(monthInput, '10');
+    expect(monthInput).toHaveTextContent('10');
+    await user.clear(yearInput);
+    await user.type(yearInput, '2022');
+    expect(yearInput).toHaveTextContent('2022');
   });
 });

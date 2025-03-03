@@ -225,16 +225,24 @@ const fillRequiredFields = async () => {
   const demographicsSection = await screen.findByLabelText('Demographics Section');
   const givenNameInput = within(demographicsSection).getByLabelText(/first/i) as HTMLInputElement;
   const familyNameInput = within(demographicsSection).getByLabelText(/family/i) as HTMLInputElement;
-  const dateOfBirthInput = within(demographicsSection).getByTestId('birthdate') as HTMLInputElement;
-  const dateOfBirthDayInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /day/i });
-  const dateOfBirthMonthInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /month/i });
-  const dateOfBirthYearInput = within(dateOfBirthInput).getByRole('spinbutton', { name: /year/i });
+  const dateInput = within(demographicsSection).getByRole('spinbutton', {
+    name: /day, date of birth/i,
+  }) as HTMLInputElement;
+  const monthInput = within(demographicsSection).getByRole('spinbutton', {
+    name: /month, date of birth/i,
+  }) as HTMLInputElement;
+  const yearInput = within(demographicsSection).getByRole('spinbutton', {
+    name: /year, date of birth/i,
+  }) as HTMLInputElement;
   const genderInput = within(demographicsSection).getByLabelText(/Male/) as HTMLSelectElement;
   await user.type(givenNameInput, 'Paul');
   await user.type(familyNameInput, 'Gaihre');
-  await user.type(dateOfBirthDayInput, '02');
-  await user.type(dateOfBirthMonthInput, '08');
-  await user.type(dateOfBirthYearInput, '1993');
+  await user.clear(dateInput);
+  await user.type(dateInput, '02');
+  await user.clear(monthInput);
+  await user.type(monthInput, '08');
+  await user.clear(yearInput);
+  await user.type(yearInput, '1993');
   await user.click(genderInput);
 };
 
@@ -267,11 +275,25 @@ describe('Registering a new patient', () => {
     expect(within(demographicSection).getByLabelText(/first name/i)).toBeInTheDocument();
     expect(within(demographicSection).getByLabelText(/middle name \(optional\)/i)).toBeInTheDocument();
     expect(within(demographicSection).getByLabelText(/family name/i)).toBeInTheDocument();
-
+    expect(within(demographicSection).getByRole('group', { name: /date of birth/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /day, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /month, date of birth/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /year, date of birth/i,
+      }),
+    ).toBeInTheDocument();
     expect(within(demographicSection).getByRole('radio', { name: /^male$/i })).toBeInTheDocument();
     expect(within(demographicSection).getByRole('radio', { name: /^female$/i })).toBeInTheDocument();
     expect(within(demographicSection).getByText(/date of birth known\?/i)).toBeInTheDocument();
-    expect(within(demographicSection).getByTestId('birthdate')).toBeInTheDocument();
 
     expect(within(contactSection).getByRole('heading', { name: /address/i })).toBeInTheDocument();
 
@@ -279,7 +301,7 @@ describe('Registering a new patient', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
-  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
+  // FIXME the register patient button is missing
   it.skip('saves the patient without extra info', async () => {
     const user = userEvent.setup();
 
@@ -320,6 +342,7 @@ describe('Registering a new patient', () => {
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
+  // FIXME: the register patient button is missing
   it.skip('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
@@ -356,7 +379,7 @@ describe('Registering a new patient', () => {
     );
   });
 
-  // TODO : Fix this test case when OpenmrsDatePicker gets fixed on core
+  // FIXME register patient button is missing
   it.skip('retries saving registration obs after a failed attempt', async () => {
     const user = userEvent.setup();
 
@@ -475,14 +498,21 @@ describe('Updating an existing patient record', () => {
 
     expect(screen.getByLabelText(/first name/i)).toHaveValue(mockPatient.name[0].given[0]);
     expect(screen.getByLabelText(/family name/i)).toHaveValue(mockPatient.name[0].family);
-    const dobField = screen.getByTestId('birthdate');
-    const dobDayField = within(dobField).getByRole('spinbutton', { name: /day/i });
-    const dobMonthField = within(dobField).getByRole('spinbutton', { name: /month/i });
-    const dobYearField = within(dobField).getByRole('spinbutton', { name: /year/i });
-    expect(dobDayField.innerHTML).toBe('04');
-    expect(dobMonthField.innerHTML).toBe('04');
-    expect(dobYearField.innerHTML).toBe('1972');
-    // expect(screen.getByLabelText(/birthdate/i)).toHaveValue('04/04/1972');
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /day, date of birth/i,
+      }),
+    ).toHaveTextContent('04');
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /month, date of birth/i,
+      }),
+    ).toHaveTextContent('04');
+    expect(
+      screen.getByRole('spinbutton', {
+        name: /year, date of birth/i,
+      }),
+    ).toHaveTextContent('1972');
     expect(
       screen.getByRole('radio', {
         name: /^male$/i,

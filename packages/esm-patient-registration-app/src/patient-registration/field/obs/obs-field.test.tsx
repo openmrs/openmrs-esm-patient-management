@@ -68,6 +68,7 @@ const useConceptAnswersMockImpl = (uuid: string) => {
         { display: 'Mexico', uuid: 'mex' },
       ],
       isLoading: false,
+      error: null,
     };
   } else if (uuid == 'other-countries-uuid') {
     return {
@@ -76,11 +77,13 @@ const useConceptAnswersMockImpl = (uuid: string) => {
         { display: 'Uganda', uuid: 'ug' },
       ],
       isLoading: false,
+      error: null,
     };
   } else if (uuid == '') {
     return {
       data: [],
       isLoading: false,
+      error: null,
     };
   } else {
     throw Error(`Programming error, you probably didn't mean to do this: unknown concept answer set uuid '${uuid}'`);
@@ -180,6 +183,9 @@ const mockInitialFormValues = {
   relationships: [],
   telephoneNumber: '',
   yearsEstimated: 0,
+  deathTime: '',
+  deathTimeFormat: 'AM' as const,
+  nonCodedCauseOfDeath: '',
 };
 
 const initialContextValues: PatientRegistrationContextProps = {
@@ -193,6 +199,7 @@ const initialContextValues: PatientRegistrationContextProps = {
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
+  setFieldTouched: jest.fn(),
 };
 
 describe('ObsField', () => {
@@ -231,19 +238,34 @@ describe('ObsField', () => {
     expect(screen.getByRole('spinbutton', { name: 'Weight (optional)' })).toBeInTheDocument();
   });
 
-  // TODO: Fix this test
-  xit('renders a datepicker for date concept', async () => {
+  it('renders a datepicker for date concept', async () => {
     render(
       <PatientRegistrationContext.Provider value={initialContextValues}>
         <ObsField fieldDefinition={dateFieldDef} />
       </PatientRegistrationContext.Provider>,
     );
 
-    const datePickerInput = screen.getByRole('textbox');
-    expect(datePickerInput).toBeInTheDocument();
+    expect(screen.getByText(/vaccination date/i)).toBeInTheDocument();
 
-    await userEvent.type(datePickerInput, '28/05/2024');
-    expect(datePickerInput).toHaveValue('28/05/2024');
+    const dateInput = screen.getByRole('spinbutton', {
+      name: /day, vaccination date/i,
+    });
+    expect(dateInput).toBeInTheDocument();
+    const monthInput = screen.getByRole('spinbutton', {
+      name: /month, vaccination date/i,
+    });
+    expect(monthInput).toBeInTheDocument();
+    const yearInput = screen.getByRole('spinbutton', {
+      name: /year, vaccination date/i,
+    });
+    expect(yearInput).toBeInTheDocument();
+    await userEvent.type(dateInput, '28');
+    await userEvent.type(monthInput, '05');
+    await userEvent.type(yearInput, '2024');
+
+    expect(dateInput).toHaveTextContent('28');
+    expect(monthInput).toHaveTextContent('05');
+    expect(yearInput).toHaveTextContent('2024');
   });
 
   it('renders a select for a coded concept', () => {

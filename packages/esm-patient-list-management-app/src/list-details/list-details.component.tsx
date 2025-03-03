@@ -173,6 +173,7 @@ const ListDetails = () => {
         )}
         {showDeleteConfirmationModal && (
           <Modal
+            className={styles.modal}
             open
             danger
             modalHeading={t('confirmDeletePatientList', 'Are you sure you want to delete this patient list?')}

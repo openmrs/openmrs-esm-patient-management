@@ -54,7 +54,6 @@
   border: layout.$spacing-01 solid transparent;
   color: $ui-05;
   outline: none;
-  padding: 0 layout.$spacing-07 0 layout.$spacing-05;
   text-decoration: none;
   user-select: none;
   vertical-align: center;
@@ -62,9 +61,8 @@
 
 .closeButton,
 .closeButton:hover {
-  background-color: white;
   svg {
-    fill: black !important;
+    fill: white !important;
   }
 }
 

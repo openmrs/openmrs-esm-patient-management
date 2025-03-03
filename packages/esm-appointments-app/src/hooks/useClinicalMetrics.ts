@@ -1,17 +1,16 @@
-import useSWR from 'swr';
+import { useContext, useMemo } from 'react';
+import { uniqBy } from 'lodash-es';
 import dayjs from 'dayjs';
-import uniqBy from 'lodash-es/uniqBy';
+import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type Appointment, type AppointmentSummary } from '../types';
 import { omrsDateFormat } from '../constants';
 import {
-  getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
+  getHighestAppointmentServiceLoad,
   getServiceCountByAppointmentType,
 } from '../helpers';
-import isEmpty from 'lodash-es/isEmpty';
 import SelectedDateContext from './selectedDateContext';
-import { useContext } from 'react';
+import { type Appointment, type AppointmentSummary } from '../types';
 
 export const useClinicalMetrics = () => {
   const { selectedDate } = useContext(SelectedDateContext);
@@ -37,45 +36,59 @@ export const useClinicalMetrics = () => {
   };
 };
 
-export function useAllAppointmentsByDate() {
+export const useAppointmentsForDate = () => {
   const { selectedDate } = useContext(SelectedDateContext);
-  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
+  const url = selectedDate ? `${restBaseUrl}/appointment/all?forDate=${selectedDate}` : null;
+
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
-    apiUrl,
+    url,
     openmrsFetch,
   );
 
+  return {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+};
+
+export const useAllAppointmentsByDate = () => {
+  const { data, error, isLoading, isValidating, mutate } = useAppointmentsForDate();
+
   const providersArray = data?.data?.flatMap(({ providers }) => providers ?? []) ?? [];
-
   const validProviders = providersArray.filter((provider) => provider.response === 'ACCEPTED');
-
   const uniqueProviders = uniqBy(validProviders, (provider) => provider.uuid);
   const providersCount = uniqueProviders.length;
 
   return {
-    totalProviders: providersCount ? providersCount : 0,
-    isLoading,
     error,
+    isLoading,
     isValidating,
     mutate,
+    totalProviders: providersCount ? providersCount : 0,
   };
-}
+};
 
-export const useScheduledAppointment = (serviceUuid: string[]) => {
-  const { selectedDate } = useContext(SelectedDateContext);
-  const url = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
+export const useScheduledAppointments = (appointmentServiceTypeUuids: string[]) => {
+  const { data, error, isLoading } = useAppointmentsForDate();
 
-  const { data, error, isLoading } = useSWR<{
-    data: Array<any>;
-  }>(url, openmrsFetch);
+  const totalScheduledAppointments = useMemo(() => {
+    const appointments = data?.data ?? [];
 
-  const totalScheduledAppointments = !isEmpty(serviceUuid)
-    ? data?.data?.filter((appt) => serviceUuid.includes(appt?.service?.uuid))?.length ?? 0
-    : data?.data?.length ?? 0;
+    if (appointmentServiceTypeUuids.length === 0) {
+      return appointments.length;
+    }
+
+    return appointments.filter(
+      (appointment) => appointment.service && appointmentServiceTypeUuids.includes(appointment.service.uuid),
+    ).length;
+  }, [data?.data, appointmentServiceTypeUuids]);
 
   return {
-    isLoading,
     error,
+    isLoading,
     totalScheduledAppointments,
   };
 };
