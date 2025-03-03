@@ -164,6 +164,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             )}
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
+              {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
               {queues.length <= 8 ? (
                 <RadioButtonGroup
                   className={styles.radioButtonGroup}
