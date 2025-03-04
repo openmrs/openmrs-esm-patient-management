@@ -85,7 +85,9 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { results, goTo, currentPage, paginated } = usePagination<AddablePatientListViewModel>(searchResults, 5);
 
   useEffect(() => {
-    goTo(1);
+    if (searchValue) {
+      goTo(1);
+    }
   }, [goTo, searchValue]);
 
   const startIndex = (currentPage - 1) * 5 + 1;
