@@ -85,10 +85,11 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { results, goTo, currentPage, paginated } = usePagination<AddablePatientListViewModel>(searchResults, 5);
 
   useEffect(() => {
-    if (currentPage !== 1) {
-      goTo(1);
-    }
-  }, [currentPage, goTo, searchValue]);
+    goTo(1);
+  }, [goTo, searchValue]);
+
+  const startIndex = (currentPage - 1) * 5 + 1;
+  const endIndex = Math.min(currentPage * 5, searchResults.length);
 
   return (
     <div className={styles.modalContent}>
@@ -166,12 +167,13 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       {paginated && (
         <div className={styles.paginationContainer}>
           <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
-            {results.length * currentPage} / {searchResults.length} {t('items', 'items')}
+            {searchResults.length > 0 ? `${startIndex}-${endIndex} / ${searchResults.length}` : '0'}{' '}
+            {t('items', 'items')}
           </span>
           <Pagination
             className={styles.pagination}
-            forwardText=""
-            backwardText=""
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
             page={currentPage}
             pageSize={5}
             pageSizes={[5]}
