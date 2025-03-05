@@ -24,6 +24,7 @@ test('Register a new patient', async ({ page }) => {
     stateProvince: 'Pernambuco',
     cityVillage: 'Recife',
     phone: '5555551234',
+    email: 'johnnyronny@example.com',
   };
 
   await test.step('When I visit the registration page', async () => {
@@ -31,54 +32,54 @@ test('Register a new patient', async ({ page }) => {
     await patientRegistrationPage.waitUntilTheFormIsLoaded();
   });
 
-  await test.step('And then I fill in the first name', async () => {
+  await test.step('And I fill in the first name', async () => {
     await patientRegistrationPage.givenNameInput().fill(formValues.givenName);
   });
 
-  await test.step('Then I fill in the middle name', async () => {
+  await test.step('And I fill in the middle name', async () => {
     await patientRegistrationPage.middleNameInput().fill(formValues.middleName);
   });
 
-  await test.step('Then I fill in the family name', async () => {
+  await test.step('And I fill in the family name', async () => {
     await patientRegistrationPage.familyNameInput().fill(formValues.familyName);
   });
 
-  await test.step('And then I fill in the gender', async () => {
+  await test.step('And I fill in the gender', async () => {
     await patientRegistrationPage.sexRadioButton(formValues.sex).check();
   });
 
-  await test.step('Then I fill in the date of birth', async () => {
+  await test.step('And I fill in the date of birth', async () => {
     await patientRegistrationPage.birthdateDayInput().fill(formValues.birthdate.day);
     await patientRegistrationPage.birthdateMonthInput().fill(formValues.birthdate.month);
     await patientRegistrationPage.birthdateYearInput().fill(formValues.birthdate.year);
   });
 
-  await test.step('And then I fill in the address', async () => {
+  await test.step('And I fill in the address', async () => {
     await expect(patientRegistrationPage.addressHierarchySearchInput()).toBeVisible();
     await expect(patientRegistrationPage.address1Input()).toBeVisible();
     await patientRegistrationPage.address1Input().fill(formValues.address1);
   });
 
-  await test.step('Then I fill in the city/village', async () => {
+  await test.step('And I fill in the city/village', async () => {
     await expect(patientRegistrationPage.cityVillageInput()).toBeVisible();
     await patientRegistrationPage.cityVillageInput().fill(formValues.cityVillage);
   });
 
-  await test.step('Then I fill in the state/province', async () => {
+  await test.step('And I fill in the state/province', async () => {
     await expect(patientRegistrationPage.stateProvinceInput()).toBeVisible();
     await patientRegistrationPage.stateProvinceInput().fill(formValues.stateProvince);
   });
 
-  await test.step('Then I fill in the country', async () => {
+  await test.step('And I fill in the country', async () => {
     await expect(patientRegistrationPage.countryInput()).toBeVisible();
     await patientRegistrationPage.countryInput().fill(formValues.country);
   });
 
-  await test.step('Then I fill in the telephone number', async () => {
+  await test.step('And I fill in the telephone number', async () => {
     await patientRegistrationPage.phoneInput().fill(formValues.phone);
   });
 
-  await test.step('And then I click the `Register Patient` button', async () => {
+  await test.step('And I click the `Register patient` button', async () => {
     await patientRegistrationPage.createPatientButton().click();
   });
 
@@ -134,7 +135,7 @@ test('Register an unknown patient', async ({ page }) => {
     await page.getByRole('tab', { name: /no/i }).first().click();
   });
 
-  await test.step('And then I set the gender to `Female`', async () => {
+  await test.step('And I set the gender to `Female`', async () => {
     await page
       .locator('label')
       .filter({ hasText: /female/i })
@@ -143,16 +144,16 @@ test('Register an unknown patient', async ({ page }) => {
       .click();
   });
 
-  await test.step('And then I click on the `No` tab in the "Date of Birth Known" field', async () => {
+  await test.step('And I click the `No` tab in the `Date of Birth Known` field', async () => {
     await page.getByRole('tab', { name: /no/i }).nth(1).click();
   });
 
   const estimatedAge = 25;
-  await test.step(`And then I fill in ${estimatedAge} as the estimated age in years`, async () => {
+  await test.step(`And I fill in ${estimatedAge} as the estimated age in years`, async () => {
     await page.getByLabel(/estimated age in years/i).fill(`${estimatedAge}`);
   });
 
-  await test.step('And I click on the submit button', async () => {
+  await test.step('And I click the `Register patient` button', async () => {
     await page.getByRole('button', { name: /register patient/i }).click();
   });
 

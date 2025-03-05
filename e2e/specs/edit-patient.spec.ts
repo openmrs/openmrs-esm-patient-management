@@ -24,6 +24,7 @@ const formValues: PatientRegistrationFormValues = {
   stateProvince: 'Pernambuco',
   cityVillage: 'Recife',
   phone: '5555551234',
+  email: 'johnnyronny@example.com',
 };
 
 test('Edit a patient', async ({ page, api }) => {
@@ -35,50 +36,50 @@ test('Edit a patient', async ({ page, api }) => {
     await patientEditPage.waitUntilTheFormIsLoaded();
   });
 
-  await test.step('And then I fill in the first name', async () => {
+  await test.step('And I fill in the first name', async () => {
     await expect(patientEditPage.givenNameInput()).not.toHaveValue('', { timeout: 2 * 60 * 1000 });
     await patientEditPage.givenNameInput().fill(formValues.givenName);
   });
 
-  await test.step('Then I fill in the middle name', async () => {
+  await test.step('And I fill in the middle name', async () => {
     await patientEditPage.middleNameInput().fill(formValues.middleName);
   });
 
-  await test.step('Then I fill in the last name', async () => {
+  await test.step('And I fill in the last name', async () => {
     await patientEditPage.familyNameInput().fill(formValues.familyName);
   });
 
-  await test.step('And then I fill in the gender', async () => {
+  await test.step('And I fill in the gender', async () => {
     await patientEditPage.sexRadioButton(formValues.sex).check();
   });
 
-  await test.step('Then I fill in the date of birth', async () => {
+  await test.step('And I fill in the date of birth', async () => {
     await patientEditPage.birthdateDayInput().fill(formValues.birthdate.day);
     await patientEditPage.birthdateMonthInput().fill(formValues.birthdate.month);
     await patientEditPage.birthdateYearInput().fill(formValues.birthdate.year);
   });
 
-  await test.step('And then I fill in the address', async () => {
+  await test.step('And I fill in the address', async () => {
     await patientEditPage.address1Input().fill(formValues.address1);
   });
 
-  await test.step('Then I fill in the city/village', async () => {
+  await test.step('And I fill in the city/village', async () => {
     await patientEditPage.cityVillageInput().fill(formValues.cityVillage);
   });
 
-  await test.step('Then I fill in the state/province', async () => {
+  await test.step('And I fill in the state/province', async () => {
     await patientEditPage.stateProvinceInput().fill(formValues.stateProvince);
   });
 
-  await test.step('Then I fill in the country', async () => {
+  await test.step('And I fill in the country', async () => {
     await patientEditPage.countryInput().fill(formValues.country);
   });
 
-  await test.step('Then I fill in the telephone number', async () => {
+  await test.step('And I fill in the telephone number', async () => {
     await patientEditPage.phoneInput().fill(formValues.phone);
   });
 
-  await test.step('And then I click the `Update patient` button', async () => {
+  await test.step('And I click the `Update patient` button', async () => {
     await patientEditPage.createPatientButton().click();
   });
 
