@@ -1,29 +1,20 @@
-import React, { useMemo, useState } from 'react';
-import dayjs from 'dayjs';
+import React, { useState } from 'react';
+import classNames from 'classnames';
 import {
   Button,
-  Checkbox,
-  ContentSwitcher,
-  DatePicker,
-  DatePickerInput,
+  Dropdown,
   InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
   RadioButton,
   RadioButtonGroup,
-  Select,
-  SelectItem,
   Stack,
-  Switch,
+  Tag,
   TextArea,
-  TimePicker,
-  TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
-import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
-import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
@@ -40,10 +31,6 @@ interface FormState {
   selectedPriority: string;
   selectedStatus: string;
   prioritycomment: string;
-  modifyDefaultTransitionDateTime: boolean;
-  transitionDate: Date;
-  transitionTime: string;
-  transitionTimeFormat: amPm;
 }
 
 interface ModalParams {
@@ -79,16 +66,11 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     isTransition,
   } = modalParams;
 
-  const initialTransitionDate = isTransition ? new Date() : new Date(queueEntry.startedAt);
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
-    modifyDefaultTransitionDateTime: false,
-    transitionDate: initialTransitionDate,
-    transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
-    transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,43 +104,35 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   };
 
   const setPriorityComment = (prioritycomment: string) => {
-    setFormState({ ...formState, prioritycomment });
+    setFormState((prevState) => ({ ...prevState, prioritycomment }));
   };
 
-  const setTransitionDate = (transitionDate: Date) => {
-    setFormState({ ...formState, transitionDate });
-  };
-
-  const setTransitionTime = (transitionTime: string) => {
-    setFormState({ ...formState, transitionTime });
-  };
-
-  const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
-    setFormState({ ...formState, transitionTimeFormat });
-  };
-
-  const setModifyDefaultTransitionDateTime = (modifyDefaultTransitionDateTime) => {
-    setFormState({ ...formState, modifyDefaultTransitionDateTime });
+  const findPriorityIndex = (uuid: string) => {
+    return priorities.findIndex((p) => p.uuid === uuid);
   };
 
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    submitAction(queueEntry, formState)
-      .then(({ status }) => {
-        if (status === 200) {
-          showSnackbar({
-            isLowContrast: true,
-            title: submitSuccessTitle,
-            kind: 'success',
-            subtitle: submitSuccessText,
-          });
-          mutateQueueEntries();
-          closeModal();
-        } else {
-          throw { message: t('unexpectedServerResponse', 'Unexpected Server Response') };
-        }
+    const updatedState = { ...formState };
+
+    if (updatedState.selectedPriority === priorities[0]?.uuid) {
+      updatedState.prioritycomment = '';
+    }
+
+    setFormState(updatedState);
+
+    submitAction(queueEntry, updatedState)
+      .then(() => {
+        showSnackbar({
+          isLowContrast: true,
+          title: submitSuccessTitle,
+          kind: 'success',
+          subtitle: submitSuccessText,
+        });
+        mutateQueueEntries();
+        closeModal();
       })
       .catch((error) => {
         showSnackbar({
@@ -172,41 +146,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       });
   };
 
-  // non-null if the selected date+time is invalid
-  const timeInvalidMessage = useMemo(() => {
-    const now = new Date();
-    const startAtDate = new Date(formState.transitionDate);
-    const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
-    startAtDate.setHours(hour, minute, 0, 0);
-
-    const previousQueueEntryStartTimeStr = queueEntry.previousQueueEntry?.startedAt;
-    const previousQueueEntryStartTime = previousQueueEntryStartTimeStr
-      ? new Date(previousQueueEntryStartTimeStr)
-      : null;
-
-    if (startAtDate > now) {
-      return t('timeCannotBeInFuture', 'Time cannot be in the future');
-    }
-    if (startAtDate <= previousQueueEntryStartTime) {
-      return t(
-        'timeCannotBePriorToPreviousQueueEntry',
-        'Time cannot be before start of previous queue entry: {{time}}',
-        {
-          time: previousQueueEntryStartTime.toLocaleString(),
-          interpolation: { escapeValue: false },
-        },
-      );
-    }
-    return null;
-  }, [
-    formState.transitionDate,
-    formState.transitionTime,
-    formState.transitionTimeFormat,
-    queueEntry.previousQueueEntry?.startedAt,
-    t,
-  ]);
-
-  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
+  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid === formState.selectedPriority);
 
   return (
     <>
@@ -214,33 +154,59 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>
-            <h5>{queueEntry.display}</h5>
-            <p>{modalInstruction}</p>
+            {isTransition ? (
+              <p>{modalInstruction}</p>
+            ) : (
+              <>
+                <h5>{queueEntry.display}</h5>
+                <p>{modalInstruction}</p>
+              </>
+            )}
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
-              <Select
-                labelText={t('selectQueue', 'Select a queue')}
-                id="queue"
-                invalidText="Required"
-                value={formState.selectedQueue}
-                onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-                {queues?.map(({ uuid, display, location }) => (
-                  <SelectItem
-                    key={uuid}
-                    text={
-                      uuid == queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: `${display} - ${location?.display}`,
-                            interpolation: { escapeValue: false },
-                          })
-                        : `${display} - ${location?.display}`
-                    }
-                    value={uuid}
-                  />
-                ))}
-              </Select>
+              {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
+              {queues.length <= 8 ? (
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  legendText={t('selectQueue', 'Select a queue')}
+                  id="queue"
+                  invalidText="Required"
+                  valueSelected={formState.selectedQueue}
+                  orientation="vertical"
+                  onChange={(uuid) => setSelectedQueueUuid(uuid)}>
+                  {queues?.map(({ uuid, display, location }) => (
+                    <RadioButton
+                      key={uuid}
+                      labelText={
+                        uuid == queueEntry.queue.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: `${display} - ${location?.display}`,
+                            })
+                          : `${display} - ${location?.display}`
+                      }
+                      value={uuid}
+                    />
+                  ))}
+                </RadioButtonGroup>
+              ) : (
+                <Dropdown
+                  titleText={t('selectQueue', 'Select a queue')}
+                  id="queue"
+                  label={selectedQueue.display}
+                  initialSelectedItem={selectedQueue}
+                  value={formState.selectedQueue}
+                  items={queues}
+                  itemToString={(item) =>
+                    item.uuid == queueEntry.queue.uuid
+                      ? t('currentValueFormatted', '{{value}} (Current)', {
+                          value: `${item.display} - ${item.location?.display}`,
+                        })
+                      : `${item.display} - ${item.location?.display}`
+                  }
+                  onChange={({ selectedItem }) => setSelectedQueueUuid(selectedItem.uuid)}
+                />
+              )}
             </section>
-
             <section>
               <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
               {hasNoStatusesConfigured ? (
@@ -265,7 +231,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                         uuid == queueEntry.status.uuid
                           ? t('currentValueFormatted', '{{value}} (Current)', {
                               value: display,
-                              interpolation: { escapeValue: false },
                             })
                           : display
                       }
@@ -275,7 +240,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 </RadioButtonGroup>
               )}
             </section>
-
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
               {hasNoPrioritiesConfigured ? (
@@ -287,89 +251,52 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   title={t('noPrioritiesConfigured', 'No priorities configured')}
                 />
               ) : (
-                <ContentSwitcher
-                  size="sm"
-                  selectedIndex={selectedPriorityIndex}
-                  onChange={(event) => {
-                    setSelectedPriorityUuid(event.name as string);
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  valueSelected={formState.selectedPriority}
+                  onChange={(uuid) => {
+                    setSelectedPriorityUuid(uuid);
                   }}>
                   {priorities?.map(({ uuid, display }) => (
-                    <Switch
-                      role="radio"
-                      name={uuid}
-                      text={
-                        uuid == queueEntry.priority.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', {
-                              value: display,
-                              interpolation: { escapeValue: false },
-                            })
-                          : display
-                      }
+                    <RadioButton
                       key={uuid}
+                      name={display}
+                      labelText={
+                        <Tag
+                          className={classNames(styles.tag, {
+                            [styles.orange]: findPriorityIndex(uuid) === 1,
+                          })}
+                          role="radio"
+                          key={uuid}
+                          value={uuid}
+                          type={(() => {
+                            const index = findPriorityIndex(uuid);
+                            return index === 0 ? 'green' : index === 2 ? 'red' : '';
+                          })()}>
+                          {uuid === queueEntry.priority.uuid
+                            ? t('currentValueFormatted', '{{value}} (Current)', {
+                                value: display,
+                              })
+                            : display}
+                        </Tag>
+                      }
                       value={uuid}
                     />
                   ))}
-                </ContentSwitcher>
+                </RadioButtonGroup>
               )}
             </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
-              <TextArea
-                labelText=""
-                value={formState.prioritycomment}
-                onChange={(e) => setPriorityComment(e.target.value)}
-                placeholder={t('enterCommentHere', 'Enter comment here')}
-              />
-            </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('timeOfTransition', 'Time of transition')}</div>
-              <Checkbox
-                labelText={t('modifyDefaultValue', 'Modify default value')}
-                id={'modifyTransitionTime'}
-                checked={formState.modifyDefaultTransitionDateTime}
-                onChange={(_, { checked }) => {
-                  setModifyDefaultTransitionDateTime(checked);
-                }}
-              />
-              <div className={styles.dateTimeFields}>
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
-                  value={formState.transitionDate}
-                  maxDate={new Date().setHours(23, 59, 59, 59)}
-                  onChange={([date]) => {
-                    setTransitionDate(date);
-                  }}>
-                  <DatePickerInput
-                    id="datePickerInput"
-                    labelText={t('date', 'Date')}
-                    placeholder={datePickerPlaceHolder}
-                    disabled={!formState.modifyDefaultTransitionDateTime}
-                  />
-                </DatePicker>
-
-                <TimePicker
-                  labelText={t('time', 'Time')}
-                  onChange={(event) => setTransitionTime(event.target.value)}
-                  pattern={time12HourFormatRegexPattern}
-                  value={formState.transitionTime}
-                  invalid={timeInvalidMessage != null}
-                  invalidText={timeInvalidMessage}
-                  disabled={!formState.modifyDefaultTransitionDateTime}>
-                  <TimePickerSelect
-                    id="visitStartTimeSelect"
-                    onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
-                    value={formState.transitionTimeFormat}
-                    labelText={t('time', 'Time')}
-                    aria-label={t('time', 'Time')}>
-                    <SelectItem value="AM" text="AM" />
-                    <SelectItem value="PM" text="PM" />
-                  </TimePickerSelect>
-                </TimePicker>
-              </div>
-            </section>
+            {selectedPriorityIndex > 0 && (
+              <section className={styles.section}>
+                <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+                <TextArea
+                  labelText=""
+                  value={formState.prioritycomment}
+                  onChange={(e) => setPriorityComment(e.target.value)}
+                  placeholder={t('enterCommentHere', 'Enter comment here')}
+                />
+              </section>
+            )}
           </Stack>
         </div>
       </ModalBody>
