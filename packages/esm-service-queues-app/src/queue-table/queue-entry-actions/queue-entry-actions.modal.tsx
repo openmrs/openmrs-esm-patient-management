@@ -115,15 +115,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
 
-    const updatedState = { ...formState };
-
-    if (updatedState.selectedPriority === priorities[0]?.uuid) {
-      updatedState.prioritycomment = '';
-    }
-
-    setFormState(updatedState);
-
-    submitAction(queueEntry, updatedState)
+    submitAction(queueEntry, formState)
       .then(() => {
         showSnackbar({
           isLowContrast: true,
@@ -286,17 +278,16 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 </RadioButtonGroup>
               )}
             </section>
-            {selectedPriorityIndex > 0 && (
-              <section className={styles.section}>
-                <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
-                <TextArea
-                  labelText=""
-                  value={formState.prioritycomment}
-                  onChange={(e) => setPriorityComment(e.target.value)}
-                  placeholder={t('enterCommentHere', 'Enter comment here')}
-                />
-              </section>
-            )}
+
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+              <TextArea
+                labelText=""
+                value={formState.prioritycomment}
+                onChange={(e) => setPriorityComment(e.target.value)}
+                placeholder={t('enterCommentHere', 'Enter comment here')}
+              />
+            </section>
           </Stack>
         </div>
       </ModalBody>
