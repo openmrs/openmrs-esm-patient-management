@@ -69,6 +69,16 @@
   "jumpTo": "Jump to",
   "male": "Male",
   "middleNameLabelText": "Middle Name",
+  "nameLabelText": {
+    "degree": "Degree",
+    "familyName": "Family Name",
+    "familyName2": "Family Name 2",
+    "familyNamePrefix": "Family Name Prefix",
+    "familyNameSuffix": "Family Name Suffix",
+    "givenName": "First Name",
+    "middleName": "Middle Name",
+    "prefix": "Prefix"
+  },
   "negativeMonths": "Estimated months cannot be negative",
   "negativeYears": "Estimated years cannot be negative",
   "no": "No",

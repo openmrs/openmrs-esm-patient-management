@@ -15,14 +15,14 @@ export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1de
 
 /**
  * DO NOT REMOVE THIS COMMENT HERE, ADDS TRANSLATION FOR NAME FIELD ELEMENTS
- * t('name.prefix', 'Prefix')
- * t('name.givenName', 'First Name')
- * t('name.middleName', 'Middle Name')
- * t('name.familyNamePrefix', 'Family Name Prefix')
- * t('name.familyName', 'Family Name')
- * t('name.familyName2', 'Family Name 2')
- * t('name.familyNameSuffix', 'Family Name Suffix')
- * t('name.degree', 'Degree')
+ * t('nameLabelText.prefix', 'Prefix')
+ * t('nameLabelText.givenName', 'First Name')
+ * t('nameLabelText.middleName', 'Middle Name')
+ * t('nameLabelText.familyNamePrefix', 'Family Name Prefix')
+ * t('nameLabelText.familyName', 'Family Name')
+ * t('nameLabelText.familyName2', 'Family Name 2')
+ * t('nameLabelText.familyNameSuffix', 'Family Name Suffix')
+ * t('nameLabelText.degree', 'Degree')
  */
 
 const containsNoNumbers = /^([^0-9]*)$/;
@@ -168,7 +168,7 @@ export const NameFieldWithTemplate: React.FC = () => {
               <Input
                 key={`text_input_${index}`}
                 name={attributes.name}
-                labelText={t(`name.${attributes.name}`, attributes.label)}
+                labelText={t(`nameLabelText.${attributes.name}`, attributes.label)}
                 id={`name.${attributes.name}`}
                 checkWarning={checkNoNumbers}
                 required={attributes.required}
