@@ -20,7 +20,7 @@ export function startupApp() {
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-export const addPatientToListModal = getAsyncLifecycle(() => import('./add-patient/add-patient.component'), {
+export const addPatientToListModal = getAsyncLifecycle(() => import('./add-patient/add-patient.modal'), {
   featureName: 'patient-actions-modal',
   moduleName,
 });
