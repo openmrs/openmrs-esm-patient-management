@@ -203,6 +203,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         ),
         sex: patient.sex,
         startDate: patient.startDate,
+        mobile: patient.mobile || '--',
       })) ?? [],
     [columns, filteredPatients],
   );
