@@ -147,7 +147,8 @@ function QueueTableSection() {
       statusUuid={null}
       tableFilters={
         <>
-          <QueueDropdownFilter /> <StatusDropdownFilter />
+          <ClearQueueEntries queueEntries={filteredQueueEntries} />
+          <StatusDropdownFilter />
           <TableToolbarSearch
             className={styles.search}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -155,7 +156,6 @@ function QueueTableSection() {
             size={isDesktop(layout) ? 'sm' : 'lg'}
             persistent
           />
-          <ClearQueueEntries queueEntries={filteredQueueEntries} />
         </>
       }
     />
@@ -201,12 +201,12 @@ function StatusDropdownFilter() {
     <div className={styles.filterContainer}>
       <Dropdown
         id="statusFilter"
-        items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}
+        items={[{ display: `${t('any', 'Any')}` }, ...(statuses ?? [])]}
         itemToString={(item) => (item ? item.display : '')}
         label={queueStatus?.statusDisplay ?? t('all', 'All')}
         onChange={handleStatusChange}
         size={isDesktop(layout) ? 'sm' : 'lg'}
-        titleText={t('filterByStatus', 'Filter by status:')}
+        titleText={t('showPatientsWithStatus', 'Show patients with status:')}
         type="inline"
       />
     </div>
