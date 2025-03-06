@@ -3,6 +3,14 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.container {
+  :global {
+    .cds--modal-content {
+      padding: 0 !important;
+    }
+  }
+}
+
 .modalHeader {
   :global {
     .cds--modal-close-button {
@@ -31,27 +39,27 @@
   }
 }
 
-.modalContent {
-  width: 100%;
-  background-color: $ui-02;
-}
-
-.patientListList {
-  padding: 0 layout.$spacing-05;
-}
-
 .checkbox {
   padding-bottom: 0.875rem;
 }
 
+.fieldset {
+  padding: 0 layout.$spacing-05;
+}
+
 .subheader {
   @include type.type-style('body-01');
-  margin: layout.$spacing-05 0;
+  margin: 0.875rem 0;
 }
 
 .pagination {
   width: 100%;
   overflow: hidden;
+}
+
+.pagination > div:first-child {
+  visibility: hidden;
+  width: 0;
 }
 
 .paginationContainer {
@@ -62,8 +70,11 @@
 }
 
 .search {
-  background-color: colors.$white;
   margin-bottom: 0.875rem;
+
+  input[role='searchbox'] {
+    background-color: colors.$gray-10;
+  }
 }
 
 .itemsCountDisplay {
@@ -76,16 +87,12 @@
   color: colors.$gray-70;
 }
 
-.pagination > div:first-child {
-  visibility: hidden;
-  width: 0;
-}
-
 .buttonSet {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  border-top: 1px solid colors.$gray-20;
 
   .createButton {
     flex: 2;
@@ -99,10 +106,14 @@
       flex: 1;
     }
   }
-}
 
-.productiveHeading03 {
-  @include type.type-style('heading-03');
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05 !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
 }
 
 .bodyLong01 {
@@ -130,11 +141,6 @@
   @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-bottom: layout.$spacing-03;
-}
-
-.helper {
-  @include type.type-style('body-compact-01');
-  color: $text-02;
 }
 
 .actionText {

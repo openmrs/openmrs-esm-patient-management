@@ -6,14 +6,15 @@ import {
   Button,
   Checkbox,
   CheckboxSkeleton,
-  ModalHeader,
+  InlineLoading,
   ModalBody,
   ModalFooter,
+  ModalHeader,
   Pagination,
   Search,
   Tile,
 } from '@carbon/react';
-import { navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
+import { getCoreTranslation, navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { type AddablePatientListViewModel } from '../api/types';
 import { useAddablePatientLists } from '../api/api-remote';
 import styles from './add-patient.scss';
@@ -28,6 +29,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { data, isLoading } = useAddablePatientLists(patientUuid);
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreateNewList = useCallback(() => {
     navigate({
@@ -52,6 +54,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   }, [patientUuid]);
 
   const handleSubmit = useCallback(() => {
+    setIsSubmitting(true);
     Promise.all(
       selected.map((selectedId) => {
         const patientList = data.find((list) => list.id === selectedId);
@@ -76,7 +79,10 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             });
           });
       }),
-    ).finally(closeModal);
+    ).finally(() => {
+      setIsSubmitting(false);
+      closeModal();
+    });
   }, [selected, closeModal, data, mutateCohortMembers, t]);
 
   const searchResults = useMemo(() => {
@@ -104,11 +110,11 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const endIndex = Math.min(currentPage * 5, searchResults.length);
 
   return (
-    <div className={styles.modalContent}>
+    <div className={styles.container}>
       <ModalHeader
-        title={t('addPatientToList', 'Add patient to list')}
+        className={styles.modalHeader}
         closeModal={closeModal}
-        className={styles.modalHeader}>
+        title={t('addPatientToList', 'Add patient to list')}>
         <h3 className={styles.subheader}>
           {t('searchForAListToAddThisPatientTo', 'Search for a list to add this patient to.')}
         </h3>
@@ -118,96 +124,97 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           className={styles.search}
           labelText={t('searchForList', 'Search for a list')}
           placeholder={t('searchForList', 'Search for a list')}
-          onChange={({ target }) => {
-            setSearchValue(target.value);
-          }}
+          onChange={({ target }) => setSearchValue(target.value)}
+          size="lg"
           value={searchValue}
         />
-        <div className={styles.patientListList}>
-          <fieldset className="cds--fieldset">
-            {!isLoading && results ? (
-              results.length > 0 ? (
-                <>
-                  <p className="cds--label">{t('patientLists', 'Patient lists')}</p>
-                  {results.map((patientList) => (
-                    <div key={patientList.id} className={styles.checkbox}>
-                      <Checkbox
-                        key={patientList.id}
-                        onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
-                        checked={patientList.checked || selected.includes(patientList.id)}
-                        disabled={patientList.checked}
-                        labelText={patientList.displayName}
-                        id={patientList.id}
-                      />
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noMatchingListsFound', 'No matching lists found')}</p>
-                      <p className={styles.actionText}>
-                        <span>{t('trySearchingForADifferentList', 'Try searching for a different list')}</span>
-                        <span>&mdash; or &mdash;</span>
-                        <Button kind="ghost" size="sm" onClick={handleCreateNewList}>
-                          {t('createNewPatientList', 'Create new patient list')}
-                        </Button>
-                      </p>
-                    </div>
-                  </Tile>
-                </div>
-              )
-            ) : (
+        <fieldset className={classNames('cds--fieldset', styles.fieldset)}>
+          {!isLoading && results ? (
+            results.length > 0 ? (
               <>
-                <div className={styles.checkbox}>
-                  <CheckboxSkeleton />
-                </div>
-                <div className={styles.checkbox}>
-                  <CheckboxSkeleton />
-                </div>
-                <div className={styles.checkbox}>
-                  <CheckboxSkeleton />
-                </div>
-                <div className={styles.checkbox}>
-                  <CheckboxSkeleton />
-                </div>
-                <div className={styles.checkbox}>
-                  <CheckboxSkeleton />
-                </div>
+                <p className="cds--label">{t('patientLists', 'Patient lists')}</p>
+                {results.map((patientList) => (
+                  <div key={patientList.id} className={styles.checkbox}>
+                    <Checkbox
+                      checked={patientList.checked || selected.includes(patientList.id)}
+                      disabled={patientList.checked}
+                      id={patientList.id}
+                      key={patientList.id}
+                      labelText={patientList.displayName}
+                      onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
+                    />
+                  </div>
+                ))}
               </>
-            )}
-          </fieldset>
-        </div>
-        {paginated && (
-          <div className={styles.paginationContainer}>
-            <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
-              {searchResults.length > 0 ? `${startIndex}-${endIndex} / ${searchResults.length}` : '0'}{' '}
-              {t('items', 'items')}
-            </span>
-            <Pagination
-              className={styles.pagination}
-              forwardText={t('', '')}
-              backwardText={t('', '')}
-              page={currentPage}
-              pageSize={5}
-              pageSizes={[5]}
-              totalItems={searchResults.length}
-              onChange={({ page }) => goTo(page)}
-            />
-          </div>
-        )}
+            ) : (
+              <div className={styles.tileContainer}>
+                <Tile className={styles.tile}>
+                  <div className={styles.tileContent}>
+                    <p className={styles.content}>{t('noMatchingListsFound', 'No matching lists found')}</p>
+                    <p className={styles.actionText}>
+                      <span>{t('trySearchingForADifferentList', 'Try searching for a different list')}</span>
+                      <span>&mdash; or &mdash;</span>
+                      <Button kind="ghost" size="sm" onClick={handleCreateNewList}>
+                        {t('createNewPatientList', 'Create new patient list')}
+                      </Button>
+                    </p>
+                  </div>
+                </Tile>
+              </div>
+            )
+          ) : (
+            <>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+            </>
+          )}
+        </fieldset>
       </ModalBody>
+      {paginated && (
+        <div className={styles.paginationContainer}>
+          <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
+            {searchResults.length > 0 ? `${startIndex}-${endIndex} / ${searchResults.length}` : '0'}{' '}
+            {t('items', 'items')}
+          </span>
+          <Pagination
+            className={styles.pagination}
+            forwardText=""
+            backwardText=""
+            page={currentPage}
+            pageSize={5}
+            pageSizes={[5]}
+            totalItems={searchResults.length}
+            onChange={({ page }) => goTo(page)}
+          />
+        </div>
+      )}
       <ModalFooter className={styles.buttonSet}>
-        <Button kind="ghost" size="xl" onClick={handleCreateNewList}>
+        <Button kind="ghost" onClick={handleCreateNewList} size="xl">
           {t('createNewPatientList', 'Create new patient list')}
         </Button>
         <div>
-          <Button kind="secondary" size="xl" onClick={closeModal}>
+          <Button kind="secondary" onClick={closeModal} size="xl">
             {t('cancel', 'Cancel')}
           </Button>
-          <Button onClick={handleSubmit} size="xl">
-            {t('addToList', 'Add to list')}
+          <Button disabled={selected.length === 0 || isSubmitting} onClick={handleSubmit} size="xl">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{getCoreTranslation('save', 'Save')}</span>
+            )}
           </Button>
         </div>
       </ModalFooter>

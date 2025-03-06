@@ -36,7 +36,7 @@ describe('AddPatient', () => {
     expect(screen.getByRole('searchbox', { name: /search for a list/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /clear search input/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create new patient list/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add to list/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /list 1/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /list 2/i })).toBeInTheDocument();
