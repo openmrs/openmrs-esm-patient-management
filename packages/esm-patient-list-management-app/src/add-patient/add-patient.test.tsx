@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
 import { useAddablePatientLists } from '../api/api-remote';
 import { mockPatient } from '__mocks__';
-import AddPatient from './add-patient.component';
+import AddPatient from './add-patient.modal';
 
 const mockNavigate = jest.mocked(navigate);
 const mockUseAddablePatientLists = jest.mocked(useAddablePatientLists);
