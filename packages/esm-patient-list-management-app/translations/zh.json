@@ -1,7 +1,6 @@
 {
   "actions": "操作",
   "addPatientToList": "将患者添加到列表",
-  "addToList": "添加到列表",
   "allLists": "所有列表",
   "backToListsPage": "返回到列表页",
   "cancel": "取消",
@@ -39,6 +38,7 @@
   "listType": "列表类型",
   "listUpdated": "列表更新成功",
   "listUpToDate": "列表现在已经更新完毕",
+  "mobile": "Mobile",
   "myLists": "我的列表",
   "name": "姓名",
   "newList": "新列表",
@@ -62,6 +62,7 @@
   "problemUpdatingList": "更新列表时出现问题",
   "removeFromList": "从列表中移除",
   "removePatientFromListConfirmation": "您确定要将{{patientName}}从此列表中移除吗？",
+  "saving": "Saving",
   "searchForAListToAddThisPatientTo": "搜索要将该患者添加至的列表",
   "searchForList": "搜索列表",
   "searchThisList": "搜索此列表",
