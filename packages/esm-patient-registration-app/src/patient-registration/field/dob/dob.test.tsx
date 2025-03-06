@@ -35,6 +35,7 @@ describe('Dob', () => {
               inEditMode: false,
               setFieldValue: () => {},
               setCapturePhotoProps: (value) => {},
+              setFieldTouched: () => {},
               currentPhoto: '',
               isOffline: false,
               initialFormValues: initialFormValues,

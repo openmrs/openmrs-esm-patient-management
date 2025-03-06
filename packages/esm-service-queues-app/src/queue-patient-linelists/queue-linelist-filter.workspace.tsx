@@ -4,8 +4,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   Form,
   Layer,
@@ -18,6 +16,7 @@ import {
 import dayjs from 'dayjs';
 import {
   type DefaultWorkspaceProps,
+  OpenmrsDatePicker,
   toDateObjectStrict,
   toOmrsIsoString,
   useLayoutType,
@@ -129,18 +128,13 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
             <Column md={2}>
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
               <Layer>
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
+                <OpenmrsDatePicker
                   value={returnDate}
-                  onChange={([date]) => setReturnDate(date)}>
-                  <DatePickerInput
-                    id="returnDate"
-                    placeholder={datePickerPlaceHolder}
-                    labelText={t('date', 'Date')}
-                    type="date"
-                  />
-                </DatePicker>
+                  onChange={setReturnDate}
+                  id="returnDate"
+                  data-testid="returnDate"
+                  labelText={t('date', 'Date')}
+                />
               </Layer>
               <Button
                 kind="ghost"
