@@ -2,8 +2,19 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import classNames from 'classnames';
 import { mutate } from 'swr';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, CheckboxSkeleton, Pagination, Search, Tile } from '@carbon/react';
-import { navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
+import {
+  Button,
+  Checkbox,
+  CheckboxSkeleton,
+  InlineLoading,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Pagination,
+  Search,
+  Tile,
+} from '@carbon/react';
+import { getCoreTranslation, navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { type AddablePatientListViewModel } from '../api/types';
 import { useAddablePatientLists } from '../api/api-remote';
 import styles from './add-patient.scss';
@@ -18,6 +29,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { data, isLoading } = useAddablePatientLists(patientUuid);
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreateNewList = useCallback(() => {
     navigate({
@@ -42,6 +54,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   }, [patientUuid]);
 
   const handleSubmit = useCallback(() => {
+    setIsSubmitting(true);
     Promise.all(
       selected.map((selectedId) => {
         const patientList = data.find((list) => list.id === selectedId);
@@ -66,7 +79,10 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             });
           });
       }),
-    ).finally(closeModal);
+    ).finally(() => {
+      setIsSubmitting(false);
+      closeModal();
+    });
   }, [selected, closeModal, data, mutateCohortMembers, t]);
 
   const searchResults = useMemo(() => {
@@ -85,30 +101,34 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { results, goTo, currentPage, paginated } = usePagination<AddablePatientListViewModel>(searchResults, 5);
 
   useEffect(() => {
-    if (currentPage !== 1) {
+    if (searchValue) {
       goTo(1);
     }
-  }, [currentPage, goTo, searchValue]);
+  }, [goTo, searchValue]);
+
+  const startIndex = (currentPage - 1) * 5 + 1;
+  const endIndex = Math.min(currentPage * 5, searchResults.length);
 
   return (
-    <div className={styles.modalContent}>
-      <div className={styles.modalHeader}>
-        <h1 className={styles.header}>{t('addPatientToList', 'Add patient to list')}</h1>
+    <div className={styles.container}>
+      <ModalHeader
+        className={styles.modalHeader}
+        closeModal={closeModal}
+        title={t('addPatientToList', 'Add patient to list')}>
         <h3 className={styles.subheader}>
           {t('searchForAListToAddThisPatientTo', 'Search for a list to add this patient to.')}
         </h3>
-      </div>
-      <Search
-        className={styles.search}
-        labelText={t('searchForList', 'Search for a list')}
-        placeholder={t('searchForList', 'Search for a list')}
-        onChange={({ target }) => {
-          setSearchValue(target.value);
-        }}
-        value={searchValue}
-      />
-      <div className={styles.patientListList}>
-        <fieldset className="cds--fieldset">
+      </ModalHeader>
+      <ModalBody>
+        <Search
+          className={styles.search}
+          labelText={t('searchForList', 'Search for a list')}
+          placeholder={t('searchForList', 'Search for a list')}
+          onChange={({ target }) => setSearchValue(target.value)}
+          size="lg"
+          value={searchValue}
+        />
+        <fieldset className={classNames('cds--fieldset', styles.fieldset)}>
           {!isLoading && results ? (
             results.length > 0 ? (
               <>
@@ -116,12 +136,12 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
                 {results.map((patientList) => (
                   <div key={patientList.id} className={styles.checkbox}>
                     <Checkbox
-                      key={patientList.id}
-                      onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
                       checked={patientList.checked || selected.includes(patientList.id)}
                       disabled={patientList.checked}
-                      labelText={patientList.displayName}
                       id={patientList.id}
+                      key={patientList.id}
+                      labelText={patientList.displayName}
+                      onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
                     />
                   </div>
                 ))}
@@ -162,11 +182,12 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             </>
           )}
         </fieldset>
-      </div>
+      </ModalBody>
       {paginated && (
         <div className={styles.paginationContainer}>
           <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
-            {results.length * currentPage} / {searchResults.length} {t('items', 'items')}
+            {searchResults.length > 0 ? `${startIndex}-${endIndex} / ${searchResults.length}` : '0'}{' '}
+            {t('items', 'items')}
           </span>
           <Pagination
             className={styles.pagination}
@@ -180,19 +201,23 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           />
         </div>
       )}
-      <div className={styles.buttonSet}>
-        <Button className={styles.createButton} kind="ghost" size="xl" onClick={handleCreateNewList}>
+      <ModalFooter className={styles.buttonSet}>
+        <Button kind="ghost" onClick={handleCreateNewList} size="xl">
           {t('createNewPatientList', 'Create new patient list')}
         </Button>
         <div>
-          <Button kind="secondary" size="xl" onClick={closeModal}>
+          <Button kind="secondary" onClick={closeModal} size="xl">
             {t('cancel', 'Cancel')}
           </Button>
-          <Button onClick={handleSubmit} size="xl">
-            {t('addToList', 'Add to list')}
+          <Button disabled={selected.length === 0 || isSubmitting} onClick={handleSubmit} size="xl">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{getCoreTranslation('save', 'Save')}</span>
+            )}
           </Button>
         </div>
-      </div>
+      </ModalFooter>
     </div>
   );
 };
