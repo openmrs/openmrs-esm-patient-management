@@ -29,9 +29,9 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) =
 
   return (
     <Button
+      className={styles.clearListButton}
       size={isDesktop(layout) ? 'sm' : 'lg'}
-      kind="danger--tertiary"
-      renderIcon={(props) => <TrashCan size={16} {...props} />}
+      kind="ghost"
       onClick={launchClearAllQueueEntriesModal}
       iconDescription={t('clearQueue', 'Clear queue')}>
       {t('clearQueue', 'Clear queue')}
