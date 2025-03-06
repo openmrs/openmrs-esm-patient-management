@@ -174,8 +174,8 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           </span>
           <Pagination
             className={styles.pagination}
-            forwardText={t('nextPage', 'Next page')}
-            backwardText={t('previousPage', 'Previous page')}
+            forwardText={t('', '')}
+            backwardText={t('', '')}
             page={currentPage}
             pageSize={5}
             pageSizes={[5]}
