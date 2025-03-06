@@ -2,7 +2,17 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import classNames from 'classnames';
 import { mutate } from 'swr';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, CheckboxSkeleton, Pagination, Search, Tile } from '@carbon/react';
+import {
+  Button,
+  Checkbox,
+  CheckboxSkeleton,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Pagination,
+  Search,
+  Tile,
+} from '@carbon/react';
 import { navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { type AddablePatientListViewModel } from '../api/types';
 import { useAddablePatientLists } from '../api/api-remote';
@@ -95,97 +105,98 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 
   return (
     <div className={styles.modalContent}>
-      <div className={styles.modalHeader}>
-        <h1 className={styles.header}>{t('addPatientToList', 'Add patient to list')}</h1>
+      <ModalHeader title="Add Patient to List" closeModal={closeModal} className={styles.modalHeader}>
         <h3 className={styles.subheader}>
           {t('searchForAListToAddThisPatientTo', 'Search for a list to add this patient to.')}
         </h3>
-      </div>
-      <Search
-        className={styles.search}
-        labelText={t('searchForList', 'Search for a list')}
-        placeholder={t('searchForList', 'Search for a list')}
-        onChange={({ target }) => {
-          setSearchValue(target.value);
-        }}
-        value={searchValue}
-      />
-      <div className={styles.patientListList}>
-        <fieldset className="cds--fieldset">
-          {!isLoading && results ? (
-            results.length > 0 ? (
-              <>
-                <p className="cds--label">{t('patientLists', 'Patient lists')}</p>
-                {results.map((patientList) => (
-                  <div key={patientList.id} className={styles.checkbox}>
-                    <Checkbox
-                      key={patientList.id}
-                      onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
-                      checked={patientList.checked || selected.includes(patientList.id)}
-                      disabled={patientList.checked}
-                      labelText={patientList.displayName}
-                      id={patientList.id}
-                    />
-                  </div>
-                ))}
-              </>
+      </ModalHeader>
+      <ModalBody>
+        <Search
+          className={styles.search}
+          labelText={t('searchForList', 'Search for a list')}
+          placeholder={t('searchForList', 'Search for a list')}
+          onChange={({ target }) => {
+            setSearchValue(target.value);
+          }}
+          value={searchValue}
+        />
+        <div className={styles.patientListList}>
+          <fieldset className="cds--fieldset">
+            {!isLoading && results ? (
+              results.length > 0 ? (
+                <>
+                  <p className="cds--label">{t('patientLists', 'Patient lists')}</p>
+                  {results.map((patientList) => (
+                    <div key={patientList.id} className={styles.checkbox}>
+                      <Checkbox
+                        key={patientList.id}
+                        onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
+                        checked={patientList.checked || selected.includes(patientList.id)}
+                        disabled={patientList.checked}
+                        labelText={patientList.displayName}
+                        id={patientList.id}
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className={styles.tileContainer}>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noMatchingListsFound', 'No matching lists found')}</p>
+                      <p className={styles.actionText}>
+                        <span>{t('trySearchingForADifferentList', 'Try searching for a different list')}</span>
+                        <span>&mdash; or &mdash;</span>
+                        <Button kind="ghost" size="sm" onClick={handleCreateNewList}>
+                          {t('createNewPatientList', 'Create new patient list')}
+                        </Button>
+                      </p>
+                    </div>
+                  </Tile>
+                </div>
+              )
             ) : (
-              <div className={styles.tileContainer}>
-                <Tile className={styles.tile}>
-                  <div className={styles.tileContent}>
-                    <p className={styles.content}>{t('noMatchingListsFound', 'No matching lists found')}</p>
-                    <p className={styles.actionText}>
-                      <span>{t('trySearchingForADifferentList', 'Try searching for a different list')}</span>
-                      <span>&mdash; or &mdash;</span>
-                      <Button kind="ghost" size="sm" onClick={handleCreateNewList}>
-                        {t('createNewPatientList', 'Create new patient list')}
-                      </Button>
-                    </p>
-                  </div>
-                </Tile>
-              </div>
-            )
-          ) : (
-            <>
-              <div className={styles.checkbox}>
-                <CheckboxSkeleton />
-              </div>
-              <div className={styles.checkbox}>
-                <CheckboxSkeleton />
-              </div>
-              <div className={styles.checkbox}>
-                <CheckboxSkeleton />
-              </div>
-              <div className={styles.checkbox}>
-                <CheckboxSkeleton />
-              </div>
-              <div className={styles.checkbox}>
-                <CheckboxSkeleton />
-              </div>
-            </>
-          )}
-        </fieldset>
-      </div>
-      {paginated && (
-        <div className={styles.paginationContainer}>
-          <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
-            {searchResults.length > 0 ? `${startIndex}-${endIndex} / ${searchResults.length}` : '0'}{' '}
-            {t('items', 'items')}
-          </span>
-          <Pagination
-            className={styles.pagination}
-            forwardText={t('', '')}
-            backwardText={t('', '')}
-            page={currentPage}
-            pageSize={5}
-            pageSizes={[5]}
-            totalItems={searchResults.length}
-            onChange={({ page }) => goTo(page)}
-          />
+              <>
+                <div className={styles.checkbox}>
+                  <CheckboxSkeleton />
+                </div>
+                <div className={styles.checkbox}>
+                  <CheckboxSkeleton />
+                </div>
+                <div className={styles.checkbox}>
+                  <CheckboxSkeleton />
+                </div>
+                <div className={styles.checkbox}>
+                  <CheckboxSkeleton />
+                </div>
+                <div className={styles.checkbox}>
+                  <CheckboxSkeleton />
+                </div>
+              </>
+            )}
+          </fieldset>
         </div>
-      )}
-      <div className={styles.buttonSet}>
-        <Button className={styles.createButton} kind="ghost" size="xl" onClick={handleCreateNewList}>
+        {paginated && (
+          <div className={styles.paginationContainer}>
+            <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
+              {searchResults.length > 0 ? `${startIndex}-${endIndex} / ${searchResults.length}` : '0'}{' '}
+              {t('items', 'items')}
+            </span>
+            <Pagination
+              className={styles.pagination}
+              forwardText={t('', '')}
+              backwardText={t('', '')}
+              page={currentPage}
+              pageSize={5}
+              pageSizes={[5]}
+              totalItems={searchResults.length}
+              onChange={({ page }) => goTo(page)}
+            />
+          </div>
+        )}
+      </ModalBody>
+      <ModalFooter className={styles.buttonSet}>
+        <Button kind="ghost" size="xl" onClick={handleCreateNewList}>
           {t('createNewPatientList', 'Create new patient list')}
         </Button>
         <div>
@@ -196,7 +207,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             {t('addToList', 'Add to list')}
           </Button>
         </div>
-      </div>
+      </ModalFooter>
     </div>
   );
 };
