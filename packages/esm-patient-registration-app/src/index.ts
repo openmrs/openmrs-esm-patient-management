@@ -1,4 +1,10 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
@@ -13,6 +19,12 @@ const options = {
 
 export function startupApp() {
   defineConfigSchema(moduleName, esmPatientRegistrationSchema);
+
+  registerFeatureFlag(
+    'name-template-layout',
+    'Patient Registration Name Layout',
+    "Customize name layout for patient registration using defined name templates as per the OpenMRS wiki article 'Customizing Name Layouts'.",
+  );
 
   registerBreadcrumbs([
     {

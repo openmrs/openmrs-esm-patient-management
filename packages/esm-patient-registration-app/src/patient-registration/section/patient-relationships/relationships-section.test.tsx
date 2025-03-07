@@ -19,6 +19,7 @@ jest.mock('../../patient-registration.resource', () => ({
 
 let mockResourcesContextValue = {
   addressTemplate: null,
+  nameTemplate: null,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',

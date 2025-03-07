@@ -9,8 +9,8 @@ import {
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
-import type { AddressTemplate, Encounter, FormValues } from './patient-registration.types';
-import { mockedAddressTemplate } from '__mocks__';
+import type { NameTemplate, AddressTemplate, Encounter, FormValues } from './patient-registration.types';
+import { mockedNameTemplate, mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
@@ -107,6 +107,7 @@ jest.mock('./patient-registration-hooks', () => ({
 }));
 
 const mockResourcesContextValue = {
+  nameTemplate: mockedNameTemplate as NameTemplate,
   addressTemplate: mockedAddressTemplate as AddressTemplate,
   currentSession: {
     authenticated: true,
