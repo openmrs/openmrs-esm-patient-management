@@ -1,7 +1,6 @@
 {
   "actions": "פעולות",
   "addPatientToList": "הוסף מטופל לרשימה",
-  "addToList": "הוסף לרשימה",
   "allLists": "כל הרשימות",
   "backToListsPage": "חזור לעמוד הרשימות",
   "cancel": "ביטול",
@@ -39,6 +38,7 @@
   "listType": "סוג הרשימה",
   "listUpdated": "הרשימה עודכנה בהצלחה",
   "listUpToDate": "הרשימה כעת עדכנית",
+  "mobile": "Mobile",
   "myLists": "הרשימות שלי",
   "name": "שם",
   "newList": "רשימה חדשה",
@@ -62,6 +62,7 @@
   "problemUpdatingList": "הייתה בעיה בעדכון הרשימה",
   "removeFromList": "הסר מהרשימה",
   "removePatientFromListConfirmation": "האם אתה בטוח שברצונך להסיר את {{patientName}} מהרשימה הזו?",
+  "saving": "Saving",
   "searchForAListToAddThisPatientTo": "חפש רשימה להוספת המטופל לתוכה.",
   "searchForList": "חפש רשימה",
   "searchThisList": "חפש ברשימה זו",
