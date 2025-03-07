@@ -1,5 +1,5 @@
-import { type Locator, type Page, expect } from '@playwright/test';
-import { type PatientRegistrationFormValues, type PatientRegistrationSex } from '../types';
+import { type Page, expect } from '@playwright/test';
+import { type PatientRegistrationSex } from '../types';
 
 export class RegistrationAndEditPage {
   constructor(readonly page: Page) {}
@@ -28,25 +28,5 @@ export class RegistrationAndEditPage {
 
   async waitUntilTheFormIsLoaded() {
     await expect(this.createPatientButton()).toBeEnabled();
-  }
-
-  async fillPatientRegistrationForm(formValues: PatientRegistrationFormValues) {
-    const tryFill = (locator: Locator, value?: string) => value && locator.fill(value);
-    await tryFill(this.givenNameInput(), formValues.givenName);
-    await tryFill(this.middleNameInput(), formValues.middleName);
-    await tryFill(this.familyNameInput(), formValues.familyName);
-    formValues.sex && (await this.sexRadioButton(formValues.sex).check());
-    this.birthDateInput().getByRole('presentation').focus();
-    await tryFill(this.birthdateDayInput(), formValues.birthdate.day);
-    await tryFill(this.birthdateMonthInput(), formValues.birthdate.month);
-    await tryFill(this.birthdateYearInput(), formValues.birthdate.year);
-    await tryFill(this.phoneInput(), formValues.phone);
-    await tryFill(this.emailInput(), formValues.email);
-    await tryFill(this.address1Input(), formValues.address1);
-    await tryFill(this.stateProvinceInput(), formValues.stateProvince);
-    await tryFill(this.cityVillageInput(), formValues.cityVillage);
-    await tryFill(this.countryInput(), formValues.country);
-    await tryFill(this.countyDistrictInput(), formValues.countyDistrict);
-    await this.createPatientButton().click();
   }
 }
