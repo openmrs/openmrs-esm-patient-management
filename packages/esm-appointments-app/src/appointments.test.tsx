@@ -10,7 +10,7 @@ describe('Appointments', () => {
     await screen.findByText(/^appointments$/i);
 
     expect(screen.getByRole('button', { name: /appointments calendar/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/dd-mmm-yyyy/i)).toBeInTheDocument();
+    expect(screen.getByTestId('appointment-date-picker')).toBeInTheDocument();
     expect(screen.getByText(/filter appointments by service type/i)).toBeInTheDocument();
     expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
