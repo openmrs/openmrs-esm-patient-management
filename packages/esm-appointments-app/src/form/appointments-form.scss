@@ -7,7 +7,7 @@ $openmrs-background-grey: #ededed;
 .formGroup {
   display: flex;
   margin-bottom: layout.$spacing-02;
-  padding: layout.$spacing-05;
+  padding: layout.$spacing-03;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .formGroup {
@@ -35,7 +35,7 @@ $openmrs-background-grey: #ededed;
 .inputContainer {
   display: flex;
   flex-flow: row wrap;
-  gap: layout.$spacing-05;
+  gap: layout.$spacing-03;
   align-items: start;
 }
 
@@ -44,7 +44,7 @@ $openmrs-background-grey: #ededed;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .dateTimeFields {
-  max-width: 32.25rem;
+  max-width: 24rem;
 }
 
 .button {
