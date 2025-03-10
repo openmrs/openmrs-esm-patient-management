@@ -70,8 +70,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
     helpers.setSubmitting(true);
-
     const updatedFormValues = { ...values, identifiers: filterOutUndefinedPatientIdentifiers(values.identifiers) };
+    const errors = await helpers.validateForm();
+    if (Object.keys(errors).length > 0) {
+      helpers.setSubmitting(false);
+      return;
+    }
     try {
       await savePatientForm(
         !inEditMode,
