@@ -37,21 +37,25 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     isValidating,
   } = usePatientAppointments(patientUuid, startDate, new AbortController());
 
-  const launchAppointmentsForm = () => {
+  const handleLaunchAppointmentsForm = () => {
     if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
-      launchPatientWorkspace('appointments-form-workspace');
+      launchPatientWorkspace('create-appointments-form-workspace');
     } else {
-      launchWorkspace('add-appointment', {
+      launchWorkspace('create-appointments-form-workspace', {
         context: 'creating',
         patientUuid,
       });
     }
   };
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+  }
+
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
+
   if (appointmentsData && Object.keys(appointmentsData)?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -77,7 +81,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add Appointments"
-              onClick={launchAppointmentsForm}>
+              onClick={handleLaunchAppointmentsForm}>
               {t('add', 'Add')}
             </Button>
           </div>

@@ -1,17 +1,16 @@
 import React from 'react';
 import { ExtensionSlot, launchWorkspace } from '@openmrs/esm-framework';
 import styles from './patient-search.scss';
-import { useTranslation } from 'react-i18next';
 
 const PatientSearch: React.FC = () => {
-  const { t } = useTranslation();
   const launchCreateAppointmentForm = (patient) => {
     const props = {
       patientUuid: patient.uuid,
       context: 'creating',
       mutate: () => {}, // TODO get this to mutate properly
     };
-    launchWorkspace('create-appointment', { ...props });
+
+    launchWorkspace('create-appointments-form-workspace', { ...props });
   };
 
   return (

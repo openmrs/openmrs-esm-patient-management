@@ -1,10 +1,9 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { showModal, useLayoutType } from '@openmrs/esm-framework';
 import type { Appointment } from '../types';
-import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
 import styles from './patient-appointments-action-menu.scss';
 
 interface appointmentsActionMenuProps {
@@ -15,25 +14,17 @@ interface appointmentsActionMenuProps {
 export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appointmentsActionMenuProps) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const patientAppointmentContext = useContext(PatientAppointmentContext);
 
-  const launchEditAppointmentForm = useCallback(() => {
-    if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
-      launchPatientWorkspace('appointments-form-workspace', {
-        workspaceTitle: t('editAppointment', 'Edit an appointment'),
-        appointment,
-        context: 'editing',
-      });
-    } else {
-      launchWorkspace('edit-appointments-form', {
-        context: 'editing',
-        appointment,
-      });
-    }
-  }, [appointment, patientAppointmentContext, t]);
+  const handleLaunchEditAppointmentForm = () => {
+    launchPatientWorkspace('edit-appointments-form-workspace', {
+      workspaceTitle: t('editAppointment', 'Edit an appointment'),
+      appointment,
+      context: 'editing',
+    });
+  };
 
-  const launchCancelAppointmentDialog = () => {
-    const dispose = showModal('patient-appointment-cancel-confirmation-dialog', {
+  const handleLaunchCancelAppointmentModal = () => {
+    const dispose = showModal('cancel-appointment-modal', {
       closeCancelModal: () => dispose(),
       appointmentUuid: appointment.uuid,
       patientUuid,
@@ -46,16 +37,16 @@ export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appo
         <OverflowMenuItem
           className={styles.menuItem}
           id="editAppointment"
-          onClick={launchEditAppointmentForm}
           itemText={t('edit', 'Edit')}
+          onClick={handleLaunchEditAppointmentForm}
         />
         <OverflowMenuItem
           className={styles.menuItem}
-          id="cancelAppointment"
-          itemText={t('cancel', 'Cancel')}
-          onClick={launchCancelAppointmentDialog}
-          isDelete={true}
           hasDivider
+          id="cancelAppointment"
+          isDelete={true}
+          itemText={t('cancel', 'Cancel')}
+          onClick={handleLaunchCancelAppointmentModal}
         />
       </OverflowMenu>
     </Layer>
