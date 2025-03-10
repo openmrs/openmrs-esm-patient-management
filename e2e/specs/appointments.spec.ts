@@ -59,7 +59,7 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/Appointment scheduled/i)).toBeVisible();
+    await expect(page.getByText(/appointment scheduled/i)).toBeVisible();
   });
 
   await test.step('When I click the overflow menu on the table row with the newly created appointment', async () => {
