@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '__mocks__';
 import QueueLinelistFilter from './queue-linelist-filter.workspace';
@@ -28,7 +28,7 @@ describe('QueueLinelistFilter', () => {
     expect(screen.getByLabelText('Age')).toBeInTheDocument();
     expect(screen.getByLabelText('Between')).toBeInTheDocument();
     expect(screen.getByLabelText('And')).toBeInTheDocument();
-    expect(screen.getByLabelText('Date')).toBeInTheDocument();
+    expect(screen.getByTestId('returnDate')).toBeInTheDocument();
     expect(screen.getByText("Use today's date")).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select visit type/i })).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -66,19 +66,6 @@ describe('QueueLinelistFilter', () => {
     await user.type(startAgeInput, '10');
 
     expect(startAgeInput).toHaveValue(10);
-  });
-
-  it('updates returnDate state when date input changes', async () => {
-    const user = userEvent.setup();
-
-    render(<QueueLinelistFilter {...workspaceProps} />);
-
-    const returnDateInput = screen.getByLabelText('Date');
-
-    await user.clear(returnDateInput);
-    await user.type(returnDateInput, '2023-08-20');
-
-    expect(returnDateInput).toHaveValue('2023-08-20');
   });
 
   it('should open the visit type dropdown and close after selection', async () => {

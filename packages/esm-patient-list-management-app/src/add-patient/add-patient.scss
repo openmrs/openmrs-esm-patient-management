@@ -3,36 +3,63 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.modalContent {
-  width: 100%;
-  background-color: $ui-02;
+.container {
+  :global {
+    .cds--modal-content {
+      padding: 0 !important;
+    }
+  }
 }
 
 .modalHeader {
-  margin: layout.$spacing-05;
-}
+  :global {
+    .cds--modal-close-button {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-end: 0;
+      margin: 0;
+      margin-top: calc(-1 * #{layout.$spacing-05});
+    }
 
-.patientListList {
-  padding: 0 layout.$spacing-05;
+    .cds--modal-close {
+      background-color: rgba(0, 0, 0, 0);
+
+      &:hover {
+        background-color: var(--cds-layer-hover);
+      }
+    }
+
+    .cds--popover--left > .cds--popover > .cds--popover-content {
+      transform: translate(-4rem, 0.85rem);
+    }
+
+    .cds--popover--left > .cds--popover > .cds--popover-caret {
+      transform: translate(-3.75rem, 1.25rem);
+    }
+  }
 }
 
 .checkbox {
   padding-bottom: 0.875rem;
 }
 
-.header {
-  @include type.type-style('heading-03');
-  margin: layout.$spacing-05 0;
+.fieldset {
+  padding: 0 layout.$spacing-05;
 }
 
 .subheader {
   @include type.type-style('body-01');
-  margin: layout.$spacing-05 0;
+  margin: 0.875rem 0;
 }
 
 .pagination {
   width: 100%;
   overflow: hidden;
+}
+
+.pagination > div:first-child {
+  visibility: hidden;
+  width: 0;
 }
 
 .paginationContainer {
@@ -43,8 +70,11 @@
 }
 
 .search {
-  background-color: colors.$white;
   margin-bottom: 0.875rem;
+
+  input[role='searchbox'] {
+    background-color: colors.$gray-10;
+  }
 }
 
 .itemsCountDisplay {
@@ -57,16 +87,12 @@
   color: colors.$gray-70;
 }
 
-.pagination > div:first-child {
-  visibility: hidden;
-  width: 0;
-}
-
 .buttonSet {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  border-top: 1px solid colors.$gray-20;
 
   .createButton {
     flex: 2;
@@ -80,10 +106,14 @@
       flex: 1;
     }
   }
-}
 
-.productiveHeading03 {
-  @include type.type-style('heading-03');
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05 !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
 }
 
 .bodyLong01 {
@@ -111,11 +141,6 @@
   @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-bottom: layout.$spacing-03;
-}
-
-.helper {
-  @include type.type-style('body-compact-01');
-  color: $text-02;
 }
 
 .actionText {

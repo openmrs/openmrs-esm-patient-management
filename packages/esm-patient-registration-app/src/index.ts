@@ -1,11 +1,8 @@
-import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
-import rootComponent from './root.component';
 import addPatientLinkComponent from './add-patient-link.extension';
-import editPatientDetailsButtonComponent from './widgets/edit-patient-details-button.component';
-import { PatientPhotoExtension } from './patient-photo.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -41,23 +38,20 @@ export function startupApp() {
   setupOffline();
 }
 
-export const root = getSyncLifecycle(rootComponent, options);
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-export const editPatient = getSyncLifecycle(rootComponent, {
-  featureName: 'edit-patient-details-form',
-  moduleName,
-});
+export const editPatient = getAsyncLifecycle(() => import('./root.component'), options);
 
 export const addPatientLink = getSyncLifecycle(addPatientLinkComponent, options);
 
 export const cancelPatientEditModal = getAsyncLifecycle(() => import('./widgets/cancel-patient-edit.modal'), options);
 
-export const patientPhotoExtension = getSyncLifecycle(PatientPhotoExtension, options);
+export const patientPhotoExtension = getAsyncLifecycle(() => import('./patient-photo.extension'), options);
 
-export const editPatientDetailsButton = getSyncLifecycle(editPatientDetailsButtonComponent, {
-  featureName: 'edit-patient-details',
-  moduleName,
-});
+export const editPatientDetailsButton = getAsyncLifecycle(
+  () => import('./widgets/edit-patient-details-button.component'),
+  options,
+);
 
 export const deleteIdentifierConfirmationModal = getAsyncLifecycle(
   () => import('./widgets/delete-identifier-confirmation.modal'),

@@ -4,8 +4,6 @@ import {
   Button,
   Checkbox,
   ContentSwitcher,
-  DatePicker,
-  DatePickerInput,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -21,8 +19,8 @@ import {
   TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
-import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
+import { OpenmrsDatePicker, showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
+import { time12HourFormatRegexPattern } from '../../constants';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
@@ -334,21 +332,15 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 }}
               />
               <div className={styles.dateTimeFields}>
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
+                <OpenmrsDatePicker
                   value={formState.transitionDate}
-                  maxDate={new Date().setHours(23, 59, 59, 59)}
-                  onChange={([date]) => {
-                    setTransitionDate(date);
-                  }}>
-                  <DatePickerInput
-                    id="datePickerInput"
-                    labelText={t('date', 'Date')}
-                    placeholder={datePickerPlaceHolder}
-                    disabled={!formState.modifyDefaultTransitionDateTime}
-                  />
-                </DatePicker>
+                  maxDate={new Date()}
+                  onChange={setTransitionDate}
+                  id="datePickerInput"
+                  data-testid="datePickerInput"
+                  labelText={t('date', 'Date')}
+                  isDisabled={!formState.modifyDefaultTransitionDateTime}
+                />
 
                 <TimePicker
                   labelText={t('time', 'Time')}

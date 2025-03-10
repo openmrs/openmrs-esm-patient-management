@@ -11,6 +11,7 @@ export class RegistrationAndEditPage {
   readonly birthDateInput = () => this.page.locator('#birthdate');
   readonly birthdateDayInput = () => this.birthDateInput().locator('[data-type="day"]');
   readonly birthdateMonthInput = () => this.birthDateInput().locator('[data-type="month"]');
+  readonly addressHierarchySearchInput = () => this.page.getByPlaceholder(/search address/i);
   readonly birthdateYearInput = () => this.birthDateInput().locator('[data-type="year"]');
   readonly address1Input = () => this.page.locator('#address1');
   readonly countryInput = () => this.page.locator('#country');

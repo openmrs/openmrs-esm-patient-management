@@ -18,4 +18,5 @@ export const patientChartDashboardMeta = {
   columns: 1,
   title: 'Appointments',
   path: 'Appointments',
+  icon: 'omrs-icon-event-schedule',
 };

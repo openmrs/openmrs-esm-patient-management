@@ -237,3 +237,7 @@ html[dir='rtl'] {
   @include type.type-style('body-compact-01');
   color: $text-02;
 }
+
+.hiddenRow {
+  display: none;
+}

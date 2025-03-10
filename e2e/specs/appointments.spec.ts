@@ -4,6 +4,7 @@ import { type Visit } from '@openmrs/esm-framework';
 import { type Patient } from '../types';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
+import dayjs from 'dayjs';
 
 let patient: Patient;
 let visit: Visit;
@@ -38,9 +39,14 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    await page.getByLabel(/^Date$/i).fill(tomorrow.toLocaleDateString('en-GB'));
+    const tomorrow = dayjs().add(1, 'day');
+    const dateInput = page.getByTestId('datePickerInput');
+    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
+    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
+    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
+    await dateDayInput.fill(tomorrow.format('DD'));
+    await dateMonthInput.fill(tomorrow.format('MM'));
+    await dateYearInput.fill(tomorrow.format('YYYY'));
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -78,9 +84,14 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('And I change the date to Today', async () => {
-    const today = new Date();
-    today.setDate(today.getDate());
-    await page.getByLabel(/^Date$/i).fill(today.toLocaleDateString('en-GB'));
+    const today = dayjs();
+    const dateInput = page.getByTestId('datePickerInput');
+    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
+    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
+    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
+    await dateDayInput.fill(today.format('DD'));
+    await dateMonthInput.fill(today.format('MM'));
+    await dateYearInput.fill(today.format('YYYY'));
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {
@@ -88,7 +99,13 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('I set the Date appointment issued', async () => {
-    await page.getByLabel('Date appointment issued').fill('20/08/2024');
+    const appointmentIssuedDateInput = page.getByTestId('dateAppointmentScheduledPickerInput');
+    const appointmentIssuedDateDayInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /day/i });
+    const appointmentIssuedDateMonthInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /month/i });
+    const appointmentIssuedDateYearInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /year/i });
+    await appointmentIssuedDateDayInput.fill('20');
+    await appointmentIssuedDateMonthInput.fill('08');
+    await appointmentIssuedDateYearInput.fill('2024');
   });
   await test.step('And I change the note', async () => {
     await page

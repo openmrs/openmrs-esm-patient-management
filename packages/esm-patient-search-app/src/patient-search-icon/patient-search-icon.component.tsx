@@ -113,7 +113,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       ) : (
         <div>
           <HeaderGlobalAction
-            aria-label={t('searchPatient', 'Search Patient')}
+            aria-label={t('searchPatient', 'Search patient')}
             className={styles.searchIconButton}
             data-testid="searchPatientIcon"
             enterDelayMs={500}

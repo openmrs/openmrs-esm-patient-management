@@ -1,13 +1,14 @@
 import { expect } from '@playwright/test';
-import { test } from '../core';
-import { RegistrationAndEditPage } from '../pages';
-import { type PatientRegistrationFormValues } from '../types';
 import { deletePatient } from '../commands';
+import { RegistrationAndEditPage } from '../pages';
+import { test } from '../core';
+import { type PatientRegistrationFormValues } from '../types';
 
+const PATIENT_CHART_URL = /\/patient\/(?<uuid>[a-f0-9-]{36})\/chart/i;
 let patientUuid: string;
 
 test('Register a new patient', async ({ page }) => {
-  test.setTimeout(5 * 60 * 1000);
+  test.slow();
   const patientRegistrationPage = new RegistrationAndEditPage(page);
 
   // TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
@@ -32,6 +33,14 @@ test('Register a new patient', async ({ page }) => {
   });
 
   await test.step('And then I fill the registration form with the data in `formValues` and then click the `Submit` button', async () => {
+    // Check for explicit visibility of address template fields
+    await expect(patientRegistrationPage.addressHierarchySearchInput()).toBeVisible();
+    await expect(patientRegistrationPage.address1Input()).toBeVisible();
+    await expect(patientRegistrationPage.countryInput()).toBeVisible();
+    await expect(patientRegistrationPage.stateProvinceInput()).toBeVisible();
+    await expect(patientRegistrationPage.cityVillageInput()).toBeVisible();
+
+    // Fill and submit the form
     await patientRegistrationPage.fillPatientRegistrationForm(formValues);
   });
 
@@ -40,9 +49,8 @@ test('Register a new patient', async ({ page }) => {
   });
 
   await test.step("And I should be redirected to the new patient's chart page", async () => {
-    const patientChartUrlRegex = new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$');
-    await page.waitForURL(patientChartUrlRegex);
-    await expect(page).toHaveURL(patientChartUrlRegex);
+    await page.waitForURL(PATIENT_CHART_URL);
+    await expect(page).toHaveURL(PATIENT_CHART_URL);
   });
 
   await test.step("And I should see the newly registered patient's details displayed in the patient banner", async () => {
@@ -76,10 +84,10 @@ test('Register a new patient', async ({ page }) => {
   });
 });
 
-test('Register an unknown patient', async ({ api, page }) => {
+test('Register an unknown patient', async ({ page }) => {
   const patientRegistrationPage = new RegistrationAndEditPage(page);
 
-  await test.step('When I visit the patient registration page', async () => {
+  await test.step('When I visit the registration page', async () => {
     await patientRegistrationPage.goto();
     await patientRegistrationPage.waitUntilTheFormIsLoaded();
   });
@@ -103,9 +111,7 @@ test('Register an unknown patient', async ({ api, page }) => {
 
   const estimatedAge = 25;
   await test.step(`And then I fill in ${estimatedAge} as the estimated age in years`, async () => {
-    const estimatedAgeField = page.getByLabel(/estimated age in years/i);
-    await estimatedAgeField.clear();
-    await estimatedAgeField.fill('' + estimatedAge);
+    await page.getByLabel(/estimated age in years/i).fill(`${estimatedAge}`);
   });
 
   await test.step('And I click on the submit button', async () => {
@@ -117,9 +123,8 @@ test('Register an unknown patient', async ({ api, page }) => {
   });
 
   await test.step("And I should be redirected to the new patient's chart page", async () => {
-    const patientChartUrlRegex = new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$');
-    await page.waitForURL(patientChartUrlRegex);
-    await expect(page).toHaveURL(patientChartUrlRegex);
+    await page.waitForURL(PATIENT_CHART_URL);
+    await expect(page).toHaveURL(PATIENT_CHART_URL);
   });
 
   await test.step("And I should see the newly registered patient's details displayed in the patient banner", async () => {
@@ -136,5 +141,11 @@ test('Register an unknown patient', async ({ api, page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await deletePatient(api, patientUuid);
+  if (patientUuid) {
+    try {
+      await deletePatient(api, patientUuid);
+    } catch (error) {
+      console.error(`Error deleting patient ${patientUuid}:`, error);
+    }
+  }
 });

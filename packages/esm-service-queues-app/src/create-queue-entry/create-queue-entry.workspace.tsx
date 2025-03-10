@@ -1,3 +1,5 @@
+import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton } from '@carbon/react';
 import {
   ArrowLeftIcon,
@@ -12,10 +14,8 @@ import {
   useVisit,
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import styles from './create-queue-entry.scss';
 import ExistingVisitFormComponent from './existing-visit-form/existing-visit-form.component';
+import styles from './create-queue-entry.scss';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
   selectedPatientUuid: string;
@@ -42,7 +42,11 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit, isLoading, error } = useVisit(selectedPatientUuid);
 
-  const [showContactDetails, setContactDetails] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
+
+  const handleToggleContactDetails = useCallback(() => {
+    setShowContactDetails((value) => !value);
+  }, []);
 
   const patientName = patient && getPatientName(patient);
 
@@ -51,21 +55,23 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
       <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
         <div className={styles.patientBannerContainer}>
           <div className={styles.patientBanner}>
-            <div className={styles.patientPhoto}>
+            <div className={styles.patientPhoto} role="img">
               <PatientPhoto patientUuid={patient.id} patientName={patientName} />
             </div>
             <PatientBannerPatientInfo patient={patient} />
             <PatientBannerToggleContactDetailsButton
+              className={styles.toggleContactDetailsButton}
               showContactDetails={showContactDetails}
-              toggleContactDetails={() => setContactDetails(!showContactDetails)}
+              toggleContactDetails={handleToggleContactDetails}
             />
           </div>
           {showContactDetails ? (
-            <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
+            <PatientBannerContactDetails deceased={patient.deceasedBoolean} patientId={patient.id} />
           ) : null}
         </div>
         <div className={styles.backButton}>
           <Button
+            className={styles.backButton}
             kind="ghost"
             renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription={t('backToSearchResults', 'Back to search results')}

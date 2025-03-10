@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
 import { IconButton } from '@carbon/react';
 import { Movement } from '@carbon/react/icons';
+import { CloseOutlineIcon, launchWorkspace } from '@openmrs/esm-framework';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CloseOutlineIcon, launchWorkspace, useAppContext } from '@openmrs/esm-framework';
-import { type WardPatientWorkspaceProps, type WardViewContext, type WardPatient } from '../../types';
+import { type WardPatient, type WardPatientWorkspaceProps } from '../../types';
 import styles from '../ward-patient-card.scss';
 
 export interface WardPatientTransferProps {
@@ -12,7 +12,6 @@ export interface WardPatientTransferProps {
 
 const WardPatientPendingTransfer: React.FC<WardPatientTransferProps> = ({ wardPatient }) => {
   const { t } = useTranslation();
-  const { WardPatientHeader } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   const { dispositionType, dispositionLocation } = wardPatient?.inpatientRequest;
   const message = useMemo(() => {
@@ -31,7 +30,6 @@ const WardPatientPendingTransfer: React.FC<WardPatientTransferProps> = ({ wardPa
   const launchCancelAdmissionForm = () => {
     launchWorkspace<WardPatientWorkspaceProps>('cancel-admission-request-workspace', {
       wardPatient,
-      WardPatientHeader,
     });
   };
 

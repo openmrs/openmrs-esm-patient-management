@@ -1,29 +1,27 @@
-import React, { type MouseEvent, useContext, useCallback, useState } from 'react';
+import React, { useContext, useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
+import { v4 as uuidv4 } from 'uuid';
+import { SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
-  age,
   ConfigurableLink,
   ExtensionSlot,
-  formatDate,
-  parseDate,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerToggleContactDetailsButton,
+  PatientBannerPatientInfo,
   PatientPhoto,
   useConfig,
-  usePatient,
+  useLayoutType,
   useVisit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
-import { type SearchedPatient } from '../../../types';
+import { type FHIRPatientType, type SearchedPatient } from '../../../types';
 import { PatientSearchContext } from '../../../patient-search-context';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
-  patientUuid: string;
   children: React.ReactNode;
+  patientUuid: string;
 }
 
 interface PatientBannerProps {
@@ -32,36 +30,82 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
+const getGender = (gender: string) => {
+  switch (gender) {
+    case 'M':
+      return 'male';
+    case 'F':
+      return 'female';
+    case 'O':
+      return 'other';
+    case 'U':
+      return 'unknown';
+    default:
+      return gender;
+  }
+};
+
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
-  const { t } = useTranslation();
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
   const { currentVisit } = useVisit(patientUuid);
-  const { patient: fhirPatient, isLoading } = usePatient(patientUuid);
   const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
   const patientName = patient.person.personName.display;
+  const isDeceased = !!patient.person.deathDate;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
-  const toggleContactDetails = useCallback((e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowContactDetails((state) => !state);
+
+  const handleToggleContactDetails = useCallback(() => {
+    setShowContactDetails((value) => !value);
   }, []);
 
-  const getGender = (gender) => {
-    switch (gender) {
-      case 'M':
-        return t('male', 'Male');
-      case 'F':
-        return t('female', 'Female');
-      case 'O':
-        return t('other', 'Other');
-      case 'U':
-        return t('unknown', 'Unknown');
-      default:
-        return gender;
-    }
-  };
+  const fhirMappedPatient: FHIRPatientType = useMemo(() => {
+    const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
+    const addressId = uuidv4();
+    const nameId = uuidv4();
 
-  const isDeceased = !!patient.person.deathDate;
+    return {
+      address: preferredAddress
+        ? [
+            {
+              id: addressId,
+              city: preferredAddress.cityVillage,
+              country: preferredAddress.country,
+              postalCode: preferredAddress.postalCode,
+              state: preferredAddress.stateProvince,
+              use: 'home',
+            },
+          ]
+        : [],
+      birthDate: patient.person.birthdate,
+      deceasedBoolean: patient.person.dead,
+      deceasedDateTime: patient.person.deathDate,
+      gender: getGender(patient.person.gender),
+      id: patient.uuid,
+      identifier: patient.identifiers.map((identifier) => ({
+        id: identifier.uuid,
+        type: {
+          coding: [
+            {
+              code: identifier.identifierType.uuid,
+            },
+          ],
+          text: identifier.identifierType.display,
+        },
+        use: 'official',
+        value: identifier.identifier,
+      })),
+      name: [
+        {
+          family: patient.person.personName.familyName,
+          given: [patient.person.personName.givenName, patient.person.personName.middleName],
+          id: nameId,
+          text: patient.person.personName.display,
+        },
+      ],
+      telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display === 'Telephone Number'),
+    };
+  }, [patient]);
 
   return (
     <>
@@ -75,61 +119,49 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           <div className={styles.patientAvatar} role="img">
             <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
           </div>
-          {/* TODO: Replace this section with PatientBannerPatientInfo once the `patient` object is
-              changed from SearchedPatient type to fhir.Patient type */}
-          <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
-            <div className={styles.flexRow}>
-              <span className={styles.patientName}>{patientName}</span>
-              <ExtensionSlot
-                className={styles.flexRow}
-                name="patient-banner-tags-slot"
-                state={{ patientUuid, patient: fhirPatient }}
-              />
-            </div>
-            <div className={styles.demographics}>
-              <span>{getGender(patient.person.gender)}</span>
-              {patient.person.birthdate && (
-                <>
-                  &middot; <span>{age(patient.person.birthdate)}</span> &middot;{' '}
-                  <span>{formatDate(parseDate(patient.person.birthdate), { mode: 'wide', time: false })}</span>
-                </>
-              )}
-            </div>
-            <div>
-              <div className={styles.identifiers}>
-                {patient.identifiers?.length ? patient.identifiers.map((i) => i.identifier).join(', ') : '--'}
-              </div>
-            </div>
-          </div>
-          <PatientBannerToggleContactDetailsButton
-            showContactDetails={showContactDetails}
-            toggleContactDetails={toggleContactDetails}
-          />
+          <PatientBannerPatientInfo patient={fhirMappedPatient} />
         </ClickablePatientContainer>
-        <div className={styles.buttonCol}>
-          {!hideActionsOverflow ? (
-            <PatientBannerActionsMenu
-              actionsSlotName={'patient-search-actions-slot'}
-              additionalActionsSlotState={{
-                selectPatientAction: nonNavigationSelectPatientAction,
-                launchPatientChart: true,
-              }}
-              isDeceased={patient.person.dead}
-              patient={fhirPatient}
-              patientUuid={patientUuid}
-            />
-          ) : null}
-          {!isDeceased && !currentVisit && (
-            <ExtensionSlot
-              name="start-visit-button-slot"
-              state={{
-                patientUuid,
-              }}
-            />
+        <div className={styles.actionButtons}>
+          <PatientBannerToggleContactDetailsButton
+            className={styles.toggleContactDetailsButton}
+            showContactDetails={showContactDetails}
+            toggleContactDetails={handleToggleContactDetails}
+          />
+          <div className={styles.rightActions}>
+            {!hideActionsOverflow ? (
+              <PatientBannerActionsMenu
+                actionsSlotName="patient-search-actions-slot"
+                additionalActionsSlotState={{
+                  selectPatientAction: nonNavigationSelectPatientAction,
+                  launchPatientChart: true,
+                }}
+                isDeceased={patient.person.dead}
+                patient={fhirMappedPatient}
+                patientUuid={patientUuid}
+              />
+            ) : null}
+            {!isDeceased && !currentVisit && (
+              <ExtensionSlot
+                name="start-visit-button-slot"
+                state={{
+                  patientUuid,
+                }}
+              />
+            )}
+          </div>
+        </div>
+        <div>
+          {showContactDetails && (
+            <div
+              className={classNames(styles.contactDetails, {
+                [styles.deceasedContactDetails]: isDeceased,
+                [styles.tabletContactDetails]: isTablet,
+              })}>
+              <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
+            </div>
           )}
         </div>
       </div>
-      {showContactDetails && <PatientBannerContactDetails patientId={patient.uuid} deceased={isDeceased} />}
     </>
   );
 };
@@ -138,6 +170,15 @@ const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientCo
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
   const config = useConfig<PatientSearchConfig>();
 
+  const handleClick = useCallback(() => {
+    nonNavigationSelectPatientAction(patientUuid);
+    patientClickSideEffect?.(patientUuid);
+  }, [nonNavigationSelectPatientAction, patientClickSideEffect, patientUuid]);
+
+  const handleBeforeNavigate = useCallback(() => {
+    patientClickSideEffect?.(patientUuid);
+  }, [patientClickSideEffect, patientUuid]);
+
   if (nonNavigationSelectPatientAction) {
     return (
       <button
@@ -145,10 +186,7 @@ const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientCo
           [styles.patientAvatarButton]: nonNavigationSelectPatientAction,
         })}
         key={patientUuid}
-        onClick={() => {
-          nonNavigationSelectPatientAction(patientUuid);
-          patientClickSideEffect?.(patientUuid);
-        }}>
+        onClick={handleClick}>
         {children}
       </button>
     );
@@ -156,7 +194,7 @@ const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientCo
     return (
       <ConfigurableLink
         className={styles.patientBanner}
-        onBeforeNavigate={() => patientClickSideEffect?.(patientUuid)}
+        onBeforeNavigate={handleBeforeNavigate}
         to={config.search.patientChartUrl}
         templateParams={{ patientUuid: patientUuid }}>
         {children}
@@ -174,21 +212,13 @@ export const PatientBannerSkeleton = () => {
           <div className={styles.flexRow}>
             <SkeletonText />
           </div>
-          <div className={styles.demographics}>
-            <SkeletonIcon />
-            &middot;
-            <SkeletonIcon />
-            &middot;
-            <SkeletonIcon />
-          </div>
           <div className={styles.identifiers}>
             <SkeletonText />
           </div>
         </div>
       </div>
-      <div className={styles.buttonCol}>
-        <ButtonSkeleton />
-        <ButtonSkeleton />
+      <div className={styles.emptyStateActionButtonsContainer}>
+        <SkeletonText />
       </div>
     </div>
   );
