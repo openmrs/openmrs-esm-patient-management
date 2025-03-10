@@ -4,15 +4,15 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import styles from './add-patient-to-queue-entry.scss';
+import styles from './add-patient-to-queue-modal.scss';
 
-interface AddPatientToQueueEntryProps {
+interface AddPatientToQueueModalProps {
   modalTitle: string;
   patientUuid: string;
   closeModal: () => void;
 }
 
-const AddPatientToQueueEntry: React.FC<AddPatientToQueueEntryProps> = ({ modalTitle, patientUuid, closeModal }) => {
+const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { activeVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
 
@@ -46,7 +46,7 @@ const AddPatientToQueueEntry: React.FC<AddPatientToQueueEntryProps> = ({ modalTi
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className={styles.container}>
       <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
@@ -61,7 +61,7 @@ const AddPatientToQueueEntry: React.FC<AddPatientToQueueEntryProps> = ({ modalTi
         </Button>
         <Button type="submit" disabled={isSubmitting} kind="primary">
           {isSubmitting
-            ? t('addingPatientToQueue', 'Adding patient to queue...')
+            ? t('addingPatientToQueue', 'Adding patient to queue') + '...'
             : t('addPatientToQueue', 'Add patient to queue')}
         </Button>
       </ModalFooter>
@@ -69,4 +69,4 @@ const AddPatientToQueueEntry: React.FC<AddPatientToQueueEntryProps> = ({ modalTi
   );
 };
 
-export default AddPatientToQueueEntry;
+export default AddPatientToQueueModal;
