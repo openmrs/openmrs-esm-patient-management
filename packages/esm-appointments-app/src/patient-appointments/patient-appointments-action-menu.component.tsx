@@ -17,9 +17,9 @@ export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appo
 
   const handleLaunchEditAppointmentForm = () => {
     launchPatientWorkspace('appointments-form-workspace', {
-      workspaceTitle: t('editAppointment', 'Edit an appointment'),
       appointment,
       context: 'editing',
+      workspaceTitle: t('editAppointment', 'Edit appointment'),
     });
   };
 
