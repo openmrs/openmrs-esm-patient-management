@@ -29,3 +29,11 @@
     }
   }
 }
+
+.container {
+  :global {
+    .cds--modal-content {
+      padding: 0 !important;
+    }
+  }
+}
