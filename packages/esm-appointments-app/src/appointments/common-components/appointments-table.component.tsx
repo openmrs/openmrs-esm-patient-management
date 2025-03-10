@@ -237,7 +237,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                   itemText={t('editAppointments', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace('edit-appointments-form-workspace', {
+                                    launchWorkspace('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',

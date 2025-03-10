@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -16,7 +16,7 @@ export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appo
   const isTablet = useLayoutType() === 'tablet';
 
   const handleLaunchEditAppointmentForm = () => {
-    launchPatientWorkspace('edit-appointments-form-workspace', {
+    launchPatientWorkspace('appointments-form-workspace', {
       workspaceTitle: t('editAppointment', 'Edit an appointment'),
       appointment,
       context: 'editing',

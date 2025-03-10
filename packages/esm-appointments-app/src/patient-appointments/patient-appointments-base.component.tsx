@@ -39,9 +39,9 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
 
   const handleLaunchAppointmentsForm = () => {
     if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
-      launchPatientWorkspace('create-appointments-form-workspace');
+      launchPatientWorkspace('appointments-form-workspace');
     } else {
-      launchWorkspace('create-appointments-form-workspace', {
+      launchWorkspace('appointments-form-workspace', {
         context: 'creating',
         patientUuid,
       });

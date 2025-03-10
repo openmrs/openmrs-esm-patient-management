@@ -103,6 +103,7 @@ export const cancelAppointmentModal = getAsyncLifecycle(
   options,
 );
 
+// t('createNewAppointment', 'Create new appointment')
 export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.workspace'), options);
 
 export const endAppointmentModal = getAsyncLifecycle(

@@ -113,15 +113,9 @@
   ],
   "workspaces": [
     {
-      "name": "create-appointments-form-workspace",
+      "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",
       "title": "createNewAppointment",
-      "type": "form"
-    },
-    {
-      "name": "edit-appointments-form-workspace",
-      "component": "appointmentsFormWorkspace",
-      "title": "editAppointment",
       "type": "form"
     }
   ]
