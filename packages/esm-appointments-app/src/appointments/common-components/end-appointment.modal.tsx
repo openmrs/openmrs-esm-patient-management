@@ -4,7 +4,7 @@ import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../form/appointments-form.resource';
-import styles from './end-appointment.modal.scss';
+import styles from './end-appointment.scss';
 
 interface EndAppointmentModalProps {
   patientUuid: string;

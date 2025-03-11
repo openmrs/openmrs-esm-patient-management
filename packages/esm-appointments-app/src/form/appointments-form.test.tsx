@@ -15,7 +15,7 @@ import { mockUseAppointmentServiceData, mockSession, mockLocations, mockProvider
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
-import AppointmentForm from './appointments-form.component';
+import AppointmentForm from './appointments-form.workspace';
 
 const defaultProps = {
   context: 'creating',

@@ -4,11 +4,11 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { type MappedQueueEntry } from '../types';
-import RemoveQueueEntryDialog from './remove-queue-entry.component';
+import RemoveQueueEntryModal from './remove-queue-entry.modal';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-describe('RemoveQueueEntryDialog', () => {
+describe('RemoveQueueEntryModal', () => {
   const queueEntry = {
     queueUuid: 'fa1e98f1-f002-4174-9e55-34d60951e710',
     queueEntryUuid: '712289ab-32c0-430f-87b6-d9c1e4e4686e',
@@ -23,9 +23,9 @@ describe('RemoveQueueEntryDialog', () => {
     });
   });
 
-  it('renders dialog content', () => {
+  it('renders the remove queue entry modal content', () => {
     const closeModal = jest.fn();
-    render(<RemoveQueueEntryDialog queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
     expect(screen.getByText('Service queue')).toBeInTheDocument();
     expect(screen.getByText('Remove patient from queue and end active visit?')).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('RemoveQueueEntryDialog', () => {
     const user = userEvent.setup();
     const closeModal = jest.fn();
 
-    render(<RemoveQueueEntryDialog queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Cancel'));
     expect(closeModal).toHaveBeenCalledTimes(1);

@@ -12,7 +12,7 @@ import {
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { updateQueueEntry } from './active-visits-table.resource';
-import ChangeStatus from './change-status-dialog.component';
+import ChangeStatusModal from './change-status.modal';
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUpdateQueueEntry = jest.mocked(updateQueueEntry);
@@ -39,7 +39,7 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
-describe('ChangeStatusDialog', () => {
+describe('ChangeStatusModal', () => {
   let consoleSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -66,7 +66,7 @@ describe('ChangeStatusDialog', () => {
       statusText: 'Updated',
     } as FetchResponse);
 
-    renderUpdateQueueEntryDialog();
+    renderChangeStatusModal();
     expect(screen.getByText(/queue service/i)).toBeInTheDocument();
     expect(screen.getByText(/queue priority/i)).toBeInTheDocument();
 
@@ -108,7 +108,7 @@ describe('ChangeStatusDialog', () => {
       },
     });
 
-    renderUpdateQueueEntryDialog();
+    renderChangeStatusModal();
     expect(screen.getByText(/move patient to the next service?/i)).toBeInTheDocument();
     expect(screen.getByText(/queue service/i)).toBeInTheDocument();
     expect(screen.getByText(/queue priority/i)).toBeInTheDocument();
@@ -153,7 +153,7 @@ describe('ChangeStatusDialog', () => {
       statusText: 'Updated',
     } as FetchResponse);
 
-    renderUpdateQueueEntryDialog();
+    renderChangeStatusModal();
 
     await user.click(screen.getByRole('button', { name: /move to next service/i }));
     expect(screen.getByText(/Queue location is required/i)).toBeInTheDocument();
@@ -162,6 +162,6 @@ describe('ChangeStatusDialog', () => {
   });
 });
 
-const renderUpdateQueueEntryDialog = () => {
-  render(<ChangeStatus queueEntry={mockMappedQueueEntry} closeModal={() => false} />);
+const renderChangeStatusModal = () => {
+  render(<ChangeStatusModal closeModal={() => false} queueEntry={mockMappedQueueEntry} />);
 };
