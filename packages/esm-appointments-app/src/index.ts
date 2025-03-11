@@ -75,8 +75,6 @@ export const earlyAppointments = getAsyncLifecycle(
   options,
 );
 
-export const appointmentsForm = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
-
 export const searchPatient = getAsyncLifecycle(() => import('./patient-search/patient-search.component'), options);
 
 // t('Appointments', 'Appointments')
@@ -100,12 +98,13 @@ export const patientUpcomingAppointmentsWidget = getAsyncLifecycle(
   options,
 );
 
-export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
+export const cancelAppointmentModal = getAsyncLifecycle(
   () => import('./patient-appointments/patient-appointments-cancel.modal'),
   options,
 );
 
-export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
+// t('createNewAppointment', 'Create new appointment')
+export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.workspace'), options);
 
 export const endAppointmentModal = getAsyncLifecycle(
   () => import('./appointments/common-components/end-appointment.modal'),
