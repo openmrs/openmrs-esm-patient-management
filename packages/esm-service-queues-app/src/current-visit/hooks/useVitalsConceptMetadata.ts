@@ -1,6 +1,6 @@
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, useConfig, formatTime, parseDate, restBaseUrl } from '@openmrs/esm-framework';
-import { type Observation, type PatientVitals, Encounter } from '../../types/index';
+import { type Observation, type PatientVitals } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 
 export function useVitalsConceptMetadata() {

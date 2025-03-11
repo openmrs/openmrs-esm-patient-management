@@ -10,7 +10,7 @@ import {
 } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import styles from './transition-queue-entry-dialog.scss';
+import styles from './transition-queue-entry-modal.scss';
 
 interface TransitionQueueEntryModalProps {
   closeModal: () => void;
@@ -45,7 +45,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ c
       endedAt,
       queueEntry?.sortWeight,
     ).then(
-      ({ status }) => {
+      () => {
         serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
           showSnackbar({
             isLowContrast: true,
