@@ -27,7 +27,7 @@ import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
-import styles from './queue-entry-actions-modal.scss';
+import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
