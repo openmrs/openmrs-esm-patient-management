@@ -24,7 +24,7 @@ const MetricsHeader: React.FC = () => {
       mutate: () => {}, // TODO get this to mutate properly
     };
 
-    launchWorkspace('create-appointment', { ...props });
+    launchWorkspace('appointments-form-workspace', { ...props });
   };
 
   return (
