@@ -10,7 +10,7 @@ import {
 } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import styles from './transition-queue-entry-modal.scss';
+import styles from './transition-queue-entry.scss';
 
 interface TransitionQueueEntryModalProps {
   closeModal: () => void;
