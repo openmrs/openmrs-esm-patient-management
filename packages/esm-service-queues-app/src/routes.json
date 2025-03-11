@@ -116,7 +116,7 @@
       "type": "service-queues"
     },
     {
-      "name": "service-queues-room-form",
+      "name": "service-queues-room-workspace",
       "title": "addNewQueueServiceRoom",
       "component": "addNewQueueServiceRoomWorkspace",
       "type": "service-queues"

@@ -9,7 +9,7 @@ import {
   updateQueueEntry,
 } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
-import TransitionQueueEntryModal from './transition-queue-entry-dialog.component';
+import TransitionQueueEntryModal from './transition-queue-entry.modal';
 
 const mockNavigate = jest.mocked(navigate);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);

@@ -8,12 +8,12 @@ import { useCheckedInAppointments, endQueueEntry } from './remove-queue-entry.re
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import styles from './remove-queue-entry.scss';
 
-interface RemoveQueueEntryDialogProps {
+interface RemoveQueueEntryModalProps {
   queueEntry: MappedQueueEntry;
   closeModal: () => void;
 }
 
-const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEntry, closeModal }) => {
+const RemoveQueueEntryModal: React.FC<RemoveQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(queueEntry.patientUuid);
   const { mutateQueueEntries } = useMutateQueueEntries();
@@ -97,4 +97,4 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
   );
 };
 
-export default RemoveQueueEntryDialog;
+export default RemoveQueueEntryModal;

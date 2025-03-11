@@ -7,7 +7,7 @@ import { useProvidersQueueRoom, useQueueRooms } from './add-provider-queue-room.
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { useQueues } from '../hooks/useQueues';
 import useQueueServices from '../hooks/useQueueService';
-import AddProviderQueueRoom from './add-provider-queue-room.component';
+import AddProviderQueueRoom from './add-provider-queue-room.modal';
 
 const mockCloseModal = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
