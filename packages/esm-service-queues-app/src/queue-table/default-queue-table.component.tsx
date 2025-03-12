@@ -22,7 +22,7 @@ import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
 import useQueueServices from '../hooks/useQueueService';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import ClearQueueEntries from '../clear-queue-entries-modal/clear-queue-entries.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
