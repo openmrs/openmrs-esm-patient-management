@@ -1,7 +1,6 @@
 {
   "actions": "Azioni",
   "addPatientToList": "Aggiungi paziente alla lista",
-  "addToList": "Aggiungi alla lista",
   "allLists": "Tutte le liste",
   "backToListsPage": "Torna alla pagina delle liste",
   "cancel": "Annulla",
@@ -39,6 +38,7 @@
   "listType": "Tipo di lista",
   "listUpdated": "Lista aggiornata con successo",
   "listUpToDate": "La lista è aggiornata",
+  "mobile": "Mobile",
   "myLists": "Le mie liste",
   "name": "Nome",
   "newList": "Nuova lista",
@@ -62,6 +62,7 @@
   "problemUpdatingList": "Si è verificato un problema nell'aggiornamento della lista",
   "removeFromList": "Rimuovi dalla lista",
   "removePatientFromListConfirmation": "Sei sicuro di voler rimuovere {{patientName}} da questa lista?",
+  "saving": "Saving",
   "searchForAListToAddThisPatientTo": "Cerca una lista a cui aggiungere questo paziente",
   "searchForList": "Cerca una lista",
   "searchThisList": "Cerca in questa lista",

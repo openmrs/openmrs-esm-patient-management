@@ -1,7 +1,6 @@
 {
   "actions": "Hành động",
   "addPatientToList": "Thêm bệnh nhân vào danh sách",
-  "addToList": "Thêm vào danh sách",
   "allLists": "Tất cả danh sách",
   "backToListsPage": "Quay trở lại danh sách trang",
   "cancel": "Hủy",
@@ -39,6 +38,7 @@
   "listType": "Loại danh sách",
   "listUpdated": "Đã cập nhật danh sách thành công",
   "listUpToDate": "Danh sách hiện đã được cập nhật",
+  "mobile": "Mobile",
   "myLists": "Những danh sách của tôi",
   "name": "Tên",
   "newList": "Danh sách mới",
@@ -62,6 +62,7 @@
   "problemUpdatingList": "Đã có sự cố khi cập nhật danh sách",
   "removeFromList": "Xóa khỏi danh sách",
   "removePatientFromListConfirmation": "Bạn có chắc chắn muốn xóa {{patientName}} khỏi danh sách này không?",
+  "saving": "Saving",
   "searchForAListToAddThisPatientTo": "Tìm kiếm danh sách để thêm bệnh nhân này vào.",
   "searchForList": "Tìm kiếm danh sách",
   "searchThisList": "Tìm kiếm danh sách này",

@@ -106,6 +106,7 @@ export const DobField: React.FC = () => {
           <div className={styles.dobField}>
             <OpenmrsDatePicker
               id="birthdate"
+              data-testid="birthdate"
               {...birthdate}
               onChange={onDateChange}
               onBlur={() => setFieldTouched('birthdate', true, false)}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLatestQueueEntry } from './transition-latest-queue-entry.resource';
 import TransitionQueueEntryModal from '../queue-table/queue-entry-actions/transition-queue-entry.modal';
