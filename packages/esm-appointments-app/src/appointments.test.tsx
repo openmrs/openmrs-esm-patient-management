@@ -7,7 +7,7 @@ describe('Appointments', () => {
   it('renders the appointments dashboard', async () => {
     render(<Appointments />);
 
-    await screen.findByText(/^appointments$/i);
+    await screen.findByRole('combobox');
 
     expect(screen.getByRole('button', { name: /appointments calendar/i })).toBeInTheDocument();
     expect(screen.getByTestId('appointment-date-picker')).toBeInTheDocument();

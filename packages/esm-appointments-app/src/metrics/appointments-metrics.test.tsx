@@ -27,7 +27,7 @@ jest.mock('../hooks/useClinicalMetrics', () => ({
 }));
 
 describe('Appointment metrics', () => {
-  it('renders metrics from the appointments list', async () => {
+  it('should render metrics cards with the correct data', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({
       data: [],
     } as unknown as FetchResponse);
@@ -36,7 +36,7 @@ describe('Appointment metrics', () => {
 
     await screen.findByText(/appointment metrics/i);
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
-    expect(screen.getByText(/patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/^appointments$/i)).toBeInTheDocument();
     expect(screen.getByText(/16/i)).toBeInTheDocument();
     expect(screen.getByText(/4/i)).toBeInTheDocument();
   });
