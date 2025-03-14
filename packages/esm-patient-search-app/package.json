@@ -1,5 +1,5 @@
 {
-  "name": "@openmrs/esm-patient-search-app",
+  "name": "@pucp-gidis-hiisc/esm-patient-search-app",
   "version": "8.3.1",
   "description": "Patient search microfrontend for O3",
   "browser": "dist/openmrs-esm-patient-search-app.js",

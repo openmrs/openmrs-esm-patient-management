@@ -1300,6 +1300,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.26.10":
+  version: 7.26.10
+  resolution: "@babel/runtime@npm:7.26.10"
+  dependencies:
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: 10/9d7ff8e96abe3791047c1138789c742411e3ef19c4d7ca18ce916f83cec92c06ec5dc64401759f6dd1e377cf8a01bbd2c62e033eb7550f435cf6579768d0d4a5
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.18.10, @babel/template@npm:^7.3.3":
   version: 7.18.10
   resolution: "@babel/template@npm:7.18.10"
@@ -3393,24 +3402,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-search-app@workspace:packages/esm-patient-search-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-search-app@workspace:packages/esm-patient-search-app"
-  dependencies:
-    "@carbon/react": "npm:^1.71.0"
-    classnames: "npm:^2.3.2"
-    lodash-es: "npm:^4.17.15"
-    react-hook-form: "npm:^7.54.0"
-    webpack: "npm:^5.74.0"
-  peerDependencies:
-    "@openmrs/esm-framework": 6.x
-    react: ^18.1.0
-    react-i18next: 11.x
-    react-router-dom: 6.x
-    swr: 2.x
-  languageName: unknown
-  linkType: soft
-
 "@openmrs/esm-react-utils@npm:6.1.1-pre.2737":
   version: 6.1.1-pre.2737
   resolution: "@openmrs/esm-react-utils@npm:6.1.1-pre.2737"
@@ -3629,6 +3620,25 @@ __metadata:
   checksum: 10/c7654046d38984257dd639eab3dc770d1b0340916097b2fac03ce5d23506ada684e05574a69b255c32ea6a144a957c8cd84264159b545fca031c772289d88788
   languageName: node
   linkType: hard
+
+"@pucp-gidis-hiisc/esm-patient-search-app@workspace:packages/esm-patient-search-app":
+  version: 0.0.0-use.local
+  resolution: "@pucp-gidis-hiisc/esm-patient-search-app@workspace:packages/esm-patient-search-app"
+  dependencies:
+    "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
+    i18next: "npm:^24.2.3"
+    lodash-es: "npm:^4.17.15"
+    react-hook-form: "npm:^7.54.0"
+    webpack: "npm:^5.74.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 6.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
 
 "@react-aria/autocomplete@npm:3.0.0-alpha.37":
   version: 3.0.0-alpha.37
@@ -11640,6 +11650,20 @@ __metadata:
   dependencies:
     "@babel/runtime": "npm:^7.17.2"
   checksum: 10/f0d2ab888627c24b00068461eeedad33437970396539b663a4916e7ba279f6bb91e34221ee9c3608079b9d320a0cb02e9f51458f5c47c809c45676900db94abf
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^24.2.3":
+  version: 24.2.3
+  resolution: "i18next@npm:24.2.3"
+  dependencies:
+    "@babel/runtime": "npm:^7.26.10"
+  peerDependencies:
+    typescript: ^5
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10/6c73d964f2a98b1aa2c2717fe6da66fc265bcbbc5fcd52b2bfff51ff013d30d4f7d7449c4eb7f464d27af43e2e73f2e7f1d46a144d731bd3bdb1385d4c199e4c
   languageName: node
   linkType: hard
 
