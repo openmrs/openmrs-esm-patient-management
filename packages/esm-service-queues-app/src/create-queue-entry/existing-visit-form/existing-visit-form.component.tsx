@@ -1,9 +1,10 @@
+import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { ExtensionSlot, useLayoutType, type Visit } from '@openmrs/esm-framework';
-import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { type QueueEntry } from '../../types';
 import QueueFields from '../queue-fields/queue-fields.component';
 import styles from './existing-visit-form.scss';
 
@@ -23,7 +24,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
 
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [callback, setCallback] = useState<{
-    submitQueueEntry: (visit: Visit) => Promise<any>;
+    submitQueueEntry: (visit: Visit) => Promise<QueueEntry>;
   }>(null);
 
   const handleSubmit = useCallback(
