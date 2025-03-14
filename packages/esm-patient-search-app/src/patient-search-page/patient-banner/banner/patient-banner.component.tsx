@@ -18,6 +18,7 @@ import { type PatientSearchConfig } from '../../../config-schema';
 import { type FHIRPatientType, type SearchedPatient } from '../../../types';
 import { PatientSearchContext } from '../../../patient-search-context';
 import styles from './patient-banner.scss';
+import StartVisitConfirmationModal from './start-visit-confirmation.modal';
 
 interface ClickablePatientContainerProps {
   children: React.ReactNode;
@@ -54,10 +55,28 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const isDeceased = !!patient.person.deathDate;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
+  const [showStartVisitConfirmationModal, setStartVisitConfirmationModal] = useState(false);
 
   const handleToggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
+
+  const handleAddToQueueClick = () => {
+    if (!currentVisit && !isDeceased) {
+      setStartVisitConfirmationModal(true);
+    } else {
+      nonNavigationSelectPatientAction(patientUuid);
+    }
+  };
+
+  const handleStartVisit = () => {
+    setStartVisitConfirmationModal(false);
+    nonNavigationSelectPatientAction(patientUuid);
+  };
+
+  const handleCloseModal = () => {
+    setStartVisitConfirmationModal(false);
+  };
 
   const fhirMappedPatient: FHIRPatientType = useMemo(() => {
     const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
@@ -140,13 +159,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patientUuid={patientUuid}
               />
             ) : null}
-            {!isDeceased && !currentVisit && (
-              <ExtensionSlot
-                name="start-visit-button-slot"
-                state={{
-                  patientUuid,
-                }}
-              />
+            {!isDeceased && (
+              <button onClick={handleAddToQueueClick} className={`${styles.addToQueueButton} ${styles.primary}`}>
+                Add patient to queue
+              </button>
             )}
           </div>
         </div>
@@ -162,6 +178,14 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           )}
         </div>
       </div>
+
+      {showStartVisitConfirmationModal && (
+        <StartVisitConfirmationModal
+          closeModal={handleCloseModal}
+          startVisit={handleStartVisit}
+          patientName={patientName}
+        />
+      )}
     </>
   );
 };
