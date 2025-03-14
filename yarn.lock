@@ -3565,30 +3565,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
-  dependencies:
-    "@carbon/react": "npm:^1.71.0"
-    classnames: "npm:^2.3.2"
-    formik: "npm:^2.1.5"
-    husky: "npm:^8.0.3"
-    i18next: "npm:^21.10.0"
-    i18next-parser: "npm:^9.0.2"
-    lodash-es: "npm:^4.17.15"
-    uuid: "npm:^8.3.2"
-    webpack: "npm:^5.74.0"
-    yup: "npm:^0.29.1"
-  peerDependencies:
-    "@openmrs/esm-framework": 6.x
-    dayjs: 1.x
-    react: 18.x
-    react-i18next: 11.x
-    react-router-dom: 6.x
-    swr: 2.x
-  languageName: unknown
-  linkType: soft
-
 "@openmrs/esm-react-utils@npm:6.1.1-pre.2737":
   version: 6.1.1-pre.2737
   resolution: "@openmrs/esm-react-utils@npm:6.1.1-pre.2737"
@@ -3807,6 +3783,30 @@ __metadata:
   checksum: 10/c7654046d38984257dd639eab3dc770d1b0340916097b2fac03ce5d23506ada684e05574a69b255c32ea6a144a957c8cd84264159b545fca031c772289d88788
   languageName: node
   linkType: hard
+
+"@pucp-gidis-hiisc/esm-patient-registration-app@workspace:packages/esm-patient-registration-app":
+  version: 0.0.0-use.local
+  resolution: "@pucp-gidis-hiisc/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
+  dependencies:
+    "@carbon/react": "npm:^1.71.0"
+    classnames: "npm:^2.3.2"
+    formik: "npm:^2.1.5"
+    husky: "npm:^8.0.3"
+    i18next: "npm:^21.10.0"
+    i18next-parser: "npm:^9.0.2"
+    lodash-es: "npm:^4.17.15"
+    uuid: "npm:^8.3.2"
+    webpack: "npm:^5.74.0"
+    yup: "npm:^0.29.1"
+  peerDependencies:
+    "@openmrs/esm-framework": 6.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
 
 "@pucp-gidis-hiisc/esm-patient-search-app@workspace:packages/esm-patient-search-app":
   version: 0.0.0-use.local

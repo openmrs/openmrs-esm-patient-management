@@ -1,8 +1,8 @@
 {
-  "name": "@openmrs/esm-patient-registration-app",
+  "name": "@pucp-gidis-hiisc/esm-patient-registration-app",
   "version": "8.3.1",
   "description": "Patient registration microfrontend for O3",
-  "browser": "dist/openmrs-esm-patient-registration-app.js",
+  "browser": "dist/pucp-gidis-hiisc-esm-patient-registration-app.js",
   "main": "src/index.ts",
   "source": true,
   "license": "MPL-2.0",
@@ -15,9 +15,9 @@
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "cross-env eslint src --ext ts,tsx",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
-    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*modal.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' 'src/patient-registration/validation/patient-registration-validation.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
@@ -53,8 +53,8 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "i18next": "^21.10.0",
     "husky": "^8.0.3",
+    "i18next": "^21.10.0",
     "i18next-parser": "^9.0.2",
     "webpack": "^5.74.0"
   }
