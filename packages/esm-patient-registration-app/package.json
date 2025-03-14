@@ -53,6 +53,9 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "i18next": "^21.10.0",
+    "husky": "^8.0.3",
+    "i18next-parser": "^9.0.2",
     "webpack": "^5.74.0"
   }
 }
