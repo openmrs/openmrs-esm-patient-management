@@ -49,7 +49,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { currentVisit } = useVisit(patientUuid);
-  const { nonNavigationSelectPatientAction, handleBackToSearchList } = useContext(PatientSearchContext);
+  const { nonNavigationSelectPatientAction, handleBackToSearchList, setIsPatientSearchOpen } =
+    useContext(PatientSearchContext);
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;
 
@@ -146,6 +147,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 state={{
                   patientUuid,
                   handleBackToSearchList,
+                  setIsPatientSearchOpen,
                 }}
               />
             )}
