@@ -28,7 +28,6 @@ describe('QueueLinelistFilter', () => {
     expect(screen.getByLabelText('Age')).toBeInTheDocument();
     expect(screen.getByLabelText('Between')).toBeInTheDocument();
     expect(screen.getByLabelText('And')).toBeInTheDocument();
-    expect(screen.getByTestId('returnDate')).toBeInTheDocument();
     expect(screen.getByText("Use today's date")).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select visit type/i })).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();

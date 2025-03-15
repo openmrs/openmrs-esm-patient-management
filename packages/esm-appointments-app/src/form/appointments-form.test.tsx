@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -83,18 +83,13 @@ describe('AppointmentForm', () => {
     expect(screen.getByLabelText(/select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write any additional points here/i)).toBeInTheDocument();
-    expect(screen.getByTestId('datePickerInput')).toBeInTheDocument();
-    expect(screen.getByTestId('dateAppointmentScheduledPickerInput')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /mosoriot/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /inpatient ward/i })).toBeInTheDocument();
-    expect(screen.getByTestId('dateAppointmentScheduledPickerInput')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /^am$/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /^pm$/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /choose appointment type/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /scheduled/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /walkin/i })).toBeInTheDocument();
-    expect(screen.getByTestId('dateAppointmentScheduledPickerInput')).toBeInTheDocument();
-
     expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
@@ -129,10 +124,7 @@ describe('AppointmentForm', () => {
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
-    const dateInput = screen.getByTestId('dateAppointmentScheduledPickerInput');
-    const dateDayInput = within(dateInput).getByRole('spinbutton', { name: /day/i });
-    const dateMonthInput = within(dateInput).getByRole('spinbutton', { name: /month/i });
-    const dateYearInput = within(dateInput).getByRole('spinbutton', { name: /year/i });
+    const dateInput = screen.getByLabelText(/^date$/i);
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const timeFormat = screen.getByRole('combobox', { name: /time/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -142,12 +134,10 @@ describe('AppointmentForm', () => {
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
-    const [day, month, year] = '4/4/2021'.split('/');
+    const date = '4/4/2021';
     const time = '09:30';
 
-    await user.type(dateDayInput, day);
-    await user.type(dateMonthInput, month);
-    await user.type(dateYearInput, year);
+    await user.type(dateInput, date);
     await user.type(timeInput, time);
     await user.tab();
     await user.selectOptions(timeFormat, 'AM');
@@ -202,10 +192,7 @@ describe('AppointmentForm', () => {
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
-    const dateInput = screen.getByTestId('dateAppointmentScheduledPickerInput');
-    const dateDayInput = within(dateInput).getByRole('spinbutton', { name: /day/i });
-    const dateMonthInput = within(dateInput).getByRole('spinbutton', { name: /month/i });
-    const dateYearInput = within(dateInput).getByRole('spinbutton', { name: /year/i });
+    const dateInput = screen.getByLabelText(/^date$/i);
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const timeFormat = screen.getByRole('combobox', { name: /time/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -215,12 +202,10 @@ describe('AppointmentForm', () => {
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
-    const [day, month, year] = '04/04/2021'.split('/');
+    const date = '4/4/2021';
     const time = '09:30';
 
-    await user.type(dateDayInput, day);
-    await user.type(dateMonthInput, month);
-    await user.type(dateYearInput, year);
+    await user.type(dateInput, date);
     await user.type(timeInput, time);
     await user.tab();
     await user.selectOptions(timeFormat, 'AM');
