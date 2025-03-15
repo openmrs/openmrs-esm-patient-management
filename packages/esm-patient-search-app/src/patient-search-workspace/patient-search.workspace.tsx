@@ -9,6 +9,7 @@ export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
   initialQuery?: string;
   handleSearchTermUpdated?: (value: string) => void;
   handleBackToSearchList?: () => void;
+  setIsPatientSearchOpen?: (isOpen: boolean) => void;
 }
 
 /**
@@ -20,6 +21,7 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
   nonNavigationSelectPatientAction,
   patientClickSideEffect,
   handleBackToSearchList,
+  setIsPatientSearchOpen,
 }) => {
   const {
     search: { disableTabletSearchOnKeyUp },
@@ -40,7 +42,12 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
 
   return (
     <PatientSearchContext.Provider
-      value={{ nonNavigationSelectPatientAction, patientClickSideEffect, handleBackToSearchList }}>
+      value={{
+        nonNavigationSelectPatientAction,
+        patientClickSideEffect,
+        handleBackToSearchList,
+        setIsPatientSearchOpen,
+      }}>
       <PatientSearchBar
         initialSearchTerm={initialQuery}
         onChange={(value) => !disableTabletSearchOnKeyUp && onSearchTermChange(value)}

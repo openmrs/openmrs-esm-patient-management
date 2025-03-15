@@ -14,6 +14,7 @@ export interface PatientSearchContextProps {
    */
   patientClickSideEffect?: ((patientUuid: string) => void) | (() => void);
   handleBackToSearchList?: () => void;
+  setIsPatientSearchOpen?: (isOpen: boolean) => void;
 }
 
 export const PatientSearchContext = createContext<PatientSearchContextProps>(null);
