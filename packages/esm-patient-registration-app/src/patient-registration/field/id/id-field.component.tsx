@@ -71,6 +71,7 @@ export const Identifiers: React.FC = () => {
   useEffect(() => {
     if (identifierTypes) {
       const identifiers = {};
+      
       identifierTypes
         .filter(
           (type) =>
@@ -87,11 +88,7 @@ export const Identifiers: React.FC = () => {
             values.identifiers[type.uuid] ?? initialFormValues.identifiers[type.uuid] ?? {},
           );
         });
-      /*
-        Identifier value should only be updated if there is any update in the
-        identifier values, otherwise, if the below 'if' clause is removed, it will
-        fall into an infinite run.
-      */
+      
       if (Object.keys(identifiers).length) {
         setFieldValue('identifiers', {
           ...values.identifiers,
@@ -99,12 +96,18 @@ export const Identifiers: React.FC = () => {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identifierTypes, setFieldValue, defaultPatientIdentifierTypes, values.identifiers, initializeIdentifier]);
+  }, [identifierTypes, setFieldValue, defaultPatientIdentifierTypes, values.identifiers]);
 
   const closeIdentifierSelectionOverlay = useCallback(
     () => setShowIdentifierOverlay(false),
     [setShowIdentifierOverlay],
+  );
+
+  const removeIdentifier = useCallback(
+    (identifierFieldName: string) => {
+      setFieldValue('identifiers', deleteIdentifierType(values.identifiers, identifierFieldName));
+    },
+    [setFieldValue, values.identifiers]
   );
 
   if (isLoading && !isOffline) {
@@ -133,9 +136,34 @@ export const Identifiers: React.FC = () => {
         </div>
       </UserHasAccess>
       <div>
-        {Object.entries(values.identifiers).map(([fieldName, identifier]) => (
-          <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
-        ))}
+        {Object.entries(values.identifiers).map(([fieldName, identifier]) => {
+          const patientIdentifierWithRequired = {
+            ...values.identifiers[fieldName],
+            required: true
+          };
+          
+          const identifierType = identifierTypes?.find(type => type.fieldName === fieldName);
+          const canRemove = !identifierType?.isPrimary && !identifierType?.required;
+          
+          return (
+            <div key={fieldName} className={styles.identifierContainer}>
+              <IdentifierInput 
+                fieldName={fieldName} 
+                patientIdentifier={patientIdentifierWithRequired} 
+              />
+              {canRemove && (
+                <Button
+                  className={styles.deleteIdentifierButton}
+                  kind="ghost"
+                  size={isDesktop(layout) ? 'sm' : 'md'}
+                  onClick={() => removeIdentifier(fieldName)}>
+                  {t('remove', 'Remove')}
+                </Button>
+              )}
+            </div>
+          );
+        })}
+        
         {showIdentifierOverlay && (
           <IdentifierSelectionOverlay setFieldValue={setFieldValue} closeOverlay={closeIdentifierSelectionOverlay} />
         )}

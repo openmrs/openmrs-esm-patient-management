@@ -1,7 +1,7 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useField } from 'formik';
+import { useField, useFormikContext } from 'formik';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
@@ -21,6 +21,7 @@ function checkNumber(value: string) {
 
 export const NameField = () => {
   const { t } = useTranslation();
+  const { values } = useFormikContext();
   const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
   const {
     fieldConfigurations: {
@@ -41,6 +42,27 @@ export const NameField = () => {
 
   const isPatientUnknown = isPatientUnknownValue === 'true';
 
+  useEffect(() => {
+    const firstFamilyName = values.firstFamilyName || '';
+    const familiName2 = values.familiName2 || '';
+    
+    const combinedFamilyName = `${firstFamilyName} ${familiName2}`.trim();
+    
+    if (combinedFamilyName !== values.familyName) {
+      setFieldValue('familyName', combinedFamilyName, false);
+    }
+  }, [values.firstFamilyName, values.familiName2, values.familyName, setFieldValue]);
+
+  useEffect(() => {
+    if (values.familyName && (!values.firstFamilyName && !values.familiName2)) {
+      const nameParts = values.familyName.split(' ');
+      if (nameParts.length > 0) {
+        setFieldValue('firstFamilyName', nameParts[0] || '', false);
+        setFieldValue('secondFamilyName', nameParts.slice(1).join(' ') || '', false);
+      }
+    }
+  }, []);
+
   const onCapturePhoto = useCallback(
     (dataUri: string, photoDateTime: string) => {
       if (setCapturePhotoProps) {
@@ -57,15 +79,20 @@ export const NameField = () => {
   const toggleNameKnown = (e) => {
     if (e.name === 'known') {
       setFieldValue('givenName', '');
-      setFieldValue('familyName', '');
+      setFieldValue('firstFamilyName', '');
+      setFieldValue('familiName2', '');
       setUnknownPatient('false');
     } else {
       setFieldValue('givenName', defaultUnknownGivenName);
-      setFieldValue('familyName', defaultUnknownFamilyName);
+      // Dividir el apellido predeterminado si es necesario
+      const [firstDefault, ...restDefault] = (defaultUnknownFamilyName || '').split(' ');
+      setFieldValue('firstFamilyName', firstDefault || '');
+      setFieldValue('familiName2', restDefault.join(' ') || '');
       setUnknownPatient('true');
     }
     setFieldTouched('givenName', true);
-    setFieldTouched('familyName', true);
+    setFieldTouched('firstFamilyName', true);
+    setFieldTouched('familiName2', true);
     setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
   };
 
@@ -88,13 +115,30 @@ export const NameField = () => {
     />
   );
 
-  const familyNameField = (
+  const firstFamilyNameField = (
     <Input
-      id="familyName"
-      name="familyName"
-      labelText={t('familyNameLabelText', 'Family Name')}
+      id="firstFamilyName"
+      name="firstFamilyName"
+      labelText={t('firstFamilyNameLabelText', 'First Family Name')}
       checkWarning={checkNumber}
       required
+    />
+  );
+
+  const secondFamilyNameField = (
+    <Input
+      id="familiName2"
+      name="familiName2"
+      labelText={t('secondFamilyNameLabelText', 'Second Family Name')}
+      checkWarning={checkNumber}
+    />
+  );
+
+  const hiddenFamilyNameField = (
+    <input
+      type="hidden"
+      id="familyName"
+      name="familyName"
     />
   );
 
@@ -122,7 +166,6 @@ export const NameField = () => {
                 onChange={toggleNameKnown}>
                 <Switch name="known" text={t('yes', 'Yes')} />
                 <Switch name="unknown" text={t('no', 'No')} />
-                <Switch name="jingle" text={t('jangle', 'jingle')} />
               </ContentSwitcher>
             </>
           )}
@@ -131,13 +174,17 @@ export const NameField = () => {
               <>
                 {firstNameField}
                 {middleNameField}
-                {familyNameField}
+                {firstFamilyNameField}
+                {secondFamilyNameField}
+                {hiddenFamilyNameField}
               </>
             ) : (
               <>
-                {familyNameField}
+                {firstFamilyNameField}
+                {secondFamilyNameField}
                 {middleNameField}
                 {firstNameField}
+                {hiddenFamilyNameField}
               </>
             ))}
         </div>
