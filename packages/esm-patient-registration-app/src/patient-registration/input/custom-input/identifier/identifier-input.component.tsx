@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { Button } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
-import { ResourcesContext } from '../../../../offline.resources';
+import { type RegistrationConfig } from '../../../../config-schema';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
-import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
-import { type PatientIdentifierValue } from '../../../patient-registration.types';
-import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { Input } from '../../basic-input/input/input.component';
+import { PatientRegistrationContext } from '../../../patient-registration-context';
+import { ResourcesContext } from '../../../../offline.resources';
+import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
+import { type PatientIdentifierValue } from '../../../patient-registration.types';
 import styles from '../../input.scss';
 
 interface IdentifierInputProps {
@@ -19,7 +20,7 @@ interface IdentifierInputProps {
 
 const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
-  const { defaultPatientIdentifierTypes } = useConfig();
+  const { defaultPatientIdentifierTypes } = useConfig<RegistrationConfig>();
   const { identifierTypes } = useContext(ResourcesContext);
   const { isOffline, values, setFieldValue } = useContext(PatientRegistrationContext);
   const identifierType = useMemo(
@@ -70,13 +71,13 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     */
 
     if (initialValue) {
-      const confirmDeleteIdentifierModal = showModal('delete-identifier-confirmation-modal', {
-        closeModal: () => confirmDeleteIdentifierModal(),
-        deleteIdentifier: (confirmed) => {
-          if (confirmed) {
+      const dispose = showModal('delete-identifier-confirmation-modal', {
+        closeModal: () => dispose(),
+        deleteIdentifier: (isConfirmed) => {
+          if (isConfirmed) {
             setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
           }
-          confirmDeleteIdentifierModal();
+          dispose();
         },
         identifierName,
         identifierValue: initialValue,
