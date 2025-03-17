@@ -122,7 +122,6 @@ export const NameField = () => {
                 onChange={toggleNameKnown}>
                 <Switch name="known" text={t('yes', 'Yes')} />
                 <Switch name="unknown" text={t('no', 'No')} />
-                <Switch name="jingle" text={t('jangle', 'jingle')} />
               </ContentSwitcher>
             </>
           )}
