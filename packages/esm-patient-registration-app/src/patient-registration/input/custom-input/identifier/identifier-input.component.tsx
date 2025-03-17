@@ -71,14 +71,15 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
 
     if (initialValue) {
       const confirmDeleteIdentifierModal = showModal('delete-identifier-confirmation-modal', {
-        deleteIdentifier: (deleteIdentifier) => {
-          if (deleteIdentifier) {
+        closeModal: () => confirmDeleteIdentifierModal(),
+        deleteIdentifier: (confirmed) => {
+          if (confirmed) {
             setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
           }
           confirmDeleteIdentifierModal();
         },
         identifierName,
-        initialValue,
+        identifierValue: initialValue,
       });
     } else {
       setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
