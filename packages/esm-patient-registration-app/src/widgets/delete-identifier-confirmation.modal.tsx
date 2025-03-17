@@ -36,7 +36,7 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
         </p>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" size="lg" onClick={() => deleteIdentifier(false)}>
+        <Button kind="secondary" size="lg" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" size="lg" onClick={() => deleteIdentifier(true)}>
