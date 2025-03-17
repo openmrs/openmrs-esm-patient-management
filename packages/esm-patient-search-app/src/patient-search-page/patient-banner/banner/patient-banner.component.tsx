@@ -1,15 +1,15 @@
 import React, { useContext, useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { Button, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ConfigurableLink,
-  ExtensionSlot,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerToggleContactDetailsButton,
   PatientBannerPatientInfo,
   PatientPhoto,
+  showModal,
   useConfig,
   useLayoutType,
   useVisit,
@@ -18,7 +18,6 @@ import { type PatientSearchConfig } from '../../../config-schema';
 import { type FHIRPatientType, type SearchedPatient } from '../../../types';
 import { PatientSearchContext } from '../../../patient-search-context';
 import styles from './patient-banner.scss';
-import StartVisitConfirmationModal from './start-visit-confirmation.modal';
 
 interface ClickablePatientContainerProps {
   children: React.ReactNode;
@@ -55,7 +54,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const isDeceased = !!patient.person.deathDate;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
-  const [showStartVisitConfirmationModal, setStartVisitConfirmationModal] = useState(false);
 
   const handleToggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
@@ -63,19 +61,20 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
   const handleAddToQueueClick = () => {
     if (!currentVisit && !isDeceased) {
-      setStartVisitConfirmationModal(true);
+      handleLaunchStartVisitConfirmationModal();
     } else {
       nonNavigationSelectPatientAction(patientUuid);
     }
   };
 
-  const handleStartVisit = () => {
-    setStartVisitConfirmationModal(false);
-    nonNavigationSelectPatientAction(patientUuid);
-  };
-
-  const handleCloseModal = () => {
-    setStartVisitConfirmationModal(false);
+  const handleLaunchStartVisitConfirmationModal = () => {
+    const dispose = showModal('start-visit-confirmation-modal', {
+      closeModal: () => {
+        dispose();
+      },
+      patientName,
+      patientUuid,
+    });
   };
 
   const fhirMappedPatient: FHIRPatientType = useMemo(() => {
@@ -159,11 +158,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patientUuid={patientUuid}
               />
             ) : null}
-            {!isDeceased && (
-              <button onClick={handleAddToQueueClick} className={`${styles.addToQueueButton} ${styles.primary}`}>
-                Add patient to queue
-              </button>
-            )}
+            {!isDeceased && <Button onClick={handleAddToQueueClick}>Add patient to list</Button>}
           </div>
         </div>
         <div>
@@ -178,14 +173,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           )}
         </div>
       </div>
-
-      {showStartVisitConfirmationModal && (
-        <StartVisitConfirmationModal
-          closeModal={handleCloseModal}
-          startVisit={handleStartVisit}
-          patientName={patientName}
-        />
-      )}
     </>
   );
 };
