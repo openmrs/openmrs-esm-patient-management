@@ -15,7 +15,6 @@ interface AddPatientToQueueModalProps {
 }
 
 const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, activeVisit, closeModal }) => {
-  console.log('activeVisit in AddPatientToQueueModal:', activeVisit);
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
 
