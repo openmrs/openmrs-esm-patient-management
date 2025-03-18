@@ -29,6 +29,7 @@ export const NameField = () => {
         allowUnidentifiedPatients,
         defaultUnknownGivenName,
         defaultUnknownFamilyName,
+        defaultUnknownFamilyName2,
         displayMiddleName,
         displayReverseFieldOrder,
       },
@@ -63,7 +64,7 @@ export const NameField = () => {
     } else {
       setFieldValue('givenName', defaultUnknownGivenName);
       setFieldValue('familyName', defaultUnknownFamilyName);
-      setFieldValue('familyName2', '');
+      setFieldValue('familyName2', defaultUnknownFamilyName2);
       setUnknownPatient('true');
     }
     setFieldTouched('givenName', true);
