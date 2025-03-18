@@ -250,17 +250,17 @@ export const esmPatientRegistrationSchema = {
       },
       defaultUnknownGivenName: {
         _type: Type.String,
-        _default: 'UNKNOWN',
+        _default: 'DESCONOCIDO',
         _description: 'The given/first name to record for unidentified patients.',
       },
       defaultUnknownFamilyName: {
         _type: Type.String,
-        _default: 'UNKNOWN',
+        _default: 'DESCONOCIDO',
         _description: 'The family/last name to record for unidentified patients.',
       },
       defaultUnknownFamilyName2: {
         _type: Type.String,
-        _default: 'UNKNOWN',
+        _default: 'DESCONOCIDO',
         _description: 'The family/last name 2 to record for unidentified patients.',
       },
       displayCapturePhoto: {
