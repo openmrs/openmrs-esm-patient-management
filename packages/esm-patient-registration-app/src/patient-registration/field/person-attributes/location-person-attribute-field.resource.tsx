@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { type FetchResponse, fhirBaseUrl, openmrsFetch, useDebounce } from '@openmrs/esm-framework';
-import { type LocationEntry, type LocationResponse } from '@openmrs/esm-service-queues-app/src/types';
+import { type LocationEntry, type LocationResponse } from './esm-service-queues-app-types';
 import useSWR from 'swr';
 
 interface UseLocationsResult {
