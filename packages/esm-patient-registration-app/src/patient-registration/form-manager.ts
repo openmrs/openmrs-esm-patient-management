@@ -340,6 +340,7 @@ export class FormManager {
         givenName: values.givenName,
         middleName: values.middleName,
         familyName: values.familyName,
+        familyName2: values.familyName2,
       },
     ];
 
@@ -350,6 +351,7 @@ export class FormManager {
         givenName: values.additionalGivenName,
         middleName: values.additionalMiddleName,
         familyName: values.additionalFamilyName,
+        familyName2: values.additionalFamilyName2,
       });
     }
 
