@@ -10,15 +10,13 @@ import capitalize from 'lodash/capitalize';
 
 interface AddPatientToQueueModalProps {
   modalTitle: string;
-  patientUuid: string;
+  activeVisit: Visit;
   closeModal: () => void;
 }
 
-const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, patientUuid, closeModal }) => {
+const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, activeVisit, closeModal }) => {
+  console.log('activeVisit in AddPatientToQueueModal:', activeVisit);
   const { t } = useTranslation();
-  const { activeVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
-  const { patient } = usePatient(patientUuid);
-  const patientName = capitalize(patient?.name[0]?.text);
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,27 +42,13 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
     [callback, activeVisit, closeModal, mutateQueueEntries],
   );
 
-  if (isLoadingVisit) {
-    return null;
-  }
-
   return (
     <Form onSubmit={handleSubmit} className={styles.container}>
       <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>
-            {!activeVisit ? (
-              <div className={styles.noActiveVisit}>
-                <InlineNotification
-                  kind="error"
-                  title={t('noActiveVisit', '{{patientName}} does not have an active visit', { patientName })}
-                  subtitle={t('unableToAddPatientToQueue', 'Unable to add the patient to the queue')}
-                />
-              </div>
-            ) : (
-              <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
-            )}
+            <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
           </Stack>
         </div>
       </ModalBody>
@@ -72,7 +56,7 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={isSubmitting || !activeVisit} kind="primary" type="submit">
+        <Button disabled={isSubmitting} kind="primary" type="submit">
           {isSubmitting
             ? t('addingPatientToQueue', 'Adding patient to queue') + '...'
             : t('addPatientToQueue', 'Add patient to queue')}
