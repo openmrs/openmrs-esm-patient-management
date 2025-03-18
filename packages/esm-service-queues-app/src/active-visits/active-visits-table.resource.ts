@@ -1,4 +1,12 @@
-import { formatDate, openmrsFetch, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
+import {
+  formatDate,
+  openmrsFetch,
+  parseDate,
+  restBaseUrl,
+  type Visit,
+  type Encounter as CoreEncounter,
+  type Obs,
+} from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isEmpty from 'lodash-es/isEmpty';
@@ -38,27 +46,14 @@ export interface MappedVisitQueueEntry {
   queueComingFrom: string;
 }
 
-interface ObsData {
-  concept: {
-    display: string;
-    uuid: string;
-  };
-  value?: string | any;
-  groupMembers?: Array<{
-    concept: { uuid: string; display: string };
-    value?: string | any;
-  }>;
-  obsDatetime: string;
-}
-
 interface Encounter {
-  diagnoses: Array<any>;
-  encounterDatetime: string;
-  encounterProviders?: Array<{ provider: { person: { display: string } } }>;
-  encounterType: { display: string; uuid: string };
-  obs: Array<ObsData>;
+  diagnoses?: Array<any>;
+  encounterDatetime?: string;
+  encounterProviders?: Array<{ provider?: { person?: { display?: string } } }>;
+  encounterType?: { display: string; uuid: string };
+  obs?: Array<Obs>;
   uuid: string;
-  voided: boolean;
+  voided?: boolean;
 }
 
 interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> {
@@ -66,7 +61,7 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
   provider: string;
 }
 
-const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
+const mapEncounterProperties = (encounter: CoreEncounter): MappedEncounter => ({
   diagnoses: encounter.diagnoses,
   encounterDatetime: encounter.encounterDatetime,
   encounterType: encounter.encounterType.display,
