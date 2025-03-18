@@ -76,8 +76,8 @@ test('Search patient by full name', async ({ page, api }) => {
     );
   });
 
-  await test.step('When I click on the `Close` button', async () => {
-    await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await test.step('When I click on the app logo', async () => {
+    await page.getByRole('link', { name: /openmrs logo/i }).click();
   });
 
   await test.step('Then I should be redirected to the home page', async () => {

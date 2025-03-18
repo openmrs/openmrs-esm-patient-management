@@ -5,6 +5,7 @@ import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation.
 
 describe('DeleteIdentifierConfirmationModal', () => {
   const mockDeleteIdentifier = jest.fn();
+  const closeModal = jest.fn();
   const mockIdentifierName = 'Identifier Name';
   const mockIdentifierValue = 'Identifier Value';
 
@@ -13,7 +14,7 @@ describe('DeleteIdentifierConfirmationModal', () => {
 
     render(
       <DeleteIdentifierConfirmationModal
-        closeModal={jest.fn()}
+        closeModal={closeModal}
         deleteIdentifier={mockDeleteIdentifier}
         identifierName={mockIdentifierName}
         identifierValue={mockIdentifierValue}
@@ -22,7 +23,7 @@ describe('DeleteIdentifierConfirmationModal', () => {
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
-    expect(mockDeleteIdentifier).toHaveBeenCalledWith(false);
+    expect(closeModal).toHaveBeenCalledTimes(1);
 
     const removeButton = screen.getByRole('button', { name: /remove identifier/i });
     await user.click(removeButton);
