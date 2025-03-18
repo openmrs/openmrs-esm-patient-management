@@ -23,7 +23,8 @@
       "name": "add-patient-action",
       "slot": "top-nav-actions-slot",
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 20
     },
     {
       "component": "patientPhotoExtension",
