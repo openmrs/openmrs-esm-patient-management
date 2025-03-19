@@ -1,6 +1,6 @@
 {
   "name": "@pucp-gidis-hiisc/esm-patient-registration-app",
-  "version": "8.3.4",
+  "version": "8.3.5",
   "description": "Patient registration microfrontend for O3",
   "browser": "dist/pucp-gidis-hiisc-esm-patient-registration-app.js",
   "main": "src/index.ts",
