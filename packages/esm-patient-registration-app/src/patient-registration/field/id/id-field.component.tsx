@@ -178,20 +178,21 @@ export const Identifiers: React.FC = () => {
           const canRemove = !identifierType?.isPrimary && !identifierType?.required;
 
           return (
-            <div key={fieldName} className={styles.identifierContainer}>
+            <div key={fieldName} style={{display: "flex", alignItems: "center", justifyContent: "initial"}}>
               <IdentifierInput
                 fieldName={fieldName}
                 patientIdentifier={patientIdentifierWithRequired}
               />
               {canRemove && (
-                <Button
-                  className={styles.deleteIdentifierButton}
-                  kind="ghost"
-                  size={isDesktop(layout) ? 'sm' : 'md'}
-                  onClick={() => removeIdentifier(fieldName)}>
-                  <TrashCan size={16} />
-                  {t('remove', 'Remove')}
-                </Button>
+                  <Button
+                    className={styles.deleteIdentifierButton}
+                    kind="ghost"
+                    hasIconOnly
+                    size="md"
+                    onClick={() => removeIdentifier(fieldName)}
+                    iconDescription={t('deleteIdentifierTooltip', 'Delete')}                  >
+                    <TrashCan size={16} />
+                  </Button>
               )}
             </div>
           );
