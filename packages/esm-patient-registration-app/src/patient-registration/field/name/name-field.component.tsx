@@ -39,7 +39,10 @@ export const NameField = () => {
   const [{ value: isPatientUnknownValue }, , { setValue: setUnknownPatient }] = useField<string>(
     `attributes.${unidentifiedPatientAttributeTypeUuid}`,
   );
-
+  /* console.log("defaultUnknownGivenName: " + defaultUnknownGivenName)
+  console.log("defaultUnknownFamilyName: " + defaultUnknownFamilyName)
+  console.log("defaultUnknownFamilyName2: " + defaultUnknownFamilyName2)
+ */
   const isPatientUnknown = isPatientUnknownValue === 'true';
 
   const onCapturePhoto = useCallback(
