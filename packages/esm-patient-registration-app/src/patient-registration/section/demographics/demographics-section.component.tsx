@@ -22,7 +22,7 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
   }, [field.value, meta.touched, setFieldValue]);
 
   return (
-    <section className={styles.formSection} aria-label="Demographics Section">
+    <section className={styles.formSection} aria-label="Demographics Section" >
       {fields.map((field) => (
         <Field key={`demographics-${field}`} name={field} />
       ))}

@@ -14,9 +14,9 @@ export function CustomField({ name }: CustomFieldProps) {
   const fieldDefinition = config.fieldDefinitions.filter((def) => def.id == name)[0];
 
   if (fieldDefinition.type === 'person attribute') {
-    return <PersonAttributeField fieldDefinition={fieldDefinition} />;
+    return <PersonAttributeField fieldDefinition={fieldDefinition}/>;
   } else if (fieldDefinition.type === 'obs') {
-    return <ObsField fieldDefinition={fieldDefinition} />;
+    return <ObsField fieldDefinition={fieldDefinition}/>;
   } else if (fieldDefinition.type === 'address') {
     return <AddressField fieldDefinition={fieldDefinition} />;
   } else {

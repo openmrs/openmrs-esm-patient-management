@@ -90,7 +90,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
   }
 
   return (
-    <div>
+    <div style={{marginBottom: "1rem"}}>
       {fieldDefinition.showHeading && (
         <h4 className={styles.productiveHeading02Light}>{fieldDefinition?.label ?? personAttributeType?.display}</h4>
       )}
