@@ -17,6 +17,7 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
       setFieldValue('additionalGivenName', '');
       setFieldValue('additionalMiddleName', '');
       setFieldValue('additionalFamilyName', '');
+      setFieldValue('additionalFamilyName2', '');
     }
   }, [field.value, meta.touched, setFieldValue]);
 
