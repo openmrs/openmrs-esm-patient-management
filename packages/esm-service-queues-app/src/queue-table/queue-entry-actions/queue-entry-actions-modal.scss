@@ -38,6 +38,10 @@ section {
   padding-bottom: layout.$spacing-05;
 }
 
+.dateTimeFields {
+  margin-top: layout.$spacing-04;
+}
+
 .modalHeader {
   :global {
     .cds--modal-close-button {

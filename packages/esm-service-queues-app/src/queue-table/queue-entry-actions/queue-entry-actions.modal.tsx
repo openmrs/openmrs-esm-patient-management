@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
+import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import {
   Button,
+  DatePicker,
+  DatePickerInput,
   Dropdown,
   InlineNotification,
   ModalBody,
@@ -9,12 +13,17 @@ import {
   ModalHeader,
   RadioButton,
   RadioButtonGroup,
+  SelectItem,
   Stack,
   Tag,
   TextArea,
+  TimePicker,
+  TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
+import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
+import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
@@ -31,6 +40,9 @@ interface FormState {
   selectedPriority: string;
   selectedStatus: string;
   prioritycomment: string;
+  transitionDate: Date;
+  transitionTime: string;
+  transitionTimeFormat: amPm;
 }
 
 interface ModalParams {
@@ -66,14 +78,19 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     isTransition,
   } = modalParams;
 
+  const initialTransitionDate = isTransition ? new Date() : new Date(queueEntry.startedAt);
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
+    transitionDate: initialTransitionDate,
+    transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
+    transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAdvancedOptionsOpen, setIsAdvancedOptionsOpen] = useState(false);
 
   const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
 
@@ -104,7 +121,19 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   };
 
   const setPriorityComment = (prioritycomment: string) => {
-    setFormState((prevState) => ({ ...prevState, prioritycomment }));
+    setFormState({ ...formState, prioritycomment });
+  };
+
+  const setTransitionDate = (transitionDate: Date) => {
+    setFormState({ ...formState, transitionDate });
+  };
+
+  const setTransitionTime = (transitionTime: string) => {
+    setFormState({ ...formState, transitionTime });
+  };
+
+  const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
+    setFormState({ ...formState, transitionTimeFormat });
   };
 
   const findPriorityIndex = (uuid: string) => {
@@ -138,7 +167,38 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       });
   };
 
-  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid === formState.selectedPriority);
+  // non-null if the selected date+time is invalid
+  const timeInvalidMessage = useMemo(() => {
+    const now = new Date();
+    const startAtDate = new Date(formState.transitionDate);
+    const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
+    startAtDate.setHours(hour, minute, 0, 0);
+
+    const previousQueueEntryStartTimeStr = queueEntry.previousQueueEntry?.startedAt;
+    const previousQueueEntryStartTime = previousQueueEntryStartTimeStr
+      ? new Date(previousQueueEntryStartTimeStr)
+      : null;
+
+    if (startAtDate > now) {
+      return t('timeCannotBeInFuture', 'Time cannot be in the future');
+    }
+    if (startAtDate <= previousQueueEntryStartTime) {
+      return t(
+        'timeCannotBePriorToPreviousQueueEntry',
+        'Time cannot be before start of previous queue entry: {{time}}',
+        {
+          time: previousQueueEntryStartTime.toLocaleString(),
+        },
+      );
+    }
+    return null;
+  }, [
+    formState.transitionDate,
+    formState.transitionTime,
+    formState.transitionTimeFormat,
+    queueEntry.previousQueueEntry?.startedAt,
+    t,
+  ]);
 
   return (
     <>
@@ -280,13 +340,61 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             </section>
 
             <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+              <div className={styles.sectionTitle}>{t('comment', 'Comment')}</div>
               <TextArea
                 labelText=""
                 value={formState.prioritycomment}
                 onChange={(e) => setPriorityComment(e.target.value)}
                 placeholder={t('enterCommentHere', 'Enter comment here')}
               />
+            </section>
+            <section>
+              <Button
+                kind="ghost"
+                renderIcon={isAdvancedOptionsOpen ? ChevronUp : ChevronDown}
+                onClick={() => setIsAdvancedOptionsOpen(!isAdvancedOptionsOpen)}>
+                {isAdvancedOptionsOpen ? t('lessOptions', 'Less options') : t('advancedOptions', 'Advanced options')}
+              </Button>
+              {isAdvancedOptionsOpen && (
+                <div className={styles.section}>
+                  <div className={styles.dateTimeFields}>
+                    <Stack gap={4}>
+                      <DatePicker
+                        datePickerType="single"
+                        dateFormat={datePickerFormat}
+                        value={formState.transitionDate}
+                        maxDate={new Date().setHours(23, 59, 59, 59)}
+                        onChange={([date]) => {
+                          setTransitionDate(date);
+                        }}>
+                        <DatePickerInput
+                          id="datePickerInput"
+                          labelText={t('dateOfTransition', 'Date of transition')}
+                          placeholder={datePickerPlaceHolder}
+                        />
+                      </DatePicker>
+
+                      <TimePicker
+                        labelText={t('timeOfTransition', 'Time of transition')}
+                        onChange={(event) => setTransitionTime(event.target.value)}
+                        pattern={time12HourFormatRegexPattern}
+                        value={formState.transitionTime}
+                        invalid={timeInvalidMessage != null}
+                        invalidText={timeInvalidMessage}>
+                        <TimePickerSelect
+                          id="visitStartTimeSelect"
+                          onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
+                          value={formState.transitionTimeFormat}
+                          labelText={t('timeOfTransition', 'Time of transition')}
+                          aria-label={t('timeOfTransition', 'Time of transition')}>
+                          <SelectItem value="AM" text="AM" />
+                          <SelectItem value="PM" text="PM" />
+                        </TimePickerSelect>
+                      </TimePicker>
+                    </Stack>
+                  </div>
+                </div>
+              )}
             </section>
           </Stack>
         </div>
