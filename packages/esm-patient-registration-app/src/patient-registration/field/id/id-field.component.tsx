@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, SkeletonText } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
+import { ArrowRight, TrashCan } from '@carbon/react/icons';
 import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
 import IdentifierSelectionOverlay from './identifier-selection-overlay.component';
 import IdentifierInput from '../../input/custom-input/identifier/identifier-input.component';
@@ -67,14 +67,14 @@ export const Identifiers: React.FC = () => {
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
   const config = useConfig();
   const { defaultPatientIdentifierTypes } = config;
-  
+
   // Usamos una referencia para rastrear si ya agregamos el DNI inicialmente
   const initialDniAdded = useRef(false);
 
   useEffect(() => {
     if (identifierTypes) {
       const identifiers = {};
-      
+
       // Agregamos los identificadores predeterminados según las reglas existentes
       identifierTypes
         .filter(
@@ -92,15 +92,15 @@ export const Identifiers: React.FC = () => {
             values.identifiers[type.uuid] ?? initialFormValues.identifiers[type.uuid] ?? {},
           );
         });
-      
+
       // Solo agregamos el DNI en la inicialización inicial
       if (!initialDniAdded.current) {
         // Agregamos el identificador DNI por defecto
         if (!values.identifiers['dni']) {
-          const dniIdentifierType = identifierTypes.find(type => 
+          const dniIdentifierType = identifierTypes.find(type =>
             type.name === 'DNI' || type.uuid === '550e8400-e29b-41d4-a716-446655440001'
           );
-          
+
           if (dniIdentifierType) {
             identifiers['dni'] = initializeIdentifier(dniIdentifierType, {});
           } else {
@@ -116,11 +116,11 @@ export const Identifiers: React.FC = () => {
             };
           }
         }
-        
+
         // Marcamos que ya hemos agregado el DNI inicialmente
         initialDniAdded.current = true;
       }
-      
+
       if (Object.keys(identifiers).length) {
         setFieldValue('identifiers', {
           ...values.identifiers,
@@ -173,15 +173,15 @@ export const Identifiers: React.FC = () => {
             ...values.identifiers[fieldName],
             required: true
           };
-          
+
           const identifierType = identifierTypes?.find(type => type.fieldName === fieldName);
           const canRemove = !identifierType?.isPrimary && !identifierType?.required;
-          
+
           return (
             <div key={fieldName} className={styles.identifierContainer}>
-              <IdentifierInput 
-                fieldName={fieldName} 
-                patientIdentifier={patientIdentifierWithRequired} 
+              <IdentifierInput
+                fieldName={fieldName}
+                patientIdentifier={patientIdentifierWithRequired}
               />
               {canRemove && (
                 <Button
@@ -189,13 +189,14 @@ export const Identifiers: React.FC = () => {
                   kind="ghost"
                   size={isDesktop(layout) ? 'sm' : 'md'}
                   onClick={() => removeIdentifier(fieldName)}>
+                  <TrashCan size={16} />
                   {t('remove', 'Remove')}
                 </Button>
               )}
             </div>
           );
         })}
-        
+
         {showIdentifierOverlay && (
           <IdentifierSelectionOverlay setFieldValue={setFieldValue} closeOverlay={closeIdentifierSelectionOverlay} />
         )}
