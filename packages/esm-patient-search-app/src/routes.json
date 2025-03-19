@@ -14,7 +14,7 @@
       "name": "patient-search-icon",
       "component": "patientSearchIcon",
       "slot": "top-nav-actions-slot",
-      "order": 0
+      "order": 10
     },
     {
       "name": "patient-search-button",

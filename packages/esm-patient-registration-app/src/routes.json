@@ -24,7 +24,7 @@
       "slot": "top-nav-actions-slot",
       "online": true,
       "offline": true,
-      "order": 20
+      "order": 30
     },
     {
       "component": "patientPhotoExtension",
