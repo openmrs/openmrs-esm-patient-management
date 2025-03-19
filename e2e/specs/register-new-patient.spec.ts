@@ -32,50 +32,50 @@ test('Register a new patient', async ({ page }) => {
     await patientRegistrationPage.waitUntilTheFormIsLoaded();
   });
 
-  await test.step('And I fill in the first name', async () => {
+  await test.step(`And I fill in ${formValues.givenName} as the first name`, async () => {
     await patientRegistrationPage.givenNameInput().fill(formValues.givenName);
   });
 
-  await test.step('And I fill in the middle name', async () => {
+  await test.step(`And I fill in ${formValues.middleName} as the middle name`, async () => {
     await patientRegistrationPage.middleNameInput().fill(formValues.middleName);
   });
 
-  await test.step('And I fill in the family name', async () => {
+  await test.step(`And I fill in ${formValues.familyName} as the family name`, async () => {
     await patientRegistrationPage.familyNameInput().fill(formValues.familyName);
   });
 
-  await test.step('And I fill in the gender', async () => {
+  await test.step(`And I set the gender to ${formValues.sex}`, async () => {
     await patientRegistrationPage.sexRadioButton(formValues.sex).check();
   });
 
-  await test.step('And I fill in the date of birth', async () => {
+  await test.step(`And I fill in ${formValues.birthdate} as the date of birth`, async () => {
     await patientRegistrationPage.birthdateDayInput().fill(formValues.birthdate.day);
     await patientRegistrationPage.birthdateMonthInput().fill(formValues.birthdate.month);
     await patientRegistrationPage.birthdateYearInput().fill(formValues.birthdate.year);
   });
 
-  await test.step('And I fill in the address', async () => {
+  await test.step(`And I fill in ${formValues.address1} as the address`, async () => {
     await expect(patientRegistrationPage.addressHierarchySearchInput()).toBeVisible();
     await expect(patientRegistrationPage.address1Input()).toBeVisible();
     await patientRegistrationPage.address1Input().fill(formValues.address1);
   });
 
-  await test.step('And I fill in the city/village', async () => {
+  await test.step(`And I fill in ${formValues.cityVillage} as the city/village`, async () => {
     await expect(patientRegistrationPage.cityVillageInput()).toBeVisible();
     await patientRegistrationPage.cityVillageInput().fill(formValues.cityVillage);
   });
 
-  await test.step('And I fill in the state/province', async () => {
+  await test.step(`And I fill in ${formValues.stateProvince} as the state/province`, async () => {
     await expect(patientRegistrationPage.stateProvinceInput()).toBeVisible();
     await patientRegistrationPage.stateProvinceInput().fill(formValues.stateProvince);
   });
 
-  await test.step('And I fill in the country', async () => {
+  await test.step(`And I fill in ${formValues.country} as the country`, async () => {
     await expect(patientRegistrationPage.countryInput()).toBeVisible();
     await patientRegistrationPage.countryInput().fill(formValues.country);
   });
 
-  await test.step('And I fill in the telephone number', async () => {
+  await test.step(`And I fill in ${formValues.phone} as the telephone number`, async () => {
     await patientRegistrationPage.phoneInput().fill(formValues.phone);
   });
 
