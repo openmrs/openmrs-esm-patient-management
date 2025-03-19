@@ -1,15 +1,15 @@
 import React, { useContext, useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { Button, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ConfigurableLink,
-  ExtensionSlot,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
   PatientBannerToggleContactDetailsButton,
   PatientBannerPatientInfo,
   PatientPhoto,
+  showModal,
   useConfig,
   useLayoutType,
   useVisit,
@@ -58,6 +58,24 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const handleToggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
+
+  const handleAddToQueueClick = () => {
+    if (!currentVisit && !isDeceased) {
+      handleLaunchStartVisitConfirmationModal();
+    } else {
+      nonNavigationSelectPatientAction(patientUuid);
+    }
+  };
+
+  const handleLaunchStartVisitConfirmationModal = () => {
+    const dispose = showModal('start-visit-confirmation-modal', {
+      closeModal: () => {
+        dispose();
+      },
+      patientName,
+      patientUuid,
+    });
+  };
 
   const fhirMappedPatient: FHIRPatientType = useMemo(() => {
     const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
@@ -140,14 +158,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patientUuid={patientUuid}
               />
             ) : null}
-            {!isDeceased && !currentVisit && (
-              <ExtensionSlot
-                name="start-visit-button-slot"
-                state={{
-                  patientUuid,
-                }}
-              />
-            )}
+            {!isDeceased && <Button onClick={handleAddToQueueClick}>Add patient to list</Button>}
           </div>
         </div>
         <div>
