@@ -4,8 +4,6 @@ import classNames from 'classnames';
 import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import {
   Button,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   InlineNotification,
   ModalBody,
@@ -92,18 +90,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAdvancedOptionsOpen, setIsAdvancedOptionsOpen] = useState(false);
 
-  const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
+  const selectedQueue = queues.find((q) => q.uuid === formState.selectedQueue);
 
   const statuses = selectedQueue?.allowedStatuses;
-  const hasNoStatusesConfigured = selectedQueue && statuses.length == 0;
+  const hasNoStatusesConfigured = selectedQueue && statuses.length === 0;
   const priorities = selectedQueue?.allowedPriorities;
-  const hasNoPrioritiesConfigured = selectedQueue && priorities.length == 0;
+  const hasNoPrioritiesConfigured = selectedQueue && priorities.length === 0;
 
   const setSelectedQueueUuid = (selectedQueueUuid: string) => {
-    const newSelectedQueue = queues.find((q) => q.uuid == selectedQueueUuid);
+    const newSelectedQueue = queues.find((q) => q.uuid === selectedQueueUuid);
     const { allowedStatuses, allowedPriorities } = newSelectedQueue;
-    const newQueueHasCurrentStatus = allowedStatuses.find((s) => s.uuid == formState.selectedStatus);
-    const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid == formState.selectedPriority);
+    const newQueueHasCurrentStatus = allowedStatuses.find((s) => s.uuid === formState.selectedStatus);
+    const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid === formState.selectedPriority);
     setFormState({
       ...formState,
       selectedQueue: selectedQueueUuid,
@@ -231,7 +229,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     <RadioButton
                       key={uuid}
                       labelText={
-                        uuid == queueEntry.queue.uuid
+                        uuid === queueEntry.queue.uuid
                           ? t('currentValueFormatted', '{{value}} (Current)', {
                               value: `${display} - ${location?.display}`,
                             })
@@ -250,7 +248,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   value={formState.selectedQueue}
                   items={queues}
                   itemToString={(item) =>
-                    item.uuid == queueEntry.queue.uuid
+                    item.uuid === queueEntry.queue.uuid
                       ? t('currentValueFormatted', '{{value}} (Current)', {
                           value: `${item.display} - ${item.location?.display}`,
                         })
@@ -324,6 +322,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                           value={uuid}
                           type={(() => {
                             const index = findPriorityIndex(uuid);
+                            // TODO: fix priority colors. https://openmrs.atlassian.net/browse/O3-4469
                             return index === 0 ? 'green' : index === 2 ? 'red' : '';
                           })()}>
                           {uuid === queueEntry.priority.uuid
@@ -359,20 +358,14 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 <div className={styles.section}>
                   <div className={styles.dateTimeFields}>
                     <Stack gap={4}>
-                      <DatePicker
-                        datePickerType="single"
-                        dateFormat={datePickerFormat}
+                      <OpenmrsDatePicker
                         value={formState.transitionDate}
-                        maxDate={new Date().setHours(23, 59, 59, 59)}
-                        onChange={([date]) => {
-                          setTransitionDate(date);
-                        }}>
-                        <DatePickerInput
-                          id="datePickerInput"
-                          labelText={t('dateOfTransition', 'Date of transition')}
-                          placeholder={datePickerPlaceHolder}
-                        />
-                      </DatePicker>
+                        maxDate={new Date()}
+                        onChange={setTransitionDate}
+                        id="datePickerInput"
+                        data-testid="datePickerInput"
+                        labelText={t('dateOfTransition', 'Date of transition')}
+                      />
 
                       <TimePicker
                         labelText={t('timeOfTransition', 'Time of transition')}
