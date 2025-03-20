@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { PatientSearchContextProvider } from '../patient-search-context.provider';
+import { PatientSearchContextProvider } from '../patient-search-context';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-page.scss';

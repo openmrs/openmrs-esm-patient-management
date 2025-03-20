@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { PatientSearchContext } from '../patient-search-context.provider';
+import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';

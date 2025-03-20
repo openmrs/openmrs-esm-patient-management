@@ -16,7 +16,7 @@ import {
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type FHIRPatientType, type SearchedPatient } from '../../../types';
-import { usePatientSearchContext } from '../../../patient-search-context.provider';
+import { usePatientSearchContext } from '../../../patient-search-context';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {

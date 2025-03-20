@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useConfig, useDebounce } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContextProvider, type PatientSearchContextProps } from '../patient-search-context.provider';
+import { PatientSearchContextProvider, type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 

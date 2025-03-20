@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
 import { useInfinitePatientSearch } from '../patient-search.resource';
-import { PatientSearchContextProvider } from '../patient-search-context.provider';
+import { PatientSearchContextProvider } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from '../compact-patient-search/patient-search.component';
 import styles from './compact-patient-search.scss';
