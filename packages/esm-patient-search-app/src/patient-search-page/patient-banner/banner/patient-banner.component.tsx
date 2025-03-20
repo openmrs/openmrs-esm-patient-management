@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
 import { SkeletonIcon, SkeletonText } from '@carbon/react';
@@ -16,7 +16,7 @@ import {
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type FHIRPatientType, type SearchedPatient } from '../../../types';
-import { PatientSearchContext } from '../../../patient-search-context';
+import { usePatientSearchContext } from '../../../patient-search-context.provider';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -49,8 +49,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { currentVisit } = useVisit(patientUuid);
-  const { nonNavigationSelectPatientAction, handleBackToSearchList, setIsPatientSearchOpen } =
-    useContext(PatientSearchContext);
+  const { nonNavigationSelectPatientAction, showPatientSearch, hidePatientSearch, handleReturnToSearchList } =
+    usePatientSearchContext();
+
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;
 
@@ -145,9 +146,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               <ExtensionSlot
                 name="start-visit-button-slot"
                 state={{
+                  handleReturnToSearchList,
+                  hidePatientSearch,
                   patientUuid,
-                  handleBackToSearchList,
-                  setIsPatientSearchOpen,
+                  showPatientSearch,
                 }}
               />
             )}
@@ -170,7 +172,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 };
 
 const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientContainerProps) => {
-  const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
+  const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
   const config = useConfig<PatientSearchConfig>();
 
   const handleClick = useCallback(() => {

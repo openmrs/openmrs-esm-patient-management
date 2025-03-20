@@ -1,14 +1,14 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useInfinitePatientSearch } from '../patient-search.resource';
-import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { type PatientSearchResponse } from '../types';
 import { mockAdvancedSearchResults } from '__mocks__';
-import { PatientSearchContext } from '../patient-search-context';
+import { PatientSearchContext } from '../patient-search-context.provider';
+import { useInfinitePatientSearch } from '../patient-search.resource';
 import { usePersonAttributeType } from './refine-search/person-attributes.resource';
+import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 const mockUseInfinitePatientSearch = jest.mocked(useInfinitePatientSearch);

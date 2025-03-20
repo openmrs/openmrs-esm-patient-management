@@ -1,20 +1,21 @@
 import React, { useCallback, useEffect } from 'react';
 import { Button } from '@carbon/react';
 import { Search } from '@carbon/react/icons';
-import { launchWorkspace } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { type PatientSearchWorkspaceProps } from '../patient-search-workspace/patient-search.workspace';
 
 interface PatientSearchButtonProps {
-  buttonText?: string;
-  overlayHeader?: string;
-  selectPatientAction?: (patientUuid: string) => {};
-  searchQueryUpdatedAction?: (query: string) => {};
   buttonProps?: Object;
+  buttonText?: string;
+  handleReturnToSearchList?: () => void;
+  hidePatientSearch?: () => void;
   isOpen?: boolean;
   searchQuery?: string;
-  handleBackToSearchList?: () => void;
-  setIsPatientSearchOpen?: (isOpen: boolean) => void;
+  searchQueryUpdatedAction?: (query: string) => {};
+  selectPatientAction?: (patientUuid: string) => {};
+  showPatientSearch?: () => void;
+  workspaceTitle?: string;
 }
 
 /**
@@ -30,14 +31,15 @@ interface PatientSearchButtonProps {
  */
 const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
   buttonText,
-  overlayHeader,
+  workspaceTitle,
   selectPatientAction,
   searchQueryUpdatedAction,
   buttonProps,
   isOpen = false,
   searchQuery = '',
-  handleBackToSearchList,
-  setIsPatientSearchOpen,
+  handleReturnToSearchList,
+  hidePatientSearch,
+  showPatientSearch,
 }) => {
   const { t } = useTranslation();
 
@@ -46,20 +48,23 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
       handleSearchTermUpdated: searchQueryUpdatedAction,
       initialQuery: searchQuery,
       nonNavigationSelectPatientAction: selectPatientAction,
-      handleBackToSearchList,
-      setIsPatientSearchOpen,
+      handleReturnToSearchList,
+      showPatientSearch,
+      hidePatientSearch,
     };
+
     launchWorkspace('patient-search-workspace', {
       ...workspaceProps,
-      workspaceTitle: overlayHeader,
+      workspaceTitle,
     });
   }, [
-    overlayHeader,
+    handleReturnToSearchList,
+    hidePatientSearch,
     searchQuery,
     searchQueryUpdatedAction,
     selectPatientAction,
-    handleBackToSearchList,
-    setIsPatientSearchOpen,
+    showPatientSearch,
+    workspaceTitle,
   ]);
 
   useEffect(() => {
@@ -70,12 +75,12 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
 
   return (
     <Button
+      aria-label="Search Patient Button"
+      aria-labelledby="Search Patient Button"
       onClick={() => {
         launchPatientSearchWorkspace();
         searchQueryUpdatedAction && searchQueryUpdatedAction('');
       }}
-      aria-label="Search Patient Button"
-      aria-labelledby="Search Patient Button"
       renderIcon={(props) => <Search size={20} {...props} />}
       {...buttonProps}>
       {buttonText ? buttonText : t('searchPatient', 'Search patient')}

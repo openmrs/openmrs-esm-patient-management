@@ -11,7 +11,7 @@ import {
 } from '@openmrs/esm-framework';
 import type { FHIRPatientType, SearchedPatient } from '../types';
 import { type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext } from '../patient-search-context';
+import { usePatientSearchContext } from '../patient-search-context.provider';
 import styles from './compact-patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -112,7 +112,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
 });
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
-  const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
+  const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
   const config = useConfig<PatientSearchConfig>();
   const isDeceased = Boolean(patient?.person?.deathDate);
 

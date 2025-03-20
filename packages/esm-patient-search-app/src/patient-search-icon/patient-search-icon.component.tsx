@@ -16,7 +16,6 @@ import {
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-icon.scss';
-import { PatientSearchContext } from '../patient-search-context';
 
 interface PatientSearchLaunchProps {}
 

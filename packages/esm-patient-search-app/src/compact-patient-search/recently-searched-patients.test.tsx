@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext } from '../patient-search-context';
+import { PatientSearchContext } from '../patient-search-context.provider';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
 const defaultProps = {
