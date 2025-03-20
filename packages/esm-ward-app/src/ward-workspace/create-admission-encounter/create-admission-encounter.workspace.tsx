@@ -1,8 +1,7 @@
-import { ArrowLeftIcon, type DefaultWorkspaceProps, useVisit } from '@openmrs/esm-framework';
-
-import { Button, InlineNotification, SkeletonText } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, InlineNotification, SkeletonText } from '@carbon/react';
+import { ArrowLeftIcon, type DefaultWorkspaceProps, useVisit } from '@openmrs/esm-framework';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import { useInpatientAdmissionByPatients } from '../../hooks/useInpatientAdmissionByPatients';
 import { useInpatientRequestByPatients } from '../../hooks/useInpatientRequestByPatients';
@@ -14,7 +13,7 @@ import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.compone
 
 export interface CreateAdmissionEncounterWorkspaceProps {
   patientUuid: string;
-  handleBackToSearchList?: () => void;
+  handleReturnToSearchList?: () => void;
 }
 
 /**
@@ -24,7 +23,7 @@ export interface CreateAdmissionEncounterWorkspaceProps {
  */
 const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorkspaceProps & DefaultWorkspaceProps> = ({
   patientUuid,
-  handleBackToSearchList,
+  handleReturnToSearchList,
   closeWorkspaceWithSavedChanges,
 }) => {
   const { location } = useWardLocation();
@@ -63,7 +62,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
           renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription={t('backToSearchResults', 'Back to search results')}
           size="sm"
-          onClick={() => handleBackToSearchList?.()}>
+          onClick={() => handleReturnToSearchList?.()}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
       </div>
@@ -142,7 +141,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
           renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription={t('backToSearchResults', 'Back to search results')}
           size="sm"
-          onClick={() => handleBackToSearchList?.()}>
+          onClick={() => handleReturnToSearchList?.()}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
       </div>
