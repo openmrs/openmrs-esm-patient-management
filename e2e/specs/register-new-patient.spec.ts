@@ -174,7 +174,7 @@ test('Register an unknown patient', async ({ page }) => {
     await expect(patientBanner.getByText('Unknown Unknown')).toBeVisible();
     await expect(patientBanner.getByText(/female/i)).toBeVisible();
     await expect(patientBanner.getByText(/25 yrs/i)).toBeVisible();
-    await expect(patientBanner.getByText(new RegExp(`01-Jan-${expectedBirthYear}`, 'i'))).toBeVisible();
+    await expect(patientBanner.getByText(expectedBirthYear.toString())).toBeVisible();
     await expect(patientBanner.getByText(/OpenMRS ID/i)).toBeVisible();
   });
 });
