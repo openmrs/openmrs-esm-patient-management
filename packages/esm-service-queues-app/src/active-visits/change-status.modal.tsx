@@ -26,9 +26,9 @@ import { useQueues } from '../hooks/useQueues';
 import { updateQueueEntry } from './active-visits-table.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
-import styles from './change-status-dialog.scss';
+import styles from './change-status.scss';
 
-interface ChangeStatusDialogProps {
+interface ChangeStatusModalProps {
   queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
 }
@@ -56,7 +56,7 @@ interface MappedVisitQueueEntry {
   queueLocation: string;
 }
 
-const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
+const ChangeStatusModal: React.FC<ChangeStatusModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const { concepts } = useConfig<ConfigObject>();
   const { allowedPriorities, allowedStatuses } = queueEntry.queue ?? {};
@@ -303,4 +303,4 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   }
 };
 
-export default ChangeStatus;
+export default ChangeStatusModal;

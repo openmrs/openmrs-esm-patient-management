@@ -40,12 +40,11 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
         <OpenmrsDatePicker
+          data-testid="appointment-date-picker"
+          id="appointment-date-picker"
+          labelText=""
           onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
           value={dayjs(selectedDate).toDate()}
-          style={{ cursor: 'pointer', backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
-          id="appointment-date-picker"
-          data-testid="appointment-date-picker"
-          labelText=""
         />
         {typeof onChange === 'function' && (
           <MultiSelect

@@ -35,16 +35,13 @@ export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(d
 
 export const homeDashboard = getAsyncLifecycle(() => import('./home.component'), options);
 
-export const editQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./active-visits/change-status-dialog.component'),
-  {
-    featureName: 'edit queue status',
-    moduleName,
-  },
-);
+export const editQueueEntryStatusModal = getAsyncLifecycle(() => import('./active-visits/change-status.modal'), {
+  featureName: 'edit queue status',
+  moduleName,
+});
 
 export const removeQueueEntry = getAsyncLifecycle(
-  () => import('./remove-queue-entry-dialog/remove-queue-entry.component'),
+  () => import('./clear-queue-entries-modal/clear-queue-entries.component'),
   {
     featureName: 'remove queue entry and end visit',
     moduleName,
@@ -52,7 +49,7 @@ export const removeQueueEntry = getAsyncLifecycle(
 );
 
 export const clearAllQueueEntries = getAsyncLifecycle(
-  () => import('./clear-queue-entries-dialog/clear-queue-entries-dialog.component'),
+  () => import('./clear-queue-entries-modal/clear-queue-entries.modal'),
   {
     featureName: 'clear all queue entries and end visits',
     moduleName,
@@ -60,7 +57,7 @@ export const clearAllQueueEntries = getAsyncLifecycle(
 );
 
 export const transitionQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./transition-queue-entry/transition-queue-entry-dialog.component'),
+  () => import('./transition-queue-entry/transition-queue-entry.modal'),
   {
     featureName: 'transition queue status',
     moduleName,
@@ -70,7 +67,7 @@ export const transitionQueueEntryStatusModal = getAsyncLifecycle(
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
 export const addProviderToRoomModal = getAsyncLifecycle(
-  () => import('./add-provider-queue-room/add-provider-queue-room.component'),
+  () => import('./add-provider-queue-room-modal/add-provider-queue-room.modal'),
   {
     featureName: 'add provider queue room',
     moduleName,

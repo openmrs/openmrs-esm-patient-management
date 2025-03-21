@@ -20,7 +20,7 @@ import styles from './create-queue-entry.scss';
 interface PatientSearchProps extends DefaultWorkspaceProps {
   selectedPatientUuid: string;
   currentServiceQueueUuid?: string;
-  handleBackToSearchList?: () => void;
+  handleReturnToSearchList?: () => void;
 }
 
 export const AddPatientToQueueContext = React.createContext({
@@ -36,7 +36,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
   promptBeforeClosing,
   selectedPatientUuid,
   currentServiceQueueUuid,
-  handleBackToSearchList,
+  handleReturnToSearchList,
 }) => {
   const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
@@ -76,7 +76,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
             renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription={t('backToSearchResults', 'Back to search results')}
             size="sm"
-            onClick={() => handleBackToSearchList?.()}>
+            onClick={() => handleReturnToSearchList?.()}>
             <span>{t('backToSearchResults', 'Back to search results')}</span>
           </Button>
         </div>
@@ -85,7 +85,11 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
         ) : error ? (
           <ErrorState headerTitle={t('errorFetchingVisit', 'Error fetching patient visit')} error={error} />
         ) : activeVisit ? (
-          <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
+          <ExistingVisitFormComponent
+            closeWorkspace={closeWorkspace}
+            handleReturnToSearchList={handleReturnToSearchList}
+            visit={activeVisit}
+          />
         ) : (
           <ExtensionSlot
             name="start-visit-workspace-form-slot"

@@ -39,7 +39,7 @@ import {
 import useQueueServices from '../hooks/useQueueService';
 import styles from './add-provider-queue-room.scss';
 
-interface AddProviderQueueRoomProps {
+interface AddProviderQueueRoomModalProps {
   closeModal: () => void;
   providerUuid: string;
 }
@@ -64,7 +64,7 @@ const createProviderQueueRoomSchema = (t: TFunction) =>
 
 type ProviderQueueRoomData = z.infer<ReturnType<typeof createProviderQueueRoomSchema>>;
 
-const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal, providerUuid }) => {
+const AddProviderQueueRoomModal: React.FC<AddProviderQueueRoomModalProps> = ({ closeModal, providerUuid }) => {
   const { t } = useTranslation();
   const { providerRoom, mutate } = useProvidersQueueRoom(providerUuid);
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom() ?? false;
@@ -291,4 +291,4 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ closeModal,
   );
 };
 
-export default AddProviderQueueRoom;
+export default AddProviderQueueRoomModal;

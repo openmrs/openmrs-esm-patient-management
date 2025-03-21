@@ -4,15 +4,15 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type QueueEntry } from '../types';
-import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
-import styles from './clear-queue-entries-dialog.scss';
+import { batchClearQueueEntries } from './clear-queue-entries.resource';
+import styles from './clear-queue-entries.scss';
 
-interface ClearQueueEntriesDialogProps {
+interface ClearQueueEntriesModalProps {
   queueEntries: Array<QueueEntry>;
   closeModal: () => void;
 }
 
-const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queueEntries, closeModal }) => {
+const ClearQueueEntriesModal: React.FC<ClearQueueEntriesModalProps> = ({ queueEntries, closeModal }) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,4 +75,4 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
   );
 };
 
-export default ClearQueueEntriesDialog;
+export default ClearQueueEntriesModal;
