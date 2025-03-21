@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
@@ -38,8 +38,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { t } = useTranslation();
   const { currentSession, identifierTypes } = useContext(ResourcesContext);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
-  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { search } = useLocation();
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
 
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(
     isLoadingPatientToEdit,
@@ -52,6 +52,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     patientToEdit,
     uuidOfPatientToEdit,
   );
+
   const [patientUuidMap] = usePatientUuidMap({}, isLoadingPatientToEdit, patientToEdit, uuidOfPatientToEdit);
 
   const [target, setTarget] = useState<undefined | string>();
@@ -164,8 +165,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
-  const createContextValue = useMemo(
-    () => (formikProps) => ({
+  const createContextValue = useCallback(
+    (formikProps) => ({
       identifierTypes,
       validationSchema,
       values: formikProps.values,

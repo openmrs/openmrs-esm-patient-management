@@ -1,4 +1,4 @@
-import { type Dispatch, useEffect, useMemo, useState } from 'react';
+import { type Dispatch, useEffect, useMemo, useState, useRef } from 'react';
 import { camelCase } from 'lodash-es';
 import { v4 } from 'uuid';
 import dayjs from 'dayjs';
@@ -29,6 +29,17 @@ import {
   getPhonePersonAttributeValueFromFhirPatient,
   latestFirstEncounter,
 } from './patient-registration-utils';
+
+interface AddressFieldValues {
+  address?: {
+    cityVillage?: string;
+    country?: string;
+    countyDistrict?: string;
+    postalCode?: string;
+    stateProvince?: string;
+    [key: string]: string | undefined;
+  };
+}
 
 interface DeathInfoResults {
   causeOfDeath: OpenmrsResource | null;
@@ -182,12 +193,13 @@ export function useInitialFormValues(
 }
 
 export function useInitialAddressFieldValues(
-  fallback = {},
+  fallback: AddressFieldValues = {},
   isLoadingPatientToEdit: boolean,
   patientToEdit: fhir.Patient,
   patientUuid: string,
-): [object, Dispatch<object>] {
-  const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<object>(fallback);
+): [AddressFieldValues, Dispatch<AddressFieldValues>] {
+  const fallbackRef = useRef(fallback);
+  const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<AddressFieldValues>(fallbackRef.current);
 
   useEffect(() => {
     (async () => {
@@ -198,10 +210,11 @@ export function useInitialAddressFieldValues(
         }));
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
-        setInitialAddressFieldValues(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
+        setInitialAddressFieldValues(
+          registration?._patientRegistrationData.initialAddressFieldValues ?? fallbackRef.current,
+        );
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   return [initialAddressFieldValues, setInitialAddressFieldValues];
@@ -213,8 +226,9 @@ export function usePatientUuidMap(
   patientToEdit: fhir.Patient,
   patientUuid: string,
 ): [PatientUuidMapType, Dispatch<PatientUuidMapType>] {
+  const fallbackRef = useRef(fallback);
+  const [patientUuidMap, setPatientUuidMap] = useState(fallbackRef.current);
   const { data: attributes } = useInitialPersonAttributes(patientUuid);
-  const [patientUuidMap, setPatientUuidMap] = useState(fallback);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -229,7 +243,7 @@ export function usePatientUuidMap(
         try {
           const registration = await getPatientRegistration(patientUuid);
           if (!abortController.signal.aborted) {
-            setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
+            setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallbackRef.current);
           }
         } catch (error) {
           if (!abortController.signal.aborted) {
@@ -241,7 +255,6 @@ export function usePatientUuidMap(
 
     updatePatientMap();
     return () => abortController.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   useEffect(() => {
