@@ -1,3 +1,5 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   InlineNotification,
   RadioButton,
@@ -8,14 +10,12 @@ import {
   SelectSkeleton,
 } from '@carbon/react';
 import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { type ConfigObject } from '../../config-schema';
+import { postQueueEntry } from './queue-fields.resource';
+import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
-import { AddPatientToQueueContext } from '../create-queue-entry.workspace';
 import { useQueueLocations } from '../hooks/useQueueLocations';
-import { postQueueEntry } from './queue-fields.resource';
 import styles from './queue-fields.scss';
 
 export interface QueueFieldsProps {
@@ -36,7 +36,7 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
   const [selectedService, setSelectedService] = useState('');
-  const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
+  const { currentServiceQueueUuid } = useAddPatientToQueueContext();
   const [priority, setPriority] = useState(defaultPriorityConceptUuid);
   const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
   const { mutateQueueEntries } = useMutateQueueEntries();

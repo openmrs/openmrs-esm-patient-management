@@ -1,7 +1,7 @@
-import { getLocale } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
+import { uniqBy } from 'lodash-es';
+import { getLocale } from '@openmrs/esm-framework';
 import { useQueues } from './useQueues';
-import uniqBy from 'lodash-es/uniqBy';
 import { useSelectedQueueLocationUuid } from '../helpers/helpers';
 
 function useQueueServices() {

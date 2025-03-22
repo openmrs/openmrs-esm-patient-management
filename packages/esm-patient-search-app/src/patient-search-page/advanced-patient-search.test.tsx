@@ -5,7 +5,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { type PatientSearchResponse } from '../types';
 import { mockAdvancedSearchResults } from '__mocks__';
-import { PatientSearchContext } from '../patient-search-context';
+import { PatientSearchContextProvider } from '../patient-search-context';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import { usePersonAttributeType } from './refine-search/person-attributes.resource';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
@@ -52,7 +52,7 @@ const mockSearchResults: PatientSearchResponse = {
 };
 
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <PatientSearchContext.Provider value={mockPatientActionContextValue}>{children}</PatientSearchContext.Provider>
+  <PatientSearchContextProvider value={mockPatientActionContextValue}>{children}</PatientSearchContextProvider>
 );
 
 describe('AdvancedPatientSearchComponent', () => {

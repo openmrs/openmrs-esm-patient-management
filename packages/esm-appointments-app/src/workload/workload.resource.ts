@@ -1,6 +1,6 @@
-import useSWR from 'swr';
 import dayjs from 'dayjs';
-import first from 'lodash-es/first';
+import useSWR from 'swr';
+import { first } from 'lodash-es';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentSummary } from '../types';
 import { omrsDateFormat } from '../constants';

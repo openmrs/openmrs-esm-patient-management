@@ -3,10 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
-import { useConcept, useConceptAnswers } from '../field.resource';
-import { ObsField } from './obs-field.component';
-import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
 import { mockOpenmrsId, mockPatient } from '__mocks__';
+import { useConcept, useConceptAnswers } from '../field.resource';
+import {
+  type PatientRegistrationContextProps,
+  PatientRegistrationContextProvider,
+} from '../../patient-registration-context';
+import { ObsField } from './obs-field.component';
 
 const mockUseConcept = jest.mocked(useConcept);
 const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
@@ -241,9 +244,9 @@ describe('ObsField', () => {
   it('renders a datepicker for date concept', async () => {
     const user = userEvent.setup();
     render(
-      <PatientRegistrationContext.Provider value={initialContextValues}>
+      <PatientRegistrationContextProvider value={initialContextValues}>
         <ObsField fieldDefinition={dateFieldDef} />
-      </PatientRegistrationContext.Provider>,
+      </PatientRegistrationContextProvider>,
     );
 
     expect(screen.getByText(/vaccination date/i)).toBeInTheDocument();

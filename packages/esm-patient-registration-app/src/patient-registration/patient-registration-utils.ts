@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import camelCase from 'lodash-es/camelCase';
+import { camelCase } from 'lodash-es';
 import { parseDate } from '@openmrs/esm-framework';
 import {
   type AddressValidationSchemaType,

@@ -1,20 +1,20 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { InlineNotification, TextInputSkeleton } from '@carbon/react';
 import { type FieldDefinition } from '../../../config-schema';
-import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
-import { TextPersonAttributeField } from './text-person-attribute-field.component';
-import { useTranslation } from 'react-i18next';
-import styles from '../field.scss';
+import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { LocationPersonAttributeField } from './location-person-attribute-field.component';
+import { TextPersonAttributeField } from './text-person-attribute-field.component';
+import styles from '../field.scss';
 
 export interface PersonAttributeFieldProps {
   fieldDefinition: FieldDefinition;
 }
 
 export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldProps) {
-  const { data: personAttributeType, isLoading, error } = usePersonAttributeType(fieldDefinition.uuid);
   const { t } = useTranslation();
+  const { data: personAttributeType, isLoading, error } = usePersonAttributeType(fieldDefinition.uuid);
 
   const personAttributeField = useMemo(() => {
     if (!personAttributeType) {

@@ -2,12 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form, useFormikContext } from 'formik';
-import { type Resources, ResourcesContext } from '../../../../offline.resources';
-import { PatientRegistrationContext } from '../../../patient-registration-context';
+import { type Resources } from '../../../../offline.resources';
+import { PatientRegistrationContextProvider } from '../../../patient-registration-context';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../../config-schema';
 import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from '__mocks__';
+import { ResourcesContextProvider } from '../../../../resources-context';
 import AddressSearchComponent from '../address-search.component';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
@@ -44,15 +45,15 @@ allFields.sort((existingField1, existingField2) => orderMap[existingField1.name]
 
 async function renderAddressHierarchy(addressTemplate = mockedAddressTemplate) {
   await render(
-    <ResourcesContext.Provider value={{ addressTemplate } as Resources}>
+    <ResourcesContextProvider value={{ addressTemplate } as Resources}>
       <Formik initialValues={{}} onSubmit={null}>
         <Form>
-          <PatientRegistrationContext.Provider value={{ setFieldValue: jest.fn() } as any}>
+          <PatientRegistrationContextProvider value={{ setFieldValue: jest.fn() } as any}>
             <AddressSearchComponent addressLayout={allFields} />
-          </PatientRegistrationContext.Provider>
+          </PatientRegistrationContextProvider>
         </Form>
       </Formik>
-    </ResourcesContext.Provider>,
+    </ResourcesContextProvider>,
   );
 }
 

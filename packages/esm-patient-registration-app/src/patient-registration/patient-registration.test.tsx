@@ -14,9 +14,9 @@ import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
-import { ResourcesContext } from '../offline.resources';
 import { FormManager } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
+import { ResourcesContextProvider } from '../resources-context';
 import { useInitialFormValues } from './patient-registration-hooks';
 
 const mockSaveEncounter = jest.mocked(saveEncounter);
@@ -247,9 +247,9 @@ const fillRequiredFields = async () => {
 };
 
 const Wrapper = ({ children }) => (
-  <ResourcesContext.Provider value={mockResourcesContextValue}>
+  <ResourcesContextProvider value={mockResourcesContextValue}>
     <Router>{children}</Router>
-  </ResourcesContext.Provider>
+  </ResourcesContextProvider>
 );
 
 describe('Registering a new patient', () => {

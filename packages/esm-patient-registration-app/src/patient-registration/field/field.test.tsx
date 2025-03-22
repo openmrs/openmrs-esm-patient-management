@@ -4,9 +4,10 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
-import { type Resources, ResourcesContext } from '../../offline.resources';
+import { type Resources } from '../../offline.resources';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
-import { PatientRegistrationContext } from '../patient-registration-context';
+import { PatientRegistrationContextProvider } from '../patient-registration-context';
+import { ResourcesContextProvider } from '../../resources-context';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
@@ -111,15 +112,15 @@ describe('Field', () => {
 
   beforeEach(() => {
     ContextWrapper = ({ children }) => (
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <ResourcesContextProvider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={jest.fn()}>
           <Form>
-            <PatientRegistrationContext.Provider value={initialContextValues}>
+            <PatientRegistrationContextProvider value={initialContextValues}>
               {children}
-            </PatientRegistrationContext.Provider>
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>
-      </ResourcesContext.Provider>
+      </ResourcesContextProvider>
     );
 
     mockUseConfig.mockReturnValue({
@@ -253,15 +254,15 @@ describe('Field', () => {
     };
 
     render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <ResourcesContextProvider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={jest.fn()}>
           <Form>
-            <PatientRegistrationContext.Provider value={updatedContextValues}>
+            <PatientRegistrationContextProvider value={updatedContextValues}>
               <Field name="id" />
-            </PatientRegistrationContext.Provider>
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>
-      </ResourcesContext.Provider>,
+      </ResourcesContextProvider>,
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });

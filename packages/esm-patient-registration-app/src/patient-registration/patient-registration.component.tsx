@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
@@ -15,14 +15,14 @@ import {
 } from '@openmrs/esm-framework';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
 import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
-import { getValidationSchema } from './validation/patient-registration-validation';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { PatientRegistrationContext } from './patient-registration-context';
-import { ResourcesContext } from '../offline.resources';
+import { getValidationSchema } from './validation/patient-registration-validation';
+import { PatientRegistrationContextProvider } from './patient-registration-context';
 import { SectionWrapper } from './section/section-wrapper.component';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import { useResourcesContext } from '../resources-context';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 
@@ -36,7 +36,7 @@ export interface PatientRegistrationProps {
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
   const config = useConfig<RegistrationConfig>();
   const { t } = useTranslation();
-  const { currentSession, identifierTypes } = useContext(ResourcesContext);
+  const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { search } = useLocation();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
@@ -242,7 +242,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               </div>
             </div>
             <div className={styles.infoGrid}>
-              <PatientRegistrationContext.Provider value={createContextValue(props)}>
+              <PatientRegistrationContextProvider value={createContextValue(props)}>
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}
@@ -250,7 +250,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     index={index}
                   />
                 ))}
-              </PatientRegistrationContext.Provider>
+              </PatientRegistrationContextProvider>
             </div>
           </div>
         </Form>

@@ -1,16 +1,16 @@
-import React, { useMemo, useCallback, useEffect, useState, useContext } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type FormValues, type PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
-import Overlay from '../../ui-components/overlay/overlay.component';
-import { ResourcesContext } from '../../../offline.resources';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { useResourcesContext } from '../../../resources-context';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import {
   isUniqueIdentifierTypeForOffline,
   shouldBlockPatientIdentifierInOfflineMode,
 } from '../../input/custom-input/identifier/utils';
 import { initializeIdentifier, setIdentifierSource } from './id-field.component';
+import Overlay from '../../ui-components/overlay/overlay.component';
 import styles from './identifier-selection.scss';
 
 interface PatientIdentifierOverlayProps {
@@ -20,8 +20,8 @@ interface PatientIdentifierOverlayProps {
 
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ closeOverlay, setFieldValue }) => {
   const layout = useLayoutType();
-  const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline, values, initialFormValues } = useContext(PatientRegistrationContext);
+  const { identifierTypes } = useResourcesContext();
+  const { isOffline, values, initialFormValues } = usePatientRegistrationContext();
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(values.identifiers);
   const [searchString, setSearchString] = useState('');
   const { t } = useTranslation();

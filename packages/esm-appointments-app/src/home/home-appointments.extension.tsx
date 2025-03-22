@@ -1,0 +1,22 @@
+import React from 'react';
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { toOmrsIsoString } from '@openmrs/esm-framework';
+import AppointmentsList from '../appointments/scheduled/appointments-list.extension';
+import styles from './home-appointments.scss';
+
+const HomeAppointments = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.container}>
+      <AppointmentsList
+        date={toOmrsIsoString(dayjs().startOf('day').toDate())}
+        excludeCancelledAppointments
+        title={t('todays', "Today's")}
+      />
+    </div>
+  );
+};
+
+export default HomeAppointments;

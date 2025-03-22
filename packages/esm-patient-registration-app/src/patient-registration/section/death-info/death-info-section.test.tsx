@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Form, Formik } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { DeathInfoSection } from './death-info-section.component';
 
 const initialContextValues = {
@@ -19,6 +19,7 @@ const initialContextValues = {
   values: {
     isDead: true,
   } as FormValues,
+  setFieldTouched: jest.fn(),
 };
 
 describe('Death info section', () => {
@@ -26,13 +27,13 @@ describe('Death info section', () => {
     initialContextValues.values.isDead = isDead;
 
     render(
-      <PatientRegistrationContext.Provider value={initialContextValues}>
+      <PatientRegistrationContextProvider value={initialContextValues}>
         <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
           <Form>
             <DeathInfoSection fields={[]} />
           </Form>
         </Formik>
-      </PatientRegistrationContext.Provider>,
+      </PatientRegistrationContextProvider>,
     );
   };
 

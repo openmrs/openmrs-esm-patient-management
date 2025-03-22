@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import capitalize from 'lodash-es/capitalize';
+import { capitalize } from 'lodash-es';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

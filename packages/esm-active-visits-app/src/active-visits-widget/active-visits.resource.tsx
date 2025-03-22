@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import last from 'lodash-es/last';
+import { last } from 'lodash-es';
 import {
   type FetchResponse,
   formatDatetime,
@@ -17,7 +17,6 @@ import {
 import useSWR from 'swr';
 import { type ActiveVisit, type VisitResponse } from '../types';
 import { useTranslation } from 'react-i18next';
-
 dayjs.extend(isToday);
 
 export function useActiveVisits() {

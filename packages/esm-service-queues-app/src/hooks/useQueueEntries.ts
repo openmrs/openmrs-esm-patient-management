@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import isEqual from 'lodash-es/isEqual';
-import useSWR from 'swr';
-import { useSWRConfig } from 'swr/_internal';
+import useSWR, { useSWRConfig } from 'swr';
+import { isEqual } from 'lodash-es';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 

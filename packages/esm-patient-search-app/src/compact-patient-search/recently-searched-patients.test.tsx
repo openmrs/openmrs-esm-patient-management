@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext } from '../patient-search-context';
+import { PatientSearchContextProvider } from '../patient-search-context';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
 const defaultProps = {
@@ -144,8 +144,8 @@ describe('RecentlySearchedPatients', () => {
 
 function renderRecentlySearchedPatients(props = {}) {
   render(
-    <PatientSearchContext.Provider value={{}}>
+    <PatientSearchContextProvider value={{}}>
       <RecentlySearchedPatients {...defaultProps} {...props} />
-    </PatientSearchContext.Provider>,
+    </PatientSearchContextProvider>,
   );
 }

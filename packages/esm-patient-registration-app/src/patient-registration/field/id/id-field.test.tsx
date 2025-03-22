@@ -6,9 +6,13 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type AddressTemplate, type IdentifierSource } from '../../patient-registration.types';
 import { mockIdentifierTypes, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
-import { ResourcesContext, type Resources } from '../../../offline.resources';
-import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
+import { type Resources } from '../../../offline.resources';
 import { Identifiers, setIdentifierSource } from './id-field.component';
+import {
+  type PatientRegistrationContextProps,
+  PatientRegistrationContextProvider,
+} from '../../patient-registration-context';
+import { ResourcesContextProvider } from '../../../resources-context';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
@@ -50,6 +54,7 @@ const mockContextValues: PatientRegistrationContextProps = {
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
+  setFieldTouched: jest.fn(),
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
@@ -65,15 +70,15 @@ describe('Identifiers', () => {
 
   it('should render loading skeleton when identifier types are loading', () => {
     render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <ResourcesContextProvider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
           <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
+            <PatientRegistrationContextProvider value={mockContextValues}>
               <Identifiers />
-            </PatientRegistrationContext.Provider>
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>
-      </ResourcesContext.Provider>,
+      </ResourcesContextProvider>,
     );
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -83,15 +88,15 @@ describe('Identifiers', () => {
     mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
 
     render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <ResourcesContextProvider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
           <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
+            <PatientRegistrationContextProvider value={mockContextValues}>
               <Identifiers />
-            </PatientRegistrationContext.Provider>
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>
-      </ResourcesContext.Provider>,
+      </ResourcesContextProvider>,
     );
 
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
@@ -104,15 +109,15 @@ describe('Identifiers', () => {
     const user = userEvent.setup();
     mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
     render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <ResourcesContextProvider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
           <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
+            <PatientRegistrationContextProvider value={mockContextValues}>
               <Identifiers />
-            </PatientRegistrationContext.Provider>
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>
-      </ResourcesContext.Provider>,
+      </ResourcesContextProvider>,
     );
 
     const configureButton = screen.getByRole('button', { name: 'Configure' });

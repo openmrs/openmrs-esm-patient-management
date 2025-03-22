@@ -1,14 +1,16 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { Form, Formik } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
-import { ResourcesContext, type Resources } from '../../../../offline.resources';
+import { type Resources } from '../../../../offline.resources';
 import {
-  PatientRegistrationContext,
+  PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
 } from '../../../patient-registration-context';
+import { ResourcesContextProvider } from '../../../../resources-context';
 import type {
   AddressTemplate,
   FormValues,
@@ -16,7 +18,6 @@ import type {
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
 import IdentifierInput from './identifier-input.component';
-import userEvent from '@testing-library/user-event';
 
 const mockIdentifierTypes = [
   {
@@ -92,15 +93,15 @@ describe('identifier input', () => {
 
   const setupIdentifierInput = (patientIdentifier: PatientIdentifierValue, initialValues = {}) => {
     render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <ResourcesContextProvider value={mockResourcesContextValue}>
         <Formik initialValues={initialValues} onSubmit={jest.fn()}>
           <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
+            <PatientRegistrationContextProvider value={mockContextValues}>
               <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
-            </PatientRegistrationContext.Provider>
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>
-      </ResourcesContext.Provider>,
+      </ResourcesContextProvider>,
     );
   };
 

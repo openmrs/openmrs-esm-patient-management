@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { DemographicsSection } from './demographics-section.component';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { PatientRegistrationContextProvider } from '../../patient-registration-context';
+import { DemographicsSection } from './demographics-section.component';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
@@ -56,7 +56,7 @@ describe('Demographics section', () => {
     render(
       <Formik initialValues={{ ...initialFormValues, birthdateEstimated, addNameInLocalLanguage }} onSubmit={null}>
         <Form>
-          <PatientRegistrationContext.Provider
+          <PatientRegistrationContextProvider
             value={{
               initialFormValues: null,
               identifierTypes: [],
@@ -70,7 +70,7 @@ describe('Demographics section', () => {
               setFieldTouched: () => {},
             }}>
             <DemographicsSection fields={['name', 'gender', 'dob']} />
-          </PatientRegistrationContext.Provider>
+          </PatientRegistrationContextProvider>
         </Form>
       </Formik>,
     );

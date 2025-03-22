@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Layer,
@@ -12,8 +12,8 @@ import { TrashCan } from '@carbon/react/icons';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
-import { PatientRegistrationContext } from '../../patient-registration-context';
-import { ResourcesContext } from '../../../offline.resources';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { useResourcesContext } from '../../../resources-context';
 import { fetchPerson } from '../../patient-registration.resource';
 import { type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
@@ -39,7 +39,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   remove,
 }) => {
   const { t } = useTranslation();
-  const { setFieldValue } = React.useContext(PatientRegistrationContext);
+  const { setFieldValue } = usePatientRegistrationContext();
   const [isInvalid, setIsInvalid] = useState(false);
   const newRelationship = !relationship.uuid;
 
@@ -159,7 +159,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 };
 
 export const RelationshipsSection = () => {
-  const { relationshipTypes } = useContext(ResourcesContext);
+  const { relationshipTypes } = useResourcesContext();
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { t } = useTranslation();
 

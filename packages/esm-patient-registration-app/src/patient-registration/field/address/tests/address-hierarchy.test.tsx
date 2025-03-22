@@ -5,13 +5,14 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockedAddressTemplate, mockedOrderedFields, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
 import { type AddressTemplate } from '../../../patient-registration.types';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../../config-schema';
-import { type Resources, ResourcesContext } from '../../../../offline.resources';
+import { type Resources } from '../../../../offline.resources';
 import {
-  PatientRegistrationContext,
+  PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
 } from '../../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
 import { AddressComponent } from '../address-field.component';
+import { ResourcesContextProvider } from '../../../../resources-context';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUseOrderedAddressHierarchyLevels = jest.mocked(useOrderedAddressHierarchyLevels);
@@ -44,6 +45,9 @@ const mockInitialFormValues = {
   relationships: [],
   telephoneNumber: '',
   yearsEstimated: 0,
+  deathTime: '',
+  deathTimeFormat: 'AM' as const,
+  nonCodedCauseOfDeath: '',
 };
 
 const initialContextValues: PatientRegistrationContextProps = {
@@ -55,6 +59,7 @@ const initialContextValues: PatientRegistrationContextProps = {
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
   setInitialFormValues: jest.fn(),
+  setFieldTouched: jest.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
 };
@@ -66,15 +71,15 @@ jest.mock('../address-hierarchy.resource', () => ({
 
 async function renderAddressHierarchy(contextValues: PatientRegistrationContextProps) {
   await render(
-    <ResourcesContext.Provider value={mockResourcesContextValue}>
+    <ResourcesContextProvider value={mockResourcesContextValue}>
       <Formik initialValues={mockInitialFormValues} onSubmit={null}>
         <Form>
-          <PatientRegistrationContext.Provider value={contextValues}>
+          <PatientRegistrationContextProvider value={contextValues}>
             <AddressComponent />
-          </PatientRegistrationContext.Provider>
+          </PatientRegistrationContextProvider>
         </Form>
       </Formik>
-    </ResourcesContext.Provider>,
+    </ResourcesContextProvider>,
   );
 }
 

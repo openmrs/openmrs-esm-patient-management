@@ -1,15 +1,15 @@
-import React, { useState, useCallback, useContext, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { Button } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
-import { type RegistrationConfig } from '../../../../config-schema';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../../../../config-schema';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
 import { Input } from '../../basic-input/input/input.component';
-import { PatientRegistrationContext } from '../../../patient-registration-context';
-import { ResourcesContext } from '../../../../offline.resources';
+import { usePatientRegistrationContext } from '../../../patient-registration-context';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
+import { useResourcesContext } from '../../../../resources-context';
 import { type PatientIdentifierValue } from '../../../patient-registration.types';
 import styles from '../../input.scss';
 
@@ -21,8 +21,8 @@ interface IdentifierInputProps {
 const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig<RegistrationConfig>();
-  const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline, values, setFieldValue } = useContext(PatientRegistrationContext);
+  const { identifierTypes } = useResourcesContext();
+  const { isOffline, values, setFieldValue } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],

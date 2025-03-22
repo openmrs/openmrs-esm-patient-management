@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
-import mapValues from 'lodash/mapValues';
+import { mapValues } from 'lodash-es';
 import { translateFrom } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../config-schema';
 import { type FormValues } from '../patient-registration.types';

@@ -19,5 +19,13 @@ export interface PatientSearchContextProps {
 }
 
 export const PatientSearchContext = createContext<PatientSearchContextProps>(null);
+
 export const PatientSearchContextProvider = PatientSearchContext.Provider;
-export const usePatientSearchContext = () => useContext(PatientSearchContext);
+
+export const usePatientSearchContext = () => {
+  const context = useContext(PatientSearchContext);
+  if (!context) {
+    throw new Error('usePatientSearchContext must be used within a PatientSearchContextProvider');
+  }
+  return context;
+};

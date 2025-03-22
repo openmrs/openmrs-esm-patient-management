@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { useSelectedDateContext } from '../../hooks/selected-date-context';
 import { monthDays } from '../../helpers';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
-import SelectedDateContext from '../../hooks/selectedDateContext';
 import styles from './monthly-workload.scss';
 
 interface MonthlyCalendarViewProps {
@@ -20,7 +21,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
 }) => {
   const monthFormat = 'MMMM, YYYY';
   const { t } = useTranslation();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
   const daysInWeeks = daysInWeek.map((day) => t(day));
@@ -45,11 +46,10 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
               <div
                 onClick={() => handleClick(dayjs(dateTime).toDate())}
                 key={i}
-                className={`${styles.monthlyWorkloadCard} ${
-                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
-                    ? styles.selectedDate
-                    : ''
-                }`}>
+                className={classNames(styles.monthlyWorkloadCard, {
+                  [styles.selectedDate]:
+                    dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD'),
+                })}>
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}

@@ -1,11 +1,11 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { MultiSelect } from '@carbon/react';
-import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
+import { AppointmentsPictogram, OpenmrsDatePicker, PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import SelectedDateContext from '../hooks/selectedDateContext';
+import { useSelectedDateContext } from '../hooks/selected-date-context';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
@@ -16,7 +16,7 @@ interface AppointmentHeaderProps {
 
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
   const { t } = useTranslation();
-  const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
+  const { selectedDate, setSelectedDate } = useSelectedDateContext();
   const { serviceTypes } = useAppointmentServices();
 
   const [selectedItems, setSelectedItems] = useState([]);

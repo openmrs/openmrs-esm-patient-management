@@ -1,8 +1,8 @@
 import React, { type CSSProperties, useCallback, useId, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import fuzzy from 'fuzzy';
-import orderBy from 'lodash-es/orderBy';
-import type { TFunction } from 'i18next';
+import { orderBy } from 'lodash-es';
+import { type TFunction } from 'i18next';
 import {
   Button,
   DataTable,

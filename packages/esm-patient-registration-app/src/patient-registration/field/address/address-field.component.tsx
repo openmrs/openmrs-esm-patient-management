@@ -1,23 +1,18 @@
-import React, { useEffect, useState, useContext, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ResourcesContext } from '../../../offline.resources';
 import { SkeletonText, InlineNotification } from '@carbon/react';
-import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig, useConnectivity } from '@openmrs/esm-framework';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { Input } from '../../input/basic-input/input/input.component';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { useResourcesContext } from '../../../resources-context';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
 
-function parseString(xmlDockAsString: string) {
-  const parser = new DOMParser();
-  return parser.parseFromString(xmlDockAsString, 'text/xml');
-}
-
 export const AddressComponent: React.FC = () => {
   const [selected, setSelected] = useState('');
-  const { addressTemplate } = useContext(ResourcesContext);
+  const { addressTemplate } = useResourcesContext();
   const addressLayout = useMemo(() => {
     if (!addressTemplate?.lines) {
       return [];
@@ -47,7 +42,7 @@ export const AddressComponent: React.FC = () => {
     },
   } = config;
 
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setFieldValue } = usePatientRegistrationContext();
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
