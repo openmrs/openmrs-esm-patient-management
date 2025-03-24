@@ -1,9 +1,9 @@
-import React, { type ChangeEvent, useCallback, useContext } from 'react';
+import React, { type ChangeEvent, useCallback } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
@@ -30,7 +30,7 @@ export const DobField: React.FC = () => {
   const [birthdate, birthdateMeta] = useField('birthdate');
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
-  const { setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
+  const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
   const today = new Date();
 
   const onToggle = useCallback(

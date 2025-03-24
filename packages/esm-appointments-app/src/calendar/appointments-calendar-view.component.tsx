@@ -4,10 +4,10 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
+import { SelectedDateContextProvider } from '../hooks/selected-date-context';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
-import SelectedDateContext from '../hooks/selectedDateContext';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
@@ -23,13 +23,13 @@ const AppointmentsCalendarView: React.FC = () => {
   }, [params.date]);
 
   return (
-    <SelectedDateContext.Provider value={{ selectedDate, setSelectedDate }}>
+    <SelectedDateContextProvider value={{ selectedDate, setSelectedDate }}>
       <div data-testid="appointments-calendar">
         <AppointmentsHeader title={t('calendar', 'Calendar')} />
         <CalendarHeader />
         <MonthlyCalendarView events={calendarEvents} />
       </div>
-    </SelectedDateContext.Provider>
+    </SelectedDateContextProvider>
   );
 };
 

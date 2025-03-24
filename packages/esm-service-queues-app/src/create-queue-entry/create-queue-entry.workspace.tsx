@@ -14,6 +14,7 @@ import {
   useVisit,
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
+import { AddPatientToQueueContextProvider } from './add-patient-to-queue-context';
 import ExistingVisitFormComponent from './existing-visit-form/existing-visit-form.component';
 import styles from './create-queue-entry.scss';
 
@@ -22,10 +23,6 @@ interface PatientSearchProps extends DefaultWorkspaceProps {
   currentServiceQueueUuid?: string;
   handleReturnToSearchList?: () => void;
 }
-
-export const AddPatientToQueueContext = React.createContext({
-  currentServiceQueueUuid: '',
-});
 
 /**
  *
@@ -52,7 +49,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
 
   return patient ? (
     <div className={styles.patientSearchContainer}>
-      <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
+      <AddPatientToQueueContextProvider value={{ currentServiceQueueUuid }}>
         <div className={styles.patientBannerContainer}>
           <div className={styles.patientBanner}>
             <div className={styles.patientPhoto} role="img">
@@ -101,7 +98,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
             }}
           />
         )}
-      </AddPatientToQueueContext.Provider>
+      </AddPatientToQueueContextProvider>
     </div>
   ) : null;
 };
