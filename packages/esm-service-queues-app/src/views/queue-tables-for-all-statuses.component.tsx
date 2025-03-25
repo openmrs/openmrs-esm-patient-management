@@ -51,7 +51,6 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
               name="patient-search-button-slot"
               state={{
                 buttonText: t('addPatientToQueue', 'Add patient to queue'),
-                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
                 buttonProps: {
                   kind: 'secondary',
                   renderIcon: (props) => <Add size={16} {...props} />,
@@ -63,6 +62,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
                     currentServiceQueueUuid: selectedQueue.uuid,
                   });
                 },
+                workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
               }}
             />
             <div className={styles.filterSearch}>

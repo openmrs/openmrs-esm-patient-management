@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 export interface PatientSearchContextProps {
   /**
@@ -13,6 +13,11 @@ export interface PatientSearchContextProps {
    * just before navigation (or after nonNavigationSelectPatientAction is called).
    */
   patientClickSideEffect?: ((patientUuid: string) => void) | (() => void);
+  handleReturnToSearchList?: () => void;
+  showPatientSearch?: () => void;
+  hidePatientSearch?: () => void;
 }
 
 export const PatientSearchContext = createContext<PatientSearchContextProps>(null);
+export const PatientSearchContextProvider = PatientSearchContext.Provider;
+export const usePatientSearchContext = () => useContext(PatientSearchContext);

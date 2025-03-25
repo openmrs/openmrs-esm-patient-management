@@ -17,7 +17,7 @@ function CreateAdmissionRequestActionButton() {
     nonNavigationSelectPatientAction: async (patientUuid) => {
       launchWorkspace<CreateAdmissionEncounterWorkspaceProps>('create-admission-encounter-workspace', {
         patientUuid,
-        handleBackToSearchList: launchSearchWorkspace,
+        handleReturnToSearchList: launchSearchWorkspace,
       });
     },
     handleSearchTermUpdated: (value: string) => {

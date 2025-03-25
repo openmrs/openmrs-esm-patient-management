@@ -10,6 +10,7 @@ import styles from './existing-visit-form.scss';
 
 interface ExistingVisitFormProps {
   closeWorkspace: () => void;
+  handleReturnToSearchList?: () => void;
   visit: Visit;
 }
 
@@ -17,7 +18,7 @@ interface ExistingVisitFormProps {
  * This is the form that appears when clicking on a search result in the "Add patient to queue" workspace,
  * when the patient already has an active visit.
  */
-const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorkspace }) => {
+const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorkspace, handleReturnToSearchList }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +27,14 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   const [callback, setCallback] = useState<{
     submitQueueEntry: (visit: Visit) => Promise<QueueEntry>;
   }>(null);
+
+  const handleCloseWorkspace = useCallback(() => {
+    if (handleReturnToSearchList) {
+      handleReturnToSearchList();
+    } else {
+      closeWorkspace();
+    }
+  }, [closeWorkspace, handleReturnToSearchList]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -59,7 +68,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
       <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
         <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={handleCloseWorkspace}>
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
