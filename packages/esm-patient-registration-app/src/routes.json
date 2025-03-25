@@ -3,6 +3,14 @@
   "backendDependencies": {
     "webservices.rest": "^2.24.0"
   },
+  "optionalBackendDependencies": {
+    "webservices.rest": "^2.48.0",
+    "feature": {
+      "flagName": "name-template-layout",
+      "label": "Patient Registration Name Layout",
+      "description": "Customize name layout for patient registration using defined name templates as per the OpenMRS wiki article 'Customizing Name Layouts'."
+    }
+  },
   "pages": [
     {
       "component": "root",

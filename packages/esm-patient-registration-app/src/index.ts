@@ -20,12 +20,6 @@ const options = {
 export function startupApp() {
   defineConfigSchema(moduleName, esmPatientRegistrationSchema);
 
-  registerFeatureFlag(
-    'name-template-layout',
-    'Patient Registration Name Layout',
-    "Customize name layout for patient registration using defined name templates as per the OpenMRS wiki article 'Customizing Name Layouts'.",
-  );
-
   registerBreadcrumbs([
     {
       path: `${window.spaBase}/${patientRegistration}`,
