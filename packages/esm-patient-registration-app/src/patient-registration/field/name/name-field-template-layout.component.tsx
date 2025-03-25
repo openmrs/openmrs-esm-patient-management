@@ -145,7 +145,7 @@ export const NameFieldWithTemplate: React.FC = () => {
 
   return (
     <NameComponentContainer>
-      {displayCapturePhoto && <PhotoComponent></PhotoComponent>}
+      {displayCapturePhoto && <PhotoComponent />}
 
       <div className={styles.nameField}>
         {(allowUnidentifiedPatients || isPatientUnknown) && (
