@@ -5,12 +5,12 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Grid, Row } from '@carbon/react';
 import { ExtensionSlot, useConnectivity, useSession } from '@openmrs/esm-framework';
 import {
-  ResourcesContext,
   fetchAddressTemplate,
   fetchNameTemplate,
   fetchAllRelationshipTypes,
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
+import { ResourcesContextProvider } from './resources-context';
 import { FormManager } from './patient-registration/form-manager';
 import { PatientRegistration } from './patient-registration/patient-registration.component';
 import styles from './root.scss';
@@ -39,7 +39,7 @@ export default function Root() {
         <Row>
           <ExtensionSlot name="breadcrumbs-slot" />
         </Row>
-        <ResourcesContext.Provider
+        <ResourcesContextProvider
           value={{
             addressTemplate,
             nameTemplate,
@@ -59,7 +59,7 @@ export default function Root() {
               />
             </Routes>
           </BrowserRouter>
-        </ResourcesContext.Provider>
+        </ResourcesContextProvider>
       </Grid>
     </main>
   );

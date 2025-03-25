@@ -3,10 +3,10 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { omrsDateFormat } from './constants';
+import { SelectedDateContextProvider } from './hooks/selected-date-context';
 import AppointmentTabs from './appointments/appointment-tabs.component';
 import AppointmentsHeader from './header/appointments-header.component';
 import AppointmentMetrics from './metrics/appointments-metrics.component';
-import SelectedDateContext from './hooks/selectedDateContext';
 
 const Appointments: React.FC = () => {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ const Appointments: React.FC = () => {
   }, [params.serviceType]);
 
   return (
-    <SelectedDateContext.Provider value={{ selectedDate, setSelectedDate }}>
+    <SelectedDateContextProvider value={{ selectedDate, setSelectedDate }}>
       <AppointmentsHeader
         appointmentServiceTypes={appointmentServiceTypes}
         onChange={setAppointmentServiceTypes}
@@ -36,7 +36,7 @@ const Appointments: React.FC = () => {
       />
       <AppointmentMetrics appointmentServiceTypes={appointmentServiceTypes} />
       <AppointmentTabs appointmentServiceTypes={appointmentServiceTypes} />
-    </SelectedDateContext.Provider>
+    </SelectedDateContextProvider>
   );
 };
 

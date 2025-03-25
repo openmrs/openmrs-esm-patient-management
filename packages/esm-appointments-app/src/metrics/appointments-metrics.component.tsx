@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorState, formatDate, parseDate } from '@openmrs/esm-framework';
 import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointments } from '../hooks/useClinicalMetrics';
 import { useAppointmentList } from '../hooks/useAppointmentList';
-import SelectedDateContext from '../hooks/selectedDateContext';
+import { useSelectedDateContext } from '../hooks/selected-date-context';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
@@ -19,7 +19,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   const { totalProviders } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointments(appointmentServiceTypes);
 
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
   // TODO we will need rework these after we discuss the logic we want to use

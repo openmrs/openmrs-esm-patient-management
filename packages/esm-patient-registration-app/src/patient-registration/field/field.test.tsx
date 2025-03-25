@@ -4,9 +4,11 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
-import { type Resources, ResourcesContext } from '../../offline.resources';
+import { type Resources } from '../../offline.resources';
 import type { AddressTemplate, NameTemplate, FormValues } from '../patient-registration.types';
-import { PatientRegistrationContext } from '../patient-registration-context';
+import { PatientRegistrationContextProvider } from '../patient-registration-context';
+import { ResourcesContextProvider } from '../../resources-context';
+import { renderWithContext } from 'tools';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
@@ -104,28 +106,14 @@ const initialContextValues = {
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
+  setFieldTouched: jest.fn(),
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: {} as FormValues,
-  setFieldTouched: jest.fn(),
 };
 
 describe('Field', () => {
-  let ContextWrapper;
-
   beforeEach(() => {
-    ContextWrapper = ({ children }) => (
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Form>
-            <PatientRegistrationContext.Provider value={initialContextValues}>
-              {children}
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>
-    );
-
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
     });
@@ -144,7 +132,18 @@ describe('Field', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    render(<Field name="name" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="name" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
     expect(screen.getByText('Full Name')).toBeInTheDocument();
   });
 
@@ -162,12 +161,33 @@ describe('Field', () => {
       } as unknown as RegistrationConfig['fieldConfigurations'],
     });
 
-    render(<Field name="gender" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="gender" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
     expect(screen.getByLabelText('Male')).toBeInTheDocument();
   });
 
   it('should render DobField component when name prop is "dob"', () => {
-    render(<Field name="dob" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="dob" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
     expect(screen.getByText('Birth')).toBeInTheDocument();
   });
 
@@ -190,7 +210,18 @@ describe('Field', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    render(<Field name="address" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="address" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
     expect(screen.getByText('Address')).toBeInTheDocument();
   });
 
@@ -256,16 +287,16 @@ describe('Field', () => {
       setFieldTouched: jest.fn(),
     };
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Form>
-            <PatientRegistrationContext.Provider value={updatedContextValues}>
-              <Field name="id" />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={updatedContextValues}>
+            <Field name="id" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
@@ -281,7 +312,15 @@ describe('Field', () => {
     let error = null;
 
     try {
-      render(<Field name="invalidField" />);
+      renderWithContext(
+        <Formik initialValues={{}} onSubmit={jest.fn()}>
+          <Form>
+            <Field name="invalidField" />
+          </Form>
+        </Formik>,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
     } catch (err) {
       error = err;
     }

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
+import { generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
 import { type Patient } from '../types';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
@@ -24,11 +24,6 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   await test.step('And I click on the “Add” button', async () => {
     await page.getByRole('button', { name: 'Add', exact: true }).click();
   });
-
-  // FIXME: Login locations are failing to populate in this dropdown in the test environment
-  // await test.step('And I select Mobile Clinic location', async () => {
-  //   await page.getByLabel('Select location').selectOption('Mobile Clinic');
-  // });
 
   await test.step('And I select “Outpatient Department” service', async () => {
     await page.selectOption('select#service', { label: 'Outpatient Department' });
