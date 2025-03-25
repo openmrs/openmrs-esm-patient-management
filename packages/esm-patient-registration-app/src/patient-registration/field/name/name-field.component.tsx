@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useField } from 'formik';
-import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
@@ -22,7 +22,7 @@ function checkNumber(value: string) {
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched } = usePatientRegistrationContext();
+  const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
 
   const {
     fieldConfigurations: {
@@ -42,19 +42,6 @@ export const NameField = () => {
   );
 
   const isPatientUnknown = isPatientUnknownValue === 'true';
-
-  const onCapturePhoto = useCallback(
-    (dataUri: string, photoDateTime: string) => {
-      if (setCapturePhotoProps) {
-        setCapturePhotoProps({
-          imageData: dataUri,
-          dateTime: photoDateTime,
-        });
-        setFieldTouched('photo', true, false);
-      }
-    },
-    [setCapturePhotoProps, setFieldTouched],
-  );
 
   const toggleNameKnown = (e) => {
     if (e.name === 'known') {

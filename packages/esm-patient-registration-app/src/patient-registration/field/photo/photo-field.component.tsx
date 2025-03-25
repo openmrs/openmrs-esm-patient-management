@@ -1,10 +1,10 @@
-import React, { useCallback, useContext } from 'react';
-import { PatientRegistrationContext } from '../../patient-registration-context';
-import styles from '../field.scss';
+import React, { useCallback } from 'react';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { ExtensionSlot } from '@openmrs/esm-framework';
+import styles from '../field.scss';
 
 export const PhotoComponent = () => {
-  const { setCapturePhotoProps, currentPhoto, setFieldTouched } = useContext(PatientRegistrationContext);
+  const { setCapturePhotoProps, currentPhoto, setFieldTouched } = usePatientRegistrationContext();
 
   const onCapturePhoto = useCallback(
     (dataUri: string, photoDateTime: string) => {

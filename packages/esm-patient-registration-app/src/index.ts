@@ -1,10 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  registerBreadcrumbs,
-  registerFeatureFlag,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';

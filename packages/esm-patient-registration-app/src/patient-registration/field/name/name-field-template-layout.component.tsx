@@ -1,15 +1,15 @@
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, SkeletonText, Switch } from '@carbon/react';
 import { useField } from 'formik';
 import { useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
-import { PatientRegistrationContext } from '../../patient-registration-context';
-import { ResourcesContext } from '../../../offline.resources';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { PhotoComponent } from '../photo/photo-field.component';
 import { type NameProperties, type NameTemplate } from '../../patient-registration.types';
 import styles from '../field.scss';
+import { useResourcesContext } from '../../../resources-context';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 
@@ -54,7 +54,7 @@ const defaultNameLayout: { id: NameProperties; name: NameProperties; label: stri
 
 export const NameFieldWithTemplate: React.FC = () => {
   const { t } = useTranslation();
-  const { setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
+  const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
   const {
     fieldConfigurations: {
       name: {
@@ -67,7 +67,7 @@ export const NameFieldWithTemplate: React.FC = () => {
     },
   } = useConfig<RegistrationConfig>();
 
-  const { nameTemplate } = useContext(ResourcesContext);
+  const { nameTemplate } = useResourcesContext();
   const nameLayout = useMemo(() => {
     if (!nameTemplate?.lines) {
       return defaultNameLayout;
