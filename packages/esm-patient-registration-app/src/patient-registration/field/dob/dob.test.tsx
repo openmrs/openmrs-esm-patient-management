@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { DobField } from './dob.component';
 
@@ -27,7 +27,7 @@ describe('Dob', () => {
     render(
       <Formik initialValues={{ birthdate: '' }} onSubmit={() => {}}>
         <Form>
-          <PatientRegistrationContext.Provider
+          <PatientRegistrationContextProvider
             value={{
               identifierTypes: [],
               values: initialFormValues,
@@ -41,7 +41,7 @@ describe('Dob', () => {
               initialFormValues: initialFormValues,
             }}>
             <DobField />
-          </PatientRegistrationContext.Provider>
+          </PatientRegistrationContextProvider>
         </Form>
       </Formik>,
     );
@@ -61,7 +61,7 @@ describe('Dob', () => {
     render(
       <Formik initialValues={{ birthdate: '' }} onSubmit={() => {}}>
         <Form>
-          <PatientRegistrationContext.Provider
+          <PatientRegistrationContextProvider
             value={{
               identifierTypes: [],
               values: initialFormValues,
@@ -75,7 +75,7 @@ describe('Dob', () => {
               setFieldTouched: () => {},
             }}>
             <DobField />
-          </PatientRegistrationContext.Provider>
+          </PatientRegistrationContextProvider>
         </Form>
       </Formik>,
     );

@@ -5,10 +5,15 @@ import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type AddressTemplate, type IdentifierSource } from '../../patient-registration.types';
 import { mockIdentifierTypes, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
+import { renderWithContext } from 'tools';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
-import { ResourcesContext, type Resources } from '../../../offline.resources';
-import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
+import { type Resources } from '../../../offline.resources';
+import {
+  PatientRegistrationContextProvider,
+  type PatientRegistrationContextProps,
+} from '../../patient-registration-context';
 import { Identifiers, setIdentifierSource } from './id-field.component';
+import { ResourcesContextProvider } from '../../../resources-context';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
@@ -64,16 +69,16 @@ describe('Identifiers', () => {
   });
 
   it('should render loading skeleton when identifier types are loading', () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <PatientRegistrationContextProvider value={mockContextValues}>
+            <Identifiers />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -82,16 +87,16 @@ describe('Identifiers', () => {
   it('should render identifier inputs when identifier types are loaded', () => {
     mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <PatientRegistrationContextProvider value={mockContextValues}>
+            <Identifiers />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
 
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
@@ -103,16 +108,17 @@ describe('Identifiers', () => {
   it('should open identifier selection overlay when "Configure" button is clicked', async () => {
     const user = userEvent.setup();
     mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <PatientRegistrationContextProvider value={mockContextValues}>
+            <Identifiers />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
 
     const configureButton = screen.getByRole('button', { name: 'Configure' });

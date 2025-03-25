@@ -1,20 +1,35 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { renderWithContext } from 'tools';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { type FormValues } from '../../patient-registration.types';
+import {
+  type PatientRegistrationContextProps,
+  PatientRegistrationContextProvider,
+} from '../../patient-registration-context';
 import { GenderField } from './gender-field.component';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
-jest.mock('react', () => ({
-  ...(jest.requireActual('react') as any),
-  useContext: jest.fn(() => ({
-    setFieldValue: jest.fn(),
-    setFieldTouched: jest.fn(),
-  })),
-}));
+const mockContextValues: PatientRegistrationContextProps = {
+  currentPhoto: null,
+  identifierTypes: [],
+  inEditMode: false,
+  initialFormValues: {
+    gender: 'male',
+  } as FormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldTouched: jest.fn(),
+  setFieldValue: jest.fn(),
+  validationSchema: esmPatientRegistrationSchema,
+  values: {
+    gender: 'male',
+  } as FormValues,
+};
 
 jest.mock('formik', () => ({
   ...(jest.requireActual('formik') as any),
@@ -47,13 +62,16 @@ describe('GenderField', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
   });
+
   it('has a label', () => {
-    render(
+    renderWithContext(
       <Formik initialValues={{}} onSubmit={null}>
         <Form>
           <GenderField />
         </Form>
       </Formik>,
+      PatientRegistrationContextProvider,
+      mockContextValues,
     );
 
     expect(screen.getByRole('heading', { name: /sex/i })).toBeInTheDocument();
@@ -63,12 +81,15 @@ describe('GenderField', () => {
 
   it('checks an option', async () => {
     const user = userEvent.setup();
-    render(
+
+    renderWithContext(
       <Formik initialValues={{}} onSubmit={null}>
         <Form>
           <GenderField />
         </Form>
       </Formik>,
+      PatientRegistrationContextProvider,
+      mockContextValues,
     );
 
     await user.click(screen.getByText(/female/i));
