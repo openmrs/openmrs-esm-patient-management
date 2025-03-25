@@ -328,7 +328,7 @@ export class FormManager {
         addresses: [values.address],
         ...FormManager.getPatientDeathInfo(values, config),
       },
-      identifiers: !isNewPatient && values.patientUuid ? [] : identifiers,
+      identifiers: isNewPatient || !values.patientUuid ? identifiers : undefined,
     };
   }
 
