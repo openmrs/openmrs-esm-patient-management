@@ -1,23 +1,36 @@
-import React, { useEffect, useState, useContext, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ResourcesContext } from '../../../offline.resources';
 import { SkeletonText, InlineNotification } from '@carbon/react';
-import { Input } from '../../input/basic-input/input/input.component';
-import { useConfig, useConnectivity } from '@openmrs/esm-framework';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { type Session, useConfig, useConnectivity } from '@openmrs/esm-framework';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
+import {
+  type PatientRegistrationContextProps,
+  PatientRegistrationContextProvider,
+  usePatientRegistrationContext,
+} from '../../patient-registration-context';
+import { ResourcesContextProvider, useResourcesContext } from '../../../resources-context';
+import { Input } from '../../input/basic-input/input/input.component';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
-
-function parseString(xmlDockAsString: string) {
-  const parser = new DOMParser();
-  return parser.parseFromString(xmlDockAsString, 'text/xml');
-}
+import { type AddressTemplate } from '../../patient-registration.types';
 
 export const AddressComponent: React.FC = () => {
-  const [selected, setSelected] = useState('');
-  const { addressTemplate } = useContext(ResourcesContext);
+  const config = useConfig();
+  const { t } = useTranslation();
+  const { setFieldValue } = usePatientRegistrationContext();
+  const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
+
+  const isOnline = useConnectivity();
+  const {
+    fieldConfigurations: {
+      address: {
+        useAddressHierarchy: { enabled: addressHierarchyEnabled, useQuickSearch, searchAddressByLevel },
+      },
+    },
+  } = config;
+
+  const { addressTemplate } = useResourcesContext();
   const addressLayout = useMemo(() => {
     if (!addressTemplate?.lines) {
       return [];
@@ -36,19 +49,7 @@ export const AddressComponent: React.FC = () => {
     });
   }, [addressTemplate]);
 
-  const { t } = useTranslation();
-  const config = useConfig();
-  const isOnline = useConnectivity();
-  const {
-    fieldConfigurations: {
-      address: {
-        useAddressHierarchy: { enabled: addressHierarchyEnabled, useQuickSearch, searchAddressByLevel },
-      },
-    },
-  } = config;
-
-  const { setFieldValue } = useContext(PatientRegistrationContext);
-  const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
+  const [selected, setSelected] = useState('');
 
   useEffect(() => {
     if (addressTemplate?.elementDefaults) {
@@ -139,15 +140,35 @@ export const AddressComponent: React.FC = () => {
 
 const AddressComponentContainer = ({ children }) => {
   const { t } = useTranslation();
+  const contextValue = useMemo(
+    () =>
+      ({
+        fieldConfigurations: {},
+        setFieldValue: () => {},
+        values: {},
+      }) as unknown as PatientRegistrationContextProps,
+    [],
+  );
+
   return (
-    <div>
-      <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-      <div
-        style={{
-          paddingBottom: '5%',
-        }}>
-        {children}
-      </div>
-    </div>
+    <ResourcesContextProvider
+      value={{
+        addressTemplate: {} as AddressTemplate,
+        currentSession: {} as Session,
+        identifierTypes: [],
+        relationshipTypes: [],
+      }}>
+      <PatientRegistrationContextProvider value={contextValue}>
+        <div>
+          <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+          <div
+            style={{
+              paddingBottom: '5%',
+            }}>
+            {children}
+          </div>
+        </div>
+      </PatientRegistrationContextProvider>
+    </ResourcesContextProvider>
   );
 };

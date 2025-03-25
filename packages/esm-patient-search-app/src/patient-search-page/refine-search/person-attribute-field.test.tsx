@@ -93,10 +93,6 @@ describe('PersonAttributeField', () => {
     control: useForm<AdvancedPatientSearchState>().control,
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe('String Attribute Type', () => {
     beforeEach(() => {
       mockUsePersonAttributeType.mockReturnValue({

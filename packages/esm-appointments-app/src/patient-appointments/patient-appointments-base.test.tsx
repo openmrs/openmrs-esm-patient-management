@@ -3,8 +3,12 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '__mocks__';
-import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { mockPatient, patientChartBasePath, renderWithContext, waitForLoadingToFinish, withSwr } from 'tools';
 import { type AppointmentsFetchResponse } from '../types';
+import {
+  PatientAppointmentContextProvider,
+  PatientAppointmentContextTypes,
+} from '../hooks/patient-appointment-context';
 import AppointmentsBase from './patient-appointments-base.component';
 
 const testProps = {
@@ -20,7 +24,11 @@ describe('AppointmentsOverview', () => {
       data: [],
     } as unknown as FetchResponse<AppointmentsFetchResponse>);
 
-    renderWithSwr(<AppointmentsBase {...testProps} />);
+    renderWithContext(
+      withSwr(<AppointmentsBase {...testProps} />),
+      PatientAppointmentContextProvider,
+      PatientAppointmentContextTypes.APPOINTMENTS_APP,
+    );
 
     await waitForLoadingToFinish();
 
@@ -40,7 +48,11 @@ describe('AppointmentsOverview', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderWithSwr(<AppointmentsBase {...testProps} />);
+    renderWithContext(
+      withSwr(<AppointmentsBase {...testProps} />),
+      PatientAppointmentContextProvider,
+      PatientAppointmentContextTypes.APPOINTMENTS_APP,
+    );
 
     await waitForLoadingToFinish();
 
@@ -59,7 +71,11 @@ describe('AppointmentsOverview', () => {
       ...mockAppointmentsData,
     } as unknown as FetchResponse<AppointmentsFetchResponse>);
 
-    renderWithSwr(<AppointmentsBase {...testProps} />);
+    renderWithContext(
+      withSwr(<AppointmentsBase {...testProps} />),
+      PatientAppointmentContextProvider,
+      PatientAppointmentContextTypes.APPOINTMENTS_APP,
+    );
 
     await waitForLoadingToFinish();
 

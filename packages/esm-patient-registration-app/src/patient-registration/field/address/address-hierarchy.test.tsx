@@ -1,17 +1,19 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockedAddressTemplate, mockedOrderedFields, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
-import { type AddressTemplate } from '../../../patient-registration.types';
-import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../../config-schema';
-import { type Resources, ResourcesContext } from '../../../../offline.resources';
+import { renderWithContext } from 'tools';
+import { type AddressTemplate } from '../../patient-registration.types';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { type Resources } from '../../../offline.resources';
 import {
-  PatientRegistrationContext,
+  PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
-} from '../../../patient-registration-context';
-import { useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
-import { AddressComponent } from '../address-field.component';
+} from '../../patient-registration-context';
+import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
+import { ResourcesContextProvider } from '../../../resources-context';
+import { AddressComponent } from './address-field.component';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUseOrderedAddressHierarchyLevels = jest.mocked(useOrderedAddressHierarchyLevels);
@@ -33,6 +35,9 @@ const mockInitialFormValues = {
   birthdateEstimated: false,
   deathCause: '',
   deathDate: '',
+  deathTime: '',
+  deathTimeFormat: 'AM' as 'AM' | 'PM',
+  nonCodedCauseOfDeath: '',
   familyName: 'Doe',
   gender: 'male',
   givenName: 'John',
@@ -54,27 +59,28 @@ const initialContextValues: PatientRegistrationContextProps = {
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
+  setFieldTouched: jest.fn(),
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
 };
 
-jest.mock('../address-hierarchy.resource', () => ({
-  ...jest.requireActual('../address-hierarchy.resource'),
+jest.mock('./address-hierarchy.resource', () => ({
+  ...jest.requireActual('./address-hierarchy.resource'),
   useOrderedAddressHierarchyLevels: jest.fn(),
 }));
 
 async function renderAddressHierarchy(contextValues: PatientRegistrationContextProps) {
-  await render(
-    <ResourcesContext.Provider value={mockResourcesContextValue}>
+  await renderWithContext(
+    <PatientRegistrationContextProvider value={contextValues}>
       <Formik initialValues={mockInitialFormValues} onSubmit={null}>
         <Form>
-          <PatientRegistrationContext.Provider value={contextValues}>
-            <AddressComponent />
-          </PatientRegistrationContext.Provider>
+          <AddressComponent />
         </Form>
       </Formik>
-    </ResourcesContext.Provider>,
+    </PatientRegistrationContextProvider>,
+    ResourcesContextProvider,
+    mockResourcesContextValue,
   );
 }
 

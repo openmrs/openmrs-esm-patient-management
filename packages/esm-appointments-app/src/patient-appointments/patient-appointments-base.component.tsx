@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
@@ -6,10 +6,9 @@ import { Add } from '@carbon/react/icons';
 import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
+import { PatientAppointmentContextTypes, usePatientAppointmentContext } from '../hooks/patient-appointment-context';
 import PatientAppointmentsTable from './patient-appointments-table.component';
 import styles from './patient-appointments-base.scss';
-
-import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
 
 interface PatientAppointmentsBaseProps {
   patientUuid: string;
@@ -25,7 +24,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
   const isTablet = useLayoutType() === 'tablet';
-  const patientAppointmentContext = useContext(PatientAppointmentContext);
+  const patientAppointmentContext = usePatientAppointmentContext();
   const [switchedView, setSwitchedView] = useState(false);
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
@@ -38,7 +37,9 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   } = usePatientAppointments(patientUuid, startDate, new AbortController());
 
   const handleLaunchAppointmentsForm = () => {
-    if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
+    if (
+      (patientAppointmentContext as PatientAppointmentContextTypes) === PatientAppointmentContextTypes.PATIENT_CHART
+    ) {
       launchPatientWorkspace('appointments-form-workspace');
     } else {
       launchWorkspace('appointments-form-workspace', {

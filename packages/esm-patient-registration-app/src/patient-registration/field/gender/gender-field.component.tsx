@@ -1,17 +1,17 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { RadioButton, RadioButtonGroup } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useField } from 'formik';
 import { type RegistrationConfig } from '../../../config-schema';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import styles from '../field.scss';
 
 export const GenderField: React.FC = () => {
-  const { fieldConfigurations } = useConfig<RegistrationConfig>();
   const { t } = useTranslation();
+  const { fieldConfigurations } = useConfig<RegistrationConfig>();
+  const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
   const [field, meta] = useField('gender');
-  const { setFieldValue, setFieldTouched } = useContext(PatientRegistrationContext);
   const fieldConfigs = fieldConfigurations?.gender;
 
   const setGender = (gender: string) => {
@@ -38,10 +38,10 @@ export const GenderField: React.FC = () => {
           valueSelected={field.value}>
           {fieldConfigs.map((option) => (
             <RadioButton
-              key={option.label ?? option.value}
               id={`gender-option-${option.value}`}
-              value={option.value}
+              key={option.label ?? option.value}
               labelText={t(option.label ?? option.value, option.label ?? option.value)}
+              value={option.value}
             />
           ))}
         </RadioButtonGroup>

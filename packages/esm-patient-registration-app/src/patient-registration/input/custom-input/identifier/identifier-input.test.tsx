@@ -1,12 +1,15 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { Form, Formik } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
-import { ResourcesContext, type Resources } from '../../../../offline.resources';
+import { renderWithContext } from 'tools';
+import { ResourcesContextProvider } from '../../../../resources-context';
+import { type Resources } from '../../../../offline.resources';
 import {
-  PatientRegistrationContext,
+  PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
 } from '../../../patient-registration-context';
 import type {
@@ -16,7 +19,6 @@ import type {
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
 import IdentifierInput from './identifier-input.component';
-import userEvent from '@testing-library/user-event';
 
 const mockIdentifierTypes = [
   {
@@ -91,16 +93,16 @@ describe('identifier input', () => {
   } as PatientIdentifierValue;
 
   const setupIdentifierInput = (patientIdentifier: PatientIdentifierValue, initialValues = {}) => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={initialValues} onSubmit={jest.fn()}>
-          <Form>
-            <PatientRegistrationContext.Provider value={mockContextValues}>
-              <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={mockContextValues}>
+            <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
   };
 

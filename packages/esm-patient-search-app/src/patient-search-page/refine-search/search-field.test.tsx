@@ -1,10 +1,10 @@
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import { render, screen } from '@testing-library/react';
-import { SearchField } from './search-field.component';
+import { renderWithSwr } from 'tools';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { type AdvancedPatientSearchState, type SearchFieldConfig } from '../../types';
-import { useForm } from 'react-hook-form';
-import { renderWithSwr } from 'tools';
+import { SearchField } from './search-field.component';
 
 jest.mock('./person-attributes.resource', () => ({
   usePersonAttributeType: jest.fn(),
@@ -61,10 +61,6 @@ describe('SearchField', () => {
     inTabletOrOverlay: false,
     isTablet: false,
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe('Gender field', () => {
     const genderField: SearchFieldConfig = {

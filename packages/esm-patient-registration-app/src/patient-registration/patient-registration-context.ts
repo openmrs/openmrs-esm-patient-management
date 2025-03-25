@@ -19,9 +19,17 @@ export interface PatientRegistrationContextProps {
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);
 
+export const PatientRegistrationContextProvider = PatientRegistrationContext.Provider;
+
+export const usePatientRegistrationContext = () => {
+  const context = useContext(PatientRegistrationContext);
+  if (!context) {
+    throw new Error('usePatientRegistrationContext must be used within a PatientRegistrationContextProvider');
+  }
+  return context;
+};
+
 export function useFieldConfig(field: string) {
   const { fieldConfigurations } = useConfig<RegistrationConfig>();
   return fieldConfigurations[field];
 }
-
-export const usePatientRegistrationContext = () => useContext(PatientRegistrationContext);

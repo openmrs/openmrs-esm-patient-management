@@ -1,19 +1,20 @@
-import { useAppContext } from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
 import React from 'react';
-import { renderWithSwr } from '../../../../../tools';
+import { screen } from '@testing-library/react';
+import { useAppContext } from '@openmrs/esm-framework';
+import { renderWithSwr } from 'tools';
 import { mockWardViewContext } from '../../../mock';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import { type AdmissionRequestsWorkspaceContextProps } from './admission-requests-context';
 import { type WardViewContext } from '../../types';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import DefaultWardPendingPatients from '../../ward-view/default-ward/default-ward-pending-patients.component';
-import AdmissionRequestsWorkspace, { type AdmissionRequestsWorkspaceProps } from './admission-requests.workspace';
+import AdmissionRequestsWorkspace from './admission-requests.workspace';
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
 jest.mock('../../hooks/useEmrConfiguration', () => jest.fn());
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
-const workspaceProps: AdmissionRequestsWorkspaceProps = {
+const workspaceProps: AdmissionRequestsWorkspaceContextProps = {
   closeWorkspace: jest.fn(),
   promptBeforeClosing: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),

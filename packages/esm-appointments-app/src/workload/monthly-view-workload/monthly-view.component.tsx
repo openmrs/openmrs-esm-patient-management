@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { monthDays } from '../../helpers';
+import { useSelectedDateContext } from '../../hooks/selected-date-context';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
-import SelectedDateContext from '../../hooks/selectedDateContext';
 import styles from './monthly-workload.scss';
 
 interface MonthlyCalendarViewProps {
@@ -20,7 +20,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
 }) => {
   const monthFormat = 'MMMM, YYYY';
   const { t } = useTranslation();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
   const daysInWeeks = daysInWeek.map((day) => t(day));
