@@ -236,7 +236,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     t('registerPatient', 'Register patient')
                   )}
                 </Button>
-                <Button className={styles.cancelButton} kind="danger--tertiary" onClick={cancelRegistration}>
+                <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}
                 </Button>
               </div>
