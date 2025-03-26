@@ -1,8 +1,8 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useField } from 'formik';
 import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 
 interface AddressFields {
   addressField: string;
@@ -57,7 +57,7 @@ export function useAddressEntries(fetchResults, searchString) {
  */
 export function useAddressEntryFetchConfig(addressField: string) {
   const { orderedFields, isLoadingFieldOrder } = useOrderedAddressHierarchyLevels();
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setFieldValue } = usePatientRegistrationContext();
   const [, { value: addressValues }] = useField('address');
 
   const index = useMemo(
