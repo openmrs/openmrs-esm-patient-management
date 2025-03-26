@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { useAddressHierarchy } from './address-hierarchy.resource';
-import { Search } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
+import { Search } from '@carbon/react';
+import { useAddressHierarchy } from './address-hierarchy.resource';
 import styles from './address-search.scss';
 
 interface AddressSearchComponentProps {
@@ -14,7 +14,6 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
   const separator = ' > ';
   const searchBox = useRef(null);
   const wrapper = useRef(null);
-
   const [searchString, setSearchString] = useState('');
 
   const { addresses } = useAddressHierarchy(searchString, separator);

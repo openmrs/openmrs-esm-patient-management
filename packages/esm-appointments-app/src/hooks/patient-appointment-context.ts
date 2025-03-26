@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 /**
  * When rendering the Patient Appointments view, let the view know if this is being rendered in the Patient Chart or the Appointments App
@@ -8,8 +8,11 @@ export enum PatientAppointmentContextTypes {
   PATIENT_CHART,
   APPOINTMENTS_APP,
 }
-const PatientAppointmentContext = createContext<PatientAppointmentContextTypes>(
+
+export const PatientAppointmentContext = createContext<PatientAppointmentContextTypes>(
   PatientAppointmentContextTypes.PATIENT_CHART,
 );
 
-export default PatientAppointmentContext;
+export const PatientAppointmentContextProvider = PatientAppointmentContext.Provider;
+
+export const usePatientAppointmentContext = () => useContext(PatientAppointmentContext);

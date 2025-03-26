@@ -1,12 +1,11 @@
+import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
-import dayjs from 'dayjs';
-import { useContext } from 'react';
-import SelectedDateContext from './selectedDateContext';
+import { useSelectedDateContext } from './selected-date-context';
 
 export const useAppointmentList = (appointmentStatus: string, date?: string) => {
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const startDate = date ? date : selectedDate;
   const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
   const searchUrl = `${restBaseUrl}/appointments/search`;
@@ -36,7 +35,7 @@ export const useAppointmentList = (appointmentStatus: string, date?: string) => 
 };
 
 export const useEarlyAppointmentList = (startDate?: string) => {
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const forDate = startDate ? startDate : selectedDate;
   const url = `${restBaseUrl}/appointment/earlyAppointment?forDate=${forDate}`;
 
