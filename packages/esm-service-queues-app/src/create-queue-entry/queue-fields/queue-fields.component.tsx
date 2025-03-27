@@ -8,19 +8,18 @@ import {
   SelectItem,
   SelectSkeleton,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
-import { useQueues } from '../../hooks/useQueues';
-import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
-import { postQueueEntry } from './queue-fields.resource';
-import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import { useQueueLocations } from '../hooks/useQueueLocations';
-import styles from './queue-fields.scss';
 import { Controller, useForm } from 'react-hook-form';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { TFunction } from 'i18next';
+import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
+import { postQueueEntry } from './queue-fields.resource';
+import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { useQueueLocations } from '../hooks/useQueueLocations';
+import { useQueues } from '../../hooks/useQueues';
+import styles from './queue-fields.scss';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<any>): void;
@@ -34,11 +33,10 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const { sessionLocation } = useSession();
   const {
-    visitQueueNumberAttributeUuid,
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
+    visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
   const { currentServiceQueueUuid } = useAddPatientToQueueContext();
-
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const QueueServiceSchema = (t: TFunction) =>
@@ -54,7 +52,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
       priority: z
         .string({ required_error: t('priorityIsRequired', 'Priority is required') })
         .trim()
-        .min(1, t('priorityIsRequired', 'Priority is required')),      
+        .min(1, t('priorityIsRequired', 'Priority is required')),
     });
 
   const {
@@ -116,15 +114,15 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
         });
     },
     [
-      trigger,
-      queueService,
+      defaultStatusConceptUuid,
+      mutateQueueEntries,
       priority,
       queueLocation,
-      defaultStatusConceptUuid,
-      visitQueueNumberAttributeUuid,
-      mutateQueueEntries,
-      t,
+      queueService,
       sortWeight,
+      t,
+      trigger,
+      visitQueueNumberAttributeUuid,
     ],
   );
 
@@ -145,7 +143,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
   }, [queueLocations, sessionLocation.uuid, setValue]);
 
   return (
-    <form>
+    <>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper>
@@ -254,7 +252,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
           />
         </section>
       )}
-    </form>
+    </>
   );
 });
 
