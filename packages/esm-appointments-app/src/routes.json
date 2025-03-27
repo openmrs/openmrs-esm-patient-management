@@ -79,7 +79,7 @@
       }
     },
     {
-      "name": "patientAppointments-details-widget",
+      "name": "appointments-details-widget",
       "component": "patientAppointmentsDetailedSummary",
       "slot": "patient-chart-appointments-dashboard-slot",
       "meta": {

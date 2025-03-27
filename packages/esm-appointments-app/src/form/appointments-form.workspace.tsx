@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +55,7 @@ import {
 } from '../constants';
 import { useProviders } from '../hooks/useProviders';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
-import SelectedDateContext from '../hooks/selectedDateContext';
+import { useSelectedDateContext } from '../hooks/selected-date-context';
 import Workload from '../workload/workload.component';
 import styles from './appointments-form.scss';
 
@@ -91,7 +91,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const { data: services, isLoading } = useAppointmentService();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 

@@ -23,7 +23,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
 }) => {
   const { t } = useTranslation();
   const id = useId();
-  const config = useConfig() as ConfigSchema;
+  const config = useConfig<ConfigSchema>();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveLevel = isTablet ? 1 : 0;
   const session = useSession();

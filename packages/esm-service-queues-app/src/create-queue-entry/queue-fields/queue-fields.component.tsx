@@ -1,3 +1,4 @@
+import React, { useCallback, useContext, useEffect } from 'react';
 import {
   InlineNotification,
   RadioButton,
@@ -7,15 +8,14 @@ import {
   SelectItem,
   SelectSkeleton,
 } from '@carbon/react';
-import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
-import React, { useCallback, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
-import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
-import { AddPatientToQueueContext } from '../create-queue-entry.workspace';
-import { useQueueLocations } from '../hooks/useQueueLocations';
+import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
 import { postQueueEntry } from './queue-fields.resource';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { useQueueLocations } from '../hooks/useQueueLocations';
 import styles from './queue-fields.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -38,6 +38,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
   } = useConfig<ConfigObject>();
   const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
+
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const QueueServiceSchema = (t: TFunction) =>

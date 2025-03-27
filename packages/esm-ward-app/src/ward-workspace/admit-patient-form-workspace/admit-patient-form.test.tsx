@@ -90,8 +90,6 @@ function renderAdmissionForm() {
 
 describe('Testing AdmitPatientForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     mockedUseSession.mockReturnValue({
       currentProvider: {
         uuid: 'current-provider-uuid',
@@ -100,6 +98,7 @@ describe('Testing AdmitPatientForm', () => {
       authenticated: true,
       sessionId: 'session-id',
     });
+
     mockedUseFeatureFlag.mockReturnValue(true);
 
     mockedUseWardLocation.mockReturnValue({

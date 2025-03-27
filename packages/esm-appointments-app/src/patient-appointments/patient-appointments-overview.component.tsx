@@ -1,10 +1,13 @@
 import React from 'react';
-import { usePatient, useLayoutType, isDesktop, WorkspaceContainer } from '@openmrs/esm-framework';
-import PatientAppointmentsBase from './patient-appointments-base.component';
-import { useParams } from 'react-router-dom';
-import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
-import PatientAppointmentsHeader from './patient-appointments-header';
 import { DataTableSkeleton } from '@carbon/react';
+import { useParams } from 'react-router-dom';
+import { usePatient, useLayoutType, isDesktop, WorkspaceContainer } from '@openmrs/esm-framework';
+import {
+  PatientAppointmentContextProvider,
+  PatientAppointmentContextTypes,
+} from '../hooks/patient-appointment-context';
+import PatientAppointmentsBase from './patient-appointments-base.component';
+import PatientAppointmentsHeader from './patient-appointments-header';
 import styles from './patient-appointments-overview.scss';
 
 /**
@@ -15,20 +18,22 @@ import styles from './patient-appointments-overview.scss';
  * @constructor
  */
 const PatientAppointmentsOverview: React.FC = () => {
-  let params = useParams();
+  const params = useParams();
   const response = usePatient(params.patientUuid);
   const layout = useLayoutType();
 
-  return response.isLoading ? (
-    <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />
-  ) : (
-    <PatientAppointmentContext.Provider value={PatientAppointmentContextTypes.APPOINTMENTS_APP}>
-      <div className={styles.patientAppointmentsOverview}>
-        <PatientAppointmentsHeader patient={response.patient} />
-        <PatientAppointmentsBase patientUuid={response.patient.id} />
-        <WorkspaceContainer overlay contextKey={`patient/${params.patientUuid}`} />
-      </div>
-    </PatientAppointmentContext.Provider>
+  return (
+    <PatientAppointmentContextProvider value={PatientAppointmentContextTypes.APPOINTMENTS_APP}>
+      {response.isLoading ? (
+        <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />
+      ) : (
+        <div className={styles.patientAppointmentsOverview}>
+          <PatientAppointmentsHeader patient={response.patient} />
+          <PatientAppointmentsBase patientUuid={response.patient.id} />
+          <WorkspaceContainer overlay contextKey={`patient/${params.patientUuid}`} />
+        </div>
+      )}
+    </PatientAppointmentContextProvider>
   );
 };
 
