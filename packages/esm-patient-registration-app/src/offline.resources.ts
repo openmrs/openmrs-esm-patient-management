@@ -27,7 +27,7 @@ export async function fetchAddressTemplate() {
 }
 
 export async function fetchNameTemplate() {
-  const { data } = await cacheAndFetch<NameTemplate>(`${restBaseUrl}/nametemplate`);
+  const { data } = await cacheAndFetch<NameTemplate>(`${restBaseUrl}/nametemplate/layout.name.format`);
   return data;
 }
 

@@ -4,7 +4,7 @@
     "webservices.rest": "^2.24.0"
   },
   "optionalBackendDependencies": {
-    "webservices.rest": "^2.48.0",
+    "webservices.rest": "^2.49.0",
     "feature": {
       "flagName": "name-template-layout",
       "label": "Patient Registration Name Layout",
