@@ -42,9 +42,18 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
 
   const QueueServiceSchema = (t: TFunction) =>
     z.object({
-      queueLocation: z.string().trim().min(1, t('queueLocationRequired', 'Queue location is required')),
-      queueService: z.string().trim().min(1, t('queueServiceRequired', 'Queue service is required')),
-      priority: z.string({ required_error: t('priorityIsRequired', 'Priority is required') }).trim(),
+      queueLocation: z
+        .string({ required_error: t('queueLocationRequired', 'Queue location is required') })
+        .trim()
+        .min(1, t('queueLocationRequired', 'Queue location is required')),
+      queueService: z
+        .string({ required_error: t('queueServiceRequired', 'Queue service is required') })
+        .trim()
+        .min(1, t('queueServiceRequired', 'Queue service is required')),
+      priority: z
+        .string({ required_error: t('priorityIsRequired', 'Priority is required') })
+        .trim()
+        .min(1, t('priorityIsRequired', 'Priority is required')),
     });
 
   const {
