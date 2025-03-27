@@ -185,7 +185,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
             ) : (
               <Select
                 {...field}
-                labelText={t('selectQueueService', 'Select a queue service')}
+                labelText={t('selectService', 'Select a service')}
                 id="queueService"
                 invalid={!!errors.queueService}
                 invalidText={errors.queueService?.message}
