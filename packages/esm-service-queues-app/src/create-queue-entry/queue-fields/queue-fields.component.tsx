@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   InlineNotification,
   RadioButton,
@@ -38,6 +38,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
   } = useConfig<ConfigObject>();
   const { currentServiceQueueUuid } = useAddPatientToQueueContext();
+
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const QueueServiceSchema = (t: TFunction) =>
@@ -53,7 +54,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
       priority: z
         .string({ required_error: t('priorityIsRequired', 'Priority is required') })
         .trim()
-        .min(1, t('priorityIsRequired', 'Priority is required')),
+        .min(1, t('priorityIsRequired', 'Priority is required')),      
     });
 
   const {
