@@ -163,11 +163,7 @@ const AddProviderQueueRoomModal: React.FC<AddProviderQueueRoomModalProps> = ({ c
   return (
     <div>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <ModalHeader
-          className={styles.modalHeader}
-          closeModal={closeModal}
-          title={t('addAProviderQueueRoom', 'Add provider queue room')}
-        />
+        <ModalHeader closeModal={closeModal} title={t('addAProviderQueueRoom', 'Add provider queue room')} />
         <ModalBody>
           <Stack gap={4}>
             <section>
