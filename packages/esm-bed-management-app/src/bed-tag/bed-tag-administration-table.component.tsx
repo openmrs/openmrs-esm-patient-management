@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -43,13 +43,16 @@ const BedTagAdministrationTable: React.FC = () => {
     });
   };
 
-  const openEditBedTagModal = (editData: BedTagData) => {
-    const dispose = showModal('edit-bed-tag-modal', {
-      closeModal: () => dispose(),
-      mutate: mutateBedTags,
-      editData: editData,
-    });
-  };
+  const openEditBedTagModal = useCallback(
+    (editData: BedTagData) => {
+      const dispose = showModal('edit-bed-tag-modal', {
+        closeModal: () => dispose(),
+        mutate: mutateBedTags,
+        editData: editData,
+      });
+    },
+    [mutateBedTags],
+  );
 
   const tableHeaders = [
     {
@@ -88,7 +91,7 @@ const BedTagAdministrationTable: React.FC = () => {
         </>
       ),
     }));
-  }, [responsiveSize, bedTags, t]);
+  }, [bedTags, t, responsiveSize, openEditBedTagModal]);
 
   if (isBedDataLoading || isLoadingBedTags) {
     return (

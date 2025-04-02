@@ -64,7 +64,18 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
         })
         .finally(closeModal);
     },
-    [closeModal, mutate, t],
+    [
+      closeModal,
+      editData.bedNumber,
+      editData.bedType.name,
+      editData.column,
+      editData.location.uuid,
+      editData.row,
+      editData.status,
+      editData.uuid,
+      mutate,
+      t,
+    ],
   );
 
   return (

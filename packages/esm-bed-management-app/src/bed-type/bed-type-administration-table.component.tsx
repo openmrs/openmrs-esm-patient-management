@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -21,8 +21,6 @@ import { ErrorState, isDesktop as desktopLayout, showModal, useLayoutType } from
 import type { BedTypeData } from '../types';
 import { useBedTypes } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
-import BedTypeForm from './new-bed-type-form.component';
-import EditBedTypeForm from './edit-bed-type.component';
 import Header from '../header/header.component';
 import styles from '../bed-administration/bed-administration-table.scss';
 
@@ -46,13 +44,16 @@ const BedTypeAdministrationTable: React.FC = () => {
     });
   };
 
-  const openEditBedTypeModal = (editData: BedTypeData) => {
-    const dispose = showModal('edit-bed-type-modal', {
-      closeModal: () => dispose(),
-      mutate: mutateBedTypes,
-      editData,
-    });
-  };
+  const openEditBedTypeModal = useCallback(
+    (editData: BedTypeData) => {
+      const dispose = showModal('edit-bed-type-modal', {
+        closeModal: () => dispose(),
+        mutate: mutateBedTypes,
+        editData,
+      });
+    },
+    [mutateBedTypes],
+  );
 
   const tableHeaders = [
     {
@@ -95,7 +96,7 @@ const BedTypeAdministrationTable: React.FC = () => {
           </IconButton>
         ),
       })),
-    [responsiveSize, bedTypes, t],
+    [openEditBedTypeModal, responsiveSize, bedTypes, t],
   );
 
   if (isLoadingBedTypes) {
