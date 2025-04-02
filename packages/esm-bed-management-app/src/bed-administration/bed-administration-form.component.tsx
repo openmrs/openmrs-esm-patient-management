@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ComboBox,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -37,8 +36,7 @@ interface BedAdministrationFormProps {
   headerTitle: string;
   initialData: BedWithLocation;
   occupancyStatuses: string[];
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
@@ -86,8 +84,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   headerTitle,
   initialData,
   occupancyStatuses,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
   const [occupancyStatus, setOccupancyStatus] = useState(capitalize(initialData.status));
@@ -129,9 +126,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    // TODO: Port this over to the modal system or create individual modals for each form
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -199,17 +195,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     items={allLocations}
                     itemToString={(location) => location?.display ?? ''}
                     label={t('location', 'Location')}
-                    /*
-                      TODO: onBlur shall be refactored to onBlur={onBlur} if esm-core has @carbon/react version 1.72+
-                      (ComboBox bug does not trigger onChange below mentioned version in production build - see https://github.com/carbon-design-system/carbon/issues/18145#issuecomment-2521936772)
-                    */
-                    onBlur={(event) => {
-                      const selectedLocation = allLocations.find((element) => element.display === event.target.value);
-                      if (selectedLocation)
-                        setValue('location', { display: selectedLocation.display, uuid: selectedLocation.uuid });
-                      else setValue('location', { display: '', uuid: '' });
-                      onBlur();
-                    }}
+                    onBlur={onBlur}
                     onChange={({ selectedItem }) => onChange(selectedItem)}
                     placeholder={t('selectBedLocation', 'Select a bed location')}
                     ref={ref}
@@ -283,14 +269,14 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 
