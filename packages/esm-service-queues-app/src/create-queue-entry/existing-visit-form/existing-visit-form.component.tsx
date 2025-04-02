@@ -24,7 +24,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
 
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [callback, setCallback] = useState<{
-    submitQueueEntry: (visit: Visit) => Promise<any>;
+    submitQueueEntry: (visit: Visit) => Promise<unknown>;
   } | null>(null);
 
   const handleCloseWorkspace = useCallback(() => {
@@ -38,27 +38,35 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
       event.preventDefault();
-      if (!callback) return;
+
+      if (!callback) {
+        return;
+      }
 
       setIsSubmitting(true);
+
       callback
-        ?.submitQueueEntry?.(visit)
-        ?.then(() => {
+        .submitQueueEntry(visit)
+        .then(() => {
           closeWorkspace();
           mutateQueueEntries();
         })
-        ?.finally(() => {
+        .finally(() => {
           setIsSubmitting(false);
         });
     },
     [closeWorkspace, callback, visit, mutateQueueEntries],
   );
 
-  const handleSetOnSubmit = useCallback((onSubmit: (visit: Visit) => Promise<any>) => {
+  const handleSetOnSubmit = useCallback((onSubmit: (visit: Visit) => Promise<unknown>) => {
     setCallback({ submitQueueEntry: onSubmit });
   }, []);
 
-  return visit ? (
+  if (!visit) {
+    return null;
+  }
+
+  return (
     <>
       {isTablet && (
         <Row className={styles.headerGridRow}>
@@ -81,7 +89,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         </ButtonSet>
       </Form>
     </>
-  ) : null;
+  );
 };
 
 export default ExistingVisitForm;
