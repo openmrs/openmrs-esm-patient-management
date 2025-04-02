@@ -24,8 +24,8 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
 
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [callback, setCallback] = useState<{
-    submitQueueEntry: (visit: Visit) => Promise<any>;
-  }>(null);
+    submitQueueEntry: (visit: Visit) => Promise<unknown>;
+  } | null>(null);
 
   const handleCloseWorkspace = useCallback(() => {
     if (handleReturnToSearchList) {
@@ -36,24 +36,37 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   }, [closeWorkspace, handleReturnToSearchList]);
 
   const handleSubmit = useCallback(
-    (event) => {
+    (event: React.FormEvent) => {
       event.preventDefault();
+
+      if (!callback) {
+        return;
+      }
+
       setIsSubmitting(true);
 
       callback
-        ?.submitQueueEntry?.(visit)
-        ?.then(() => {
+        .submitQueueEntry(visit)
+        .then(() => {
           closeWorkspace();
           mutateQueueEntries();
         })
-        ?.finally(() => {
+        .finally(() => {
           setIsSubmitting(false);
         });
     },
     [closeWorkspace, callback, visit, mutateQueueEntries],
   );
 
-  return visit ? (
+  const handleSetOnSubmit = useCallback((onSubmit: (visit: Visit) => Promise<unknown>) => {
+    setCallback({ submitQueueEntry: onSubmit });
+  }, []);
+
+  if (!visit) {
+    return null;
+  }
+
+  return (
     <>
       {isTablet && (
         <Row className={styles.headerGridRow}>
@@ -65,18 +78,18 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         </Row>
       )}
       <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
-        <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
+        <QueueFields setOnSubmit={handleSetOnSubmit} />
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={handleCloseWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          <Button className={styles.button} disabled={isSubmitting || !callback} kind="primary" type="submit">
             {t('addPatientToQueue', 'Add patient to queue')}
           </Button>
         </ButtonSet>
       </Form>
     </>
-  ) : null;
+  );
 };
 
 export default ExistingVisitForm;
