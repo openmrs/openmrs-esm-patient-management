@@ -17,7 +17,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedTagData } from '../types';
-import styles from '../modals.scss';
 
 const BedTagAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -77,7 +76,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
 
   return (
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader className={styles.modalHeader} title={headerTitle} />
+      <ModalHeader title={headerTitle} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>

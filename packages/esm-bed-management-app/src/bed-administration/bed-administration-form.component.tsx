@@ -23,7 +23,6 @@ import { type TFunction, useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
 import type { BedType, BedWithLocation } from '../types';
-import styles from '../modals.scss';
 
 /**
  * Adds translation for occupancy status options
@@ -132,7 +131,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   return (
     // TODO: Port this over to the modal system or create individual modals for each form
     <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader className={styles.modalHeader} title={headerTitle} />
+      <ModalHeader title={headerTitle} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
