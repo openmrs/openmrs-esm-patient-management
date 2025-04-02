@@ -22,7 +22,7 @@ import { useQueues } from '../../hooks/useQueues';
 import styles from './queue-fields.scss';
 
 export interface QueueFieldsProps {
-  setOnSubmit(onSubmit: (visit: Visit) => Promise<any>): void;
+  setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
 }
 
 /**
@@ -57,18 +57,18 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
 
   const {
     control,
-    watch,
+    formState: { errors },
     setValue,
     trigger,
-    formState: { errors },
+    watch,
   } = useForm({
-    resolver: zodResolver(QueueServiceSchema(t)),
     defaultValues: {
+      priority: defaultPriorityConceptUuid,
       queueLocation: queueLocations[0]?.id || '',
       queueService: '',
-      priority: defaultPriorityConceptUuid,
     },
     mode: 'onChange',
+    resolver: zodResolver(QueueServiceSchema(t)),
   });
 
   const queueLocation = watch('queueLocation');
@@ -143,7 +143,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
   }, [queueLocations, sessionLocation.uuid, setValue]);
 
   return (
-    <>
+    <div>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper>
@@ -252,7 +252,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
           />
         </section>
       )}
-    </>
+    </div>
   );
 });
 
