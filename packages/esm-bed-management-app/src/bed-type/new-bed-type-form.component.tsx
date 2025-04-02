@@ -7,11 +7,10 @@ import BedTypeAdministrationForm from './bed-type-admin-form.component';
 
 interface BedTypeFormProps {
   mutate: Mutator<BedType>;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, showModal }) => {
+const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const headerTitle = t('createBedType', 'Create bed type');
@@ -52,11 +51,9 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, sho
             subtitle: error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, t],
+    [closeModal, t, mutate],
   );
 
   return (
@@ -66,8 +63,7 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, sho
       handleSubmission={handleCreateBedType}
       headerTitle={headerTitle}
       initialData={initialData}
-      onModalChange={onModalChange}
-      showModal={showModal}
+      closeModal={closeModal}
     />
   );
 };

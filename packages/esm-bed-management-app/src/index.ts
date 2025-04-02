@@ -54,3 +54,10 @@ export const bedTagLeftPanelLink = getSyncLifecycle(
   }),
   options,
 );
+
+export const newBedModal = getAsyncLifecycle(() => import('./bed-administration/new-bed-form.component'), options);
+export const editBedModal = getAsyncLifecycle(() => import('./bed-administration/edit-bed-form.component'), options);
+export const newBedTypeModal = getAsyncLifecycle(() => import('./bed-type/new-bed-type-form.component'), options);
+export const editBedTypeModal = getAsyncLifecycle(() => import('./bed-type/edit-bed-type.component'), options);
+export const newBedTagModal = getAsyncLifecycle(() => import('./bed-tag/new-tag-form.component'), options);
+export const editBedTagModal = getAsyncLifecycle(() => import('./bed-tag/edit-tag-form.component'), options);

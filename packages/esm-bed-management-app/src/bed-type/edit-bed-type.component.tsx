@@ -9,11 +9,10 @@ import BedTypeAdministrationForm from './bed-type-admin-form.component';
 interface EditBedTypeFormProps {
   editData: BedTypeData;
   mutate: Mutator<BedType>;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, onModalChange, showModal }) => {
+const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
   const { bedTypes } = useBedTypes();
   const headerTitle = t('editBedType', 'Edit bed type');
@@ -48,25 +47,20 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, onM
             kind: 'error',
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, editData, t],
+    [editData.uuid, t, mutate, closeModal],
   );
 
   return (
-    <>
-      <BedTypeAdministrationForm
-        onModalChange={onModalChange}
-        availableBedTypes={bedTypes}
-        showModal={showModal}
-        handleSubmission={handleUpdateBedType}
-        headerTitle={headerTitle}
-        initialData={editData}
-        allLocations={[]}
-      />
-    </>
+    <BedTypeAdministrationForm
+      availableBedTypes={bedTypes}
+      handleSubmission={handleUpdateBedType}
+      headerTitle={headerTitle}
+      initialData={editData}
+      allLocations={[]}
+      closeModal={closeModal}
+    />
   );
 };
 
