@@ -20,8 +20,8 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [callback, setCallback] = useState<{
-    submitQueueEntry: (visit: Visit) => Promise<QueueEntry>;
-  }>(null);
+    submitQueueEntry: (visit: Visit) => Promise<unknown>;
+  } | null>(null);
 
   const handleSubmit = useCallback(
     (event) => {
