@@ -51,25 +51,27 @@ const defaultPriorityUuid = 'f4620bfa-3625-4883-bd3f-84c2cce14470';
 const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
 const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
 
+export const priorityConfig: PriorityConfig[] = [
+  {
+    conceptUuid: defaultEmergencyPriorityUuid,
+    color: 'red',
+    style: 'bold',
+  },
+  {
+    conceptUuid: defaultPriorityUuid,
+    color: 'green',
+    style: 'bold',
+  },
+  {
+    conceptUuid: defaultUrgentPriorityUuid,
+    color: 'orange',
+    style: 'bold',
+  },
+];
+
 export const defaultColumnConfig: ColumnConfig = {
   identifierTypeUuid: defaultIdentifierTypeUuid,
-  priorityConfigs: [
-    {
-      conceptUuid: defaultEmergencyPriorityUuid,
-      style: null,
-      color: 'red',
-    },
-    {
-      conceptUuid: defaultPriorityUuid,
-      style: null,
-      color: 'green',
-    },
-    {
-      conceptUuid: defaultUrgentPriorityUuid,
-      style: null,
-      color: 'orange',
-    },
-  ],
+  priorityConfigs: priorityConfig,
   statusConfigs: [],
   visitQueueNumberAttributeUuid: null,
 };
