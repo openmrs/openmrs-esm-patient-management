@@ -159,6 +159,7 @@
   "queueService": "Servizio di coda",
   "queueServiceCreated": "Servizio di coda creato",
   "queueServiceCreatedSuccessfully": "Servizio di coda creato con successo",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "Stato della coda",
   "refills": "Rinnovi della prescrizione",
   "remove": "Rimuovi",

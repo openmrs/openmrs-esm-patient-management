@@ -159,6 +159,7 @@
   "queueService": "Service d'attente",
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "Statut de la file d'attente",
   "refills": "Recharges",
   "remove": "Remove",
