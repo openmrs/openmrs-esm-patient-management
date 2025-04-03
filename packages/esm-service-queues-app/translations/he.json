@@ -159,6 +159,7 @@
   "queueService": "שירות התור",
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "מצב התור",
   "refills": "חידושים",
   "remove": "Remove",
