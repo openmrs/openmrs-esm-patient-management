@@ -90,7 +90,7 @@ describe('Demographics section', () => {
 
   it('renders demographics fields and date of birth inputs', async () => {
     const inputNames = await setupSection();
-    expect(inputNames.length).toBe(2);
+    expect(inputNames.length).toBe(3);
 
     expect(screen.getByText(/date of birth known\?/i)).toBeInTheDocument();
     expect(
