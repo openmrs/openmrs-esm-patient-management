@@ -54,18 +54,18 @@ const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
 export const priorityConfig: PriorityConfig[] = [
   {
     conceptUuid: defaultEmergencyPriorityUuid,
+    style: null,
     color: 'red',
-    style: 'bold',
   },
   {
     conceptUuid: defaultPriorityUuid,
+    style: null,
     color: 'green',
-    style: 'bold',
   },
   {
     conceptUuid: defaultUrgentPriorityUuid,
+    style: null,
     color: 'orange',
-    style: 'bold',
   },
 ];
 
