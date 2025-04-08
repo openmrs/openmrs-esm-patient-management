@@ -159,6 +159,7 @@
   "queueService": "Dịch vụ hàng đợi",
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "Trạng thái hàng đợi",
   "refills": "Nạp lại",
   "remove": "Remove",

@@ -159,6 +159,7 @@
   "queueService": "Serviço de fila",
   "queueServiceCreated": "Serviço de fila criado",
   "queueServiceCreatedSuccessfully": "Serviço de fila criado com sucesso",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "Status da fila",
   "refills": "Recargas",
   "remove": "Remove",
