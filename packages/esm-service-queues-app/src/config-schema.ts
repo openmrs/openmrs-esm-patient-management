@@ -56,22 +56,24 @@ export const priorityConfig: PriorityConfig[] = [
     conceptUuid: defaultEmergencyPriorityUuid,
     style: null,
     color: 'red',
+    priorityConfigs: [],
   },
   {
     conceptUuid: defaultPriorityUuid,
     style: null,
     color: 'green',
+    priorityConfigs: [],
   },
   {
     conceptUuid: defaultUrgentPriorityUuid,
     style: null,
     color: 'orange',
+    priorityConfigs: [],
   },
 ];
 
 export const defaultColumnConfig: ColumnConfig = {
   identifierTypeUuid: defaultIdentifierTypeUuid,
-  priorityConfigs: priorityConfig,
   statusConfigs: [],
   visitQueueNumberAttributeUuid: null,
 };
@@ -82,6 +84,30 @@ export const defaultQueueTable: TableDefinitions = {
 };
 
 export const configSchema = {
+  priorityConfigs: {
+    _type: Type.Array,
+    _default: [],
+    _description: 'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
+    _elements: {
+      conceptUuid: {
+        _type: Type.UUID,
+        _description: 'The UUID of the priority concept to configure',
+      },
+      color: {
+        _type: Type.String,
+        _description:
+          'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
+        _validators: [validators.oneOf(priorityTagColors)],
+        _default: 'gray',
+      },
+      style: {
+        _type: Type.String,
+        _description: 'Style to apply to the tag',
+        _validators: [validators.oneOf(tagStyles)],
+        _default: null,
+      },
+    },
+  },
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
@@ -221,18 +247,15 @@ export const configSchema = {
           ),
           validator(
             (columnDfn: ColumnDefinition) => {
-              return (
-                !columnDfn.config.priorityConfigs ||
-                columnDfn.config.priorityConfigs.length == 0 ||
-                columnHasType(columnDfn, 'priority')
-              );
+              return columnHasType(columnDfn, 'priority') || !columnDfn.config.hasOwnProperty('priorityConfigs');
             },
             (columnDfn) => {
               return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${
                 columnDfn.columnType ?? columnDfn.id
-              }.`;
+              }'.`;
             },
           ),
+
           validator(
             (columnDfn: ColumnDefinition) => {
               return (
@@ -269,31 +292,6 @@ export const configSchema = {
             _type: Type.UUID,
             _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
             _default: defaultIdentifierTypeUuid,
-          },
-          priorityConfigs: {
-            _type: Type.Array,
-            _default: [],
-            _description:
-              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
-            _elements: {
-              conceptUuid: {
-                _type: Type.UUID,
-                _description: 'The UUID of the priority concept to configure',
-              },
-              color: {
-                _type: Type.String,
-                _description:
-                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
-                _validators: [validators.oneOf(priorityTagColors)],
-                _default: 'gray',
-              },
-              style: {
-                _type: Type.String,
-                _description: 'Style to apply to the tag',
-                _validators: [validators.oneOf(tagStyles)],
-                _default: null,
-              },
-            },
           },
           statusConfigs: {
             _type: Type.Array,
@@ -410,6 +408,7 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 }
 
 export interface ConfigObject {
+  priorityConfigs: Array<PriorityConfig>;
   appointmentStatuses: Array<string>;
   biometrics: BiometricsConfigObject;
   concepts: {
@@ -468,13 +467,10 @@ export interface PatientIdentifierColumnConfig {
   identifierTypeUuid: string; // uuid of the identifier type
 }
 export interface PriorityConfig {
+  priorityConfigs: PriorityConfig[];
   conceptUuid: string;
   color: PriorityTagColor;
   style: TagStyle;
-}
-
-export interface PriorityColumnConfig {
-  priorityConfigs: PriorityConfig[];
 }
 
 export interface StatusConfig {
@@ -486,10 +482,7 @@ export interface StatusColumnConfig {
   statusConfigs: StatusConfig[];
 }
 
-export type ColumnConfig = PatientIdentifierColumnConfig &
-  PriorityColumnConfig &
-  StatusColumnConfig &
-  VisitAttributeQueueNumberColumnConfig;
+export type ColumnConfig = PatientIdentifierColumnConfig & StatusColumnConfig & VisitAttributeQueueNumberColumnConfig;
 
 export interface TableDefinitions {
   // Column IDs defined either in columnDefinitions or in builtInColumns
