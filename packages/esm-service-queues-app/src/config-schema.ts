@@ -56,19 +56,16 @@ export const priorityConfig: PriorityConfig[] = [
     conceptUuid: defaultEmergencyPriorityUuid,
     style: null,
     color: 'red',
-    priorityConfigs: [],
   },
   {
     conceptUuid: defaultPriorityUuid,
     style: null,
     color: 'green',
-    priorityConfigs: [],
   },
   {
     conceptUuid: defaultUrgentPriorityUuid,
     style: null,
     color: 'orange',
-    priorityConfigs: [],
   },
 ];
 
@@ -467,7 +464,6 @@ export interface PatientIdentifierColumnConfig {
   identifierTypeUuid: string; // uuid of the identifier type
 }
 export interface PriorityConfig {
-  priorityConfigs: PriorityConfig[];
   conceptUuid: string;
   color: PriorityTagColor;
   style: TagStyle;
