@@ -159,6 +159,7 @@
   "queueService": "队列服务",
   "queueServiceCreated": "队列服务已创建",
   "queueServiceCreatedSuccessfully": "队列服务已成功创建",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "队列状态",
   "refills": "补充处方",
   "remove": "Remove",
