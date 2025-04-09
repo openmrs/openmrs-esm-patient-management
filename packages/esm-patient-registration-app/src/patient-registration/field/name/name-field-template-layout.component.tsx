@@ -13,18 +13,6 @@ import { useResourcesContext } from '../../../resources-context';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 
-/**
- * DO NOT REMOVE THIS COMMENT HERE, ADDS TRANSLATION FOR NAME FIELD ELEMENTS
- * t('nameLabelText.prefix', 'Prefix')
- * t('nameLabelText.givenName', 'First Name')
- * t('nameLabelText.middleName', 'Middle Name')
- * t('nameLabelText.familyNamePrefix', 'Family Name Prefix')
- * t('nameLabelText.familyName', 'Family Name')
- * t('nameLabelText.familyName2', 'Family Name 2')
- * t('nameLabelText.familyNameSuffix', 'Family Name Suffix')
- * t('nameLabelText.degree', 'Degree')
- */
-
 const containsNoNumbers = /^([^0-9]*)$/;
 
 function checkNoNumbers(value: string) {
@@ -46,12 +34,6 @@ function getRequiredFields(nameTemplate: NameTemplate, ...required: NameProperti
   return Object.fromEntries(requiredFields.concat(nameTemplateRequiredFields));
 }
 
-const defaultNameLayout: { id: NameProperties; name: NameProperties; label: string; required: boolean }[] = [
-  { id: 'givenName', name: 'givenName', label: 'First Name', required: true },
-  { id: 'middleName', name: 'middleName', label: 'Middle Name', required: false },
-  { id: 'familyName', name: 'familyName', label: 'Family Name', required: true },
-];
-
 export const NameFieldWithTemplate: React.FC = () => {
   const { t } = useTranslation();
   const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
@@ -68,11 +50,21 @@ export const NameFieldWithTemplate: React.FC = () => {
   } = useConfig<RegistrationConfig>();
 
   const { nameTemplate } = useResourcesContext();
+
+  // name layout to apply if no valid nametemplate is provided by the backend
+  const defaultNameLayout = useMemo(() => {
+    const fields = [
+      { id: 'givenName', name: 'givenName', label: t('givenNameLabelText', 'First Name'), required: true },
+      { id: 'middleName', name: 'middleName', label: t('middleNameLabelText', 'Middle Name'), required: false },
+      { id: 'familyName', name: 'familyName', label: t('familyNameLabelText', 'Family Name'), required: true },
+    ];
+    return !displayReverseFieldOrder ? fields : fields.reverse();
+  }, [t, displayReverseFieldOrder]);
+
   const nameLayout = useMemo(() => {
     if (!nameTemplate?.lines) {
       return defaultNameLayout;
     }
-
     const fields = getLayoutFields(nameTemplate, displayReverseFieldOrder);
     // givenName and familyName fields are always required for the patient API, irrespective of the name template.
     // ...see also patient-registration-validation.ts
@@ -85,7 +77,7 @@ export const NameFieldWithTemplate: React.FC = () => {
         required: Boolean(requiredFields[codeName]),
       };
     });
-  }, [nameTemplate, displayReverseFieldOrder]);
+  }, [nameTemplate, defaultNameLayout, displayReverseFieldOrder]);
 
   const clearNameFieldValues = () => {
     nameLayout?.forEach((value) => {
@@ -168,7 +160,7 @@ export const NameFieldWithTemplate: React.FC = () => {
               <Input
                 key={`text_input_${index}`}
                 name={attributes.name}
-                labelText={t(`nameLabelText.${attributes.name}`, attributes.label)}
+                labelText={attributes.label}
                 id={`name.${attributes.name}`}
                 checkWarning={checkNoNumbers}
                 required={attributes.required}
