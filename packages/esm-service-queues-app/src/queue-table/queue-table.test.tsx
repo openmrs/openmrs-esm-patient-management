@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
@@ -93,7 +94,7 @@ describe('QueueTable', () => {
 
     for (const entry of mockQueueEntries) {
       const patientName = entry.patient.person.display;
-      const row = screen.getByRole('row', { name: patientName });
+      const row = screen.getByText(patientName).closest('tr');
 
       expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
       expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
