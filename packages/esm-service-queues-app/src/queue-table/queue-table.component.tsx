@@ -35,8 +35,8 @@ interface QueueTableProps {
   // statusUuid param should be null.
   // For a table displaying entries from multiple quueues
   // both queueUuid and statusUuid params should be null
-  queueUuid: string;
-  statusUuid: string;
+  queueUuid: string | null;
+  statusUuid: string | null;
 
   // If provided, overides the columns specified by the tablesConfig configuration.
   queueTableColumnsOverride?: QueueTableColumn[];

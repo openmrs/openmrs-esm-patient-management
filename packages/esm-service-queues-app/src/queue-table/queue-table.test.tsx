@@ -20,7 +20,6 @@ const configWithCustomColumns = {
         config: {
           identifierType: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
           identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
-          priorityConfigs: [],
           statusConfigs: [],
           visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
         },
@@ -96,8 +95,8 @@ describe('QueueTable', () => {
       const patientName = entry.patient.person.display;
       const row = screen.getByText(patientName).closest('tr');
 
-      expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
-      expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
+      expect(within(row!).getByText(entry.status.display)).toBeInTheDocument();
+      expect(within(row!).getByText(entry.priority.display)).toBeInTheDocument();
     }
   });
 
@@ -173,18 +172,6 @@ describe('QueueTable', () => {
             id: 'priority',
             config: {
               identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
-              priorityConfigs: [
-                {
-                  conceptUuid: mockPriorityNonUrgent.uuid,
-                  color: 'blue',
-                  style: 'bold',
-                },
-                {
-                  conceptUuid: mockPriorityUrgent.uuid,
-                  color: 'orange',
-                  style: null,
-                },
-              ],
               statusConfigs: [],
               visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
             },
