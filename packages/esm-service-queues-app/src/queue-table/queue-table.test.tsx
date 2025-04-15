@@ -78,7 +78,7 @@ describe('QueueTable', () => {
     renderQueueTable();
 
     const rows = screen.queryAllByRole('row');
-    expect(rows).toHaveLength(1); // should only have the header row
+    expect(rows).toHaveLength(1);
 
     const headerRow = rows[0];
     const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
@@ -95,8 +95,8 @@ describe('QueueTable', () => {
       const patientName = entry.patient.person.display;
       const row = screen.getByText(patientName).closest('tr');
 
-      expect(within(row!).getByText(entry.status.display)).toBeInTheDocument();
-      expect(within(row!).getByText(entry.priority.display)).toBeInTheDocument();
+      expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
+      expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
     }
   });
 
@@ -166,6 +166,18 @@ describe('QueueTable', () => {
   it('supports custom styles for priority tags at column level', () => {
     mockUseConfig.mockReturnValue({
       ...configDefaults,
+      priorityConfigs: [
+        {
+          conceptUuid: mockPriorityNonUrgent.uuid,
+          color: 'blue',
+          style: 'bold',
+        },
+        {
+          conceptUuid: mockPriorityUrgent.uuid,
+          color: 'orange',
+          style: null,
+        },
+      ],
       queueTables: {
         columnDefinitions: [
           {
