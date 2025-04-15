@@ -17,9 +17,8 @@ import {
   InlineLoading,
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
-import { navigate, usePagination } from '@openmrs/esm-framework';
+import { navigate, showModal, usePagination } from '@openmrs/esm-framework';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
-import NewBedForm from '../bed-administration/new-bed-form.component';
 import Header from '../header/header.component';
 import styles from './ward-with-beds.scss';
 
@@ -32,7 +31,6 @@ const WardWithBeds: React.FC = () => {
   const { name } = useLocationName(location);
 
   const [pageSize, setPageSize] = useState(10);
-  const [showAddBedModal, setShowAddBedModal] = useState(false);
   const { results: paginatedData, goTo, currentPage } = usePagination(bedsData, pageSize);
 
   if (isLoadingBeds) {
@@ -89,6 +87,14 @@ const WardWithBeds: React.FC = () => {
     }));
   }, [paginatedData]);
 
+  const openNewBedModal = () => {
+    const dispose = showModal('new-bed-modal', {
+      closeModal: () => dispose(),
+      mutate: mutate,
+      defaultLocation: { display: name, uuid: location },
+    });
+  };
+
   return (
     <>
       <Header title={name ? name : '--'} />
@@ -113,22 +119,9 @@ const WardWithBeds: React.FC = () => {
               <span>{t('returnToSummary', 'Return to summary')}</span>
             </Button>
             <span>{isValidating ? <InlineLoading /> : null}</span>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setShowAddBedModal(true)}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedModal}>
               <span>{t('addBed', 'Add bed')}</span>
             </Button>
-          </div>
-          <div>
-            {showAddBedModal ? (
-              <NewBedForm
-                mutate={mutate}
-                onModalChange={setShowAddBedModal}
-                showModal={showAddBedModal}
-                defaultLocation={{ display: name, uuid: location }}
-              />
-            ) : null}
           </div>
           <div className={styles.container}>
             <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>

@@ -107,7 +107,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ c
 
   return (
     <div>
-      <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={t('servePatient', 'Serve patient')} />
+      <ModalHeader closeModal={closeModal} title={t('servePatient', 'Serve patient')} />
       <ModalBody className={styles.modalBody}>
         <div>
           <section className={styles.modalBody}>

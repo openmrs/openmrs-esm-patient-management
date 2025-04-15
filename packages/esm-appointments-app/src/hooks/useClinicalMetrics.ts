@@ -1,19 +1,19 @@
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { uniqBy } from 'lodash-es';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
+import { useSelectedDateContext } from './selected-date-context';
 import {
   flattenAppointmentSummary,
   getHighestAppointmentServiceLoad,
   getServiceCountByAppointmentType,
 } from '../helpers';
-import SelectedDateContext from './selectedDateContext';
 import { type Appointment, type AppointmentSummary } from '../types';
 
 export const useClinicalMetrics = () => {
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const endDate = dayjs(new Date(selectedDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
   const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${selectedDate}&endDate=${endDate}`;
   const { data, error, isLoading } = useSWR<{
@@ -37,7 +37,7 @@ export const useClinicalMetrics = () => {
 };
 
 export const useAppointmentsForDate = () => {
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   const url = selectedDate ? `${restBaseUrl}/appointment/all?forDate=${selectedDate}` : null;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(

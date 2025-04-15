@@ -1,9 +1,8 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Identifier } from '../types';
 import { configSchema } from '../config-schema';
-import SelectedDateContext from './selectedDateContext';
-import { useContext } from 'react';
+import { useSelectedDateContext } from './selected-date-context';
 
 export interface Response {
   age: number;
@@ -21,7 +20,7 @@ export interface Response {
 }
 
 export function useUnscheduledAppointments() {
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useSelectedDateContext();
   // TODO/NOTE: this endpoint is not implemented in main Bahmni Appointments backend
   const url = `${restBaseUrl}/appointment/unScheduledAppointment?forDate=${selectedDate}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Response> }>(url, openmrsFetch, { errorRetryCount: 2 });
