@@ -4,7 +4,6 @@ import { type QueueEntry } from '../../types';
 import { Button, ModalHeader, ModalBody, ModalFooter, Stack } from '@carbon/react';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import styles from './queue-entry-confirm-action.scss';
 
 interface QueueEntryUndoActionsModalProps {
   queueEntry: QueueEntry;
@@ -78,7 +77,7 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
 
   return (
     <>
-      <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
+      <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         {isRemovingPatientFromQueue ? (
           <p>{modalInstruction}</p>

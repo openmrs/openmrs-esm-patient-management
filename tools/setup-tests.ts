@@ -15,7 +15,7 @@ window.HTMLFormElement.prototype.requestSubmit = jest.fn();
 window.matchMedia = jest.fn().mockImplementation(() => {
   return {
     matches: false,
-    addListener: () => {},
-    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
   };
 });

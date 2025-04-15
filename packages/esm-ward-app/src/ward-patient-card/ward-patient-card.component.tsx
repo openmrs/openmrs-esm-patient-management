@@ -21,6 +21,8 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
           launchWorkspaceGroup('ward-patient', {
             state: {
               wardPatient,
+              patient,
+              patientUuid: patient.uuid,
             },
             onWorkspaceGroupLaunch: () => {
               const store = getPatientChartStore();

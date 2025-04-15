@@ -72,7 +72,6 @@ const RemoveQueueEntryModal: React.FC<RemoveQueueEntryModalProps> = ({ queueEntr
   return (
     <>
       <ModalHeader
-        className={styles.modalHeader}
         closeModal={closeModal}
         label={t('serviceQueue', 'Service queue')}
         title={t('removeFromQueueAndEndVisit', 'Remove patient from queue and end active visit?')}
