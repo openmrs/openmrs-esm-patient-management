@@ -7,8 +7,8 @@
   "dose": "Dose",
   "encounterType": "Encounter Type",
   "endDate": "End date",
-  "filterTable": "Filter table",
   "filterActiveVisits": "Filter active visits",
+  "filterTable": "Filter table",
   "gender": "Gender",
   "idNumber": "ID Number",
   "indication": "Indication",
@@ -32,8 +32,8 @@
   "thereIsNoInformationToDisplayHere": "There is no information to display here",
   "time": "Time",
   "totalVisits": "Total Visits Today",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "Visit Time",
   "visitSummary": "Visit Summary",
-  "visitType": "Visit Type",
-  "viewPatientChartFor": "View patient chart for {{patientName}}"
+  "visitType": "Visit Type"
 }
