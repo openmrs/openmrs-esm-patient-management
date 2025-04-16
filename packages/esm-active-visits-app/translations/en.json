@@ -8,6 +8,7 @@
   "encounterType": "Encounter Type",
   "endDate": "End date",
   "filterTable": "Filter table",
+  "filterActiveVisits": "Filter active visits",
   "gender": "Gender",
   "idNumber": "ID Number",
   "indication": "Indication",
@@ -33,5 +34,6 @@
   "totalVisits": "Total Visits Today",
   "visitStartTime": "Visit Time",
   "visitSummary": "Visit Summary",
-  "visitType": "Visit Type"
+  "visitType": "Visit Type",
+  "viewPatientChartFor": "View patient chart for {{patientName}}"
 }

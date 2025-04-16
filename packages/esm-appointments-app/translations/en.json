@@ -90,6 +90,7 @@
   "expected": "Expected",
   "filterAppointmentsByServiceType": "Filter appointments by service type",
   "filterTable": "Filter table",
+  "filterAppointments": "Filter appointments",
   "gender": "Gender",
   "highestServiceVolume": "Highest volume service: {{time}}",
   "identifier": "Identifier",
