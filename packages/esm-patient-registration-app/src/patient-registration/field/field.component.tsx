@@ -1,5 +1,5 @@
 import React from 'react';
-import { reportError, useConfig } from '@openmrs/esm-framework';
+import { reportError, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { builtInFields, type RegistrationConfig } from '../../config-schema';
 import { AddressComponent } from './address/address-field.component';
 import { CauseOfDeathField } from './cause-of-death/cause-of-death.component';
@@ -9,6 +9,7 @@ import { DobField } from './dob/dob.component';
 import { GenderField } from './gender/gender-field.component';
 import { Identifiers } from './id/id-field.component';
 import { NameField } from './name/name-field.component';
+import { NameFieldWithTemplate } from './name/name-field-template-layout.component';
 import { PhoneField } from './phone/phone-field.component';
 
 export interface FieldProps {
@@ -17,6 +18,8 @@ export interface FieldProps {
 
 export function Field({ name }: FieldProps) {
   const config = useConfig<RegistrationConfig>();
+  const isNameTemplateLayoutEnabled = useFeatureFlag('name-template-layout');
+  
   if (
     !(builtInFields as ReadonlyArray<string>).includes(name) &&
     !config.fieldDefinitions.some((def) => def.id == name)
@@ -32,7 +35,7 @@ export function Field({ name }: FieldProps) {
 
   switch (name) {
     case 'name':
-      return <NameField />;
+      return isNameTemplateLayoutEnabled ? <NameFieldWithTemplate /> : <NameField />;
     case 'gender':
       return <GenderField />;
     case 'dob':

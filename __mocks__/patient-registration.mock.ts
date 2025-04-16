@@ -1,3 +1,62 @@
+export const mockedNameTemplate = {
+  displayName: null,
+  codeName: 'default',
+  country: null,
+  lines: [
+    [
+      {
+        isToken: 'IS_NOT_NAME_TOKEN' as const,
+        displayText: '',
+      },
+      {
+        isToken: 'IS_NAME_TOKEN' as const,
+        displayText: 'First Name',
+        codeName: 'givenName' as const,
+        displaySize: '40',
+      },
+    ],
+    [
+      {
+        isToken: 'IS_NOT_NAME_TOKEN' as const,
+        displayText: '',
+      },
+      {
+        isToken: 'IS_NAME_TOKEN' as const,
+        displayText: 'Middle Name',
+        codeName: 'middleName' as const,
+        displaySize: '40',
+      },
+    ],
+    [
+      {
+        isToken: 'IS_NOT_NAME_TOKEN' as const,
+        displayText: '',
+      },
+      {
+        isToken: 'IS_NAME_TOKEN' as const,
+        displayText: 'Family Name',
+        codeName: 'familyName' as const,
+        displaySize: '40',
+      },
+    ],
+  ],
+  lineByLineFormat: ['givenName', 'middleName', 'familyName'],
+  nameMappings: {
+    givenName: 'First Name',
+    middleName: 'Middle Name',
+    familyName: 'Family Name',
+  },
+  sizeMappings: {
+    givenName: '40',
+    middleName: '40',
+    familyName: '40',
+  },
+  elementDefaults: {},
+  elementRegex: null,
+  elementRegexFormats: null,
+  requiredElements: null,
+};
+
 export const mockedAddressTemplate = {
   displayName: null,
   codeName: 'default',
