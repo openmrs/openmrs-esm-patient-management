@@ -64,7 +64,6 @@
   "idFieldLabelText": "Identifiers",
   "IDInstructions": "Select the identifiers you'd like to add for this patient:",
   "invalidEmail": "Invalid email",
-  "invalidIdentifierFormat": "{{description}}",
   "invalidInput": "Invalid Input",
   "isDeadInputLabel": "Is dead",
   "jumpTo": "Jump to",

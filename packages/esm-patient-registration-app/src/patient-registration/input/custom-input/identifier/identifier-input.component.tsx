@@ -57,9 +57,8 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
       if (regex.test(value)) {
         return;
       }
-      return t('invalidIdentifierFormat', '{{description}}', {
-        description: identifierType.formatDescription || `Expected format: ${identifierType.format}`,
-      });
+
+      return identifierType.formatDescription ?? `Expected format: ${identifierType.format}`;
     } catch (e) {
       console.error('Invalid regex pattern:', identifierType.format);
       return;
