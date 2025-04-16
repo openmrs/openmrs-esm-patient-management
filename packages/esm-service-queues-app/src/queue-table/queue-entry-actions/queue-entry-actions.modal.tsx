@@ -25,7 +25,7 @@ import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
-import styles from './queue-entry-actions-modal.scss';
+import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -208,7 +208,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   return (
     <>
-      <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
+      <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>

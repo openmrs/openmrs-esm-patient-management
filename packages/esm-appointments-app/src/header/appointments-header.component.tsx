@@ -1,11 +1,11 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { MultiSelect } from '@carbon/react';
 import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import SelectedDateContext from '../hooks/selectedDateContext';
+import { useSelectedDateContext } from '../hooks/selected-date-context';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
@@ -16,7 +16,7 @@ interface AppointmentHeaderProps {
 
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
   const { t } = useTranslation();
-  const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
+  const { selectedDate, setSelectedDate } = useSelectedDateContext();
   const { serviceTypes } = useAppointmentServices();
 
   const [selectedItems, setSelectedItems] = useState([]);
@@ -40,12 +40,11 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
         <OpenmrsDatePicker
+          data-testid="appointment-date-picker"
+          id="appointment-date-picker"
+          labelText=""
           onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
           value={dayjs(selectedDate).toDate()}
-          style={{ cursor: 'pointer', backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
-          id="appointment-date-picker"
-          data-testid="appointment-date-picker"
-          labelText=""
         />
         {typeof onChange === 'function' && (
           <MultiSelect

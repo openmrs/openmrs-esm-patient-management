@@ -24,6 +24,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
+import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   formatDate,
@@ -35,7 +36,6 @@ import {
   launchWorkspace,
   usePagination,
 } from '@openmrs/esm-framework';
-import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
@@ -234,13 +234,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                 size={responsiveSize}>
                                 <OverflowMenuItem
                                   className={styles.menuItem}
-                                  itemText={t('editAppointments', 'Edit appointment')}
+                                  itemText={t('editAppointment', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace('edit-appointments-form', {
+                                    launchWorkspace('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
+                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />

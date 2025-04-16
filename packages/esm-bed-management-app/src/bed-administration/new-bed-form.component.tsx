@@ -1,20 +1,19 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { type BedWithLocation } from '../types';
-import { type BedAdministrationData } from './bed-administration-types';
 import { saveBed, useBedType } from './bed-administration.resource';
 import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
 import BedAdministrationForm from './bed-administration-form.component';
+import { type BedWithLocation } from '../types';
+import { type BedAdministrationData } from './bed-administration-types';
 
 interface NewBedFormProps {
   mutate: () => void;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
   defaultLocation?: { display: string; uuid: string };
 }
 
-const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate, defaultLocation }) => {
+const NewBedForm: React.FC<NewBedFormProps> = ({ closeModal, mutate, defaultLocation }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
@@ -64,19 +63,16 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
             subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, t],
+    [t, mutate, closeModal],
   );
 
   return (
     <BedAdministrationForm
-      onModalChange={onModalChange}
+      closeModal={closeModal}
       allLocations={admissionLocations}
       availableBedTypes={availableBedTypes}
-      showModal={showModal}
       handleCreateBed={handleCreateBed}
       headerTitle={headerTitle}
       occupancyStatuses={occupancyStatuses}

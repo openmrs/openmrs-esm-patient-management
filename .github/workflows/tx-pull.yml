@@ -9,11 +9,12 @@ name: "Scheduled Transifex Update"
 jobs:
   pull-translations-from-transifex:
     name: pull-translations-from-transifex
-    
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
+    if: github.repository_owner == 'openmrs'
+
     steps:
       - uses: actions/checkout@v4
       - name: Push source file using transifex client
@@ -22,11 +23,22 @@ jobs:
           token: ${{ secrets.TRANSIFEX_TOKEN }}
           args: pull --force --all
       - name: Create PR if necessary
-        uses: peter-evans/create-pull-request@v6.0.1
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: "(chore) Update translations from Transifex"
-          title: "(chore) Update translations from Transifex"
-          body: "Automated updates of translations pulled from Transifex"
-          branch: "chore/update-transifex"
-          author: "OpenMRS Bot <infrastructure@openmrs.org>"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '(chore) Update translations from Transifex'
+          title: '(chore) Update translations from Transifex'
+          body: 'Automated updates of translations pulled from Transifex'
+          branch: 'chore/update-transifex'
+          author: 'OpenMRS Bot <infrastructure@openmrs.org>'
+          token: ${{ secrets.OMRS_BOT_GH_TOKEN }}
+      - name: ✅ Auto approve PR
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
+        run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 🔀 Automerge PR
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
+        run: gh pr merge --auto --squash "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

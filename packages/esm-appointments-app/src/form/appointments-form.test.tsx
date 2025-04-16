@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -15,7 +15,7 @@ import { mockUseAppointmentServiceData, mockSession, mockLocations, mockProvider
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
-import AppointmentForm from './appointments-form.component';
+import AppointmentForm from './appointments-form.workspace';
 
 const defaultProps = {
   context: 'creating',
@@ -83,18 +83,13 @@ describe('AppointmentForm', () => {
     expect(screen.getByLabelText(/select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write any additional points here/i)).toBeInTheDocument();
-    expect(screen.getByTestId('datePickerInput')).toBeInTheDocument();
-    expect(screen.getByTestId('dateAppointmentScheduledPickerInput')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /mosoriot/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /inpatient ward/i })).toBeInTheDocument();
-    expect(screen.getByTestId('dateAppointmentScheduledPickerInput')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /^am$/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /^pm$/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /choose appointment type/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /scheduled/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /walkin/i })).toBeInTheDocument();
-    expect(screen.getByTestId('dateAppointmentScheduledPickerInput')).toBeInTheDocument();
-
     expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
@@ -129,10 +124,8 @@ describe('AppointmentForm', () => {
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
-    const dateInput = screen.getByTestId('dateAppointmentScheduledPickerInput');
-    const dateDayInput = within(dateInput).getByRole('spinbutton', { name: /day/i });
-    const dateMonthInput = within(dateInput).getByRole('spinbutton', { name: /month/i });
-    const dateYearInput = within(dateInput).getByRole('spinbutton', { name: /year/i });
+    const dateInput = screen.getByRole('textbox', { name: /^date$/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const timeFormat = screen.getByRole('combobox', { name: /time/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -142,15 +135,14 @@ describe('AppointmentForm', () => {
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
-    const [day, month, year] = '4/4/2021'.split('/');
+    const date = '2024-01-04';
     const time = '09:30';
 
-    await user.type(dateDayInput, day);
-    await user.type(dateMonthInput, month);
-    await user.type(dateYearInput, year);
+    fireEvent.change(dateInput, { target: { value: date } });
     await user.type(timeInput, time);
-    await user.tab();
     await user.selectOptions(timeFormat, 'AM');
+    await user.click(dateAppointmentIssuedInput);
+    fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
     await user.click(saveButton);
 
     expect(mockSaveAppointment).toHaveBeenCalledTimes(1);
@@ -202,10 +194,8 @@ describe('AppointmentForm', () => {
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
-    const dateInput = screen.getByTestId('dateAppointmentScheduledPickerInput');
-    const dateDayInput = within(dateInput).getByRole('spinbutton', { name: /day/i });
-    const dateMonthInput = within(dateInput).getByRole('spinbutton', { name: /month/i });
-    const dateYearInput = within(dateInput).getByRole('spinbutton', { name: /year/i });
+    const dateInput = screen.getByRole('textbox', { name: /^date$/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const timeFormat = screen.getByRole('combobox', { name: /time/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -215,14 +205,13 @@ describe('AppointmentForm', () => {
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
-    const [day, month, year] = '04/04/2021'.split('/');
+    const date = '2024-01-04';
     const time = '09:30';
 
-    await user.type(dateDayInput, day);
-    await user.type(dateMonthInput, month);
-    await user.type(dateYearInput, year);
+    fireEvent.change(dateInput, { target: { value: date } });
     await user.type(timeInput, time);
-    await user.tab();
+    await user.click(dateAppointmentIssuedInput);
+    fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
     await user.selectOptions(timeFormat, 'AM');
     await user.click(saveButton);
 

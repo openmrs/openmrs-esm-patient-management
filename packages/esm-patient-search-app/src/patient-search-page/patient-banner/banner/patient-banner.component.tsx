@@ -1,7 +1,6 @@
-import React, { useContext, useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { v4 as uuidv4 } from 'uuid';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { Button, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ConfigurableLink,
   ExtensionSlot,
@@ -10,15 +9,16 @@ import {
   PatientBannerToggleContactDetailsButton,
   PatientBannerPatientInfo,
   PatientPhoto,
+  showModal,
   useConfig,
   useLayoutType,
   useVisit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
-import { type FHIRPatientType, type SearchedPatient } from '../../../types';
-import { PatientSearchContext } from '../../../patient-search-context';
+import { type SearchedPatient } from '../../../types';
+import { usePatientSearchContext } from '../../../patient-search-context';
+import { mapToFhirPatient } from '../../../utils/fhir-mapper';
 import styles from './patient-banner.scss';
-import StartVisitConfirmationModal from './start-visit-confirmation.modal';
 
 interface ClickablePatientContainerProps {
   children: React.ReactNode;
@@ -31,31 +31,17 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
-const getGender = (gender: string) => {
-  switch (gender) {
-    case 'M':
-      return 'male';
-    case 'F':
-      return 'female';
-    case 'O':
-      return 'other';
-    case 'U':
-      return 'unknown';
-    default:
-      return gender;
-  }
-};
-
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { currentVisit } = useVisit(patientUuid);
-  const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
+  const { nonNavigationSelectPatientAction, showPatientSearch, hidePatientSearch, handleReturnToSearchList } =
+    usePatientSearchContext();
+
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
-  const [showStartVisitConfirmationModal, setStartVisitConfirmationModal] = useState(false);
 
   const handleToggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
@@ -63,68 +49,23 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
   const handleAddToQueueClick = () => {
     if (!currentVisit && !isDeceased) {
-      setStartVisitConfirmationModal(true);
+      handleLaunchStartVisitConfirmationModal();
     } else {
       nonNavigationSelectPatientAction(patientUuid);
     }
   };
 
-  const handleStartVisit = () => {
-    setStartVisitConfirmationModal(false);
-    nonNavigationSelectPatientAction(patientUuid);
+  const handleLaunchStartVisitConfirmationModal = () => {
+    const dispose = showModal('start-visit-confirmation-modal', {
+      closeModal: () => {
+        dispose();
+      },
+      patientName,
+      patientUuid,
+    });
   };
 
-  const handleCloseModal = () => {
-    setStartVisitConfirmationModal(false);
-  };
-
-  const fhirMappedPatient: FHIRPatientType = useMemo(() => {
-    const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
-    const addressId = uuidv4();
-    const nameId = uuidv4();
-
-    return {
-      address: preferredAddress
-        ? [
-            {
-              id: addressId,
-              city: preferredAddress.cityVillage,
-              country: preferredAddress.country,
-              postalCode: preferredAddress.postalCode,
-              state: preferredAddress.stateProvince,
-              use: 'home',
-            },
-          ]
-        : [],
-      birthDate: patient.person.birthdate,
-      deceasedBoolean: patient.person.dead,
-      deceasedDateTime: patient.person.deathDate,
-      gender: getGender(patient.person.gender),
-      id: patient.uuid,
-      identifier: patient.identifiers.map((identifier) => ({
-        id: identifier.uuid,
-        type: {
-          coding: [
-            {
-              code: identifier.identifierType.uuid,
-            },
-          ],
-          text: identifier.identifierType.display,
-        },
-        use: 'official',
-        value: identifier.identifier,
-      })),
-      name: [
-        {
-          family: patient.person.personName.familyName,
-          given: [patient.person.personName.givenName, patient.person.personName.middleName],
-          id: nameId,
-          text: patient.person.personName.display,
-        },
-      ],
-      telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display === 'Telephone Number'),
-    };
-  }, [patient]);
+  const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
 
   return (
     <>
@@ -154,16 +95,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                   selectPatientAction: nonNavigationSelectPatientAction,
                   launchPatientChart: true,
                 }}
-                isDeceased={patient.person.dead}
                 patient={fhirMappedPatient}
                 patientUuid={patientUuid}
               />
             ) : null}
-            {!isDeceased && (
-              <button onClick={handleAddToQueueClick} className={`${styles.addToQueueButton} ${styles.primary}`}>
-                Add patient to queue
-              </button>
-            )}
+            {!isDeceased && <Button onClick={handleAddToQueueClick}>Add patient to list</Button>}
           </div>
         </div>
         <div>
@@ -178,20 +114,12 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           )}
         </div>
       </div>
-
-      {showStartVisitConfirmationModal && (
-        <StartVisitConfirmationModal
-          closeModal={handleCloseModal}
-          startVisit={handleStartVisit}
-          patientName={patientName}
-        />
-      )}
     </>
   );
 };
 
 const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientContainerProps) => {
-  const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
+  const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
   const config = useConfig<PatientSearchConfig>();
 
   const handleClick = useCallback(() => {

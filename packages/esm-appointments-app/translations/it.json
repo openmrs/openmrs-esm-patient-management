@@ -78,7 +78,6 @@
   "durationMins": "Durata min",
   "edit": "Modifica",
   "editAppointment": "Modifica appuntamento",
-  "editAppointments": "Modifica appuntamenti",
   "emptyStateText": "Non ci sono <1>{{displayText}}</1> da mostrare",
   "encounters": "Consulti",
   "encounterType": "Tipo consulto",

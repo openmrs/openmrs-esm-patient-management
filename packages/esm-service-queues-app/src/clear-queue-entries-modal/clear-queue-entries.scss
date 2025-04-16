@@ -1,0 +1,7 @@
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.subHeading {
+  @include type.type-style('heading-compact-01');
+  color: $ui-05;
+}

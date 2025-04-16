@@ -1,0 +1,47 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.radioButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: layout.$spacing-03;
+  min-height: layout.$spacing-10;
+  width: 100%;
+  @include type.type-style('body-compact-01');
+}
+
+.radioButton {
+  padding: layout.$spacing-02 layout.$spacing-02;
+  margin: layout.$spacing-03 0;
+}
+
+section {
+  margin: layout.$spacing-03;
+}
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-04;
+}
+
+.modalBody {
+  padding-bottom: layout.$spacing-05;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+}
+
+.loading {
+  margin-right: layout.$spacing-02;
+}
+
+.error {
+  margin-top: layout.$spacing-03;
+  color: colors.$red-60;
+  @include type.type-style('label-01');
+}

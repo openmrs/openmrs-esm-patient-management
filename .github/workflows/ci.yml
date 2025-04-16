@@ -27,7 +27,7 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: 💾 Cache dependencies
         id: cache
@@ -62,17 +62,15 @@ jobs:
 
   pre_release:
     runs-on: ubuntu-latest
-
     needs: build
-
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.repository_owner == 'openmrs' }}
 
     steps:
       - uses: actions/checkout@v4
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
       - name: 💾 Cache dependencies
@@ -118,17 +116,15 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-
     needs: build
-
-    if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'release' && github.repository_owner == 'openmrs' }}
 
     steps:
       - uses: actions/checkout@v4
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
       - name: 💾 Cache dependencies
@@ -149,10 +145,8 @@ jobs:
 
   deploy_patient_management:
     runs-on: ubuntu-latest
-
     needs: pre_release
-
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' }} && github.repository_owner == 'openmrs'
 
     steps:
       - name: 🔄 Trigger RefApp Build

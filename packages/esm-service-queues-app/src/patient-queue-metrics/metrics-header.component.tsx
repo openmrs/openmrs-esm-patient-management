@@ -50,7 +50,7 @@ const MetricsHeader = () => {
           />
           <MenuItem
             label={t('addNewServiceRoom', 'Add new service room')}
-            onClick={() => launchWorkspace('service-queues-room-form')}
+            onClick={() => launchWorkspace('service-queues-room-workspace')}
           />
         </UserHasAccess>
         <MenuItem label={t('addProviderQueueRoom', 'Add provider queue room')} onClick={launchAddProviderToRoomModal} />
