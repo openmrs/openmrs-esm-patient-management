@@ -8,6 +8,8 @@ export class RegistrationAndEditPage {
   readonly middleNameInput = () => this.page.locator('#middleName');
   readonly familyNameInput = () => this.page.locator('#familyName');
   readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=gender-option-${sex}]`);
+  readonly editButton = () => this.page.getByRole('button', { name: /edit/i });
+  readonly addImageButton = () => this.page.getByRole('button', { name: /add image/i });
   readonly birthDateInput = () => this.page.locator('#birthdate');
   readonly birthdateDayInput = () => this.birthDateInput().locator('[data-type="day"]');
   readonly birthdateMonthInput = () => this.birthDateInput().locator('[data-type="month"]');
