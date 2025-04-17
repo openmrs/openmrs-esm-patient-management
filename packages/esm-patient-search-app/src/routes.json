@@ -36,7 +36,7 @@
       "name": "patient-search-workspace",
       "title": "searchPatient",
       "type": "patient-search-workspace",
-      "width": "wider"
+      "width": "narrow"
     }
   ]
 }

@@ -159,6 +159,7 @@
   "queueService": "Queue service",
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "Queue status",
   "refills": "Refills",
   "remove": "Remove",

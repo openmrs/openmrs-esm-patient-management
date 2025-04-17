@@ -75,8 +75,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
 
   return (
     <Button
-      aria-label="Search Patient Button"
-      aria-labelledby="Search Patient Button"
+      aria-label={t('searchPatientButton', 'Search Patient Button')}
       onClick={() => {
         launchPatientSearchWorkspace();
         searchQueryUpdatedAction && searchQueryUpdatedAction('');

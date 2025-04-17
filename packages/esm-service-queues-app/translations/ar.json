@@ -159,6 +159,7 @@
   "queueService": "خدمة الطابور",
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "حالة الطابور",
   "refills": "إعادة التعبئة",
   "remove": "Remove",
