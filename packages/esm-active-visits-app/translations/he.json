@@ -7,6 +7,7 @@
   "dose": "מנה",
   "encounterType": "סוג המפגש",
   "endDate": "End date",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "סנן טבלה",
   "gender": "מגדר",
   "idNumber": "מספר תעודת זהות",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "אין מידע להצגה כאן",
   "time": "זמן",
   "totalVisits": "Total Visits Today",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "שעת התחלת הביקור",
   "visitSummary": "סיכום הביקור",
   "visitType": "סוג הביקור"

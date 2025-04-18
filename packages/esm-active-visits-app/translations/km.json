@@ -7,6 +7,7 @@
   "dose": "កំរិតប្រើប្រាស់",
   "encounterType": "ប្រភេទនៃការជួបពិនិត្យជំងឺ",
   "endDate": "End date",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "តារាងត្រង",
   "gender": "ភេទ",
   "idNumber": "លេខសំគាល់",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "មិនមានព័ត៌មានដើម្បីបង្ហាញនៅទីនេះទេ",
   "time": "ម៉ោងពេល",
   "totalVisits": "Total Visits Today",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "ម៉ោងពេលពិនិត្យជំងឺ",
   "visitSummary": "សេចក្តីសង្ខេបពីការពិនិត្យជំងឺ",
   "visitType": "ប្រភេទនៃជំងឺពិនិត្យ"
