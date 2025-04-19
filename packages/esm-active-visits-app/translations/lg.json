@@ -7,6 +7,7 @@
   "dose": "Obuyinza bwa Ddagala",
   "encounterType": "Engeri y’Okukyala",
   "endDate": "Olunaku lw’Enkomerero",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Fulumya Olukalala Olusengejjeddwa",
   "gender": "Ekitundu ky’Obuntu",
   "idNumber": "Namba y’Omulwadde",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "Tewali kalonda kalabikako kuno",
   "time": "Ekiseera",
   "totalVisits": "Okukyala Okubala Olunaku Luno",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "Ekiseera ky’Okutandika Okukyala",
   "visitSummary": "Okubala okw’Okukyala",
   "visitType": "Engeri y’Okukyala"

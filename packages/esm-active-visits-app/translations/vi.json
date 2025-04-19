@@ -7,6 +7,7 @@
   "dose": "Liều lượng",
   "encounterType": "Loại cuộc gặp",
   "endDate": "Ngày kết thúc",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Bảng lọc",
   "gender": "Giới tính",
   "idNumber": "ID",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "Không có thông tin nào hiển thị ở  đây",
   "time": "Thời gian",
   "totalVisits": "Tổng số lượt khám trong ngày",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "Thời gian khám",
   "visitSummary": "Tóm tắt lượt khám",
   "visitType": "Loại lượt khám"

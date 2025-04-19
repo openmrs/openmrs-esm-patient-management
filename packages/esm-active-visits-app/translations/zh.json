@@ -7,6 +7,7 @@
   "dose": "剂量",
   "encounterType": "问诊类型",
   "endDate": "结束日期",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "筛选表格",
   "gender": "性别",
   "idNumber": "ID Number",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "这里没有可显示的信息",
   "time": "时间",
   "totalVisits": "Total Visits Today",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "就诊时间",
   "visitSummary": "就诊总结",
   "visitType": "就诊类型"
