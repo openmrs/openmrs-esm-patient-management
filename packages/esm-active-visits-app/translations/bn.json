@@ -7,6 +7,7 @@
   "dose": "ঔষধের মাত্রা",
   "encounterType": "সাক্ষাতের ধরন",
   "endDate": "সমাপ্তি",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Filter table",
   "gender": "লিঙ্গ",
   "idNumber": "আইডি নম্বর",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "প্রদর্শনযোগ্য কোনো তথ্য নেই",
   "time": "সময়",
   "totalVisits": "আজকের সর্বমোট ভিজিট সংখ্যা",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "দেখা করার সময়",
   "visitSummary": "ভিজিটের সারমর্ম",
   "visitType": "ভিজিটের ধরন"

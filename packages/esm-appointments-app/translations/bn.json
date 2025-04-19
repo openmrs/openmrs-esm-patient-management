@@ -88,6 +88,7 @@
   "endTime": "End Time",
   "errorCreatingAppointmentService": "Error creating appointment service",
   "expected": "Expected",
+  "filterAppointments": "Filter appointments",
   "filterAppointmentsByServiceType": "Filter appointments by service type",
   "filterTable": "Filter table",
   "gender": "লিঙ্গ",
