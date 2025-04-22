@@ -40,6 +40,26 @@ const mockIdentifierTypes = [
     uniquenessBehavior: 'UNIQUE' as const,
     uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
   },
+  {
+    fieldName: 'ssn',
+    format: '^[A-Z]{1}-[0-9]{7}$',
+    formatDescription: 'Identifier should be one letter, followed by a dash, and then 7 digits e.g. A-1234567',
+    identifierSources: [
+      {
+        uuid: '01af8526-cea4-4175-aa90-340acb411771',
+        name: 'Generator 2 for SSN',
+        autoGenerationOption: {
+          manualEntryEnabled: true,
+          automaticGenerationEnabled: false,
+        },
+      },
+    ],
+    isPrimary: false,
+    name: 'SSN',
+    required: true,
+    uniquenessBehavior: 'UNIQUE' as const,
+    uuid: 'a71403f3-8584-4289-ab41-2b4e5570bd45',
+  },
 ];
 
 const mockResourcesContextValue: Resources = {
@@ -53,18 +73,35 @@ const mockResourcesContextValue: Resources = {
   identifierTypes: [...mockIdentifierTypes],
 };
 
+const mockInitialFormValues = {
+  additionalFamilyName: '',
+  additionalGivenName: '',
+  additionalMiddleName: '',
+  addNameInLocalLanguage: false,
+  address: {},
+  attributes: {},
+  birthdate: null,
+  deathDate: null,
+  familyName: '',
+  gender: '',
+  givenName: '',
+  identifiers: {},
+  middleName: '',
+  relationships: [],
+} as FormValues;
+
 const mockContextValues: PatientRegistrationContextProps = {
   currentPhoto: '',
   inEditMode: false,
   identifierTypes: [],
-  initialFormValues: {} as FormValues,
+  initialFormValues: mockInitialFormValues,
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
   setInitialFormValues: jest.fn(),
   setFieldTouched: jest.fn(),
   validationSchema: null,
-  values: {} as FormValues,
+  values: mockInitialFormValues,
 };
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
@@ -201,5 +238,98 @@ describe('identifier input', () => {
         });
       });
     });
+  });
+
+  it('validates identifier format correctly for identifier types with regex formats', async () => {
+    const user = userEvent.setup();
+
+    const ssnIdentifier = {
+      ...openmrsID,
+      autoGeneration: false,
+      format: '^[A-Z]{1}-[0-9]{7}$',
+      identifierName: 'SSN',
+      identifierTypeUuid: 'a71403f3-8584-4289-ab41-2b4e5570bd45',
+      identifierValue: undefined,
+      initialValue: '',
+      required: true,
+      selectedSource: {
+        uuid: '01af8526-cea4-4175-aa90-340acb411771',
+        name: 'Generator 2 for SSN',
+        autoGenerationOption: {
+          manualEntryEnabled: true,
+          automaticGenerationEnabled: false,
+        },
+      } as IdentifierSource,
+    };
+
+    const mockSetFieldTouched = jest.fn();
+    const mockSetFieldValue = jest.fn();
+    const testContextValues = {
+      ...mockContextValues,
+      setFieldTouched: mockSetFieldTouched,
+      setFieldValue: mockSetFieldValue,
+      values: {
+        ...mockInitialFormValues,
+        identifiers: {
+          [fieldName]: ssnIdentifier,
+        },
+      },
+    };
+
+    const initialValues = {
+      identifiers: {
+        [fieldName]: {
+          identifierValue: '',
+        },
+      },
+    };
+
+    renderWithContext(
+      <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={testContextValues}>
+            <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    const input = screen.getByRole('textbox', {
+      name: /ssn/i,
+    });
+
+    // Valid cases
+    await user.type(input, 'A-1234567');
+    await user.tab();
+    expect(input).toHaveValue('A-1234567');
+    expect(input).not.toHaveClass('cds--text-input--invalid');
+    expect(screen.queryByText(/identifier should be/i)).not.toBeInTheDocument();
+
+    // Invalid cases
+    await user.clear(input);
+    await user.type(input, 'A-0010902aaa'); // Extra characters
+    await user.tab();
+    expect(input).toHaveClass('cds--text-input--invalid');
+    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
+
+    await user.clear(input);
+    await user.type(input, 'a-1234567'); // Lowercase letter
+    await user.tab();
+    expect(input).toHaveClass('cds--text-input--invalid');
+    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
+
+    await user.clear(input);
+    await user.type(input, 'AB-1234567'); // Two letters
+    await user.tab();
+    expect(input).toHaveClass('cds--text-input--invalid');
+    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
+
+    await user.clear(input);
+    await user.type(input, 'A-123456'); // Only 6 digits
+    await user.tab();
+    expect(input).toHaveClass('cds--text-input--invalid');
+    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
   });
 });

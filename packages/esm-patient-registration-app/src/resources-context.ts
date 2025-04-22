@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import { createContext, useContext } from 'react';
 import { type Resources } from './offline.resources';
 
 export const ResourcesContext = createContext<Resources>(null);

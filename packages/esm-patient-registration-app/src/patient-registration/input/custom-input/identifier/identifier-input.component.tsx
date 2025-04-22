@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
+import { useField, Field } from 'formik';
 import { Button } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { type RegistrationConfig } from '../../../../config-schema';
@@ -42,6 +42,28 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     });
     return map;
   }, [defaultPatientIdentifierTypes]);
+
+  const validateInput = (value: string) => {
+    if (!value || value === '') {
+      return;
+    }
+
+    if (!identifierType?.format) {
+      return;
+    }
+
+    try {
+      const regex = new RegExp(identifierType.format);
+      if (regex.test(value)) {
+        return;
+      }
+
+      return identifierType.formatDescription ?? `Expected format: ${identifierType.format}`;
+    } catch (e) {
+      console.error('Invalid regex pattern:', identifierType.format);
+      return;
+    }
+  };
 
   const handleReset = useCallback(() => {
     setHideInputField(true);
@@ -93,17 +115,20 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   return (
     <div className={styles.IDInput}>
       {!hideInputField ? (
-        <Input
-          id={name}
-          labelText={identifierName}
-          name={name}
-          disabled={disabled}
-          required={required}
-          invalid={!!(identifierFieldMeta.touched && identifierFieldMeta.error)}
-          invalidText={identifierFieldMeta.error && t(identifierFieldMeta.error)}
-          // t('identifierValueRequired', 'Identifier value is required')
-          {...identifierField}
-        />
+        <Field name={name} validate={validateInput}>
+          {({ field, form: { touched, errors } }) => (
+            <Input
+              id={name}
+              labelText={identifierName}
+              name={name}
+              disabled={disabled}
+              required={required}
+              invalid={errors[name] && touched[name]}
+              invalidText={errors[name] && t(errors[name])}
+              {...field}
+            />
+          )}
+        </Field>
       ) : (
         <div className={styles.textID}>
           <p data-testid="identifier-label" className={styles.label}>
