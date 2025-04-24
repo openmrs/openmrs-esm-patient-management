@@ -36,6 +36,7 @@
   "searchingText": "Đang tìm kiếm",
   "searchLocationPersonAttribute": "Search location",
   "searchPatient": "Tìm kiếm bệnh nhân",
+  "searchPatientButton": "Search Patient Button",
   "searchResults": "Kết quả tìm kiếm",
   "searchResultsCount_one": "{{count}} kết quả tìm kiếm",
   "searchResultsCount_other": "{{count}} kết quả tìm kiếm",

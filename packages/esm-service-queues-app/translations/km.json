@@ -159,6 +159,7 @@
   "queueService": "សេវាកម្មជួរ",
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
+  "queueServiceRequired": "Queue service is required",
   "queueStatus": "ស្ថានភាពជួរ",
   "refills": "ការបំពេញបន្ថែម",
   "remove": "Remove",
