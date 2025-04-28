@@ -88,6 +88,7 @@
   "endTime": "Hora de Fim",
   "errorCreatingAppointmentService": "Erro ao criar serviço de consulta",
   "expected": "Esperado",
+  "filterAppointments": "Filter appointments",
   "filterAppointmentsByServiceType": "Filter appointments by service type",
   "filterTable": "Tabela de filtro",
   "gender": "Sexo",

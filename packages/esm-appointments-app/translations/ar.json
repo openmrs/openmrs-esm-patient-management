@@ -88,6 +88,7 @@
   "endTime": "وقت الانتهاء",
   "errorCreatingAppointmentService": "Error creating appointment service",
   "expected": "Expected",
+  "filterAppointments": "Filter appointments",
   "filterAppointmentsByServiceType": "Filter appointments by service type",
   "filterTable": "Filter table",
   "gender": "الجنس",

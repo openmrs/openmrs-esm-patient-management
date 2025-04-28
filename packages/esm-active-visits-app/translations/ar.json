@@ -7,6 +7,7 @@
   "dose": "الجرعة",
   "encounterType": "نوع اللقاء",
   "endDate": "تاريخ النهاية",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "فلتر الجدول",
   "gender": "الجنس",
   "idNumber": "رقم الهوية",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "لا توجد معلومات لعرضها هنا",
   "time": "الوقت",
   "totalVisits": "عدد الزيارات اليوم",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "وقت الزيارة",
   "visitSummary": "ملخص الزيارة",
   "visitType": "نوع الزيارة"
