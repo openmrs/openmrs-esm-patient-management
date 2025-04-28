@@ -30,21 +30,6 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
-const getGender = (gender: string) => {
-  switch (gender) {
-    case 'M':
-      return 'male';
-    case 'F':
-      return 'female';
-    case 'O':
-      return 'other';
-    case 'U':
-      return 'unknown';
-    default:
-      return gender;
-  }
-};
-
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
@@ -91,7 +76,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                   selectPatientAction: nonNavigationSelectPatientAction,
                   launchPatientChart: true,
                 }}
-                isDeceased={patient.person.dead}
                 patient={fhirMappedPatient}
                 patientUuid={patientUuid}
               />

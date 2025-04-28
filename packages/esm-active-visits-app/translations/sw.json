@@ -7,6 +7,7 @@
   "dose": "Dozi",
   "encounterType": "Aina ya Mkutano",
   "endDate": "Tarehe ya kumaliza",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Chuja jedwali",
   "gender": "Jinsia",
   "idNumber": "Nambari ya Kitambulisho",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "Hakuna taarifa za kuonyeshwa hapa",
   "time": "Wakati",
   "totalVisits": "Ziara Zote Leo",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "Wakati wa Ziara",
   "visitSummary": "Muhtasari wa Ziara",
   "visitType": "Aina ya Ziara"

@@ -89,7 +89,7 @@
 .IDInput {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: end;
+  align-items: center;
 }
 
 .trashCan {
@@ -119,5 +119,4 @@
 
 .actionButtonContainer {
   margin-left: layout.$spacing-05;
-  margin-bottom: layout.$spacing-05;
 }
