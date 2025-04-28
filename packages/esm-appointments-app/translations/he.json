@@ -88,6 +88,7 @@
   "endTime": "שעת סיום",
   "errorCreatingAppointmentService": "שגיאה ביצירת שירות התור",
   "expected": "צפוי",
+  "filterAppointments": "Filter appointments",
   "filterAppointmentsByServiceType": "Filter appointments by service type",
   "filterTable": "סינון הטבלה",
   "gender": "מגדר",

@@ -7,6 +7,7 @@
   "dose": "Dose",
   "encounterType": "Tipo de Consulta",
   "endDate": "Data Final",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Filtrar tabela",
   "gender": "Sexo",
   "idNumber": "Número de Identificação",
@@ -31,6 +32,7 @@
   "thereIsNoInformationToDisplayHere": "Sem informações para mostrar aqui",
   "time": "Tempo",
   "totalVisits": "Total de visitas hoje",
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitStartTime": "Hora da Visita",
   "visitSummary": "Sumário da Visita",
   "visitType": "Tipo de Visita"

@@ -36,6 +36,7 @@
   "searchingText": "...מחפש",
   "searchLocationPersonAttribute": "Search location",
   "searchPatient": "חיפוש מטופל/",
+  "searchPatientButton": "Search Patient Button",
   "searchResults": "תוצאות חיפוש",
   "searchResultsCount_one": "{{count}} תוצאת חיפוש",
   "searchResultsCount_other": "{{count}} תוצאות חיפוש",
