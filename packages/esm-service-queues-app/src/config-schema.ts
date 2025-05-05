@@ -83,7 +83,7 @@ export const defaultQueueTable: TableDefinitions = {
 export const configSchema = {
   priorityConfigs: {
     _type: Type.Array,
-    _default: [],
+    _default: defaultPriorityConfig,
     _description: 'Add entries to configure the styling for specific priority tags.',
     _elements: {
       conceptUuid: {
@@ -264,7 +264,7 @@ export const configSchema = {
             (columnDfn) => {
               return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${
                 columnDfn.columnType ?? columnDfn.id
-              }.`;
+              }`;
             },
           ),
         ],
@@ -467,6 +467,10 @@ export interface PriorityConfig {
   conceptUuid: string;
   color: PriorityTagColor;
   style: TagStyle;
+}
+
+export interface configSchema {
+  priorityConfigs: PriorityConfig[];
 }
 
 export interface StatusConfig {
