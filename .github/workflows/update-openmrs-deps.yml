@@ -1,14 +1,14 @@
 on:
   workflow_dispatch:
   schedule:
-    # every day at 8:15 PM UTC
-    - cron: "15 20 * * *"
+    # every hour
+    - cron: '30 * * * *'
 
-name: "Scheduled Transifex Update"
+name: 'Check for OpenMRS Dependency Updates'
 
 jobs:
-  pull-translations-from-transifex:
-    name: pull-translations-from-transifex
+  check-for-updates:
+    name: Check for updates to OpenMRS libraries
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,19 +17,30 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Push source file using transifex client
-        uses: transifex/cli-action@v2
+      - name: 🟢 Use Node.js
+        uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.TRANSIFEX_TOKEN }}
-          args: pull --force --all
-      - name: Create PR if necessary
+          node-version: 20
+      - name: 💾 Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - name: 📦 Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --immutable
+      - name: ✅ Check for updates
+        run: node ./tools/update-openmrs-deps.mjs
+      - name: ⬆️ Create PR if necessary
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: '(chore) Update translations from Transifex'
-          title: '(chore) Update translations from Transifex'
-          body: 'Automated updates of translations pulled from Transifex'
-          branch: 'chore/update-transifex'
+          commit-message: '(chore) Update OpenMRS dependencies'
+          title: '(chore) Update OpenMRS dependencies'
+          body: |
+            Update OpenMRS dependencies
+          branch: 'chore/update-openmrs-deps'
           author: 'OpenMRS Bot <infrastructure@openmrs.org>'
           token: ${{ secrets.OMRS_BOT_GH_TOKEN }}
       - name: ✅ Auto approve PR
