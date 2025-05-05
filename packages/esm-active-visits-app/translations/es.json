@@ -7,7 +7,7 @@
   "dose": "Dosis",
   "encounterType": "Tipo De Encuentro",
   "endDate": "Fecha de finalización",
-  "filterActiveVisits": "Filter active visits",
+  "filterActiveVisits": "Filtrar Visitas Activas",
   "filterTable": "Filtrar la tabla",
   "gender": "Género",
   "idNumber": "Número de ID",
@@ -32,7 +32,7 @@
   "thereIsNoInformationToDisplayHere": "No hay información para mostrar aquí",
   "time": "Hora",
   "totalVisits": "Total de Consultas Hoy",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "viewPatientChartFor": "Ver historial clínico de {{patientName}}",
   "visitStartTime": "Tiempo de la Consulta",
   "visitSummary": "Resumen de la Consulta",
   "visitType": "Tipo de Consulta"
