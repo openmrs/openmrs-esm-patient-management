@@ -51,7 +51,7 @@ const defaultPriorityUuid = 'f4620bfa-3625-4883-bd3f-84c2cce14470';
 const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
 const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
 
-export const priorityConfig: PriorityConfig[] = [
+export const defaultPriorityConfig: PriorityConfig[] = [
   {
     conceptUuid: defaultEmergencyPriorityUuid,
     style: null,
@@ -84,7 +84,7 @@ export const configSchema = {
   priorityConfigs: {
     _type: Type.Array,
     _default: [],
-    _description: 'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
+    _description: 'Add entries to configure the styling for specific priority tags.',
     _elements: {
       conceptUuid: {
         _type: Type.UUID,
