@@ -25,7 +25,7 @@ function CreateAdmissionRequestActionButton() {
     if (transferLocations && location?.display) {
       setIsValidLocation(transferLocations.some((loc) => loc.name === location.display));
     } else {
-      setIsValidLocation(false); // or true, depending on your default case
+      setIsValidLocation(false);
     }
   }, [location, transferLocations]);
 
