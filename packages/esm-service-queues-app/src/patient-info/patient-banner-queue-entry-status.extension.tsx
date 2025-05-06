@@ -13,7 +13,7 @@ interface PatientBannerQueueEntryStatusProps {
 
 /**
  * This extension appears in the patient banner to indicate the patient's
- * queue entry status, with a quick link to transition them to a new queue / status
+ *  queue entry status, with a quick link to transition them to q new queue / status
  */
 const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps> = ({ patientUuid, renderedFrom }) => {
   const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
@@ -21,20 +21,20 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
   const queueEntry = queueEntries?.[0];
   const { t } = useTranslation();
   const isPatientChart = renderedFrom === 'patient-chart';
+
   if (!isPatientChart || !queueEntry) {
-    return <></>;
+    return null;
   }
 
-  const mappedPriority = queueEntry.priority.display === 'Urgent' ? 'Priority' : queueEntry.priority.display;
+  const priorityDisplay = queueEntry.priority.display;
+  const tagColor = getTagColor(queueEntry.priority.uuid);
 
   return (
     <div className={styles.queueEntryStatusContainer}>
       <span className={styles.separator}>&middot;</span>
       <span>{queueEntry.queue.name}</span>
-      <Tag
-        className={mappedPriority === 'Priority' ? styles.priorityTag : styles.tag}
-        type={getTagType(mappedPriority?.toLocaleLowerCase('en'))}>
-        {mappedPriority}
+      <Tag className={tagColor === 'red' ? styles.priorityTag : styles.tag} type={tagColor}>
+        {priorityDisplay}
       </Tag>
       <Button
         kind="ghost"
@@ -51,11 +51,9 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
   );
 };
 
-const getTagType = (priority: string) => {
-  const priorityConfig = defaultPriorityConfig.find(
-    (config) => config.conceptUuid.toLocaleLowerCase() === priority.toLocaleLowerCase(),
-  );
-  return priorityConfig ? priorityConfig.color : 'gray';
+const getTagColor = (priorityUuid: string): string => {
+  const config = defaultPriorityConfig.find((item) => item.conceptUuid.toLowerCase() === priorityUuid.toLowerCase());
+  return config?.color ?? 'gray';
 };
 
 export default PatientBannerQueueEntryStatus;
