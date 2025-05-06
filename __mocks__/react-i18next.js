@@ -29,25 +29,25 @@ const renderNodes = (reactNodes) => {
   });
 };
 
-const useMock = [(k) => k, {}];
+const useMock = [(key) => key, {}];
 useMock.t = (key, defaultValue, options = {}) => {
-  let translatedString = defaultValue;
-  Object.keys(options).forEach((key) => {
-    if (key != 'interpolation') {
-      translatedString = defaultValue.replace(`{{${key}}}`, `${options[key]}`);
+  let translatedString = defaultValue || key;
+  Object.entries(options).forEach(([k, v]) => {
+    if (key !== 'interpolation') {
+      translatedString = translatedString.replace(new RegExp(`{{${k}}}`, 'g'), v);
     }
   });
 
-  return translatedString ?? key;
+  return translatedString;
 };
-useMock.i18n = {};
+
+useMock.i18n = { language: 'en_US' };
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop
-  Trans: ({ children }) => renderNodes(children),
+  Trans: ({ children }) => (Array.isArray(children) ? renderNodes(children) : renderNodes([children])),
   Translation: ({ children }) => children((k) => k, { i18n: {} }),
   useTranslation: () => useMock,
-
   // mock if needed
   I18nextProvider: reactI18next.I18nextProvider,
   initReactI18next: reactI18next.initReactI18next,
