@@ -15,10 +15,10 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { ErrorState, isDesktop as desktopLayout, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import type { BedTagData } from '../types';
-import { useBedTags } from '../summary/summary.resource';
+import { deleteBedTag, useBedTags } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import styles from '../bed-administration/bed-administration-table.scss';
@@ -54,10 +54,46 @@ const BedTagAdministrationTable: React.FC = () => {
     [mutateBedTags],
   );
 
+  const handleDeleteBedTag = useCallback(
+    (bedTagId: string, reason: string, bedTagData: BedTagData, closeModal: () => void) => {
+      deleteBedTag({ bedTagId, reason })
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            title: t('bedTagDeleted', 'Bed tag deleted'),
+            subtitle: t('bedTagDeletedSuccessfully', "The bed tag '{{bedTagName}}' has been succesfully deleted", {
+              bedTagName: bedTagData.name,
+            }),
+          });
+          mutateBedTags();
+        })
+        .catch((error) => {
+          showSnackbar({
+            kind: 'error',
+            title: t('errorDeletingBedTag', 'Error deleting bed tag'),
+            subtitle: error?.message,
+          });
+        })
+        .finally(closeModal);
+    },
+    [t, mutateBedTags],
+  );
+
+  const openDeleteBedTagModal = useCallback(
+    (bedTagData: BedTagData) => {
+      const dispose = showModal('delete-bed-tag-modal', {
+        bedTagData: bedTagData,
+        handleDeleteBedTag: handleDeleteBedTag,
+        closeModal: () => dispose(),
+      });
+    },
+    [handleDeleteBedTag],
+  );
+
   const tableHeaders = [
     {
       header: t('ids', 'ID'),
-      key: 'ids',
+      key: 'id',
     },
     {
       header: t('name', 'Name'),
@@ -71,7 +107,7 @@ const BedTagAdministrationTable: React.FC = () => {
 
   const tableRows = useMemo(() => {
     return bedTags?.map((entry) => ({
-      id: entry.uuid,
+      id: entry.id,
       name: entry?.name,
       actions: (
         <>
@@ -88,10 +124,23 @@ const BedTagAdministrationTable: React.FC = () => {
             size={responsiveSize}
             tooltipAlignment="start"
           />
+          <Button
+            enterDelayMs={300}
+            renderIcon={TrashCan}
+            onClick={(e) => {
+              e.preventDefault();
+              openDeleteBedTagModal(entry);
+            }}
+            kind={'ghost'}
+            iconDescription={t('deleteBedTag', 'Delete Bed Tag')}
+            hasIconOnly
+            size={responsiveSize}
+            tooltipAlignment="start"
+          />
         </>
       ),
     }));
-  }, [bedTags, t, responsiveSize, openEditBedTagModal]);
+  }, [bedTags, t, responsiveSize, openEditBedTagModal, openDeleteBedTagModal]);
 
   if (isBedDataLoading || isLoadingBedTags) {
     return (

@@ -61,3 +61,4 @@ export const newBedTypeModal = getAsyncLifecycle(() => import('./bed-type/new-be
 export const editBedTypeModal = getAsyncLifecycle(() => import('./bed-type/edit-bed-type.component'), options);
 export const newBedTagModal = getAsyncLifecycle(() => import('./bed-tag/new-tag-form.component'), options);
 export const editBedTagModal = getAsyncLifecycle(() => import('./bed-tag/edit-tag-form.component'), options);
+export const deleteBedTagModal = getAsyncLifecycle(() => import('./bed-tag/delete-bed-tag-form.modal'), options);

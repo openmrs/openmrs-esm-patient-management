@@ -285,3 +285,11 @@ export async function editBedTag({
     body: bedTagPayload,
   });
 }
+
+export async function deleteBedTag({ bedTagId, reason }: { bedTagId: string; reason: string }): Promise<FetchResponse> {
+  return await openmrsFetch(`${restBaseUrl}/bedTag/${bedTagId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: reason,
+  });
+}
