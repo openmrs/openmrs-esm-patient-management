@@ -6,14 +6,6 @@ The `Ward` app is a frontend module that enables users to manage patients (typic
 
 The `Ward` app brings together functionality from several back-end modules and requires a fair amount of back-end configuration to get up and running. The most extensive set of configurations are necessary to enable the system to represent ADT workflow events within the EMR API module.
 
-Please see the [EMR API Configuration overview page](https://rest.openmrs.org/#emrapi-configuration) in the REST API documentation for details of what the EMR API configuration contains.
-
-Please see the [EMR API README](https://github.com/openmrs/openmrs-module-emrapi) for specific details on how the EMR API module should be configured.
-
-## Frontend Configuration
-
-See the [config-schema](./src/config-schema.ts) for details on the configuration options available to the ward app.
-
 ### EMR API
 
 The EMR API module supports configuration of all ADT workflows, including encounter types that represent Admissions, Transfers, and Discharges, and Disposition observations that represent requests for Admission, Discharge, and Transfer.
