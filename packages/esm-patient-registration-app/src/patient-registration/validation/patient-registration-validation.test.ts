@@ -57,8 +57,9 @@ describe('Patient registration validation', () => {
 
   const validateFormValues = async (formValues) => {
     const config = (await getConfig('@openmrs/esm-patient-registration-app')) as unknown as RegistrationConfig;
+    const mockT = (key: string, defaultValue: string) => defaultValue;
 
-    const validationSchema = getValidationSchema(config);
+    const validationSchema = getValidationSchema(config, mockT);
     try {
       await validationSchema.validate(formValues, { abortEarly: false });
     } catch (err) {
@@ -77,7 +78,7 @@ describe('Patient registration validation', () => {
       givenName: '',
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('givenNameRequired');
+    expect(validationError.errors).toContain('Given name is required');
   });
 
   it('should require familyName', async () => {
@@ -86,7 +87,7 @@ describe('Patient registration validation', () => {
       familyName: '',
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('familyNameRequired');
+    expect(validationError.errors).toContain('Family name is required');
   });
 
   it('should require additionalGivenName when addNameInLocalLanguage is true', async () => {
@@ -96,7 +97,7 @@ describe('Patient registration validation', () => {
       additionalGivenName: '',
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('givenNameRequired');
+    expect(validationError.errors).toContain('Given name is required');
   });
 
   it('should require additionalFamilyName when addNameInLocalLanguage is true', async () => {
@@ -106,7 +107,7 @@ describe('Patient registration validation', () => {
       additionalFamilyName: '',
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('familyNameRequired');
+    expect(validationError.errors).toContain('Family name is required');
   });
 
   it('should require gender', async () => {
@@ -115,7 +116,7 @@ describe('Patient registration validation', () => {
       gender: '',
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('genderUnspecified');
+    expect(validationError.errors).toContain('Gender unspecified');
   });
 
   it('should allow female as a valid gender', async () => {
@@ -151,7 +152,7 @@ describe('Patient registration validation', () => {
       birthdate: new Date('2100-01-01'),
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('birthdayNotInTheFuture');
+    expect(validationError.errors).toContain('Birthday cannot be in future');
   });
 
   it('should throw an error when date of birth is more than 140 years ago', async () => {
@@ -160,7 +161,7 @@ describe('Patient registration validation', () => {
       birthdate: dayjs().subtract(141, 'years').toDate(),
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('birthdayNotOver140YearsAgo');
+    expect(validationError.errors).toContain('Birthday cannot be more than 140 years ago');
   });
 
   it('should require yearsEstimated when birthdateEstimated is true', async () => {
@@ -169,7 +170,7 @@ describe('Patient registration validation', () => {
       birthdateEstimated: true,
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('yearsEstimateRequired');
+    expect(validationError.errors).toContain('Estimated years required');
   });
 
   it('should throw an error when monthEstimated is negative', async () => {
@@ -180,7 +181,7 @@ describe('Patient registration validation', () => {
       monthsEstimated: -1,
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('negativeMonths');
+    expect(validationError.errors).toContain('Estimated months cannot be negative');
   });
 
   it('should throw an error when yearsEstimated is more than 140', async () => {
@@ -190,7 +191,7 @@ describe('Patient registration validation', () => {
       yearsEstimated: 141,
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('nonsensicalYears');
+    expect(validationError.errors).toContain('Estimated years cannot be more than 140');
   });
 
   it('should throw an error when deathDate is in future', async () => {
@@ -199,6 +200,6 @@ describe('Patient registration validation', () => {
       deathDate: new Date('2100-01-01'),
     };
     const validationError = await validateFormValues(invalidFormValues);
-    expect(validationError.errors).toContain('deathDateInFuture');
+    expect(validationError.errors).toContain('Death date cannot be in future');
   });
 });

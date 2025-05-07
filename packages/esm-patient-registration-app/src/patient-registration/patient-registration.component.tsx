@@ -63,7 +63,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
-  const validationSchema = getValidationSchema(config);
+  const validationSchema = getValidationSchema(config, t);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
