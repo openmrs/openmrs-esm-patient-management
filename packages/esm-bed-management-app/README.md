@@ -5,12 +5,12 @@ wards and beds in those wards: Configuring beds and where they are located in th
 related to patients, such as assigning patients to beds. This provides a simple UI for setting up names of beds and where those beds can be found. Then the Ward App uses this information. 
 
 So for example:
-Hospital X 
-   IPD
-       Ward ZZZZ
-            Bed 1
-             Bed 2
-              etc
+* Hospital X
+  * IPD
+    * Ward ZZZZ
+      * Bed 1
+      * Bed 2
+          * etc
 
 Requires [openmrs-module-bedmanagement](https://github.com/openmrs/openmrs-module-bedmanagement)
 to be installed on the OpenMRS server.
