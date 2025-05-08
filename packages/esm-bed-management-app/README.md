@@ -6,3 +6,5 @@ related to patients, such as assigning patients to beds.
 
 Requires [openmrs-module-bedmanagement](https://github.com/openmrs/openmrs-module-bedmanagement)
 to be installed on the OpenMRS server.
+
+See also the Ward App and it's helpful README here: [esm-ward-app](https://github.com/openmrs/openmrs-esm-patient-management/tree/main/packages/esm-ward-app)
