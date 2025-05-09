@@ -92,7 +92,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                       id="bedName"
                       invalidText={fieldState.error?.message}
                       labelText={t('bedName', 'Bed name')}
-                      placeholder={t('bedTypePlaceholder', '')}
+                      placeholder={t('bedNamePlaceholder', 'Name of this bed')}
                       {...field}
                     />
                   </>
@@ -108,7 +108,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     id="displayName"
                     invalidText={fieldState.error?.message}
                     labelText={t('displayName', 'Display name')}
-                    placeholder={t('displayNamePlaceholder', '')}
+                    placeholder={t('displayNamePlaceholder', 'Display name for this bed')}
                     {...field}
                   />
                 )}

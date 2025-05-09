@@ -62,6 +62,10 @@
     {
       "name": "edit-bed-tag-modal",
       "component": "editBedTagModal"
+    },
+    {
+      "name": "delete-bed-tag-modal",
+      "component": "deleteBedTagModal"
     }
   ]
 }

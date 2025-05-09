@@ -48,7 +48,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate 
           showSnackbar({
             kind: 'success',
             title: t('bedUpdated', 'Bed updated'),
-            subtitle: t('bedUpdatedSuccessfully', `${bedPayload.bedNumber} updated successfully`, {
+            subtitle: t('bedUpdatedSuccessfully', '{{bedNumber}} updated successfully', {
               bedNumber: bedPayload.bedNumber,
             }),
           });
