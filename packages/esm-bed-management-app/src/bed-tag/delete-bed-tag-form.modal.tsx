@@ -22,7 +22,7 @@ interface ErrorType {
 }
 
 const DeleteBedTagAdministrationSchema = z.object({
-  reason: z.string().max(255),
+  reason: z.string().min(1).max(255),
 });
 
 const DeleteBedTagForm: React.FC<DeleteBedTagFormProps> = ({ bedTagData, handleDeleteBedTag, closeModal }) => {
@@ -59,30 +59,28 @@ const DeleteBedTagForm: React.FC<DeleteBedTagFormProps> = ({ bedTagData, handleD
         title={t('deleteTagConfirmation', 'Are you sure you want to delete this bed tag?')}
         closeModal={closeModal}
       />
-      <ModalBody hasScrollingContent>
+      <ModalBody>
         <Form>
-          <Stack gap={3}>
-            <FormGroup legendText={''}>
-              <Controller
-                name="reason"
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field }) => (
-                  <>
-                    <TextInput
-                      {...field}
-                      id="bedTag"
-                      labelText={t('reason', 'Reason to delete bed tag')}
-                      placeholder={t('reasonPlaceholder', 'Enter your reason to delete this bed tag')}
-                      invalidText={isInvalid && formStateError}
-                    />
-                  </>
-                )}
-              />
-            </FormGroup>
-          </Stack>
+          <FormGroup legendText={''}>
+            <Controller
+              name="reason"
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field }) => (
+                <>
+                  <TextInput
+                    {...field}
+                    id="bedTag"
+                    labelText={t('reasonToDeleteTag', 'Reason to delete bed tag')}
+                    placeholder={t('reasonToDeleteTagPlaceholder', 'Enter your reason to delete this bed tag')}
+                    invalidText={isInvalid && formStateError}
+                  />
+                </>
+              )}
+            />
+          </FormGroup>
         </Form>
       </ModalBody>
       <ModalFooter>
@@ -90,7 +88,7 @@ const DeleteBedTagForm: React.FC<DeleteBedTagFormProps> = ({ bedTagData, handleD
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
-          <span>{t('delete', 'Delete')}</span>
+          {getCoreTranslation('delete', 'Delete')}
         </Button>
       </ModalFooter>
     </React.Fragment>

@@ -92,7 +92,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                       id="bedName"
                       invalidText={fieldState.error?.message}
                       labelText={t('bedName', 'Bed name')}
-                      placeholder={t('bedNamePlaceholder', 'The name of this bed')}
+                      placeholder={t('bedNamePlaceholder', 'Name of this bed')}
                       {...field}
                     />
                   </>
