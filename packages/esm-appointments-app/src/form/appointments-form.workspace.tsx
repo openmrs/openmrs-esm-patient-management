@@ -64,6 +64,7 @@ interface AppointmentsFormProps {
   recurringPattern?: RecurringPattern;
   patientUuid?: string;
   context: string;
+  onAppointmentSave?: (appointment: Appointment) => void;
 }
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
@@ -77,6 +78,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   context,
   closeWorkspace,
   promptBeforeClosing,
+  onAppointmentSave,
 }) => {
   const { patient } = usePatient(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
@@ -362,7 +364,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
       : saveAppointment(appointmentPayload, abortController)
     ).then(
-      ({ status }) => {
+      ({ status, data }) => {
         if (status === 200) {
           setIsSubmitting(false);
           setIsSuccessful(true);
@@ -376,6 +378,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                 ? t('appointmentEdited', 'Appointment edited')
                 : t('appointmentScheduled', 'Appointment scheduled'),
           });
+          onAppointmentSave?.(data);
         }
         if (status === 204) {
           setIsSubmitting(false);
