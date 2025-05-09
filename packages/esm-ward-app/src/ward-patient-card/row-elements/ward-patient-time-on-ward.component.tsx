@@ -26,19 +26,42 @@ const WardPatientTimeOnWard: React.FC<WardPatientTimeOnWardProps> = ({
   const seconds = dur.seconds();
 
   const parts = [];
-  // TODO: Fix translations to use the correct pluralization.
-  // Keys and strings extracted from translations below don't use the correct plural suffixes.
+
   if (days > 0) {
-    parts.push(t('days', '{{count}} days', { count: days }));
+    parts.push(
+      t('days', {
+        count: days,
+        defaultValue_one: '{{count}} day',
+        defaultValue_other: '{{count}} days',
+      }),
+    );
   }
   if (hours > 0) {
-    parts.push(t('hours', '{{count}} hours', { count: hours }));
+    parts.push(
+      t('hours', {
+        count: hours,
+        defaultValue_one: '{{count}} hour',
+        defaultValue_other: '{{count}} hours',
+      }),
+    );
   }
   if (minutes > 0) {
-    parts.push(t('minutes', '{{count}} minutes', { count: minutes }));
+    parts.push(
+      t('minutes', {
+        count: minutes,
+        defaultValue_one: '{{count}} minute',
+        defaultValue_other: '{{count}} minutes',
+      }),
+    );
   }
   if (seconds > 0 && parts.length === 0) {
-    parts.push(t('seconds', '{{count}} seconds', { count: seconds }));
+    parts.push(
+      t('seconds', {
+        count: seconds,
+        defaultValue_one: '{{count}} second',
+        defaultValue_other: '{{count}} seconds',
+      }),
+    );
   }
 
   if (parts.length === 0) {
