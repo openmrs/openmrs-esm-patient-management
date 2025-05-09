@@ -92,7 +92,7 @@
       "component": "admissionRequestWorkspace",
       "title": "admissionRequests",
       "type": "pending-admission-requests",
-      "width": "narrow"
+      "width": "wider"
     },{
       "name": "create-admission-encounter-workspace",
       "component": "createAdmissionEncounterWorkspace",
