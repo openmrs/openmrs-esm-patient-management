@@ -612,34 +612,40 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value } }) => (
+                    render={({ field: { onChange, value }, fieldState }) => (
                       <ResponsiveWrapper>
-                        <DatePicker
-                          datePickerType="range"
-                          dateFormat={datePickerFormat}
-                          value={[value.startDate, value.recurringPatternEndDate]}
-                          onChange={([startDate, endDate]) => {
+                        <OpenmrsDatePicker
+                          value={value.startDate}
+                          onChange={(date) => {
                             onChange({
-                              startDate: new Date(startDate),
-                              recurringPatternEndDate: new Date(endDate),
-                              recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
-                              startDateText: dayjs(new Date(startDate)).format(dateFormat),
+                              ...value,
+                              startDate: date,
+                              startDateText: dayjs(date).format(dateFormat),
                             });
-                          }}>
-                          <DatePickerInput
-                            id="startDatePickerInput"
-                            labelText={t('startDate', 'Start date')}
-                            style={{ width: '100%' }}
-                            value={watch('appointmentDateTime').startDateText}
-                          />
-                          <DatePickerInput
-                            id="endDatePickerInput"
-                            labelText={t('endDate', 'End date')}
-                            style={{ width: '100%' }}
-                            placeholder={datePickerPlaceHolder}
-                            value={watch('appointmentDateTime').recurringPatternEndDateText}
-                          />
-                        </DatePicker>
+                          }}
+                          id="startDatePickerInput"
+                          data-testid="startDatePickerInput"
+                          labelText={t('startDate', 'Start date')}
+                          style={{ width: '100%' }}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
+                        <OpenmrsDatePicker
+                          value={value.recurringPatternEndDate}
+                          onChange={(date) => {
+                            onChange({
+                              ...value,
+                              recurringPatternEndDate: date,
+                              recurringPatternEndDateText: dayjs(date).format(dateFormat),
+                            });
+                          }}
+                          id="endDatePickerInput"
+                          data-testid="endDatePickerInput"
+                          labelText={t('endDate', 'End date')}
+                          style={{ width: '100%' }}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
                       </ResponsiveWrapper>
                     )}
                   />
