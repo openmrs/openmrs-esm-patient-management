@@ -643,6 +643,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                           data-testid="endDatePickerInput"
                           labelText={t('endDate', 'End date')}
                           style={{ width: '100%' }}
+                          minDate={value.startDate || new Date()}
                           invalid={Boolean(fieldState?.error?.message)}
                           invalidText={fieldState?.error?.message}
                         />
