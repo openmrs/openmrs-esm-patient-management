@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import classNames from 'classnames';
-import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import {
   Button,
+  Checkbox,
   Dropdown,
   InlineNotification,
   ModalBody,
@@ -38,6 +38,7 @@ interface FormState {
   selectedPriority: string;
   selectedStatus: string;
   prioritycomment: string;
+  modifyDefaultTransitionDateTime: boolean;
   transitionDate: Date;
   transitionTime: string;
   transitionTimeFormat: amPm;
@@ -82,13 +83,13 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
+    modifyDefaultTransitionDateTime: false,
     transitionDate: initialTransitionDate,
     transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
     transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAdvancedOptionsOpen, setIsAdvancedOptionsOpen] = useState(false);
 
   const selectedQueue = queues.find((q) => q.uuid === formState.selectedQueue);
 
@@ -132,6 +133,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
     setFormState({ ...formState, transitionTimeFormat });
+  };
+
+  const setModifyDefaultTransitionDateTime = (modifyDefaultTransitionDateTime) => {
+    setFormState({ ...formState, modifyDefaultTransitionDateTime });
   };
 
   const findPriorityIndex = (uuid: string) => {
@@ -348,46 +353,48 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               />
             </section>
             <section>
-              <Button
-                kind="ghost"
-                renderIcon={isAdvancedOptionsOpen ? ChevronUp : ChevronDown}
-                onClick={() => setIsAdvancedOptionsOpen(!isAdvancedOptionsOpen)}>
-                {isAdvancedOptionsOpen ? t('lessOptions', 'Less options') : t('advancedOptions', 'Advanced options')}
-              </Button>
-              {isAdvancedOptionsOpen && (
-                <div className={styles.section}>
-                  <div className={styles.dateTimeFields}>
-                    <Stack gap={4}>
-                      <OpenmrsDatePicker
-                        value={formState.transitionDate}
-                        maxDate={new Date()}
-                        onChange={setTransitionDate}
-                        id="datePickerInput"
-                        data-testid="datePickerInput"
-                        labelText={t('dateOfTransition', 'Date of transition')}
-                      />
+              <div className={styles.section}>
+                <Checkbox
+                  labelText={t('modifyDefaultValue', 'Modify default value')}
+                  id={'modifyTransitionTime'}
+                  checked={formState.modifyDefaultTransitionDateTime}
+                  onChange={(_, { checked }) => {
+                    setModifyDefaultTransitionDateTime(checked);
+                  }}
+                />
+                <div className={styles.dateTimeFields}>
+                  <Stack gap={4}>
+                    <OpenmrsDatePicker
+                      value={formState.transitionDate}
+                      maxDate={new Date()}
+                      onChange={setTransitionDate}
+                      id="datePickerInput"
+                      data-testid="datePickerInput"
+                      labelText={t('dateOfTransition', 'Date of transition')}
+                      isDisabled={!formState.modifyDefaultTransitionDateTime}
+                    />
 
-                      <TimePicker
+                    <TimePicker
+                      labelText={t('timeOfTransition', 'Time of transition')}
+                      onChange={(event) => setTransitionTime(event.target.value)}
+                      pattern={time12HourFormatRegexPattern}
+                      value={formState.transitionTime}
+                      invalid={timeInvalidMessage != null}
+                      invalidText={timeInvalidMessage}
+                      disabled={!formState.modifyDefaultTransitionDateTime}>
+                      <TimePickerSelect
+                        id="visitStartTimeSelect"
+                        onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
+                        value={formState.transitionTimeFormat}
                         labelText={t('timeOfTransition', 'Time of transition')}
-                        onChange={(event) => setTransitionTime(event.target.value)}
-                        pattern={time12HourFormatRegexPattern}
-                        value={formState.transitionTime}
-                        invalid={timeInvalidMessage != null}
-                        invalidText={timeInvalidMessage}>
-                        <TimePickerSelect
-                          id="visitStartTimeSelect"
-                          onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
-                          value={formState.transitionTimeFormat}
-                          labelText={t('timeOfTransition', 'Time of transition')}
-                          aria-label={t('timeOfTransition', 'Time of transition')}>
-                          <SelectItem value="AM" text="AM" />
-                          <SelectItem value="PM" text="PM" />
-                        </TimePickerSelect>
-                      </TimePicker>
-                    </Stack>
-                  </div>
+                        aria-label={t('timeOfTransition', 'Time of transition')}>
+                        <SelectItem value="AM" text="AM" />
+                        <SelectItem value="PM" text="PM" />
+                      </TimePickerSelect>
+                    </TimePicker>
+                  </Stack>
                 </div>
-              )}
+              </div>
             </section>
           </Stack>
         </div>

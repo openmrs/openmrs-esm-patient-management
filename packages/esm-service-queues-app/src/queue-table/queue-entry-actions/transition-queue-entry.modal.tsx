@@ -41,7 +41,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({
             newStatus: formState.selectedStatus,
             newPriority: formState.selectedPriority,
             newPriorityComment: formState.prioritycomment,
-            ...{ transitionDate: transitionDate.toISOString() },
+            ...(formState.modifyDefaultTransitionDateTime ? { transitionDate: transitionDate.toISOString() } : {}),
           });
         },
         disableSubmit: (queueEntry, formState) =>
