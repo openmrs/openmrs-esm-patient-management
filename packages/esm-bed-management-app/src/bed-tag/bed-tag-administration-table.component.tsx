@@ -36,14 +36,14 @@ const BedTagAdministrationTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const openNewBedTagModal = () => {
+  const launchNewBedTagModal = () => {
     const dispose = showModal('new-bed-tag-modal', {
       closeModal: () => dispose(),
       mutate: mutateBedTags,
     });
   };
 
-  const openEditBedTagModal = useCallback(
+  const launchEditBedTagModal = useCallback(
     (editData: BedTagData) => {
       const dispose = showModal('edit-bed-tag-modal', {
         closeModal: () => dispose(),
@@ -79,7 +79,7 @@ const BedTagAdministrationTable: React.FC = () => {
     [t, mutateBedTags],
   );
 
-  const openDeleteBedTagModal = useCallback(
+  const launchDeleteBedTagModal = useCallback(
     (bedTagData: BedTagData) => {
       const dispose = showModal('delete-bed-tag-modal', {
         bedTagData: bedTagData,
@@ -114,10 +114,7 @@ const BedTagAdministrationTable: React.FC = () => {
           <Button
             enterDelayMs={300}
             renderIcon={Edit}
-            onClick={(e) => {
-              e.preventDefault();
-              openEditBedTagModal(entry);
-            }}
+            onClick={() => launchEditBedTagModal(entry)}
             kind={'ghost'}
             iconDescription={t('editBedTag', 'Edit Bed Tag')}
             hasIconOnly
@@ -127,10 +124,7 @@ const BedTagAdministrationTable: React.FC = () => {
           <Button
             enterDelayMs={300}
             renderIcon={TrashCan}
-            onClick={(e) => {
-              e.preventDefault();
-              openDeleteBedTagModal(entry);
-            }}
+            onClick={() => launchDeleteBedTagModal(entry)}
             kind={'ghost'}
             iconDescription={t('deleteBedTag', 'Delete Bed Tag')}
             hasIconOnly
@@ -140,7 +134,7 @@ const BedTagAdministrationTable: React.FC = () => {
         </>
       ),
     }));
-  }, [bedTags, t, responsiveSize, openEditBedTagModal, openDeleteBedTagModal]);
+  }, [bedTags, t, responsiveSize, launchEditBedTagModal, launchDeleteBedTagModal]);
 
   if (isBedDataLoading || isLoadingBedTags) {
     return (
@@ -174,7 +168,7 @@ const BedTagAdministrationTable: React.FC = () => {
             <span>{isValidatingBedTags ? <InlineLoading /> : null}</span>
           </span>
           {bedTags?.length ? (
-            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedTagModal}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={launchNewBedTagModal}>
               {t('addBedTag', 'Add bed tag')}
             </Button>
           ) : null}
@@ -212,7 +206,7 @@ const BedTagAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={openNewBedTagModal}>
+                      onClick={launchNewBedTagModal}>
                       {t('addBedTag', 'Add bed tag')}
                     </Button>
                   </Tile>

@@ -56,29 +56,27 @@ const DeleteBedTagForm: React.FC<DeleteBedTagFormProps> = ({ bedTagData, handleD
   return (
     <React.Fragment>
       <ModalHeader
-        title={t('deleteTagConfirmation', 'Are you sure you want to delete this bed tag?')}
         closeModal={closeModal}
+        title={t('deleteTagConfirmation', 'Are you sure you want to delete this bed tag?')}
       />
       <ModalBody>
         <Form>
           <FormGroup legendText={''}>
             <Controller
-              name="reason"
               control={control}
+              name="reason"
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  id="bedTag"
+                  invalidText={isInvalid && formStateError}
+                  labelText={t('reasonForDeletingBedTag', 'Reason for deletion')}
+                  placeholder={t('reasonForDeletingBedTagPlaceholder', 'Enter a reason for deletion')}
+                />
+              )}
               rules={{
                 required: true,
               }}
-              render={({ field }) => (
-                <>
-                  <TextInput
-                    {...field}
-                    id="bedTag"
-                    labelText={t('reasonToDeleteTag', 'Reason to delete bed tag')}
-                    placeholder={t('reasonToDeleteTagPlaceholder', 'Enter your reason to delete this bed tag')}
-                    invalidText={isInvalid && formStateError}
-                  />
-                </>
-              )}
             />
           </FormGroup>
         </Form>
