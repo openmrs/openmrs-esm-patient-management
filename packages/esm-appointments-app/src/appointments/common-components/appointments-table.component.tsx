@@ -138,11 +138,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     return (
       <EmptyState
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
-        displayText={`${
-          tableHeading?.match(/today/i)
+        displayText={
+          tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
-        }`}
+        }
         launchForm={() => launchWorkspace('search-patient')}
       />
     );

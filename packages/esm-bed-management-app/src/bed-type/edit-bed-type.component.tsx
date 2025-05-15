@@ -32,7 +32,7 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
         .then(() => {
           showSnackbar({
             title: t('bedTypeUpdated', 'Bed type updated'),
-            subtitle: t('bedTypeUpdatedSuccessfully', `${bedTypePayload.name} updated successfully`, {
+            subtitle: t('bedTypeUpdatedSuccessfully', '{{bedType}} updated successfully', {
               bedType: bedTypePayload.name,
             }),
             kind: 'success',

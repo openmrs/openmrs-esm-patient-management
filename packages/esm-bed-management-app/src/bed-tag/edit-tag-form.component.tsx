@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
+import BedTagsAdministrationForm from './bed-tags-admin-form.modal';
 import { editBedTag, useBedTags } from '../summary/summary.resource';
 import { type BedTagData, type Mutator } from '../types';
 import { type BedTagDataAdministration } from '../bed-administration/bed-administration-types';
-import BedTagsAdministrationForm from './bed-tags-admin-form.component';
 
 interface EditBedTagFormProps {
   editData: BedTagData;
@@ -31,7 +31,7 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, close
           showSnackbar({
             kind: 'success',
             title: t('bedTagUpdated', 'Bed tag updated'),
-            subtitle: t('bedTagUpdatedSuccessfully', `${bedTagPayload.name} updated successfully`, {
+            subtitle: t('bedTagUpdatedSuccessfully', '{{bedTag}} updated successfully', {
               bedTag: bedTagPayload.name,
             }),
           });

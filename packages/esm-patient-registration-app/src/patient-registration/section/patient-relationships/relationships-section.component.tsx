@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useState } from 'react';
 import {
   Button,
   Layer,
@@ -42,6 +42,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   const { setFieldValue } = usePatientRegistrationContext();
   const [isInvalid, setIsInvalid] = useState(false);
   const newRelationship = !relationship.uuid;
+  const selectId = useId();
 
   const handleRelationshipTypeChange = useCallback(
     (event) => {
@@ -123,7 +124,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
       <div className={styles.selectRelationshipType} style={{ marginBottom: '1rem' }}>
         <Layer>
           <Select
-            id="select"
+            id={selectId}
             labelText={t('relationship', 'Relationship')}
             onChange={handleRelationshipTypeChange}
             name={`relationships[${index}].relationshipType`}

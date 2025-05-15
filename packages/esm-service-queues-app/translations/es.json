@@ -159,7 +159,7 @@
   "queueService": "Servicio de cola",
   "queueServiceCreated": "Servicio de cola creado",
   "queueServiceCreatedSuccessfully": "Servicio de cola creado exitosamente",
-  "queueServiceRequired": "Queue service is required",
+  "queueServiceRequired": "Servicio de cola requerido",
   "queueStatus": "Estado de la cola",
   "refills": "Reabastecimiento",
   "remove": "Quitar",

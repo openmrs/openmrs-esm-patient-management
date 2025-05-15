@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -26,7 +25,6 @@ interface BedTagAdministrationFormProps {
   allLocations: Location[];
   availableBedTags: Array<BedTagData>;
   handleCreateBedTag?: (formData: BedTagData) => void;
-  handleDeleteBedTag?: () => void;
   headerTitle: string;
   initialData: BedTagData;
   closeModal: () => void;
@@ -86,7 +84,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedTag"
-                      labelText={t('bedTags', 'Bed tags')}
+                      labelText={t('bedTagName', 'Name of the bed tag')}
                       placeholder={t('bedTagPlaceholder', '')}
                       invalidText={fieldState.error?.message}
                       {...field}

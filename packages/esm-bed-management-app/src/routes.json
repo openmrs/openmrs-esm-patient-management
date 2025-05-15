@@ -40,28 +40,32 @@
   ],
   "modals": [
     {
-      "name": "new-bed-modal",
-      "component": "newBedModal"
+      "name": "delete-bed-tag-modal",
+      "component": "deleteBedTagModal"
     },
     {
       "name": "edit-bed-modal",
       "component": "editBedModal"
     },
     {
-      "name": "new-bed-type-modal",
-      "component": "newBedTypeModal"
+      "name": "edit-bed-tag-modal",
+      "component": "editBedTagModal"
     },
     {
       "name": "edit-bed-type-modal",
       "component": "editBedTypeModal"
     },
     {
+      "name": "new-bed-modal",
+      "component": "newBedModal"
+    },
+    {
       "name": "new-bed-tag-modal",
       "component": "newBedTagModal"
     },
     {
-      "name": "edit-bed-tag-modal",
-      "component": "editBedTagModal"
+      "name": "new-bed-type-modal",
+      "component": "newBedTypeModal"
     }
   ]
 }
