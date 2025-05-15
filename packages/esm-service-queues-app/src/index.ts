@@ -137,7 +137,7 @@ export const transitionPatientToLatestQueue = getAsyncLifecycle(
 export const transitionOverflowMenuItem = getAsyncLifecycle(
   () => import('./transition-latest-queue-entry/transition-overflow-menu-item/transition-overflow-menu-item.component'),
   {
-    featureName: 'transition patient to new queue to support overflow menu',
+    featureName: 'overflow menu with action to transition patient to a new queue',
     moduleName,
   },
 );
