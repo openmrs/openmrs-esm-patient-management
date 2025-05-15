@@ -1,12 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, InlineNotification } from '@carbon/react';
 import { usePatient, useVisit, type Visit } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type QueueEntry } from '../../types';
 import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
 import styles from './add-patient-to-queue-entry.scss';
-import capitalize from 'lodash/capitalize';
 
 interface AddPatientToQueueModalProps {
   modalTitle: string;
