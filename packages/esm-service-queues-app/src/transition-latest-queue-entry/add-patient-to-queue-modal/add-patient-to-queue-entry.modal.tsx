@@ -1,11 +1,9 @@
 import React, { useCallback, useState } from 'react';
+import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack } from '@carbon/react';
+import { type Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack, InlineNotification } from '@carbon/react';
-import { usePatient, useVisit, type Visit } from '@openmrs/esm-framework';
-import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import { type QueueEntry } from '../../types';
 import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
-import styles from './add-patient-to-queue-entry.scss';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 
 interface AddPatientToQueueModalProps {
   modalTitle: string;
@@ -41,10 +39,11 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
   );
 
   return (
-    <Form onSubmit={handleSubmit} className={styles.container}>
-      <ModalHeader className={styles.modalHeader} closeModal={closeModal} title={modalTitle} />
+    <>
+    <Form onSubmit={handleSubmit}>
+      <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
-        <div className={styles.queueEntryActionModalBody}>
+        <div>
           <Stack gap={4}>
             <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
           </Stack>
@@ -61,6 +60,7 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
         </Button>
       </ModalFooter>
     </Form>
+    </>
   );
 };
 
