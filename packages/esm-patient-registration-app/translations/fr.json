@@ -32,7 +32,7 @@
   "deathSection": "Informations sur le décès",
   "deathTimeFormatInvalid": "Format de l'heure invalide",
   "deathTimeFormatRequired": "Format de l'heure obligatoire",
-  "deathTimeInvalid": "L'heure ne correspond pas au format 'hh:mm'",
+  "deathTimeInvalid": "L’heure ne correspond pas au format 'hh:mm'",
   "deathTimeRequired": "L'heure de décès est requis",
   "deleteIdentifierModalHeading": "Supprimer l'identifiant ?",
   "deleteIdentifierModalText": "a une valeur de",
