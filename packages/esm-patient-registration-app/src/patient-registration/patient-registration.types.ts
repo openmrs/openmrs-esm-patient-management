@@ -312,6 +312,39 @@ export interface AddressTemplate {
   requiredElements: Array<AddressProperties> | null;
 }
 
+export type NameProperties =
+  | 'prefix'
+  | 'givenName'
+  | 'middleName'
+  | 'familyNamePrefix'
+  | 'familyName'
+  | 'familyName2'
+  | 'familyNameSuffix'
+  | 'degree';
+
+export type ExtensibleNameProperties = { [p in NameProperties]?: string } | null;
+
+export interface NameTemplate {
+  displayName: string | null;
+  codeName: string | null;
+  country: string | null;
+  lines: Array<
+    Array<{
+      isToken: 'IS_NOT_NAME_TOKEN' | 'IS_NAME_TOKEN';
+      displayText: string;
+      codeName?: NameProperties;
+      displaySize?: string;
+    }>
+  > | null;
+  lineByLineFormat: Array<string> | null;
+  nameMappings: ExtensibleNameProperties;
+  sizeMappings: ExtensibleNameProperties;
+  elementDefaults: ExtensibleNameProperties;
+  elementRegex: ExtensibleNameProperties;
+  elementRegexFormats: ExtensibleNameProperties;
+  requiredElements: Array<NameProperties> | null;
+}
+
 // https://rest.openmrs.org/#address-template
 export interface RestAddressTemplate {
   uuid: string;
