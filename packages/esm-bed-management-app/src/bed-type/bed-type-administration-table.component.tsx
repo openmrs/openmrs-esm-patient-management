@@ -16,12 +16,12 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, showModal, useLayoutType } from '@openmrs/esm-framework';
-import type { BedTypeData } from '../types';
-import { useBedTypes } from '../summary/summary.resource';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { ErrorState, isDesktop as desktopLayout, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
+import { deleteBedType, useBedTypes } from '../summary/summary.resource';
+import type { BedTypeData } from '../types';
 import styles from '../bed-administration/bed-administration-table.scss';
 
 const BedTypeAdministrationTable: React.FC = () => {
@@ -34,8 +34,7 @@ const BedTypeAdministrationTable: React.FC = () => {
   const { bedTypes, errorLoadingBedTypes, isLoadingBedTypes, isValidatingBedTypes, mutateBedTypes } = useBedTypes();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageSize, setPageSize] = useState(10);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
 
   const openNewBedTypeModal = () => {
     const dispose = showModal('new-bed-type-modal', {
@@ -53,6 +52,42 @@ const BedTypeAdministrationTable: React.FC = () => {
       });
     },
     [mutateBedTypes],
+  );
+
+  const handleDeleteBedType = useCallback(
+    (bedTypeId: string, reason: string, bedTypeData: BedTypeData, closeModal: () => void) => {
+      deleteBedType({ bedTypeId, reason })
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            title: t('bedTypeDeleted', 'Bed type deleted'),
+            subtitle: t('bedTypeDeletedSuccessfully', "The bed type '{{bedTypeName}}' has been succesfully deleted", {
+              bedTypeName: bedTypeData.name,
+            }),
+          });
+          mutateBedTypes();
+        })
+        .catch((error) => {
+          showSnackbar({
+            kind: 'error',
+            title: t('errorDeletingBedType', 'Error deleting bed type'),
+            subtitle: error?.message,
+          });
+        })
+        .finally(closeModal);
+    },
+    [t, mutateBedTypes],
+  );
+
+  const openDeleteBedTypeModal = useCallback(
+    (bedTypeData: BedTypeData) => {
+      const dispose = showModal('delete-bed-type-modal', {
+        bedTypeData: bedTypeData,
+        handleDeleteBedType: handleDeleteBedType,
+        closeModal: () => dispose(),
+      });
+    },
+    [handleDeleteBedType],
   );
 
   const tableHeaders = [
@@ -82,21 +117,35 @@ const BedTypeAdministrationTable: React.FC = () => {
         displayName: entry?.displayName,
         description: entry?.description,
         actions: (
-          <IconButton
-            align="top-start"
-            enterDelayMs={300}
-            kind="ghost"
-            label={t('editBedType', 'Edit bed type')}
-            onClick={(e) => {
-              e.preventDefault();
-              openEditBedTypeModal(entry);
-            }}
-            size={responsiveSize}>
-            <Edit />
-          </IconButton>
+          <>
+            <IconButton
+              align="top-start"
+              enterDelayMs={300}
+              kind="ghost"
+              label={t('editBedType', 'Edit bed type')}
+              onClick={(e) => {
+                e.preventDefault();
+                openEditBedTypeModal(entry);
+              }}
+              size={responsiveSize}>
+              <Edit />
+            </IconButton>
+            <IconButton
+              align="top-start"
+              enterDelayMs={300}
+              kind="ghost"
+              label={t('deleteBedType', 'Delete bed type')}
+              onClick={(e) => {
+                e.preventDefault();
+                openDeleteBedTypeModal(entry);
+              }}
+              size={responsiveSize}>
+              <TrashCan />
+            </IconButton>
+          </>
         ),
       })),
-    [openEditBedTypeModal, responsiveSize, bedTypes, t],
+    [openEditBedTypeModal, openDeleteBedTypeModal, responsiveSize, bedTypes, t],
   );
 
   if (isLoadingBedTypes) {
