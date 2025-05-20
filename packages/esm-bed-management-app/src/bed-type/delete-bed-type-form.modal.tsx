@@ -57,7 +57,7 @@ const DeleteBedTypeForm: React.FC<DeleteBedTypeFormFormProps> = ({ bedTypeData, 
     <React.Fragment>
       <ModalHeader
         closeModal={closeModal}
-        title={t('deleteTypeConfirmation', 'Are you sure you want to delete this bed type?')}
+        title={t('deleteBedTypeConfirmation', 'Are you sure you want to delete this bed type?')}
       />
       <ModalBody>
         <Form>
