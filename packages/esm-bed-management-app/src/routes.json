@@ -44,6 +44,10 @@
       "component": "deleteBedTagModal"
     },
     {
+      "name": "delete-bed-type-modal",
+      "component": "deleteBedTypeModal"
+    },
+    {
       "name": "edit-bed-modal",
       "component": "editBedModal"
     },
