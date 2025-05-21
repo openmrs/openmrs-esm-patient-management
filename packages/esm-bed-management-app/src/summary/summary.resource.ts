@@ -291,3 +291,15 @@ export async function deleteBedTag({ bedTagId, reason }: { bedTagId: string; rea
     method: 'DELETE',
   });
 }
+
+export async function deleteBedType({
+  bedTypeId,
+  reason,
+}: {
+  bedTypeId: string;
+  reason: string;
+}): Promise<FetchResponse> {
+  return await openmrsFetch(`${restBaseUrl}/bedtype/${bedTypeId}?reason=${encodeURIComponent(reason)}`, {
+    method: 'DELETE',
+  });
+}
