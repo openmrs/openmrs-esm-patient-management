@@ -41,6 +41,11 @@
       "slot": "service-queues-dashboard-slot"
     },
     {
+      "name": "queue-table-by-status-view",
+      "component": "queueTableByStatusView",
+      "slot": "queue-table-by-status-view-slot"
+    },
+    {
       "name": "remove-queue-entry",
       "component": "removeQueueEntry"
     },
