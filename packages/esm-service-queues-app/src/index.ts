@@ -134,6 +134,14 @@ export const transitionPatientToLatestQueue = getAsyncLifecycle(
   },
 );
 
+export const transitionOverflowMenuItem = getAsyncLifecycle(
+  () => import('./transition-latest-queue-entry/transition-overflow-menu-item/transition-overflow-menu-item.component'),
+  {
+    featureName: 'overflow menu with action to transition patient to a new queue',
+    moduleName,
+  },
+);
+
 // t('addNewQueueServiceRoom', 'Add new queue service room')
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./queue-rooms/queue-room-form.workspace'),
