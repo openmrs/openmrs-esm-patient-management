@@ -62,7 +62,7 @@
   "problemUpdatingList": "Houve um problema ao atualizar a lista",
   "removeFromList": "Remover da lista",
   "removePatientFromListConfirmation": "Tem certeza de que deseja remover {{patientName}} dessa lista?",
-  "saving": "Saving",
+  "saving": "Salvando",
   "searchForAListToAddThisPatientTo": "Procurar uma lista para adicionar esse paciente.",
   "searchForList": "Pesquisar uma lista",
   "searchThisList": "Pesquisar essa lista",
