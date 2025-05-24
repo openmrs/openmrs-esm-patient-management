@@ -79,7 +79,7 @@
   "edit": "ჩასწორება",
   "editAppointment": "მიღების ჩასწორება",
   "emptyStateText": "There are no <1>{{displayText}}</1> to display",
-  "encounters": "Encounters",
+  "encounters": "კონსულტაციები",
   "encounterType": "კონსულტაციის ტიპი",
   "endAppointmentAndVisitConfirmationMessage": "Checking the patient out will mark the appointment as complete, and close out the active visit for this patient.",
   "endAppointmentConfirmation": "Are you sure you want to check the patient out for this appointment?",
