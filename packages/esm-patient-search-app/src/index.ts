@@ -36,6 +36,11 @@ export const patientSearchWorkspace = getAsyncLifecycle(
   options,
 );
 
+export const startVisitConfirmationModal = getAsyncLifecycle(
+  () => import('./patient-search-page/patient-banner/banner/start-visit-confirmation.modal'),
+  options,
+);
+
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
