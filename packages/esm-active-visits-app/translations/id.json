@@ -22,7 +22,7 @@
   "noObservationsFound": "Tidak ada observasi ditemukan",
   "notes": "Catatan",
   "noVisitsToDisplay": "Tidak ada kunjungan untuk ditampilkan",
-  "orderDurationAndUnit": "Durasi dan satuan pesanan",
+  "orderDurationAndUnit": "untuk {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Durasi pesanan tidak ditentukan",
   "patients": "Pasien",
   "provider": "Penyedia layanan",
@@ -32,7 +32,7 @@
   "thereIsNoInformationToDisplayHere": "Tidak ada informasi yang dapat ditampilkan di sini",
   "time": "Waktu",
   "totalVisits": "Total kunjungan",
-  "viewPatientChartFor": "Lihat grafik pasien untuk",
+  "viewPatientChartFor": "Lihat grafik pasien untuk {{patientName}}",
   "visitStartTime": "Waktu mulai kunjungan",
   "visitSummary": "Ringkasan kunjungan",
   "visitType": "Jenis kunjungan"
