@@ -2,32 +2,22 @@ import { expect } from '@playwright/test';
 import type { Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
 
-import {
-  createEncounter,
-  deleteEncounter,
-  deletePatient,
-  endVisit,
-  generateRandomPatient,
-  getProvider,
-  startVisit,
-} from '../commands';
+import { createEncounter, deleteEncounter, endVisit, getProvider, startVisit } from '../commands';
 import { HomePage } from '../pages';
 import { type Encounter, type Patient, type Provider } from '../types';
 
-let patient: Patient;
 let visit: Visit;
 let encounter: Encounter;
 let provider: Provider;
 const encounterNote = 'This is a test note';
 
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
+test.beforeEach(async ({ api, patient }) => {
   visit = await startVisit(api, patient.uuid);
   provider = await getProvider(api);
   encounter = await createEncounter(api, patient.uuid, provider.uuid, encounterNote);
 });
 
-test('View active visits', async ({ page }) => {
+test('View active visits', async ({ page, patient }) => {
   const homePage = new HomePage(page);
   const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
   const firstName = patient.person.display.split(' ')[0];
@@ -55,8 +45,7 @@ test('View active visits', async ({ page }) => {
   });
 });
 
-test.afterEach(async ({ api }) => {
+test.afterEach(async ({ api, patient }) => {
   await endVisit(api, patient.uuid);
   await deleteEncounter(api, encounter.uuid);
-  await deletePatient(api, patient.uuid);
 });
