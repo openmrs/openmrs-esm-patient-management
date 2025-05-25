@@ -29,6 +29,12 @@
       "offline": true
     }
   ],
+  "modals": [
+    {
+      "name": "start-visit-confirmation-modal",
+      "component": "startVisitConfirmationModal"
+    }
+  ],
   "workspaces": [
     {
       "component": "patientSearchWorkspace",
