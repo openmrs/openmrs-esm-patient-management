@@ -1,16 +1,8 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage } from '../pages';
-import { generateRandomPatient, deletePatient } from '../commands';
-import { type Patient } from '../types';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Search patient by patient identifier', async ({ page, api }) => {
+test('Search patient by patient identifier', async ({ page, patient }) => {
   // extract details from the created patient
   const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
   const firstName = patient.person.display.split(' ')[0];
@@ -43,7 +35,7 @@ test('Search patient by patient identifier', async ({ page, api }) => {
   });
 });
 
-test('Search patient by full name', async ({ page, api }) => {
+test('Search patient by full name', async ({ page, patient }) => {
   // extract details from the created patient
   const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
   const firstName = patient.person.display.split(' ')[0];
@@ -83,8 +75,4 @@ test('Search patient by full name', async ({ page, api }) => {
   await test.step('Then I should be redirected to the home page', async () => {
     await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home`);
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });
