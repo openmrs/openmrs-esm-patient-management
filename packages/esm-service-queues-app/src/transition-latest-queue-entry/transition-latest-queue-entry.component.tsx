@@ -4,6 +4,7 @@ import { useLatestQueueEntry } from './transition-latest-queue-entry.resource';
 import AddPatientToQueueModal from './add-patient-to-queue-modal/add-patient-to-queue.modal';
 import TransitionQueueEntryModal from '../queue-table/queue-entry-actions/transition-queue-entry.modal';
 import { type Visit } from '@openmrs/esm-framework';
+import { DropdownSkeleton, InlineNotification } from '@carbon/react';
 
 interface TransitionQueueProps {
   activeVisit: Visit;
@@ -13,7 +14,22 @@ interface TransitionQueueProps {
 const TransitionQueue: React.FC<TransitionQueueProps> = ({ closeModal, activeVisit }) => {
   const patientUuid = activeVisit?.patient?.uuid;
   const { t } = useTranslation();
-  const { data: queueEntry } = useLatestQueueEntry(patientUuid);
+  const { data: queueEntry, isLoading, error } = useLatestQueueEntry(patientUuid);
+
+  if (isLoading) {
+    return <DropdownSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <InlineNotification
+        kind="error"
+        title={t('errorLoadingQueueEntry', 'Error loading queue entry')}
+        subtitle={error?.message || t('unexpectedError', 'An unexpected error occurred')}
+        lowContrast
+      />
+    );
+  }
 
   return (
     <>

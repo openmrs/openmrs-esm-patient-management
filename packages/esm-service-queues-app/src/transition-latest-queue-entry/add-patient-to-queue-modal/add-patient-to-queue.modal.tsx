@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack } from '@carbon/react';
-import { type Visit } from '@openmrs/esm-framework';
+import { showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
@@ -31,11 +31,19 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
           closeModal();
           mutateQueueEntries();
         })
+        ?.catch((error) => {
+          showSnackbar({
+            title: t('queueEntryError', 'Error adding patient to the queue'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: error?.message,
+          });
+        })
         ?.finally(() => {
           setIsSubmitting(false);
         });
     },
-    [callback, activeVisit, closeModal, mutateQueueEntries],
+    [callback, activeVisit, closeModal, mutateQueueEntries, t],
   );
 
   return (
