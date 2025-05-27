@@ -22,12 +22,12 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: modalTitle || t('transitionPatient', 'Transition patient'),
+        modalTitle: modalTitle || t('movePatient', 'Move {{patient}}', { patient: queueEntry.display }),
         modalInstruction: t(
           'transitionPatientStatusOrQueue',
-          'Select a new status or queue for patient to transition to.',
+          'Select a new status or queue for patient to transition to',
         ),
-        submitButtonText: t('transitionPatient', 'Transition patient'),
+        submitButtonText: t('move', 'Move'),
         submitSuccessTitle: t('queueEntryTransitioned', 'Queue entry transitioned'),
         submitSuccessText: t('queueEntryTransitionedSuccessfully', 'Queue entry transitioned successfully'),
         submitFailureTitle: t('queueEntryTransitionFailed', 'Error transitioning queue entry'),
@@ -35,7 +35,6 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({
           const transitionDate = new Date(formState.transitionDate);
           const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
           transitionDate.setHours(hour, minute, 0, 0);
-
           return transitionQueueEntry({
             queueEntryToTransition: queueEntry.uuid,
             newQueue: formState.selectedQueue,
