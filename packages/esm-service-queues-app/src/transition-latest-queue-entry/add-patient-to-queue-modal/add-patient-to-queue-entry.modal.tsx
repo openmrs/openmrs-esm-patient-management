@@ -1,10 +1,11 @@
-import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack } from '@carbon/react';
-import { useVisit, type Visit } from '@openmrs/esm-framework';
 import React, { useCallback, useState } from 'react';
+import { Button, Form, ModalBody, ModalFooter, ModalHeader, Stack } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
+import { useVisit, type Visit } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import styles from './add-patient-to-queue-modal.scss';
+import { type QueueEntry } from '../../types';
+import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
+import styles from './add-patient-to-queue-entry.scss';
 
 interface AddPatientToQueueModalProps {
   modalTitle: string;
@@ -15,12 +16,11 @@ interface AddPatientToQueueModalProps {
 const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { activeVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { mutateQueueEntries } = useMutateQueueEntries();
   const [callback, setCallback] = useState<{
-    submitQueueEntry: (visit: Visit) => Promise<any>;
+    submitQueueEntry: (visit: Visit) => Promise<QueueEntry>;
   }>(null);
 
   const handleSubmit = useCallback(
@@ -59,7 +59,7 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" disabled={isSubmitting} kind="primary">
+        <Button disabled={isSubmitting} kind="primary" type="submit">
           {isSubmitting
             ? t('addingPatientToQueue', 'Adding patient to queue') + '...'
             : t('addPatientToQueue', 'Add patient to queue')}
