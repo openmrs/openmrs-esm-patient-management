@@ -73,6 +73,11 @@
       "name": "queue-patient-info-queue-entry-status",
       "component": "patientBannerQueueEntryStatus",
       "slot": "patient-banner-tags-slot"
+    },
+    {
+      "name": "transition-overflow-menu-item",
+      "component": "transitionOverflowMenuItem",
+      "slot": "transition-overflow-menu-item-slot"
     }
   ],
   "modals": [
