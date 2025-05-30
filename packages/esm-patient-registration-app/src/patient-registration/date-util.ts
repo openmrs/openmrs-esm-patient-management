@@ -1,7 +1,7 @@
 export const generateFormatting = (order: Array<string>, separator: string) => {
   const parse = (value: string) => {
     const parts = value.split(separator);
-    const date = new Date(null);
+    const date = new Date(0);
 
     order.forEach((key, index) => {
       switch (key) {
