@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -17,7 +16,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedTagData } from '../types';
-import styles from '../modals.scss';
 
 const BedTagAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -27,11 +25,9 @@ interface BedTagAdministrationFormProps {
   allLocations: Location[];
   availableBedTags: Array<BedTagData>;
   handleCreateBedTag?: (formData: BedTagData) => void;
-  handleDeleteBedTag?: () => void;
   headerTitle: string;
   initialData: BedTagData;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
@@ -42,8 +38,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   handleCreateBedTag,
   headerTitle,
   initialData,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
 
@@ -76,8 +71,8 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader className={styles.modalHeader} title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -89,7 +84,7 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedTag"
-                      labelText={t('bedTags', 'Bed tags')}
+                      labelText={t('bedTagName', 'Name of the bed tag')}
                       placeholder={t('bedTagPlaceholder', '')}
                       invalidText={fieldState.error?.message}
                       {...field}
@@ -114,14 +109,14 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 

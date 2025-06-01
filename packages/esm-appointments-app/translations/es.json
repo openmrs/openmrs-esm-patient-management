@@ -88,6 +88,7 @@
   "endTime": "Hora de finalización",
   "errorCreatingAppointmentService": "Error al crear el servicio de cita",
   "expected": "Esperado",
+  "filterAppointments": "Filtrar Citas",
   "filterAppointmentsByServiceType": "Filtrar citas por tipo de servicio",
   "filterTable": "Filtrar tabla",
   "gender": "Género",

@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -18,7 +17,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import type { BedType, BedTypeData } from '../types';
-import styles from '../modals.scss';
 
 const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -32,8 +30,7 @@ interface BedAdministrationFormProps {
   handleSubmission?: (formData: BedTypeData) => void;
   headerTitle: string;
   initialData: BedTypeData;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
@@ -44,8 +41,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   handleSubmission,
   headerTitle,
   initialData,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
 
@@ -80,8 +76,8 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader className={styles.modalHeader} title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -95,7 +91,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                       id="bedName"
                       invalidText={fieldState.error?.message}
                       labelText={t('bedName', 'Bed name')}
-                      placeholder={t('bedTypePlaceholder', '')}
+                      placeholder={t('bedNamePlaceholder', 'Name of this bed')}
                       {...field}
                     />
                   </>
@@ -111,7 +107,7 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     id="displayName"
                     invalidText={fieldState.error?.message}
                     labelText={t('displayName', 'Display name')}
-                    placeholder={t('displayNamePlaceholder', '')}
+                    placeholder={t('displayNamePlaceholder', 'Display name for this bed')}
                     {...field}
                   />
                 )}
@@ -149,14 +145,14 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 

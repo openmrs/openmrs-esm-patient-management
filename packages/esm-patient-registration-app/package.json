@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-registration-app",
-  "version": "8.3.1",
+  "version": "8.5.0",
   "description": "Patient registration microfrontend for O3",
   "browser": "dist/openmrs-esm-patient-registration-app.js",
   "main": "src/index.ts",
@@ -37,7 +37,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
   },
   "dependencies": {
-    "@carbon/react": "^1.71.0",
+    "@carbon/react": "^1.76.0",
     "classnames": "^2.3.2",
     "formik": "^2.1.5",
     "lodash-es": "^4.17.15",

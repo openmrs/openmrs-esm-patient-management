@@ -138,11 +138,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     return (
       <EmptyState
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
-        displayText={`${
-          tableHeading?.match(/today/i)
+        displayText={
+          tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
-        }`}
+        }
         launchForm={() => launchWorkspace('search-patient')}
       />
     );
@@ -158,7 +158,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       <div className={styles.toolbar}>
         <Search
           className={styles.searchbar}
-          labelText=""
+          labelText={t('filterAppointments', 'Filter appointments')}
           placeholder={t('filterTable', 'Filter table')}
           onChange={(event) => setSearchString(event.target.value)}
           size={responsiveSize}
@@ -205,7 +205,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     {headers.map((header) => (
                       <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
-                    <TableHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>

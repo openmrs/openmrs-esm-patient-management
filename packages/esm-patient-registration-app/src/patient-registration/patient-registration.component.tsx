@@ -63,7 +63,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
-  const validationSchema = getValidationSchema(config);
+  const validationSchema = getValidationSchema(config, t);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -236,7 +236,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     t('registerPatient', 'Register patient')
                   )}
                 </Button>
-                <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
+                <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}
                 </Button>
               </div>

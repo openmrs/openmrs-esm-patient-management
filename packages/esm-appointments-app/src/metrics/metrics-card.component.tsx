@@ -24,19 +24,19 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, co
       <div className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>
-            <label className={styles.headerLabel}>{headerLabel}</label>
+            <span className={styles.headerLabel}>{headerLabel}</span>
           </div>
         </div>
         <div className={styles.metricsGrid}>
           <div>
-            <label className={styles.totalsLabel}>{label}</label>
+            <span className={styles.totalsLabel}>{label}</span>
             <p className={styles.totalsValue}>{value}</p>
           </div>
           {!isEmpty(count) && (
             <div className={styles.countGrid}>
               <span>{t('checkedIn', 'Checked in')}</span>
               <span>{isSelectedDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived')}</span>
-              <p style={{ color: '#319227' }}>{count.arrivedAppointments?.length}</p>
+              <p style={{ color: '#22651B' }}>{count.arrivedAppointments?.length}</p>
               <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>
             </div>
           )}
