@@ -3,29 +3,29 @@ import { expect } from '@playwright/test';
 import { type Patient } from '../types';
 import { generateRandomPatient } from '../commands';
 let patient: Patient;
-let console:Console;
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
 test('Cancel Admission Request and verify removal from the list', async ({ page }) => {
-  await test.step('Should be in the Inpatient location',async()=>{
- await page.goto('http://localhost:8080/openmrs/spa/home/ward');
-await page.getByRole('button', { name: 'Change location' }).click();
-await page.locator('label').filter({ hasText: 'Inpatient Ward' }).locator('span').first().click();
-await page.getByRole('button', { name: 'Confirm' }).click();  
+  await test.step('Should be in the Inpatient location', async () => {
+    await page.goto('http://localhost:8080/openmrs/spa/home/ward');
+    await page.getByRole('button', { name: 'Change location' }).click();
+    await page.locator('label').filter({ hasText: 'Inpatient Ward' }).locator('span').first().click();
+    await page.getByRole('button', { name: 'Confirm' }).click();
   });
- await test.step('Open Admission Requests list', async () => {
+  await test.step('Open Admission Requests list', async () => {
+
     await page.getByRole('button', { name: 'Manage' }).click();
   });
 
   await test.step('Verify patient is in the admission request list', async () => {
-  const card = page.locator('.-esm-ward__admission-request-card__admissionRequestCard___ArwhY').first();
-  await expect(card).toBeVisible();
+
+    const card = page.locator('.-esm-ward__admission-request-card__admissionRequestCard___ArwhY').first();
+    await expect(card).toBeVisible();
   });
 
   await test.step('Cancel the admission request', async () => {
     await page.locator('button').filter({ hasText: 'Cancel' }).first().click();
-   
   });
 
   await test.step('Enter cancellation reason and save', async () => {
@@ -36,7 +36,8 @@ await page.getByRole('button', { name: 'Confirm' }).click();
   });
 
   await test.step('Verify cancellation success message', async () => {
-    await page.waitForSelector('text=Admission request cancelled.',{state:'visible'});
+
+    await page.waitForSelector('text=Admission request cancelled.', { state: 'visible' });
     await expect(page.getByText('Admission request cancelled.')).toBeVisible();
   });
 
@@ -45,8 +46,5 @@ await page.getByRole('button', { name: 'Confirm' }).click();
   });
 });
 
+test.afterEach(async ({ api }) => {});
 
-test.afterEach(async ({ api }) => {
-  console.log(`Test cleanup complete for patient: ${patient.uuid}`);
-
-});
