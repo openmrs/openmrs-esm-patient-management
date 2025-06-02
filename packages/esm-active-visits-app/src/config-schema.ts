@@ -42,7 +42,7 @@ export const configSchema = {
           _description: 'Name of the desired identifier to filter data returned from the visit resource.',
         },
       },
-      _default: null,
+      _default: [],
     },
     pageSize: {
       _type: Type.Number,
@@ -52,6 +52,10 @@ export const configSchema = {
     pageSizes: {
       _type: Type.Array,
       _description: 'Customizable page sizes that user can choose',
+      _elements: {
+        _type: Type.Number,
+        _description: 'Number of entries to be displayed on the active visits table.',
+      },
       _default: [10, 20, 50],
     },
     obs: {
