@@ -48,6 +48,31 @@ test('Register a new patient', async ({ page }) => {
     await patientRegistrationPage.sexRadioButton(formValues.sex).check();
   });
 
+  await test.step('And I click the `Edit` button to upload an image', async () => {
+    await patientRegistrationPage.editButton().click();
+  });
+
+  await test.step('And I upload an image from the file system and click the `Add image` button', async () => {
+    const testImage = {
+      name: 'test-image.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAUA' +
+          'AAAFCAYAAACNbyblAAAAHElEQVQI12P4' +
+          '//8/w38GIAXDIBKE0DHxgljNBAAO' +
+          '9TXL0Y4OHwAAAABJRU5ErkJggg==',
+        'base64',
+      ),
+    };
+    const fileInput = page.locator('input.cds--file-input');
+    await fileInput.setInputFiles(testImage);
+    await patientRegistrationPage.addImageButton().click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/upload complete/i)).toBeVisible();
+  });
+
   await test.step(`And I fill in ${formValues.birthdate} as the date of birth`, async () => {
     await patientRegistrationPage.birthdateDayInput().fill(formValues.birthdate.day);
     await patientRegistrationPage.birthdateMonthInput().fill(formValues.birthdate.month);
@@ -96,6 +121,7 @@ test('Register a new patient', async ({ page }) => {
     const patientBanner = page.locator('header[aria-label="patient banner"]');
 
     await expect(patientBanner).toBeVisible();
+    await expect(patientBanner.locator('img.sb-avatar__image')).toBeVisible();
     await expect(patientBanner.getByText('Johnny Donny Ronny')).toBeVisible();
     await expect(patientBanner.getByText(/male/i)).toBeVisible();
     await expect(patientBanner.getByText(/01-Feb-2020/i)).toBeVisible();
