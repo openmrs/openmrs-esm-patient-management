@@ -214,7 +214,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
           <Stack gap={4}>
             <h5>{queueEntry.display}</h5>
             <p>{modalInstruction}</p>
-            <section className={styles.section}>
+            <section>
               <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
               <Select
                 labelText={t('selectQueue', 'Select a queue')}
@@ -274,7 +274,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               )}
             </section>
 
-            <section className={styles.section}>
+            <section>
               <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
               {hasNoPrioritiesConfigured ? (
                 <InlineNotification
@@ -311,7 +311,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               )}
             </section>
 
-            <section className={styles.section}>
+            <section>
               <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
               <TextArea
                 labelText=""
@@ -321,7 +321,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               />
             </section>
 
-            <section className={styles.section}>
+            <section>
               <div className={styles.sectionTitle}>{t('timeOfTransition', 'Time of transition')}</div>
               <Checkbox
                 labelText={t('modifyDefaultValue', 'Modify default value')}
