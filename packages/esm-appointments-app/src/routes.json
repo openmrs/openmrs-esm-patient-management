@@ -26,11 +26,15 @@
       "slot": "clinical-appointments-dashboard-slot"
     },
     {
+      "name": "appointments-dashboard",
+      "slot": "appointments-dashboard-slot",
+      "component": "appointmentsDashboard"
+    },
+    {
       "name": "appointments-calendar-dashboard-link",
       "slot": "calendar-dashboard-slot",
       "component": "appointmentsCalendarDashboardLink"
     },
-
     {
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
@@ -66,16 +70,6 @@
       "component": "earlyAppointments"
     },
     {
-      "name": "appointments-form-workspace",
-      "component": "appointmentsFormWorkspace",
-      "meta": {
-        "title": {
-          "key": "createNewAppointment",
-          "default": "Create new appointment"
-        }
-      }
-    },
-    {
       "name": "patient-appointments-summary-dashboard",
       "component": "patientAppointmentsSummaryDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -83,13 +77,14 @@
       "meta": {
         "columns": 1,
         "columnSpan": 1,
+        "hideDashboardTitle": true,
+        "path": "Appointments",
         "slot": "patient-chart-appointments-dashboard-slot",
-        "title": "Appointments",
-        "path": "Appointments"
+        "title": "Appointments"
       }
     },
     {
-      "name": "patientAppointments-details-widget",
+      "name": "appointments-details-widget",
       "component": "patientAppointmentsDetailedSummary",
       "slot": "patient-chart-appointments-dashboard-slot",
       "meta": {
@@ -102,38 +97,8 @@
       "slot": "visit-form-top-slot"
     },
     {
-      "name": "edit-appointments-form",
-      "component": "appointmentsForm",
-      "meta": {
-        "title":{
-          "key":"editAppointment",
-          "default":"Edit Appointment"
-        }
-      }
-    },
-    {
       "name": "search-patient",
       "component": "searchPatient"
-   },
-    {
-      "name": "create-appointment",
-      "component": "appointmentsForm",
-      "meta": {
-        "title": {
-          "key":"appointmentForm",
-          "default":"Appointment Form"
-        }
-      }
-    },
-    {
-      "name": "add-appointment",
-      "component": "appointmentsForm",
-      "meta": {
-        "title": {
-          "key": "createNewAppointment",
-          "default": "Create new appointment"
-        }
-      }
     },
     {
       "name": "home-appointments-tile",
@@ -147,8 +112,16 @@
       "component": "endAppointmentModal"
     },
     {
-      "name": "patient-appointment-cancel-confirmation-dialog",
-      "component": "patientAppointmentsCancelConfirmationDialog"
+      "name": "cancel-appointment-modal",
+      "component": "cancelAppointmentModal"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace",
+      "title": "createNewAppointment",
+      "type": "form"
     }
   ]
 }

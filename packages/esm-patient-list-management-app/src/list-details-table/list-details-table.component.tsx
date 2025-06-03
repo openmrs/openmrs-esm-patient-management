@@ -203,6 +203,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         ),
         sex: patient.sex,
         startDate: patient.startDate,
+        mobile: patient.mobile || '--',
       })) ?? [],
     [columns, filteredPatients],
   );
@@ -364,6 +365,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         </div>
         {showConfirmationModal && (
           <Modal
+            className={styles.modal}
             open
             danger
             modalHeading={t(

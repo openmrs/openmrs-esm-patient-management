@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
 import type { PatientSearchResponse } from '../types';
@@ -13,8 +13,9 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
   ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
+
     const loadingIconRef = useCallback(
-      (node) => {
+      (node: HTMLDivElement | null) => {
         if (isValidating) {
           return;
         }
@@ -37,6 +38,14 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
       },
       [isValidating, hasMore, setPage],
     );
+
+    useEffect(() => {
+      return () => {
+        if (observer.current) {
+          observer.current.disconnect();
+        }
+      };
+    }, []);
 
     if (!searchResults && isLoading) {
       return (

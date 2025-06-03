@@ -2,15 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
-import Pagination from '../ui-components/pagination/pagination.component';
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  PatientSearchResults,
-  SearchResultsEmptyState,
-} from './patient-search-views.component';
 import type { SearchedPatient } from '../types';
+import { EmptyState, ErrorState, LoadingState, PatientSearchResults } from './patient-search-views.component';
+import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
 import { inferModeFromSearchParams } from '../mpi/utils';
 import { useSearchParams } from '../hooks/useSearchParams';
@@ -20,7 +14,7 @@ interface PatientSearchComponentProps {
   stickyPagination?: boolean;
   searchResults: Array<SearchedPatient>;
   isLoading: boolean;
-  fetchError: Error;
+  fetchError: Error | null;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -47,26 +41,20 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   }, [query, goTo]);
 
   const searchResultsView = useMemo(() => {
-    if (!query) {
-      return <EmptyState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
-    }
-
     if (isLoading) {
-      return <LoadingState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
+      return <LoadingState />;
     }
 
     if (fetchError) {
-      return <ErrorState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} />;
+      return <ErrorState />;
     }
 
-    if (results?.length === 0) {
-      return (
-        <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} searchTerm={query} searchMode={searchMode} />
-      );
+    if (!isLoading && (!results || results.length === 0)) {
+      return <EmptyState searchTerm={query} />;
     }
 
     return <PatientSearchResults searchResults={results} searchTerm={query} searchMode={searchMode} />;
-  }, [query, isLoading, inTabletOrOverlay, results, fetchError, searchMode]);
+  }, [query, isLoading, results, fetchError, searchMode]);
 
   return (
     <div
@@ -74,17 +62,19 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         [styles.searchResultsDesktop]: !inTabletOrOverlay,
         [styles.searchResultsTabletOrOverlay]: inTabletOrOverlay,
       })}>
-      <div className={classNames(stickyPagination, styles.broadBottomMargin)}>
+      <div
+        className={classNames({
+          [styles.broadBottomMargin]: stickyPagination,
+        })}>
         <h2
           className={classNames(styles.resultsHeader, styles.productiveHeading02, {
             [styles.leftPaddedResultHeader]: inTabletOrOverlay,
           })}>
-          {isLoading ? t('searchingText', 'Searching...') : null}
-          {!isLoading
-            ? t('searchResultsCount', '{{count}} search result', {
+          {isLoading
+            ? t('searchingText', 'Searching...')
+            : t('searchResultsCount', '{{count}} search result', {
                 count: totalResults,
-              })
-            : null}
+              })}
         </h2>
         {searchResultsView}
       </div>

@@ -1,4 +1,4 @@
-import { showNotification, useConfig, type Patient } from '@openmrs/esm-framework';
+import { showNotification, useConfig, type Location, type Patient } from '@openmrs/esm-framework';
 import type { TFunction } from 'i18next';
 import { useMemo } from 'react';
 import {
@@ -77,11 +77,16 @@ export function getInpatientAdmissionsUuidMap(inpatientAdmissions: InpatientAdmi
 }
 
 export function createAndGetWardPatientGrouping(
-  inpatientAdmissions: InpatientAdmission[],
+  inpatientAdmissionsAtCurrentLocation: InpatientAdmission[],
   admissionLocation: AdmissionLocationFetchResponse,
   inpatientRequests: InpatientRequest[],
+  inpatientAdmissionsAtOtherLocations: InpatientAdmission[],
+  currentWardLocation: Location,
 ) {
-  const inpatientAdmissionsByPatientUuid = getInpatientAdmissionsUuidMap(inpatientAdmissions);
+  const inpatientAdmissionsByPatientUuid = getInpatientAdmissionsUuidMap([
+    ...(inpatientAdmissionsAtCurrentLocation ?? []),
+    ...(inpatientAdmissionsAtOtherLocations ?? []),
+  ]);
 
   const wardAdmittedPatientsWithBed = new Map<string, InpatientAdmission>();
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
@@ -91,12 +96,12 @@ export function createAndGetWardPatientGrouping(
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
     patients.map((patient) => {
-      const patientAdmittedWithBed = inpatientAdmissionsByPatientUuid.get(patient.uuid);
+      const admission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
       allWardPatientUuids.add(patient.uuid);
-      if (patientAdmittedWithBed) {
-        wardAdmittedPatientsWithBed.set(patient.uuid, patientAdmittedWithBed);
+      if (admission?.currentInpatientLocation?.uuid == currentWardLocation.uuid) {
+        wardAdmittedPatientsWithBed.set(patient.uuid, admission);
         //count the pending metric
-        const dispositionType = patientAdmittedWithBed.currentInpatientRequest?.dispositionType;
+        const dispositionType = admission.currentInpatientRequest?.dispositionType;
         if (dispositionType == 'TRANSFER' || dispositionType == 'DISCHARGE') wardPatientPendingCount++;
       } else {
         wardUnadmittedPatientsWithBed.set(patient.uuid, patient);
@@ -105,7 +110,7 @@ export function createAndGetWardPatientGrouping(
   });
 
   const wardUnassignedPatientsList =
-    inpatientAdmissions?.filter((inpatientAdmission) => {
+    inpatientAdmissionsAtCurrentLocation?.filter((inpatientAdmission) => {
       allWardPatientUuids.add(inpatientAdmission.patient.uuid);
       return (
         !wardAdmittedPatientsWithBed.has(inpatientAdmission.patient.uuid) &&
@@ -131,6 +136,7 @@ export function createAndGetWardPatientGrouping(
     wardUnassignedPatientsList,
     allWardPatientUuids,
     totalPatientsCount,
+    inpatientAdmissionsByPatientUuid,
   };
 }
 

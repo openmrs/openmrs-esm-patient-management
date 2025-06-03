@@ -40,15 +40,14 @@ export const useLocationsWithAdmissionTag = () => {
 export const useBedsForLocation = (locationUuid: string) => {
   const apiUrl = `${restBaseUrl}/bed?locationUuid=${locationUuid}&v=full`;
 
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<Bed> } }, Error>(
+  const { data, isLoading, error, mutate, isValidating } = useSWR<{ data: { results: Array<Bed> } }, Error>(
     locationUuid ? apiUrl : null,
     openmrsFetch,
   );
 
   const mappedBedData: MappedBedData = (data?.data?.results ?? []).map((bed) => ({
-    description: bed.bedType?.description,
     id: bed.id,
-    name: bed.bedType?.displayName,
+    type: bed.bedType?.displayName,
     number: bed.bedNumber,
     status: bed.status,
     uuid: bed.uuid,
@@ -59,8 +58,10 @@ export const useBedsForLocation = (locationUuid: string) => {
       bedsData: mappedBedData,
       errorLoadingBeds: error,
       isLoadingBeds: isLoading,
+      mutate,
+      isValidating,
     }),
-    [mappedBedData, isLoading, error],
+    [mappedBedData, isLoading, error, mutate, isValidating],
   );
 
   return results;
@@ -282,5 +283,23 @@ export async function editBedTag({
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: bedTagPayload,
+  });
+}
+
+export async function deleteBedTag({ bedTagId, reason }: { bedTagId: string; reason: string }): Promise<FetchResponse> {
+  return await openmrsFetch(`${restBaseUrl}/bedTag/${bedTagId}?reason=${encodeURIComponent(reason)}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function deleteBedType({
+  bedTypeId,
+  reason,
+}: {
+  bedTypeId: string;
+  reason: string;
+}): Promise<FetchResponse> {
+  return await openmrsFetch(`${restBaseUrl}/bedtype/${bedTypeId}?reason=${encodeURIComponent(reason)}`, {
+    method: 'DELETE',
   });
 }

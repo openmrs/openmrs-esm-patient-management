@@ -15,8 +15,20 @@ const swrWrapper = ({ children }) => {
   );
 };
 
+const withSwr = (ui: ReactElement) => (
+  <SWRConfig value={{ dedupingInterval: 0, provider: () => new Map() }}>{ui}</SWRConfig>
+);
+
 const renderWithSwr = (ui: ReactElement, options?: Omit<RenderOptions, 'queries'>) =>
   render(ui, { wrapper: swrWrapper, ...options });
+
+const renderWithContext = <T,>(
+  ui: ReactElement,
+  ContextProvider: React.ComponentType<{ value: T; children: React.ReactNode }>,
+  contextValue: T,
+) => {
+  return render(<ContextProvider value={contextValue}>{ui}</ContextProvider>);
+};
 
 const renderWithRouter = (component: React.ReactElement, initialRoute = '/') => {
   return render(
@@ -158,7 +170,9 @@ export {
   mockPatientWithLongName,
   mockPatientWithoutFormattedName,
   patientChartBasePath,
+  renderWithContext,
   renderWithSwr,
   renderWithRouter,
   waitForLoadingToFinish,
+  withSwr,
 };

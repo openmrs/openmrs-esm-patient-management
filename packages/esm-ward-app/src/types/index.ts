@@ -48,7 +48,6 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
-  WardPatientHeader: WardPatientCardType;
 }
 
 // server-side types defined in openmrs-module-bedmanagement:
@@ -73,7 +72,7 @@ export interface Bed {
 
 export interface BedDetail {
   bedId: number;
-  bedNumber: number;
+  bedNumber: string;
   bedType: BedType;
   physicalLocation: Location;
   patients: Array<Patient>;
@@ -152,6 +151,8 @@ export interface InpatientAdmission {
 
   // the current in patient request
   currentInpatientRequest: InpatientRequest;
+
+  currentInpatientLocation: Location;
 }
 
 export interface MotherAndChild {

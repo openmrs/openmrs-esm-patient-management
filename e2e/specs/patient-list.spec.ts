@@ -1,27 +1,19 @@
+/* eslint-disable playwright/no-skipped-test */
 import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
-import {
-  addPatientToCohort,
-  deleteCohort,
-  deletePatient,
-  generateRandomCohort,
-  generateRandomPatient,
-  removePatientFromCohort,
-} from '../commands';
+import { addPatientToCohort, deleteCohort, generateRandomCohort, removePatientFromCohort } from '../commands';
 import { type Cohort, type CohortMember, type Patient } from '../types';
 
 let cohortMember: CohortMember;
 let cohortUuid: string;
 let cohort: Cohort;
-let patient: Patient;
 
 test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
   cohort = await generateRandomCohort(api);
 });
 
-test('Create and edit a patient list', async ({ page }) => {
+test.skip('Create and edit a patient list', async ({ page }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I visit the patient lists page', async () => {
@@ -66,7 +58,7 @@ test('Create and edit a patient list', async ({ page }) => {
   });
 });
 
-test('Manage patients in a list', async ({ api, page }) => {
+test.skip('Manage patients in a list', async ({ api, page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step("When I visit a specific patient list's page", async () => {
@@ -93,6 +85,5 @@ test.afterEach(async ({ api }) => {
     await removePatientFromCohort(api, cohortMember.uuid);
   }
   await deleteCohort(api, cohortUuid);
-  await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
 });

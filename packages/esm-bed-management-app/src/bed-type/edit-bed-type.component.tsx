@@ -4,16 +4,15 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import { editBedType, useBedTypes } from '../summary/summary.resource';
 import { type BedTypeDataAdministration } from '../bed-administration/bed-administration-types';
 import { type BedType, type BedTypeData, type Mutator } from '../types';
-import BedTypeAdministrationForm from './bed-type-admin-form.component';
+import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 
 interface EditBedTypeFormProps {
   editData: BedTypeData;
   mutate: Mutator<BedType>;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, onModalChange, showModal }) => {
+const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
   const { bedTypes } = useBedTypes();
   const headerTitle = t('editBedType', 'Edit bed type');
@@ -33,7 +32,7 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, onM
         .then(() => {
           showSnackbar({
             title: t('bedTypeUpdated', 'Bed type updated'),
-            subtitle: t('bedTypeUpdatedSuccessfully', `${bedTypePayload.name} updated successfully`, {
+            subtitle: t('bedTypeUpdatedSuccessfully', '{{bedType}} updated successfully', {
               bedType: bedTypePayload.name,
             }),
             kind: 'success',
@@ -43,30 +42,25 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, onM
         })
         .catch((error) => {
           showSnackbar({
-            title: t('errorCreatingForm', 'Error creating bed'),
-            subtitle: error?.message,
+            title: t('errorCreatingBedType', 'Error creating bed type'),
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
             kind: 'error',
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, editData, t],
+    [editData.uuid, t, mutate, closeModal],
   );
 
   return (
-    <>
-      <BedTypeAdministrationForm
-        onModalChange={onModalChange}
-        availableBedTypes={bedTypes}
-        showModal={showModal}
-        handleSubmission={handleUpdateBedType}
-        headerTitle={headerTitle}
-        initialData={editData}
-        allLocations={[]}
-      />
-    </>
+    <BedTypeAdministrationForm
+      availableBedTypes={bedTypes}
+      handleSubmission={handleUpdateBedType}
+      headerTitle={headerTitle}
+      initialData={editData}
+      allLocations={[]}
+      closeModal={closeModal}
+    />
   );
 };
 

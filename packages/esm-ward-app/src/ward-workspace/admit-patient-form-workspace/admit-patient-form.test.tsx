@@ -1,22 +1,21 @@
+import React from 'react';
+import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import {
-  CloseWorkspaceOptions,
   type DefaultWorkspaceProps,
   showSnackbar,
   useAppContext,
   useFeatureFlag,
   useSession,
 } from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '../../../../../__mocks__';
-import { renderWithSwr } from '../../../../../tools';
+import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
-import useWardLocation from '../../hooks/useWardLocation';
-import type { DispositionType, WardPatient, WardViewContext } from '../../types';
+import type { WardPatient, WardViewContext } from '../../types';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
+import useWardLocation from '../../hooks/useWardLocation';
 
 jest.mock('../../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
@@ -90,8 +89,6 @@ function renderAdmissionForm() {
 
 describe('Testing AdmitPatientForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     mockedUseSession.mockReturnValue({
       currentProvider: {
         uuid: 'current-provider-uuid',
@@ -100,6 +97,7 @@ describe('Testing AdmitPatientForm', () => {
       authenticated: true,
       sessionId: 'session-id',
     });
+
     mockedUseFeatureFlag.mockReturnValue(true);
 
     mockedUseWardLocation.mockReturnValue({
@@ -116,7 +114,7 @@ describe('Testing AdmitPatientForm', () => {
           results: [
             {
               bedId: 1,
-              bedNumber: 1,
+              bedNumber: '1',
               bedType: null,
               patients: [mockPatientAlice],
               physicalLocation: mockLocationInpatientWard,
@@ -196,7 +194,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(mockedAssignPatientToBed).toHaveBeenCalledWith(3, mockPatientAlice.uuid, 'encounter-uuid');
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
-      subtitle: '{{patientName}} has been successfully admitted and assigned to bed bed3',
+      subtitle: 'Alice Johnson has been successfully admitted and assigned to bed bed3',
       title: 'Patient admitted successfully',
     });
   });

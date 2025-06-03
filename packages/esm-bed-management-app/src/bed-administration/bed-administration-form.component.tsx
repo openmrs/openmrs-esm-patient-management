@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ComboBox,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -17,54 +16,66 @@ import {
   Select,
   SelectItem,
   Stack,
-  TextArea,
   TextInput,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
-import { type BedType, type BedFormData } from '../types';
-import styles from '../modals.scss';
+import type { BedType, BedWithLocation } from '../types';
+
+/**
+ * Adds translation for occupancy status options
+ * t('occupancyStatusAvailable', 'Available')
+ * t('occupancyStatusOccupied', 'Occupied')
+ */
 
 interface BedAdministrationFormProps {
   allLocations: Location[];
   availableBedTypes: Array<BedType>;
   handleCreateBed?: (formData: BedAdministrationData) => void;
   headerTitle: string;
-  initialData: BedFormData;
+  initialData: BedWithLocation;
   occupancyStatuses: string[];
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
 interface ErrorType {
   message: string;
 }
 
-const numberInString = z.string().transform((val, ctx) => {
-  const parsed = parseInt(val);
-  if (isNaN(parsed) || parsed < 1) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      // TODO: Translate this message
-      message: 'Please enter a valid number',
-    });
-    return z.NEVER;
-  }
-  return val;
-});
+const createSchema = (t: TFunction) => {
+  const numberInString = z.string().transform((val, ctx) => {
+    const parsed = parseInt(val);
+    if (isNaN(parsed) || parsed < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t('invalidNumber', 'Please enter a valid number'),
+      });
+      return z.NEVER;
+    }
+    return val;
+  });
 
-const BedAdministrationSchema = z.object({
-  bedColumn: numberInString,
-  bedId: z.string().max(255),
-  bedRow: numberInString,
-  bedType: z.string().refine((value) => value != '', 'Please select a valid bed type'),
-  description: z.string().max(255),
-  location: z
-    .object({ display: z.string(), uuid: z.string() })
-    .refine((value) => value.display != '', 'Please select a valid location'),
-  occupancyStatus: z.string().refine((value) => value != '', 'Please select a valid occupied status'),
-});
+  return z.object({
+    bedId: z
+      .string()
+      .max(255)
+      .refine((value) => value !== '', {
+        message: t('invalidBedId', 'Bed ID cannot be empty'),
+      }),
+    bedRow: numberInString,
+    bedColumn: numberInString,
+    location: z.object({ display: z.string(), uuid: z.string() }).refine((value) => value.display != '', {
+      message: t('invalidLocation', 'Please select a valid location'),
+    }),
+    occupancyStatus: z.string().refine((value) => value != '', {
+      message: t('invalidOccupancyStatus', 'Please select a valid occupied status'),
+    }),
+    bedType: z.string().refine((value) => value != '', {
+      message: t('invalidBedType', 'Please select a valid bed type'),
+    }),
+  });
+};
 
 const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   allLocations,
@@ -73,8 +84,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   headerTitle,
   initialData,
   occupancyStatuses,
-  onModalChange,
-  showModal,
+  closeModal,
 }) => {
   const { t } = useTranslation();
   const [occupancyStatus, setOccupancyStatus] = useState(capitalize(initialData.status));
@@ -82,10 +92,13 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
 
+  const BedAdministrationSchema = createSchema(t);
+
   const {
     handleSubmit,
     control,
     formState: { isDirty },
+    setValue,
   } = useForm<BedAdministrationData>({
     mode: 'all',
     resolver: zodResolver(BedAdministrationSchema),
@@ -94,7 +107,6 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
       bedId: initialData.bedNumber ?? '',
       bedRow: initialData.row.toString() ?? '0',
       bedType: initialData.bedType?.name ?? '',
-      description: initialData.bedType?.description ?? '',
       location: initialData.location ?? {},
       occupancyStatus: capitalize(initialData.status) ?? occupancyStatus,
     },
@@ -114,9 +126,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    // TODO: Port this over to the modal system or create individual modals for each form
-    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
-      <ModalHeader className={styles.modalHeader} title={headerTitle} />
+    <React.Fragment>
+      <ModalHeader title={headerTitle} closeModal={closeModal} />
       <ModalBody hasScrollingContent>
         <Form>
           <Stack gap={3}>
@@ -140,25 +151,6 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
 
             <FormGroup>
               <Controller
-                name="description"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <>
-                    <TextArea
-                      id="description"
-                      invalidText={fieldState?.error?.message}
-                      labelText={t('bedDescription', 'Bed description')}
-                      placeholder={t('enterBedDescription', 'Enter the bed description')}
-                      rows={2}
-                      {...field}
-                    />
-                  </>
-                )}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Controller
                 name="bedRow"
                 control={control}
                 render={({ fieldState, field }) => (
@@ -166,8 +158,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     hideSteppers
                     id="bedRow"
                     invalidText={fieldState?.error?.message}
-                    label="Bed row"
-                    labelText="Bed row"
+                    label={t('bedRow', 'Bed row')}
+                    labelText={t('bedRow', 'Bed row')}
                     {...field}
                   />
                 )}
@@ -182,8 +174,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                   <NumberInput
                     hideSteppers
                     id="bedColumn"
-                    label="Bed column"
-                    labelText="Bed column"
+                    label={t('bedColumn', 'Bed column')}
+                    labelText={t('bedColumn', 'Bed column')}
                     invalidText={fieldState.error?.message}
                     {...field}
                   />
@@ -232,8 +224,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                     {occupancyStatuses.map((occupancyStatus, index) => (
                       <SelectItem
                         key={`occupancyStatus-${index}`}
-                        text={t('occupancyStatus', `${occupancyStatus}`)}
-                        value={t('occupancyStatus', `${occupancyStatus}`)}
+                        text={t(`occupancyStatus${occupancyStatus}`, `${occupancyStatus}`)}
+                        value={occupancyStatus}
                       />
                     ))}
                   </Select>
@@ -269,7 +261,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 onClose={() => setShowErrorNotification(false)}
                 role="alert"
                 style={{ minWidth: '100%', margin: '0', padding: '0' }}
-                subtitle={t('pleaseFillField', formStateError) + '.'}
+                subtitle={formStateError}
                 title={t('error', 'Error')}
               />
             )}
@@ -277,14 +269,14 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => onModalChange(false)} kind="secondary">
+        <Button onClick={closeModal} kind="secondary">
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
         <Button disabled={!isDirty} onClick={handleSubmit(onSubmit, onError)}>
           <span>{t('save', 'Save')}</span>
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </React.Fragment>
   );
 };
 

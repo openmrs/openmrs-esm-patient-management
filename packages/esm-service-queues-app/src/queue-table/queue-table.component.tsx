@@ -76,7 +76,7 @@ function QueueTable({
     goTo(1);
   }, [goTo, queueEntries]);
 
-  const rowsData =
+  const rows =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
       columns.forEach(({ key, CellComponent }) => {
@@ -97,18 +97,18 @@ function QueueTable({
     <DataTable
       data-floating-menu-container
       overflowMenuOnHover={isDesktop(layout)}
-      rows={rowsData}
+      rows={rows}
       headers={columns}
       size={responsiveSize}
-      useZebraStyles>
+      useZebraStyles={columns?.length > 1}>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
         <>
           <TableContainer className={styles.tableContainer}>
             <div className={styles.toolbarContainer}>
               {isValidating ? (
-                <span>
+                <div className={styles.loaderContainer}>
                   <InlineLoading />
-                </span>
+                </div>
               ) : null}
 
               {tableFilters && (
@@ -117,7 +117,7 @@ function QueueTable({
                 </TableToolbar>
               )}
             </div>
-            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+            <Table {...getTableProps()} className={styles.queueTable}>
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
@@ -135,23 +135,25 @@ function QueueTable({
                   return (
                     <React.Fragment key={row.id}>
                       <Row {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
+                        {row.cells.map((cell, i) => (
                           <TableCell
                             key={cell.id}
                             className={classNames({
-                              'cds--table-column-menu': cell?.id?.split(':')?.[1] === 'actions',
+                              'cds--table-column-menu': columns[i].key.includes('actions'),
                             })}>
                             {cell.value}
                           </TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && row.isExpanded && (
+                      {ExpandedRow && row.isExpanded ? (
                         <TableExpandedRow
-                          key={i}
                           className={styles.expandedActiveVisitRow}
-                          colSpan={headers.length + 1}>
+                          colSpan={headers.length + 2}
+                          key={i}>
                           <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
                         </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                       )}
                     </React.Fragment>
                   );

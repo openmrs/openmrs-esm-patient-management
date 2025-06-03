@@ -39,6 +39,7 @@ export function useActiveVisits() {
     let url = `${restBaseUrl}/visit?v=${customRepresentation}&`;
     let urlSearchParams = new URLSearchParams();
 
+    urlSearchParams.append('includeParentLocations', 'true');
     urlSearchParams.append('includeInactive', 'false');
     urlSearchParams.append('totalCount', 'true');
     urlSearchParams.append('location', `${sessionLocation}`);
@@ -67,8 +68,9 @@ export function useActiveVisits() {
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => {
     // create base object
+    const age = visit?.patient?.person?.age;
     const activeVisits: ActiveVisit = {
-      age: visit?.patient?.person?.age,
+      age: age ? String(age) : null,
       id: visit.uuid,
       idNumber: null,
       gender: visit?.patient?.person?.gender,

@@ -31,6 +31,11 @@
       "slot": "ward-dashboard-slot"
     },
     {
+      "component": "wardView",
+      "name": "ward-view",
+      "slot": "ward-view-slot"
+    },
+    {
       "component": "wardPatientActionButtonExtension",
       "name": "ward-patient-action-button",
       "slot": "action-menu-ward-patient-items-slot"
@@ -61,6 +66,16 @@
       "slot": "action-menu-ward-patient-items-slot"
     },
     {
+      "name": "admission-requests-workspace-siderail-button",
+      "component": "admissionRequestsWorkspaceSideRailIcon",
+      "slot": "action-menu-ward-patient-admission-requests-items-slot"
+    },
+    {
+      "name": "create-admission-request-workspace-siderail-button",
+      "component": "createAdmissionEncounterWorkspaceSideRailIcon",
+      "slot": "action-menu-ward-patient-admission-requests-items-slot"
+    },
+    {
       "component": "defaultWardView",
       "name": "default-ward",
       "slot": "default-ward"
@@ -69,6 +84,11 @@
       "component": "maternalWardView",
       "name": "maternal-ward",
       "slot": "maternal-ward"
+    },
+    {
+      "component": "wardPatientWorkspaceBanner",
+      "name": "ward-patient-workspace-banner",
+      "slot": "ward-workspace-patient-banner-slot"
     }
   ],
   "workspaces": [
@@ -76,16 +96,20 @@
       "name": "admission-requests-workspace",
       "component": "admissionRequestWorkspace",
       "title": "admissionRequests",
-      "type": "admission-requests"
+      "type": "pending-admission-requests",
+      "width": "wider"
+    },{
+      "name": "create-admission-encounter-workspace",
+      "component": "createAdmissionEncounterWorkspace",
+      "title": "admitPatient",
+      "type": "patient-search-workspace",
+      "width": "wider"
     },
     {
       "name": "ward-patient-notes-workspace",
       "component": "wardPatientNotesWorkspace",
       "type": "ward-patient-notes",
-      "title": "inpatientNotesWorkspaceTitle",
-      "sidebarFamily": "ward-patient",
-      "hasOwnSidebar": true,
-      "groups": ["ward-patient"]
+      "title": "inpatientNotesWorkspaceTitle"
 
     },
     {
@@ -99,19 +123,13 @@
       "component": "wardPatientWorkspace",
       "type": "ward",
       "title": "Ward patient",
-      "width": "extra-wide",
-      "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient",
-      "groups": ["ward-patient"]
+      "width": "extra-wide"
     },
     {
       "name": "patient-transfer-swap-workspace",
       "component": "patientTransferAndSwapWorkspace",
       "title": "transfers",
-      "type": "transfer-swap-bed-form",
-      "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient",
-      "groups": ["ward-patient"]
+      "type": "transfer-swap-bed-form"
 
     },
     {
@@ -124,27 +142,42 @@
       "name": "patient-discharge-workspace",
       "component": "patientDischargeWorkspace",
       "title": "discharge",
-      "type": "ward-patient-discharge",
-      "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient",
-      "groups": ["ward-patient"]
+      "type": "ward-patient-discharge"
     },
     {
       "name": "ward-patient-clinical-forms-workspace",
       "component": "patientClinicalFormsWorkspace",
       "title": "clinicalForms",
       "type": "ward-patient-clinical-forms",
-      "hasOwnSidebar": true,
-      "sidebarFamily": "ward-patient",
-      "width": "wider",
-      "groups": ["ward-patient"]
+      "width": "wider"
     },
     {
       "name": "cancel-admission-request-workspace",
       "component": "cancelAdmissionRequestWorkspace",
       "title": "cancelAdmissionRequest",
-      "type": "cancel-admission-request",
-      "sidebarFamily": "ward-patient"
+      "type": "cancel-admission-request"
+    }
+  ],
+  "workspaceGroups": [
+    {
+      "name": "ward-patient",
+      "members": [
+        "ward-patient-workspace",
+        "ward-patient-notes-workspace",
+        "patient-transfer-swap-workspace",
+        "patient-discharge-workspace",
+        "ward-patient-clinical-forms-workspace",
+        "add-drug-order",
+        "order-basket",
+        "add-lab-order"
+      ]
+    },
+    {
+      "name": "ward-patient-admission-requests",
+      "members": [
+        "admission-requests-workspace",
+        "create-admission-encounter-workspace"
+      ]
     }
   ]
 }

@@ -1,17 +1,17 @@
+import React, { type ReactNode } from 'react';
 import { Tag } from '@carbon/react';
 import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-framework';
-import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useObs } from '../../hooks/useObs';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
-import styles from '../ward-patient-card.scss';
-import WardPatientSkeletonText from '../row-elements/ward-patient-skeleton-text';
 import {
   getObsEncounterString,
   obsCustomRepresentation,
   useConceptToTagColorMap,
 } from '../row-elements/ward-patient-obs.resource';
-import WardPatientResponsiveTooltip from '../row-elements/ward-patient-responsive-tooltip';
+import WardPatientSkeletonText from '../row-elements/ward-patient-skeleton-text.component';
+import WardPatientResponsiveTooltip from '../row-elements/ward-patient-responsive-tooltip.component';
+import styles from '../ward-patient-card.scss';
 
 interface WardPatientCodedObsTagsRowProps {
   id: string;

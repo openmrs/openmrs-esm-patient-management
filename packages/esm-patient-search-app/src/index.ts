@@ -3,17 +3,12 @@ import {
   fetchCurrentPatient,
   fhirBaseUrl,
   getAsyncLifecycle,
-  getSyncLifecycle,
   makeUrl,
   messageOmrsServiceWorker,
   registerFeatureFlag,
   setupDynamicOfflineDataHandler,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import rootComponent from './root.component';
-import patientSearchIconComponent from './patient-search-icon';
-import patientSearchButtonComponent from './patient-search-button/patient-search-button.component';
-import patientSearchBarComponent from './compact-patient-search-extension';
 
 const moduleName = '@openmrs/esm-patient-search-app';
 
@@ -24,15 +19,18 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-export const root = getSyncLifecycle(rootComponent, options);
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-export const patientSearchIcon = getSyncLifecycle(patientSearchIconComponent, options);
+export const patientSearchIcon = getAsyncLifecycle(() => import('./patient-search-icon'), options);
 
 // This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
-export const patientSearchButton = getSyncLifecycle(patientSearchButtonComponent, options);
+export const patientSearchButton = getAsyncLifecycle(
+  () => import('./patient-search-button/patient-search-button.component'),
+  options,
+);
 
 // This extension is not compatible with the tablet view.
-export const patientSearchBar = getSyncLifecycle(patientSearchBarComponent, options);
+export const patientSearchBar = getAsyncLifecycle(() => import('./compact-patient-search-extension'), options);
 
 export const patientSearchWorkspace = getAsyncLifecycle(
   () => import('./patient-search-workspace/patient-search.workspace'),

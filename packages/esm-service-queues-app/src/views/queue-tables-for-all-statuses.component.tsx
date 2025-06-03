@@ -51,7 +51,6 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
               name="patient-search-button-slot"
               state={{
                 buttonText: t('addPatientToQueue', 'Add patient to queue'),
-                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
                 buttonProps: {
                   kind: 'secondary',
                   renderIcon: (props) => <Add size={16} {...props} />,
@@ -63,6 +62,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
                     currentServiceQueueUuid: selectedQueue.uuid,
                   });
                 },
+                workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
               }}
             />
             <div className={styles.filterSearch}>
@@ -95,7 +95,7 @@ interface QueueTablesByStatusProps {
 function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
   const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
+  const allowedStatuses = [...selectedQueue.allowedStatuses].reverse();
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;

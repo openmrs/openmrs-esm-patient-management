@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-appointments-app",
-  "version": "8.1.1",
+  "version": "8.5.0",
   "description": "Appointments front-end module for O3",
   "browser": "dist/openmrs-esm-appointments-app.js",
   "main": "src/index.ts",
@@ -12,7 +12,7 @@
     "serve": "webpack serve --mode=development",
     "debug": "npm run serve",
     "build": "webpack --mode production",
-    "analyze": "webpack --mode=production --env.analyze=true",
+    "analyze": "webpack --mode=production --env analyze=true",
     "lint": "eslint src --ext tsx",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
     "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
@@ -37,20 +37,27 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
   },
   "dependencies": {
-    "@carbon/react": "^1.71.0",
+    "@carbon/react": "^1.76.0",
+    "@hookform/resolvers": "^3.9.1",
+    "classnames": "^2.3.2",
     "formik": "^2.2.9",
     "lodash-es": "^4.17.15",
-    "yup": "^0.32.11"
+    "react-hook-form": "^7.54.0",
+    "xlsx": "^0.18.5",
+    "yup": "^0.32.11",
+    "zod": "^3.24.1"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "6.x",
-    "@openmrs/esm-patient-common-lib": "9.x",
+    "@openmrs/esm-patient-common-lib": "10.x",
     "react": "18.x",
+    "react-dom": "18.x",
     "react-i18next": "11.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
+    "@openmrs/esm-patient-common-lib": "next",
     "webpack": "^5.74.0"
   }
 }

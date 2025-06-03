@@ -48,6 +48,9 @@ const ListDetails = () => {
               startDate: member?.startDate ? formatDate(parseDate(member.startDate)) : null,
               uuid: `${member?.patient?.uuid}`,
               membershipUuid: member?.uuid,
+              mobile:
+                member?.patient?.person?.attributes?.find((attr) => attr?.attributeType?.display === 'Telephone Number')
+                  ?.value ?? null,
             }))
           : []
         : [],
@@ -75,6 +78,10 @@ const ListDetails = () => {
       {
         key: 'startDate',
         header: t('startDate', 'Start Date'),
+      },
+      {
+        key: 'mobile',
+        header: t('mobile', 'Mobile'),
       },
     ],
     [t],
@@ -173,6 +180,7 @@ const ListDetails = () => {
         )}
         {showDeleteConfirmationModal && (
           <Modal
+            className={styles.modal}
             open
             danger
             modalHeading={t('confirmDeletePatientList', 'Are you sure you want to delete this patient list?')}

@@ -13,8 +13,8 @@ interface BedSelectorProps {
   currentPatient: Patient;
   selectedBedId: number;
   error: FieldError;
-  onChange(bedId: number);
-  control: Control<{ bedId?: number }, any, { bedId?: number }>;
+  onChange(bedId: number): void;
+  control: Control<{ bedId?: number }>;
   minBedCountToUseDropdown?: number;
 }
 

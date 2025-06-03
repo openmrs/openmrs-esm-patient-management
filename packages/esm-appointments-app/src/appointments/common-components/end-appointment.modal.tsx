@@ -71,7 +71,7 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
   }, [activeVisit, appointmentUuid, closeModal, mutate, mutateAppointments, t]);
 
   return (
-    <div>
+    <>
       <ModalHeader
         closeModal={closeModal}
         title={t('endAppointmentConfirmation', 'Are you sure you want to check the patient out for this appointment?')}
@@ -94,7 +94,7 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
           {t('checkOut', 'Check out')}
         </Button>
       </ModalFooter>
-    </div>
+    </>
   );
 };
 

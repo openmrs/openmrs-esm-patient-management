@@ -24,6 +24,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
+import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   formatDate,
@@ -35,7 +36,6 @@ import {
   launchWorkspace,
   usePagination,
 } from '@openmrs/esm-framework';
-import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
@@ -53,9 +53,15 @@ interface AppointmentsTableProps {
   appointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
+  hasActiveFilters?: boolean;
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading }) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
+  appointments,
+  isLoading,
+  tableHeading,
+  hasActiveFilters,
+}) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
@@ -113,15 +119,30 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
     return <DataTableSkeleton role="progressbar" row={5} />;
   }
 
+  if (hasActiveFilters && !appointments?.length) {
+    return (
+      <div className={styles.filterEmptyState}>
+        <Layer level={0}>
+          <Tile className={styles.filterEmptyStateTile}>
+            <p className={styles.filterEmptyStateContent}>
+              {t('noMatchingAppointments', 'No matching appointments found')}
+            </p>
+            <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+          </Tile>
+        </Layer>
+      </div>
+    );
+  }
+
   if (!appointments?.length) {
     return (
       <EmptyState
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
-        displayText={`${
-          tableHeading?.match(/today/i)
+        displayText={
+          tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
-        }`}
+        }
         launchForm={() => launchWorkspace('search-patient')}
       />
     );
@@ -137,7 +158,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       <div className={styles.toolbar}>
         <Search
           className={styles.searchbar}
-          labelText=""
+          labelText={t('filterAppointments', 'Filter appointments')}
           placeholder={t('filterTable', 'Filter table')}
           onChange={(event) => setSearchString(event.target.value)}
           size={responsiveSize}
@@ -153,7 +174,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                   noToday: true,
                 })
               : null;
-            exportAppointmentsToSpreadsheet(appointments, `${tableHeading}_appointments_${date}`);
+            exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
           }}>
           {t('download', 'Download')}
         </Button>
@@ -184,7 +205,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                     {headers.map((header) => (
                       <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
-                    <TableHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -213,13 +234,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                                 size={responsiveSize}>
                                 <OverflowMenuItem
                                   className={styles.menuItem}
-                                  itemText={t('editAppointments', 'Edit appointment')}
+                                  itemText={t('editAppointment', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace('edit-appointments-form', {
+                                    launchWorkspace('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
+                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />

@@ -1,10 +1,9 @@
-import { Hourglass } from '@carbon/react/icons';
 import React, { useCallback, useEffect } from 'react';
+import { Hourglass } from '@carbon/react/icons';
 import { type WardPatient } from '../../types';
-
 import { useElementConfig } from '../../ward-view/ward-view.resource';
 import { WardPatientPendingOrder } from '../row-elements/ward-patient-pending-order.component';
-import WardPatientPendingTransfer from '../row-elements/ward-patient-pending-transfer';
+import WardPatientPendingTransfer from '../row-elements/ward-patient-pending-transfer.component';
 import styles from '../ward-patient-card.scss';
 
 export interface PendingItemsRowProps {

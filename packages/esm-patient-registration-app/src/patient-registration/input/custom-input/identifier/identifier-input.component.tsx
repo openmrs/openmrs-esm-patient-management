@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useContext, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
+import { useField, Field } from 'formik';
 import { Button } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
-import { ResourcesContext } from '../../../../offline.resources';
+import { type RegistrationConfig } from '../../../../config-schema';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
-import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
-import { type PatientIdentifierValue } from '../../../patient-registration.types';
-import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { Input } from '../../basic-input/input/input.component';
+import { usePatientRegistrationContext } from '../../../patient-registration-context';
+import { useResourcesContext } from '../../../../resources-context';
+import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
+import { type PatientIdentifierValue } from '../../../patient-registration.types';
 import styles from '../../input.scss';
 
 interface IdentifierInputProps {
@@ -19,9 +20,9 @@ interface IdentifierInputProps {
 
 const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
-  const { defaultPatientIdentifierTypes } = useConfig();
-  const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline, values, setFieldValue } = useContext(PatientRegistrationContext);
+  const { defaultPatientIdentifierTypes } = useConfig<RegistrationConfig>();
+  const { identifierTypes } = useResourcesContext();
+  const { isOffline, values, setFieldValue } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
@@ -41,6 +42,28 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     });
     return map;
   }, [defaultPatientIdentifierTypes]);
+
+  const validateInput = (value: string) => {
+    if (!value || value === '') {
+      return;
+    }
+
+    if (!identifierType?.format) {
+      return;
+    }
+
+    try {
+      const regex = new RegExp(identifierType.format);
+      if (regex.test(value)) {
+        return;
+      }
+
+      return identifierType.formatDescription ?? `Expected format: ${identifierType.format}`;
+    } catch (e) {
+      console.error('Invalid regex pattern:', identifierType.format);
+      return;
+    }
+  };
 
   const handleReset = useCallback(() => {
     setHideInputField(true);
@@ -70,15 +93,16 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     */
 
     if (initialValue) {
-      const confirmDeleteIdentifierModal = showModal('delete-identifier-confirmation-modal', {
-        deleteIdentifier: (deleteIdentifier) => {
-          if (deleteIdentifier) {
+      const dispose = showModal('delete-identifier-confirmation-modal', {
+        closeModal: () => dispose(),
+        deleteIdentifier: (isConfirmed) => {
+          if (isConfirmed) {
             setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
           }
-          confirmDeleteIdentifierModal();
+          dispose();
         },
         identifierName,
-        initialValue,
+        identifierValue: initialValue,
       });
     } else {
       setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
@@ -91,17 +115,20 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   return (
     <div className={styles.IDInput}>
       {!hideInputField ? (
-        <Input
-          id={name}
-          labelText={identifierName}
-          name={name}
-          disabled={disabled}
-          required={required}
-          invalid={!!(identifierFieldMeta.touched && identifierFieldMeta.error)}
-          invalidText={identifierFieldMeta.error && t(identifierFieldMeta.error)}
-          // t('identifierValueRequired', 'Identifier value is required')
-          {...identifierField}
-        />
+        <Field name={name} validate={validateInput}>
+          {({ field, form: { touched, errors } }) => (
+            <Input
+              id={name}
+              labelText={identifierName}
+              name={name}
+              disabled={disabled}
+              required={required}
+              invalid={errors[name] && touched[name]}
+              invalidText={errors[name] && t(errors[name])}
+              {...field}
+            />
+          )}
+        </Field>
       ) : (
         <div className={styles.textID}>
           <p data-testid="identifier-label" className={styles.label}>

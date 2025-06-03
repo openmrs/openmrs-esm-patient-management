@@ -1,8 +1,7 @@
 import {
-  type InpatientAdmission,
-  type InpatientRequest,
   type AdmissionLocationFetchResponse,
   type BedType,
+  type InpatientAdmission,
 } from '../packages/esm-ward-app/src/types';
 import { mockLocationInpatientWard } from './locations.mock';
 import { mockPatientAlice, mockPatientBrian } from './patient.mock';
@@ -78,5 +77,6 @@ export const mockInpatientAdmissions: InpatientAdmission[] = [
     encounterAssigningToCurrentInpatientLocation: null,
     currentInpatientRequest: null,
     firstAdmissionOrTransferEncounter: null,
+    currentInpatientLocation: mockLocationInpatientWard,
   },
 ];

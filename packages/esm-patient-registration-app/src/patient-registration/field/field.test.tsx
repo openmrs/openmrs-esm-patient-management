@@ -1,32 +1,16 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
-import { type Resources, ResourcesContext } from '../../offline.resources';
+import { type Resources } from '../../offline.resources';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
-import { PatientRegistrationContext } from '../patient-registration-context';
+import { PatientRegistrationContextProvider } from '../patient-registration-context';
+import { ResourcesContextProvider } from '../../resources-context';
+import { renderWithContext } from 'tools';
 
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-
-mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange }) => {
-  return (
-    <>
-      <label htmlFor={id}>{labelText}</label>
-      <input
-        id={id}
-        // @ts-ignore
-        value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
-        onChange={(evt) => {
-          onChange(dayjs(evt.target.value).toDate());
-        }}
-      />
-    </>
-  );
-});
 
 const predefinedAddressTemplate = {
   uuid: 'test-address-template-uuid',
@@ -118,27 +102,14 @@ const initialContextValues = {
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
+  setFieldTouched: jest.fn(),
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: {} as FormValues,
 };
 
 describe('Field', () => {
-  let ContextWrapper;
-
   beforeEach(() => {
-    ContextWrapper = ({ children }) => (
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Form>
-            <PatientRegistrationContext.Provider value={initialContextValues}>
-              {children}
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>
-    );
-
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
     });
@@ -157,7 +128,18 @@ describe('Field', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    render(<Field name="name" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="name" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
     expect(screen.getByText('Full Name')).toBeInTheDocument();
   });
 
@@ -175,12 +157,33 @@ describe('Field', () => {
       } as unknown as RegistrationConfig['fieldConfigurations'],
     });
 
-    render(<Field name="gender" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="gender" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
     expect(screen.getByLabelText('Male')).toBeInTheDocument();
   });
 
   it('should render DobField component when name prop is "dob"', () => {
-    render(<Field name="dob" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="dob" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
     expect(screen.getByText('Birth')).toBeInTheDocument();
   });
 
@@ -203,7 +206,18 @@ describe('Field', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    render(<Field name="address" />, { wrapper: ContextWrapper });
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <Field name="address" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
     expect(screen.getByText('Address')).toBeInTheDocument();
   });
 
@@ -266,18 +280,19 @@ describe('Field', () => {
       setInitialFormValues: jest.fn(),
       validationSchema: null,
       values: { identifiers: { openmrsID } } as unknown as FormValues,
+      setFieldTouched: jest.fn(),
     };
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Form>
-            <PatientRegistrationContext.Provider value={updatedContextValues}>
-              <Field name="id" />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Form>
+          <PatientRegistrationContextProvider value={updatedContextValues}>
+            <Field name="id" />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
@@ -293,7 +308,15 @@ describe('Field', () => {
     let error = null;
 
     try {
-      render(<Field name="invalidField" />);
+      renderWithContext(
+        <Formik initialValues={{}} onSubmit={jest.fn()}>
+          <Form>
+            <Field name="invalidField" />
+          </Form>
+        </Formik>,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
     } catch (err) {
       error = err;
     }

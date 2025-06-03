@@ -2,19 +2,18 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { type BedAdministrationData } from './bed-administration-types';
-import { type BedFormData } from '../types';
+import { type BedWithLocation } from '../types';
 import { editBed, useBedType } from './bed-administration.resource';
 import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
 import BedAdministrationForm from './bed-administration-form.component';
 
 interface EditBedFormProps {
-  editData: BedFormData;
+  editData: BedWithLocation;
   mutate: () => void;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, editData, mutate }) => {
+const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
@@ -31,7 +30,6 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
         bedId = editData.bedNumber,
         bedRow = editData.row.toString(),
         bedType = editData.bedType.name,
-        description = editData.description,
         location: { uuid: bedLocation = editData.location.uuid },
         occupancyStatus = editData.status,
       } = formData;
@@ -40,7 +38,6 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
         bedNumber: bedId,
         bedType,
         column: parseInt(bedColumn),
-        description,
         locationUuid: bedLocation,
         row: parseInt(bedRow),
         status: occupancyStatus.toUpperCase(),
@@ -51,7 +48,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
           showSnackbar({
             kind: 'success',
             title: t('bedUpdated', 'Bed updated'),
-            subtitle: t('bedUpdatedSuccessfully', `${bedPayload.bedNumber} updated successfully`, {
+            subtitle: t('bedUpdatedSuccessfully', '{{bedNumber}} updated successfully', {
               bedNumber: bedPayload.bedNumber,
             }),
           });
@@ -62,14 +59,23 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
           showSnackbar({
             kind: 'error',
             title: t('errorCreatingForm', 'Error creating bed'),
-            subtitle: error?.message,
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [editData, mutate, onModalChange, t],
+    [
+      closeModal,
+      editData.bedNumber,
+      editData.bedType.name,
+      editData.column,
+      editData.location.uuid,
+      editData.row,
+      editData.status,
+      editData.uuid,
+      mutate,
+      t,
+    ],
   );
 
   return (
@@ -80,8 +86,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
       headerTitle={headerTitle}
       initialData={editData}
       occupancyStatuses={occupancyStatuses}
-      onModalChange={onModalChange}
-      showModal={showModal}
+      closeModal={closeModal}
     />
   );
 };

@@ -109,7 +109,7 @@ const ActiveVisitsTable = () => {
           </div>
         </div>
         <Search
-          labelText=""
+          labelText={t('filterActiveVisits', 'Filter active visits')}
           placeholder={t('filterTable', 'Filter table')}
           onChange={handleSearch}
           size={isDesktop(layout) ? 'sm' : 'lg'}
@@ -166,7 +166,7 @@ const ActiveVisitsTable = () => {
         </div>
       </div>
       <Search
-        labelText=""
+        labelText={t('filterActiveVisits', 'Filter active visits')}
         placeholder={t('filterTable', 'Filter table')}
         onChange={handleSearch}
         size={isDesktop(layout) ? 'sm' : 'lg'}
@@ -210,7 +210,10 @@ const ActiveVisitsTable = () => {
                             {cell.info.header === 'name' && currentVisit.patientUuid ? (
                               <ConfigurableLink
                                 to={patientChartUrl}
-                                templateParams={{ patientUuid: currentVisit.patientUuid }}>
+                                templateParams={{ patientUuid: currentVisit.patientUuid }}
+                                aria-label={t('viewPatientChartFor', 'View patient chart for {{patientName}}', {
+                                  patientName: cell.value,
+                                })}>
                                 {cell.value}
                               </ConfigurableLink>
                             ) : (

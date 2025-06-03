@@ -41,8 +41,9 @@
       "slot": "service-queues-dashboard-slot"
     },
     {
-      "name": "patient-info-banner-slot",
-      "component": "patientInfoBannerSlot"
+      "name": "queue-table-by-status-view",
+      "component": "queueTableByStatusView",
+      "slot": "queue-table-by-status-view-slot"
     },
     {
       "name": "remove-queue-entry",
@@ -67,6 +68,16 @@
       "name": "visit-form-queue-fields",
       "component": "visitFormQueueFields",
       "slot":"visit-form-bottom-slot"
+    },
+    {
+      "name": "queue-patient-info-queue-entry-status",
+      "component": "patientBannerQueueEntryStatus",
+      "slot": "patient-banner-tags-slot"
+    },
+    {
+      "name": "transition-overflow-menu-item",
+      "component": "transitionOverflowMenuItem",
+      "slot": "transition-overflow-menu-item-slot"
     }
   ],
   "modals": [
@@ -115,7 +126,7 @@
       "type": "service-queues"
     },
     {
-      "name": "service-queues-room-form",
+      "name": "service-queues-room-workspace",
       "title": "addNewQueueServiceRoom",
       "component": "addNewQueueServiceRoomWorkspace",
       "type": "service-queues"
@@ -130,7 +141,8 @@
       "name": "create-queue-entry-workspace",
       "title": "addPatientToQueue",
       "component": "createQueueEntryWorkspace",
-      "type": "service-queues"
+      "type": "service-queues",
+      "width": "wider"
     }
   ]
 }

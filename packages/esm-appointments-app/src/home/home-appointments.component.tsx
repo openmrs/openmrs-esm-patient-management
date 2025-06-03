@@ -1,9 +1,9 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import AppointmentsList from '../appointments/scheduled/appointments-list.component';
 import dayjs from 'dayjs';
-import styles from './home-appointments.scss';
+import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString } from '@openmrs/esm-framework';
+import AppointmentsList from '../appointments/scheduled/appointments-list.component';
+import styles from './home-appointments.scss';
 
 const HomeAppointments = () => {
   const { t } = useTranslation();
@@ -12,8 +12,8 @@ const HomeAppointments = () => {
     <div className={styles.container}>
       <AppointmentsList
         date={toOmrsIsoString(dayjs().startOf('day').toDate())}
+        excludeCancelledAppointments
         title={t('todays', "Today's")}
-        filterCancelled={true}
       />
     </div>
   );

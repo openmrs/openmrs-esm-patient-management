@@ -8,7 +8,6 @@ import {
 import { configSchema } from './config-schema';
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink.component';
-import rootComponent from './root.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -17,9 +16,11 @@ const options = {
   moduleName,
 };
 
-export const root = getSyncLifecycle(rootComponent, options);
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
 export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'ward', title: 'wards' }), options);
+
+export const wardView = getAsyncLifecycle(() => import('./ward-view/ward-view.component'), options);
 
 // t('admissionRequests', 'Admission Requests')
 export const admissionRequestWorkspace = getAsyncLifecycle(
@@ -98,6 +99,21 @@ export const clinicalFormWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
+export const admissionRequestsWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./ward-workspace/admission-request-workspace/admission-requests-action-button.extension'),
+  options,
+);
+
+export const createAdmissionEncounterWorkspaceSideRailIcon = getAsyncLifecycle(
+  () => import('./ward-workspace/create-admission-encounter/create-admission-encounter-action-button.extension'),
+  options,
+);
+
+export const createAdmissionEncounterWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/create-admission-encounter/create-admission-encounter.workspace'),
+  options,
+);
+
 export const defaultWardView = getAsyncLifecycle(
   () => import('./ward-view/default-ward/default-ward-view.component'),
   options,
@@ -105,6 +121,11 @@ export const defaultWardView = getAsyncLifecycle(
 
 export const maternalWardView = getAsyncLifecycle(
   () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  options,
+);
+
+export const wardPatientWorkspaceBanner = getAsyncLifecycle(
+  () => import('./ward-workspace/patient-banner/patient-banner.component'),
   options,
 );
 

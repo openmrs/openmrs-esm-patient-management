@@ -2,15 +2,6 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadc
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
-import rootComponent from './root.component';
-import queueTableByStatusMenuComponent from './queue-table/queue-table-by-status-menu.component';
-import appointmentListComponent from './queue-patient-linelists/scheduled-appointments-table.component';
-import queueListComponent from './queue-patient-linelists/queue-services-table.component';
-import outpatientSideNavComponent from './side-menu/side-menu.component';
-import homeDashboardComponent from './home.component';
-import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
-import pastVisitSummaryComponent from './past-visit/past-visit.component';
-import VisitFormQueueFields from './create-queue-entry/queue-fields/visit-form-queue-fields.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -21,35 +12,40 @@ const options = {
   moduleName,
 };
 
-export const root = getSyncLifecycle(rootComponent, options);
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-export const queueTableByStatusMenu = getSyncLifecycle(queueTableByStatusMenuComponent, options);
+export const queueTableByStatusMenu = getAsyncLifecycle(
+  () => import('./queue-table/queue-table-by-status-menu.component'),
+  options,
+);
+export const queueTableByStatusView = getAsyncLifecycle(
+  () => import('./views/queue-table-by-status-view.component'),
+  options,
+);
 
-export const appointmentsList = getSyncLifecycle(appointmentListComponent, options);
+export const appointmentsList = getAsyncLifecycle(
+  () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
+  options,
+);
 
-export const queueList = getSyncLifecycle(queueListComponent, options);
+export const queueList = getAsyncLifecycle(
+  () => import('./queue-patient-linelists/queue-services-table.component'),
+  options,
+);
 
-export const outpatientSideNav = getSyncLifecycle(outpatientSideNavComponent, options);
+export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const homeDashboard = getSyncLifecycle(homeDashboardComponent, options);
+export const homeDashboard = getAsyncLifecycle(() => import('./home.component'), options);
 
-export const editQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./active-visits/change-status-dialog.component'),
-  {
-    featureName: 'edit queue status',
-    moduleName,
-  },
-);
-
-export const patientInfoBannerSlot = getSyncLifecycle(patientInfoBannerSlotComponent, {
-  featureName: 'patient info slot',
+export const editQueueEntryStatusModal = getAsyncLifecycle(() => import('./active-visits/change-status.modal'), {
+  featureName: 'edit queue status',
   moduleName,
 });
 
 export const removeQueueEntry = getAsyncLifecycle(
-  () => import('./remove-queue-entry-dialog/remove-queue-entry.component'),
+  () => import('./clear-queue-entries-modal/clear-queue-entries.component'),
   {
     featureName: 'remove queue entry and end visit',
     moduleName,
@@ -57,7 +53,7 @@ export const removeQueueEntry = getAsyncLifecycle(
 );
 
 export const clearAllQueueEntries = getAsyncLifecycle(
-  () => import('./clear-queue-entries-dialog/clear-queue-entries-dialog.component'),
+  () => import('./clear-queue-entries-modal/clear-queue-entries.modal'),
   {
     featureName: 'clear all queue entries and end visits',
     moduleName,
@@ -65,17 +61,17 @@ export const clearAllQueueEntries = getAsyncLifecycle(
 );
 
 export const transitionQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./transition-queue-entry/transition-queue-entry-dialog.component'),
+  () => import('./transition-queue-entry/transition-queue-entry.modal'),
   {
     featureName: 'transition queue status',
     moduleName,
   },
 );
 
-export const pastVisitSummary = getSyncLifecycle(pastVisitSummaryComponent, options);
+export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
 export const addProviderToRoomModal = getAsyncLifecycle(
-  () => import('./add-provider-queue-room/add-provider-queue-room.component'),
+  () => import('./add-provider-queue-room-modal/add-provider-queue-room.modal'),
   {
     featureName: 'add provider queue room',
     moduleName,
@@ -138,6 +134,14 @@ export const transitionPatientToLatestQueue = getAsyncLifecycle(
   },
 );
 
+export const transitionOverflowMenuItem = getAsyncLifecycle(
+  () => import('./transition-latest-queue-entry/transition-overflow-menu-item/transition-overflow-menu-item.component'),
+  {
+    featureName: 'overflow menu with action to transition patient to a new queue',
+    moduleName,
+  },
+);
+
 // t('addNewQueueServiceRoom', 'Add new queue service room')
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./queue-rooms/queue-room-form.workspace'),
@@ -147,7 +151,10 @@ export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   },
 );
 
-export const visitFormQueueFields = getSyncLifecycle(VisitFormQueueFields, options);
+export const visitFormQueueFields = getAsyncLifecycle(
+  () => import('./create-queue-entry/queue-fields/visit-form-queue-fields.extension'),
+  options,
+);
 
 export const createQueueEntryWorkspace = getAsyncLifecycle(
   () => import('./create-queue-entry/create-queue-entry.workspace'),
@@ -162,6 +169,14 @@ export const activeVisitsRowActions = getAsyncLifecycle(
   {
     featureName:
       'quick actions to queue, requeue and transfer patients. With overflow menu actions to edit patient and end visit',
+    moduleName,
+  },
+);
+
+export const patientBannerQueueEntryStatus = getAsyncLifecycle(
+  () => import('./patient-info/patient-banner-queue-entry-status.extension'),
+  {
+    featureName: 'patient-info-queue-entry-status',
     moduleName,
   },
 );

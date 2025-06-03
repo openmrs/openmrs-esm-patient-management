@@ -6,13 +6,10 @@
 .wardPatientCard {
   @include type.type-style('body-compact-01');
   color: $text-02;
-
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: layout.$spacing-02;
   background-color: $ui-02;
-
   position: relative; // this allows positioning the button correctly
 }
 
@@ -114,11 +111,10 @@
 
 .wardPatientBedNumber {
   @include type.type-style('heading-compact-01');
-  border-radius: 50%;
+  border-radius: 50vh;
   color: $ui-02;
   background-color: $color-blue-60-2;
-  padding: layout.$spacing-04;
-  width: layout.$spacing-04;
+  padding: layout.$spacing-04 layout.$spacing-03;
   height: layout.$spacing-04;
   display: flex;
   justify-content: center;

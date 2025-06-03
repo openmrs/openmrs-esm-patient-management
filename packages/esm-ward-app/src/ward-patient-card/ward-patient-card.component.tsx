@@ -1,8 +1,8 @@
-import { getPatientName, useAppContext, launchWorkspaceGroup } from '@openmrs/esm-framework';
-import React, { type ReactNode } from 'react';
-import { type WardViewContext, type WardPatient } from '../types';
-import styles from './ward-patient-card.scss';
+import { getPatientName, launchWorkspaceGroup } from '@openmrs/esm-framework';
 import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+import React, { type ReactNode } from 'react';
+import { type WardPatient } from '../types';
+import styles from './ward-patient-card.scss';
 
 interface Props {
   children: ReactNode;
@@ -11,7 +11,6 @@ interface Props {
 
 const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
   const { patient } = wardPatient;
-  const { WardPatientHeader } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   return (
     <div className={styles.wardPatientCard}>
@@ -22,7 +21,8 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
           launchWorkspaceGroup('ward-patient', {
             state: {
               wardPatient,
-              WardPatientHeader,
+              patient,
+              patientUuid: patient.uuid,
             },
             onWorkspaceGroupLaunch: () => {
               const store = getPatientChartStore();
