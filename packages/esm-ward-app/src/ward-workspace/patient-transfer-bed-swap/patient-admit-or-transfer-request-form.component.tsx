@@ -205,7 +205,7 @@ export default function PatientAdmitOrTransferForm({
                 invalid={!!error?.message}
                 invalidText={error?.message}
                 ancestorLocation={visit?.location}
-                locationsToFilter={currentAdmission ? [currentAdmission.currentInpatientLocation] : []}
+                excludeLocations={currentAdmission ? [currentAdmission.currentInpatientLocation] : []}
               />
             )}
           />

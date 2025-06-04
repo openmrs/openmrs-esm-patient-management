@@ -27,13 +27,13 @@ interface LocationSelectorProps extends RadioButtonGroupProps {
   /**
    * a list of locations that should be filtered from the location selector
    */
-  locationsToFilter?: Location[];
+  excludeLocations?: Location[];
 }
 
 export default function LocationSelector({
   paginationSize = 15,
   ancestorLocation,
-  locationsToFilter,
+  excludeLocations: locationsToFilter,
 }: LocationSelectorProps) {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
