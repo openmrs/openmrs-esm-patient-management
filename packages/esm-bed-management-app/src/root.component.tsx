@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
+import { useLeftNav } from '@openmrs/esm-framework';
 import BedAdministrationTable from './bed-administration/bed-administration-table.component';
 import BedTagAdministrationTable from './bed-tag/bed-tag-administration-table.component';
 import BedTypeAdministrationTable from './bed-type/bed-type-administration-table.component';
@@ -13,13 +13,7 @@ const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
   const bedManagementBasename = window.getOpenmrsSpaBase() + 'bed-management';
 
-  useEffect(() => {
-    setLeftNav({
-      name: 'bed-management-left-panel-slot',
-      basePath: spaBasePath,
-    });
-    return () => unsetLeftNav('bed-management-left-panel-slot');
-  }, [spaBasePath]);
+  useLeftNav({ name: 'bed-management-left-panel-slot', basePath: spaBasePath });
 
   return (
     <BrowserRouter basename={bedManagementBasename}>
