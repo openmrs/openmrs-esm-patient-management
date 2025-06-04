@@ -1,10 +1,10 @@
 import React from 'react';
+import { DropdownSkeleton, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { type Visit } from '@openmrs/esm-framework';
 import { useLatestQueueEntry } from './transition-latest-queue-entry.resource';
 import AddPatientToQueueModal from './add-patient-to-queue-modal/add-patient-to-queue.modal';
 import TransitionQueueEntryModal from '../queue-table/queue-entry-actions/transition-queue-entry.modal';
-import { type Visit } from '@openmrs/esm-framework';
-import { DropdownSkeleton, InlineNotification } from '@carbon/react';
 
 interface TransitionQueueProps {
   activeVisit: Visit;

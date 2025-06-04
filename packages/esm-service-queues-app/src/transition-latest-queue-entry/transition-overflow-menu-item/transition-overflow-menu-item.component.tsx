@@ -1,7 +1,7 @@
-import { SkeletonText, OverflowMenuItem } from '@carbon/react';
-import { showModal, useVisit } from '@openmrs/esm-framework';
 import React from 'react';
+import { OverflowMenuItem, SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { showModal, useVisit } from '@openmrs/esm-framework';
 
 interface TransitionOverflowMenuItemProps {
   patientUuid: string;
@@ -18,19 +18,15 @@ const TransitionOverflowMenuItem: React.FC<TransitionOverflowMenuItemProps> = ({
     });
   };
 
-  if (isLoading) {
-    return <SkeletonText />;
-  }
-
   if (!activeVisit) {
     return null;
   }
 
-  return (
-    <>
-      <OverflowMenuItem itemText={t('transitionPatient', 'Transition patient')} onClick={handleLaunchModal} />
-    </>
-  );
+  if (isLoading) {
+    return <SkeletonText />;
+  }
+
+  return <OverflowMenuItem itemText={t('transitionPatient', 'Transition patient')} onClick={handleLaunchModal} />;
 };
 
 export default TransitionOverflowMenuItem;
