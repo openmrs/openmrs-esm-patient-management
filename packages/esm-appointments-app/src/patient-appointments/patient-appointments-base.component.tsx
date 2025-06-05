@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
 import { PatientAppointmentContextTypes, usePatientAppointmentContext } from '../hooks/patient-appointment-context';
 import PatientAppointmentsTable from './patient-appointments-table.component';
@@ -40,7 +40,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     if (
       (patientAppointmentContext as PatientAppointmentContextTypes) === PatientAppointmentContextTypes.PATIENT_CHART
     ) {
-      launchPatientWorkspace('appointments-form-workspace');
+      launchWorkspace('appointments-form-workspace');
     } else {
       launchWorkspace('appointments-form-workspace', {
         context: 'creating',
