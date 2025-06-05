@@ -19,7 +19,7 @@ export const generateFormatting = (order: Array<string>, separator: string) => {
     return date;
   };
 
-  const format = (date: Date) => {
+  const format = (date: Date | null) => {
     if (date === null) {
       return '';
     } else if (!(date instanceof Date)) {
