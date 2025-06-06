@@ -201,7 +201,8 @@ export default function PatientAdmitOrTransferForm({
             control={control}
             render={({ field, fieldState: { error } }) => (
               <LocationSelector
-                {...field}
+                name={field.name}
+                field={field}
                 invalid={!!error?.message}
                 invalidText={error?.message}
                 ancestorLocation={visit?.location}

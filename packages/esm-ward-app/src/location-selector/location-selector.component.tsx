@@ -15,6 +15,7 @@ import {
 import useEmrConfiguration from '../hooks/useEmrConfiguration';
 import useLocations from '../hooks/useLocations';
 import styles from './location-selector.scss';
+import { type ControllerRenderProps } from 'react-hook-form';
 
 interface LocationSelectorProps extends RadioButtonGroupProps {
   paginationSize?: number;
@@ -28,12 +29,22 @@ interface LocationSelectorProps extends RadioButtonGroupProps {
    * a list of locations that should be filtered from the location selector
    */
   excludeLocations?: Location[];
+
+  field: ControllerRenderProps<
+    {
+      note?: string;
+      location?: string;
+      transferType?: string;
+    },
+    'location'
+  >;
 }
 
 export default function LocationSelector({
   paginationSize = 15,
   ancestorLocation,
   excludeLocations: locationsToFilter,
+  field,
 }: LocationSelectorProps) {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
@@ -93,7 +104,7 @@ export default function LocationSelector({
         </div>
       ) : (
         <ResponsiveWrapper>
-          <RadioButtonGroup className={styles.radioButtonGroup} orientation="vertical">
+          <RadioButtonGroup {...field} className={styles.radioButtonGroup} orientation="vertical">
             {filteredLocations?.length > 0 ? (
               filteredLocations?.map((location) => (
                 <RadioButton key={location.id} labelText={location.name} value={location.id} />
