@@ -77,8 +77,10 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
           />
         </Row>
       )}
-      <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
-        <QueueFields setOnSubmit={handleSetOnSubmit} />
+      <Form className={styles.form} onSubmit={handleSubmit}>
+        <div className={styles.container}>
+          <QueueFields setOnSubmit={handleSetOnSubmit} />
+        </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={handleCloseWorkspace}>
             {t('discard', 'Discard')}

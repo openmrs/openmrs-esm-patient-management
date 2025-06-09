@@ -220,7 +220,6 @@ const ChangeStatusModal: React.FC<ChangeStatusModalProps> = ({ queueEntry, close
                     control={control}
                     render={({ field: { value, onChange } }) => (
                       <RadioButtonGroup
-                        className={styles.radioButtonWrapper}
                         id="status"
                         name="status"
                         invalid={!!errors.status}

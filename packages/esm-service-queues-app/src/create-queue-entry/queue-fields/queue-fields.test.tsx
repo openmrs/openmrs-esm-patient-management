@@ -12,8 +12,8 @@ import {
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSession, mockVisitAlice } from '__mocks__';
-import QueueFields from './queue-fields.component';
 import { postQueueEntry } from './queue-fields.resource';
+import QueueFields from './queue-fields.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -45,6 +45,7 @@ jest.mock('./queue-fields.resource', () => {
     postQueueEntry: jest.fn(),
   };
 });
+
 const mockPostQueueEntry = jest.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
 
 describe('QueueFields', () => {
@@ -62,13 +63,14 @@ describe('QueueFields', () => {
     const setOnSubmit = (callback) => {
       onSubmit = callback;
     };
+
     render(<QueueFields setOnSubmit={setOnSubmit} />);
 
-    expect(screen.getByLabelText('Select a queue location')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /queue location/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /service/i })).toBeInTheDocument();
 
     const queueUuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
-    const serviceSelect = screen.getByLabelText('Select a service').closest('select');
+    const serviceSelect = screen.getByTitle(/select a queue service/i);
     await user.selectOptions(serviceSelect, queueUuid);
 
     expect(screen.getByText('Priority')).toBeInTheDocument();

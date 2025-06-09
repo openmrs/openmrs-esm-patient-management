@@ -20,11 +20,15 @@ export type WardPatientCardType = React.FC<WardPatientCardProps>;
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
   /**
-   * The patient and their current visit. These values are taken either
-   * from either the inpatientAdmission object, the inpatientRequest object
+   * Taken either from the inpatientAdmission object, the inpatientRequest object
    * or the admissionLocation object (which contains the bed)
    */
   patient: Patient;
+
+  /**
+   * Taken either from the inpatientAdmission object, the inpatientRequest object
+   * or the admissionLocation object (which contains the bed)
+   */
   visit: Visit;
 
   /**

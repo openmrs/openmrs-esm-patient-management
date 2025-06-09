@@ -112,7 +112,7 @@ export default function PatientAdmitOrTransferForm({
         });
       }
 
-      createEncounter(patient, emrConfiguration.transferRequestEncounterType, [
+      createEncounter(patient, emrConfiguration.transferRequestEncounterType, visit?.uuid, [
         {
           concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
           groupMembers: obs,
@@ -145,6 +145,7 @@ export default function PatientAdmitOrTransferForm({
       patient,
       t,
       wardPatientGroupDetails,
+      visit?.uuid,
     ],
   );
 
@@ -201,10 +202,12 @@ export default function PatientAdmitOrTransferForm({
             control={control}
             render={({ field, fieldState: { error } }) => (
               <LocationSelector
-                {...field}
+                name={field.name}
+                field={field}
                 invalid={!!error?.message}
                 invalidText={error?.message}
                 ancestorLocation={visit?.location}
+                excludeLocations={currentAdmission ? [currentAdmission.currentInpatientLocation] : []}
               />
             )}
           />

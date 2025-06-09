@@ -5,10 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext, useSession } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
-import useWardLocation from '../../hooks/useWardLocation';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './cancel-admission-request.scss';
 
@@ -17,14 +16,12 @@ export default function CancelAdmissionRequestWorkspace({
   wardPatient,
   promptBeforeClosing,
 }: WardPatientWorkspaceProps) {
-  const { patient } = wardPatient ?? {};
+  const { patient, visit } = wardPatient ?? {};
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
-  const { currentProvider } = useSession();
-  const { location } = useWardLocation();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
   const zodSchema = useMemo(
@@ -77,7 +74,7 @@ export default function CancelAdmissionRequestWorkspace({
         },
       ];
 
-      createEncounter(patient, emrConfiguration?.cancelADTRequestEncounterType, obs)
+      createEncounter(patient, emrConfiguration?.cancelADTRequestEncounterType, visit?.uuid, obs)
         .then(() => {
           showSnackbar({
             title: t('admissionRequestCancelled', 'Admission request cancelled.'),
@@ -107,6 +104,7 @@ export default function CancelAdmissionRequestWorkspace({
       t,
       closeWorkspaceWithSavedChanges,
       wardPatientGroupDetails,
+      visit?.uuid,
     ],
   );
 
