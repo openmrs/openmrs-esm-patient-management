@@ -8,7 +8,6 @@ import styles from './patient-search-lg.scss';
 import { navigate, useFeatureFlag } from '@openmrs/esm-framework';
 
 interface CommonProps {
-  inTabletOrOverlay: boolean;
   searchMode?: 'mpi' | null | undefined;
   searchTerm: string;
 }

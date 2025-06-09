@@ -28,7 +28,6 @@ const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = jest.mocked(usePatient);
 const mockUseParams = useParams as jest.Mock;
 const mockUseInitialFormValues = jest.mocked(useInitialFormValues);
-const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
 const mockUseMpiPatient = useMpiPatient as jest.Mock;
 
 jest.mock('./mpi/mpi-patient.resource', () => ({
@@ -277,7 +276,7 @@ describe('Registering a new patient', () => {
   // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
   it.skip('saves the patient without extra info', async () => {
     const user = userEvent.setup();
-    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />);
 
     await screen.findByRole('heading', { name: /create new patientnj/i });
 
@@ -608,7 +607,11 @@ describe('Import an MPI patient record', () => {
     ]);
     // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
-      render(<PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />, { wrapper: Wrapper });
+      renderWithContext(
+        <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
     });
 
     const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);

@@ -226,12 +226,14 @@ export function useMpiInitialFormValues(patientUuid: string): [FormValues, Dispa
 
   useEffect(() => {
     (async () => {
-      if (mpiPatient?.data?.identifier) {
-        const identifiers = await getIdentifierFieldValuesFromFhirPatient(
-          mpiPatient.data,
-          fieldConfigurations.identifierMappings,
-        );
-
+      if (mpiPatient?.data) {
+        let identifiers = {};
+        if (mpiPatient?.data?.identifier) {
+          identifiers = await getIdentifierFieldValuesFromFhirPatient(
+            mpiPatient.data,
+            fieldConfigurations.identifierMappings,
+          );
+        }
         const values = {
           ...initialMPIFormValues,
           ...getFormValuesFromFhirPatient(mpiPatient.data),

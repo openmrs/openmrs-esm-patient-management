@@ -71,30 +71,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           <div className={styles.patientAvatar} role="img">
             <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
           </div>
-          <div>
-            {isMPIPatient && (
-              <div>
-                <Tag className={styles.mpiTag} type="blue">
-                  &#127760; {t('mpi', 'MPI')}
-                </Tag>
-              </div>
-            )}
-          </div>
           <PatientBannerPatientInfo patient={fhirMappedPatient} />
-          <div>
-            {isMPIPatient && (
-              <div>
-                <Button
-                  kind="ghost"
-                  renderIcon={UserFollowIcon}
-                  iconDescription="Create Patient Record"
-                  onClick={() => handleCreatePatientRecord(patient.externalId)}
-                  style={{ marginTop: '-0.25rem' }}>
-                  {t('createPatientRecord', 'Create Patient Record')}
-                </Button>
-              </div>
-            )}
-          </div>
         </ClickablePatientContainer>
         <div className={styles.actionButtons}>
           <PatientBannerToggleContactDetailsButton
@@ -103,7 +80,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             toggleContactDetails={handleToggleContactDetails}
           />
           <div className={styles.rightActions}>
-            {!hideActionsOverflow ? (
+            {!hideActionsOverflow && !isMPIPatient ? (
               <PatientBannerActionsMenu
                 actionsSlotName="patient-search-actions-slot"
                 additionalActionsSlotState={{
@@ -113,8 +90,27 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patient={fhirMappedPatient}
                 patientUuid={patientUuid}
               />
+            ) : isMPIPatient ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div>
+                  <Tag className={styles.mpiTag} type="blue">
+                    &#127760; {t('mpi', 'MPI')}
+                  </Tag>
+                </div>
+
+                <div>
+                  <Button
+                    kind="ghost"
+                    renderIcon={UserFollowIcon}
+                    iconDescription="Create Patient Record"
+                    onClick={() => handleCreatePatientRecord(patient.externalId)}
+                    style={{ marginTop: '-0.25rem' }}>
+                    {t('createPatientRecord', 'Create Patient Record')}
+                  </Button>
+                </div>
+              </div>
             ) : null}
-            {!isDeceased && !currentVisit && (
+            {!isDeceased && !currentVisit && !isMPIPatient && (
               <ExtensionSlot
                 name="start-visit-button-slot"
                 state={{

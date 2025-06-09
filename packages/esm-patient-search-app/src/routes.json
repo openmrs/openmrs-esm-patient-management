@@ -3,6 +3,9 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies": {
+    "clientregistry": "1.1.8-SNAPSHOT"
+  },  
   "pages": [
     {
       "component": "root",

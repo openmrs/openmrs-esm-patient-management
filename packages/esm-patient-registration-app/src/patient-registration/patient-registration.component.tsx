@@ -44,7 +44,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { search } = useLocation();
-  const sourcePatientId = new URLSearchParams(search).get('sourceRecord');
+  const sourcePatientId = new URLSearchParams(search).get('sourceRecord') || '';
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const config = useConfig<RegistrationConfig>();
 
@@ -64,7 +64,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   const [target, setTarget] = useState<undefined | string>();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialMPIFormValues, setInitialMPIFormValues] = useMpiInitialFormValues(sourcePatientId);
+  const [initialMPIFormValues] = useMpiInitialFormValues(sourcePatientId);
 
   const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
@@ -74,10 +74,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const validationSchema = getValidationSchema(config, t);
 
   useEffect(() => {
-    if (initialMPIFormValues) {
+    if (sourcePatientId && initialMPIFormValues) {
       setInitialFormValues(initialMPIFormValues);
     }
-  }, [initialMPIFormValues, setInitialFormValues]);
+  }, [initialMPIFormValues, setInitialFormValues, sourcePatientId]);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
