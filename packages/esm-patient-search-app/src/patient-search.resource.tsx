@@ -1,14 +1,24 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  useSession,
+  type FetchResponse,
+  restBaseUrl,
+  fhirBaseUrl,
+  useConfig,
+} from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
+import { mapToOpenMRSPatient } from './mpi/utils';
+import { type PatientSearchConfig } from './config-schema';
 
 type InfinitePatientSearchResponse = FetchResponse<{
   results: Array<SearchedPatient>;
   links: Array<{ rel: 'prev' | 'next' }>;
   totalCount: number;
 }>;
+type InfinitePatientBundleResponse = FetchResponse<fhir.Bundle>;
 
 const patientProperties = [
   'patientId',
@@ -43,6 +53,7 @@ const patientSearchCustomRepresentation = `custom:(${patientProperties.join(',')
  */
 export function useInfinitePatientSearch(
   searchQuery: string,
+  searchMode: 'mpi' | null | undefined,
   includeDead: boolean,
   isSearching: boolean = true,
   resultsToFetch: number = 10,
@@ -72,28 +83,86 @@ export function useInfinitePatientSearch(
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
+  const getExtUrl = useCallback(
+    (
+      page,
+      prevPageData: FetchResponse<{ results: Array<fhir.Bundle>; link: Array<{ relation: 'prev' | 'next' }> }>,
+    ) => {
+      if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
+        return null;
+      }
+      let url = `${fhirBaseUrl}/Patient/$cr-search?name=${searchQuery}`;
+
+      return url;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchQuery, customRepresentation, includeDead, resultsToFetch],
+  );
+
   const shouldFetch = isSearching && searchQuery;
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
-    shouldFetch ? getUrl : null,
+    shouldFetch ? (searchMode !== 'mpi' ? getUrl : null) : null,
     openmrsFetch,
   );
 
-  const mappedData = data?.flatMap((res) => res.data?.results ?? []) ?? null;
-
-  return useMemo(
-    () => ({
-      data: mappedData,
-      isLoading,
-      fetchError: error,
-      hasMore: data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
-      isValidating,
-      setPage: setSize,
-      currentPage: size,
-      totalResults: data?.[0]?.data?.totalCount ?? 0,
-    }),
-    [mappedData, isLoading, error, data, isValidating, setSize, size],
+  const {
+    data: mpiData,
+    isLoading: isLoadingMpi,
+    isValidating: isValidatingMpi,
+    setSize: setMpiSize,
+    error: mpiError,
+    size: mpiSize,
+  } = useSWRInfinite<InfinitePatientBundleResponse, Error>(
+    shouldFetch ? (searchMode == 'mpi' ? getExtUrl : null) : null,
+    openmrsFetch,
   );
+
+  const { nameTemplate } = useConfig() as PatientSearchConfig;
+
+  const mappedData =
+    searchMode === 'mpi'
+      ? mpiData
+        ? mapToOpenMRSPatient(mpiData ? mpiData[0].data : null, nameTemplate)
+        : null
+      : data?.flatMap((response) => response?.data?.results ?? []) ?? null;
+
+  return useMemo(() => {
+    const isMpiMode = searchMode === 'mpi';
+    const currentIsLoading = isMpiMode ? isLoadingMpi : isLoading;
+    const currentIsValidating = isMpiMode ? isValidatingMpi : isValidating;
+    const currentSize = isMpiMode ? mpiSize : size;
+    const currentSetSize = isMpiMode ? setMpiSize : setSize;
+    const currentError = isMpiMode ? mpiError : error;
+
+    return {
+      data: mappedData,
+      isLoading: currentIsLoading,
+      fetchError: currentError,
+      hasMore: isMpiMode
+        ? mpiData?.at(-1)?.data?.link?.some((link) => link.relation === 'next') ?? false
+        : data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
+      isValidating: currentIsValidating,
+      setPage: currentSetSize,
+      currentPage: currentSize,
+      totalResults: isMpiMode ? mpiData?.[0]?.data?.total ?? 0 : data?.[0]?.data?.totalCount ?? 0,
+    };
+  }, [
+    mappedData,
+    isLoading,
+    isLoadingMpi,
+    error,
+    mpiError,
+    data,
+    mpiData,
+    isValidating,
+    isValidatingMpi,
+    setSize,
+    setMpiSize,
+    size,
+    mpiSize,
+    searchMode,
+  ]);
 }
 
 /**

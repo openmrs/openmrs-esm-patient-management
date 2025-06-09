@@ -5,6 +5,7 @@ import {
   getAsyncLifecycle,
   makeUrl,
   messageOmrsServiceWorker,
+  registerFeatureFlag,
   setupDynamicOfflineDataHandler,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';

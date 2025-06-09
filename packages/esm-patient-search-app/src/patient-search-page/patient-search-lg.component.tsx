@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
@@ -6,7 +6,8 @@ import type { SearchedPatient } from '../types';
 import { EmptyState, ErrorState, LoadingState, PatientSearchResults } from './patient-search-views.component';
 import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
-
+import { inferModeFromSearchParams } from '../mpi/utils';
+import { useSearchParams } from '../hooks/useSearchParams';
 interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
@@ -27,6 +28,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
   const totalResults = searchResults.length;
+  const searchParams = useSearchParams();
+  const searchMode = inferModeFromSearchParams(searchParams);
 
   const { results, goTo, totalPages, currentPage, showNextButton, paginated } = usePagination(
     searchResults,
@@ -47,11 +50,11 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     if (!isLoading && (!results || results.length === 0)) {
-      return <EmptyState />;
+      return <EmptyState searchTerm={query} />;
     }
 
-    return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+    return <PatientSearchResults searchResults={results} searchTerm={query} searchMode={searchMode} />;
+  }, [query, isLoading, results, fetchError, searchMode]);
 
   return (
     <div

@@ -9,6 +9,7 @@ import {
   createErrorHandler,
   interpolateUrl,
   showSnackbar,
+  useAppContext,
   useConfig,
   usePatient,
   usePatientPhoto,
@@ -22,7 +23,12 @@ import { useResourcesContext } from '../resources-context';
 import { SectionWrapper } from './section/section-wrapper.component';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
-import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import {
+  useInitialAddressFieldValues,
+  useMpiInitialFormValues,
+  useInitialFormValues,
+  usePatientUuidMap,
+} from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 
@@ -38,6 +44,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { search } = useLocation();
+  const sourcePatientId = new URLSearchParams(search).get('sourceRecord') || '';
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const config = useConfig<RegistrationConfig>();
 
@@ -57,6 +64,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   const [target, setTarget] = useState<undefined | string>();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
+  const [initialMPIFormValues] = useMpiInitialFormValues(sourcePatientId);
 
   const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
@@ -64,6 +72,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const validationSchema = getValidationSchema(config, t);
+
+  useEffect(() => {
+    if (sourcePatientId && initialMPIFormValues) {
+      setInitialFormValues(initialMPIFormValues);
+    }
+  }, [initialMPIFormValues, setInitialFormValues, sourcePatientId]);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
