@@ -1,14 +1,11 @@
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
 import mapValues from 'lodash/mapValues';
-import { translateFrom } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../config-schema';
 import { type FormValues } from '../patient-registration.types';
 import { getDatetime } from '../patient-registration.resource';
 
-const t = (key: string, value: string) => translateFrom('@openmrs/esm-framework', key, value);
-
-export function getValidationSchema(config: RegistrationConfig) {
+export function getValidationSchema(config: RegistrationConfig, t: (key: string, defaultValue: string) => string) {
   return Yup.object({
     givenName: Yup.string().required(t('givenNameRequired', 'Given name is required')),
     familyName: Yup.string().required(t('familyNameRequired', 'Family name is required')),
@@ -56,7 +53,7 @@ export function getValidationSchema(config: RegistrationConfig) {
         then: Yup.date().required(t('deathDateRequired', 'Death date is required')),
         otherwise: Yup.date().nullable(),
       })
-      .max(new Date(), 'deathDateInFuture')
+      .max(new Date(), t('deathDateInFuture', 'Death date cannot be in future'))
       .test(
         'deathDate-after-birthdate',
         t('deathdayInvalidDate', 'Death date and time cannot be before the birthday'),

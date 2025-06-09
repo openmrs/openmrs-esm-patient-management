@@ -26,6 +26,11 @@
       "slot": "clinical-appointments-dashboard-slot"
     },
     {
+      "name": "appointments-dashboard",
+      "slot": "appointments-dashboard-slot",
+      "component": "appointmentsDashboard"
+    },
+    {
       "name": "appointments-calendar-dashboard-link",
       "slot": "calendar-dashboard-slot",
       "component": "appointmentsCalendarDashboardLink"

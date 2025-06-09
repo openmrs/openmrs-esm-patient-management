@@ -111,6 +111,7 @@ export interface BedTypeData {
 }
 
 export interface BedTagData {
+  id?: string;
   uuid: string;
   name: string;
 }

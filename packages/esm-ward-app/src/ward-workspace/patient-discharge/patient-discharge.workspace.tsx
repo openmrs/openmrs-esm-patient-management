@@ -19,7 +19,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   const submitDischarge = useCallback(() => {
     setIsSubmitting(true);
 
-    createEncounter(wardPatient?.patient, emrConfiguration.exitFromInpatientEncounterType)
+    createEncounter(wardPatient?.patient, emrConfiguration.exitFromInpatientEncounterType, wardPatient?.visit.uuid)
       .then((response) => {
         if (response?.ok) {
           if (wardPatient?.bed?.id) {

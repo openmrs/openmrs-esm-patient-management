@@ -18,6 +18,10 @@ export const queueTableByStatusMenu = getAsyncLifecycle(
   () => import('./queue-table/queue-table-by-status-menu.component'),
   options,
 );
+export const queueTableByStatusView = getAsyncLifecycle(
+  () => import('./views/queue-table-by-status-view.component'),
+  options,
+);
 
 export const appointmentsList = getAsyncLifecycle(
   () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
@@ -126,6 +130,14 @@ export const transitionPatientToLatestQueue = getAsyncLifecycle(
   () => import('./transition-latest-queue-entry/transition-latest-queue-entry.component'),
   {
     featureName: 'transition patient to new queue',
+    moduleName,
+  },
+);
+
+export const transitionOverflowMenuItem = getAsyncLifecycle(
+  () => import('./transition-latest-queue-entry/transition-overflow-menu-item/transition-overflow-menu-item.component'),
+  {
+    featureName: 'overflow menu with action to transition patient to a new queue',
     moduleName,
   },
 );
