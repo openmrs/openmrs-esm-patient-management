@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import {
+  FormGroup,
   InlineNotification,
   RadioButton,
   RadioButtonGroup,
@@ -7,6 +8,7 @@ import {
   Select,
   SelectItem,
   SelectSkeleton,
+  Stack,
 } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { type TFunction, useTranslation } from 'react-i18next';
@@ -19,7 +21,6 @@ import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
-import styles from './queue-fields.scss';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
@@ -150,10 +151,16 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
   }, [queueLocations, sessionLocation.uuid, setValue]);
 
   return (
-    <div>
-      <section className={styles.section}>
-        <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
-        <ResponsiveWrapper>
+    /*
+     * Do not style this component directly. It is used in multiple contexts:
+     * 1. As an extension in the Visit form in the Patient Chart
+     * 2. In the Add patient to queue modal
+     *
+     * Instead, use the parent component's styling context or create a wrapper component with specific styles.
+     */
+    <Stack gap={5}>
+      <ResponsiveWrapper>
+        <FormGroup legendText={t('queueLocation', 'Queue Location')}>
           <Controller
             name="queueLocation"
             control={control}
@@ -163,7 +170,7 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
               ) : (
                 <Select
                   {...field}
-                  labelText={t('selectQueueLocation', 'Select a queue location')}
+                  labelText=""
                   id="queueLocation"
                   invalid={!!errors.queueLocation}
                   invalidText={errors.queueLocation?.message}
@@ -178,11 +185,10 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
               )
             }
           />
-        </ResponsiveWrapper>
-      </section>
+        </FormGroup>
+      </ResponsiveWrapper>
 
-      <section className={styles.section}>
-        <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+      <FormGroup legendText={t('service', 'Service')}>
         <Controller
           name="queueService"
           control={control}
@@ -191,8 +197,7 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
               <SelectSkeleton />
             ) : !queues?.length ? (
               <InlineNotification
-                className={styles.inlineNotification}
-                kind={'error'}
+                kind="error"
                 lowContrast
                 subtitle={t('configureServices', 'Please configure services to continue.')}
                 title={t('noServicesConfigured', 'No services configured')}
@@ -200,7 +205,7 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
             ) : (
               <Select
                 {...field}
-                labelText={t('selectService', 'Select a service')}
+                labelText=""
                 id="queueService"
                 invalid={!!errors.queueService}
                 invalidText={errors.queueService?.message}
@@ -215,13 +220,12 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
             )
           }
         />
-      </section>
+      </FormGroup>
       {/* Status section of the form would go here; historical version of this code can be found at
       https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
       {queueService && (
-        <section className={styles.section}>
-          <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+        <FormGroup legendText={t('priority', 'Priority')}>
           <Controller
             name="priority"
             control={control}
@@ -234,8 +238,7 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
                 </RadioButtonGroup>
               ) : !priorities?.length ? (
                 <InlineNotification
-                  className={styles.inlineNotification}
-                  kind={'error'}
+                  kind="error"
                   lowContrast
                   title={t('noPrioritiesForServiceTitle', 'No priorities available')}>
                   {t(
@@ -246,7 +249,6 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
               ) : (
                 <RadioButtonGroup
                   {...field}
-                  className={styles.radioButtonWrapper}
                   id="priority"
                   valueSelected={field.value}
                   onChange={(uuid) => field.onChange(uuid)}>
@@ -257,9 +259,9 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
               )
             }
           />
-        </section>
+        </FormGroup>
       )}
-    </div>
+    </Stack>
   );
 });
 
