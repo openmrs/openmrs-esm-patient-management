@@ -9,11 +9,19 @@ export const configSchema = {
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
+    _elements: {
+      _type: Type.String,
+      _description: 'Status of an appointment',
+    },
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
   },
   appointmentTypes: {
     _type: Type.Array,
     _description: 'Configurable appointment types (types of appointments)',
+    _elements: {
+      _type: Type.String,
+      _description: 'Type of an appointment',
+    },
     _default: ['Scheduled'],
   },
   checkInButton: {
