@@ -6,18 +6,17 @@ import { createEncounter, deleteEncounter, endVisit, getProvider, startVisit } f
 import { HomePage } from '../pages';
 import { type Encounter, type Patient, type Provider } from '../types';
 
-let visit: Visit;
+// let visit: Visit;
 let encounter: Encounter;
 let provider: Provider;
 const encounterNote = 'This is a test note';
 
 test.beforeEach(async ({ api, patient }) => {
-  visit = await startVisit(api, patient.uuid);
   provider = await getProvider(api);
   encounter = await createEncounter(api, patient.uuid, provider.uuid, encounterNote);
 });
 
-test('View active visits', async ({ page, patient }) => {
+test('View active visits', async ({ page, patient, visit }) => {
   const homePage = new HomePage(page);
   const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
   const firstName = patient.person.display.split(' ')[0];
@@ -45,7 +44,6 @@ test('View active visits', async ({ page, patient }) => {
   });
 });
 
-test.afterEach(async ({ api, patient }) => {
-  await endVisit(api, patient.uuid);
+test.afterEach(async ({ api }) => {
   await deleteEncounter(api, encounter.uuid);
 });
