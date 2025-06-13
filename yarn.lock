@@ -3358,7 +3358,7 @@ __metadata:
     sass: "npm:^1.29.0"
     sass-loader: "npm:^10.1.0"
     swc-loader: "npm:^0.2.3"
-    swr: "npm:^2.0.1"
+    swr: "npm:2.2.5"
     turbo: "npm:^2.5.2"
     typedoc: "npm:^0.22.15"
     typescript: "npm:^4.0.3"
@@ -18621,7 +18621,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swr@npm:2.2.5, swr@npm:^2.0.1":
+"swr@npm:2.2.5":
   version: 2.2.5
   resolution: "swr@npm:2.2.5"
   dependencies:
