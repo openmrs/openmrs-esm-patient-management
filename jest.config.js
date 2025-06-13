@@ -7,9 +7,9 @@ const path = require('path');
 module.exports = {
   clearMocks: true,
   transform: {
-    '^.+\\.[jt]sx?$': ['@swc/jest'],
+    '^.+\\.m?[jt]sx?$': ['@swc/jest'],
   },
-  transformIgnorePatterns: ['/node_modules/(?!@openmrs|rxjs|.+\\.pnp\\.[^\\/]+$)'],
+  transformIgnorePatterns: ['/node_modules/(?!@openmrs|.+\\.pnp\\.[^\\/]+$)'],
   moduleDirectories: ['node_modules', '__mocks__', 'tools', __dirname],
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
