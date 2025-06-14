@@ -37,8 +37,6 @@ export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/sid
 
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const homeDashboard = getAsyncLifecycle(() => import('./home.component'), options);
-
 export const editQueueEntryStatusModal = getAsyncLifecycle(() => import('./active-visits/change-status.modal'), {
   featureName: 'edit queue status',
   moduleName,
