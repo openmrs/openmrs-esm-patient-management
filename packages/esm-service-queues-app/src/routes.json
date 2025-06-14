@@ -22,7 +22,8 @@
         "title": "Service queues"
       },
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 1
     },
     {
       "name": "queue-table-by-status-menu-dashboard-link",

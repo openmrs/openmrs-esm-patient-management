@@ -18,7 +18,8 @@
         "name": "appointments",
         "slot": "clinical-appointments-dashboard-slot",
         "title": "Appointments"
-      }
+      },
+      "order": 2
     },
     {
       "component": "root",
