@@ -1,4 +1,4 @@
-import { Tag , Button } from '@carbon/react';
+import { Tag, Button } from '@carbon/react';
 import React from 'react';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import styles from './patient-banner-queue-entry-status.scss';
