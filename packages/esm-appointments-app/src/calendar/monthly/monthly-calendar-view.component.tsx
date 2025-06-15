@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { useSelectedDateContext } from '../../hooks/selected-date-context';
+import { useAppointmentsStore } from '../../store';
 import { monthDays } from '../../helpers';
 import MonthlyViewWorkload from './monthly-workload-view.component';
 import MonthlyHeader from './monthly-header.component';
@@ -15,7 +15,7 @@ interface MonthlyCalendarViewProps {
 }
 
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events }) => {
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
 
   return (
     <div className={styles.calendarViewContainer}>

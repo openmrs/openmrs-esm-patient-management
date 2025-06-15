@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { useTranslation } from 'react-i18next';
 import { isEmpty } from 'lodash-es';
-import { useSelectedDateContext } from '../hooks/selected-date-context';
+import { useAppointmentsStore } from '../../store';
 import styles from './metrics-card.scss';
 dayjs.extend(isSameOrBefore);
 
@@ -16,7 +16,7 @@ interface MetricsCardProps {
 
 const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, count }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
   const isSelectedDateInPast = useMemo(() => dayjs(selectedDate).isBefore(dayjs(), 'date'), [selectedDate]);
 
   return (

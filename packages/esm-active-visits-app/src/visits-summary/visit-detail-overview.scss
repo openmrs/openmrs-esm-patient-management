@@ -214,6 +214,7 @@
 
 .contentSwitcher {
   // TODO: Remove once override gets added to styleguide
+  // Hey Dennis, did this happen?
   :global(.cds--content-switcher-btn) {
     min-width: fit-content;
   }
