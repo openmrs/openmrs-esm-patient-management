@@ -37,7 +37,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
   },
   "dependencies": {
-    "@carbon/react": "^1.76.0",
+    "@carbon/react": "^1.83.0",
     "@hookform/resolvers": "^3.9.1",
     "classnames": "^2.3.2",
     "formik": "^2.2.9",
@@ -58,6 +58,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "next",
-    "webpack": "^5.74.0"
+    "webpack": "^5.99.9"
   }
 }
