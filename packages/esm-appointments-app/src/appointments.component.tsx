@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { omrsDateFormat } from './constants';
-import { SelectedDateContextProvider } from './hooks/selected-date-context';
 import AppointmentTabs from './appointments/appointment-tabs.component';
 import AppointmentsHeader from './header/appointments-header.component';
 import AppointmentMetrics from './metrics/appointments-metrics.component';
+import { useAppointmentsStore, setAppointmentServiceTypes, setSelectedDate } from './store';
 
 const Appointments: React.FC = () => {
   const { t } = useTranslation();
-  const [appointmentServiceTypes, setAppointmentServiceTypes] = useState<Array<string>>([]);
-  const [selectedDate, setSelectedDate] = useState(dayjs().startOf('day').format(omrsDateFormat));
+  const { appointmentServiceTypes } = useAppointmentsStore();
 
   const params = useParams();
 
@@ -28,15 +27,11 @@ const Appointments: React.FC = () => {
   }, [params.serviceType]);
 
   return (
-    <SelectedDateContextProvider value={{ selectedDate, setSelectedDate }}>
-      <AppointmentsHeader
-        appointmentServiceTypes={appointmentServiceTypes}
-        onChange={setAppointmentServiceTypes}
-        title={t('appointments', 'Appointments')}
-      />
+    <>
+      <AppointmentsHeader title={t('appointments', 'Appointments')} showServiceTypeFilter />
       <AppointmentMetrics appointmentServiceTypes={appointmentServiceTypes} />
       <AppointmentTabs appointmentServiceTypes={appointmentServiceTypes} />
-    </SelectedDateContextProvider>
+    </>
   );
 };
 
