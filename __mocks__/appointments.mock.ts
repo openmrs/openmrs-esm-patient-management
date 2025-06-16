@@ -264,50 +264,6 @@ export const mockAppointmentsData = {
   ],
 };
 
-// TODO: still used by the queue-linelist-base-table test?
-export const mockMappedAppointmentsData = {
-  data: [
-    {
-      id: 'e10ce4e3-0e91-4b97-bc6c-9b5068e58428',
-      name: 'John Wilson',
-      age: '45',
-      gender: 'M',
-      phoneNumber: '0700123456',
-      dob: '1986-04-03T00:00:00.000+0000',
-      patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
-      dateTime: '	30-Aug-2021, 03:35 PM',
-      serviceType: 'HIV Clinic',
-      visitType: 'HIV Clinic',
-      provider: 'Dr James Cook',
-      location: 'HIV Clinic',
-      comments: 'Some additional notes',
-      appointmentNumber: '0001',
-      serviceUuid: 'ce03060e-1cbe-11ed-861d-0242ac120002',
-      appointmentKind: 'Scheduled',
-      status: 'Cancelled',
-    },
-    {
-      id: 'cdb0676f-0805-4c3e-bfef-7757a005e892',
-      name: 'Eric Test Ric',
-      age: '32',
-      gender: 'M',
-      phoneNumber: '0700987654',
-      dob: '1986-04-03T00:00:00.000+0000',
-      patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
-      dateTime: '10-Sept-2021, 03:50 PM',
-      serviceType: 'TB Clinic',
-      visitType: 'TB Clinic',
-      provider: 'Dr James Cook',
-      location: 'TB Clinic',
-      comments: 'Some additional notes here',
-      appointmentNumber: '0001',
-      serviceUuid: 'c674bc34-1cbe-11ed-861d-0242ac120002',
-      appointmentKind: 'WalkIn',
-      status: 'Scheduled',
-    },
-  ],
-};
-
 export const mockAppointmentMetrics = {
   totalAppointments: 16,
   highestServiceLoad: 'HIV Consultation',
@@ -333,34 +289,6 @@ export const mockPatient = {
   age: 35,
   birthdate: '1986-04-03T00:00:00.000+0000',
   phoneNumber: '0700000000',
-};
-
-export const mockAppointmentServices = [
-  { uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'Clinical consultation' },
-  { uuid: 'd80ff12a-06a7-11ed-b939-0242ac120002', display: 'Triage' },
-];
-
-export const mockAppointmentServiceTypes = {
-  data: [
-    {
-      name: 'HIV Clinic',
-      uuid: '7bff050e-9a83-4fdb-9212-1a4c2cee349b',
-      duration: 15,
-    },
-    {
-      name: 'Drug Dispense',
-      uuid: '0e960ced-d35e-43de-b87f-bc08ef3b6ec3',
-      duration: 15,
-    },
-  ],
-};
-
-export const mockFrequency = {
-  data: [
-    { uuid: 'b127d100-bccb-4699-b30e-fe60a068ca46', display: 'Daily' },
-    { uuid: 'dbc32cf4-e11d-4006-b398-c71204cfc0d0', display: 'Weekly' },
-    { uuid: '6e263ecd-173e-4ee1-a9a5-df1f8d5b274b', display: 'Monthly' },
-  ],
 };
 
 export const mockProviders = {

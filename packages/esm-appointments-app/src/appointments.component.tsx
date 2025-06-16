@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { omrsDateFormat } from './constants';
 import AppointmentTabs from './appointments/appointment-tabs.component';
 import AppointmentsHeader from './header/appointments-header.component';
-import AppointmentMetrics from './metrics/appointments-metrics.component';
+import AppointmentMetrics from './metrics/metrics-container.component';
 import { useAppointmentsStore, setAppointmentServiceTypes, setSelectedDate } from './store';
 
 const Appointments: React.FC = () => {
