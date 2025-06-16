@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import useSWRInfinite from 'swr/infinite';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import last from 'lodash-es/last';
+import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import {
   type FetchResponse,
   formatDatetime,
@@ -14,9 +16,7 @@ import {
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 import { type ActiveVisit, type VisitResponse } from '../types';
-import { useTranslation } from 'react-i18next';
 
 dayjs.extend(isToday);
 
