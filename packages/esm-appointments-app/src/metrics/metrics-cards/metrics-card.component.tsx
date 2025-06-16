@@ -20,27 +20,25 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, co
   const isSelectedDateInPast = useMemo(() => dayjs(selectedDate).isBefore(dayjs(), 'date'), [selectedDate]);
 
   return (
-    <article className={styles.container}>
-      <div className={styles.tileContainer}>
-        <div className={styles.tileHeader}>
-          <div className={styles.headerLabelContainer}>
-            <span className={styles.headerLabel}>{headerLabel}</span>
-          </div>
+    <article className={styles.tileContainer}>
+      <div className={styles.tileHeader}>
+        <div className={styles.headerLabelContainer}>
+          <span className={styles.headerLabel}>{headerLabel}</span>
         </div>
-        <div className={styles.metricsGrid}>
-          <div>
-            <span className={styles.totalsLabel}>{label}</span>
-            <p className={styles.totalsValue}>{value}</p>
-          </div>
-          {!isEmpty(count) && (
-            <div className={styles.countGrid}>
-              <span>{t('checkedIn', 'Checked in')}</span>
-              <span>{isSelectedDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived')}</span>
-              <p style={{ color: '#22651B' }}>{count.arrivedAppointments?.length}</p>
-              <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>
-            </div>
-          )}
+      </div>
+      <div className={styles.metricsGrid}>
+        <div>
+          <span className={styles.totalsLabel}>{label}</span>
+          <p className={styles.totalsValue}>{value}</p>
         </div>
+        {!isEmpty(count) && (
+          <div className={styles.countGrid}>
+            <span>{t('checkedIn', 'Checked in')}</span>
+            <span>{isSelectedDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived')}</span>
+            <p style={{ color: '#22651B' }}>{count.arrivedAppointments?.length}</p>
+            <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>
+          </div>
+        )}
       </div>
     </article>
   );

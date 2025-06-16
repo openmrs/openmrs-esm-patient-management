@@ -1,7 +1,7 @@
 import React from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import MetricsHeader from './metrics-header.component';
-import styles from './appointments-metrics.scss';
+import styles from './metrics-container.scss';
 
 interface AppointmentMetricsProps {
   appointmentServiceTypes: Array<string>;

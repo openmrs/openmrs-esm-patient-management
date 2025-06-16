@@ -10,7 +10,7 @@ import {
 } from '@openmrs/esm-framework';
 import { mockMetrics, mockServiceTypes, mockLocations, mockSession } from '__mocks__';
 import { type ConfigObject, configSchema } from '../config-schema';
-import ClinicMetrics from './clinic-metrics.component';
+import ClinicMetrics from './metrics-container.component';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
