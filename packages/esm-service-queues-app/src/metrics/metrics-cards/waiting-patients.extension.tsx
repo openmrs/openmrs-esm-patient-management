@@ -4,7 +4,7 @@ import { Dropdown } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import MetricsCard from './metrics-card.component';
 import { updateSelectedService, useSelectedQueueLocationUuid, useSelectedService } from '../../helpers/helpers';
-import { useServiceMetricsCount } from '../queue-metrics.resource';
+import { useServiceMetricsCount } from '../metrics.resource';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
 import useQueueServices from '../../hooks/useQueueService';
 import { type Service } from '../metrics-container.component';

@@ -264,23 +264,6 @@ export const mockAppointmentsData = {
   ],
 };
 
-export const mockAppointmentMetrics = {
-  totalAppointments: 16,
-  highestServiceLoad: 'HIV Consultation',
-  isLoading: false,
-  error: null,
-};
-
-export const mockProvidersCount = {
-  totalProviders: 4,
-  isLoading: false,
-  error: null,
-};
-
-export const mockStartTime = {
-  startTime: '2022-10-03T00:00:00.000+0000',
-};
-
 export const mockPatient = {
   identifier: '100GEJ',
   name: 'John Wilson',
