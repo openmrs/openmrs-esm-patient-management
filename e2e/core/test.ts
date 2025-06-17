@@ -29,7 +29,3 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     { scope: 'test', auto: true },
   ],
 });
-
-test.afterEach(async ({ api, patient }) => {
-    await deletePatient(api, patient.uuid);
-});
