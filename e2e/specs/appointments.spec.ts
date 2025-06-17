@@ -1,9 +1,17 @@
 import { expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
+import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
 import dayjs from 'dayjs';
 
-test('Add, edit and cancel an appointment', async ({ page, patient, visit }) => {
+let visit: Visit;
+
+test.beforeEach(async ({ api, patient }) => {
+  visit = await startVisit(api, patient.uuid);
+});
+
+test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   const appointmentsPage = new AppointmentsPage(page);
 
   await test.step('When I go to the Appointments page in the patient chart', async () => {
@@ -124,4 +132,8 @@ test('Add, edit and cancel an appointment', async ({ page, patient, visit }) => 
   await test.step('Then I should see a success message', async () => {
     await expect(page.getByText(/appointment cancelled successfully/i)).toBeVisible();
   });
+});
+
+test.afterEach(async ({ api }) => {
+  await endVisit(api, visit.uuid);
 });

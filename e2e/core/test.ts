@@ -49,18 +49,7 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
   ],
 });
 
-test.afterEach(async ({ api, patient, visit }, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    try {
-      if (visit?.uuid) await endVisit(api, visit.uuid);
-    } catch (e) {
-      console.warn('Failed to end visit during cleanup:', e);
-    }
-
-    try {
-      if (patient?.uuid) await deletePatient(api, patient.uuid);
-    } catch (e) {
-      console.warn('Failed to delete patient during cleanup:', e);
-    }
-  }
+test.afterEach(async ({ api, patient, visit }) => {
+  if (visit?.uuid) await endVisit(api, visit.uuid);
+  if (patient?.uuid) await deletePatient(api, patient.uuid);
 });
