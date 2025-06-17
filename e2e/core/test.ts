@@ -1,8 +1,7 @@
 import { type APIRequestContext, type Page, test as base } from '@playwright/test';
 import { api } from '../fixtures';
 import { type Patient } from '../types';
-import { generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
-import { type Visit } from '@openmrs/esm-framework';
+import { generateRandomPatient, deletePatient } from '../commands';
 
 // This file sets up our custom test harness using the custom fixtures.
 // See https://playwright.dev/docs/test-fixtures#creating-a-fixture for details.
@@ -13,7 +12,6 @@ import { type Visit } from '@openmrs/esm-framework';
 export interface CustomTestFixtures {
   loginAsAdmin: Page;
   patient: Patient;
-  visit?: Visit;
 }
 
 export interface CustomWorkerFixtures {
@@ -36,7 +34,6 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
   ],
 });
 
-test.afterEach(async ({ api, patient, visit }) => {
-  if (visit?.uuid) await endVisit(api, visit.uuid);
+test.afterEach(async ({ api, patient }) => {
   if (patient.uuid) await deletePatient(api, patient.uuid);
 });
