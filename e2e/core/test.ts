@@ -34,22 +34,9 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     },
     { scope: 'test', auto: true },
   ],
-
-  visit: [
-    async ({ api, patient }, use) => {
-      const visit = await startVisit(api, patient.uuid);
-      await use(visit);
-      try {
-        if (visit) await endVisit(api, visit.uuid);
-      } catch (e) {
-        console.warn('Failed to end visit:', e);
-      }
-    },
-    { scope: 'test', auto: true },
-  ],
 });
 
 test.afterEach(async ({ api, patient, visit }) => {
   if (visit?.uuid) await endVisit(api, visit.uuid);
-  if (patient?.uuid) await deletePatient(api, patient.uuid);
+  if (patient.uuid) await deletePatient(api, patient.uuid);
 });
