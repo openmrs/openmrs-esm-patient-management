@@ -1,6 +1,5 @@
 {
   "activeVisits": "Kunjungan aktif",
-  "age": "Usia",
   "allEncounters": "Semua Pertemuan",
   "checkFilters": "Periksa filter di atas",
   "diagnoses": "Diagnosis",
@@ -9,11 +8,8 @@
   "endDate": "Tanggal berakhir",
   "filterActiveVisits": "Filter Kunjungan Aktif",
   "filterTable": "Filter tabel",
-  "gender": "Jenis kelamin",
-  "idNumber": "Nomor ID",
   "indication": "Indikasi",
   "medications": "Obat-obatan",
-  "name": "Nama",
   "noActiveVisitsForLocation": "Tidak ada kunjungan aktif untuk lokasi ini.",
   "noDiagnosesFound": "Tidak ada diagnosis yang ditemukan",
   "noEncountersFound": "Tidak ada pertemuan yang ditemukan",
@@ -33,7 +29,5 @@
   "time": "Waktu",
   "totalVisits": "Total Kunjungan Hari Ini",
   "viewPatientChartFor": "Lihat rekam medis untuk {{patientName}}",
-  "visitStartTime": "Waktu Kunjungan",
-  "visitSummary": "Ringkasan Kunjungan",
-  "visitType": "Jenis Kunjungan"
+  "visitSummary": "Ringkasan Kunjungan"
 }

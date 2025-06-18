@@ -1,6 +1,5 @@
 {
   "activeVisits": "চলমান ভিজিট",
-  "age": "বয়স",
   "allEncounters": "সাক্ষাৎ সমূহ",
   "checkFilters": "উপরের ফিল্টারসমূহ যাচাই করুন",
   "diagnoses": "Diagnoses",
@@ -9,11 +8,8 @@
   "endDate": "সমাপ্তি",
   "filterActiveVisits": "Filter active visits",
   "filterTable": "Filter table",
-  "gender": "লিঙ্গ",
-  "idNumber": "আইডি নম্বর",
   "indication": "রোগের লক্ষণ",
   "medications": "ঔষধসমূহ",
-  "name": "নাম",
   "noActiveVisitsForLocation": "এই স্থানের জন্য কোনো চলমান ভিজিট নেই।",
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersFound": "কোনো সাক্ষাৎ পাওয়া যায়নি",
@@ -33,7 +29,5 @@
   "time": "সময়",
   "totalVisits": "আজকের সর্বমোট ভিজিট সংখ্যা",
   "viewPatientChartFor": "View patient chart for {{patientName}}",
-  "visitStartTime": "দেখা করার সময়",
-  "visitSummary": "ভিজিটের সারমর্ম",
-  "visitType": "ভিজিটের ধরন"
+  "visitSummary": "ভিজিটের সারমর্ম"
 }

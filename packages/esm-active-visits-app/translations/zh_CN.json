@@ -1,6 +1,5 @@
 {
   "activeVisits": "当前就诊",
-  "age": "年龄",
   "allEncounters": "所有问诊记录",
   "checkFilters": "检查上方的筛选条件",
   "diagnoses": "诊断",
@@ -9,11 +8,8 @@
   "endDate": "结束日期",
   "filterActiveVisits": "过滤活动的就诊",
   "filterTable": "筛选表格",
-  "gender": "性别",
-  "idNumber": "ID",
   "indication": "适应症",
   "medications": "药物",
-  "name": "姓名",
   "noActiveVisitsForLocation": "在这个地点没有活动的就诊记录可供显示。",
   "noDiagnosesFound": "未找到诊断",
   "noEncountersFound": "未找到问诊记录",
@@ -33,7 +29,5 @@
   "time": "时间",
   "totalVisits": "本日总接诊",
   "viewPatientChartFor": "查看患者  {{patientName}} 病历图表",
-  "visitStartTime": "就诊时间",
-  "visitSummary": "就诊总结",
-  "visitType": "就诊类型"
+  "visitSummary": "就诊总结"
 }

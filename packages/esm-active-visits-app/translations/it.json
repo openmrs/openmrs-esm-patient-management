@@ -1,6 +1,5 @@
 {
   "activeVisits": "Visite Attive",
-  "age": "Età",
   "allEncounters": "Tutti i consulti",
   "checkFilters": "Controlla i filtri sopra",
   "diagnoses": "Diagnosi",
@@ -9,11 +8,8 @@
   "endDate": "Data di fine",
   "filterActiveVisits": "Filter active visits",
   "filterTable": "Filtra tabella",
-  "gender": "Genere",
-  "idNumber": "Numero ID",
   "indication": "Indicazione",
   "medications": "Farmaci",
-  "name": "Nome",
   "noActiveVisitsForLocation": "Non ci sono visite attive da visualizzare per questa sede.",
   "noDiagnosesFound": "Nessuna diagnosi trovata",
   "noEncountersFound": "Nessuna consulto trovato",
@@ -33,7 +29,5 @@
   "time": "Orario",
   "totalVisits": "Visite totali di oggi",
   "viewPatientChartFor": "View patient chart for {{patientName}}",
-  "visitStartTime": "Orario della visita",
-  "visitSummary": "Riepilogo della visita",
-  "visitType": "Tipo di visita"
+  "visitSummary": "Riepilogo della visita"
 }

@@ -1,6 +1,5 @@
 {
   "activeVisits": "Số lượt đang khám",
-  "age": "Tuổi",
   "allEncounters": "Tất cả cuộc gặp",
   "checkFilters": "Kiểm tra các bộ lọc ở trên",
   "diagnoses": "Chẩn doán",
@@ -9,11 +8,8 @@
   "endDate": "Ngày kết thúc",
   "filterActiveVisits": "Filter active visits",
   "filterTable": "Bảng lọc",
-  "gender": "Giới tính",
-  "idNumber": "ID",
   "indication": "Chỉ định",
   "medications": "Thuốc",
-  "name": "Tên",
   "noActiveVisitsForLocation": "Không có lượt khám nào đang hoạt động để hiển thị cho vị trí này.",
   "noDiagnosesFound": "Không tìm thấy chẩn đoán",
   "noEncountersFound": "Không tìm thấy cuộc gặp gỡ nào",
@@ -33,7 +29,5 @@
   "time": "Thời gian",
   "totalVisits": "Tổng số lượt khám trong ngày",
   "viewPatientChartFor": "View patient chart for {{patientName}}",
-  "visitStartTime": "Thời gian khám",
-  "visitSummary": "Tóm tắt lượt khám",
-  "visitType": "Loại lượt khám"
+  "visitSummary": "Tóm tắt lượt khám"
 }
