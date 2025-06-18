@@ -1,8 +1,8 @@
-import { SkeletonText } from '@carbon/react';
-import { type Obs } from '@openmrs/esm-api/src';
-import classNames from 'classnames';
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
+import { SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { type Obs } from '@openmrs/esm-framework';
 import styles from '../visit-detail-overview.scss';
 
 interface EncounterObservationsProps {

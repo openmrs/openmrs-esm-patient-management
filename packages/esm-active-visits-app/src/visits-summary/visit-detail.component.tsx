@@ -1,12 +1,12 @@
-import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
-import { formatDatetime, formatTime, parseDate } from '@openmrs/esm-framework';
-import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
+import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import styles from './visit-detail-overview.scss';
+import { formatDatetime, formatTime, parseDate } from '@openmrs/esm-framework';
 import { useVisit } from './visit.resource';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
+import styles from './visit-detail-overview.scss';
 
 interface VisitDetailComponentProps {
   visitUuid: string;
@@ -35,6 +35,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
+
   if (visit) {
     return (
       <div className={styles.visitsDetailWidgetContainer}>

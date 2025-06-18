@@ -10,7 +10,6 @@ import ActiveVisitsTable from './active-visits.component';
 
 const mockUseActiveVisits = jest.mocked(useActiveVisits);
 const mockUseObsConcepts = jest.mocked(useObsConcepts);
-const mockIsDesktop = jest.mocked(useObsConcepts);
 const mockUseConfig = jest.mocked(useConfig<ActiveVisitsConfigSchema>);
 
 jest.mock('./active-visits.resource', () => ({
