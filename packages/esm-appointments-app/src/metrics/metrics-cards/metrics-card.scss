@@ -3,17 +3,10 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.container {
-  flex-grow: 1;
-}
-
 .tileContainer {
   border: 1px solid $ui-03;
   height: 7.875rem;
   padding: layout.$spacing-05;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
 }
 
 .tileHeader {

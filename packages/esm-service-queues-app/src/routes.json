@@ -78,6 +78,24 @@
       "name": "transition-overflow-menu-item",
       "component": "transitionOverflowMenuItem",
       "slot": "transition-overflow-menu-item-slot"
+    },
+    {
+      "name": "metrics-card-checked-in-patients",
+      "component": "metricsCardCheckedInPatients",
+      "slot": "service-queues-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "metrics-card-waiting-patients",
+      "component": "metricsCardWaitingPatients",
+      "slot": "service-queues-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "metrics-card-average-wait-time",
+      "component": "metricsCardAverageWaitTime",
+      "slot": "service-queues-metrics-slot",
+      "order": 3
     }
   ],
   "modals": [

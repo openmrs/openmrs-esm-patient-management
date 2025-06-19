@@ -104,6 +104,24 @@
       "name": "home-appointments-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile"
+    },
+    {
+      "name": "metrics-card-scheduled-appointments",
+      "component": "metricsCardScheduledAppointments",
+      "slot": "appointments-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "metrics-card-highest-volume-service",
+      "component": "metricsCardHighestVolumeService",
+      "slot": "appointments-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "metrics-card-providers-booked",
+      "component": "metricsCardProvidersBooked",
+      "slot": "appointments-metrics-slot",
+      "order": 3
     }
   ],
   "modals": [

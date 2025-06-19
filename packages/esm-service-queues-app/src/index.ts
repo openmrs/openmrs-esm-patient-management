@@ -70,6 +70,21 @@ export const transitionQueueEntryStatusModal = getAsyncLifecycle(
 
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
+export const metricsCardCheckedInPatients = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/checked-in-patients.extension'),
+  options,
+);
+
+export const metricsCardWaitingPatients = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/waiting-patients.extension'),
+  options,
+);
+
+export const metricsCardAverageWaitTime = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/average-wait-time.extension'),
+  options,
+);
+
 export const addProviderToRoomModal = getAsyncLifecycle(
   () => import('./add-provider-queue-room-modal/add-provider-queue-room.modal'),
   {

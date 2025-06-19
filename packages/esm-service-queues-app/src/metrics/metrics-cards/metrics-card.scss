@@ -2,23 +2,10 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.container {
-  flex-grow: 1;
-}
-
-/* Tablet viewport */
-:global(.omrs-breakpoint-lt-desktop) {
-  // The card containing the dropdown element should be the first to overflow on tablet
-  .cardWithChildren {
-    order: 3;
-  }
-}
-
 .tileContainer {
-  border: 0.0625rem solid $ui-03;
+  border: 1px solid $ui-03;
   height: 7.875rem;
   padding: layout.$spacing-05;
-  margin: layout.$spacing-03 layout.$spacing-03;
 }
 
 .tileHeader {
