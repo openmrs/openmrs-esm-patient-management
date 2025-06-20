@@ -76,13 +76,16 @@ export const defaultColumnConfig: ColumnConfig = {
 
 export const defaultQueueTable: TableDefinitions = {
   columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
-  appliedTo: [{ queue: null, status: null }],
+  appliedTo: [{ queue: '', status: '' }],
 };
 
 export const configSchema = {
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
+    _elements: {
+      _type: Type.String,
+    },
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
   },
   biometrics: biometricsConfigSchema,
@@ -122,6 +125,9 @@ export const configSchema = {
     historicalObsConceptUuid: {
       _type: Type.Array,
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
+      _elements: {
+        _type: Type.ConceptUuid,
+      },
       _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     },
     oxygenSaturationUuid: {
@@ -160,7 +166,6 @@ export const configSchema = {
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   dashboardTitle: {
-    _type: Type.Object,
     _description: 'The title to be displayed on the service queues dashboard',
     key: {
       _type: Type.String,
@@ -182,7 +187,7 @@ export const configSchema = {
   },
   defaultIdentifierTypes: {
     _type: Type.Array,
-    _element: {
+    _elements: {
       _type: Type.String,
     },
     _description: 'The identifier types to be display on all patient search result page',
@@ -254,13 +259,13 @@ export const configSchema = {
           _type: Type.String,
           _description: 'The type of column, if different from the ID',
           _validators: [validators.oneOf(columnTypes)],
-          _default: null,
+          _default: '',
         },
         header: {
           _type: Type.String,
           _description:
             'The header text for the column. Will be translated if it is a valid translation key. If not provided, the header will be based on the columnType.',
-          _default: null,
+          _default: '',
         },
         config: {
           identifierTypeUuid: {
@@ -289,7 +294,7 @@ export const configSchema = {
                 _type: Type.String,
                 _description: 'Style to apply to the tag',
                 _validators: [validators.oneOf(tagStyles)],
-                _default: null,
+                _default: '',
               },
             },
           },
@@ -306,14 +311,14 @@ export const configSchema = {
                 _type: Type.String,
                 _description: 'The icon component to display for the status',
                 _validators: [validators.oneOf(statusIcons)],
-                _default: null,
+                _default: '',
               },
             },
             visitQueueNumberAttributeUuid: {
               _type: Type.String,
               _description:
                 'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-              _default: null,
+              _default: '',
             },
           },
         },
@@ -335,12 +340,12 @@ export const configSchema = {
             queue: {
               _type: Type.String,
               _description: 'The UUID of the queue. If not provided, applies to all queues.',
-              _default: null,
+              _default: '',
             },
             status: {
               _type: Type.String,
               _description: 'The UUID of the status. If not provided, applies to all statuses.',
-              _default: null,
+              _default: '',
             },
           },
         },
@@ -375,12 +380,12 @@ export const configSchema = {
   visitQueueNumberAttributeUuid: {
     _type: Type.String,
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: null,
+    _default: '',
   },
   visitTypeResourceUrl: {
     _type: Type.String,
     _description: 'The `visitTypeResourceUrl`',
-    _default: null,
+    _default: '',
   },
   vitals: vitalsConfigSchema,
   _validators: [
