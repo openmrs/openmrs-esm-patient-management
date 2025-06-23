@@ -90,6 +90,7 @@ export const configSchema = {
         _type: Type.Array,
         _description: 'Configuration for person attributes to display on advanced search',
         _elements: {
+          _type: Type.Object,
           placeholder: {
             _type: Type.String,
             _description: 'Placeholder text for the field',

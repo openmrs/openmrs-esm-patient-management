@@ -200,6 +200,7 @@ export const configSchema = {
       _description:
         "Custom columns for queue tables can be defined here. These columns will be referenced by their `id` in the `tableDefinitions` columns configuration. If the provided `id` matches a built-in column, the custom configuration will override the built-in column's configuration.",
       _elements: {
+        _type: Type.Object,
         _validators: [
           validator(
             (columnDfn: ColumnDefinition) =>
@@ -279,6 +280,7 @@ export const configSchema = {
             _description:
               'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
             _elements: {
+              _type: Type.Object,
               conceptUuid: {
                 _type: Type.UUID,
                 _description: 'The UUID of the priority concept to configure',
@@ -303,6 +305,7 @@ export const configSchema = {
             _default: [],
             _description: 'For columnType "status". Configures the icons for each status.',
             _elements: {
+              _type: Type.Object,
               conceptUuid: {
                 _type: Type.UUID,
                 _description: 'The UUID of the status concept to configure',
@@ -314,12 +317,12 @@ export const configSchema = {
                 _default: '',
               },
             },
-            visitQueueNumberAttributeUuid: {
-              _type: Type.String,
-              _description:
-                'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-              _default: '',
-            },
+          },
+          visitQueueNumberAttributeUuid: {
+            _type: Type.String,
+            _description:
+              'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
+            _default: '',
           },
         },
       },
@@ -328,6 +331,7 @@ export const configSchema = {
       _type: Type.Array,
       _default: [defaultQueueTable],
       _elements: {
+        _type: Type.Object,
         columns: {
           _type: Type.Array,
           _elements: {
@@ -337,6 +341,7 @@ export const configSchema = {
         appliedTo: {
           _type: Type.Array,
           _elements: {
+            _type: Type.Object,
             queue: {
               _type: Type.String,
               _description: 'The UUID of the queue. If not provided, applies to all queues.',

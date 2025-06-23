@@ -125,6 +125,7 @@ export const esmPatientRegistrationSchema = {
   sectionDefinitions: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       id: {
         _type: Type.String,
         _description: `How this section will be referred to in the \`sections\` configuration. To override a built-in section, use that section's id. The built in section ids are '${builtInSections
@@ -151,6 +152,7 @@ export const esmPatientRegistrationSchema = {
   fieldDefinitions: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       id: {
         _type: Type.String,
         _description:
@@ -216,6 +218,7 @@ export const esmPatientRegistrationSchema = {
       customConceptAnswers: {
         _type: Type.Array,
         _elements: {
+          _type: Type.Object,
           uuid: {
             _type: Type.UUID,
             _description: 'Answer concept UUID',
@@ -282,6 +285,7 @@ export const esmPatientRegistrationSchema = {
     gender: {
       _type: Type.Array,
       _elements: {
+        _type: Type.Object,
         value: {
           _type: Type.String,
           _description:
@@ -331,11 +335,6 @@ export const esmPatientRegistrationSchema = {
             "Whether to fill the addresses by levels, i.e. County => subCounty, the current field is dependent on it's previous field.",
           _default: false,
         },
-        // useAddressHierarchyLabel: {
-        //   _type: Type.Object,
-        //   _description: 'Whether to use custom labels for address hierarchy',
-        //   _default: {},
-        // },
       },
     },
     dateOfBirth: {
