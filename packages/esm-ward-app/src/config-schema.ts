@@ -37,6 +37,7 @@ export const configSchema: ConfigSchema = {
       _description: 'Configures obs values to display.',
       _default: [],
       _elements: {
+        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -85,6 +86,7 @@ export const configSchema: ConfigSchema = {
         },
       ],
       _elements: {
+        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -94,6 +96,7 @@ export const configSchema: ConfigSchema = {
             _type: Type.Array,
             _description: 'Configures pending orders and transfers to display.',
             _elements: {
+              _type: Type.Object,
               uuid: {
                 _type: Type.UUID,
                 _description: 'Identifies the order type.',
@@ -124,6 +127,7 @@ export const configSchema: ConfigSchema = {
         },
       ],
       _elements: {
+        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -145,6 +149,7 @@ export const configSchema: ConfigSchema = {
         },
       ],
       _elements: {
+        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -169,6 +174,7 @@ export const configSchema: ConfigSchema = {
         },
       ],
       _elements: {
+        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -182,7 +188,9 @@ export const configSchema: ConfigSchema = {
     coloredObsTags: {
       _type: Type.Array,
       _description: 'Configures observation values to display as Carbon tags.',
+      _default: [],
       _elements: {
+        _type: Type.Object,
         conceptUuid: {
           _type: Type.UUID,
           _description: 'Required. Identifies the concept to use to identify the desired observations.',
@@ -210,6 +218,7 @@ export const configSchema: ConfigSchema = {
           _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
           _default: [],
           _elements: {
+            _type: Type.Object,
             color: {
               _type: Type.String,
               _description:
@@ -232,6 +241,7 @@ export const configSchema: ConfigSchema = {
     _type: Type.Array,
     _default: [{ id: 'default-ward' }],
     _elements: {
+      _type: Type.Object,
       id: {
         _type: Type.String,
         _description:
@@ -242,6 +252,7 @@ export const configSchema: ConfigSchema = {
         _description:
           'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
         _elements: {
+          _type: Type.Object,
           location: {
             _type: Type.UUID,
             _description: 'The UUID of the location. If not provided, applies to all wards.',

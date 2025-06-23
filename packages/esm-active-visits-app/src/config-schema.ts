@@ -24,6 +24,7 @@ export const configSchema = {
       _type: Type.Array,
       _description: 'Customizable list of identifiers to display on active visits table',
       _elements: {
+        _type: Type.Object,
         header: {
           key: {
             _type: Type.String,
