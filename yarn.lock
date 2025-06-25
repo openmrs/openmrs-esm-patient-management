@@ -3188,6 +3188,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openmrs/esm-home-app@workspace:packages/esm-home-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-home-app@workspace:packages/esm-home-app"
+  dependencies:
+    webpack: "npm:^5.74.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 6.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-navigation@npm:6.3.1-pre.3106":
   version: 6.3.1-pre.3106
   resolution: "@openmrs/esm-navigation@npm:6.3.1-pre.3106"
@@ -19511,7 +19525,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.99.9":
+"webpack@npm:^5.74.0, webpack@npm:^5.99.9":
   version: 5.99.9
   resolution: "webpack@npm:5.99.9"
   dependencies:
