@@ -1,6 +1,29 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ListDetailsTable from './list-details-table.component';
+import { showSnackbar } from '@openmrs/esm-framework';
+
+jest.mock('@openmrs/esm-framework', () => {
+  const actual = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...actual,
+    showSnackbar: jest.fn(),
+    useLayoutType: () => 'desktop',
+    isDesktop: () => true,
+    ExtensionSlot: ({ state }) => (
+      <button onClick={() => state.selectPatientAction('new-patient')}>{state.buttonText}</button>
+    ),
+  };
+});
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key, fallback) => fallback || key }),
+}));
+
+jest.mock('../api/api-remote', () => ({
+  addPatientToList: jest.fn(() => Promise.resolve()),
+  removePatientFromList: jest.fn(),
+}));
 
 describe('ListDetailsTable', () => {
   const patients = [
@@ -65,6 +88,7 @@ describe('ListDetailsTable', () => {
         isFetching={true}
         mutateListDetails={jest.fn()}
         mutateListMembers={jest.fn()}
+        cohortUuid="test-cohort"
       />,
     );
     expect(screen.getByTestId('patientsTable')).toBeInTheDocument();
@@ -81,9 +105,62 @@ describe('ListDetailsTable', () => {
         isFetching={false}
         mutateListDetails={jest.fn()}
         mutateListMembers={jest.fn()}
+        cohortUuid="test-cohort"
       />,
     );
 
     expect(screen.getByTestId('data-table-skeleton')).toBeInTheDocument();
+  });
+
+  it('renders add patient button slot', () => {
+    render(
+      <ListDetailsTable
+        patients={patients}
+        columns={columns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={jest.fn()}
+        mutateListMembers={jest.fn()}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    expect(screen.getByText('Add patient to list')).toBeInTheDocument();
+  });
+
+  it('adds a new patient to the list when add button is clicked', async () => {
+    const mockMutateListDetails = jest.fn();
+    const mockMutateListMembers = jest.fn();
+
+    render(
+      <ListDetailsTable
+        patients={patients}
+        columns={columns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={mockMutateListDetails}
+        mutateListMembers={mockMutateListMembers}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    const addButton = screen.getByText('Add patient to list');
+    fireEvent.click(addButton);
+
+    await waitFor(() => {
+      expect(showSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: expect.stringMatching(/Patient added to list/i),
+          kind: 'success',
+        }),
+      );
+    });
+
+    expect(mockMutateListMembers).toHaveBeenCalled();
+    expect(mockMutateListDetails).toHaveBeenCalled();
   });
 });

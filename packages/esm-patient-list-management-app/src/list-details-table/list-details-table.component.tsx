@@ -20,9 +20,17 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { ArrowLeft, TrashCan } from '@carbon/react/icons';
-import { ConfigurableLink, useLayoutType, isDesktop, showSnackbar, useDebounce } from '@openmrs/esm-framework';
-import { removePatientFromList } from '../api/api-remote';
+import { Add, ArrowLeft, TrashCan } from '@carbon/react/icons';
+import {
+  ConfigurableLink,
+  useLayoutType,
+  isDesktop,
+  showSnackbar,
+  useDebounce,
+  ExtensionSlot,
+  toOmrsIsoString,
+} from '@openmrs/esm-framework';
+import { addPatientToList, removePatientFromList } from '../api/api-remote';
 import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
 import styles from './list-details-table.scss';
 
@@ -137,6 +145,7 @@ interface ListDetailsTableProps {
     lastPage?: boolean;
   };
   patients;
+  cohortUuid: string;
   style?: CSSProperties;
 }
 
@@ -157,6 +166,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   mutateListMembers,
   pagination,
   patients,
+  cohortUuid,
 }) => {
   const { t } = useTranslation();
   const id = useId();
@@ -234,6 +244,47 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     setShowConfirmationModal(false);
   }, [membershipUuid, mutateListDetails, mutateListMembers, t]);
 
+  const handleAddPatientToList = useCallback(
+    async (patient) => {
+      const alreadyInList = patients.some((p) => patient == p.uuid);
+
+      if (alreadyInList) {
+        showSnackbar({
+          kind: 'info',
+          subtitle: t('patientAlreadyInList', 'This patient is already in the list'),
+          title: t('cannotAddPatient', 'Cannot add patient'),
+          isLowContrast: true,
+        });
+        return;
+      }
+
+      try {
+        await addPatientToList({
+          cohort: cohortUuid,
+          patient,
+          startDate: toOmrsIsoString(new Date()),
+        });
+
+        mutateListMembers();
+        mutateListDetails();
+
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('listUpToDate', 'The list is now up to date'),
+          title: t('patientAddedToList', 'Patient added to list'),
+        });
+      } catch (e) {
+        showSnackbar({
+          kind: 'error',
+          subtitle: e?.message,
+          title: t('errorAddingPatientToList', 'Failed to add patient to list'),
+        });
+      }
+    },
+    [cohortUuid, mutateListDetails, mutateListMembers, patients, t],
+  );
+
   const BackButton = () => (
     <div className={styles.backButton}>
       <ConfigurableLink to={patientListsPath}>
@@ -279,6 +330,21 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   placeholder={t('searchThisList', 'Search this list')}
                   size={responsiveSize}
+                />
+              </Layer>
+              <Layer>
+                <ExtensionSlot
+                  key={`${id}-patient-search`}
+                  name="patient-search-button-slot"
+                  state={{
+                    buttonText: t('addPatientToList', 'Add patient to list'),
+                    buttonProps: {
+                      kind: 'secondary',
+                      renderIcon: (props) => <Add size={16} {...props} />,
+                      size: 'sm',
+                    },
+                    selectPatientAction: handleAddPatientToList,
+                  }}
                 />
               </Layer>
             </div>
@@ -395,6 +461,20 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
             <EmptyDataIllustration />
           </div>
           <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
+          <ExtensionSlot
+            key={`${id}-patient-search`}
+            name="patient-search-button-slot"
+            className=""
+            state={{
+              buttonText: t('addPatientToList', 'Add patient to list'),
+              buttonProps: {
+                kind: 'ghost',
+                renderIcon: (props) => <Add size={16} {...props} />,
+                size: 'sm',
+              },
+              selectPatientAction: handleAddPatientToList,
+            }}
+          />
         </Tile>
       </Layer>
     </>
