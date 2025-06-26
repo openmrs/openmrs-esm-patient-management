@@ -36,6 +36,8 @@
 .searchContainer > div {
   align-self: center;
   justify-self: end;
+  display: flex;
+  gap: layout.$spacing-03;
 }
 
 .searchOverrides {
