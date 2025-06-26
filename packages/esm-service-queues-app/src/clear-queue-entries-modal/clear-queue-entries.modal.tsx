@@ -43,7 +43,7 @@ const ClearQueueEntriesModal: React.FC<ClearQueueEntriesModalProps> = ({ queueEn
   }, [closeModal, mutateQueueEntries, t, queueEntries]);
 
   return (
-    <div>
+    <div className={styles.modalContainer}>
       <ModalHeader
         closeModal={closeModal}
         label={t('serviceQueue', 'Service queue')}
