@@ -4,6 +4,7 @@ import { Button } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
 import { isDesktop, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueEntry } from '../types';
+import styles from './clear-queue-entries.scss';
 
 interface ClearQueueEntriesProps {
   queueEntries: Array<QueueEntry>;
@@ -29,7 +30,7 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) =
 
   return (
     <Button
-      className={styles.clearListButton}
+      className={styles.clearQueueButton}
       size={isDesktop(layout) ? 'sm' : 'lg'}
       kind="ghost"
       onClick={launchClearAllQueueEntriesModal}
