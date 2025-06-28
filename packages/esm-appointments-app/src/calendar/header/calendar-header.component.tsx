@@ -5,12 +5,12 @@ import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
-import { useSelectedDateContext } from '../../hooks/selected-date-context';
+import { useAppointmentsStore } from '../../store';
 import styles from './calendar-header.scss';
 
 const CalendarHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
 
   const handleClick = () => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });

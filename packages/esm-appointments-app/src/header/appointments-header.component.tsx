@@ -1,34 +1,27 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { MultiSelect } from '@carbon/react';
 import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import { useSelectedDateContext } from '../hooks/selected-date-context';
+import { useAppointmentsStore, setSelectedDate, setAppointmentServiceTypes } from '../store';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
-  appointmentServiceTypes?: Array<string>;
-  onChange?: (evt) => void;
+  showServiceTypeFilter?: boolean;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter }) => {
   const { t } = useTranslation();
-  const { selectedDate, setSelectedDate } = useSelectedDateContext();
+  const { selectedDate, appointmentServiceTypes } = useAppointmentsStore();
   const { serviceTypes } = useAppointmentServices();
 
-  const [selectedItems, setSelectedItems] = useState([]);
-
-  const handleMultiSelectChange = useCallback(
-    ({ selectedItems }) => {
-      const selectedUuids = selectedItems.map((item) => item.id);
-      setSelectedItems(selectedUuids);
-      onChange?.(selectedUuids);
-    },
-    [onChange],
-  );
+  const handleChangeServiceTypeFilter = useCallback(({ selectedItems }) => {
+    const selectedUuids = selectedItems.map((item) => item.id);
+    setAppointmentServiceTypes(selectedUuids);
+  }, []);
 
   const serviceTypeOptions = useMemo(
     () => serviceTypes?.map((item) => ({ id: item.uuid, label: item.name })) ?? [],
@@ -46,14 +39,15 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
           onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
           value={dayjs(selectedDate).toDate()}
         />
-        {typeof onChange === 'function' && (
+        {showServiceTypeFilter && (
           <MultiSelect
             id="serviceTypeMultiSelect"
             items={serviceTypeOptions}
             itemToString={(item) => (item ? item.label : '')}
             label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
-            onChange={handleMultiSelectChange}
+            onChange={handleChangeServiceTypeFilter}
             type="inline"
+            selectedItems={serviceTypeOptions.filter((item) => appointmentServiceTypes.includes(item.id))}
           />
         )}
       </div>
