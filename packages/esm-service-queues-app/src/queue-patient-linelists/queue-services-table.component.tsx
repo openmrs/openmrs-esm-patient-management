@@ -50,7 +50,7 @@ const ServicesTable: React.FC = () => {
   return (
     <div>
       <QueuePatientBaseTable
-        title={t('alistOfClients', 'A list of clients waiting for ')}
+        title={t('aListOfPatients', 'A list of patients waiting for ')}
         headers={tableHeaders}
         patientData={serviceQueueEntries}
         serviceType={service}
