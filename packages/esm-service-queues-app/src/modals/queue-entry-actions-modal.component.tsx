@@ -324,11 +324,11 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             <section>
               <div className={styles.sectionTitle}>{t('timeOfTransition', 'Time of transition')}</div>
               <Checkbox
-                labelText={t('modifyDefaultValue', 'Modify default value')}
+                labelText={t('now', 'Now')}
                 id={'modifyTransitionTime'}
-                checked={formState.modifyDefaultTransitionDateTime}
+                checked={!formState.modifyDefaultTransitionDateTime}
                 onChange={(_, { checked }) => {
-                  setModifyDefaultTransitionDateTime(checked);
+                  setModifyDefaultTransitionDateTime(!checked);
                 }}
               />
               <div className={styles.dateTimeFields}>
