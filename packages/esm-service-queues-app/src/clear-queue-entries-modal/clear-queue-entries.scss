@@ -5,3 +5,8 @@
   @include type.type-style('heading-compact-01');
   color: $ui-05;
 }
+
+.clearQueueButton,
+.clearQueueButton:hover {
+  color: $danger;
+}
