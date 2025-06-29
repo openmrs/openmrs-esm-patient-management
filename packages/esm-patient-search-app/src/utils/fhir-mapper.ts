@@ -27,47 +27,48 @@ export function mapToFhirPatient(patient: SearchedPatient) {
       ? [
           {
             id: addressId,
-            city: preferredAddress.cityVillage,
-            country: preferredAddress.country,
-            postalCode: preferredAddress.postalCode,
-            state: preferredAddress.stateProvince,
+            city: preferredAddress.cityVillage || '',
+            country: preferredAddress.country || '',
+            postalCode: preferredAddress.postalCode || '',
+            state: preferredAddress.stateProvince || '',
             use: 'home',
           },
         ]
       : [],
-    birthDate: patient.person.birthdate,
-    deceasedBoolean: patient.person.dead,
-    deceasedDateTime: patient.person.deathDate ?? undefined,
-    gender: getGender(patient.person.gender),
-    id: patient.uuid,
-    identifier: patient.identifiers.map((identifier) => ({
-      id: identifier.uuid,
+    birthDate: patient.person?.birthdate || '',
+    deceasedBoolean: patient.person?.dead || false,
+    deceasedDateTime: patient.person?.deathDate ?? undefined,
+    gender: getGender(patient.person?.gender) || 'unknown',
+    id: patient.uuid || '',
+    identifier: (patient.identifiers || []).map((identifier) => ({
+      id: identifier.uuid || '',
       type: {
         coding: [
           {
-            code: identifier.identifierType.uuid,
+            code: identifier.identifierType?.uuid || '',
           },
         ],
-        text: identifier.identifierType.display,
+        text: identifier.identifierType?.display || '',
       },
       use: 'official',
-      value: identifier.identifier,
+      value: identifier.identifier || '',
     })),
     name: [
       {
         id: nameId,
-        given: [patient.person.personName.givenName, patient.person.personName.middleName],
-        family: patient.person.personName.familyName,
-        text: patient.person.personName.display,
+        given: [patient.person?.personName?.givenName || '', patient.person?.personName?.middleName || ''].filter(
+          Boolean,
+        ),
+        family: patient.person?.personName?.familyName || '',
+        text: patient.person?.personName?.display || '',
       },
     ],
-    telecom:
-      patient.attributes
-        ?.filter((attribute) => attribute.attributeType.display === 'Telephone Number')
-        ?.map((phone) => ({
-          system: 'phone',
-          value: phone.value.toString(),
-          use: 'mobile',
-        })) ?? [],
+    telecom: (patient.attributes || [])
+      .filter((attribute) => attribute?.attributeType?.display === 'Telephone Number')
+      .map((phone) => ({
+        system: 'phone',
+        value: phone?.value?.toString() || '',
+        use: 'mobile',
+      })),
   };
 }
