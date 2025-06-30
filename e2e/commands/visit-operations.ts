@@ -14,40 +14,16 @@ export const startVisit = async (api: APIRequestContext, patientId: string, loca
   });
 
   await expect(visitRes.ok()).toBeTruthy();
-  const visit = await visitRes.json();
-  // Verify visit exists by fetching it
-  const verifyRes = await api.get(`visit/${visit.uuid}`);
-  await expect(verifyRes.ok()).toBeTruthy();
-
-  return visit;
+  return await visitRes.json();
 };
 
-// export const endVisit = async (api: APIRequestContext, uuid: string, isWardTest = false) => {
-//   await api.post(`visit/${uuid}`, {
-//     data: {
-//       location: isWardTest ? process.env.E2E_WARD_LOCATION_UUID : process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-//       startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
-//       visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-//       stopDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
-//     },
-//   });
-// };
-
 export const endVisit = async (api: APIRequestContext, uuid: string, isWardTest = false) => {
-  try {
-    const res = await api.post(`visit/${uuid}`, {
-      data: {
-        location: isWardTest ? process.env.E2E_WARD_LOCATION_UUID : process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-        startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
-        visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-        stopDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
-      },
-    });
-
-    if (!res.ok()) {
-      console.warn(`Failed to end visit ${uuid}: ${res.status()} ${res.statusText()}`);
-    }
-  } catch (error) {
-    console.warn(`Error ending visit ${uuid}:`, error);
-  }
+  await api.post(`visit/${uuid}`, {
+    data: {
+      location: isWardTest ? process.env.E2E_WARD_LOCATION_UUID : process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
+      startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+      visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+      stopDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+    },
+  });
 };

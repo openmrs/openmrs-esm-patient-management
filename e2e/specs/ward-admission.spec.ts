@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage } from '../pages';
@@ -9,29 +8,10 @@ import { type Patient } from '../types';
 let visit: Visit;
 let wardPatient: Patient;
 
-// test.beforeEach(async ({ api }) => {
-//   await changeToWardLocation(api);
-//   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
-//   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-// });
-
-test.beforeEach(async ({ api, page }) => {
-  // Add network logging for debugging
-  page.on('request', (request) => console.log('>>', request.method(), request.url()));
-  page.on('response', (response) => console.log('<<', response.status(), response.url()));
-
+test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
-  console.log(`Created patient: ${wardPatient.uuid}`);
-
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  console.log(`Created visit: ${visit.uuid}`);
-
-  // Verify visit exists in system
-  const verifyRes = await api.get(`visit/${visit.uuid}`);
-  if (!verifyRes.ok()) {
-    throw new Error(`Visit ${visit.uuid} not properly created!`);
-  }
 });
 
 test('Adding a patient admission Request list', async ({ page }) => {
@@ -93,5 +73,5 @@ test('Adding a patient admission Request list', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await endVisit(api, wardPatient.uuid, true);
+  await endVisit(api, visit.uuid, true);
 });
