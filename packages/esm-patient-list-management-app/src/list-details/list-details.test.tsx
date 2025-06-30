@@ -1,19 +1,23 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
-import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
+import type { OpenmrsCohortMember, OpenmrsCohort, CohortResponse, CohortType } from '../api/types';
+import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
 import { getByTextWithMarkup } from 'tools';
 import ListDetails from './list-details.component';
+import { FetchResponse } from '@openmrs/esm-framework/src';
+import { MutatorCallback, MutatorOptions } from 'swr';
 
 const mockUsePatientListDetails = jest.mocked(usePatientListDetails);
 const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
 const mockDeletePatientList = jest.mocked(deletePatientList);
+const mockUseCohortTypes = jest.mocked(useCohortTypes);
 
 jest.mock('../api/hooks', () => ({
   usePatientListDetails: jest.fn(),
   usePatientListMembers: jest.fn(),
+  useCohortTypes: jest.fn(),
 }));
 
 jest.mock('../api/api-remote');
@@ -50,6 +54,13 @@ const mockPatientListMembers = [
   },
 ] as OpenmrsCohortMember[];
 
+const mockCohortTypeList = [
+  {
+    display: 'sms reminder',
+    uuid: 'uuid-2345',
+  },
+];
+
 describe('ListDetails', () => {
   beforeEach(() => {
     mockUsePatientListDetails.mockReturnValue({
@@ -67,6 +78,13 @@ describe('ListDetails', () => {
     });
 
     mockDeletePatientList.mockResolvedValue({});
+
+    mockUseCohortTypes.mockReturnValue({
+      listCohortTypes: mockCohortTypeList,
+      isLoading: false,
+      error: null,
+      mutate: jest.fn().mockReturnValue({}),
+    });
   });
 
   it('renders patient list details page', async () => {

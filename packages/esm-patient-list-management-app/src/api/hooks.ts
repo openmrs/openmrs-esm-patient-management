@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, type FetchResponse, useConfig, useSession, restBaseUrl } from '@openmrs/esm-framework';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
 import { type ConfigSchema } from '../config-schema';
 import {
@@ -145,6 +145,16 @@ export function usePatientListMembers(
 }
 
 export function useCohortTypes() {
-  const swrResult = useSWR<FetchResponse<CohortResponse<CohortType>>, Error>(`${cohortUrl}/cohorttype`, openmrsFetch);
-  return { ...swrResult, data: swrResult?.data?.data?.results };
+  const apiUrl = `${cohortUrl}/cohorttype`;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<CohortResponse<CohortType>>, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  return {
+    listCohortTypes: data?.data?.results ?? [],
+    isLoading,
+    error,
+    mutate,
+  };
 }
