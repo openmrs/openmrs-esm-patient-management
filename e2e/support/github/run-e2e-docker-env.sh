@@ -34,7 +34,7 @@ jq -n \
     "@openmrs/esm-home-app": "next",
     "@openmrs/esm-patient-chart-app": "next",
     "@openmrs/esm-patient-banner-app": "next",
-    "@openmrs/esm-patient-tests-app": "next",
+    "@openmrs/esm-form-engine-app": "next",
     "@openmrs/esm-patient-forms-app": "next"
 
   } + (
