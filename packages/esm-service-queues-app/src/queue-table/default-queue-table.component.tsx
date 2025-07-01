@@ -8,7 +8,6 @@ import {
   isDesktop,
   launchWorkspace,
   showSnackbar,
-  showToast,
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { serviceQueuesPatientSearchWorkspace } from '../constants';
@@ -123,10 +122,10 @@ function QueueTableSection() {
 
   const columns = useColumns(null, null);
   if (!columns) {
-    showToast({
-      title: t('notableConfig', 'No table configuration'),
+    showSnackbar({
       kind: 'warning',
-      description: 'No table configuration defined for queue: null and status: null',
+      title: t('notableConfig', 'No table configuration'),
+      subtitle: 'No table configuration defined for queue: null and status: null',
     });
   }
 
