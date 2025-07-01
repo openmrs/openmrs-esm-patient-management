@@ -73,6 +73,6 @@ test('Search patient by full name', async ({ page, patient }) => {
   });
 
   await test.step('Then I should be redirected to the home page', async () => {
-    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home`);
+    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home/service-queues`);
   });
 });
