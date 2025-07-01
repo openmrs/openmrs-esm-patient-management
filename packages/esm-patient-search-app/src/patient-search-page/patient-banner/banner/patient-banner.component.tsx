@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { ButtonSkeleton, SkeletonIcon, SkeletonText, Button, Tag } from '@carbon/react';
 import {
   ConfigurableLink,
   ExtensionSlot,
@@ -12,6 +13,8 @@ import {
   useConfig,
   useLayoutType,
   useVisit,
+  navigate,
+  UserFollowIcon,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
@@ -28,9 +31,11 @@ interface PatientBannerProps {
   patient: SearchedPatient;
   patientUuid: string;
   hideActionsOverflow?: boolean;
+  isMPIPatient: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow, isMPIPatient }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { currentVisit } = useVisit(patientUuid);
@@ -47,6 +52,12 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
+
+  const handleCreatePatientRecord = (externalId: string) => {
+    navigate({
+      to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${externalId}`,
+    });
+  };
 
   return (
     <>
@@ -69,7 +80,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             toggleContactDetails={handleToggleContactDetails}
           />
           <div className={styles.rightActions}>
-            {!hideActionsOverflow ? (
+            {!hideActionsOverflow && !isMPIPatient ? (
               <PatientBannerActionsMenu
                 actionsSlotName="patient-search-actions-slot"
                 additionalActionsSlotState={{
@@ -79,8 +90,27 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patient={fhirMappedPatient}
                 patientUuid={patientUuid}
               />
+            ) : isMPIPatient ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div>
+                  <Tag className={styles.mpiTag} type="blue">
+                    &#127760; {t('mpi', 'MPI')}
+                  </Tag>
+                </div>
+
+                <div>
+                  <Button
+                    kind="ghost"
+                    renderIcon={UserFollowIcon}
+                    iconDescription="Create Patient Record"
+                    onClick={() => handleCreatePatientRecord(patient.externalId)}
+                    style={{ marginTop: '-0.25rem' }}>
+                    {t('createPatientRecord', 'Create Patient Record')}
+                  </Button>
+                </div>
+              </div>
             ) : null}
-            {!isDeceased && !currentVisit && (
+            {!isDeceased && !currentVisit && !isMPIPatient && (
               <ExtensionSlot
                 name="start-visit-button-slot"
                 state={{

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import camelCase from 'lodash-es/camelCase';
-import { parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, parseDate } from '@openmrs/esm-framework';
 import {
   type AddressValidationSchemaType,
   type Encounter,
@@ -109,16 +109,16 @@ export function cancelRegistration() {
 export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   const result = {} as FormValues;
   const patientName = patient.name[0];
-  const additionalPatientName = patient.name[1];
+  const additionalPatientName = patient.name?.[1]?.given?.[0] && patient.name?.[1]?.family ? patient.name[1] : null;
 
   result.patientUuid = patient.id;
   result.givenName = patientName?.given[0];
   result.middleName = patientName?.given[1];
   result.familyName = patientName?.family;
   result.addNameInLocalLanguage = !!additionalPatientName ? true : undefined;
-  result.additionalGivenName = additionalPatientName?.given[0];
-  result.additionalMiddleName = additionalPatientName?.given[1];
-  result.additionalFamilyName = additionalPatientName?.family;
+  result.additionalGivenName = additionalPatientName?.given?.[0] ?? '';
+  result.additionalMiddleName = additionalPatientName?.given?.[1] ?? '';
+  result.additionalFamilyName = additionalPatientName?.family ?? '';
 
   result.gender = patient.gender;
   result.birthdate = patient.birthDate ? parseDate(patient.birthDate) : undefined;
@@ -126,7 +126,7 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
 
   return {
     ...result,
-    ...patient.identifier.map((identifier) => {
+    ...patient.identifier?.map((identifier) => {
       const key = camelCase(identifier.system || identifier.type.text);
       return { [key]: identifier.value };
     }),
@@ -192,11 +192,59 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Arr
   });
 }
 
-export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient) {
-  const result = {};
-  if (patient.telecom) {
-    result['phone'] = patient.telecom[0].value;
+export async function getIdentifierFieldValuesFromFhirPatient(
+  patient: fhir.Patient,
+  identifierConfig,
+): Promise<{ [identifierFieldName: string]: PatientIdentifierValue }> {
+  const identifiers: FormValues['identifiers'] = {};
+  const promises: Promise<void>[] = [];
+
+  for (const identifier of patient.identifier) {
+    for (const config of identifierConfig) {
+      if (config.fhirIdentifierSystem !== identifier.system) {
+        continue;
+      }
+
+      const url = `${restBaseUrl}/patientidentifiertype/${config.openmrsIdentifierTypeUuid}`;
+
+      promises.push(
+        openmrsFetch(url)
+          .then((response) => {
+            if (!response.data?.name) {
+              return;
+            }
+            identifiers[response.data.name] = {
+              identifierUuid: null,
+              preferred: false,
+              initialValue: identifier.value,
+              identifierValue: identifier.value,
+              identifierTypeUuid: config.openmrsIdentifierTypeUuid,
+              identifierName: response.data.name,
+              required: false,
+              selectedSource: null,
+              autoGeneration: false,
+            };
+          })
+          .catch((error) => {
+            console.error(`Error fetching identifier type for ${config.openmrsIdentifierTypeUuid}:`, error);
+          }),
+      );
+    }
   }
+  await Promise.all(promises);
+  return identifiers;
+}
+
+export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient, phoneUuid) {
+  const result = {};
+
+  if (patient.telecom && Array.isArray(patient.telecom)) {
+    const phoneEntry = patient.telecom.find((entry) => entry.system === 'phone');
+    if (phoneEntry) {
+      result[phoneUuid] = phoneEntry.value;
+    }
+  }
+
   return result;
 }
 

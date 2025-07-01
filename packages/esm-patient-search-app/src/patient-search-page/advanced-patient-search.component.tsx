@@ -11,12 +11,14 @@ interface AdvancedPatientSearchProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
+  searchMode?: 'mpi' | null | undefined;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   query,
   stickyPagination,
   inTabletOrOverlay,
+  searchMode,
 }) => {
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialFilters);
   const filtersApplied = useMemo(() => {
@@ -40,7 +42,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     hasMore,
     isLoading,
     fetchError,
-  } = useInfinitePatientSearch(query, false, !!query, 50);
+  } = useInfinitePatientSearch(query, searchMode, false, !!query, 50);
 
   useEffect(() => {
     if (searchResults?.length === currentPage * 50 && hasMore) {
