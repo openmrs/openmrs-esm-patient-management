@@ -9,7 +9,8 @@ import {
   generateWarAdmission,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient, type Encounter, type Provider } from '../types';
+import { type Patient, type Encounter, type Provider, type Bed } from '../commands/types';
+import { generateRandomBed } from '../commands/bed-operations';
 
 let visit: Visit;
 let wardPatient: Patient;
@@ -18,6 +19,7 @@ let provider: Provider;
 
 test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);
+  await generateRandomBed(api);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
