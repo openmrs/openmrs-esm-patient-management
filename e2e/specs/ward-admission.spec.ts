@@ -73,5 +73,6 @@ test('Adding a patient admission Request list', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
+  await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
