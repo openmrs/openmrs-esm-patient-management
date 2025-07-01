@@ -4,7 +4,7 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import { editBedType, useBedTypes } from '../summary/summary.resource';
 import { type BedTypeDataAdministration } from '../bed-administration/bed-administration-types';
 import { type BedType, type BedTypeData, type Mutator } from '../types';
-import BedTypeAdministrationForm from './bed-type-admin-form.component';
+import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 
 interface EditBedTypeFormProps {
   editData: BedTypeData;
@@ -32,7 +32,7 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
         .then(() => {
           showSnackbar({
             title: t('bedTypeUpdated', 'Bed type updated'),
-            subtitle: t('bedTypeUpdatedSuccessfully', `${bedTypePayload.name} updated successfully`, {
+            subtitle: t('bedTypeUpdatedSuccessfully', '{{bedType}} updated successfully', {
               bedType: bedTypePayload.name,
             }),
             kind: 'success',
@@ -42,8 +42,8 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
         })
         .catch((error) => {
           showSnackbar({
-            title: t('errorCreatingForm', 'Error creating bed'),
-            subtitle: error?.message,
+            title: t('errorCreatingBedType', 'Error creating bed type'),
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
             kind: 'error',
           });
         })

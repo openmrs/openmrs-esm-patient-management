@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import type { BedType, BedTypeData, Mutator } from '../types';
+import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 import { saveBedType, useBedTypes, useLocationsWithAdmissionTag } from '../summary/summary.resource';
-import BedTypeAdministrationForm from './bed-type-admin-form.component';
+import type { BedType, BedTypeData, Mutator } from '../types';
 
 interface BedTypeFormProps {
   mutate: Mutator<BedType>;
@@ -38,7 +38,7 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
           showSnackbar({
             kind: 'success',
             title: t('bedTypeCreated', 'Bed type created'),
-            subtitle: t('bedTypeCreatedSuccessfully', `${name} created successfully`, {
+            subtitle: t('bedTypeCreatedSuccessfully', '{{bedType}} created successfully', {
               bedType: name,
             }),
           });
@@ -47,8 +47,8 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
         .catch((error) => {
           showSnackbar({
             kind: 'error',
-            title: t('errorCreatingForm', 'Error creating bed'),
-            subtitle: error?.message,
+            title: t('errorCreatingBedType', 'Error creating bed type'),
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
         .finally(closeModal);

@@ -1,15 +1,9 @@
 import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { deletePatient, generateRandomPatient, getPatient } from '../commands';
+import { getPatient } from '../commands';
 import { RegistrationAndEditPage } from '../pages';
-import { type Patient, type PatientRegistrationFormValues } from '../types';
-
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
+import { type PatientRegistrationFormValues } from '../types';
 
 const formValues: PatientRegistrationFormValues = {
   givenName: `Johnny`,
@@ -27,7 +21,7 @@ const formValues: PatientRegistrationFormValues = {
   email: 'johnnyronny@example.com',
 };
 
-test('Edit a patient', async ({ page, api }) => {
+test('Edit a patient', async ({ page, api, patient }) => {
   test.setTimeout(5 * 60 * 1000);
   const patientEditPage = new RegistrationAndEditPage(page);
 
@@ -100,8 +94,4 @@ test('Edit a patient', async ({ page, api }) => {
     expect(person.preferredAddress.country).toBe(formValues.country);
     expect(person.attributes[0].display).toBe(formValues.phone);
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

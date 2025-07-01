@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
-  ComposedModal,
   Form,
   FormGroup,
   InlineNotification,
@@ -12,23 +11,25 @@ import {
   ModalFooter,
   ModalHeader,
   Stack,
+  TextArea,
   TextInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
-import type { BedTagData } from '../types';
+import type { BedType, BedTypeData } from '../types';
 
-const BedTagAdministrationSchema = z.object({
+const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),
+  displayName: z.string().max(255),
+  description: z.string().max(255),
 });
 
-interface BedTagAdministrationFormProps {
+interface BedAdministrationFormProps {
   allLocations: Location[];
-  availableBedTags: Array<BedTagData>;
-  handleCreateBedTag?: (formData: BedTagData) => void;
-  handleDeleteBedTag?: () => void;
+  availableBedTypes: Array<BedType>;
+  handleSubmission?: (formData: BedTypeData) => void;
   headerTitle: string;
-  initialData: BedTagData;
+  initialData: BedTypeData;
   closeModal: () => void;
 }
 
@@ -36,8 +37,8 @@ interface ErrorType {
   message: string;
 }
 
-const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
-  handleCreateBedTag,
+const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
+  handleSubmission,
   headerTitle,
   initialData,
   closeModal,
@@ -51,19 +52,21 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
     handleSubmit,
     control,
     formState: { isDirty },
-  } = useForm<BedTagData>({
+  } = useForm<BedTypeData>({
     mode: 'all',
-    resolver: zodResolver(BedTagAdministrationSchema),
+    resolver: zodResolver(BedTypeAdministrationSchema),
     defaultValues: {
       name: initialData.name || '',
+      displayName: initialData.displayName || '',
+      description: initialData.description || '',
     },
   });
 
-  const onSubmit = (formData: BedTagData) => {
-    const result = BedTagAdministrationSchema.safeParse(formData);
+  const onSubmit = (formData: BedTypeData) => {
+    const result = BedTypeAdministrationSchema.safeParse(formData);
     if (result.success) {
       setShowErrorNotification(false);
-      handleCreateBedTag(formData);
+      handleSubmission?.(formData);
     }
   };
 
@@ -85,26 +88,57 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                 render={({ field, fieldState }) => (
                   <>
                     <TextInput
-                      id="bedTag"
-                      labelText={t('bedTags', 'Bed tags')}
-                      placeholder={t('bedTagPlaceholder', '')}
+                      id="bedName"
                       invalidText={fieldState.error?.message}
+                      labelText={t('bedName', 'Bed name')}
+                      placeholder={t('bedNamePlaceholder', 'Name of this bed')}
                       {...field}
                     />
                   </>
                 )}
               />
             </FormGroup>
+            <FormGroup legendText={''}>
+              <Controller
+                name="displayName"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    id="displayName"
+                    invalidText={fieldState.error?.message}
+                    labelText={t('displayName', 'Display name')}
+                    placeholder={t('displayNamePlaceholder', 'Display name for this bed')}
+                    {...field}
+                  />
+                )}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Controller
+                name="description"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextArea
+                    rows={2}
+                    id="description"
+                    invalidText={fieldState?.error?.message}
+                    labelText={t('description', 'Description')}
+                    {...field}
+                    placeholder={t('enterBedDescription', 'Enter the bed description')}
+                  />
+                )}
+              />
+            </FormGroup>
 
             {showErrorNotification && (
               <InlineNotification
-                lowContrast
-                title={t('error', 'Error')}
-                style={{ minWidth: '100%', margin: '0', padding: '0' }}
-                role="alert"
                 kind="error"
-                subtitle={t('pleaseFillField', formStateError) + '.'}
+                lowContrast
                 onClose={() => setShowErrorNotification(false)}
+                role="alert"
+                style={{ minWidth: '100%', margin: '0', padding: '0' }}
+                subtitle={t('pleaseFillField', formStateError) + '.'}
+                title={t('error', 'Error')}
               />
             )}
           </Stack>
@@ -122,4 +156,4 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   );
 };
 
-export default BedTagsAdministrationForm;
+export default BedTypeAdministrationForm;

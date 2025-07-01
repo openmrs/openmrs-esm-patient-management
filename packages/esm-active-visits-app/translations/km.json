@@ -1,6 +1,5 @@
 {
   "activeVisits": "ការមកពិនិត្យជំងឺសកម្ម",
-  "age": "អាយុ",
   "allEncounters": "ការជួបទាំងអស់",
   "checkFilters": "Check the filters above",
   "diagnoses": "រោគវិនិច្ឆ័យ",
@@ -9,11 +8,8 @@
   "endDate": "End date",
   "filterActiveVisits": "Filter active visits",
   "filterTable": "តារាងត្រង",
-  "gender": "ភេទ",
-  "idNumber": "លេខសំគាល់",
   "indication": "Indication",
   "medications": "ឱសថ",
-  "name": "នាម",
   "noActiveVisitsForLocation": "មិនមានការមកពិនិត្យជំងឺសកម្មបង្ហាញក្នុងទីតាំងនេះទេ",
   "noDiagnosesFound": "រកមិនឃើញរោគវិនិច្ឆ័យទេ។",
   "noEncountersFound": "រកមិនឃើញការជួបគ្នាទេ",
@@ -33,7 +29,5 @@
   "time": "ម៉ោងពេល",
   "totalVisits": "Total Visits Today",
   "viewPatientChartFor": "View patient chart for {{patientName}}",
-  "visitStartTime": "ម៉ោងពេលពិនិត្យជំងឺ",
-  "visitSummary": "សេចក្តីសង្ខេបពីការពិនិត្យជំងឺ",
-  "visitType": "ប្រភេទនៃជំងឺពិនិត្យ"
+  "visitSummary": "សេចក្តីសង្ខេបពីការពិនិត្យជំងឺ"
 }

@@ -157,7 +157,7 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     expect(admitPatientButton).toBeEnabled();
 
     await user.click(admitPatientButton);
-    expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT');
+    expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT', 'mock-visit');
   });
   it('should have warning when patient has a pending admission request', async () => {
     mockedUseInpatientRequestByPatients.mockReturnValueOnce({
@@ -183,7 +183,7 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     expect(admitPatientButton).toBeEnabled();
 
     await user.click(admitPatientButton);
-    expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT');
+    expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT', 'mock-visit');
   });
 
   it('should have warning when patient is already admitted elsewhere', async () => {
@@ -206,7 +206,7 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     expect(admitPatientButton).toBeEnabled();
 
     await user.click(admitPatientButton);
-    expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'TRANSFER');
+    expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'TRANSFER', 'mock-visit');
   });
 
   it('should disable admit patient button when patient is already admitted to current location', () => {
