@@ -7,6 +7,7 @@ import {
   generateRandomPatient,
   getProvider,
   generateWarAdmission,
+  deletePatient
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Patient, type Encounter, type Provider } from '../commands/types';
