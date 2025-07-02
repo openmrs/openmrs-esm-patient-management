@@ -1,6 +1,7 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
 import { type Encounter } from '../types';
+import { type Visit } from '@openmrs/esm-framework';
 
 export const createEncounter = async (
   api: APIRequestContext,
@@ -51,7 +52,7 @@ export const generateWardAdmission = async (
         patient: patientId,
         encounterDatetime: dayjs().format(),
         location: process.env.E2E_WARD_LOCATION_UUID,
-        encounterType: process.env.E2E_ENCOUNTER_TYPE,
+        encounterType: process.env.E2E_TRANSFER_REQUEST_ENCOUNTER_TYPE,
         encounterProviders: [
           {
             provider: providerId,
@@ -92,6 +93,31 @@ export const generateWardAdmission = async (
   return encounter;
 };
 
+export const inWardAdmission = async (
+  api: APIRequestContext,
+  providerId: string,
+  patientId: string,
+  visit: string,
+): Promise<Encounter> => {
+  const formRes = await api.post('/openmrs/ws/rest/v1/encounter', {
+    data: {
+      patient: patientId,
+      location: process.env.E2E_WARD_LOCATION_UUID,
+      encounterType: 'b2c4d5e6-7f8a-4e9b-8c1d-2e3f8e4a3b8f',
+      encounterProviders: [
+        {
+          provider: providerId,
+          encounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
+        },
+      ],
+      obs: [],
+      visit: visit,
+    },
+  });
+  await expect(formRes.ok()).toBeTruthy();
+  const encounter = await formRes.json();
+  return encounter;
+};
 export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
   await api.delete(`encounter/${uuid}`, { data: {} });
 };
