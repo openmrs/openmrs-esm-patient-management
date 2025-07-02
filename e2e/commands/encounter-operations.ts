@@ -39,7 +39,7 @@ export const createEncounter = async (
   return await encounterRes.json();
 };
 
-export const generateWarAdmission = async (
+export const generateWardAdmission = async (
   api: APIRequestContext,
   providerId: string,
   patientId: string,
@@ -51,7 +51,7 @@ export const generateWarAdmission = async (
         patient: patientId,
         encounterDatetime: dayjs().format(),
         location: process.env.E2E_WARD_LOCATION_UUID,
-        encounterType: 'b2c4d5e6-7f8a-4e9b-8c1d-2e3f8e4a3b8f',
+        encounterType: process.env.E2E_ENCOUNTER_TYPE,
         encounterProviders: [
           {
             provider: providerId,
