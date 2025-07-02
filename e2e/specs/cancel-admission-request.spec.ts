@@ -10,7 +10,7 @@ import {
   startVisit,
 } from '../commands';
 import { test } from '../core';
-import { deleteBed, generateBedType, generateRandomBed } from '../commands/bed-operations';
+import { deleteBed, deleteBedType, generateBedType, generateRandomBed } from '../commands/bed-operations';
 import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../types';
 
 let bed: Bed;
@@ -69,6 +69,7 @@ test('Cancelling an admission request', async ({ page }) => {
 
 test.afterEach(async ({ api }) => {
   await deleteBed(api, bed.uuid);
+  await deleteBedType(api, bedtype.uuid);
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
