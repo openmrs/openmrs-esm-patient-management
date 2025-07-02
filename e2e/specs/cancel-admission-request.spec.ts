@@ -1,24 +1,24 @@
 import { expect } from '@playwright/test';
-import { test } from '../core';
-import {
-  endVisit,
-  startVisit,
-  changeToWardLocation,
-  generateRandomPatient,
-  getProvider,
-  generateWardAdmission,
-  deletePatient,
-} from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
+import {
+  changeToWardLocation,
+  deletePatient,
+  endVisit,
+  generateRandomPatient,
+  generateWardAdmission,
+  getProvider,
+  startVisit,
+} from '../commands';
+import { test } from '../core';
+import { deleteBed, generateBedType, generateRandomBed } from '../commands/bed-operations';
 import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../types';
-import { deleteBed, deleteBedType, generateBedType, generateRandomBed } from '../commands/bed-operations';
 
-let visit: Visit;
-let wardPatient: Patient;
-let encounter: Encounter;
-let provider: Provider;
 let bed: Bed;
 let bedtype: BedType;
+let encounter: Encounter;
+let provider: Provider;
+let visit: Visit;
+let wardPatient: Patient;
 
 test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);

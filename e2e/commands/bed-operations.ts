@@ -21,9 +21,9 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
 export const generateBedType = async (api: APIRequestContext): Promise<BedType> => {
   const bedRes = await api.post('/openmrs/ws/rest/v1/bedtype', {
     data: {
-      name: 'Guplix',
-      displayName: 'Guplix',
-      description: '',
+      name: 'General Ward Bed',
+      displayName: 'General Ward Bed',
+      description: 'Standard hospital bed for general ward patients',
     },
   });
   await expect(bedRes.ok()).toBeTruthy();

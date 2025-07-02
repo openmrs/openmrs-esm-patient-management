@@ -1,7 +1,6 @@
-import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
+import { type APIRequestContext, expect } from '@playwright/test';
 import { type Encounter } from '../types';
-import { type Visit } from '@openmrs/esm-framework';
 
 export const createEncounter = async (
   api: APIRequestContext,
@@ -52,7 +51,7 @@ export const generateWardAdmission = async (
         patient: patientId,
         encounterDatetime: dayjs().format(),
         location: process.env.E2E_WARD_LOCATION_UUID,
-        encounterType: process.env.E2E_TRANSFER_REQUEST_ENCOUNTER_TYPE,
+        encounterType: process.env.E2E_TRANSFER_REQUEST_ENCOUNTER_TYPE_UUID,
         encounterProviders: [
           {
             provider: providerId,
