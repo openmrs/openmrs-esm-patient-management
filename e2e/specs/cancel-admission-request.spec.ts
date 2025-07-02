@@ -47,6 +47,9 @@ test('Cancelling an admission request', async ({ page }) => {
 
   await test.step('And when I click the "Cancel" button to cancel the request', async () => {
     await page.getByRole('button', { name: 'Cancel' }).click();
+  });
+
+  await test.step('Then I should see the "Cancel admission request" form launched in the workspace', async () => {
     await expect(page.getByText('Cancel admission request')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Clinical notes' })).toBeVisible();
   });
@@ -65,40 +68,8 @@ test('Cancelling an admission request', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  const bedResponse = await api.get(`/openmrs/ws/rest/v1/bed/${bed.uuid}`);
-  if (bedResponse.ok()) {
-    const bedData = await bedResponse.json();
-    if (bedData.status !== 'AVAILABLE') {
-      await api.post(`/openmrs/ws/rest/v1/bed/${bed.uuid}`, {
-        data: { status: 'AVAILABLE' },
-      });
-    }
-  }
-
-  let bedRetries = 3;
-  while (bedRetries > 0) {
-    try {
-      await deleteBed(api, bed.uuid);
-      break;
-    } catch (error) {
-      bedRetries--;
-      if (bedRetries === 0) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-  }
-
-  let bedTypeRetries = 3;
-  while (bedTypeRetries > 0) {
-    try {
-      await deleteBedType(api, bedtype.uuid);
-      break;
-    } catch (error) {
-      bedTypeRetries--;
-      if (bedTypeRetries === 0) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-  }
-
+  await deleteBed(api, bed.uuid);
+  await deleteBedType(api, bedtype.uuid);
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
