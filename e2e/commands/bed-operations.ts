@@ -33,7 +33,7 @@ export const generateBedType = async (api: APIRequestContext): Promise<BedType> 
 };
 
 export const deleteBed = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`bed/${uuid}?reason=Test cleanup`, { data: {} });
+  const response = await api.delete(`bed/${uuid}?reason=Test cleanup&purge=true`, { data: {} });
   await expect(response.ok()).toBeTruthy();
 };
 
