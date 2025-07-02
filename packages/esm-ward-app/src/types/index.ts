@@ -15,7 +15,7 @@ interface WardPatientCardProps {
   wardPatient: WardPatient;
 }
 
-export type WardPatientCardType = React.FC<WardPatientCardProps>;
+export type WardPatientCardType = React.ComponentType<WardPatientCardProps>;
 
 // WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
@@ -242,7 +242,10 @@ export interface ObsPayload {
 export type WardPatientGroupDetails = ReturnType<typeof useWardPatientGrouping>;
 export interface WardViewContext {
   wardPatientGroupDetails: WardPatientGroupDetails;
-  WardPatientHeader: WardPatientCardType;
+  WardPatientHeader: React.ComponentType<WardPatientCardProps>;
+  [key: string]: unknown;
+  [key: number]: unknown;
+  [key: symbol]: unknown;
 }
 
 export interface PatientAndAdmission {
@@ -258,6 +261,9 @@ export interface MotherChildRelationships {
 
 export interface MaternalWardViewContext {
   motherChildRelationships: MotherChildRelationships;
+  [key: string]: unknown;
+  [key: number]: unknown;
+  [key: symbol]: unknown;
 }
 
 export type PatientWorkspaceAdditionalProps = Omit<WardPatientWorkspaceProps, keyof DefaultWorkspaceProps>;

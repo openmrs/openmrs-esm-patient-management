@@ -33,7 +33,7 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const { currentVisit } = useVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
   const { nonNavigationSelectPatientAction, showPatientSearch, hidePatientSearch, handleReturnToSearchList } =
     usePatientSearchContext();
 
@@ -80,7 +80,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patientUuid={patientUuid}
               />
             ) : null}
-            {!isDeceased && !currentVisit && (
+            {!isDeceased && !activeVisit && (
               <ExtensionSlot
                 name="start-visit-button-slot"
                 state={{

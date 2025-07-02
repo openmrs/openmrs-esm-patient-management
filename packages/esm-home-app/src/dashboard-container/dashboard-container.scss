@@ -1,0 +1,41 @@
+@use '@carbon/colors';
+
+.homePageWrapper {
+  display: flex;
+}
+
+.dashboardContainer {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  margin: 0;
+  // Full vertical height minus the primary navigation menu height
+  height: calc(100vh - 3rem);
+
+  // Ensure the width of the home page dashboard is fixed
+  // and does not expand based on the width of its children
+  width: calc(100% - 16rem);
+  background-color: colors.$gray-10;
+
+  & a {
+    width: 100%;
+  }
+
+  &.hasLeftNav {
+    //Making space for the left nav menu
+    margin-left: 16rem;
+  }
+}
+
+.dashboardContainerTablet {
+  flex-grow: 1;
+}
+
+.logoSection {
+  display: flex;
+  justify-content: center;
+}
+
+.dashboardView {
+  background-color: colors.$white-0;
+}

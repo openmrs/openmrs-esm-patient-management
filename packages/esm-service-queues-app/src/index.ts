@@ -23,11 +23,6 @@ export const queueTableByStatusView = getAsyncLifecycle(
   options,
 );
 
-export const appointmentsList = getAsyncLifecycle(
-  () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
-  options,
-);
-
 export const queueList = getAsyncLifecycle(
   () => import('./queue-patient-linelists/queue-services-table.component'),
   options,
@@ -36,8 +31,6 @@ export const queueList = getAsyncLifecycle(
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
-
-export const homeDashboard = getAsyncLifecycle(() => import('./home.component'), options);
 
 export const editQueueEntryStatusModal = getAsyncLifecycle(() => import('./active-visits/change-status.modal'), {
   featureName: 'edit queue status',
