@@ -23,7 +23,7 @@ let bedtype: BedType;
 test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);
   bedtype = await generateBedType(api);
-  bed = await generateRandomBed(api);
+  bed = await generateRandomBed(api, bedtype);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
@@ -65,8 +65,40 @@ test('Cancelling an admission request', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await deleteBedType(api, bedtype.uuid);
-  await deleteBed(api, bed.uuid);
+  const bedResponse = await api.get(`/openmrs/ws/rest/v1/bed/${bed.uuid}`);
+  if (bedResponse.ok()) {
+    const bedData = await bedResponse.json();
+    if (bedData.status !== 'AVAILABLE') {
+      await api.post(`/openmrs/ws/rest/v1/bed/${bed.uuid}`, {
+        data: { status: 'AVAILABLE' },
+      });
+    }
+  }
+
+  let bedRetries = 3;
+  while (bedRetries > 0) {
+    try {
+      await deleteBed(api, bed.uuid);
+      break;
+    } catch (error) {
+      bedRetries--;
+      if (bedRetries === 0) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
+  let bedTypeRetries = 3;
+  while (bedTypeRetries > 0) {
+    try {
+      await deleteBedType(api, bedtype.uuid);
+      break;
+    } catch (error) {
+      bedTypeRetries--;
+      if (bedTypeRetries === 0) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
