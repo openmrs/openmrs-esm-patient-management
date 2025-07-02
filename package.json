@@ -19,7 +19,7 @@
     "@babel/core": "^7.11.6",
     "@carbon/react": "^1.83.0",
     "@openmrs/esm-framework": "next",
-    "@playwright/test": "^1.50.1",
+    "@playwright/test": "^1.52.0",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.29",
     "@testing-library/dom": "^9.3.3",
