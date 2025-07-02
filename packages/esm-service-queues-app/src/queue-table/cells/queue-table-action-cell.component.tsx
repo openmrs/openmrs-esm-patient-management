@@ -49,37 +49,21 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
           }}
           itemText={t('removePatient', 'Remove patient')}
         />
-        {queueEntry.previousQueueEntry == null ? (
-          <OverflowMenuItem
-            className={styles.menuItem}
-            aria-label={t('delete', 'Delete')}
-            hasDivider
-            isDelete
-            onClick={() => {
-              const dispose = showModal('void-queue-entry-modal', {
-                closeModal: () => dispose(),
-                queueEntry,
-                size: 'sm',
-              });
-            }}
-            itemText={t('delete', 'Delete')}
-          />
-        ) : (
-          <OverflowMenuItem
-            className={styles.menuItem}
-            aria-label={t('undoTransition', 'Undo transition')}
-            hasDivider
-            isDelete
-            onClick={() => {
-              const dispose = showModal('undo-transition-queue-entry-modal', {
-                closeModal: () => dispose(),
-                queueEntry,
-                size: 'sm',
-              });
-            }}
-            itemText={t('undoTransition', 'Undo transition')}
-          />
-        )}
+
+        <OverflowMenuItem
+          className={styles.menuItem}
+          aria-label={t('undoTransition', 'Undo transition')}
+          hasDivider
+          isDelete
+          onClick={() => {
+            const dispose = showModal('undo-transition-queue-entry-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+              size: 'sm',
+            });
+          }}
+          itemText={t('undoTransition', 'Undo transition')}
+        />
       </OverflowMenu>
     </div>
   );
