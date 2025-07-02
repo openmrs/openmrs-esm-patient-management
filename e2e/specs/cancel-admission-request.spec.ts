@@ -69,7 +69,6 @@ test('Cancelling an admission request', async ({ page }) => {
 
 test.afterEach(async ({ api }) => {
   await deleteBed(api, bed.uuid);
-  await deleteBedType(api, bedtype.uuid);
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
