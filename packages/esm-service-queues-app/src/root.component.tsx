@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom';
-import AppointmentsTable from './queue-patient-linelists/scheduled-appointments-table.component';
 import Home from './home.component';
 import ServicesTable from './queue-patient-linelists/queue-services-table.component';
 import QueueScreen from './queue-screen/queue-screen.component';
@@ -16,7 +15,6 @@ const Root: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/queue-table-by-status/:queueUuid" element={<QueueTableByStatusViewWrapper />} />
           <Route path="/screen" element={<QueueScreen />} />
-          <Route path="/appointments-list/:value/" element={<AppointmentsTable />} />
           <Route path="/queue-list/:service/:serviceUuid/:locationUuid" element={<ServicesTable />} />
         </Routes>
       </BrowserRouter>
