@@ -23,11 +23,6 @@ export const queueTableByStatusView = getAsyncLifecycle(
   options,
 );
 
-export const appointmentsList = getAsyncLifecycle(
-  () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
-  options,
-);
-
 export const queueList = getAsyncLifecycle(
   () => import('./queue-patient-linelists/queue-services-table.component'),
   options,
