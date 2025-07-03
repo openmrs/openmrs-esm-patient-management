@@ -1,4 +1,4 @@
-import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
 export const addressFields = [
   'cityVillage',
@@ -27,8 +27,9 @@ export const addressFields = [
 
 type AddressField = keyof typeof addressFields;
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   patientCardElements: {
+    _type: Type.Object,
     _default: {},
     _description:
       'Configuration of various patient card elements. Each configured element must have a unique id, defined in the ward React component being used.',
@@ -92,6 +93,7 @@ export const configSchema: ConfigSchema = {
           _description: 'The unique identifier for this patient card element',
         },
         orders: {
+          _type: Type.Object,
           orderTypes: {
             _type: Type.Array,
             _description: 'Configures pending orders and transfers to display.',
@@ -256,7 +258,7 @@ export const configSchema: ConfigSchema = {
           location: {
             _type: Type.UUID,
             _description: 'The UUID of the location. If not provided, applies to all wards.',
-            _default: '',
+            _default: null,
           },
         },
       },

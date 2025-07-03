@@ -76,7 +76,7 @@ export const defaultColumnConfig: ColumnConfig = {
 
 export const defaultQueueTable: TableDefinitions = {
   columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
-  appliedTo: [{ queue: '', status: '' }],
+  appliedTo: [{ queue: null, status: null }],
 };
 
 export const configSchema = {
@@ -155,7 +155,7 @@ export const configSchema = {
     _type: Type.UUID,
     _description:
       'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
-    _default: '',
+    _default: null,
   },
   customPatientChartUrl: {
     _type: Type.String,
@@ -182,7 +182,7 @@ export const configSchema = {
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: '',
+    _default: null,
     _description: 'Custom URL to load default facility if it is not in the session',
   },
   defaultIdentifierTypes: {
@@ -322,7 +322,7 @@ export const configSchema = {
             _type: Type.String,
             _description:
               'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-            _default: '',
+            _default: null,
           },
         },
       },
@@ -385,12 +385,12 @@ export const configSchema = {
   visitQueueNumberAttributeUuid: {
     _type: Type.String,
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: '',
+    _default: null,
   },
   visitTypeResourceUrl: {
     _type: Type.String,
     _description: 'The `visitTypeResourceUrl`',
-    _default: '',
+    _default: null,
   },
   vitals: vitalsConfigSchema,
   _validators: [
