@@ -1,7 +1,7 @@
 import React, { useCallback, type SyntheticEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Layer, TextArea, TextInput } from '@carbon/react';
-import { useLayoutType, showSnackbar, useSession, useConfig } from '@openmrs/esm-framework';
+import { useLayoutType, showSnackbar, useSession } from '@openmrs/esm-framework';
 import type { ConfigSchema } from '../config-schema';
 import type { NewCohortData, OpenmrsCohort } from '../api/types';
 import { createPatientList, editPatientList } from '../api/api-remote';
@@ -24,7 +24,6 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
 }) => {
   const { t } = useTranslation();
   const id = useId();
-  const config = useConfig<ConfigSchema>();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveLevel = isTablet ? 1 : 0;
   const session = useSession();
