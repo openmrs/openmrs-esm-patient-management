@@ -155,8 +155,8 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
               }));
             }}
             selectedItem={listCohortTypes.find((item) => item.uuid === cohortDetails.cohortType) || null}
-            label={t('chooseCohortType', 'Choose Cohort Type')}
-            titleText={t('selectCohortType', 'Select Cohort Type')}
+            label={t('chooseCohortType', 'Choose cohort type')}
+            titleText={t('selectCohortType', 'Select cohort type')}
             type="default"
           />
         </Layer>

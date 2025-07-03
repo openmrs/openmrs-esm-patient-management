@@ -1,13 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { OpenmrsCohortMember, OpenmrsCohort, CohortResponse, CohortType } from '../api/types';
+import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
 import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
 import { getByTextWithMarkup } from 'tools';
 import ListDetails from './list-details.component';
-import { FetchResponse } from '@openmrs/esm-framework/src';
-import { MutatorCallback, MutatorOptions } from 'swr';
 
 const mockUsePatientListDetails = jest.mocked(usePatientListDetails);
 const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
