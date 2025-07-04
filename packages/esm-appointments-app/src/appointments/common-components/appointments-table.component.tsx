@@ -143,6 +143,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
         }
+        // TODO @brandones: Make this a workspace, not an extension
         launchForm={() => launchWorkspace('search-patient')}
       />
     );

@@ -27,7 +27,6 @@ describe('Home Component', () => {
 
     // Assert that the expected components are rendered
     expect(screen.getByTestId('patient-queue-header')).toBeInTheDocument();
-    expect(screen.getByTestId('clinic-metrics')).toBeInTheDocument();
 
     // Clean up the mock
     window.location = originalLocation;

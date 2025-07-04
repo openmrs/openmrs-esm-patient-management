@@ -55,7 +55,7 @@ import {
 } from '../constants';
 import { useProviders } from '../hooks/useProviders';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
-import { useSelectedDateContext } from '../hooks/selected-date-context';
+import { useAppointmentsStore } from '../store';
 import Workload from '../workload/workload.component';
 import styles from './appointments-form.scss';
 
@@ -91,7 +91,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
   const { data: services, isLoading } = useAppointmentService();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
