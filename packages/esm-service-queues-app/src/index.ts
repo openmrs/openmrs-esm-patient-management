@@ -32,7 +32,7 @@ export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/sid
 
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const editQueueEntryStatusModal = getAsyncLifecycle(() => import('./active-visits/change-status.modal'), {
+export const editQueueEntryStatusModal = getAsyncLifecycle(() => import('./change-status-modal/change-status.modal'), {
   featureName: 'edit queue status',
   moduleName,
 });
@@ -168,15 +168,6 @@ export const createQueueEntryWorkspace = getAsyncLifecycle(
   () => import('./create-queue-entry/create-queue-entry.workspace'),
   {
     featureName: 'create-queue-entry-workspace',
-    moduleName,
-  },
-);
-
-export const activeVisitsRowActions = getAsyncLifecycle(
-  () => import('./active-visits/active-visits-row-actions.component'),
-  {
-    featureName:
-      'quick actions to queue, requeue and transfer patients. With overflow menu actions to edit patient and end visit',
     moduleName,
   },
 );

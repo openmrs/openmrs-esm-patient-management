@@ -3,11 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader, Tag } from '@carbon/react';
 import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import {
-  type MappedVisitQueueEntry,
-  serveQueueEntry,
-  updateQueueEntry,
-} from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry, serveQueueEntry, updateQueueEntry } from '../service-queues.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import styles from './transition-queue-entry.scss';

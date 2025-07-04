@@ -23,7 +23,7 @@ import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type Queue } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../hooks/useQueues';
-import { updateQueueEntry } from './active-visits-table.resource';
+import { updateQueueEntry } from '../service-queues.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import styles from './change-status.scss';
