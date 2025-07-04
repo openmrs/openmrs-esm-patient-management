@@ -94,6 +94,7 @@ export interface CohortResponse<T> {
 export interface NewCohortData {
   name: string;
   description: string;
+  cohortType: string;
 }
 
 export interface NewCohortDataPayload {
