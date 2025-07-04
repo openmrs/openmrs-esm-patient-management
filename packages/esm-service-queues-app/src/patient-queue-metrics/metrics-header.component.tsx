@@ -18,7 +18,6 @@ const MetricsHeader = () => {
   const currentUserSession = useSession();
   const layout = useLayoutType();
 
-  const metricsTitle = t('clinicMetrics', 'Clinic metrics');
   const queueScreenText = t('queueScreen', 'Queue screen');
   const providerUuid = currentUserSession?.currentProvider?.uuid;
 
@@ -35,7 +34,6 @@ const MetricsHeader = () => {
 
   return (
     <div className={styles.metricsContainer}>
-      <span className={styles.metricsTitle}>{metricsTitle}</span>
       <ComboButton
         className={styles.comboBtn}
         label={queueScreenText}
