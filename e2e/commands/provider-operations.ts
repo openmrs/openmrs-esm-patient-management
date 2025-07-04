@@ -1,10 +1,8 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type Provider } from '../types';
+import { type Provider } from './types';
 
 export const getProvider = async (api: APIRequestContext): Promise<Provider> => {
-  const providerRes = await api.get('provider?q=admin', {
-    data: {},
-  });
+  const providerRes = await api.get('provider?q=admin');
   await expect(providerRes.ok()).toBeTruthy();
   const { results } = await providerRes.json();
   return await results[0];
