@@ -216,3 +216,23 @@ export interface Identifier {
   uuid: string;
   display: string;
 }
+
+export interface Bed {
+  id: number;
+  uuid: string;
+  bedNumber: string;
+  bedType: BedType;
+  row: number;
+  column: number;
+  status: BedStatus;
+}
+
+export interface BedType {
+  uuid: string;
+  name: string;
+  displayName: string;
+  description: string;
+  resourceVersion: string;
+}
+
+export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
