@@ -14,6 +14,7 @@ import {
   fetchAllFieldDefinitionTypes,
   fetchAllRelationshipTypes,
   fetchCurrentSession,
+  fetchNameTemplate,
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
 import { FormManager } from './patient-registration/form-manager';
@@ -66,6 +67,7 @@ function getPatientUrlsToBeCached(patientUuid: string) {
 async function precacheStaticAssets() {
   await Promise.all([
     fetchCurrentSession(),
+    fetchNameTemplate(),
     fetchAddressTemplate(),
     fetchAllRelationshipTypes(),
     fetchAllFieldDefinitionTypes(),
