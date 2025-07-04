@@ -4,11 +4,11 @@ import { Button, ModalBody, ModalFooter, ModalHeader, Tag } from '@carbon/react'
 import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { type MappedVisitQueueEntry, serveQueueEntry, updateQueueEntry } from '../service-queues.resource';
-import { requeueQueueEntry } from './transition-queue-entry.resource';
+import { requeueQueueEntry } from './move-queue-entry.resource';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import styles from './transition-queue-entry.scss';
+import styles from './move-queue-entry.scss';
 
-interface TransitionQueueEntryModalProps {
+interface MoveQueueEntryModalProps {
   closeModal: () => void;
   queueEntry: MappedVisitQueueEntry;
 }
@@ -17,7 +17,7 @@ enum priorityComment {
   REQUEUED = 'Requeued',
 }
 
-const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ closeModal, queueEntry }) => {
+const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ closeModal, queueEntry }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const defaultTransitionStatus = config.concepts.defaultTransitionStatus;
@@ -136,4 +136,4 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ c
   );
 };
 
-export default TransitionQueueEntryModal;
+export default MoveQueueEntryModal;
