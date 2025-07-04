@@ -40,7 +40,6 @@
   "currentVisit": "Current visit",
   "date": "Date",
   "date&Time": "Date & time",
-  "delete": "Delete",
   "deleteQueueEntry": "Delete queue entry",
   "discard": "Discard",
   "dose": "Dose",
@@ -228,6 +227,7 @@
   "vitals": "Vitals",
   "vitalsForm": "Vitals form",
   "vitalsNotRecordedForVisit": "Vitals has not been recorded for this patient for this visit",
+  "voidEntry": "Void entry",
   "waitingFor": "Waiting for",
   "weight": "Weight"
 }
