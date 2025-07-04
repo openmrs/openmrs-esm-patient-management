@@ -11,11 +11,6 @@
   padding: 0 layout.$spacing-05;
 }
 
-.metricsTitle {
-  @include type.type-style('heading-03');
-  color: $ui-05;
-}
-
 .link {
   text-decoration: none;
   display: flex;
@@ -30,4 +25,5 @@
   display: flex;
   align-items: center;
   gap: layout.$spacing-05;
+  margin-left: auto;
 }
