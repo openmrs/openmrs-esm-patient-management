@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, updateVisit } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse, type EndVisitPayload } from '../types';
-import { endPatientStatus } from '../active-visits/active-visits-table.resource';
+import { endPatientStatus } from '../service-queues.resource';
 import { omrsDateFormat, timeZone } from '../constants';
 
 const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);

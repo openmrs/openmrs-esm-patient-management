@@ -1,4 +1,4 @@
-import { endPatientStatus } from '../active-visits/active-visits-table.resource';
+import { endPatientStatus } from '../service-queues.resource';
 import { type QueueEntry } from '../types';
 
 export async function batchClearQueueEntries(queueEntries: Array<QueueEntry>) {

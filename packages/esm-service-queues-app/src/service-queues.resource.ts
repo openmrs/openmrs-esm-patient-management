@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isEmpty from 'lodash-es/isEmpty';
 import useSWR from 'swr';
-import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
+import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from './types';
 
 dayjs.extend(isToday);
 
