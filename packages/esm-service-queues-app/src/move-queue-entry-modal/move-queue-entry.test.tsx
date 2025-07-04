@@ -3,18 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
-import {
-  type MappedVisitQueueEntry,
-  serveQueueEntry,
-  updateQueueEntry,
-} from '../active-visits/active-visits-table.resource';
-import { requeueQueueEntry } from './transition-queue-entry.resource';
-import TransitionQueueEntryModal from './transition-queue-entry.modal';
+import { type MappedVisitQueueEntry, serveQueueEntry, updateQueueEntry } from '../service-queues.resource';
+import { requeueQueueEntry } from './move-queue-entry.resource';
+import MoveQueueEntryModal from './move-queue-entry.modal';
 
 const mockNavigate = jest.mocked(navigate);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-jest.mock('../active-visits/active-visits-table.resource', () => ({
+jest.mock('../service-queues.resource', () => ({
   serveQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
   updateQueueEntry: jest.fn().mockResolvedValue({ status: 201 }),
 }));
@@ -23,11 +19,11 @@ jest.mock('../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 
-jest.mock('./transition-queue-entry.resource', () => ({
+jest.mock('./move-queue-entry.resource', () => ({
   requeueQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
 }));
 
-describe('TransitionQueueEntryModal', () => {
+describe('MoveQueueEntryModal', () => {
   const queueEntry = {
     visitUuid: 'c90386ff-ae85-45cc-8a01-25852099c5ae',
     identifiers: [
@@ -59,7 +55,7 @@ describe('TransitionQueueEntryModal', () => {
 
   it('renders modal content', () => {
     const closeModal = jest.fn();
-    render(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<MoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
     expect(screen.getByText(/Serve patient/i)).toBeInTheDocument();
     expect(screen.getByText(/Patient name :/i)).toBeInTheDocument();
@@ -69,7 +65,7 @@ describe('TransitionQueueEntryModal', () => {
     const user = userEvent.setup();
 
     const closeModal = jest.fn();
-    render(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<MoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Requeue'));
 
@@ -80,7 +76,7 @@ describe('TransitionQueueEntryModal', () => {
     const user = userEvent.setup();
 
     const closeModal = jest.fn();
-    render(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<MoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Serve'));
 

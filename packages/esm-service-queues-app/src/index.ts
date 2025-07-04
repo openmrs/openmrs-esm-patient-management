@@ -53,13 +53,10 @@ export const clearAllQueueEntries = getAsyncLifecycle(
   },
 );
 
-export const transitionQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./transition-queue-entry/transition-queue-entry.modal'),
-  {
-    featureName: 'transition queue status',
-    moduleName,
-  },
-);
+export const moveQueueEntryModal = getAsyncLifecycle(() => import('./move-queue-entry-modal/move-queue-entry.modal'), {
+  featureName: 'move queue entry',
+  moduleName,
+});
 
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 

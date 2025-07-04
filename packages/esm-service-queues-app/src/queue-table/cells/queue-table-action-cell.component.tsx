@@ -8,12 +8,23 @@ import { type ActionsColumnConfig } from '../../config-schema';
 
 // Map action strings to component props
 const ActionProps = {
-  transition: {
-    // t('transition', 'Transition'),
-    label: 'transition',
-    text: 'Transition',
+  call: {
+    // t('call', 'Call'),
+    label: 'call',
+    text: 'Call',
     onClick: (queueEntry: QueueEntry) => {
-      const dispose = showModal('transition-queue-entry-modal', {
+      const dispose = showModal('call-queue-entry-modal', {
+        closeModal: () => dispose(),
+        queueEntry,
+      });
+    },
+  },
+  move: {
+    // t('move', 'Move'),
+    label: 'move',
+    text: 'Move',
+    onClick: (queueEntry: QueueEntry) => {
+      const dispose = showModal('move-queue-entry-modal', {
         closeModal: () => dispose(),
         queueEntry,
       });
