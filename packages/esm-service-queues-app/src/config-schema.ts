@@ -83,6 +83,9 @@ export const configSchema = {
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
+    _elements: {
+      _type: Type.String,
+    },
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
   },
   biometrics: biometricsConfigSchema,
@@ -122,6 +125,9 @@ export const configSchema = {
     historicalObsConceptUuid: {
       _type: Type.Array,
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
+      _elements: {
+        _type: Type.ConceptUuid,
+      },
       _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     },
     oxygenSaturationUuid: {
@@ -149,7 +155,7 @@ export const configSchema = {
     _type: Type.UUID,
     _description:
       'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
-    _default: '',
+    _default: null,
   },
   customPatientChartUrl: {
     _type: Type.String,
@@ -160,7 +166,6 @@ export const configSchema = {
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   dashboardTitle: {
-    _type: Type.Object,
     _description: 'The title to be displayed on the service queues dashboard',
     key: {
       _type: Type.String,
@@ -177,12 +182,12 @@ export const configSchema = {
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: '',
+    _default: null,
     _description: 'Custom URL to load default facility if it is not in the session',
   },
   defaultIdentifierTypes: {
     _type: Type.Array,
-    _element: {
+    _elements: {
       _type: Type.String,
     },
     _description: 'The identifier types to be display on all patient search result page',
@@ -195,6 +200,7 @@ export const configSchema = {
       _description:
         "Custom columns for queue tables can be defined here. These columns will be referenced by their `id` in the `tableDefinitions` columns configuration. If the provided `id` matches a built-in column, the custom configuration will override the built-in column's configuration.",
       _elements: {
+        _type: Type.Object,
         _validators: [
           validator(
             (columnDfn: ColumnDefinition) =>
@@ -254,13 +260,13 @@ export const configSchema = {
           _type: Type.String,
           _description: 'The type of column, if different from the ID',
           _validators: [validators.oneOf(columnTypes)],
-          _default: null,
+          _default: '',
         },
         header: {
           _type: Type.String,
           _description:
             'The header text for the column. Will be translated if it is a valid translation key. If not provided, the header will be based on the columnType.',
-          _default: null,
+          _default: '',
         },
         config: {
           identifierTypeUuid: {
@@ -274,6 +280,7 @@ export const configSchema = {
             _description:
               'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
             _elements: {
+              _type: Type.Object,
               conceptUuid: {
                 _type: Type.UUID,
                 _description: 'The UUID of the priority concept to configure',
@@ -289,7 +296,7 @@ export const configSchema = {
                 _type: Type.String,
                 _description: 'Style to apply to the tag',
                 _validators: [validators.oneOf(tagStyles)],
-                _default: null,
+                _default: '',
               },
             },
           },
@@ -298,6 +305,7 @@ export const configSchema = {
             _default: [],
             _description: 'For columnType "status". Configures the icons for each status.',
             _elements: {
+              _type: Type.Object,
               conceptUuid: {
                 _type: Type.UUID,
                 _description: 'The UUID of the status concept to configure',
@@ -306,15 +314,15 @@ export const configSchema = {
                 _type: Type.String,
                 _description: 'The icon component to display for the status',
                 _validators: [validators.oneOf(statusIcons)],
-                _default: null,
+                _default: '',
               },
             },
-            visitQueueNumberAttributeUuid: {
-              _type: Type.String,
-              _description:
-                'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-              _default: null,
-            },
+          },
+          visitQueueNumberAttributeUuid: {
+            _type: Type.String,
+            _description:
+              'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
+            _default: null,
           },
         },
       },
@@ -323,6 +331,7 @@ export const configSchema = {
       _type: Type.Array,
       _default: [defaultQueueTable],
       _elements: {
+        _type: Type.Object,
         columns: {
           _type: Type.Array,
           _elements: {
@@ -332,15 +341,16 @@ export const configSchema = {
         appliedTo: {
           _type: Type.Array,
           _elements: {
+            _type: Type.Object,
             queue: {
               _type: Type.String,
               _description: 'The UUID of the queue. If not provided, applies to all queues.',
-              _default: null,
+              _default: '',
             },
             status: {
               _type: Type.String,
               _description: 'The UUID of the status. If not provided, applies to all statuses.',
-              _default: null,
+              _default: '',
             },
           },
         },
