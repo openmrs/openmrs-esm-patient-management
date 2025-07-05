@@ -112,15 +112,19 @@
     },
     {
       "name": "transition-patient-to-latest-queue-modal",
-      "component": "transitionPatientToLatestQueue"
+      "component": "addOrMoveModal"
     },
     {
-      "name": "transition-queue-entry-modal",
-      "component": "transitionQueueEntryModal"
+      "name": "call-queue-entry-modal",
+      "component": "callQueueEntryModal"
     },
     {
-      "name": "transition-queue-entry-status-modal",
-      "component": "transitionQueueEntryStatusModal"
+      "name": "move-queue-entry-modal",
+      "component": "moveQueueEntryModal"
+    },
+    {
+      "name": "update-queue-entry-status-modal",
+      "component": "updateQueueEntryStatusModal"
     },
     {
       "name": "undo-transition-queue-entry-modal",

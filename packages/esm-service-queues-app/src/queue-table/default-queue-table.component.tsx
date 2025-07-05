@@ -23,7 +23,7 @@ import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
 import useQueueServices from '../hooks/useQueueService';
 import usePatientSearchVisibility from '../hooks/usePatientSearchVisibility';
-import ClearQueueEntries from '../clear-queue-entries-modal/clear-queue-entries.component';
+import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
