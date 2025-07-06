@@ -217,7 +217,7 @@ export interface Identifier {
   display: string;
 }
 
-export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+export type BedStatus = 'Available' | 'Occupied';
 
 export interface AdmissionLocationFetchResponse {
   totalBeds: number;
