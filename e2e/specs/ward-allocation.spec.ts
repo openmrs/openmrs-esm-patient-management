@@ -47,15 +47,17 @@ test('create Bed types', async ({ page }) => {
   // Create Ward 1 Bed Type
   await page.getByRole('button', { name: 'Add bed type' }).click();
   await wardAllocation.createBedType(ward1BedType);
-  await page.getByRole('button', { name: 'Save' }).click();
+  await wardAllocation.expectSaveEnabled();
+  await wardAllocation.submit();
 
   // Create Inpatient Ward Bed Type
   await page.getByRole('button', { name: 'Add bed type' }).click();
   await wardAllocation.createBedType(inpatientBedType);
-  await page.getByRole('button', { name: 'Save' }).click();
+  await wardAllocation.expectSaveEnabled();
+  await wardAllocation.submit();
 
-  await expect(page.getByText('ward1-bed')).toBeVisible();
-  await expect(page.getByText('inpatient-bed')).toBeVisible();
+  await expect(page.getByText('ward1-bed').nth(1)).toBeVisible();
+  await expect(page.getByText('inpatient-bed').nth(1)).toBeVisible();
 });
 test('allocate beds to wards', async ({ page }) => {
   const wardAllocation = new WardAllocation(page);
@@ -64,12 +66,14 @@ test('allocate beds to wards', async ({ page }) => {
   // Allocate Ward 1 Bed
   await page.getByRole('button', { name: 'Add Bed' }).click();
   await wardAllocation.allocateWard(ward1BedLayout);
-  await page.getByRole('button', { name: 'Save' }).click();
+  await wardAllocation.expectSaveEnabled();
+  await wardAllocation.submit();
 
   // Allocate Inpatient Ward Bed
   await page.getByRole('button', { name: 'Add Bed' }).click();
   await wardAllocation.allocateWard(inpatientBedLayout);
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('301')).toBeVisible();
-  await expect(page.getByText('302')).toBeVisible();
+  await wardAllocation.expectSaveEnabled();
+  await wardAllocation.submit();
+  await expect(page.getByText('301').nth(1)).toBeVisible();
+  await expect(page.getByText('302').nth(1)).toBeVisible();
 });
