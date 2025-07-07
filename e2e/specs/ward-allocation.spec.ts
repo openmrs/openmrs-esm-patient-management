@@ -59,6 +59,7 @@ test('create Bed types', async ({ page }) => {
   await expect(page.getByText('ward1-bed').nth(1)).toBeVisible();
   await expect(page.getByText('inpatient-bed').nth(1)).toBeVisible();
 });
+
 test('allocate beds to wards', async ({ page }) => {
   const wardAllocation = new WardAllocation(page);
   await wardAllocation.goto('bed-management/bed-administration');
