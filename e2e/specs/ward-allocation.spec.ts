@@ -1,5 +1,3 @@
-// specs/ward-allocation.spec.ts
-
 import { test, expect } from '@playwright/test';
 import { WardAllocation } from '../pages/ward-allocation';
 import { type BedStatus } from '../types';
