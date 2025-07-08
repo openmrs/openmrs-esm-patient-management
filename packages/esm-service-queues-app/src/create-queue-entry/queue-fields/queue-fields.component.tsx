@@ -24,6 +24,7 @@ import { useQueues } from '../../hooks/useQueues';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
+  defaultInitialServiceQueue?: string;
 }
 
 const createQueueServiceSchema = (t: TFunction) =>
@@ -46,7 +47,7 @@ const createQueueServiceSchema = (t: TFunction) =>
  * This component contains form fields for starting a patient's queue entry.
  */
 
-const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
+const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: QueueFieldsProps) => {
   const { t } = useTranslation();
   const schema = React.useMemo(() => createQueueServiceSchema(t), [t]);
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
@@ -143,6 +144,13 @@ const QueueFields = React.memo(({ setOnSubmit }: QueueFieldsProps) => {
       setValue('queueService', currentServiceQueueUuid, { shouldValidate: true });
     }
   }, [currentServiceQueueUuid, setValue]);
+
+  useEffect(() => {
+    if (defaultInitialServiceQueue) {
+      const initialServiceQueue = queues.find((q) => q.name === defaultInitialServiceQueue);
+      setValue('queueService', initialServiceQueue?.uuid, { shouldValidate: true });
+    }
+  }, [defaultInitialServiceQueue, setValue, queues]);
 
   useEffect(() => {
     if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {

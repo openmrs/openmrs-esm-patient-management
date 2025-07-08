@@ -39,21 +39,6 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
     [visitQueueNumberAttributeUuid],
   );
 
-  const columnsMap = useMemo(() => {
-    const map = new Map<string, QueueTableColumn>();
-    for (const column of builtInColumns) {
-      map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
-    }
-    for (const columnDef of columnDefinitions) {
-      if (columnDef.columnType == 'queue-number' || columnDef.id == 'queue-number') {
-        columnDef.config.visitQueueNumberAttributeUuid =
-          columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
-      }
-      map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
-    }
-    return map;
-  }, [columnDefinitions, globalColumnConfig, t, visitQueueNumberAttributeUuid]);
-
   const tableDefinition = useMemo(
     () =>
       tableDefinitions.find((tableDef) => {
@@ -69,6 +54,22 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
       }),
     [tableDefinitions, queue, status],
   );
+
+  const columnsMap = useMemo(() => {
+    const map = new Map<string, QueueTableColumn>();
+    const builtInColumnsInUse = builtInColumns.filter((columnId) => tableDefinition?.columns.includes(columnId));
+    for (const column of builtInColumnsInUse) {
+      map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
+    }
+    for (const columnDef of columnDefinitions) {
+      if (columnDef.columnType == 'queue-number' || columnDef.id == 'queue-number') {
+        columnDef.config.visitQueueNumberAttributeUuid =
+          columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
+      }
+      map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
+    }
+    return map;
+  }, [tableDefinition, columnDefinitions, globalColumnConfig, t, visitQueueNumberAttributeUuid]);
 
   const columns = tableDefinition?.columns?.map((columnId) => {
     const column = columnsMap.get(columnId);
