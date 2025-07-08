@@ -48,8 +48,7 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
           appliedTo == null ||
           appliedTo.some(
             (criteria) =>
-              (criteria.queue == null || criteria.queue == queue) &&
-              (criteria.status == null || criteria.status == status),
+              (criteria.queue == '' || criteria.queue == queue) && (criteria.status == '' || criteria.status == status),
           )
         );
       }),
@@ -127,7 +126,7 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
       return queueTableVisitStartTimeColumn(id, translatedHeader ?? t('visitStartTime', 'Visit start time'));
     }
     case 'actions': {
-      return queueTableActionColumn(id, translatedHeader ?? t('actions', 'Actions'));
+      return queueTableActionColumn(id, translatedHeader ?? t('actions', 'Actions'), columnDef.config);
     }
     case 'extension': {
       return queueTableExtensionColumn(id, translatedHeader);
