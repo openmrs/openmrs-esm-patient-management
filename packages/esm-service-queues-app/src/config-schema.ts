@@ -20,7 +20,7 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
-const queueEntryActions = ['transition', 'call', 'edit', 'remove', 'void', 'undo'] as const;
+const queueEntryActions = ['transition', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
 type QueueEntryAction = (typeof queueEntryActions)[number];
 
 const statusIcons = ['Group', 'InProgress'] as const;

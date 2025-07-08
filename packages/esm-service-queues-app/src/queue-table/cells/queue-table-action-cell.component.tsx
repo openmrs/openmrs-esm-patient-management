@@ -42,10 +42,10 @@ const ActionProps = {
       });
     },
   },
-  void: {
-    // t('voidEntry', 'Void entry'),
-    label: 'voidEntry',
-    text: 'Void entry',
+  delete: {
+    // t('deleteEntry', 'Delete entry'),
+    label: 'deleteEntry',
+    text: 'Delete entry',
     onClick: (queueEntry: QueueEntry) => {
       const dispose = showModal('void-queue-entry-modal', {
         closeModal: () => dispose(),
