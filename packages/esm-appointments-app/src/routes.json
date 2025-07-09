@@ -18,12 +18,18 @@
         "name": "appointments",
         "slot": "clinical-appointments-dashboard-slot",
         "title": "Appointments"
-      }
+      },
+      "order": 2
     },
     {
       "component": "root",
       "name": "clinical-appointments-dashboard",
       "slot": "clinical-appointments-dashboard-slot"
+    },
+    {
+      "name": "appointments-dashboard",
+      "slot": "appointments-dashboard-slot",
+      "component": "appointmentsDashboard"
     },
     {
       "name": "appointments-calendar-dashboard-link",

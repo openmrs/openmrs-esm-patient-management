@@ -42,7 +42,7 @@
   "searchResultsCount_other": "{{count}} résultats de recherche",
   "selectOption": "Sélectionner une option",
   "sex": "Sexe",
-  "trySearchWithPatientUniqueID": "Essayez de chercher par l'identifiant unique du patient",
+  "trySearchWithPatientUniqueID": "Essayez de chercher par l’identifiant unique du patient",
   "unknown": "Inconnu",
   "unsupportedAttributeFormat": "Format d'attribut non supporté : {{format}}",
   "yearOfBirth": "Année de naissance"

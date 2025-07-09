@@ -7,9 +7,9 @@ const path = require('path');
 module.exports = {
   clearMocks: true,
   transform: {
-    '^.+\\.(j|t)sx?$': '@swc/jest',
+    '^.+\\.m?[jt]sx?$': ['@swc/jest'],
   },
-  transformIgnorePatterns: ['/node_modules/(?!@openmrs)'],
+  transformIgnorePatterns: ['/node_modules/(?!@openmrs|.+\\.pnp\\.[^\\/]+$)'],
   moduleDirectories: ['node_modules', '__mocks__', 'tools', __dirname],
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
@@ -17,7 +17,7 @@ module.exports = {
     '^dexie$': require.resolve('dexie'),
     '^lodash-es/(.*)$': 'lodash/$1',
     'lodash-es': 'lodash',
-    '^react-i18next$': path.resolve(__dirname, 'react-i18next.js'),
+    '^react-i18next$': path.resolve(__dirname, '__mocks__', 'react-i18next.js'),
     '^uuid$': path.resolve(__dirname, 'node_modules', 'uuid', 'dist', 'index.js'),
   },
   collectCoverageFrom: [

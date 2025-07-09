@@ -2,27 +2,18 @@
 import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
-import {
-  addPatientToCohort,
-  deleteCohort,
-  deletePatient,
-  generateRandomCohort,
-  generateRandomPatient,
-  removePatientFromCohort,
-} from '../commands';
+import { addPatientToCohort, deleteCohort, generateRandomCohort, removePatientFromCohort } from '../commands';
 import { type Cohort, type CohortMember, type Patient } from '../types';
 
 let cohortMembership: CohortMember;
 let cohort: Cohort;
-let patient: Patient;
 
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
+test.beforeEach(async ({ api, patient }) => {
   cohort = await generateRandomCohort(api);
   cohortMembership = await addPatientToCohort(api, cohort.uuid, patient.uuid);
 });
 
-test.skip('Return to patient list from the patient chart', async ({ page }) => {
+test.skip('Return to patient list from the patient chart', async ({ page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I navigate to the patient list', async () => {
@@ -48,7 +39,10 @@ test.skip('Return to patient list from the patient chart', async ({ page }) => {
   });
 });
 
-test.skip('Return to patient list after navigating to visits page from the patient chart', async ({ page }) => {
+test.skip('Return to patient list after navigating to visits page from the patient chart', async ({
+  page,
+  patient,
+}) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I navigate to the patient list', async () => {
@@ -82,7 +76,7 @@ test.skip('Return to patient list after navigating to visits page from the patie
   });
 });
 
-test.skip('Return to patient list after navigating to visits and refreshing the page', async ({ page }) => {
+test.skip('Return to patient list after navigating to visits and refreshing the page', async ({ page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I navigate to the patient list', async () => {
@@ -120,7 +114,7 @@ test.skip('Return to patient list after navigating to visits and refreshing the 
   });
 });
 
-test.skip('Return to patient list from the patient chart on a new tab', async ({ page, context }) => {
+test.skip('Return to patient list from the patient chart on a new tab', async ({ page, context, patient }) => {
   const patientListPage = new PatientListsPage(page);
   const locator = page.locator('table tbody tr td:nth-child(1) a');
   const pagePromise = context.waitForEvent('page');
@@ -163,6 +157,5 @@ test.skip('Return to patient list from the patient chart on a new tab', async ({
 
 test.afterEach(async ({ api }) => {
   await removePatientFromCohort(api, cohortMembership.uuid);
-  await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
 });

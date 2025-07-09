@@ -17,10 +17,6 @@
   margin: layout.$spacing-03 0;
 }
 
-section {
-  margin: layout.$spacing-03;
-}
-
 .sectionTitle {
   @include type.type-style('heading-compact-02');
   color: $text-02;
