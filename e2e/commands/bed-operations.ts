@@ -19,7 +19,7 @@ export const generateRandomBed = async (api: APIRequestContext): Promise<Bed> =>
 export const generateBedType = async (api: APIRequestContext): Promise<BedType> => {
   const bedRes = await api.post('/openmrs/ws/rest/v1/bedtype', {
     data: {
-      name: 'duplix',
+      name: 'Duplix',
       displayName: 'Duplix',
       description: '',
     },

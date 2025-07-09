@@ -6,7 +6,7 @@ import {
   changeToWardLocation,
   generateRandomPatient,
   getProvider,
-  generateWarAdmission,
+  generateWardAdmission,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Patient, type Encounter, type Provider } from '../commands/types';
@@ -14,7 +14,7 @@ import { generateBedType, generateRandomBed } from '../commands/bed-operations';
 
 let visit: Visit;
 let wardPatient: Patient;
-let ecounter: Encounter;
+let encounter: Encounter;
 let provider: Provider;
 
 test.beforeEach(async ({ api }) => {
@@ -24,7 +24,7 @@ test.beforeEach(async ({ api }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  ecounter = await generateWarAdmission(api, provider.uuid, wardPatient.uuid);
+  encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Confirming patient is admitted to ward', async ({ page }) => {
