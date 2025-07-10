@@ -1,12 +1,31 @@
 import React, { useCallback, type SyntheticEvent, useEffect, useId, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Layer, TextArea, TextInput } from '@carbon/react';
-import { useLayoutType, showSnackbar, useSession, useConfig } from '@openmrs/esm-framework';
-import type { ConfigSchema } from '../config-schema';
-import type { NewCohortData, OpenmrsCohort } from '../api/types';
-import { createPatientList, editPatientList } from '../api/api-remote';
+import { Button, ButtonSet, Dropdown, Layer, TextArea, TextInput } from '@carbon/react';
+import { type TFunction, useTranslation } from 'react-i18next';
+import { z } from 'zod';
+import { OpenmrsFetchError, showSnackbar, useLayoutType, useSession } from '@openmrs/esm-framework';
+import type { NewCohortData, NewCohortDataPayload, OpenmrsCohort } from '../api/types';
+import {
+  createPatientList,
+  editPatientList,
+  extractErrorMessagesFromResponse,
+  type ErrorObject,
+} from '../api/api-remote';
+import { useCohortTypes } from '../api/hooks';
 import Overlay from '../overlay.component';
 import styles from './create-edit-patient-list.scss';
+
+const createCohortSchema = (t: TFunction) => {
+  return z.object({
+    name: z
+      .string()
+      .min(1, { message: t('cohortNameRequired', 'Cohort name is required') })
+      .trim(),
+    cohortType: z.string().optional(),
+    description: z.string().optional(),
+  });
+};
+
+type CohortFormData = z.infer<ReturnType<typeof createCohortSchema>>;
 
 interface CreateEditPatientListProps {
   close: () => void;
@@ -21,31 +40,57 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
   patientListDetails = null,
   onSuccess = () => {},
 }) => {
-  const { t } = useTranslation();
   const id = useId();
-  const config = useConfig<ConfigSchema>();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveLevel = isTablet ? 1 : 0;
   const session = useSession();
+  const { t } = useTranslation();
+  const cohortSchema = createCohortSchema(t);
+  const { listCohortTypes } = useCohortTypes() ?? {};
   const { user } = session;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cohortDetails, setCohortDetails] = useState<NewCohortData>({
+  const [cohortDetails, setCohortDetails] = useState<CohortFormData>({
     name: '',
     description: '',
+    cohortType: '',
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  const validateForm = useCallback(
+    (data: CohortFormData) => {
+      try {
+        cohortSchema.parse(data);
+        setValidationErrors({});
+        return true;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          setValidationErrors(
+            Object.fromEntries(Object.entries(error.flatten().fieldErrors).map(([k, v]) => [k, v[0] ?? ''])),
+          );
+        }
+        return false;
+      }
+    },
+    [cohortSchema],
+  );
 
   useEffect(() => {
     setCohortDetails({
       name: patientListDetails?.name || '',
       description: patientListDetails?.description || '',
+      cohortType: patientListDetails?.cohortType?.uuid || '',
     });
   }, [user, patientListDetails]);
 
   const handleSubmit = useCallback(() => {
+    if (!validateForm(cohortDetails)) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     if (isEditing) {
-      editPatientList(patientListDetails.uuid, cohortDetails)
+      editPatientList(patientListDetails.uuid, cohortDetails as NewCohortData)
         .then(() => {
           showSnackbar({
             title: t('updated', 'Updated'),
@@ -59,9 +104,16 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           close();
         })
         .catch((error) => {
+          const errorDescription =
+            OpenmrsFetchError && error instanceof OpenmrsFetchError
+              ? typeof error.responseBody === 'string'
+                ? error.responseBody
+                : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+              : error?.message;
+
           showSnackbar({
             title: t('errorUpdatingList', 'Error updating list'),
-            subtitle: t('problemUpdatingList', 'There was a problem updating the list'),
+            subtitle: errorDescription,
             kind: 'error',
           });
           setIsSubmitting(false);
@@ -71,9 +123,8 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     if (!isEditing) {
       createPatientList({
         ...cohortDetails,
-        cohortType: config?.myListCohortTypeUUID,
         location: session?.sessionLocation?.uuid,
-      })
+      } as NewCohortDataPayload)
         .then(() => {
           showSnackbar({
             title: t('created', 'Created'),
@@ -86,9 +137,16 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           close();
         })
         .catch((error) => {
+          const errorDescription =
+            OpenmrsFetchError && error instanceof OpenmrsFetchError
+              ? typeof error.responseBody === 'string'
+                ? error.responseBody
+                : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+              : error?.message;
+
           showSnackbar({
             title: t('errorCreatingList', 'Error creating list'),
-            subtitle: t('problemCreatingList', 'There was a problem creating the list'),
+            subtitle: errorDescription,
             kind: 'error',
           });
           setIsSubmitting(false);
@@ -97,12 +155,12 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
   }, [
     close,
     cohortDetails,
-    config?.myListCohortTypeUUID,
     isEditing,
     patientListDetails?.uuid,
     onSuccess,
     session.sessionLocation?.uuid,
     t,
+    validateForm,
   ]);
 
   const handleChange = useCallback(
@@ -145,6 +203,27 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             onChange={handleChange}
             placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
             value={cohortDetails?.name}
+            invalid={!!validationErrors.name}
+            invalidText={validationErrors.name}
+          />
+        </Layer>
+      </div>
+      <div className={styles.input}>
+        <Layer level={responsiveLevel}>
+          <Dropdown
+            id="cohortType"
+            items={listCohortTypes}
+            itemToString={(item) => (item ? item.display : '')}
+            label={t('chooseCohortType', 'Choose cohort type')}
+            onChange={({ selectedItem }) => {
+              setCohortDetails((prev) => ({
+                ...prev,
+                cohortType: selectedItem?.uuid || '',
+              }));
+            }}
+            selectedItem={listCohortTypes.find((item) => item.uuid === cohortDetails.cohortType) || null}
+            titleText={t('selectCohortType', 'Select cohort type')}
+            type="default"
           />
         </Layer>
       </div>

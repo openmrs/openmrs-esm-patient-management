@@ -29,7 +29,6 @@ const MetricsHeader: React.FC = () => {
 
   return (
     <div className={styles.metricsContainer}>
-      <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <div className={styles.metricsContent}>
         <Button
           kind="tertiary"

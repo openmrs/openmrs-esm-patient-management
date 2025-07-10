@@ -233,8 +233,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
         '', // assumes only a single previously-scheduled provider with state "ACCEPTED", if multiple, just takes the first
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
-      appointmentType: appointment?.appointmentKind || '',
-      selectedService: appointment?.service?.name || '',
+      appointmentType: appointment?.appointmentKind || (appointmentTypes?.length === 1 ? appointmentTypes[0] : ''),
+      selectedService: appointment?.service?.name || (services?.length === 1 ? services[0].name : ''),
       recurringPatternType: defaultRecurringPatternType,
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
