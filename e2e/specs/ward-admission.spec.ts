@@ -48,7 +48,7 @@ test('Confirming patient is admitted to ward', async ({ page }) => {
   });
 
   await test.step('And I select the ward/location for admission', async () => {
-    await page.getByRole('combobox', { name: 'Choose an option' }).click();
+    //await page.getByRole('combobox', { name: 'Choose an option' }).click();
     await page.getByText(`${bed.bedNumber} · Empty`).click();
   });
 
