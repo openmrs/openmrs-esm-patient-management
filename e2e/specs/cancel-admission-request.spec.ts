@@ -34,7 +34,7 @@ test('Cancelling an admission request', async ({ page }) => {
   const fullName = wardPatient.person?.display;
 
   await test.step('When I visit the patient ward page', async () => {
-    await page.goto(process.env.E2E_BASE_URL + `/spa/home/ward`);
+    await page.goto(`/openmrs/spa/home/ward`);
   });
 
   await test.step('And I click the "Manage" button to view admission requests', async () => {
@@ -68,8 +68,9 @@ test('Cancelling an admission request', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await deleteBed(api, bed.uuid);
-  await deleteBedType(api, bedtype.uuid);
+  //We are waiting for the backend fix on https://bahmni.atlassian.net/browse/BAH-4197 to be able to delete beds
+  // await deleteBed(api, bed.uuid);
+  // await deleteBedType(api, bedtype.uuid);
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
