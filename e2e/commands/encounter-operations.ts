@@ -32,7 +32,7 @@ export const createEncounter = async (
         },
       ],
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-      encounterType: 'd7151f82-c1f3-4152-a605-2f9ea7414a79',
+      encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
       obs: observations,
     },
   });
@@ -52,7 +52,7 @@ export const generateWardAdmission = async (
         patient: patientId,
         encounterDatetime: dayjs().format(),
         location: process.env.E2E_WARD_LOCATION_UUID,
-        encounterType: process.env.E2E_TRANSFER_REQUEST_ENCOUNTER_TYPE,
+        encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
         encounterProviders: [
           {
             provider: providerId,
