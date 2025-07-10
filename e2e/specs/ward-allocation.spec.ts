@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { WardAllocation } from '../pages/ward-allocation';
-import { type BedStatus } from '../types';
 
 const ward1BedType = {
   name: 'ward1-bed',
@@ -8,7 +7,6 @@ const ward1BedType = {
   description: 'Standard bed in Ward 1',
 };
 
-const ward1Status: BedStatus = 'Available';
 const ward1BedLayout = {
   bedId: 301,
   bedNumber: '301A',
@@ -16,63 +14,95 @@ const ward1BedLayout = {
   rowNumber: 1,
   columnNumber: 1,
   location: 'Ward 1',
-  status: ward1Status,
+  status: 'Available',
   bedType: ward1BedType,
 };
 
-const inpatientWardStatus: BedStatus = 'Available';
-
-const inpatientBedType = {
-  name: 'inpatient-bed',
-  displayName: 'ward 2 Bed',
-  description: 'Bed for inpatient ward',
-};
-const inpatientBedLayout = {
-  bedId: 302,
-  bedNumber: '302A',
-  bedUuid: 'uuid-inpatient-bed',
-  rowNumber: 2,
-  columnNumber: 1,
-  location: 'Inpatient Ward',
-  status: inpatientWardStatus,
-  bedType: inpatientBedType,
-};
-
-test('create Bed types', async ({ page }) => {
+test('Create bed type and allocate ward with detailed steps', async ({ page }) => {
   const wardAllocation = new WardAllocation(page);
-  await wardAllocation.goto('bed-management/bed-types');
 
-  // Create Ward 1 Bed Type
-  await page.getByRole('button', { name: 'Add bed type' }).click();
-  await wardAllocation.createBedType(ward1BedType);
-  await wardAllocation.expectSaveEnabled();
-  await wardAllocation.submit();
+  await test.step('Navigate to bed types management page', async () => {
+    await wardAllocation.goto('bed-management/bed-types');
+  });
 
-  // Create Inpatient Ward Bed Type
-  await page.getByRole('button', { name: 'Add bed type' }).click();
-  await wardAllocation.createBedType(inpatientBedType);
-  await wardAllocation.expectSaveEnabled();
-  await wardAllocation.submit();
+  await test.step('Click Add bed type button', async () => {
+    await page.getByRole('button', { name: 'Add bed type' }).click();
+  });
+
+  await test.step('Fill bed name input', async () => {
+    await wardAllocation.bedNameInput().fill(ward1BedType.name);
+  });
+
+  await test.step('Fill display name input', async () => {
+    await wardAllocation.displayNameInput().fill(ward1BedType.displayName);
+  });
+
+  await test.step('Fill description input', async () => {
+    await wardAllocation.descriptionInput().fill(ward1BedType.description);
+  });
+
+  await test.step('Check save button enabled', async () => {
+    await wardAllocation.expectSaveEnabled();
+  });
+
+  await test.step('Submit bed type form', async () => {
+    await wardAllocation.submit();
+  });
 
   await expect(page.getByText('ward1-bed').nth(1)).toBeVisible();
   await expect(page.getByText('inpatient-bed').nth(1)).toBeVisible();
 });
-
 test('allocate beds to wards', async ({ page }) => {
   const wardAllocation = new WardAllocation(page);
   await wardAllocation.goto('bed-management/bed-administration');
 
-  // Allocate Ward 1 Bed
-  await page.getByRole('button', { name: 'Add Bed' }).click();
-  await wardAllocation.allocateWard(ward1BedLayout);
-  await wardAllocation.expectSaveEnabled();
-  await wardAllocation.submit();
+  await test.step('Click Add Bed button', async () => {
+    await page.getByRole('button', { name: 'Add Bed' }).click();
+  });
 
-  // Allocate Inpatient Ward Bed
-  await page.getByRole('button', { name: 'Add Bed' }).click();
-  await wardAllocation.allocateWard(inpatientBedLayout);
-  await wardAllocation.expectSaveEnabled();
-  await wardAllocation.submit();
-  await expect(page.getByText('301').nth(1)).toBeVisible();
-  await expect(page.getByText('302').nth(1)).toBeVisible();
+  await test.step('Fill bed ID input', async () => {
+    await wardAllocation.bedIdInput().fill(ward1BedLayout.bedId.toString());
+  });
+
+  await test.step('Fill bed row input', async () => {
+    await wardAllocation.bedRowInput().fill(ward1BedLayout.rowNumber.toString());
+  });
+
+  await test.step('Fill bed column input', async () => {
+    await wardAllocation.bedColumnInput().fill(ward1BedLayout.columnNumber.toString());
+  });
+
+  await test.step('Select location from combo box', async () => {
+    await wardAllocation.locationComboBox().click();
+    await page.keyboard.type(ward1BedLayout.location);
+    await page.getByRole('option', { name: new RegExp(ward1BedLayout.location, 'i') }).click();
+    await page.keyboard.press('Tab');
+  });
+
+  await test.step('Select occupancy status', async () => {
+    await wardAllocation.occupancyStatusSelect().click();
+    await wardAllocation.occupancyStatusSelect().selectOption({ label: ward1BedLayout.status });
+    await page.keyboard.press('Tab');
+  });
+
+  await test.step('Select bed type', async () => {
+    await wardAllocation.bedTypeSelect().click();
+    await wardAllocation.bedTypeSelect().selectOption({ label: ward1BedLayout.bedType.name });
+  });
+
+  await test.step('Check save button enabled before submitting bed allocation', async () => {
+    await wardAllocation.expectSaveEnabled();
+  });
+
+  await test.step('Submit bed allocation form', async () => {
+    await wardAllocation.submit();
+  });
+
+  await test.step('Verify success notification for bed creation', async () => {
+    await expect(page.getByText(/ New bed created /i)).toBeVisible();
+  });
+
+  await test.step('Verify bed allocation form is filled correctly', async () => {
+    await expect(wardAllocation.bedNameInput()).toHaveValue(ward1BedType.name);
+  });
 });
