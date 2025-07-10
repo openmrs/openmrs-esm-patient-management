@@ -48,7 +48,6 @@ test('Confirming patient is admitted to ward', async ({ page }) => {
   });
 
   await test.step('And I select the ward/location for admission', async () => {
-    //await page.getByRole('combobox', { name: 'Choose an option' }).click();
     await page.getByText(`${bed.bedNumber} · Empty`).click();
   });
 
@@ -64,7 +63,8 @@ test('Confirming patient is admitted to ward', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  //We are waiting for the backend fix on https://bahmni.atlassian.net/browse/BAH-4197 to be able to delete beds
+  //We are waiting for the backend fix on https://bahmni.atlassian.net/browse/BAH-4197 to be able to delete beds,
+  //bed management module doesn't have support for deleting a bed, see https://github.com/openmrs/openmrs-module-bedmanagement/blob/master/omod/src/main/java/org/openmrs/module/bedmanagement/rest/resource/BedResource.java#L155-L164
   // await deleteBed(api, bed.uuid);
   await endVisit(api, visit.uuid, true);
 });
