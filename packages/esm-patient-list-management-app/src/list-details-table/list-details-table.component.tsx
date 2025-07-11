@@ -20,8 +20,10 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, ArrowLeft, TrashCan } from '@carbon/react/icons';
 import {
+  AddIcon,
+  ArrowLeftIcon,
+  TrashCanIcon,
   ConfigurableLink,
   useLayoutType,
   isDesktop,
@@ -290,7 +292,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       <ConfigurableLink to={patientListsPath}>
         <Button
           kind="ghost"
-          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+          renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription="Return to lists page"
           size="sm"
           onClick={() => {}}>
@@ -340,7 +342,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                     buttonText: t('addPatientToList', 'Add patient to list'),
                     buttonProps: {
                       kind: 'secondary',
-                      renderIcon: (props) => <Add size={16} {...props} />,
+                      renderIcon: (props) => <AddIcon {...props} />,
                       size: 'sm',
                     },
                     selectPatientAction: handleAddPatientToList,
@@ -383,7 +385,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                             <Button
                               kind="ghost"
                               hasIconOnly
-                              renderIcon={TrashCan}
+                              renderIcon={TrashCanIcon}
                               iconDescription={t('removeFromList', 'Remove from list')}
                               size={responsiveSize}
                               tooltipPosition="left"
@@ -469,7 +471,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
               buttonText: t('addPatientToList', 'Add patient to list'),
               buttonProps: {
                 kind: 'ghost',
-                renderIcon: (props) => <Add size={16} {...props} />,
+                renderIcon: (props) => <AddIcon {...props} />,
                 size: 'sm',
               },
               selectPatientAction: handleAddPatientToList,
