@@ -1,5 +1,4 @@
 import { type Page, expect } from '@playwright/test';
-import { type BedLayout, BedStatus, type BedType } from '../types';
 
 export class WardAllocation {
   constructor(readonly page: Page) {}

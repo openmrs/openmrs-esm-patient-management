@@ -219,42 +219,33 @@ export interface Identifier {
 
 export type BedStatus = 'Available' | 'Occupied';
 
-export interface AdmissionLocationFetchResponse {
-  totalBeds: number;
-  occupiedBeds: number;
-  ward: Location;
-  bedLayouts: Array<BedLayout>;
-}
-
 export interface Bed {
   id: number;
   uuid: string;
   bedNumber: string;
-  bedType: BedType;
+  bedType?: BedTypeData;
   row: number;
   column: number;
-  status: BedStatus;
+  status: 'AVAILABLE' | 'OCCUPIED';
 }
 
-export interface BedDetail {
-  bedId: number;
-  bedNumber: string;
-  bedType: BedType;
-  physicalLocation: Location;
-  patients: Array<Patient>;
-}
-
-export interface BedLayout {
-  rowNumber: number;
-  columnNumber: number;
-  bedNumber: string;
-  bedId: number;
-  status: BedStatus;
-  bedType: BedType;
-  location: string;
+export interface BedWithLocation extends Bed {
+  location: {
+    display: string;
+    uuid: string;
+  };
 }
 
 export interface BedType {
+  uuid: string;
+  name: string;
+  displayName: string;
+  description: string;
+  resourceVersion: string;
+}
+
+export interface BedTypeData {
+  uuid: string;
   name: string;
   displayName: string;
   description: string;

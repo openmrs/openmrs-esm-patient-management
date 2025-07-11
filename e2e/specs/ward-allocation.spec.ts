@@ -1,22 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { WardAllocation } from '../pages/ward-allocation';
+import { bed, bedType } from '../commands/ward-allocation-operation';
 
-const ward1BedType = {
-  name: 'ward1-bed',
-  displayName: 'Ward 1 Bed',
-  description: 'Standard bed in Ward 1',
-};
-
-const ward1BedLayout = {
-  bedId: 301,
-  bedNumber: '301A',
-  bedUuid: 'uuid-ward1-bed',
-  rowNumber: 1,
-  columnNumber: 1,
-  location: 'Ward 1',
-  status: 'Available',
-  bedType: ward1BedType,
-};
+const bedStatus = 'Available';
 
 test('Create bed type and allocate ward with detailed steps', async ({ page }) => {
   const wardAllocation = new WardAllocation(page);
@@ -30,15 +16,15 @@ test('Create bed type and allocate ward with detailed steps', async ({ page }) =
   });
 
   await test.step('Fill bed name input', async () => {
-    await wardAllocation.bedNameInput().fill(ward1BedType.name);
+    await wardAllocation.bedNameInput().fill(bedType.name);
   });
 
   await test.step('Fill display name input', async () => {
-    await wardAllocation.displayNameInput().fill(ward1BedType.displayName);
+    await wardAllocation.displayNameInput().fill(bedType.displayName);
   });
 
   await test.step('Fill description input', async () => {
-    await wardAllocation.descriptionInput().fill(ward1BedType.description);
+    await wardAllocation.descriptionInput().fill(bedType.description);
   });
 
   await test.step('Check save button enabled', async () => {
@@ -61,33 +47,33 @@ test('allocate beds to wards', async ({ page }) => {
   });
 
   await test.step('Fill bed ID input', async () => {
-    await wardAllocation.bedIdInput().fill(ward1BedLayout.bedId.toString());
+    await wardAllocation.bedIdInput().fill(bed.id.toString());
   });
 
   await test.step('Fill bed row input', async () => {
-    await wardAllocation.bedRowInput().fill(ward1BedLayout.rowNumber.toString());
+    await wardAllocation.bedRowInput().fill(bed.row.toString());
   });
 
   await test.step('Fill bed column input', async () => {
-    await wardAllocation.bedColumnInput().fill(ward1BedLayout.columnNumber.toString());
+    await wardAllocation.bedColumnInput().fill(bed.column.toString());
   });
 
   await test.step('Select location from combo box', async () => {
     await wardAllocation.locationComboBox().click();
-    await page.keyboard.type(ward1BedLayout.location);
-    await page.getByRole('option', { name: new RegExp(ward1BedLayout.location, 'i') }).click();
+    await page.keyboard.type(bed.location.display);
+    await page.getByRole('option', { name: new RegExp(bed.location.display, 'i') }).click();
     await page.keyboard.press('Tab');
   });
 
   await test.step('Select occupancy status', async () => {
     await wardAllocation.occupancyStatusSelect().click();
-    await wardAllocation.occupancyStatusSelect().selectOption({ label: ward1BedLayout.status });
+    await wardAllocation.occupancyStatusSelect().selectOption({ label: bedStatus });
     await page.keyboard.press('Tab');
   });
 
   await test.step('Select bed type', async () => {
     await wardAllocation.bedTypeSelect().click();
-    await wardAllocation.bedTypeSelect().selectOption({ label: ward1BedLayout.bedType.name });
+    await wardAllocation.bedTypeSelect().selectOption({ label: bed.bedType.name });
   });
 
   await test.step('Check save button enabled before submitting bed allocation', async () => {
@@ -103,6 +89,6 @@ test('allocate beds to wards', async ({ page }) => {
   });
 
   await test.step('Verify bed allocation form is filled correctly', async () => {
-    await expect(wardAllocation.bedNameInput()).toHaveValue(ward1BedType.name);
+    await expect(wardAllocation.bedNameInput()).toHaveValue(bedType.name);
   });
 });
