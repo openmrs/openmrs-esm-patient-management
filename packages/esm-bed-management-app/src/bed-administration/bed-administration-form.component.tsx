@@ -214,7 +214,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 render={({ field, fieldState }) => (
                   <Select
                     defaultValue={occupancyStatus}
-                    id="occupancyStatus"
+                    id="occupiedStatus"
                     invalidText={fieldState.error?.message}
                     labelText={t('occupancyStatus', 'Occupancy status')}
                     onChange={(event) => setOccupancyStatus(event.target.value)}

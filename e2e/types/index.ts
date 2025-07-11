@@ -216,3 +216,37 @@ export interface Identifier {
   uuid: string;
   display: string;
 }
+
+export type BedStatus = 'Available' | 'Occupied';
+
+export interface Bed {
+  id: number;
+  uuid: string;
+  bedNumber: string;
+  bedType?: BedTypeData;
+  row: number;
+  column: number;
+  status: 'AVAILABLE' | 'OCCUPIED';
+}
+
+export interface BedWithLocation extends Bed {
+  location: {
+    display: string;
+    uuid: string;
+  };
+}
+
+export interface BedType {
+  uuid: string;
+  name: string;
+  displayName: string;
+  description: string;
+  resourceVersion: string;
+}
+
+export interface BedTypeData {
+  uuid: string;
+  name: string;
+  displayName: string;
+  description: string;
+}
