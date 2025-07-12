@@ -40,23 +40,13 @@ export const editQueueEntryStatusModal = getAsyncLifecycle(
   },
 );
 
-export const removeQueueEntry = getAsyncLifecycle(() => import('./modals/remove-modal/remove-queue-entry.modal'), {
-  featureName: 'remove queue entry and end visit',
-  moduleName,
-});
-
-export const clearAllQueueEntries = getAsyncLifecycle(
+export const clearAllQueueEntriesModal = getAsyncLifecycle(
   () => import('./modals/clear-queue-entries-modal/clear-queue-entries.modal'),
   {
     featureName: 'clear all queue entries and end visits',
     moduleName,
   },
 );
-
-export const moveQueueEntryModal = getAsyncLifecycle(() => import('./move-queue-entry-modal/move-queue-entry.modal'), {
-  featureName: 'move queue entry',
-  moduleName,
-});
 
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 

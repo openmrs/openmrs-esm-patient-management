@@ -47,14 +47,6 @@
       "slot": "queue-table-by-status-view-slot"
     },
     {
-      "name": "remove-queue-entry",
-      "component": "removeQueueEntry"
-    },
-    {
-      "name": "clear-all-queue-entries",
-      "component": "clearAllQueueEntries"
-    },
-    {
       "name": "previous-visit-summary-widget",
       "component": "pastVisitSummary",
       "slot": "previous-visit-summary-slot"
@@ -97,6 +89,10 @@
     {
       "name": "add-provider-to-room-modal",
       "component": "addProviderToRoomModal"
+    },
+    {
+      "name": "clear-all-queue-entries-modal",
+      "component": "clearAllQueueEntriesModal"
     },
     {
       "name": "edit-queue-entry-modal",

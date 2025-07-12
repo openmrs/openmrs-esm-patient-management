@@ -21,7 +21,7 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) =
   const layout = useLayoutType();
 
   const launchClearAllQueueEntriesModal = useCallback(() => {
-    const dispose = showModal('clear-all-queue-entries', {
+    const dispose = showModal('clear-all-queue-entries-modal', {
       closeModal: () => dispose(),
       queueEntries,
     });
