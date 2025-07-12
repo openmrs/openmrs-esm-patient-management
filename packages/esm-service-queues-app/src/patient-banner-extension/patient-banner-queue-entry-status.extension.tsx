@@ -40,12 +40,12 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}
         onClick={() => {
-          const dispose = showModal('transition-queue-entry-modal', {
+          const dispose = showModal('move-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
           });
         }}>
-        {t('change', 'Change')}
+        {t('move', 'Move')}
       </Button>
     </div>
   );
