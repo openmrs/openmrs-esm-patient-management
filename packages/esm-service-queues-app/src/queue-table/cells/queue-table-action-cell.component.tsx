@@ -165,7 +165,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
     const actionPropsByKey = useActionPropsByKey();
     const { buttons, overflowMenu } = config.actions;
 
-    const buttonComponents = useMemo(() => {
+    const [buttonComponents, overflowMenuComponents] = useMemo(() => {
       const declaredButtonComponents = buttons
         .map((actionKey) => {
           const actionProps = actionPropsByKey[actionKey];
@@ -183,6 +183,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
         })
         .filter(Boolean);
       let fallbackActionComponent: React.ReactNode | null = null;
+      let overflowMenuKeys: string[] = [];
       if (declaredButtonComponents.length === 0) {
         const defaultAction = overflowMenu.find((actionKey) => {
           const showIf = actionPropsByKey[actionKey].showIf;
@@ -195,9 +196,19 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
           fallbackActionComponent = (
             <ActionButton key={defaultAction} actionKey={defaultAction} queueEntry={queueEntry} />
           );
+          overflowMenuKeys = overflowMenu.filter((actionKey) => actionKey !== defaultAction);
+        } else {
+          overflowMenuKeys = overflowMenu;
         }
+      } else {
+        overflowMenuKeys = overflowMenu;
       }
-      return [...declaredButtonComponents, fallbackActionComponent];
+
+      const overflowMenuComponents = overflowMenuKeys.map((actionKey) => (
+        <ActionOverflowMenuItem key={actionKey} actionKey={actionKey} queueEntry={queueEntry} />
+      ));
+
+      return [[...declaredButtonComponents, fallbackActionComponent], overflowMenuComponents];
     }, [buttons, overflowMenu, queueEntry, actionPropsByKey]);
 
     return (
@@ -205,9 +216,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
         {buttonComponents}
 
         <OverflowMenu aria-label="Actions menu" size={isDesktop(layout) ? 'sm' : 'lg'} align="left" flipped>
-          {overflowMenu.map((actionKey) => (
-            <ActionOverflowMenuItem key={actionKey} actionKey={actionKey} queueEntry={queueEntry} />
-          ))}
+          {overflowMenuComponents}
         </OverflowMenu>
       </div>
     );
