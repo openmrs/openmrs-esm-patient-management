@@ -32,8 +32,6 @@ function DefaultQueuePage() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const selectedService = useSelectedService();
-  const currentLocationUuid = useSelectedQueueLocationUuid();
-  const selectedQueueStatus = useSelectedQueueStatus();
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
 
   const { isPatientSearchOpen, hidePatientSearch, showPatientSearch } = usePatientSearchVisibility();

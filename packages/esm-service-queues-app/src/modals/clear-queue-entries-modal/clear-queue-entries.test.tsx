@@ -16,7 +16,7 @@ jest.mock('./clear-queue-entries.resource', () => ({
   batchClearQueueEntries: jest.fn(),
 }));
 
-jest.mock('../hooks/useQueueEntries', () => ({
+jest.mock('../../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 

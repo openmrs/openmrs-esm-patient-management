@@ -3,19 +3,21 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../../config-schema';
-import { type MappedVisitQueueEntry, serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
+import { serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
 import { requeueQueueEntry } from './call-queue-entry.resource';
 import CallQueueEntryModal from './call-queue-entry.modal';
+import { mockQueueEntryAlice } from '__mocks__';
 
 const mockNavigate = jest.mocked(navigate);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-jest.mock('../service-queues.resource', () => ({
+jest.mock('../../service-queues.resource', () => ({
+  ...jest.requireActual('../../service-queues.resource'),
   serveQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
   updateQueueEntry: jest.fn().mockResolvedValue({ status: 201 }),
 }));
 
-jest.mock('../hooks/useQueueEntries', () => ({
+jest.mock('../../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 
@@ -23,28 +25,7 @@ jest.mock('./call-queue-entry.resource', () => ({
   requeueQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
 }));
 
-// TODO: Update this to use QueueEntry, not MappedVisitQueueEntry
-// You'll also need to mock config.
 describe('MoveQueueEntryModal', () => {
-  const queueEntry = {
-    visitUuid: 'c90386ff-ae85-45cc-8a01-25852099c5ae',
-    identifiers: [
-      {
-        identifier: '100GEJ',
-        display: 'OpenMRS ID',
-        uuid: 'ac1f1f1e-6b0e-4d4e-8f0b-0b0e4e6b1fac',
-      },
-    ],
-    queueUuid: 'fa1e98f1-f002-4174-9e55-34d60951e710',
-    queueEntryUuid: '712289ab-32c0-430f-87b6-d9c1e4e4686e',
-    patientUuid: 'cc75ad73-c24b-499c-8db9-a7ef4fc0b36d',
-    priorityUuid: 'f9684018-a4d3-4d6f-9dd5-b4b1e89af3e7',
-    queue: {
-      name: 'Triage Queue',
-    },
-    name: 'John Doe',
-  } as unknown as MappedVisitQueueEntry;
-
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
@@ -57,7 +38,7 @@ describe('MoveQueueEntryModal', () => {
 
   it('renders modal content', () => {
     const closeModal = jest.fn();
-    render(<CallQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     expect(screen.getByText(/Serve patient/i)).toBeInTheDocument();
     expect(screen.getByText(/Patient name :/i)).toBeInTheDocument();
@@ -67,18 +48,22 @@ describe('MoveQueueEntryModal', () => {
     const user = userEvent.setup();
 
     const closeModal = jest.fn();
-    render(<CallQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Requeue'));
 
-    expect(requeueQueueEntry).toHaveBeenCalledWith('Requeued', queueEntry.queueUuid, queueEntry.queueEntryUuid);
+    expect(requeueQueueEntry).toHaveBeenCalledWith(
+      'Requeued',
+      mockQueueEntryAlice.queue.uuid,
+      mockQueueEntryAlice.uuid,
+    );
   });
 
   it('handles serving patient', async () => {
     const user = userEvent.setup();
 
     const closeModal = jest.fn();
-    render(<CallQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Serve'));
 

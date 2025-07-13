@@ -99,10 +99,6 @@
       "component": "editQueueEntryModal"
     },
     {
-      "name": "edit-queue-entry-status-modal",
-      "component": "editQueueEntryStatusModal"
-    },
-    {
       "name": "end-queue-entry-modal",
       "component": "endQueueEntryModal"
     },
@@ -117,10 +113,6 @@
     {
       "name": "move-queue-entry-modal",
       "component": "moveQueueEntryModal"
-    },
-    {
-      "name": "update-queue-entry-status-modal",
-      "component": "updateQueueEntryStatusModal"
     },
     {
       "name": "undo-transition-queue-entry-modal",

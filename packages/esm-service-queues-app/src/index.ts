@@ -32,14 +32,6 @@ export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/sid
 
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const editQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./modals/update-status-modal/update-status.modal'),
-  {
-    featureName: 'edit queue status',
-    moduleName,
-  },
-);
-
 export const clearAllQueueEntriesModal = getAsyncLifecycle(
   () => import('./modals/clear-queue-entries-modal/clear-queue-entries.modal'),
   {
@@ -82,14 +74,6 @@ export const moveQueueEntryModal = getAsyncLifecycle(() => import('./modals/move
   featureName: 'move queue entry',
   moduleName,
 });
-
-export const updateQueueEntryStatusModal = getAsyncLifecycle(
-  () => import('./modals/update-status-modal/update-status.modal'),
-  {
-    featureName: 'change queue entry status',
-    moduleName,
-  },
-);
 
 export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit-queue-entry.modal'), {
   featureName: 'edit queue entry of a patient',

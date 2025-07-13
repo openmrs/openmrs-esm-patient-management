@@ -27,6 +27,7 @@ export interface MappedVisitQueueEntry {
   name: string;
   patientAge: string;
   patientDob: string;
+  patientGender: string;
   patientUuid: string;
   queue: Queue;
   priority: Concept;
@@ -83,6 +84,7 @@ export const mapVisitQueueEntryProperties = (
   patientDob: queueEntry?.patient?.person?.birthdate
     ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
     : '--',
+  patientGender: queueEntry.patient.person.gender,
   queue: queueEntry.queue,
   priority: queueEntry.priority,
   priorityComment: queueEntry.priorityComment,

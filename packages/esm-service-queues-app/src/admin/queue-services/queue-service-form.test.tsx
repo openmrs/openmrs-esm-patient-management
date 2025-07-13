@@ -26,7 +26,7 @@ jest.mock('./queue-service.resource', () => ({
   saveQueue: jest.fn(() => Promise.resolve({ status: 201 })),
 }));
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+jest.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
   useQueueLocations: () => ({
     queueLocations: [
       { id: '34567eb0-b035-4acd-b284-da45f5067502', name: 'Location 1' },

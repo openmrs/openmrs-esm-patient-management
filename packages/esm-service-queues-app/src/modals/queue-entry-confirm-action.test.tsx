@@ -10,7 +10,7 @@ import VoidQueueEntryModal from './void-queue-entry.modal';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-jest.mock('../../hooks/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({
       queues: mockQueues,

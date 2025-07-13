@@ -24,16 +24,16 @@ jest.mock('./add-provider-queue-room.resource', () => ({
   useQueueRooms: jest.fn(),
 }));
 
-jest.mock('../hooks/useQueues', () => ({
+jest.mock('../../hooks/useQueues', () => ({
   useQueues: jest.fn(),
 }));
 
-jest.mock('../hooks/useQueueService', () => ({
+jest.mock('../../hooks/useQueueService', () => ({
   __esModule: true,
   default: jest.fn(),
 }));
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+jest.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(),
 }));
 
