@@ -18,12 +18,12 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: modalTitle || t('transitionPatient', 'Transition patient'),
+        modalTitle: modalTitle || t('movePatient', 'Move patient'),
         modalInstruction: t(
           'transitionPatientStatusOrQueue',
           'Select a new status or queue for patient to transition to.',
         ),
-        submitButtonText: t('transitionPatient', 'Transition patient'),
+        submitButtonText: t('move', 'Move'),
         submitSuccessTitle: t('queueEntryTransitioned', 'Queue entry transitioned'),
         submitSuccessText: t('queueEntryTransitionedSuccessfully', 'Queue entry transitioned successfully'),
         submitFailureTitle: t('queueEntryTransitionFailed', 'Error transitioning queue entry'),
