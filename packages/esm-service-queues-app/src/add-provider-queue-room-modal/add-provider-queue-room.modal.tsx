@@ -26,7 +26,7 @@ import {
   useQueueRooms,
 } from './add-provider-queue-room.resource';
 import {
-  updatedSelectedQueueRoomTimestamp,
+  updateSelectedQueueRoomTimestamp,
   updateIsPermanentProviderQueueRoom,
   updateSelectedQueueLocationName,
   updateSelectedQueueLocationUuid,
@@ -145,7 +145,7 @@ const AddProviderQueueRoomModal: React.FC<AddProviderQueueRoomModalProps> = ({ c
 
         const timestamp = new Date().toString();
         localStorage.setItem('lastUpdatedQueueRoomTimestamp', timestamp);
-        updatedSelectedQueueRoomTimestamp(new Date());
+        updateSelectedQueueRoomTimestamp(new Date());
         await mutate();
         closeModal();
       } catch (error) {
