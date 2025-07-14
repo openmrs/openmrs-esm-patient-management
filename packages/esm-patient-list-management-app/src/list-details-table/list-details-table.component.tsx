@@ -466,7 +466,6 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           <ExtensionSlot
             key={`${id}-patient-search`}
             name="patient-search-button-slot"
-            className=""
             state={{
               buttonText: t('addPatientToList', 'Add patient to list'),
               buttonProps: {

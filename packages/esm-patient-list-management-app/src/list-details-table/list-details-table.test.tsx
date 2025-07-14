@@ -1,24 +1,23 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 import ListDetailsTable from './list-details-table.component';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { addPatientToList } from '../api/api-remote';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const actual = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...actual,
-    showSnackbar: jest.fn(),
-    useLayoutType: () => 'desktop',
-    isDesktop: () => true,
-    ExtensionSlot: ({ state }) => (
-      <button onClick={() => state.selectPatientAction('new-patient')}>{state.buttonText}</button>
-    ),
-  };
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockIsDesktop = jest.mocked(isDesktop);
+const mockExtensionSlot = jest.mocked(ExtensionSlot);
+
+beforeEach(() => {
+  mockUseLayoutType.mockReturnValue('small-desktop');
+  mockIsDesktop.mockReturnValue(true);
+  mockShowSnackbar.mockImplementation(() => {});
+  mockExtensionSlot.mockImplementation(({ state }: any) => (
+    <button onClick={() => state.selectPatientAction('new-patient')}>{state.buttonText}</button>
+  ));
 });
-
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key, fallback) => fallback || key }),
-}));
 
 jest.mock('../api/api-remote', () => ({
   addPatientToList: jest.fn(() => Promise.resolve()),
@@ -127,13 +126,13 @@ describe('ListDetailsTable', () => {
       />,
     );
 
-    expect(screen.getByText('Add patient to list')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add patient to list/i })).toBeInTheDocument();
   });
 
   it('adds a new patient to the list when add button is clicked', async () => {
     const mockMutateListDetails = jest.fn();
     const mockMutateListMembers = jest.fn();
-
+    const user = userEvent.setup();
     render(
       <ListDetailsTable
         patients={patients}
@@ -148,17 +147,22 @@ describe('ListDetailsTable', () => {
       />,
     );
 
-    const addButton = screen.getByText('Add patient to list');
-    fireEvent.click(addButton);
+    const addButton = screen.getByRole('button', { name: /add patient to list/i });
+    expect(addButton).toBeInTheDocument();
+    await user.click(addButton);
 
-    await waitFor(() => {
-      expect(showSnackbar).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: expect.stringMatching(/Patient added to list/i),
-          kind: 'success',
-        }),
-      );
+    expect(addPatientToList).toHaveBeenCalledWith({
+      cohort: 'test-cohort',
+      patient: 'new-patient',
+      startDate: expect.any(String),
     });
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subtitle: 'The list is now up to date',
+        title: 'Patient added to list',
+        kind: 'success',
+      }),
+    );
 
     expect(mockMutateListMembers).toHaveBeenCalled();
     expect(mockMutateListDetails).toHaveBeenCalled();
