@@ -151,6 +151,7 @@ const ListDetails = () => {
         <div className={styles.tableContainer}>
           <ListDetailsTable
             patients={patients}
+            cohortUuid={patientListUuid}
             columns={headers}
             isLoading={isLoadingListMembers}
             isFetching={!listMembers}
