@@ -23,11 +23,30 @@
 .totalsLabel {
   @include type.type-style('label-01');
   color: $text-02;
+  margin-bottom: layout.$spacing-02;
 }
 
 .totalsValue {
   @include type.type-style('heading-04');
   color: $ui-05;
+  margin: 0;
+}
+
+.metricsContainer {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: flex-end;
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+
+  &:nth-child(2) {
+    .totalsValue {
+      color: red;
+    }
+  }
 }
 
 .headerLabelContainer {

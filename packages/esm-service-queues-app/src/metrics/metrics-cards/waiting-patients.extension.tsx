@@ -30,11 +30,14 @@ export default function WaitingPatientsExtension() {
     return !currentService?.serviceDisplay || !currentService?.serviceUuid;
   });
 
-  const { totalCount } = useQueueEntries({
+  const { totalCount, queueEntries } = useQueueEntries({
     service: currentService?.serviceUuid,
     location: currentQueueLocation,
     isEnded: false,
   });
+
+  // Calculate urgent cases count
+  const urgentCount = queueEntries.filter((entry) => entry.priority?.display?.toLowerCase() === 'urgent').length;
 
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem.display);
@@ -52,7 +55,9 @@ export default function WaitingPatientsExtension() {
       locationUuid={currentQueueLocation}
       service={currentService?.serviceDisplay}
       serviceUuid={currentService?.serviceUuid}
-      value={initialSelectedItem ? totalCount ?? '--' : serviceCount}>
+      value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
+      showUrgent={true}
+      urgentCount={urgentCount}>
       <Dropdown
         id="inline"
         initialSelectedItem={defaultServiceItem}

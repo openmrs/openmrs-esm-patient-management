@@ -220,5 +220,6 @@
   "vitalsForm": "Vitals form",
   "vitalsNotRecordedForVisit": "Vitals has not been recorded for this patient for this visit",
   "waitingFor": "Waiting for",
-  "weight": "Weight"
+  "weight": "Weight",
+  "urgent": "Urgent"
 }
