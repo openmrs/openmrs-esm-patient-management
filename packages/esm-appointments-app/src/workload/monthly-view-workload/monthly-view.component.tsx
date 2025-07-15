@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '@openmrs/esm-framework/';
+import { formatDate } from '@openmrs/esm-framework';
 import { monthDays } from '../../helpers';
 import { useAppointmentsStore } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
