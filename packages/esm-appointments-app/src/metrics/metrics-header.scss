@@ -4,16 +4,10 @@
 
 .metricsContainer {
   display: flex;
-  justify-content: space-between;
   background-color: $ui-02;
   height: layout.$spacing-10;
   align-items: center;
   padding: 0 layout.$spacing-05;
-}
-
-.metricsTitle {
-  @include type.type-style('heading-03');
-  color: $ui-05;
 }
 
 .link {
@@ -30,4 +24,5 @@
   display: flex;
   align-items: center;
   gap: layout.$spacing-05;
+  margin-left: auto;
 }

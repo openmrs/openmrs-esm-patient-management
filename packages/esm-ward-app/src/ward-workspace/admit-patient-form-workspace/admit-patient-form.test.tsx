@@ -89,6 +89,8 @@ function renderAdmissionForm() {
 
 describe('Testing AdmitPatientForm', () => {
   beforeEach(() => {
+    mockedUseAdmitPatient.mockReturnValue(mockUseAdmitPatientObj);
+
     mockedUseSession.mockReturnValue({
       currentProvider: {
         uuid: 'current-provider-uuid',
@@ -122,6 +124,7 @@ describe('Testing AdmitPatientForm', () => {
           ],
         },
       },
+      isLoading: false,
     });
 
     // @ts-ignore - we only need these two keys for now
@@ -161,7 +164,7 @@ describe('Testing AdmitPatientForm', () => {
   });
 
   it('should block the form if emr configuration is not fetched properly', () => {
-    mockedUseAdmitPatient.mockReturnValueOnce({
+    mockedUseAdmitPatient.mockReturnValue({
       admitPatient: mockedAdmitPatient,
       isLoadingEmrConfiguration: false,
       errorFetchingEmrConfiguration: true,
@@ -169,7 +172,7 @@ describe('Testing AdmitPatientForm', () => {
 
     renderAdmissionForm();
 
-    const admitButton = screen.getByText('Admit');
+    const admitButton = screen.getByRole('button', { name: /admit/i });
     expect(admitButton).toBeDisabled();
   });
 

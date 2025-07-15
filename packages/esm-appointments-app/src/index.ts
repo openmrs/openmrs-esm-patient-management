@@ -75,6 +75,21 @@ export const earlyAppointments = getAsyncLifecycle(
   options,
 );
 
+export const metricsCardScheduledAppointments = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/scheduled-appointments.extension'),
+  options,
+);
+
+export const metricsCardHighestVolumeService = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/highest-volume-service.extension'),
+  options,
+);
+
+export const metricsCardProvidersBooked = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/providers-booked.extension'),
+  options,
+);
+
 export const searchPatient = getAsyncLifecycle(() => import('./patient-search/patient-search.component'), options);
 
 // t('Appointments', 'Appointments')
