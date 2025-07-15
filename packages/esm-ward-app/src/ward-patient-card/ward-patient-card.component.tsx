@@ -13,7 +13,7 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
   const { patient } = wardPatient;
 
   return (
-    <div className={styles.wardPatientCard}>
+    <div data-testid={patient.uuid} className={styles.wardPatientCard}>
       {children}
       <button
         className={styles.wardPatientCardButton}
