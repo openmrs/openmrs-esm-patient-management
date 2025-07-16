@@ -19,11 +19,12 @@ import {
   TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { OpenmrsDatePicker, showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
 import { time12HourFormatRegexPattern } from '../constants';
 import { convertTime12to24, type amPm } from '../helpers/time-helpers';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
+import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './queue-entry-actions.scss';
 
@@ -63,6 +64,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   closeModal,
   modalParams,
 }) => {
+  const config = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const {
@@ -101,12 +103,15 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   const setSelectedQueueUuid = (selectedQueueUuid: string) => {
     const newSelectedQueue = queues.find((q) => q.uuid == selectedQueueUuid);
     const { allowedStatuses, allowedPriorities } = newSelectedQueue;
-    const newQueueHasCurrentStatus = allowedStatuses.find((s) => s.uuid == formState.selectedStatus);
     const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid == formState.selectedPriority);
+    const defaultStatusUuid = config.concepts.defaultStatusConceptUuid;
+    const newQueueHasDefaultStatus = allowedStatuses.find((s) => s.uuid == defaultStatusUuid);
+    const newStatus = newQueueHasDefaultStatus ? defaultStatusUuid : allowedStatuses[0]?.uuid;
+
     setFormState({
       ...formState,
       selectedQueue: selectedQueueUuid,
-      selectedStatus: newQueueHasCurrentStatus ? formState.selectedStatus : allowedStatuses[0]?.uuid,
+      selectedStatus: newStatus,
       selectedPriority: newQueueHasCurrentPriority ? formState.selectedPriority : allowedPriorities[0]?.uuid,
     });
   };
