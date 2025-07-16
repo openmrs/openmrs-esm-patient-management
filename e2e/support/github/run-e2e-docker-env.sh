@@ -52,5 +52,3 @@ echo "Starting Docker containers..."
 # CACHE_BUST to ensure the assemble step is always run
 docker compose build --build-arg CACHE_BUST=$(date +%s) frontend
 docker compose up -d
-echo "Backend image digest:"
-docker inspect openmrs/openmrs-reference-application-3-backend:nightly-with-data --format='{{index .RepoDigests 0}}'
