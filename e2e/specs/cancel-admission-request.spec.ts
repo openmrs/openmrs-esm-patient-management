@@ -11,7 +11,7 @@ import {
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../types';
-import { deleteBed, deleteBedType, generateBedType, generateRandomBed } from '../commands/bed-operations';
+import { deleteBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
 let visit: Visit;
@@ -33,7 +33,7 @@ test.beforeEach(async ({ api, page }) => {
   wardPage = new WardPage(page);
 });
 
-test('Cancelling an admission request', async ({ page }) => {
+test('Cancel an admission request', async ({ page }) => {
   const fullName = wardPatient.person?.display;
 
   await test.step('When I visit the patient ward page', async () => {
@@ -72,7 +72,7 @@ test('Cancelling an admission request', async ({ page }) => {
 
 test.afterEach(async ({ api }) => {
   await deleteBed(api, bed.uuid);
-  await deleteBedType(api, bedtype.uuid);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });

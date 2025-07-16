@@ -39,3 +39,13 @@ export const deleteBedType = async (api: APIRequestContext, uuid: string) => {
   const response = await api.delete(`bedtype/${uuid}`, { data: {} });
   await expect(response.ok()).toBeTruthy();
 };
+
+export const retireBedType = async (api: APIRequestContext, uuid: string, retireReason: string) => {
+  const response = await api.put(`bedtype/${uuid}`, {
+    data: {
+      retired: 'true',
+      retiredReason: retireReason,
+    },
+  });
+  await expect(response.ok()).toBeTruthy();
+};
