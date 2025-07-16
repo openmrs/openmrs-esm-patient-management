@@ -20,6 +20,9 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
+const queueEntryActions = ['move', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
+type QueueEntryAction = (typeof queueEntryActions)[number];
+
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
 
@@ -70,6 +73,10 @@ export const defaultPriorityConfig: PriorityConfig[] = [
 ];
 
 export const defaultColumnConfig: ColumnConfig = {
+  actions: {
+    buttons: ['call'],
+    overflowMenu: ['move', 'edit', 'remove', 'undo'],
+  },
   identifierTypeUuid: defaultIdentifierTypeUuid,
   statusConfigs: [],
   visitQueueNumberAttributeUuid: null,
@@ -77,7 +84,7 @@ export const defaultColumnConfig: ColumnConfig = {
 
 export const defaultQueueTable: TableDefinitions = {
   columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
-  appliedTo: [{ queue: null, status: null }],
+  appliedTo: [{ queue: '', status: '' }],
 };
 
 export const configSchema = {
@@ -285,6 +292,30 @@ export const configSchema = {
           _default: null,
         },
         config: {
+          actions: {
+            buttons: {
+              _type: Type.Array,
+              _default: ['call'],
+              _description:
+                'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
+                queueEntryActions.join(', '),
+              _elements: {
+                _type: Type.String,
+                _validators: [validators.oneOf(queueEntryActions)],
+              },
+            },
+            overflowMenu: {
+              _type: Type.Array,
+              _default: ['edit', 'remove', 'undo'],
+              _description:
+                'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
+                queueEntryActions.join(', '),
+              _elements: {
+                _type: Type.String,
+                _validators: [validators.oneOf(queueEntryActions)],
+              },
+            },
+          },
           identifierTypeUuid: {
             _type: Type.UUID,
             _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
@@ -331,13 +362,13 @@ export const configSchema = {
           _elements: {
             queue: {
               _type: Type.String,
-              _description: 'The UUID of the queue. If not provided, applies to all queues.',
-              _default: null,
+              _description: 'The UUID of the queue. If blank, applies to all queues.',
+              _default: '',
             },
             status: {
               _type: Type.String,
-              _description: 'The UUID of the status. If not provided, applies to all statuses.',
-              _default: null,
+              _description: 'The UUID of the status. If blank, applies to all statuses.',
+              _default: '',
             },
           },
         },
@@ -456,13 +487,17 @@ export type ColumnDefinition = {
   config: ColumnConfig;
 };
 
-export interface VisitAttributeQueueNumberColumnConfig {
-  visitQueueNumberAttributeUuid: string;
+export interface ActionsColumnConfig {
+  actions: {
+    buttons: QueueEntryAction[];
+    overflowMenu: QueueEntryAction[];
+  };
 }
 
 export interface PatientIdentifierColumnConfig {
   identifierTypeUuid: string; // uuid of the identifier type
 }
+
 export interface PriorityConfig {
   conceptUuid: string;
   color: PriorityTagColor;
@@ -482,7 +517,15 @@ export interface StatusColumnConfig {
   statusConfigs: StatusConfig[];
 }
 
-export type ColumnConfig = PatientIdentifierColumnConfig & StatusColumnConfig & VisitAttributeQueueNumberColumnConfig;
+export interface VisitAttributeQueueNumberColumnConfig {
+  visitQueueNumberAttributeUuid: string;
+}
+
+export type ColumnConfig = ActionsColumnConfig &
+  PatientIdentifierColumnConfig &
+  PriorityColumnConfig &
+  StatusColumnConfig &
+  VisitAttributeQueueNumberColumnConfig;
 
 export interface TableDefinitions {
   // Column IDs defined either in columnDefinitions or in builtInColumns
@@ -490,5 +533,5 @@ export interface TableDefinitions {
 
   // apply the columns to tables of any of the specified queue and status
   // (if appliedTo is null, apply to all tables, including the one in the service queue app home page)
-  appliedTo?: Array<{ queue?: string; status?: string }>;
+  appliedTo?: Array<{ queue: string; status: string }>;
 }

@@ -24,11 +24,7 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     async ({ api }, use) => {
       const patient = await generateRandomPatient(api);
       await use(patient);
-      try {
-        if (patient) await deletePatient(api, patient.uuid);
-      } catch (e) {
-        console.warn('Failed to delete patient:', e);
-      }
+      await deletePatient(api, patient.uuid);
     },
     { scope: 'test', auto: true },
   ],

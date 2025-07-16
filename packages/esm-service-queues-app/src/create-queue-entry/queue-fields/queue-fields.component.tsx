@@ -24,13 +24,32 @@ import { useQueues } from '../../hooks/useQueues';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
+  defaultInitialServiceQueue?: string;
 }
+
+const createQueueServiceSchema = (t: TFunction) =>
+  z.object({
+    queueLocation: z
+      .string({ required_error: t('queueLocationRequired', 'Queue location is required') })
+      .trim()
+      .min(1, t('queueLocationRequired', 'Queue location is required')),
+    queueService: z
+      .string({ required_error: t('queueServiceRequired', 'Queue service is required') })
+      .trim()
+      .min(1, t('queueServiceRequired', 'Queue service is required')),
+    priority: z
+      .string({ required_error: t('priorityIsRequired', 'Priority is required') })
+      .trim()
+      .min(1, t('priorityIsRequired', 'Priority is required')),
+  });
 
 /**
  * This component contains form fields for starting a patient's queue entry.
  */
-const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => {
+
+const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: QueueFieldsProps) => {
   const { t } = useTranslation();
+  const schema = React.useMemo(() => createQueueServiceSchema(t), [t]);
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const { sessionLocation } = useSession();
   const {
@@ -39,22 +58,6 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
   } = useConfig<ConfigObject>();
   const { currentServiceQueueUuid } = useAddPatientToQueueContext();
   const { mutateQueueEntries } = useMutateQueueEntries();
-
-  const QueueServiceSchema = (t: TFunction) =>
-    z.object({
-      queueLocation: z
-        .string({ required_error: t('queueLocationRequired', 'Queue location is required') })
-        .trim()
-        .min(1, t('queueLocationRequired', 'Queue location is required')),
-      queueService: z
-        .string({ required_error: t('queueServiceRequired', 'Queue service is required') })
-        .trim()
-        .min(1, t('queueServiceRequired', 'Queue service is required')),
-      priority: z
-        .string({ required_error: t('priorityIsRequired', 'Priority is required') })
-        .trim()
-        .min(1, t('priorityIsRequired', 'Priority is required')),
-    });
 
   const {
     control,
@@ -69,7 +72,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
       queueService: '',
     },
     mode: 'onChange',
-    resolver: zodResolver(QueueServiceSchema(t)),
+    resolver: zodResolver(schema),
   });
 
   const queueLocation = watch('queueLocation');
@@ -81,9 +84,13 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
 
   const onSubmit = useCallback(
     async (visit: Visit) => {
-      const isValid = await trigger();
+      const isValid = await trigger(['queueLocation', 'queueService', 'priority']);
+
       if (!isValid) {
-        return Promise.reject(new Error('Form validation failed'));
+        const errorMessages = Object.entries(errors)
+          .map(([, error]) => `${error?.message ?? 'Invalid'}`)
+          .join('\n');
+        return Promise.reject(new Error(`Form validation failed:\n${errorMessages}`));
       }
       return postQueueEntry(
         visit.uuid,
@@ -124,6 +131,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
       t,
       trigger,
       visitQueueNumberAttributeUuid,
+      errors,
     ],
   );
 
@@ -136,6 +144,13 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
       setValue('queueService', currentServiceQueueUuid, { shouldValidate: true });
     }
   }, [currentServiceQueueUuid, setValue]);
+
+  useEffect(() => {
+    if (defaultInitialServiceQueue) {
+      const initialServiceQueue = queues.find((q) => q.name === defaultInitialServiceQueue);
+      setValue('queueService', initialServiceQueue?.uuid, { shouldValidate: true });
+    }
+  }, [defaultInitialServiceQueue, setValue, queues]);
 
   useEffect(() => {
     if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
@@ -215,7 +230,7 @@ const QueueFields: React.FC<QueueFieldsProps> = React.memo(({ setOnSubmit }) => 
         />
       </FormGroup>
       {/* Status section of the form would go here; historical version of this code can be found at
-          https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
+      https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
       {queueService && (
         <FormGroup legendText={t('priority', 'Priority')}>

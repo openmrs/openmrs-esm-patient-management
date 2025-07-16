@@ -8,7 +8,6 @@ import {
   isDesktop,
   launchWorkspace,
   showSnackbar,
-  showToast,
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { serviceQueuesPatientSearchWorkspace } from '../constants';
@@ -24,7 +23,7 @@ import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
 import useQueueServices from '../hooks/useQueueService';
 import usePatientSearchVisibility from '../hooks/usePatientSearchVisibility';
-import ClearQueueEntries from '../clear-queue-entries-modal/clear-queue-entries.component';
+import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
@@ -33,8 +32,6 @@ function DefaultQueuePage() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const selectedService = useSelectedService();
-  const currentLocationUuid = useSelectedQueueLocationUuid();
-  const selectedQueueStatus = useSelectedQueueStatus();
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
 
   const { isPatientSearchOpen, hidePatientSearch, showPatientSearch } = usePatientSearchVisibility();
@@ -123,10 +120,10 @@ function QueueTableSection() {
 
   const columns = useColumns(null, null);
   if (!columns) {
-    showToast({
-      title: t('notableConfig', 'No table configuration'),
+    showSnackbar({
       kind: 'warning',
-      description: 'No table configuration defined for queue: null and status: null',
+      title: t('notableConfig', 'No table configuration'),
+      subtitle: 'No table configuration defined for queue: null and status: null',
     });
   }
 
@@ -154,14 +151,15 @@ function QueueTableSection() {
       statusUuid={null}
       tableFilters={
         <>
-          <QueueDropdownFilter /> <StatusDropdownFilter />
+          <ClearQueueEntries queueEntries={filteredQueueEntries} />
+          <StatusDropdownFilter />
           <TableToolbarSearch
             className={styles.search}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('searchThisList', 'Search this list')}
             size={isDesktop(layout) ? 'sm' : 'lg'}
+            persistent
           />
-          <ClearQueueEntries queueEntries={filteredQueueEntries} />
         </>
       }
     />
@@ -207,12 +205,12 @@ function StatusDropdownFilter() {
     <div className={styles.filterContainer}>
       <Dropdown
         id="statusFilter"
-        items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}
+        items={[{ display: `${t('any', 'Any')}` }, ...(statuses ?? [])]}
         itemToString={(item) => (item ? item.display : '')}
         label={queueStatus?.statusDisplay ?? t('all', 'All')}
         onChange={handleStatusChange}
         size={isDesktop(layout) ? 'sm' : 'lg'}
-        titleText={t('filterByStatus', 'Filter by status:')}
+        titleText={t('showPatientsWithStatus', 'Show patients with status:')}
         type="inline"
       />
     </div>

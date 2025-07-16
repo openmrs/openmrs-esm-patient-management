@@ -39,9 +39,26 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
     [visitQueueNumberAttributeUuid],
   );
 
+  const tableDefinition = useMemo(
+    () =>
+      tableDefinitions.find((tableDef) => {
+        const appliedTo = tableDef.appliedTo;
+
+        return (
+          appliedTo == null ||
+          appliedTo.some(
+            (criteria) =>
+              (criteria.queue == '' || criteria.queue == queue) && (criteria.status == '' || criteria.status == status),
+          )
+        );
+      }),
+    [tableDefinitions, queue, status],
+  );
+
   const columnsMap = useMemo(() => {
     const map = new Map<string, QueueTableColumn>();
-    for (const column of builtInColumns) {
+    const builtInColumnsInUse = builtInColumns.filter((columnId) => tableDefinition?.columns.includes(columnId));
+    for (const column of builtInColumnsInUse) {
       map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
     }
     for (const columnDef of columnDefinitions) {
@@ -52,24 +69,7 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
       map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
     }
     return map;
-  }, [columnDefinitions, globalColumnConfig, t, visitQueueNumberAttributeUuid]);
-
-  const tableDefinition = useMemo(
-    () =>
-      tableDefinitions.find((tableDef) => {
-        const appliedTo = tableDef.appliedTo;
-
-        return (
-          appliedTo == null ||
-          appliedTo.some(
-            (criteria) =>
-              (criteria.queue == null || criteria.queue == queue) &&
-              (criteria.status == null || criteria.status == status),
-          )
-        );
-      }),
-    [tableDefinitions, queue, status],
-  );
+  }, [tableDefinition, columnDefinitions, globalColumnConfig, t, visitQueueNumberAttributeUuid]);
 
   const columns = tableDefinition?.columns?.map((columnId) => {
     const column = columnsMap.get(columnId);
@@ -126,7 +126,7 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
       return queueTableVisitStartTimeColumn(id, translatedHeader ?? t('visitStartTime', 'Visit start time'));
     }
     case 'actions': {
-      return queueTableActionColumn(id, translatedHeader ?? t('actions', 'Actions'));
+      return queueTableActionColumn(id, translatedHeader ?? t('actions', 'Actions'), columnDef.config);
     }
     case 'extension': {
       return queueTableExtensionColumn(id, translatedHeader);

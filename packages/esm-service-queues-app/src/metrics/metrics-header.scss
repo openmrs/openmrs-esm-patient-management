@@ -1,0 +1,21 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.metricsContainer {
+  display: flex;
+  background-color: $ui-02;
+  height: layout.$spacing-10;
+  align-items: center;
+  padding: 0 layout.$spacing-05;
+}
+
+.actionBtn {
+  display: flex;
+  column-gap: layout.$spacing-03;
+}
+
+.comboBtn {
+  cursor: default;
+  margin-left: auto;
+}

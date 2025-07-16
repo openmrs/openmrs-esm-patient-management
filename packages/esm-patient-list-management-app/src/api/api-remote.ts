@@ -29,6 +29,20 @@ import {
   PatientListType,
 } from './types';
 
+export type FieldError = {
+  [key: string]: Array<{ code: string; message: string }>;
+};
+
+export type ErrorObject = {
+  error: {
+    code: string;
+    message: string;
+    detail: string;
+    fieldErrors?: FieldError;
+    globalErrors?: FieldError;
+  };
+};
+
 export const cohortUrl = `${restBaseUrl}/cohortm`;
 
 async function postData(url: string, data = {}, ac = new AbortController()) {
@@ -42,6 +56,26 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
   });
 
   return response.data;
+}
+
+export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
+  const {
+    error: { fieldErrors, globalErrors, message, code },
+  } = errorObject ?? {};
+
+  if (fieldErrors) {
+    return Object.values(fieldErrors)
+      .flatMap((errors) => errors.map((error) => error.message))
+      .join('\n');
+  }
+
+  if (globalErrors) {
+    return Object.values(globalErrors)
+      .flatMap((errors) => errors.map((error) => error.message))
+      .join('\n');
+  }
+
+  return message ?? code ?? this.translateService.instant('unknownError');
 }
 
 async function deleteData(url: string, data = {}, ac = new AbortController()) {

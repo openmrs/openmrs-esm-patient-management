@@ -28,6 +28,15 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-bed-management-app
 
+[o:openmrs:p:openmrs3:r:esm-home-app]
+file_filter            = packages/esm-home-app/translations/<lang>.json
+source_file            = packages/esm-home-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+resource_name          = esm-home-app
+
 [o:openmrs:p:openmrs3:r:esm-patient-list-management-app]
 file_filter            = packages/esm-patient-list-management-app/translations/<lang>.json
 source_file            = packages/esm-patient-list-management-app/translations/en.json

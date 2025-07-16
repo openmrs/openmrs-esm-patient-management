@@ -1,6 +1,5 @@
 {
   "activeVisits": "Active Visits",
-  "age": "Age",
   "allEncounters": "All Encounters",
   "checkFilters": "Check the filters above",
   "diagnoses": "Diagnoses",
@@ -9,11 +8,8 @@
   "endDate": "End date",
   "filterActiveVisits": "Filter active visits",
   "filterTable": "Filter table",
-  "gender": "Gender",
-  "idNumber": "ID Number",
   "indication": "Indication",
   "medications": "Medications",
-  "name": "Name",
   "noActiveVisitsForLocation": "There are no active visits to display for this location.",
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersFound": "No encounters found",
@@ -33,7 +29,5 @@
   "time": "Time",
   "totalVisits": "Total Visits Today",
   "viewPatientChartFor": "View patient chart for {{patientName}}",
-  "visitStartTime": "Visit Time",
-  "visitSummary": "Visit Summary",
-  "visitType": "Visit Type"
+  "visitSummary": "Visit Summary"
 }

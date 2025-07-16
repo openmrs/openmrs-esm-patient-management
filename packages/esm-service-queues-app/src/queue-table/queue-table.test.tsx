@@ -108,7 +108,7 @@ describe('QueueTable', () => {
         tableDefinitions: [
           {
             columns: ['patient-name', 'status', 'wait-time', 'actions'],
-            appliedTo: [{ queue: null, status: null }],
+            appliedTo: [{ queue: '', status: '' }],
           },
         ],
       },
@@ -183,6 +183,10 @@ describe('QueueTable', () => {
           {
             id: 'priority',
             config: {
+              actions: {
+                buttons: ['transition'],
+                overflowMenu: ['edit', 'remove', 'undo'],
+              },
               identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
               statusConfigs: [],
               visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
