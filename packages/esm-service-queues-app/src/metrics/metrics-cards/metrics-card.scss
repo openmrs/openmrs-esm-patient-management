@@ -41,12 +41,11 @@
 .metricItem {
   display: flex;
   flex-direction: column;
+}
 
-  &:nth-child(2) {
-    .totalsValue {
-      color: red;
-    }
-  }
+.urgentValue {
+  @include type.type-style('heading-04');
+  color: red;
 }
 
 .headerLabelContainer {
