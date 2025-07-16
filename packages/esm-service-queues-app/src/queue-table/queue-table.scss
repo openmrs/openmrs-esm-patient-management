@@ -53,15 +53,6 @@
   }
 }
 
-.statusContainer {
-  display: flex;
-  align-items: center;
-
-  svg {
-    margin-right: layout.$spacing-03;
-  }
-}
-
 .search {
   max-width: 16rem;
   display: inline;
