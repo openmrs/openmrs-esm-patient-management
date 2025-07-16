@@ -162,7 +162,7 @@ export const configSchema = {
     _type: Type.UUID,
     _description:
       'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
-    _default: '',
+    _default: null,
   },
   customPatientChartUrl: {
     _type: Type.String,
@@ -173,19 +173,20 @@ export const configSchema = {
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   dashboardTitle: {
-    _type: Type.Array,
-    _elements: {
-      key: {
-        _type: Type.String,
-        _description: 'The translation key of the title to be displayed on the service queues dashboard',
-      },
-      value: {
-        _type: Type.String,
-        _description: 'The translation value of the title to be displayed on the service queues dashboard',
-      },
+    _type: Type.Object,
+    _description: 'The title to be displayed on the service queues dashboard',
+    key: {
+      _type: Type.String,
+      _description: 'The translation key of the title to be displayed on the service queues dashboard',
     },
-    _description: 'The titles to be displayed on the service queues dashboard',
-    _default: [{ key: 'serviceQueues', value: 'Service queues' }],
+    value: {
+      _type: Type.String,
+      _description: 'The translation value of the title to be displayed on the service queues dashboard',
+    },
+    _default: {
+      key: 'serviceQueues',
+      value: 'Service queues',
+    },
   },
   defaultIdentifierTypes: {
     _type: Type.Array,
@@ -289,7 +290,7 @@ export const configSchema = {
             _type: Type.String,
             _description:
               'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-            _default: '',
+            _default: null,
           },
         },
         _validators: [

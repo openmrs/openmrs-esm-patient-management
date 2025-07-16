@@ -9,25 +9,15 @@ export const esmHomeSchema = {
     _validators: [validators.oneOf(['normal', 'collapsed', 'hidden'])],
   },
   defaultDashboardPerRole: {
-    _type: Type.Array,
-    _elements: {
-      key: {
-        _type: Type.String,
-        _description: 'OpenMRS user role',
-      },
-      value: {
-        _type: Type.String,
-        _description: 'Name of dashboard (what goes in the URL after /home/)',
-      },
-    },
+    _type: Type.Object,
     _description:
       'Keys are OpenMRS user roles, values are names of dashboards (what goes in the URL after /home/). If a role\'s default dashboard is not configured here, "service-queues" is the default.',
-    _default: [
-      {
-        key: 'Organizational: Registration Clerk',
-        value: 'appointments',
-      },
-    ],
+    _elements: {
+      _type: Type.String,
+    },
+    _default: {
+      'Organizational: Registration Clerk': 'appointments',
+    },
   },
 };
 
