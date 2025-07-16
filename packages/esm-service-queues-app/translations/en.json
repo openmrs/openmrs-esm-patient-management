@@ -213,6 +213,7 @@
   "unexpectedError": "An unexpected error occurred",
   "unexpectedServerResponse": "Unexpected Server Response",
   "updateEntry": "Update entry",
+  "urgent": "Urgent",
   "useTodaysDate": "Use today's date",
   "visitTabs": "Visit tabs",
   "visitType": "Visit Type",
@@ -220,6 +221,5 @@
   "vitalsForm": "Vitals form",
   "vitalsNotRecordedForVisit": "Vitals has not been recorded for this patient for this visit",
   "waitingFor": "Waiting for",
-  "weight": "Weight",
-  "urgent": "Urgent"
+  "weight": "Weight"
 }
