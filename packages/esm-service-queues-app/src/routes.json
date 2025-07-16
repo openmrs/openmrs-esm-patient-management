@@ -47,23 +47,9 @@
       "slot": "queue-table-by-status-view-slot"
     },
     {
-      "name": "remove-queue-entry",
-      "component": "removeQueueEntry"
-    },
-    {
-      "name": "clear-all-queue-entries",
-      "component": "clearAllQueueEntries"
-    },
-    {
       "name": "previous-visit-summary-widget",
       "component": "pastVisitSummary",
       "slot": "previous-visit-summary-slot"
-    },
-
-    {
-      "name": "active-visits-row-actions",
-      "component": "activeVisitsRowActions",
-      "slot": "queue-table-serve-patient-slot"
     },
     {
       "name": "visit-form-queue-fields",
@@ -105,12 +91,12 @@
       "component": "addProviderToRoomModal"
     },
     {
-      "name": "edit-queue-entry-modal",
-      "component": "editQueueEntryModal"
+      "name": "clear-all-queue-entries-modal",
+      "component": "clearAllQueueEntriesModal"
     },
     {
-      "name": "edit-queue-entry-status-modal",
-      "component": "editQueueEntryStatusModal"
+      "name": "edit-queue-entry-modal",
+      "component": "editQueueEntryModal"
     },
     {
       "name": "end-queue-entry-modal",
@@ -118,15 +104,15 @@
     },
     {
       "name": "transition-patient-to-latest-queue-modal",
-      "component": "transitionPatientToLatestQueue"
+      "component": "addOrMoveModal"
     },
     {
-      "name": "transition-queue-entry-modal",
-      "component": "transitionQueueEntryModal"
+      "name": "call-queue-entry-modal",
+      "component": "callQueueEntryModal"
     },
     {
-      "name": "transition-queue-entry-status-modal",
-      "component": "transitionQueueEntryStatusModal"
+      "name": "move-queue-entry-modal",
+      "component": "moveQueueEntryModal"
     },
     {
       "name": "undo-transition-queue-entry-modal",
