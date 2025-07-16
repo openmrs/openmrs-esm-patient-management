@@ -29,16 +29,9 @@ type AddressField = keyof typeof addressFields;
 
 export const configSchema = {
   patientCardElements: {
-    _type: Type.Object,
-    _default: {},
-    _description:
-      'Configuration of various patient card elements. Each configured element must have a unique id, defined in the ward React component being used.',
     obs: {
       _type: Type.Array,
-      _description: 'Configures obs values to display.',
-      _default: [],
       _elements: {
-        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -73,32 +66,20 @@ export const configSchema = {
           _default: false,
         },
       },
+      _description: 'Configures obs values to display.',
+      _default: [],
     },
     pendingItems: {
       _type: Type.Array,
-      _description: 'Configures pending orders and transfers to display.',
-      _default: [
-        {
-          id: 'pending-items',
-          orders: {
-            orderTypes: [{ label: 'Labs', uuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e' }],
-          },
-          showPendingItems: true,
-        },
-      ],
       _elements: {
-        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
         },
         orders: {
-          _type: Type.Object,
           orderTypes: {
             _type: Type.Array,
-            _description: 'Configures pending orders and transfers to display.',
             _elements: {
-              _type: Type.Object,
               uuid: {
                 _type: Type.UUID,
                 _description: 'Identifies the order type.',
@@ -110,6 +91,7 @@ export const configSchema = {
                 _default: '',
               },
             },
+            _description: 'Configures pending orders and transfers to display.',
           },
         },
         showPendingItems: {
@@ -118,18 +100,20 @@ export const configSchema = {
             'Optional. If true, pending items (e.g., number of pending orders) will be displayed on the patient card.',
         },
       },
+      _description: 'Configures pending orders and transfers to display.',
+      _default: [
+        {
+          id: 'pending-items',
+          orders: {
+            orderTypes: [{ label: 'Labs', uuid: '52a447d3-a64a-11e3-9aeb-50e549534c5e' }],
+          },
+          showPendingItems: true,
+        },
+      ],
     },
     patientIdentifier: {
       _type: Type.Array,
-      _description: `Configures patient identifier to display. An unconfigured element displays the preferred identifier.`,
-      _default: [
-        {
-          id: 'patient-identifier',
-          showIdentifierLabel: false,
-        },
-      ],
       _elements: {
-        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -140,9 +124,31 @@ export const configSchema = {
             'If true, the identifier type (eg: "OpenMRS ID") is shown along with the identifier itself. Defaults to false',
         },
       },
+      _description:
+        'Configures patient identifier to display. An unconfigured element displays the preferred identifier.',
+      _default: [
+        {
+          id: 'patient-identifier',
+          showIdentifierLabel: false,
+        },
+      ],
     },
     patientAddress: {
       _type: Type.Array,
+      _elements: {
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for this patient card element',
+        },
+        fields: {
+          _type: Type.Array,
+          _elements: {
+            _type: Type.String,
+            _validators: [validators.oneOf(addressFields)],
+          },
+          _description: 'The fields of the address to display',
+        },
+      },
       _description: 'Configures patient address elements.',
       _default: [
         {
@@ -150,33 +156,10 @@ export const configSchema = {
           fields: ['cityVillage', 'country'],
         },
       ],
-      _elements: {
-        _type: Type.Object,
-        id: {
-          _type: Type.String,
-          _description: 'The unique identifier for this patient card element',
-        },
-        fields: {
-          _type: Type.Array,
-          _description: 'The fields of the address to display',
-          _elements: {
-            _type: Type.String,
-            _validators: [validators.oneOf(addressFields)],
-          },
-        },
-      },
     },
     admissionRequestNote: {
       _type: Type.Array,
-      _description: 'Configures admission request notes to display.',
-      _default: [
-        {
-          id: 'admission-request-note',
-          conceptUuid: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        },
-      ],
       _elements: {
-        _type: Type.Object,
         id: {
           _type: Type.String,
           _description: 'The unique identifier for this patient card element',
@@ -186,13 +169,17 @@ export const configSchema = {
           _description: 'Required. Identifies the concept for the admission request note.',
         },
       },
+      _description: 'Configures admission request notes to display.',
+      _default: [
+        {
+          id: 'admission-request-note',
+          conceptUuid: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+      ],
     },
     coloredObsTags: {
       _type: Type.Array,
-      _description: 'Configures observation values to display as Carbon tags.',
-      _default: [],
       _elements: {
-        _type: Type.Object,
         conceptUuid: {
           _type: Type.UUID,
           _description: 'Required. Identifies the concept to use to identify the desired observations.',
@@ -217,10 +204,7 @@ export const configSchema = {
         },
         tags: {
           _type: Type.Array,
-          _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
-          _default: [],
           _elements: {
-            _type: Type.Object,
             color: {
               _type: Type.String,
               _description:
@@ -228,22 +212,23 @@ export const configSchema = {
             },
             appliedToConceptSets: {
               _type: Type.Array,
-              _description: `The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets will be displayed as their own tag with the specified color. If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.`,
               _elements: {
                 _type: Type.UUID,
               },
+              _description: `The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets will be displayed as their own tag with the specified color. If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.`,
             },
           },
+          _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
+          _default: [],
         },
       },
+      _description: 'Configures observation values to display as Carbon tags.',
+      _default: [],
     },
   },
   wards: {
-    _description: 'Configuration of what type of ward to use at different ward locations.',
     _type: Type.Array,
-    _default: [{ id: 'default-ward' }],
     _elements: {
-      _type: Type.Object,
       id: {
         _type: Type.String,
         _description:
@@ -251,22 +236,23 @@ export const configSchema = {
       },
       appliedTo: {
         _type: Type.Array,
-        _description:
-          'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
         _elements: {
-          _type: Type.Object,
           location: {
             _type: Type.UUID,
             _description: 'The UUID of the location. If not provided, applies to all wards.',
-            _default: null,
+            _default: '',
           },
         },
+        _description:
+          'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
       },
     },
+    _description: 'Configuration of what type of ward to use at different ward locations.',
+    _default: [{ id: 'default-ward' }],
   },
   hideWorkspaceVitalsLinks: {
-    _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
     _type: Type.Boolean,
+    _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
     _default: false,
   },
 };

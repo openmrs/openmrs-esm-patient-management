@@ -89,10 +89,10 @@ export const defaultQueueTable: TableDefinitions = {
 export const configSchema = {
   appointmentStatuses: {
     _type: Type.Array,
-    _description: 'Configurable appointment status (status of appointments)',
     _elements: {
       _type: Type.String,
     },
+    _description: 'Configurable appointment status (status of appointments)',
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
   },
   biometrics: biometricsConfigSchema,
@@ -131,10 +131,10 @@ export const configSchema = {
     },
     historicalObsConceptUuid: {
       _type: Type.Array,
-      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
       _elements: {
         _type: Type.ConceptUuid,
       },
+      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
       _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     },
     oxygenSaturationUuid: {
@@ -162,35 +162,30 @@ export const configSchema = {
     _type: Type.UUID,
     _description:
       'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
-    _default: null,
+    _default: '',
   },
   customPatientChartUrl: {
     _type: Type.String,
-    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
     _description: `Template URL that will be used when clicking on the patient name in the queues table.
-      Available arguments: patientUuid, openmrsSpaBase, openBase
-      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
+    Available arguments: patientUuid, openmrsSpaBase, openBase
+    (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
+    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   dashboardTitle: {
-    _description: 'The title to be displayed on the service queues dashboard',
-    key: {
-      _type: Type.String,
-      _description: 'The translation key of the title to be displayed on the service queues dashboard',
+    _type: Type.Array,
+    _elements: {
+      key: {
+        _type: Type.String,
+        _description: 'The translation key of the title to be displayed on the service queues dashboard',
+      },
+      value: {
+        _type: Type.String,
+        _description: 'The translation value of the title to be displayed on the service queues dashboard',
+      },
     },
-    value: {
-      _type: Type.String,
-      _description: 'The translation value of the title to be displayed on the service queues dashboard',
-    },
-    _default: {
-      key: 'serviceQueues',
-      value: 'Service queues',
-    },
-  },
-  defaultFacilityUrl: {
-    _type: Type.String,
-    _default: null,
-    _description: 'Custom URL to load default facility if it is not in the session',
+    _description: 'The titles to be displayed on the service queues dashboard',
+    _default: [{ key: 'serviceQueues', value: 'Service queues' }],
   },
   defaultIdentifierTypes: {
     _type: Type.Array,
@@ -203,11 +198,100 @@ export const configSchema = {
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
-      _default: [],
-      _description:
-        "Custom columns for queue tables can be defined here. These columns will be referenced by their `id` in the `tableDefinitions` columns configuration. If the provided `id` matches a built-in column, the custom configuration will override the built-in column's configuration.",
       _elements: {
-        _type: Type.Object,
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for the column you are defining',
+        },
+        columnType: {
+          _type: Type.String,
+          _description: 'The type of column, if different from the ID',
+          _validators: [validators.oneOf(columnTypes)],
+          _default: '',
+        },
+        header: {
+          _type: Type.String,
+          _description:
+            'The header text for the column. Will be translated if it is a valid translation key. If not provided, the header will be based on the columnType.',
+          _default: '',
+        },
+        config: {
+          actions: {
+            buttons: {
+              _type: Type.Array,
+              _elements: {
+                _type: Type.String,
+              },
+              _description:
+                'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
+                queueEntryActions.join(', '),
+              _default: ['transition'],
+            },
+            overflowMenu: {
+              _type: Type.Array,
+              _elements: {
+                _type: Type.String,
+              },
+              _description:
+                'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
+                queueEntryActions.join(', '),
+              _default: ['edit', 'remove', 'undo'],
+            },
+          },
+          identifierTypeUuid: {
+            _type: Type.UUID,
+            _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
+            _default: defaultIdentifierTypeUuid,
+          },
+          priorityConfigs: {
+            _type: Type.Array,
+            _elements: {
+              conceptUuid: {
+                _type: Type.UUID,
+                _description: 'The UUID of the priority concept to configure',
+              },
+              color: {
+                _type: Type.String,
+                _description:
+                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
+                _default: 'gray',
+                _validators: [validators.oneOf(priorityTagColors)],
+              },
+              style: {
+                _type: Type.String,
+                _description: 'Style to apply to the tag',
+                _default: '',
+                _validators: [validators.oneOf(tagStyles)],
+              },
+            },
+            _description:
+              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
+            _default: [],
+          },
+          statusConfigs: {
+            _type: Type.Array,
+            _elements: {
+              conceptUuid: {
+                _type: Type.UUID,
+                _description: 'The UUID of the status concept to configure',
+              },
+              iconComponent: {
+                _type: Type.String,
+                _description: 'The icon component to display for the status',
+                _validators: [validators.oneOf(statusIcons)],
+                _default: '',
+              },
+            },
+            _description: 'For columnType "status". Configures the icons for each status.',
+            _default: [],
+          },
+          visitQueueNumberAttributeUuid: {
+            _type: Type.String,
+            _description:
+              'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
+            _default: '',
+          },
+        },
         _validators: [
           validator(
             (columnDfn: ColumnDefinition) =>
@@ -259,110 +343,14 @@ export const configSchema = {
             },
           ),
         ],
-        id: {
-          _type: Type.String,
-          _description: 'The unique identifier for the column you are defining',
-        },
-        columnType: {
-          _type: Type.String,
-          _description: 'The type of column, if different from the ID',
-          _validators: [validators.oneOf(columnTypes)],
-          _default: '',
-        },
-        header: {
-          _type: Type.String,
-          _description:
-            'The header text for the column. Will be translated if it is a valid translation key. If not provided, the header will be based on the columnType.',
-          _default: '',
-        },
-        config: {
-          actions: {
-            buttons: {
-              _type: Type.Array,
-              _default: ['call'],
-              _description:
-                'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
-              _elements: {
-                _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
-              },
-            },
-            overflowMenu: {
-              _type: Type.Array,
-              _default: ['edit', 'remove', 'undo'],
-              _description:
-                'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
-              _elements: {
-                _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
-              },
-            },
-          },
-          identifierTypeUuid: {
-            _type: Type.UUID,
-            _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
-            _default: defaultIdentifierTypeUuid,
-          },
-          priorityConfigs: {
-            _type: Type.Array,
-            _default: [],
-            _description:
-              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
-            _elements: {
-              _type: Type.Object,
-              conceptUuid: {
-                _type: Type.UUID,
-                _description: 'The UUID of the priority concept to configure',
-              },
-              color: {
-                _type: Type.String,
-                _description:
-                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
-                _validators: [validators.oneOf(priorityTagColors)],
-                _default: 'gray',
-              },
-              style: {
-                _type: Type.String,
-                _description: 'Style to apply to the tag',
-                _validators: [validators.oneOf(tagStyles)],
-                _default: '',
-              },
-            },
-          },
-          statusConfigs: {
-            _type: Type.Array,
-            _default: [],
-            _description: 'For columnType "status". Configures the icons for each status.',
-            _elements: {
-              _type: Type.Object,
-              conceptUuid: {
-                _type: Type.UUID,
-                _description: 'The UUID of the status concept to configure',
-              },
-              iconComponent: {
-                _type: Type.String,
-                _description: 'The icon component to display for the status',
-                _validators: [validators.oneOf(statusIcons)],
-                _default: '',
-              },
-            },
-          },
-          visitQueueNumberAttributeUuid: {
-            _type: Type.String,
-            _description:
-              'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-            _default: null,
-          },
-        },
       },
+      _default: [],
+      _description:
+        "Custom columns for queue tables can be defined here. These columns will be referenced by their `id` in the `tableDefinitions` columns configuration. If the provided `id` matches a built-in column, the custom configuration will override the built-in column's configuration.",
     },
     tableDefinitions: {
       _type: Type.Array,
-      _default: [defaultQueueTable],
       _elements: {
-        _type: Type.Object,
         columns: {
           _type: Type.Array,
           _elements: {
@@ -372,7 +360,6 @@ export const configSchema = {
         appliedTo: {
           _type: Type.Array,
           _elements: {
-            _type: Type.Object,
             queue: {
               _type: Type.String,
               _description: 'The UUID of the queue. If not provided, applies to all queues.',
@@ -386,6 +373,7 @@ export const configSchema = {
           },
         },
       },
+      _default: [defaultQueueTable],
     },
     _validators: [
       validator(
@@ -416,12 +404,12 @@ export const configSchema = {
   visitQueueNumberAttributeUuid: {
     _type: Type.String,
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: null,
+    _default: '',
   },
   visitTypeResourceUrl: {
     _type: Type.String,
     _description: 'The `visitTypeResourceUrl`',
-    _default: null,
+    _default: '',
   },
   vitals: vitalsConfigSchema,
   _validators: [
