@@ -20,7 +20,6 @@ const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ pat
       <button
         className="cds--overflow-menu-options__btn"
         role="menuitem"
-        title={t('editPatientDetails', 'Edit patient details')}
         data-floating-menu-primary-focus
         onClick={handleClick}>
         <span className="cds--overflow-menu-options__option-content">

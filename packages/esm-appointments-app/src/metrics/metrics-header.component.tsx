@@ -6,14 +6,14 @@ import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import { ExtensionSlot, isDesktop, launchWorkspace, navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../constants';
-import { useSelectedDateContext } from '../hooks/selected-date-context';
+import { useAppointmentsStore } from '../store';
 import styles from './metrics-header.scss';
 
 dayjs.extend(isToday);
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
@@ -29,7 +29,6 @@ const MetricsHeader: React.FC = () => {
 
   return (
     <div className={styles.metricsContainer}>
-      <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <div className={styles.metricsContent}>
         <Button
           kind="tertiary"
