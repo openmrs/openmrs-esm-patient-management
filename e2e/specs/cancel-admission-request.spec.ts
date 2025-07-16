@@ -20,7 +20,6 @@ let encounter: Encounter;
 let provider: Provider;
 let bed: Bed;
 let bedtype: BedType;
-let wardPage: WardPage;
 
 test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
@@ -30,10 +29,10 @@ test.beforeEach(async ({ api, page }) => {
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
-  wardPage = new WardPage(page);
 });
 
 test('Cancel an admission request', async ({ page }) => {
+  const wardPage = new WardPage(page);
   const fullName = wardPatient.person?.display;
 
   await test.step('When I visit the patient ward page', async () => {
@@ -44,7 +43,7 @@ test('Cancel an admission request', async ({ page }) => {
     await wardPage.clickManageAdmissionRequests();
   });
 
-  await test.step('Then I should see an admission request for the patient', async () => {
+  await test.step('Then I should see a pending admission request for the patient', async () => {
     await expect(page.getByText(fullName)).toBeVisible();
   });
 
