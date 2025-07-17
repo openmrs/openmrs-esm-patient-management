@@ -4,9 +4,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const bedType: BedTypeData = {
   uuid: uuidv4(),
-  displayName: 'Ward 1 Bed',
-  description: 'Ward 1 bed type',
-  name: 'Ward 1 Bed',
+  displayName: 'ICU Bed',
+  description: 'ICU bed type',
+  name: 'ICU Bed',
 };
 
 export const bed: BedWithLocation = {
@@ -23,7 +23,7 @@ export const bed: BedWithLocation = {
   bedType: bedType,
 };
 export const createBedType = async (api: APIRequestContext, bedType: BedTypeData): Promise<BedTypeData> => {
-  const response = await api.post('bedtype', {
+  const response = await api.post('/openmrs/ws/rest/v1/bedtype', {
     data: bedType,
   });
 
@@ -47,7 +47,7 @@ export const createBed = async (api: APIRequestContext, bed: BedWithLocation): P
 };
 
 export const getBed = async (api: APIRequestContext): Promise<BedWithLocation> => {
-  const bedsResponse = await api.get('bed');
+  const bedsResponse = await api.get('/openmrs/ws/rest/v1/bed');
   const { results } = await bedsResponse.json();
   return results;
 };
@@ -59,14 +59,14 @@ export const getBedTypes = async (api: APIRequestContext): Promise<BedTypeData> 
 };
 
 export const deleteBed = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`bed/${uuid}`);
+  const response = await api.delete(`/openmrs/ws/rest/v1/bed/${uuid}`);
   if (!response.ok()) {
     throw new Error(`Failed to delete bed: ${response.status()} - ${await response.text()}`);
   }
 };
 
 export const deleteBedType = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`bedtype/${uuid}`);
+  const response = await api.delete(`/openmrs/ws/rest/v1/bedtype/${uuid}`);
   if (!response.ok()) {
     throw new Error(`Failed to delete bed type: ${response.status()} - ${await response.text()}`);
   }
