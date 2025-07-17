@@ -12,7 +12,7 @@ import {
   useLayoutType,
   isDesktop,
 } from '@openmrs/esm-framework';
-import { useSelectedDateContext } from '../../hooks/selected-date-context';
+import { useAppointmentsStore } from '../../store';
 import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
@@ -27,7 +27,7 @@ const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceTypes }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 

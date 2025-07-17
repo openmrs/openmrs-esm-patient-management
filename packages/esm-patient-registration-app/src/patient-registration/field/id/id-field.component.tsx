@@ -120,7 +120,7 @@ export const Identifiers: React.FC = () => {
 
   return (
     <div className={styles.halfWidthInDesktopView}>
-      <UserHasAccess privilege={['Get Identifier Types', 'Add patient identifiers']}>
+      <UserHasAccess privilege={['Get Identifier Types', 'Add Patient Identifiers']}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
           <Button

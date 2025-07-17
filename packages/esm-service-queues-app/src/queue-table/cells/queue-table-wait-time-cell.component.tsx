@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import QueueDuration from '../../queue-entry-table-components/queue-duration.component';
+import QueueDuration from '../components/queue-duration.component';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {

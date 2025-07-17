@@ -11,20 +11,18 @@ const mockShowModal = jest.mocked(showModal);
 describe('AddPatientToPatientListMenuItem', () => {
   it('renders the button with the correct title', () => {
     render(<AddPatientToPatientListMenuItem patientUuid={patientUuid} />);
-    const button = screen.getByRole('menuitem');
 
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveTextContent('Add to list');
-    expect(button).toHaveAttribute('title', 'Add to list');
+    const addPatientToListButton = screen.getByRole('menuitem', { name: /add to list/i });
+    expect(addPatientToListButton).toBeInTheDocument();
   });
 
   it('should open the modal on button click', async () => {
     const user = userEvent.setup();
 
     render(<AddPatientToPatientListMenuItem patientUuid={patientUuid} />);
-    const button = screen.getByRole('menuitem');
+    const addPatientToListButton = screen.getByRole('menuitem', { name: /add to list/i });
 
-    await user.click(button);
+    await user.click(addPatientToListButton);
 
     expect(mockShowModal).toHaveBeenCalledWith('add-patient-to-patient-list-modal', {
       closeModal: expect.any(Function),

@@ -1,8 +1,9 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '@openmrs/esm-framework';
 import { monthDays } from '../../helpers';
-import { useSelectedDateContext } from '../../hooks/selected-date-context';
+import { useAppointmentsStore } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
@@ -18,9 +19,8 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   dateToDisplay = '',
   onDateClick,
 }) => {
-  const monthFormat = 'MMMM, YYYY';
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDateContext();
+  const { selectedDate } = useAppointmentsStore();
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
   const daysInWeeks = daysInWeek.map((day) => t(day));
@@ -35,9 +35,13 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
     <div className={styles.calendarViewContainer}>
       <>
         <div className={styles.container}></div>
-        <span className={styles.headerContainer}>{dayjs(monthViewDate).format(monthFormat)}</span>
+        <span className={styles.headerContainer}>
+          {formatDate(new Date(monthViewDate), { day: false, time: false, noToday: true })}
+        </span>
         <div className={styles.workLoadCard}>
-          {daysInWeeks?.map((day, i) => <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />)}
+          {daysInWeeks?.map((day, i) => (
+            <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />
+          ))}
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>

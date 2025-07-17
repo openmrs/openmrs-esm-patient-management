@@ -33,7 +33,6 @@ const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProp
         <button
           className="cds--overflow-menu-options__btn"
           role="menuitem"
-          title={t('openPatientList', 'Add to list')}
           data-floating-menu-primary-focus
           onClick={openModal}
           style={{
