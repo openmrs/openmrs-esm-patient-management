@@ -54,29 +54,30 @@ const defaultPriorityUuid = 'f4620bfa-3625-4883-bd3f-84c2cce14470';
 const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
 const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
 
+export const defaultPriorityConfig: PriorityConfig[] = [
+  {
+    conceptUuid: defaultEmergencyPriorityUuid,
+    style: null,
+    color: 'red',
+  },
+  {
+    conceptUuid: defaultPriorityUuid,
+    style: null,
+    color: 'green',
+  },
+  {
+    conceptUuid: defaultUrgentPriorityUuid,
+    style: null,
+    color: 'orange',
+  },
+];
+
 export const defaultColumnConfig: ColumnConfig = {
   actions: {
     buttons: ['call'],
     overflowMenu: ['move', 'edit', 'remove', 'undo'],
   },
   identifierTypeUuid: defaultIdentifierTypeUuid,
-  priorityConfigs: [
-    {
-      conceptUuid: defaultEmergencyPriorityUuid,
-      style: null,
-      color: 'red',
-    },
-    {
-      conceptUuid: defaultPriorityUuid,
-      style: null,
-      color: 'green',
-    },
-    {
-      conceptUuid: defaultUrgentPriorityUuid,
-      style: null,
-      color: 'orange',
-    },
-  ],
   statusConfigs: [],
   visitQueueNumberAttributeUuid: null,
 };
@@ -87,6 +88,30 @@ export const defaultQueueTable: TableDefinitions = {
 };
 
 export const configSchema = {
+  priorityConfigs: {
+    _type: Type.Array,
+    _default: defaultPriorityConfig,
+    _description: 'Add entries to configure the styling for specific priority tags.',
+    _elements: {
+      conceptUuid: {
+        _type: Type.UUID,
+        _description: 'The UUID of the priority concept to configure',
+      },
+      color: {
+        _type: Type.String,
+        _description:
+          'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
+        _validators: [validators.oneOf(priorityTagColors)],
+        _default: 'gray',
+      },
+      style: {
+        _type: Type.String,
+        _description: 'Style to apply to the tag',
+        _validators: [validators.oneOf(tagStyles)],
+        _default: null,
+      },
+    },
+  },
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
@@ -226,18 +251,15 @@ export const configSchema = {
           ),
           validator(
             (columnDfn: ColumnDefinition) => {
-              return (
-                !columnDfn.config.priorityConfigs ||
-                columnDfn.config.priorityConfigs.length == 0 ||
-                columnHasType(columnDfn, 'priority')
-              );
+              return columnHasType(columnDfn, 'priority') || !columnDfn.config.hasOwnProperty('priorityConfigs');
             },
             (columnDfn) => {
               return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${
                 columnDfn.columnType ?? columnDfn.id
-              }.`;
+              }'.`;
             },
           ),
+
           validator(
             (columnDfn: ColumnDefinition) => {
               return (
@@ -249,7 +271,7 @@ export const configSchema = {
             (columnDfn) => {
               return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${
                 columnDfn.columnType ?? columnDfn.id
-              }.`;
+              }`;
             },
           ),
         ],
@@ -298,31 +320,6 @@ export const configSchema = {
             _type: Type.UUID,
             _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
             _default: defaultIdentifierTypeUuid,
-          },
-          priorityConfigs: {
-            _type: Type.Array,
-            _default: [],
-            _description:
-              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
-            _elements: {
-              conceptUuid: {
-                _type: Type.UUID,
-                _description: 'The UUID of the priority concept to configure',
-              },
-              color: {
-                _type: Type.String,
-                _description:
-                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
-                _validators: [validators.oneOf(priorityTagColors)],
-                _default: 'gray',
-              },
-              style: {
-                _type: Type.String,
-                _description: 'Style to apply to the tag',
-                _validators: [validators.oneOf(tagStyles)],
-                _default: null,
-              },
-            },
           },
           statusConfigs: {
             _type: Type.Array,
@@ -439,6 +436,7 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 }
 
 export interface ConfigObject {
+  priorityConfigs: Array<PriorityConfig>;
   appointmentStatuses: Array<string>;
   biometrics: BiometricsConfigObject;
   concepts: {
@@ -506,7 +504,7 @@ export interface PriorityConfig {
   style: TagStyle;
 }
 
-export interface PriorityColumnConfig {
+export interface configSchema {
   priorityConfigs: PriorityConfig[];
 }
 
