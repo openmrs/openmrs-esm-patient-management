@@ -56,7 +56,7 @@ export default function WaitingPatientsExtension() {
       service={currentService?.serviceDisplay}
       serviceUuid={currentService?.serviceUuid}
       value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
-      showUrgent={true}
+      showUrgent={urgentCount > 0}
       urgentCount={urgentCount}>
       <Dropdown
         id="inline"

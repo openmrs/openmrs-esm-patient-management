@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .tileContainer {
@@ -45,7 +46,11 @@
 
 .urgentValue {
   @include type.type-style('heading-04');
-  color: red;
+  color: colors.$red-50;
+}
+
+.urgentLabel {
+  @extend .totalsLabel;
 }
 
 .headerLabelContainer {
