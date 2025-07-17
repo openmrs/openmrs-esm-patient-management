@@ -75,7 +75,7 @@ jobs:
 
       - name: 🛑 Stop dev server
         if: '!cancelled()'
-        run: docker stop $(docker ps -a -q)
+        run: docker stop $(docker ps -a -q) || true
 
       - name: 📤 Upload Report
         uses: actions/upload-artifact@v4
