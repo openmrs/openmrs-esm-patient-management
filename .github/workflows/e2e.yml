@@ -65,7 +65,10 @@ jobs:
         run: yarn turbo run build --color --concurrency=5
 
       - name: 🖥️ Run dev server
-        run: bash e2e/support/github/run-e2e-docker-env.sh
+        run: |
+          bash e2e/support/github/run-e2e-docker-env.sh
+          docker ps -a  # Debug container status
+          docker logs frontend 2>&1 | tail -n 50  # Show recent logs if any
 
       - name: ⏳ Wait for OpenMRS instance to start
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8080/openmrs/login.htm)" != "200" ]]; do sleep 10; done
