@@ -92,7 +92,7 @@ cat > "$config_file" <<EOF
     "@openmrs/esm-home-app": "next",
     "@openmrs/esm-patient-chart-app": "next",
     "@openmrs/esm-patient-banner-app": "next",
-    "@openmrs/esm-form-engine-app": "next
+    "@openmrs/esm-form-engine-app": "next"
 EOF
 
 # Add dynamic modules
