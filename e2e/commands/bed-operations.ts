@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type BedType, type Bed } from '../types';
+import { type BedType, type Bed } from './types';
 
 export const generateRandomBed = async (api: APIRequestContext, bedType: BedType): Promise<Bed> => {
   const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -28,6 +28,11 @@ export const generateBedType = async (api: APIRequestContext): Promise<BedType> 
   });
   await expect(bedRes.ok()).toBeTruthy();
   return await bedRes.json();
+};
+
+export const dischargePatientFromBed = async (api: APIRequestContext, id: number, patientUuid: string) => {
+  const response = await api.delete(`beds/${id}?patientUuid=${patientUuid}`);
+  await expect(response.ok()).toBeTruthy();
 };
 
 export const deleteBed = async (api: APIRequestContext, uuid: string) => {
