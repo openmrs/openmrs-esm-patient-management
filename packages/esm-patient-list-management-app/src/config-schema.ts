@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
   myListCohortTypeUUID: {
@@ -15,6 +15,7 @@ export const configSchema = {
     _type: Type.Number,
     _description: 'The default number of lists to show in the Lists dashboard table',
     _default: 10,
+    _validators: [validator((v: unknown) => typeof v === 'number' && v > 0, 'Must be greater than zero')],
   },
 };
 

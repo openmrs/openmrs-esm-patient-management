@@ -4,49 +4,25 @@ export const configSchema = {
   search: {
     patientChartUrl: {
       _type: Type.String,
-      _default: '${openmrsSpaBase}/patient/${patientUuid}/chart/',
       _description:
         'The URL template to navigate to when a patient is selected from the search results. `openmrsSpaBase` is the base URL for the SPA, and patientUuid is the UUID of the patient.',
+      _default: '${openmrsSpaBase}/patient/${patientUuid}/chart/',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
     },
     showRecentlySearchedPatients: {
       _type: Type.Boolean,
-      _default: true,
       _description:
         'When enabled, displays a list of recently searched patients in the initial search results, providing quick access to frequently accessed patient records.',
+      _default: true,
     },
     disableTabletSearchOnKeyUp: {
       _type: Type.Boolean,
-      _default: false,
       _description:
         'Disable the default "keyup search" for instant patient search as typing concludes on tablet devices',
+      _default: false,
     },
     searchFilterFields: {
-      _type: Type.Object,
-      _description: 'Configuration for advanced search fields',
-      _default: {
-        gender: {
-          enabled: true,
-        },
-        dateOfBirth: {
-          enabled: true,
-        },
-        age: {
-          enabled: true,
-          min: 0,
-        },
-        postcode: {
-          enabled: true,
-        },
-        personAttributes: [
-          {
-            attributeTypeUuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-          },
-        ],
-      },
       gender: {
-        _type: Type.Object,
-        _description: 'Configuration for gender field',
         enabled: {
           _type: Type.Boolean,
           _description: 'Optional. If true, determines whether to display the gender field or not. Defaults to true',
@@ -54,8 +30,6 @@ export const configSchema = {
         },
       },
       dateOfBirth: {
-        _type: Type.Object,
-        _description: 'Configuration for the date of birth field',
         enabled: {
           _type: Type.Boolean,
           _description:
@@ -64,8 +38,6 @@ export const configSchema = {
         },
       },
       age: {
-        _type: Type.Object,
-        _description: 'Configuration for the age field',
         enabled: {
           _type: Type.Boolean,
           _description: 'Optional. If true, determines whether to display the age field or not. Defaults to true',
@@ -83,8 +55,6 @@ export const configSchema = {
         },
       },
       postcode: {
-        _type: Type.Object,
-        _description: 'Configuration for the postcode field',
         enabled: {
           _type: Type.Boolean,
           _description: 'Optional. If true, determines whether to display the postcode field or not. Defaults to true',
@@ -95,7 +65,6 @@ export const configSchema = {
         _type: Type.Array,
         _description: 'Configuration for person attributes to display on advanced search',
         _elements: {
-          _type: Type.Object,
           placeholder: {
             _type: Type.String,
             _description: 'Placeholder text for the field',
@@ -104,21 +73,25 @@ export const configSchema = {
           attributeTypeUuid: {
             _type: Type.UUID,
             _description: 'UUID of the person attribute type',
+            _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
           },
           answerConceptSetUuid: {
             _type: Type.ConceptUuid,
-            _default: null,
+            _default: '',
             _description:
               'For coded questions only. A concept which has the possible responses either as answers or as set members.',
           },
           conceptAnswersUuids: {
             _type: Type.Array,
             _description: 'A list of UUIDs representing the possible answers for the associated concept question.',
+            _elements: {
+              _type: Type.UUID,
+            },
             _default: [],
           },
           locationTag: {
             _type: Type.String,
-            _default: null,
+            _default: '',
             _description:
               'Only for fields with "person attribute" type `org.openmrs.Location`. This filters the list of location options in the dropdown based on their location tag.',
           },
@@ -129,8 +102,8 @@ export const configSchema = {
   },
   includeDead: {
     _type: Type.Boolean,
-    _default: true,
     _description: 'Whether to include dead patients in search results',
+    _default: true,
   },
   contactAttributeType: {
     _type: Type.Array,

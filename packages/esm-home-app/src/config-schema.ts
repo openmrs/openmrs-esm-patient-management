@@ -5,8 +5,8 @@ export const esmHomeSchema = {
     _type: Type.String,
     _description:
       'Allows making the left nav bar always collapsed (even on large screens) or completely hidden on the home page.',
-    _validators: [validators.oneOf(['normal', 'collapsed', 'hidden'])],
     _default: 'normal',
+    _validators: [validators.oneOf(['normal', 'collapsed', 'hidden'])],
   },
   defaultDashboardPerRole: {
     _type: Type.Object,

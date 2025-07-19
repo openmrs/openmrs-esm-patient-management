@@ -114,13 +114,13 @@ export const builtInFields = [
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships'],
-    _description: `An array of strings which are the keys from 'sectionDefinitions' or any of the following built-in sections: '${builtInSections
-      .map((s) => s.id)
-      .join("', '")}'.`,
     _elements: {
       _type: Type.String,
     },
+    _description: `An array of strings which are the keys from 'sectionDefinitions' or any of the following built-in sections: '${builtInSections
+      .map((s) => s.id)
+      .join("', '")}'.`,
+    _default: ['demographics', 'contact', 'relationships'],
   },
   sectionDefinitions: {
     _type: Type.Array,
@@ -137,11 +137,13 @@ export const esmPatientRegistrationSchema = {
       },
       fields: {
         _type: Type.Array,
-        _default: [],
+        _elements: {
+          _type: Type.String,
+        },
         _description: `The parts to include in the section. Can be any of the following built-in fields: ${builtInFields.join(
           ', ',
         )}. Can also be an id from an object in the \`fieldDefinitions\` array, which you can use to define custom fields.`,
-        _elements: { _type: Type.String },
+        _default: [],
       },
     },
     _default: [],
@@ -170,43 +172,46 @@ export const esmPatientRegistrationSchema = {
       },
       label: {
         _type: Type.String,
-        _default: null,
         _description: 'The label of the input. By default, uses the metadata `display` attribute.',
+        _default: '',
       },
       placeholder: {
         _type: Type.String,
-        _default: '',
         _description: 'Placeholder that will appear in the input.',
+        _default: '',
       },
       allowFutureDates: {
         _type: Type.Boolean,
-        _default: true,
         _description: 'Indicates whether the date input field should allow the selection of future dates or not.',
+        _default: true,
       },
       allowPastDates: {
         _type: Type.Boolean,
-        _default: true,
         _description: 'Indicates whether the date input field should allow the selection of past dates or not.',
+        _default: true,
       },
       validation: {
-        required: { _type: Type.Boolean, _default: false },
+        required: {
+          _type: Type.Boolean,
+          _default: false,
+        },
         matches: {
           _type: Type.String,
-          _default: null,
           _description: 'Optional RegEx for testing the validity of the input.',
+          _default: '',
         },
       },
       locationTag: {
         _type: Type.String,
-        _default: null,
         _description:
           'Only for fields with "person attribute" type `org.openmrs.Location`. This filters the list of location options in the dropdown based on their location tag. By default, all locations are shown.',
+        _default: '',
       },
       answerConceptSetUuid: {
         _type: Type.ConceptUuid,
-        _default: null,
         _description:
           'For coded questions only. A concept which has the possible responses either as answers or as set members.',
+        _default: '',
       },
       customConceptAnswers: {
         _type: Type.Array,
@@ -217,19 +222,19 @@ export const esmPatientRegistrationSchema = {
           },
           label: {
             _type: Type.String,
-            _default: null,
             _description: 'The custom label for the answer concept.',
+            _default: '',
           },
         },
-        _default: [],
         _description:
           'For coded questions only (obs or person attrbute). A list of custom concept answers. Overrides answers that come from the obs concept or from `answerSetConceptUuid`.',
+        _default: [],
       },
     },
     // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
-    _default: [],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
+    _default: [],
   },
   fieldConfigurations: {
     causeOfDeath: {
@@ -238,34 +243,40 @@ export const esmPatientRegistrationSchema = {
         _description: 'The concept UUID to get cause of death answers',
         _default: '9272a14b-7260-4353-9e5b-5787b5dead9d',
       },
-      required: { _type: Type.Boolean, _default: false },
+      required: {
+        _type: Type.Boolean,
+        _default: false,
+      },
     },
     name: {
-      displayMiddleName: { _type: Type.Boolean, _default: true },
-      allowUnidentifiedPatients: {
+      displayMiddleName: {
         _type: Type.Boolean,
         _default: true,
+      },
+      allowUnidentifiedPatients: {
+        _type: Type.Boolean,
         _description: 'Whether to allow registering unidentified patients.',
+        _default: true,
       },
       defaultUnknownGivenName: {
         _type: Type.String,
-        _default: 'UNKNOWN',
         _description: 'The given/first name to record for unidentified patients.',
+        _default: 'UNKNOWN',
       },
       defaultUnknownFamilyName: {
         _type: Type.String,
-        _default: 'UNKNOWN',
         _description: 'The family/last name to record for unidentified patients.',
+        _default: 'UNKNOWN',
       },
       displayCapturePhoto: {
         _type: Type.Boolean,
-        _default: true,
         _description: 'Whether to display capture patient photo slot on name field',
+        _default: true,
       },
       displayReverseFieldOrder: {
         _type: Type.Boolean,
-        _default: false,
         _description: "Whether to display the name fields in the order 'Family name' -> 'Middle name' -> 'First name'",
+        _default: false,
       },
     },
     gender: {
@@ -279,11 +290,13 @@ export const esmPatientRegistrationSchema = {
         },
         label: {
           _type: Type.String,
-          _default: null,
+          _default: '',
           _description:
             'The label displayed for the sex option, if it should be different from the value (the value will be translated; the English "translation" is upper-case).',
         },
       },
+      _description:
+        'The options for sex selection during patient registration. This is Administrative Gender as it is called by FHIR (Possible options are limited to those defined in FHIR Administrative Gender, see https://hl7.org/fhir/R4/valueset-administrative-gender.html).',
       _default: [
         {
           value: 'male',
@@ -298,8 +311,6 @@ export const esmPatientRegistrationSchema = {
           value: 'unknown',
         },
       ],
-      _description:
-        'The options for sex selection during patient registration. This is Administrative Gender as it is called by FHIR (Possible options are limited to those defined in FHIR Administrative Gender, see https://hl7.org/fhir/R4/valueset-administrative-gender.html).',
     },
     address: {
       useAddressHierarchy: {
@@ -320,11 +331,6 @@ export const esmPatientRegistrationSchema = {
             "Whether to fill the addresses by levels, i.e. County => subCounty, the current field is dependent on it's previous field.",
           _default: false,
         },
-        useAddressHierarchyLabel: {
-          _type: Type.Object,
-          _description: 'Whether to use custom labels for address hierarchy',
-          _default: {},
-        },
       },
     },
     dateOfBirth: {
@@ -343,26 +349,31 @@ export const esmPatientRegistrationSchema = {
           _type: Type.Number,
           _description: 'The custom day of the month use on the estimated date of birth',
           _default: 0,
+          _validators: [validators.inRange(0, 30)],
         },
         month: {
           _type: Type.Number,
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
+          _validators: [validators.inRange(0, 11)],
         },
       },
     },
     phone: {
       personAttributeUuid: {
         _type: Type.UUID,
-        _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
         _description: 'The UUID of the phone number person attribute type',
+        _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
       },
       validation: {
-        required: { _type: Type.Boolean, _default: false },
+        required: {
+          _type: Type.Boolean,
+          _default: false,
+        },
         matches: {
           _type: Type.String,
-          _default: null,
           _description: 'Optional RegEx for testing the validity of the input.',
+          _default: '',
         },
       },
     },
@@ -384,25 +395,25 @@ export const esmPatientRegistrationSchema = {
   registrationObs: {
     encounterTypeUuid: {
       _type: Type.UUID,
-      _default: null,
       _description:
         'Obs created during registration will be associated with an encounter of this type. This must be set in order to use fields of type `obs`.',
+      _default: '',
     },
     encounterProviderRoleUuid: {
       _type: Type.UUID,
-      _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
       _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
+      _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
     },
     registrationFormUuid: {
       _type: Type.UUID,
-      _default: null,
       _description:
         'The form UUID to associate with the registration encounter. By default no form will be associated.',
+      _default: '',
     },
   },
   freeTextFieldConceptUuid: {
-    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
+    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   _validators: [
     validator(
