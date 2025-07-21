@@ -74,7 +74,6 @@ test('Confirming patient is admitted to ward', async ({ page }) => {
 
 test.afterEach(async ({ api }) => {
   await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  await new Promise(r => setTimeout(r, 500));
   await deleteBed(api, bed.uuid);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
