@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { WardAllocation } from '../pages/ward-allocation';
-import { deleteBed, deleteBedType, generateBedType, generateRandomBed } from '../commands';
+import { bedLocation, deleteBed, deleteBedType, generateBedType, generateRandomBed } from '../commands';
 import { test } from '../core';
 import type { Location } from '@openmrs/esm-framework';
 import { type Bed, type BedType } from '../types';
@@ -13,8 +13,7 @@ test.describe('Ward Bed Allocation', () => {
   test.beforeEach(async ({ api }) => {
     bedType = await generateBedType(api);
     bed = await generateRandomBed(api, bedType);
-    const locationRes = await api.get(`/openmrs/ws/rest/v1/location/${process.env.E2E_WARD_LOCATION_UUID}`);
-    location = await locationRes.json();
+    location = await bedLocation(api);
   });
 
   test('Create bed type and allocate ward with detailed steps', async ({ page }) => {
