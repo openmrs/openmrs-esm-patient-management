@@ -14,7 +14,7 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
 });
 
-test('Adding a patient admission Request list', async ({ page }) => {
+test('Add a patient to the admission request list', async ({ page }) => {
   const chartPage = new PatientChartPage(page);
   const fullName = wardPatient.person?.display;
 
@@ -37,23 +37,23 @@ test('Adding a patient admission Request list', async ({ page }) => {
     await expect(page.getByRole('cell', { name: /ward admission/i, exact: true })).toBeVisible();
   });
 
-  await test.step('When I click the `ward request` link to launch the form', async () => {
+  await test.step('When I click the "Ward request" link to launch the form in the workspace', async () => {
     await page.getByText(/ward admission/i).click();
   });
 
-  await test.step('Then I should see the `ward request` form launch in the workspace', async () => {
+  await test.step('Then I should see the "Ward request" form launch in the workspace', async () => {
     await expect(page.getByText(/ward request/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /ward details/i, exact: true })).toBeVisible();
     await expect(page.getByText(/inpatient patient disposition/i)).toBeVisible();
   });
 
-  await test.step('And I select Inpatient Ward at Admitted to Location', async () => {
+  await test.step('And I select "Inpatient Ward" as the value of the "Admitted to Location" field', async () => {
     await page.getByRole('group', { name: 'Inpatient patient disposition' }).locator('span').nth(2).click();
     await page.getByRole('button', { name: 'Open' }).click();
     await page.getByRole('option', { name: 'Inpatient Ward' }).locator('div').click();
   });
 
-  await test.step('And I click on the `Save and close` button', async () => {
+  await test.step('And I click the "Save and close" button', async () => {
     await page.getByRole('button', { name: 'Save' }).click();
   });
 
