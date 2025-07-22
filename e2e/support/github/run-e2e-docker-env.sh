@@ -34,7 +34,8 @@ jq -n \
     "@openmrs/esm-home-app": "next",
     "@openmrs/esm-patient-chart-app": "next",
     "@openmrs/esm-patient-banner-app": "next",
-    "@openmrs/esm-form-engine-app": "next
+    "@openmrs/esm-patient-forms-app": "next",
+    "@openmrs/esm-form-engine-app": "next"
   } + (
     ($apps | split("\n")) as $apps | ($app_names | split(" ") | map("/app/" + .)) as $app_files
     | [$apps, $app_files]
