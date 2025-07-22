@@ -83,6 +83,12 @@
       "component": "metricsCardAverageWaitTime",
       "slot": "service-queues-metrics-slot",
       "order": 3
+    },
+    {
+      "name": "metrics-card-patients-seen",
+      "component": "metricsCardPatientsSeen",
+      "slot": "service-queues-metrics-slot",
+      "order": 4
     }
   ],
   "modals": [

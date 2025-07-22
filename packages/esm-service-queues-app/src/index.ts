@@ -80,6 +80,11 @@ export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit
   moduleName,
 });
 
+export const metricsCardPatientsSeen = getAsyncLifecycle(
+  () => import('./metrics/metrics-cards/patients-seen.extension'),
+  options,
+);
+
 export const undoTransitionQueueEntryModal = getAsyncLifecycle(
   () => import('./modals/undo-transition-queue-entry.modal'),
   {

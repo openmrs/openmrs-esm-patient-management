@@ -3,8 +3,9 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
 import styles from './metrics-card.scss';
+import { type ConfigObject } from '../../config-schema';
 
 interface MetricsCardProps {
   label: string;
@@ -16,6 +17,8 @@ interface MetricsCardProps {
   locationUuid?: string;
   showUrgent?: boolean;
   urgentCount?: number;
+  inConsultation?: number;
+  unScheduled?: number;
 }
 
 const MetricsCard: React.FC<MetricsCardProps> = ({
@@ -28,8 +31,11 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   locationUuid,
   showUrgent,
   urgentCount,
+  inConsultation,
+  unScheduled,
 }) => {
   const { t } = useTranslation();
+  const { showPatientSeenCard } = useConfig<ConfigObject>();
   const queueListPath =
     window.getOpenmrsSpaBase() + `home/service-queues/queue-list/${service}/${serviceUuid}/${locationUuid}`;
 
@@ -70,6 +76,18 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
               <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
               <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
             </div>
+          )}
+          {showPatientSeenCard && (
+            <>
+              <div className={styles.metricItem}>
+                <label className={styles.urgentLabel}>{t('inConsultation', 'In consultation')}</label>
+                <p className={styles.totalsValue}>{inConsultation}</p>
+              </div>
+              <div className={styles.metricItem}>
+                <label className={styles.urgentLabel}>{t('unScheduled', 'Unscheduled')}</label>
+                <p className={styles.totalsValue}>{unScheduled ?? '0'}</p>
+              </div>
+            </>
           )}
         </div>
       </Tile>
