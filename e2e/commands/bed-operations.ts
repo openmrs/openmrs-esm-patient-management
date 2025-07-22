@@ -23,7 +23,7 @@ export const generateBedType = async (api: APIRequestContext): Promise<BedType> 
     data: {
       name: 'Guplix',
       displayName: 'Guplix',
-      description: '',
+      description: 'Guplix Bed',
     },
   });
   await expect(bedRes.ok()).toBeTruthy();
@@ -48,4 +48,10 @@ export const retireBedType = async (api: APIRequestContext, uuid: string, retire
     },
   });
   await expect(response.ok()).toBeTruthy();
+};
+
+export const bedLocation = async (api: APIRequestContext) => {
+  const locationRes = await api.get(`/openmrs/ws/rest/v1/location/${process.env.E2E_WARD_LOCATION_UUID}`);
+  await expect(locationRes.ok()).toBeTruthy();
+  return locationRes.json();
 };
