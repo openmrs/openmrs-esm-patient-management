@@ -1,6 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel-link.component';
+import AddEditBedWorkspace from './bed-administration/form/add-edit-bed.workspace';
 
 const moduleName = '@openmrs/esm-bed-management-app';
 
@@ -57,9 +58,8 @@ export const bedTagLeftPanelLink = getSyncLifecycle(
 
 export const deleteBedTagModal = getAsyncLifecycle(() => import('./bed-tag/delete-bed-tag-form.modal'), options);
 export const deleteBedTypeModal = getAsyncLifecycle(() => import('./bed-type/delete-bed-type-form.modal'), options);
-export const editBedModal = getAsyncLifecycle(() => import('./bed-administration/edit-bed-form.component'), options);
 export const editBedTagModal = getAsyncLifecycle(() => import('./bed-tag/edit-tag-form.component'), options);
 export const editBedTypeModal = getAsyncLifecycle(() => import('./bed-type/edit-bed-type.component'), options);
-export const newBedModal = getAsyncLifecycle(() => import('./bed-administration/new-bed-form.component'), options);
 export const newBedTagModal = getAsyncLifecycle(() => import('./bed-tag/new-tag-form.component'), options);
 export const newBedTypeModal = getAsyncLifecycle(() => import('./bed-type/new-bed-type-form.component'), options);
+export const addEditBed = getSyncLifecycle(AddEditBedWorkspace, options);
