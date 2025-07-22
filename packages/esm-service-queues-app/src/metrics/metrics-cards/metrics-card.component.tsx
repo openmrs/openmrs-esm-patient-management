@@ -5,7 +5,6 @@ import { Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
 import styles from './metrics-card.scss';
-import { type ConfigObject } from '../../config-schema';
 
 interface MetricsCardProps {
   label: string;
@@ -19,6 +18,7 @@ interface MetricsCardProps {
   urgentCount?: number;
   inConsultation?: number;
   unScheduled?: number;
+  showPatientSeenMetrics?: boolean;
 }
 
 const MetricsCard: React.FC<MetricsCardProps> = ({
@@ -33,9 +33,9 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   urgentCount,
   inConsultation,
   unScheduled,
+  showPatientSeenMetrics,
 }) => {
   const { t } = useTranslation();
-  const { showPatientSeenCard } = useConfig<ConfigObject>();
   const queueListPath =
     window.getOpenmrsSpaBase() + `home/service-queues/queue-list/${service}/${serviceUuid}/${locationUuid}`;
 
@@ -77,7 +77,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
               <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
             </div>
           )}
-          {showPatientSeenCard && (
+          {showPatientSeenMetrics && (
             <>
               <div className={styles.metricItem}>
                 <label className={styles.urgentLabel}>{t('inConsultation', 'In consultation')}</label>

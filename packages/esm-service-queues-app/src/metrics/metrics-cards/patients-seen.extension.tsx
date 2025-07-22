@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MetricsCard from './metrics-card.component';
+import { useConfig } from '@openmrs/esm-framework';
 import { useActiveVisits } from '../metrics.resource';
 import { useSelectedService } from '../../helpers/helpers';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
+import { type ConfigObject } from '../../config-schema';
 import { useUniquePatientsWithAppointmentsCount } from '../../hooks/useUniquePatientsWithAppointmentsCount';
 
 export default function PatientsSeenExtension() {
   const { t } = useTranslation();
+  const { showPatientSeenCard } = useConfig<ConfigObject>();
   const currentService = useSelectedService();
   const { activeVisitsCount } = useActiveVisits();
   const { count: todaysAppointmentsCount } = useUniquePatientsWithAppointmentsCount();
@@ -29,6 +32,7 @@ export default function PatientsSeenExtension() {
       value={inServiceCount ?? '0'}
       inConsultation={inServiceCount}
       unScheduled={unScheduledPatientsCount}
+      showPatientSeenMetrics={showPatientSeenCard}
     />
   );
 }
