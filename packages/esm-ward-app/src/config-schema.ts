@@ -31,6 +31,8 @@ export const configSchema = {
   patientCardElements: {
     obs: {
       _type: Type.Array,
+      _default: [],
+      _description: 'Configures obs values to display.',
       _elements: {
         id: {
           _type: Type.String,
@@ -42,65 +44,33 @@ export const configSchema = {
         },
         label: {
           _type: Type.String,
+          _default: '',
           _description:
             "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
-          _default: '',
         },
         orderBy: {
           _type: Type.String,
+          _default: 'descending',
           _description:
             "One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly.",
-          _default: 'descending',
           _validators: [validators.oneOf(['ascending', 'descending'])],
         },
         limit: {
           _type: Type.Number,
+          _default: 1,
           _description:
             'If set to a number greater than one, this will show multiple obs for this concept, which will appear as a list. Set to 0 for unlimited.',
-          _default: 1,
         },
         onlyWithinCurrentVisit: {
           _type: Type.Boolean,
+          _default: false,
           _description:
             'Optional. If true, limits display to only observations within current visit. Defaults to false',
-          _default: false,
         },
       },
-      _description: 'Configures obs values to display.',
-      _default: [],
     },
     pendingItems: {
       _type: Type.Array,
-      _elements: {
-        id: {
-          _type: Type.String,
-          _description: 'The unique identifier for this patient card element',
-        },
-        orders: {
-          orderTypes: {
-            _type: Type.Array,
-            _elements: {
-              uuid: {
-                _type: Type.UUID,
-                _description: 'Identifies the order type.',
-              },
-              label: {
-                _type: Type.String,
-                _description:
-                  "The label or i18n key to the translated label to display. If not provided, defaults to 'Orders'",
-                _default: '',
-              },
-            },
-            _description: 'Configures pending orders and transfers to display.',
-          },
-        },
-        showPendingItems: {
-          _type: Type.Boolean,
-          _description:
-            'Optional. If true, pending items (e.g., number of pending orders) will be displayed on the patient card.',
-        },
-      },
-      _description: 'Configures pending orders and transfers to display.',
       _default: [
         {
           id: 'pending-items',
@@ -110,9 +80,47 @@ export const configSchema = {
           showPendingItems: true,
         },
       ],
+      _description: 'Configures pending orders and transfers to display.',
+      _elements: {
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for this patient card element',
+        },
+        orders: {
+          orderTypes: {
+            _type: Type.Array,
+            _description: 'Configures pending orders and transfers to display.',
+            _elements: {
+              uuid: {
+                _type: Type.UUID,
+                _description: 'Identifies the order type.',
+              },
+              label: {
+                _type: Type.String,
+                _default: '',
+                _description:
+                  "The label or i18n key to the translated label to display. If not provided, defaults to 'Orders'",
+              },
+            },
+          },
+        },
+        showPendingItems: {
+          _type: Type.Boolean,
+          _description:
+            'Optional. If true, pending items (e.g., number of pending orders) will be displayed on the patient card.',
+        },
+      },
     },
     patientIdentifier: {
       _type: Type.Array,
+      _default: [
+        {
+          id: 'patient-identifier',
+          showIdentifierLabel: false,
+        },
+      ],
+      _description:
+        'Configures patient identifier to display. An unconfigured element displays the preferred identifier.',
       _elements: {
         id: {
           _type: Type.String,
@@ -124,17 +132,16 @@ export const configSchema = {
             'If true, the identifier type (eg: "OpenMRS ID") is shown along with the identifier itself. Defaults to false',
         },
       },
-      _description:
-        'Configures patient identifier to display. An unconfigured element displays the preferred identifier.',
-      _default: [
-        {
-          id: 'patient-identifier',
-          showIdentifierLabel: false,
-        },
-      ],
     },
     patientAddress: {
       _type: Type.Array,
+      _default: [
+        {
+          id: 'patient-address',
+          fields: ['cityVillage', 'country'],
+        },
+      ],
+      _description: 'Configures patient address elements.',
       _elements: {
         id: {
           _type: Type.String,
@@ -142,23 +149,23 @@ export const configSchema = {
         },
         fields: {
           _type: Type.Array,
+          _description: 'The fields of the address to display',
           _elements: {
             _type: Type.String,
             _validators: [validators.oneOf(addressFields)],
           },
-          _description: 'The fields of the address to display',
         },
       },
-      _description: 'Configures patient address elements.',
-      _default: [
-        {
-          id: 'patient-address',
-          fields: ['cityVillage', 'country'],
-        },
-      ],
     },
     admissionRequestNote: {
       _type: Type.Array,
+      _default: [
+        {
+          id: 'admission-request-note',
+          conceptUuid: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+      ],
+      _description: 'Configures admission request notes to display.',
       _elements: {
         id: {
           _type: Type.String,
@@ -169,41 +176,38 @@ export const configSchema = {
           _description: 'Required. Identifies the concept for the admission request note.',
         },
       },
-      _description: 'Configures admission request notes to display.',
-      _default: [
-        {
-          id: 'admission-request-note',
-          conceptUuid: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        },
-      ],
     },
     coloredObsTags: {
       _type: Type.Array,
+      _default: [],
+      _description: 'Configures observation values to display as Carbon tags.',
       _elements: {
         conceptUuid: {
           _type: Type.UUID,
-          _description: 'Required. Identifies the concept to use to identify the desired observations.',
           // Problem list
           _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          _description: 'Required. Identifies the concept to use to identify the desired observations.',
         },
         summaryLabel: {
           _type: Type.String,
-          _description: `Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag shows the count of the number of answers that are present but not configured to show as their own tags. If not provided, defaults to the name of the concept.`,
           _default: '',
+          _description: `Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag shows the count of the number of answers that are present but not configured to show as their own tags. If not provided, defaults to the name of the concept.`,
         },
         summaryLabelI18nModule: {
           _type: Type.String,
-          _description: 'Optional. The custom module to use for translation of the summary label',
           _default: '',
+          _description: 'Optional. The custom module to use for translation of the summary label',
         },
         summaryLabelColor: {
           _type: Type.String,
+          _default: '',
           _description:
             'The color of the summary tag. See https://react.carbondesignsystem.com/?path=/docs/components-tag--overview for a list of supported colors',
-          _default: '',
         },
         tags: {
           _type: Type.Array,
+          _default: [],
+          _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
           _elements: {
             color: {
               _type: Type.String,
@@ -212,22 +216,20 @@ export const configSchema = {
             },
             appliedToConceptSets: {
               _type: Type.Array,
+              _description: `The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets will be displayed as their own tag with the specified color. If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.`,
               _elements: {
                 _type: Type.UUID,
               },
-              _description: `The concept sets which the color applies to. Observations with coded values that are members of the specified concept sets will be displayed as their own tag with the specified color. If an observation's coded value belongs to multiple concept sets, the first matching applied-to rule takes precedence.`,
             },
           },
-          _description: `An array specifying concept sets and color. Observations with coded values that are members of the specified concept sets will be displayed as their own tags with the specified color. Any observation with coded values not belonging to any concept sets specified will be summarized as a count in the summary tag. If a concept set is listed multiple times, the first matching applied-to rule takes precedence.`,
-          _default: [],
         },
       },
-      _description: 'Configures observation values to display as Carbon tags.',
-      _default: [],
     },
   },
   wards: {
     _type: Type.Array,
+    _default: [{ id: 'default-ward' }],
+    _description: 'Configuration of what type of ward to use at different ward locations.',
     _elements: {
       id: {
         _type: Type.String,
@@ -236,24 +238,22 @@ export const configSchema = {
       },
       appliedTo: {
         _type: Type.Array,
+        _description:
+          'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
         _elements: {
           location: {
             _type: Type.UUID,
-            _description: 'The UUID of the location. If not provided, applies to all wards.',
             _default: '',
+            _description: 'The UUID of the location. If not provided, applies to all wards.',
           },
         },
-        _description:
-          'Optional. Conditions under which this card definition should be used. If not provided, the configuration is applied to all wards.',
       },
     },
-    _description: 'Configuration of what type of ward to use at different ward locations.',
-    _default: [{ id: 'default-ward' }],
   },
   hideWorkspaceVitalsLinks: {
     _type: Type.Boolean,
-    _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
     _default: false,
+    _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
   },
 };
 
