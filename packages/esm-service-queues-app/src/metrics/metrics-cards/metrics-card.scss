@@ -40,7 +40,7 @@
 }
 
 .metricItem {
-  display: flex;
+  display: inline-block;
   flex-direction: column;
 }
 
@@ -51,6 +51,25 @@
 
 .urgentLabel {
   @extend .totalsLabel;
+}
+
+.countGrid {
+  flex-direction: column;
+  row-gap: layout.$spacing-03;
+  grid-template-columns: 1fr 1fr;
+  align-items: flex-start;
+  margin: layout.$spacing-03;
+
+  & > label {
+    font-size: 0.7rem !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  & > p {
+    margin: 0;
+    margin-top: layout.$spacing-01;
+  }
 }
 
 .headerLabelContainer {
