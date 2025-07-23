@@ -60,13 +60,13 @@
   align-items: flex-start;
   margin: layout.$spacing-03;
 
-  & > label {
+  .countGridLabel {
     font-size: 0.7rem !important;
     margin: 0;
     color: colors.$gray-70;
   }
 
-  & > p {
+  .countGridValue {
     margin: 0;
     margin-top: layout.$spacing-01;
   }
