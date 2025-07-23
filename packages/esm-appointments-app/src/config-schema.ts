@@ -20,11 +20,6 @@ export const configSchema = {
     enabled: {
       _type: Type.Boolean,
       _description: 'Whether the check-in button on the "Appointments" list should be enabled',
-      _default: true,
-    },
-    showIfActiveVisit: {
-      _type: Type.Boolean,
-      _description: 'Whether to show the check-in button if the patient currently has an active visit',
       _default: false,
     },
     customUrl: {
@@ -77,7 +72,6 @@ export interface ConfigObject {
   appointmentTypes: Array<string>;
   checkInButton: {
     enabled: boolean;
-    showIfActiveVisit: boolean;
     customUrl: string;
   };
   checkOutButton: {

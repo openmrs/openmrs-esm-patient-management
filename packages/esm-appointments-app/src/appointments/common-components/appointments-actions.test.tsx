@@ -76,7 +76,7 @@ describe('AppointmentActions', () => {
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      checkInButton: { enabled: true, showIfActiveVisit: false, customUrl: '' },
+      checkInButton: { enabled: true, customUrl: '' },
       checkOutButton: { enabled: true, customUrl: '' },
     });
 
@@ -98,7 +98,7 @@ describe('AppointmentActions', () => {
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      checkInButton: { enabled: false, showIfActiveVisit: false, customUrl: '' },
+      checkInButton: { enabled: false, customUrl: '' },
       checkOutButton: { enabled: true, customUrl: '' },
     });
 
@@ -120,7 +120,7 @@ describe('AppointmentActions', () => {
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      checkInButton: { enabled: true, showIfActiveVisit: false, customUrl: '' },
+      checkInButton: { enabled: true, customUrl: '' },
       checkOutButton: { enabled: true, customUrl: '' },
     });
 
@@ -154,7 +154,7 @@ describe('AppointmentActions', () => {
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      checkInButton: { enabled: true, showIfActiveVisit: false, customUrl: '' },
+      checkInButton: { enabled: true, customUrl: '' },
       checkOutButton: { enabled: true, customUrl: '' },
     });
 
@@ -188,7 +188,7 @@ describe('AppointmentActions', () => {
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      checkInButton: { enabled: true, showIfActiveVisit: false, customUrl: '' },
+      checkInButton: { enabled: true, customUrl: '' },
       checkOutButton: { enabled: false, customUrl: '' },
     });
 
@@ -215,6 +215,32 @@ describe('AppointmentActions', () => {
     render(<AppointmentActions {...props} />);
 
     expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
+  });
+
+  it('does not render check-in button when appointment is cancelled', () => {
+    appointment.status = AppointmentStatus.CANCELLED;
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      checkInButton: {
+        enabled: true,
+        customUrl: '',
+      },
+    });
+    render(<AppointmentActions {...defaultProps} />);
+    expect(screen.queryByText(/check in/i)).not.toBeInTheDocument();
+  });
+
+  it('does not render check-in button when config disables it', () => {
+    appointment.status = AppointmentStatus.SCHEDULED;
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      checkInButton: {
+        enabled: false,
+        customUrl: '',
+      },
+    });
+    render(<AppointmentActions {...defaultProps} />);
+    expect(screen.queryByText(/check in/i)).not.toBeInTheDocument();
   });
 
   // commenting these tests out as this functionality is not implemented yet so not sure how they would have ever passed?

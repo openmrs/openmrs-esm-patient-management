@@ -25,9 +25,6 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
   const { visits, mutateVisit } = useTodaysVisits(); // TODO doesn't work if visit didn't start today?  what about inpatient?
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
-  const hasActiveVisitToday = visits?.some(
-    (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && !visit?.stopDatetime,
-  );
   const isTodaysAppointment = visitDate.isToday();
   const isCheckedIn = appointment.status === AppointmentStatus.CHECKEDIN;
   const isCompleted = appointment.status === AppointmentStatus.COMPLETED;
@@ -68,7 +65,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
             {t('checkOut', 'Check out')}
           </Button>
         );
-      case checkInButton.enabled && (!hasActiveVisitToday || checkInButton.showIfActiveVisit) && isTodaysAppointment: {
+      case checkInButton.enabled && isTodaysAppointment: {
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       }
       default:
