@@ -44,7 +44,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             <label className={styles.headerLabel}>{headerLabel}</label>
             {children}
           </div>
-          {service == 'scheduled' ? (
+          {/* TODO: Uncomment this when functionality of the patient list works.*/}
+          {/* {service == 'scheduled' ? (
             <div className={styles.link}>
               <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/home`}>
                 {t('patientList', 'Patient list')}
@@ -58,7 +59,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
               </ConfigurableLink>
               <ArrowRight size={16} />
             </div>
-          )}
+          )} */}
         </div>
         <div className={styles.metricsContainer}>
           <div className={styles.metricItem}>
