@@ -60,11 +60,8 @@
   & > p {
     margin: 0;
     margin-top: layout.$spacing-01;
+    color: colors.$red-50;
   }
-}
-
-.urgentValue {
-  color: colors.$red-50;
 }
 
 .headerLabelContainer {
