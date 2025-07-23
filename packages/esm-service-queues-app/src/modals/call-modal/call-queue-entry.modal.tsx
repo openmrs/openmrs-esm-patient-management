@@ -6,8 +6,8 @@ import { type ConfigObject } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
 import { requeueQueueEntry } from './call-queue-entry.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import styles from './call-queue-entry.scss';
 import { type QueueEntry } from '../../types';
+import styles from './call-queue-entry.scss';
 
 interface CallQueueEntryModalProps {
   closeModal: () => void;
@@ -113,7 +113,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
         <div>
           <section className={styles.modalBody}>
             <p className={styles.p}>
-              {t('patientName', 'Patient name')} : &nbsp; {mappedQueueEntry.name}
+              {t('patientName', 'Patient name')}: &nbsp; {mappedQueueEntry.name}
             </p>
             {preferredIdentifiers?.length
               ? preferredIdentifiers.map((identifier) => (
@@ -123,10 +123,12 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
                 ))
               : ''}
             <p className={styles.p}>
-              {t('patientAge', 'Age')} : &nbsp; {mappedQueueEntry.patientAge}
+              {t('patientAge', 'Age')}: &nbsp; {mappedQueueEntry.patientAge}
             </p>
             <div>
-              {mappedQueueEntry.identifiers?.map((identifier) => <Tag key={identifier.uuid}>{identifier.display}</Tag>)}
+              {mappedQueueEntry.identifiers?.map((identifier) => (
+                <Tag key={identifier.uuid}>{identifier.display}</Tag>
+              ))}
             </div>
           </section>
         </div>

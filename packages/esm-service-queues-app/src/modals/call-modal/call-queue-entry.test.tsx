@@ -2,11 +2,11 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
+import { mockQueueEntryAlice } from '__mocks__';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
 import { requeueQueueEntry } from './call-queue-entry.resource';
 import CallQueueEntryModal from './call-queue-entry.modal';
-import { mockQueueEntryAlice } from '__mocks__';
 
 const mockNavigate = jest.mocked(navigate);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -41,7 +41,7 @@ describe('MoveQueueEntryModal', () => {
     render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     expect(screen.getByText(/Serve patient/i)).toBeInTheDocument();
-    expect(screen.getByText(/Patient name :/i)).toBeInTheDocument();
+    expect(screen.getByText(/Patient name:/i)).toBeInTheDocument();
   });
 
   it('handles requeueing patient', async () => {
