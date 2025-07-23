@@ -223,12 +223,13 @@ export const configSchema = {
           actions: {
             buttons: {
               _type: Type.Array,
-              _default: ['transition'],
+              _default: ['call'],
               _description:
                 'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
                 queueEntryActions.join(', '),
               _elements: {
                 _type: Type.String,
+                _validators: [validators.oneOf(queueEntryActions)],
               },
             },
             overflowMenu: {
@@ -239,6 +240,7 @@ export const configSchema = {
                 queueEntryActions.join(', '),
               _elements: {
                 _type: Type.String,
+                _validators: [validators.oneOf(queueEntryActions)],
               },
             },
           },

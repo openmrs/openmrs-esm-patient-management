@@ -11,7 +11,6 @@ export interface ActiveVisitsConfigSchema {
 }
 
 export interface IdentifiersDefinition {
-  id: Number;
   header: {
     key: string;
     default: string;
@@ -34,9 +33,6 @@ export const configSchema = {
       _default: [],
       _description: 'Customizable list of identifiers to display on active visits table',
       _elements: {
-        id: {
-          _type: Type.Number,
-        },
         header: {
           key: {
             _type: Type.String,
