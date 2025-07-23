@@ -36,7 +36,7 @@
 .metricsContainer {
   display: flex;
   gap: layout.$spacing-05;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .metricItem {
@@ -45,14 +45,14 @@
 }
 
 .countGrid {
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   row-gap: layout.$spacing-03;
-  grid-template-columns: 1fr 1fr;
   align-items: flex-start;
   margin: layout.$spacing-03;
 
   .urgentLabel {
-    font-size: 0.7rem !important;
+    font-size: layout.$spacing-04 !important;
     margin: 0;
     color: colors.$gray-70;
   }
