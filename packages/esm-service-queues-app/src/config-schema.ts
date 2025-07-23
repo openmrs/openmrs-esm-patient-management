@@ -403,9 +403,9 @@ export const configSchema = {
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
     _default: false,
   },
-  showPatientSeenCard: {
+  showPatientSeenMetricsCard: {
     _type: Type.Boolean,
-    _description: 'Whether to show patients seen metrics card in service queues app ',
+    _description: 'Whether to show the Patients seen metrics card in Service Queues app ',
     _default: false,
   },
   visitQueueNumberAttributeUuid: {
@@ -470,7 +470,7 @@ export interface ConfigObject {
   };
   queueTables: TablesConfig;
   showRecommendedVisitTypeTab: boolean;
-  showPatientSeenCard: boolean;
+  showPatientSeenMetricsCard: boolean;
   visitQueueNumberAttributeUuid: string | null;
   visitTypeResourceUrl: string;
   vitals: VitalsConfigObject;

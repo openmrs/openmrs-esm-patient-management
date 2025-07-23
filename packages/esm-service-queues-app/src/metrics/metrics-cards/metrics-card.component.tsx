@@ -80,11 +80,11 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           {showPatientSeenMetrics && (
             <>
               <div className={styles.countGrid}>
-                <label className={styles.countGridLabel}>{t('inConsultation', 'In consultation')}</label>
+                <label className={styles.countGridLabel}>{t('inconsultation', 'In consultation')}</label>
                 <p className={styles.countGridValue}>{inConsultation}</p>
               </div>
               <div className={styles.countGrid}>
-                <label className={styles.countGridLabel}>{t('unScheduled', 'Unscheduled')}</label>
+                <label className={styles.countGridLabel}>{t('unscheduled', 'Unscheduled')}</label>
                 <p className={styles.countGridValue}>{unScheduled ?? '0'}</p>
               </div>
             </>

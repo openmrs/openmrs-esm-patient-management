@@ -10,12 +10,12 @@ import { useUniquePatientsWithAppointmentsCount } from '../../hooks/useUniquePat
 
 export default function PatientsSeenExtension() {
   const { t } = useTranslation();
-  const { showPatientSeenCard } = useConfig<ConfigObject>();
+  const { showPatientSeenMetricsCard } = useConfig<ConfigObject>();
   const currentService = useSelectedService();
   const { activeVisitsCount } = useActiveVisits();
   const { count: todaysAppointmentsCount } = useUniquePatientsWithAppointmentsCount();
 
-  const unScheduledPatientsCount = Math.max(activeVisitsCount - todaysAppointmentsCount, 0);
+  const unscheduledPatientsCount = Math.max(activeVisitsCount - todaysAppointmentsCount, 0);
 
   const { queueEntries } = useQueueEntries({
     service: currentService?.serviceUuid,
@@ -27,12 +27,12 @@ export default function PatientsSeenExtension() {
   return (
     <MetricsCard
       label={t('patients', 'Patients')}
-      headerLabel={t('patientsSeen', 'Patients Seen')}
+      headerLabel={t('patientsSeen', 'Patients seen')}
       service="waitTime"
       value={inServiceCount ?? '0'}
       inConsultation={inServiceCount}
-      unScheduled={unScheduledPatientsCount}
-      showPatientSeenMetrics={showPatientSeenCard}
+      unScheduled={unscheduledPatientsCount}
+      showPatientSeenMetrics={showPatientSeenMetricsCard}
     />
   );
 }
