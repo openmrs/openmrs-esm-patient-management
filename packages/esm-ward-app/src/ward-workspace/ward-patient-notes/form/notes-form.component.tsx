@@ -16,6 +16,7 @@ import { moduleName } from '../../../constant';
 import { savePatientNote } from '../notes.resource';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 import styles from './notes-form.scss';
+import { type EncounterPayload } from '../../../types';
 
 type NotesFormData = z.infer<typeof noteFormSchema>;
 
@@ -66,7 +67,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
       const { wardClinicalNote } = data;
       setIsSubmitting(true);
 
-      const notePayload = {
+      const notePayload: EncounterPayload = {
         patient: patientUuid,
         location: locationUuid,
         encounterType: emrConfiguration?.inpatientNoteEncounterType.uuid,

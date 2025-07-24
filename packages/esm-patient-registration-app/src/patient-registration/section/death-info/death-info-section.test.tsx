@@ -1,9 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { renderWithContext } from 'tools';
+import { initialFormValues } from '../../patient-registration.component';
+import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { DeathInfoSection } from './death-info-section.component';
 
 const initialContextValues = {
@@ -14,6 +15,7 @@ const initialContextValues = {
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
+  setFieldTouched: jest.fn(),
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: {
@@ -25,14 +27,14 @@ describe('Death info section', () => {
   const renderDeathInfoSection = (isDead) => {
     initialContextValues.values.isDead = isDead;
 
-    render(
-      <PatientRegistrationContext.Provider value={initialContextValues}>
-        <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
-          <Form>
-            <DeathInfoSection fields={[]} />
-          </Form>
-        </Formik>
-      </PatientRegistrationContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
+        <Form>
+          <DeathInfoSection fields={[]} />
+        </Form>
+      </Formik>,
+      PatientRegistrationContextProvider,
+      initialContextValues,
     );
   };
 

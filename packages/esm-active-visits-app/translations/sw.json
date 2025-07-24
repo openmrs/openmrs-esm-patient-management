@@ -1,18 +1,15 @@
 {
   "activeVisits": "Ziara hai",
-  "age": "Umri",
   "allEncounters": "Mikutano Yote",
   "checkFilters": "Tazama vichujio vilivyo juu",
   "diagnoses": "Hali za magonjwa",
   "dose": "Dozi",
   "encounterType": "Aina ya Mkutano",
   "endDate": "Tarehe ya kumaliza",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Chuja jedwali",
-  "gender": "Jinsia",
-  "idNumber": "Nambari ya Kitambulisho",
   "indication": "Dalili",
   "medications": "Dawa",
-  "name": "Jina",
   "noActiveVisitsForLocation": "Hakuna ziara hai kwa eneo hili",
   "noDiagnosesFound": "Hakuna hali za magonjwa zilizopatikana.",
   "noEncountersFound": "Hakuna mikutano iliyopatikana",
@@ -31,7 +28,6 @@
   "thereIsNoInformationToDisplayHere": "Hakuna taarifa za kuonyeshwa hapa",
   "time": "Wakati",
   "totalVisits": "Ziara Zote Leo",
-  "visitStartTime": "Wakati wa Ziara",
-  "visitSummary": "Muhtasari wa Ziara",
-  "visitType": "Aina ya Ziara"
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "visitSummary": "Muhtasari wa Ziara"
 }

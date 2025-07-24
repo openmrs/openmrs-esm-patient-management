@@ -18,7 +18,8 @@
         "name": "appointments",
         "slot": "clinical-appointments-dashboard-slot",
         "title": "Appointments"
-      }
+      },
+      "order": 2
     },
     {
       "component": "root",
@@ -26,11 +27,15 @@
       "slot": "clinical-appointments-dashboard-slot"
     },
     {
+      "name": "appointments-dashboard",
+      "slot": "appointments-dashboard-slot",
+      "component": "appointmentsDashboard"
+    },
+    {
       "name": "appointments-calendar-dashboard-link",
       "slot": "calendar-dashboard-slot",
       "component": "appointmentsCalendarDashboardLink"
     },
-
     {
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
@@ -66,16 +71,6 @@
       "component": "earlyAppointments"
     },
     {
-      "name": "appointments-form-workspace",
-      "component": "appointmentsFormWorkspace",
-      "meta": {
-        "title": {
-          "key": "createNewAppointment",
-          "default": "Create new appointment"
-        }
-      }
-    },
-    {
       "name": "patient-appointments-summary-dashboard",
       "component": "patientAppointmentsSummaryDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -90,7 +85,7 @@
       }
     },
     {
-      "name": "patientAppointments-details-widget",
+      "name": "appointments-details-widget",
       "component": "patientAppointmentsDetailedSummary",
       "slot": "patient-chart-appointments-dashboard-slot",
       "meta": {
@@ -103,43 +98,31 @@
       "slot": "visit-form-top-slot"
     },
     {
-      "name": "edit-appointments-form",
-      "component": "appointmentsForm",
-      "meta": {
-        "title":{
-          "key":"editAppointment",
-          "default":"Edit Appointment"
-        }
-      }
-    },
-    {
       "name": "search-patient",
       "component": "searchPatient"
-   },
-    {
-      "name": "create-appointment",
-      "component": "appointmentsForm",
-      "meta": {
-        "title": {
-          "key":"appointmentForm",
-          "default":"Appointment Form"
-        }
-      }
-    },
-    {
-      "name": "add-appointment",
-      "component": "appointmentsForm",
-      "meta": {
-        "title": {
-          "key": "createNewAppointment",
-          "default": "Create new appointment"
-        }
-      }
     },
     {
       "name": "home-appointments-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile"
+    },
+    {
+      "name": "metrics-card-scheduled-appointments",
+      "component": "metricsCardScheduledAppointments",
+      "slot": "appointments-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "metrics-card-highest-volume-service",
+      "component": "metricsCardHighestVolumeService",
+      "slot": "appointments-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "metrics-card-providers-booked",
+      "component": "metricsCardProvidersBooked",
+      "slot": "appointments-metrics-slot",
+      "order": 3
     }
   ],
   "modals": [
@@ -148,8 +131,16 @@
       "component": "endAppointmentModal"
     },
     {
-      "name": "patient-appointment-cancel-confirmation-dialog",
-      "component": "patientAppointmentsCancelConfirmationDialog"
+      "name": "cancel-appointment-modal",
+      "component": "cancelAppointmentModal"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace",
+      "title": "createNewAppointment",
+      "type": "form"
     }
   ]
 }

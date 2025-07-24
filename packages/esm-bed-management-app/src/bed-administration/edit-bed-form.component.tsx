@@ -10,11 +10,10 @@ import BedAdministrationForm from './bed-administration-form.component';
 interface EditBedFormProps {
   editData: BedWithLocation;
   mutate: () => void;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, editData, mutate }) => {
+const EditBedForm: React.FC<EditBedFormProps> = ({ closeModal, editData, mutate }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
@@ -49,7 +48,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
           showSnackbar({
             kind: 'success',
             title: t('bedUpdated', 'Bed updated'),
-            subtitle: t('bedUpdatedSuccessfully', `${bedPayload.bedNumber} updated successfully`, {
+            subtitle: t('bedUpdatedSuccessfully', '{{bedNumber}} updated successfully', {
               bedNumber: bedPayload.bedNumber,
             }),
           });
@@ -63,11 +62,20 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
             subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [editData, mutate, onModalChange, t],
+    [
+      closeModal,
+      editData.bedNumber,
+      editData.bedType.name,
+      editData.column,
+      editData.location.uuid,
+      editData.row,
+      editData.status,
+      editData.uuid,
+      mutate,
+      t,
+    ],
   );
 
   return (
@@ -78,8 +86,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, edi
       headerTitle={headerTitle}
       initialData={editData}
       occupancyStatuses={occupancyStatuses}
-      onModalChange={onModalChange}
-      showModal={showModal}
+      closeModal={closeModal}
     />
   );
 };

@@ -14,18 +14,15 @@ import {
   useVisit,
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
+import { AddPatientToQueueContextProvider } from './add-patient-to-queue-context';
 import ExistingVisitFormComponent from './existing-visit-form/existing-visit-form.component';
 import styles from './create-queue-entry.scss';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
   selectedPatientUuid: string;
   currentServiceQueueUuid?: string;
-  handleBackToSearchList?: () => void;
+  handleReturnToSearchList?: () => void;
 }
-
-export const AddPatientToQueueContext = React.createContext({
-  currentServiceQueueUuid: '',
-});
 
 /**
  *
@@ -36,7 +33,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
   promptBeforeClosing,
   selectedPatientUuid,
   currentServiceQueueUuid,
-  handleBackToSearchList,
+  handleReturnToSearchList,
 }) => {
   const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
@@ -52,7 +49,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
 
   return patient ? (
     <div className={styles.patientSearchContainer}>
-      <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
+      <AddPatientToQueueContextProvider value={{ currentServiceQueueUuid }}>
         <div className={styles.patientBannerContainer}>
           <div className={styles.patientBanner}>
             <div className={styles.patientPhoto} role="img">
@@ -76,7 +73,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
             renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription={t('backToSearchResults', 'Back to search results')}
             size="sm"
-            onClick={() => handleBackToSearchList?.()}>
+            onClick={() => handleReturnToSearchList?.()}>
             <span>{t('backToSearchResults', 'Back to search results')}</span>
           </Button>
         </div>
@@ -85,7 +82,11 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
         ) : error ? (
           <ErrorState headerTitle={t('errorFetchingVisit', 'Error fetching patient visit')} error={error} />
         ) : activeVisit ? (
-          <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
+          <ExistingVisitFormComponent
+            closeWorkspace={closeWorkspace}
+            handleReturnToSearchList={handleReturnToSearchList}
+            visit={activeVisit}
+          />
         ) : (
           <ExtensionSlot
             name="start-visit-workspace-form-slot"
@@ -97,7 +98,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
             }}
           />
         )}
-      </AddPatientToQueueContext.Provider>
+      </AddPatientToQueueContextProvider>
     </div>
   ) : null;
 };

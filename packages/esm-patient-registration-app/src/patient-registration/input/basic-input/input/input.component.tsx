@@ -152,7 +152,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   */
 
   const value = field.value || '';
-  const invalidText = meta.error && t(meta.error);
+  const invalidText = meta.error || '';
   const warnText = useMemo(() => {
     if (!invalidText && typeof checkWarning === 'function') {
       const warning = checkWarning(value);

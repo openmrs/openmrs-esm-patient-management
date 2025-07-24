@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
@@ -13,16 +13,16 @@ import {
   usePatient,
   usePatientPhoto,
 } from '@openmrs/esm-framework';
-import { getValidationSchema } from './validation/patient-registration-validation';
-import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
-import { PatientRegistrationContext } from './patient-registration-context';
-import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
-import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
-import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
-import { ResourcesContext } from '../offline.resources';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
+import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
+import { getValidationSchema } from './validation/patient-registration-validation';
+import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
+import { PatientRegistrationContextProvider } from './patient-registration-context';
+import { useResourcesContext } from '../resources-context';
 import { SectionWrapper } from './section/section-wrapper.component';
+import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
+import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
+import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 
@@ -34,24 +34,36 @@ export interface PatientRegistrationProps {
 }
 
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
-  const { currentSession, identifierTypes } = useContext(ResourcesContext);
-  const { search } = useLocation();
-  const config = useConfig() as RegistrationConfig;
-  const [target, setTarget] = useState<undefined | string>();
-  const { patientUuid: uuidOfPatientToEdit } = useParams();
-  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
+  const { currentSession, identifierTypes } = useResourcesContext();
+  const { patientUuid: uuidOfPatientToEdit } = useParams();
+  const { search } = useLocation();
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
+  const config = useConfig<RegistrationConfig>();
+
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(
+    isLoadingPatientToEdit,
+    patientToEdit,
+    uuidOfPatientToEdit,
+  );
+  const [initialAddressFieldValues] = useInitialAddressFieldValues(
+    {},
+    isLoadingPatientToEdit,
+    patientToEdit,
+    uuidOfPatientToEdit,
+  );
+
+  const [patientUuidMap] = usePatientUuidMap({}, isLoadingPatientToEdit, patientToEdit, uuidOfPatientToEdit);
+
+  const [target, setTarget] = useState<undefined | string>();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
-  const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
-  const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
+
   const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
-  const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
-  const validationSchema = getValidationSchema(config);
+  const validationSchema = getValidationSchema(config, t);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -153,12 +165,37 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
+  const createContextValue = useCallback(
+    (formikProps) => ({
+      identifierTypes,
+      validationSchema,
+      values: formikProps.values,
+      inEditMode,
+      setFieldValue: formikProps.setFieldValue,
+      setFieldTouched: formikProps.setFieldTouched,
+      setCapturePhotoProps,
+      currentPhoto: photo?.imageSrc,
+      isOffline,
+      initialFormValues: formikProps.initialValues,
+      setInitialFormValues,
+    }),
+    [
+      identifierTypes,
+      validationSchema,
+      inEditMode,
+      setCapturePhotoProps,
+      photo?.imageSrc,
+      isOffline,
+      setInitialFormValues,
+    ],
+  );
+
   return (
     <Formik
       enableReinitialize
       initialValues={initialFormValues}
-      validationSchema={validationSchema}
-      onSubmit={onFormSubmit}>
+      onSubmit={onFormSubmit}
+      validationSchema={validationSchema}>
       {(props) => (
         <Form className={styles.form}>
           <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
@@ -199,26 +236,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     t('registerPatient', 'Register patient')
                   )}
                 </Button>
-                <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
+                <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}
                 </Button>
               </div>
             </div>
             <div className={styles.infoGrid}>
-              <PatientRegistrationContext.Provider
-                value={{
-                  identifierTypes: identifierTypes,
-                  validationSchema,
-                  values: props.values,
-                  inEditMode,
-                  setFieldValue: props.setFieldValue,
-                  setFieldTouched: props.setFieldTouched,
-                  setCapturePhotoProps,
-                  currentPhoto: photo?.imageSrc,
-                  isOffline,
-                  initialFormValues: props.initialValues,
-                  setInitialFormValues,
-                }}>
+              <PatientRegistrationContextProvider value={createContextValue(props)}>
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}
@@ -226,7 +250,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     index={index}
                   />
                 ))}
-              </PatientRegistrationContext.Provider>
+              </PatientRegistrationContextProvider>
             </div>
           </div>
         </Form>

@@ -1,0 +1,17 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-04;
+}
+
+.checkbox {
+  padding-top: layout.$spacing-04;
+}
+
+.errorNotification {
+  margin-top: layout.$spacing-02;
+}

@@ -42,24 +42,6 @@ export interface Address {
   stateProvince: string;
 }
 
-export interface FHIRPatientType {
-  id: string;
-  identifier: Array<FHIRIdentifier>;
-  name: Array<FHIRName>;
-  gender: string;
-  birthDate: string;
-  deceasedBoolean: boolean;
-  deceasedDateTime: string;
-  address: Array<{
-    id: string;
-    use: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  }>;
-}
-
 export interface FHIRIdentifier {
   id: string;
   use: string;
@@ -80,7 +62,7 @@ export interface FHIRPatientSearchResponse {
     url: string;
   }>;
   entry: Array<{
-    resource: FHIRPatientType;
+    resource: fhir.Patient;
   }>;
 }
 

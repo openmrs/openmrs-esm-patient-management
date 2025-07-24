@@ -4,7 +4,6 @@ import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../form/appointments-form.resource';
-import styles from './end-appointment.modal.scss';
 
 interface EndAppointmentModalProps {
   patientUuid: string;
@@ -74,7 +73,6 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
   return (
     <>
       <ModalHeader
-        className={styles.modalHeader}
         closeModal={closeModal}
         title={t('endAppointmentConfirmation', 'Are you sure you want to check the patient out for this appointment?')}
       />

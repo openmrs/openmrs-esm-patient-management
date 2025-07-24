@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-import { useServiceQueueEntries } from '../active-visits/active-visits-table.resource';
+import { useServiceQueueEntries } from '../service-queues.resource';
 
 const ServicesTable: React.FC = () => {
   const { t } = useTranslation();
@@ -50,7 +50,7 @@ const ServicesTable: React.FC = () => {
   return (
     <div>
       <QueuePatientBaseTable
-        title={t('alistOfClients', 'A list of clients waiting for ')}
+        title={t('aListOfPatients', 'A list of patients waiting for ')}
         headers={tableHeaders}
         patientData={serviceQueueEntries}
         serviceType={service}

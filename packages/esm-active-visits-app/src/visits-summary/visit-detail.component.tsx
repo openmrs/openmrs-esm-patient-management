@@ -1,10 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
-import { useVisit } from './visit.resource';
-import { type Encounter } from '../types';
+import { useTranslation } from 'react-i18next';
 import { formatDatetime, formatTime, parseDate } from '@openmrs/esm-framework';
+import { useVisit } from './visit.resource';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
@@ -22,7 +21,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   const encounters = useMemo(
     () =>
       visit
-        ? visit?.encounters?.map((encounter: Encounter) => ({
+        ? visit?.encounters?.map((encounter) => ({
             id: encounter.uuid,
             time: formatTime(parseDate(encounter.encounterDateTime)),
             encounterType: encounter.encounterType.display,
@@ -36,6 +35,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
+
   if (visit) {
     return (
       <div className={styles.visitsDetailWidgetContainer}>

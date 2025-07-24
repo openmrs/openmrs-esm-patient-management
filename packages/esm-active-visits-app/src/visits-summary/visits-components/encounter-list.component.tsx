@@ -1,6 +1,3 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Table,
@@ -14,10 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { type Observation } from '../../types';
-import EncounterObservations from './encounter-observations.component';
+import { isDesktop, type Obs, useLayoutType } from '@openmrs/esm-framework';
+import classNames from 'classnames';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from '../visit-detail-overview.scss';
+import EncounterObservations from './encounter-observations.component';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -25,7 +24,7 @@ interface EncounterListProps {
     time: any;
     encounterType: string;
     provider: string;
-    obs: Array<Observation>;
+    obs: Array<Obs>;
   }>;
   visitUuid: string;
 }

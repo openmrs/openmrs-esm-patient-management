@@ -25,7 +25,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
-  const { patient, inpatientRequest } = wardPatient ?? {};
+  const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
 
   const { t } = useTranslation();
@@ -67,7 +67,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
     setShowErrorNotifications(false);
     setIsSubmitting(true);
     const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
-    admitPatient(patient, dispositionType)
+    admitPatient(patient, dispositionType, visit.uuid)
       .then(
         async (response) => {
           if (response.ok) {

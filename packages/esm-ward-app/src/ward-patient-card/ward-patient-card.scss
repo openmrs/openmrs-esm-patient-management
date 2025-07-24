@@ -6,13 +6,10 @@
 .wardPatientCard {
   @include type.type-style('body-compact-01');
   color: $text-02;
-
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: layout.$spacing-02;
   background-color: $ui-02;
-
   position: relative; // this allows positioning the button correctly
 }
 

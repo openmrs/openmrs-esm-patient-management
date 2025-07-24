@@ -1,19 +1,16 @@
-import { InlineNotification } from '@carbon/react';
-import { useAppContext, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
-import React, { createContext, type ReactNode } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { InlineNotification } from '@carbon/react';
+import { useAppContext } from '@openmrs/esm-framework';
+import { type WardViewContext } from '../../types';
+import {
+  AdmissionRequestsWorkspaceContextProvider,
+  type AdmissionRequestsWorkspaceContextProps,
+} from './admission-requests-context';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import styles from './admission-requests-workspace.scss';
-import { type WardViewContext } from '../../types';
 
-export interface AdmissionRequestsWorkspaceProps extends DefaultWorkspaceProps {
-  wardPendingPatients: ReactNode;
-}
-
-export const AdmissionRequestsWorkspaceContext = createContext<AdmissionRequestsWorkspaceProps>(null);
-
-const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = (props) => {
-  const { wardPendingPatients } = props;
+const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceContextProps> = ({ wardPendingPatients }) => {
   const { t } = useTranslation();
   const { errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
@@ -36,9 +33,10 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = (p
         </div>
       )}
       {inpatientRequests?.length == 0 && <div>{t('noPendingPatientRequests', 'No pending patient requests')}</div>}
-      <AdmissionRequestsWorkspaceContext.Provider value={props}>
+      <AdmissionRequestsWorkspaceContextProvider
+        value={{ wardPendingPatients } as unknown as AdmissionRequestsWorkspaceContextProps}>
         <div className={styles.content}>{wardPendingPatients}</div>
-      </AdmissionRequestsWorkspaceContext.Provider>
+      </AdmissionRequestsWorkspaceContextProvider>
     </div>
   );
 };

@@ -43,7 +43,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
           className={styles.patientSearchInput}
           closeButtonLabelText={t('clearSearch', 'Clear')}
           data-testid="patientSearchBar"
-          labelText=""
+          labelText={t('searchForPatient', 'Search for a patient by name or identifier number')}
           onChange={(event) => handleChange(event.target.value)}
           onClear={onClear}
           placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}

@@ -19,7 +19,7 @@ import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { PatientAppointmentsActionMenu } from './patient-appointments-action-menu.component';
-import styles from './patient-appointments-action-menu.scss';
+import styles from './patient-appointments-table.scss';
 
 const pageSize = 10;
 
@@ -79,7 +79,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
       <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
-            <Table {...getTableProps()}>
+            <Table className={styles.table} {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

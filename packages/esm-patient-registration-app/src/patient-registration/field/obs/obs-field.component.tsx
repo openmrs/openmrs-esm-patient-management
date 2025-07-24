@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import styles from './../field.scss';
 
 export interface ObsFieldProps {
@@ -166,7 +166,7 @@ interface DateObsFieldProps {
 function DateObsField({ concept, label, required, allowPastDates, allowFutureDates }: DateObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { setFieldValue } = usePatientRegistrationContext();
   const futureDatesAllowed = allowFutureDates ?? true;
   const pastDatesAllowed = allowPastDates ?? true;
 

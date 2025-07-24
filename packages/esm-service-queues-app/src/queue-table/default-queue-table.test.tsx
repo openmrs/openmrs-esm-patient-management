@@ -10,7 +10,7 @@ import {
 } from '__mocks__';
 import React from 'react';
 import { renderWithSwr } from 'tools';
-import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import { useQueueRooms } from '../admin/add-provider-queue-room-modal/add-provider-queue-room.resource';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { useQueueEntries } from '../hooks/useQueueEntries';
@@ -33,8 +33,8 @@ jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(),
 }));
 
-jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => ({
-  ...jest.requireActual('../add-provider-queue-room/add-provider-queue-room.resource'),
+jest.mock('../admin/add-provider-queue-room-modal/add-provider-queue-room.resource', () => ({
+  ...jest.requireActual('../admin/add-provider-queue-room-modal/add-provider-queue-room.resource'),
   useQueueRooms: jest.fn(),
 }));
 

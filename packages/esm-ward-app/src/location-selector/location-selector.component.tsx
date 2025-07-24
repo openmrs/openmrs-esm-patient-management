@@ -15,15 +15,38 @@ import {
 import useEmrConfiguration from '../hooks/useEmrConfiguration';
 import useLocations from '../hooks/useLocations';
 import styles from './location-selector.scss';
+import { type ControllerRenderProps } from 'react-hook-form';
 
 interface LocationSelectorProps extends RadioButtonGroupProps {
   paginationSize?: number;
+
+  /**
+   * If provided, limits the locations to child locations of the given ancestor location.
+   */
   ancestorLocation?: Location;
+
+  /**
+   * a list of locations that should be filtered from the location selector
+   */
+  excludeLocations?: Location[];
+
+  field: ControllerRenderProps<
+    {
+      note?: string;
+      location?: string;
+      transferType?: string;
+    },
+    'location'
+  >;
 }
 
-export default function LocationSelector({ paginationSize = 15, ...props }: LocationSelectorProps) {
+export default function LocationSelector({
+  paginationSize = 15,
+  ancestorLocation,
+  excludeLocations: locationsToFilter,
+  field,
+}: LocationSelectorProps) {
   const { t } = useTranslation();
-  const { ancestorLocation } = props;
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
   const isTablet = !isDesktop(useLayoutType());
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,6 +76,8 @@ export default function LocationSelector({ paginationSize = 15, ...props }: Loca
     goToPrevious,
   } = useLocations(filterCriteria, paginationSize, !emrConfiguration);
 
+  const filteredLocations = locations?.filter((l) => !locationsToFilter?.some((fl) => fl.uuid === l.id));
+
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearchTerm(event.target.value);
@@ -79,9 +104,9 @@ export default function LocationSelector({ paginationSize = 15, ...props }: Loca
         </div>
       ) : (
         <ResponsiveWrapper>
-          <RadioButtonGroup {...props} className={styles.radioButtonGroup} orientation="vertical">
-            {locations?.length > 0 ? (
-              locations?.map((location) => (
+          <RadioButtonGroup {...field} className={styles.radioButtonGroup} orientation="vertical">
+            {filteredLocations?.length > 0 ? (
+              filteredLocations?.map((location) => (
                 <RadioButton key={location.id} labelText={location.name} value={location.id} />
               ))
             ) : (

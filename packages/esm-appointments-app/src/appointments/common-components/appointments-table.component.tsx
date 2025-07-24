@@ -24,6 +24,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
+import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   formatDate,
@@ -35,7 +36,6 @@ import {
   launchWorkspace,
   usePagination,
 } from '@openmrs/esm-framework';
-import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
@@ -138,11 +138,12 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     return (
       <EmptyState
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
-        displayText={`${
-          tableHeading?.match(/today/i)
+        displayText={
+          tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
-        }`}
+        }
+        // TODO @brandones: Make this a workspace, not an extension
         launchForm={() => launchWorkspace('search-patient')}
       />
     );
@@ -158,7 +159,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       <div className={styles.toolbar}>
         <Search
           className={styles.searchbar}
-          labelText=""
+          labelText={t('filterAppointments', 'Filter appointments')}
           placeholder={t('filterTable', 'Filter table')}
           onChange={(event) => setSearchString(event.target.value)}
           size={responsiveSize}
@@ -205,7 +206,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     {headers.map((header) => (
                       <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
-                    <TableHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -234,13 +235,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                 size={responsiveSize}>
                                 <OverflowMenuItem
                                   className={styles.menuItem}
-                                  itemText={t('editAppointments', 'Edit appointment')}
+                                  itemText={t('editAppointment', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace('edit-appointments-form', {
+                                    launchWorkspace('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
+                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />

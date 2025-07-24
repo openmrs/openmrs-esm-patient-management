@@ -1,15 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
+import { PatientAppointmentContextTypes, usePatientAppointmentContext } from '../hooks/patient-appointment-context';
 import PatientAppointmentsTable from './patient-appointments-table.component';
 import styles from './patient-appointments-base.scss';
-
-import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
 
 interface PatientAppointmentsBaseProps {
   patientUuid: string;
@@ -25,7 +24,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
   const isTablet = useLayoutType() === 'tablet';
-  const patientAppointmentContext = useContext(PatientAppointmentContext);
+  const patientAppointmentContext = usePatientAppointmentContext();
   const [switchedView, setSwitchedView] = useState(false);
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
@@ -37,21 +36,28 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     isValidating,
   } = usePatientAppointments(patientUuid, startDate, new AbortController());
 
-  const launchAppointmentsForm = () => {
-    if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
-      launchPatientWorkspace('appointments-form-workspace');
+  const handleLaunchAppointmentsForm = () => {
+    if (
+      (patientAppointmentContext as PatientAppointmentContextTypes) === PatientAppointmentContextTypes.PATIENT_CHART
+    ) {
+      launchWorkspace('appointments-form-workspace');
     } else {
-      launchWorkspace('add-appointment', {
+      launchWorkspace('appointments-form-workspace', {
         context: 'creating',
         patientUuid,
+        workspaceTitle: t('createNewAppointment', 'Create new appointment'),
       });
     }
   };
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+  }
+
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
+
   if (appointmentsData && Object.keys(appointmentsData)?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -77,7 +83,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add Appointments"
-              onClick={launchAppointmentsForm}>
+              onClick={handleLaunchAppointmentsForm}>
               {t('add', 'Add')}
             </Button>
           </div>

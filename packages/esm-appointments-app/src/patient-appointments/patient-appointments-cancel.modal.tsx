@@ -3,15 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
-import styles from './patient-appointments-cancel.scss';
 
-interface PatientCancelAppointmentModalProps {
+interface CancelAppointmentModalProps {
   closeCancelModal: () => void;
   appointmentUuid: string;
   patientUuid: string;
 }
 
-const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps> = ({
+const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
   closeCancelModal,
   appointmentUuid,
   patientUuid,
@@ -20,21 +19,19 @@ const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps
   const { mutate } = usePatientAppointments(patientUuid, new Date().toUTCString(), new AbortController());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCancel = async () => {
+  const handleCancelAppointment = async () => {
     setIsSubmitting(true);
 
     changeAppointmentStatus('Cancelled', appointmentUuid)
-      .then(({ status }) => {
-        if (status === 200) {
-          mutate();
-          closeCancelModal();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            subtitle: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
-            title: t('appointmentCancelled', 'Appointment cancelled'),
-          });
-        }
+      .then(() => {
+        mutate();
+        closeCancelModal();
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
+          title: t('appointmentCancelled', 'Appointment cancelled'),
+        });
       })
       .catch((err) => {
         showSnackbar({
@@ -48,11 +45,7 @@ const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps
 
   return (
     <div>
-      <ModalHeader
-        className={styles.modalHeader}
-        closeModal={closeCancelModal}
-        title={t('cancelAppointment', 'Cancel appointment')}
-      />
+      <ModalHeader closeModal={closeCancelModal} title={t('cancelAppointment', 'Cancel appointment')} />
       <ModalBody>
         <p>{t('cancelAppointmentModalConfirmationText', 'Are you sure you want to cancel this appointment?')}</p>
       </ModalBody>
@@ -60,7 +53,7 @@ const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps
         <Button kind="secondary" onClick={closeCancelModal}>
           {t('discard', 'Discard')}
         </Button>
-        <Button kind="danger" onClick={handleCancel} disabled={isSubmitting}>
+        <Button kind="danger" onClick={handleCancelAppointment} disabled={isSubmitting}>
           {t('cancelAppointment', 'Cancel appointment')}
         </Button>
       </ModalFooter>
@@ -68,4 +61,4 @@ const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps
   );
 };
 
-export default PatientCancelAppointmentModal;
+export default CancelAppointmentModal;

@@ -1,17 +1,16 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import type { BedType, BedTypeData, Mutator } from '../types';
+import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 import { saveBedType, useBedTypes, useLocationsWithAdmissionTag } from '../summary/summary.resource';
-import BedTypeAdministrationForm from './bed-type-admin-form.component';
+import type { BedType, BedTypeData, Mutator } from '../types';
 
 interface BedTypeFormProps {
   mutate: Mutator<BedType>;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, showModal }) => {
+const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
   const { t } = useTranslation();
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const headerTitle = t('createBedType', 'Create bed type');
@@ -39,7 +38,7 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, sho
           showSnackbar({
             kind: 'success',
             title: t('bedTypeCreated', 'Bed type created'),
-            subtitle: t('bedTypeCreatedSuccessfully', `${name} created successfully`, {
+            subtitle: t('bedTypeCreatedSuccessfully', '{{bedType}} created successfully', {
               bedType: name,
             }),
           });
@@ -48,15 +47,13 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, sho
         .catch((error) => {
           showSnackbar({
             kind: 'error',
-            title: t('errorCreatingForm', 'Error creating bed'),
-            subtitle: error?.message,
+            title: t('errorCreatingBedType', 'Error creating bed type'),
+            subtitle: error?.responseBody?.error?.message ?? error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, t],
+    [closeModal, t, mutate],
   );
 
   return (
@@ -66,8 +63,7 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, onModalChange, sho
       handleSubmission={handleCreateBedType}
       headerTitle={headerTitle}
       initialData={initialData}
-      onModalChange={onModalChange}
-      showModal={showModal}
+      closeModal={closeModal}
     />
   );
 };

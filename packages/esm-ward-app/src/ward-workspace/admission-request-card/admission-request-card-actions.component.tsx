@@ -1,16 +1,16 @@
+import React from 'react';
 import { Button } from '@carbon/react';
-import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { useAdmissionRequestsWorkspaceContext } from '../admission-request-workspace/admission-requests-context';
 import type { WardPatientCardType, WardPatientWorkspaceProps } from '../../types';
-import { AdmissionRequestsWorkspaceContext } from '../admission-request-workspace/admission-requests.workspace';
 import AdmitPatientButton from '../admit-patient-button.component';
 import styles from './admission-request-card.scss';
 
 const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
   const { t } = useTranslation();
+  const { closeWorkspaceWithSavedChanges } = useAdmissionRequestsWorkspaceContext();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
-  const { closeWorkspaceWithSavedChanges } = useContext(AdmissionRequestsWorkspaceContext);
 
   const launchPatientTransferForm = () => {
     launchWorkspace<WardPatientWorkspaceProps>('patient-transfer-request-workspace', {

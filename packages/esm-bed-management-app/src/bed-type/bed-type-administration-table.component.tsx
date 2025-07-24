@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -16,14 +16,12 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
-import type { BedTypeData } from '../types';
-import { useBedTypes } from '../summary/summary.resource';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { ErrorState, isDesktop as desktopLayout, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import CardHeader from '../card-header/card-header.component';
-import BedTypeForm from './new-bed-type-form.component';
-import EditBedTypeForm from './edit-bed-type.component';
 import Header from '../header/header.component';
+import { deleteBedType, useBedTypes } from '../summary/summary.resource';
+import type { BedTypeData } from '../types';
 import styles from '../bed-administration/bed-administration-table.scss';
 
 const BedTypeAdministrationTable: React.FC = () => {
@@ -36,11 +34,61 @@ const BedTypeAdministrationTable: React.FC = () => {
   const { bedTypes, errorLoadingBedTypes, isLoadingBedTypes, isValidatingBedTypes, mutateBedTypes } = useBedTypes();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageSize, setPageSize] = useState(10);
-  const [editData, setEditData] = useState<BedTypeData>();
-  const [pageSize] = useState(10);
-  const [showBedTypeModal, setAddBedTypeModal] = useState(false);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+
+  const openNewBedTypeModal = () => {
+    const dispose = showModal('new-bed-type-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedTypes,
+    });
+  };
+
+  const openEditBedTypeModal = useCallback(
+    (editData: BedTypeData) => {
+      const dispose = showModal('edit-bed-type-modal', {
+        closeModal: () => dispose(),
+        mutate: mutateBedTypes,
+        editData,
+      });
+    },
+    [mutateBedTypes],
+  );
+
+  const handleDeleteBedType = useCallback(
+    (bedTypeId: string, reason: string, bedTypeData: BedTypeData, closeModal: () => void) => {
+      deleteBedType({ bedTypeId, reason })
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            title: t('bedTypeDeleted', 'Bed type deleted'),
+            subtitle: t('bedTypeDeletedSuccessfully', "The bed type '{{bedTypeName}}' has been succesfully deleted", {
+              bedTypeName: bedTypeData.name,
+            }),
+          });
+          mutateBedTypes();
+        })
+        .catch((error) => {
+          showSnackbar({
+            kind: 'error',
+            title: t('errorDeletingBedType', 'Error deleting bed type'),
+            subtitle: error?.message,
+          });
+        })
+        .finally(closeModal);
+    },
+    [t, mutateBedTypes],
+  );
+
+  const openDeleteBedTypeModal = useCallback(
+    (bedTypeData: BedTypeData) => {
+      const dispose = showModal('delete-bed-type-modal', {
+        bedTypeData: bedTypeData,
+        handleDeleteBedType: handleDeleteBedType,
+        closeModal: () => dispose(),
+      });
+    },
+    [handleDeleteBedType],
+  );
 
   const tableHeaders = [
     {
@@ -69,23 +117,35 @@ const BedTypeAdministrationTable: React.FC = () => {
         displayName: entry?.displayName,
         description: entry?.description,
         actions: (
-          <IconButton
-            align="top-start"
-            enterDelayMs={300}
-            kind="ghost"
-            label={t('editBedType', 'Edit bed type')}
-            onClick={(e) => {
-              e.preventDefault();
-              setEditData(entry);
-              setShowEditBedModal(true);
-              setAddBedTypeModal(false);
-            }}
-            size={responsiveSize}>
-            <Edit />
-          </IconButton>
+          <>
+            <IconButton
+              align="top-start"
+              enterDelayMs={300}
+              kind="ghost"
+              label={t('editBedType', 'Edit bed type')}
+              onClick={(e) => {
+                e.preventDefault();
+                openEditBedTypeModal(entry);
+              }}
+              size={responsiveSize}>
+              <Edit />
+            </IconButton>
+            <IconButton
+              align="top-start"
+              enterDelayMs={300}
+              kind="ghost"
+              label={t('deleteBedType', 'Delete bed type')}
+              onClick={(e) => {
+                e.preventDefault();
+                openDeleteBedTypeModal(entry);
+              }}
+              size={responsiveSize}>
+              <TrashCan />
+            </IconButton>
+          </>
         ),
       })),
-    [responsiveSize, bedTypes, t],
+    [openEditBedTypeModal, openDeleteBedTypeModal, responsiveSize, bedTypes, t],
   );
 
   if (isLoadingBedTypes) {
@@ -113,28 +173,13 @@ const BedTypeAdministrationTable: React.FC = () => {
   return (
     <>
       <Header title={t('bedTypes', 'Bed types')} />
-
       <div className={styles.widgetCard}>
-        {showBedTypeModal ? (
-          <BedTypeForm onModalChange={setAddBedTypeModal} showModal={showBedTypeModal} mutate={mutateBedTypes} />
-        ) : null}
-        {showEditBedModal ? (
-          <EditBedTypeForm
-            editData={editData}
-            mutate={mutateBedTypes}
-            onModalChange={setShowEditBedModal}
-            showModal={showEditBedModal}
-          />
-        ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedTypes ? <InlineLoading /> : null}</span>
           </span>
           {bedTypes?.length ? (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setAddBedTypeModal(true)}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedTypeModal}>
               {t('addBedType', 'Add bed type')}
             </Button>
           ) : null}
@@ -172,7 +217,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setAddBedTypeModal(true)}>
+                      onClick={openNewBedTypeModal}>
                       {t('addBedType', 'Add bed type')}
                     </Button>
                   </Tile>

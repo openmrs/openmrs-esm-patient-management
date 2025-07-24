@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
@@ -6,7 +6,7 @@ import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
-import SelectedDateContext from '../../hooks/selectedDateContext';
+import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
 import styles from './monthly-view-workload.scss';
 
@@ -18,7 +18,7 @@ export interface MonthlyWorkloadViewProps {
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
   const layout = useLayoutType();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useAppointmentsStore();
 
   const currentData = useMemo(
     () =>

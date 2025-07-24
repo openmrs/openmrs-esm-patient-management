@@ -1,16 +1,16 @@
-import { useConfig } from '@openmrs/esm-framework';
 import React from 'react';
-import { type RegistrationConfig } from '../../config-schema';
+import { useConfig } from '@openmrs/esm-framework';
 import { AddressField } from './address/custom-address-field.component';
 import { ObsField } from './obs/obs-field.component';
 import { PersonAttributeField } from './person-attributes/person-attribute-field.component';
+import { type RegistrationConfig } from '../../config-schema';
 
 export interface CustomFieldProps {
   name: string;
 }
 
 export function CustomField({ name }: CustomFieldProps) {
-  const config = useConfig() as RegistrationConfig;
+  const config = useConfig<RegistrationConfig>();
   const fieldDefinition = config.fieldDefinitions.filter((def) => def.id == name)[0];
 
   if (fieldDefinition.type === 'person attribute') {

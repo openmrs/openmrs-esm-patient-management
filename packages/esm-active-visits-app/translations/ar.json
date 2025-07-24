@@ -1,18 +1,15 @@
 {
   "activeVisits": "الزيارات النشطة",
-  "age": "العمر",
   "allEncounters": "جميع اللقاءات",
   "checkFilters": "تحقق من الفلاتر أعلاه",
   "diagnoses": "التشخيصات",
   "dose": "الجرعة",
   "encounterType": "نوع اللقاء",
   "endDate": "تاريخ النهاية",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "فلتر الجدول",
-  "gender": "الجنس",
-  "idNumber": "رقم الهوية",
   "indication": "اشارة",
   "medications": "الأدوية",
-  "name": "الاسم",
   "noActiveVisitsForLocation": "لا توجد زيارات نشطة لعرضها لهذا الموقع.",
   "noDiagnosesFound": "لم يتم العثور على تشخيصات",
   "noEncountersFound": "لم يتم العثور على لقاءات",
@@ -31,7 +28,6 @@
   "thereIsNoInformationToDisplayHere": "لا توجد معلومات لعرضها هنا",
   "time": "الوقت",
   "totalVisits": "عدد الزيارات اليوم",
-  "visitStartTime": "وقت الزيارة",
-  "visitSummary": "ملخص الزيارة",
-  "visitType": "نوع الزيارة"
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "visitSummary": "ملخص الزيارة"
 }

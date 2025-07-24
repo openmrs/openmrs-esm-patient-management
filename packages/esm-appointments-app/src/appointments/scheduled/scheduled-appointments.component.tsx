@@ -1,7 +1,7 @@
-import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import {
   ExtensionSlot,
@@ -12,22 +12,22 @@ import {
   useLayoutType,
   isDesktop,
 } from '@openmrs/esm-framework';
-import SelectedDateContext from '../../hooks/selectedDateContext';
+import { useAppointmentsStore } from '../../store';
 import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
-  appointmentServiceType?: string[];
+  appointmentServiceTypes?: Array<string>;
 }
 
 type DateType = 'pastDate' | 'today' | 'futureDate';
 
 const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceType }) => {
+const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceTypes }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
@@ -81,22 +81,22 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
         onChange={({ name }) => setCurrentTab(name)}
         selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
         selectionMode="manual">
-        {panelsToShow.map((panel) => {
-          return <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />;
-        })}
+        {panelsToShow.map((panel) => (
+          <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
+        ))}
       </ContentSwitcher>
 
       <ExtensionSlot name={scheduledAppointmentsPanelsSlot}>
         {(extension) => {
           return (
             <ExtensionWrapper
-              extension={extension}
+              appointmentServiceTypes={appointmentServiceTypes}
               currentTab={currentTab}
-              appointmentServiceType={appointmentServiceType}
               date={selectedDate}
               dateType={dateType}
-              showExtensionTab={showExtension}
+              extension={extension}
               hideExtensionTab={hideExtension}
+              showExtensionTab={showExtension}
             />
           );
         }}
@@ -133,7 +133,7 @@ function useAllowedExtensions() {
 function ExtensionWrapper({
   extension,
   currentTab,
-  appointmentServiceType,
+  appointmentServiceTypes,
   date,
   dateType,
   showExtensionTab,
@@ -141,7 +141,7 @@ function ExtensionWrapper({
 }: {
   extension: ConnectedExtension;
   currentTab: string;
-  appointmentServiceType: string[];
+  appointmentServiceTypes: Array<string>;
   date: string;
   dateType: DateType;
   showExtensionTab: (extension: string) => void;
@@ -173,7 +173,7 @@ function ExtensionWrapper({
       <Extension
         state={{
           date,
-          appointmentServiceType,
+          appointmentServiceTypes,
           status: extension.config?.status,
           title: extension.config?.title,
         }}

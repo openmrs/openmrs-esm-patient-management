@@ -1,10 +1,12 @@
 import React from 'react';
 import { Form, Formik } from 'formik';
-import { render, screen } from '@testing-library/react';
-import { type Resources, ResourcesContext } from '../../../offline.resources';
+import { screen } from '@testing-library/react';
+import { type Resources } from '../../../offline.resources';
 import { type FormValues } from '../../patient-registration.types';
-import { PatientRegistrationContext } from '../../patient-registration-context';
+import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { RelationshipsSection } from './relationships-section.component';
+import { ResourcesContextProvider } from '../../../resources-context';
+import { renderWithContext } from 'tools';
 
 jest.mock('../../patient-registration.resource', () => ({
   fetchPerson: jest.fn().mockResolvedValue({
@@ -36,6 +38,7 @@ const initialContextValues = {
   isOffline: false,
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
+  setFieldTouched: jest.fn(),
   setInitialFormValues: jest.fn(),
   validationSchema: null,
   values: {} as FormValues,
@@ -43,14 +46,14 @@ const initialContextValues = {
 
 describe('RelationshipsSection', () => {
   it('renders a loader when relationshipTypes are not available', () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <RelationshipsSection />
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <RelationshipsSection />
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
 
     expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
@@ -82,20 +85,20 @@ describe('RelationshipsSection', () => {
       relationshipTypes: relationshipTypes,
     };
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik
-          initialValues={{
-            relationships: [{ action: 'ADD', relatedPersonUuid: '11524ae7-3ef6-4ab6-aff6-804ffc58704a' }],
-          }}
-          onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider value={initialContextValues}>
-              <RelationshipsSection />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
+    renderWithContext(
+      <Formik
+        initialValues={{
+          relationships: [{ action: 'ADD', relatedPersonUuid: '11524ae7-3ef6-4ab6-aff6-804ffc58704a' }],
+        }}
+        onSubmit={null}>
+        <Form>
+          <PatientRegistrationContextProvider value={initialContextValues}>
+            <RelationshipsSection />
+          </PatientRegistrationContextProvider>
+        </Form>
+      </Formik>,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
     );
 
     expect(screen.getByLabelText(/relationships section/i)).toBeInTheDocument();

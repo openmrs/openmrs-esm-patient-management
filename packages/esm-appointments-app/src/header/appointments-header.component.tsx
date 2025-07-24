@@ -1,34 +1,27 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { DatePicker, DatePickerInput, MultiSelect } from '@carbon/react';
-import { PageHeader, PageHeaderContent, AppointmentsPictogram } from '@openmrs/esm-framework';
+import { MultiSelect } from '@carbon/react';
+import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import SelectedDateContext from '../hooks/selectedDateContext';
+import { useAppointmentsStore, setSelectedDate, setAppointmentServiceTypes } from '../store';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
-  appointmentServiceType?: string[];
-  onChange?: (evt) => void;
+  showServiceTypeFilter?: boolean;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointmentServiceType, onChange }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter }) => {
   const { t } = useTranslation();
-  const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
+  const { selectedDate, appointmentServiceTypes } = useAppointmentsStore();
   const { serviceTypes } = useAppointmentServices();
 
-  const [selectedItems, setSelectedItems] = useState([]);
-
-  const handleMultiSelectChange = useCallback(
-    ({ selectedItems }) => {
-      const selectedUuids = selectedItems.map((item) => item.id);
-      setSelectedItems(selectedUuids);
-      onChange?.(selectedUuids);
-    },
-    [onChange],
-  );
+  const handleChangeServiceTypeFilter = useCallback(({ selectedItems }) => {
+    const selectedUuids = selectedItems.map((item) => item.id);
+    setAppointmentServiceTypes(selectedUuids);
+  }, []);
 
   const serviceTypeOptions = useMemo(
     () => serviceTypes?.map((item) => ({ id: item.uuid, label: item.name })) ?? [],
@@ -39,28 +32,22 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
     <PageHeader className={styles.header} data-testid="appointments-header">
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
-        <DatePicker
-          dateFormat="d-M-Y"
-          datePickerType="single"
-          onChange={([date]) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
-          value={dayjs(selectedDate).format('DD MMM YYYY')}>
-          <DatePickerInput
-            style={{ cursor: 'pointer', backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
-            id="appointment-date-picker"
-            labelText=""
-            placeholder="DD-MMM-YYYY"
-            type="text"
-          />
-        </DatePicker>
-        {typeof onChange === 'function' && (
+        <OpenmrsDatePicker
+          data-testid="appointment-date-picker"
+          id="appointment-date-picker"
+          labelText=""
+          onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
+          value={dayjs(selectedDate).toDate()}
+        />
+        {showServiceTypeFilter && (
           <MultiSelect
             id="serviceTypeMultiSelect"
-            label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
             items={serviceTypeOptions}
             itemToString={(item) => (item ? item.label : '')}
-            onChange={handleMultiSelectChange}
-            initialSelectedItems={serviceTypeOptions.length > 0 ? [serviceTypeOptions[0].id] : []}
+            label={t('filterAppointmentsByServiceType', 'Filter appointments by service type')}
+            onChange={handleChangeServiceTypeFilter}
             type="inline"
+            selectedItems={serviceTypeOptions.filter((item) => appointmentServiceTypes.includes(item.id))}
           />
         )}
       </div>

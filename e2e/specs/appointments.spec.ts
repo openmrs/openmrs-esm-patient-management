@@ -1,19 +1,17 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient } from '../types';
+import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
+import dayjs from 'dayjs';
 
-let patient: Patient;
 let visit: Visit;
 
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
+test.beforeEach(async ({ api, patient }) => {
   visit = await startVisit(api, patient.uuid);
 });
 
-test('Add, edit and cancel an appointment', async ({ page, api }) => {
+test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   const appointmentsPage = new AppointmentsPage(page);
 
   await test.step('When I go to the Appointments page in the patient chart', async () => {
@@ -24,11 +22,6 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
     await page.getByRole('button', { name: 'Add', exact: true }).click();
   });
 
-  // FIXME: Login locations are failing to populate in this dropdown in the test environment
-  // await test.step('And I select Mobile Clinic location', async () => {
-  //   await page.getByLabel('Select location').selectOption('Mobile Clinic');
-  // });
-
   await test.step('And I select “Outpatient Department” service', async () => {
     await page.selectOption('select#service', { label: 'Outpatient Department' });
   });
@@ -38,9 +31,14 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    await page.getByLabel(/^Date$/i).fill(tomorrow.toLocaleDateString('en-GB'));
+    const tomorrow = dayjs().add(1, 'day');
+    const dateInput = page.getByTestId('datePickerInput');
+    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
+    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
+    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
+    await dateDayInput.fill(tomorrow.format('DD'));
+    await dateMonthInput.fill(tomorrow.format('MM'));
+    await dateYearInput.fill(tomorrow.format('YYYY'));
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -78,9 +76,14 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('And I change the date to Today', async () => {
-    const today = new Date();
-    today.setDate(today.getDate());
-    await page.getByLabel(/^Date$/i).fill(today.toLocaleDateString('en-GB'));
+    const today = dayjs();
+    const dateInput = page.getByTestId('datePickerInput');
+    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
+    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
+    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
+    await dateDayInput.fill(today.format('DD'));
+    await dateMonthInput.fill(today.format('MM'));
+    await dateYearInput.fill(today.format('YYYY'));
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {
@@ -88,7 +91,13 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   });
 
   await test.step('I set the Date appointment issued', async () => {
-    await page.getByLabel('Date appointment issued').fill('20/08/2024');
+    const appointmentIssuedDateInput = page.getByTestId('dateAppointmentScheduledPickerInput');
+    const appointmentIssuedDateDayInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /day/i });
+    const appointmentIssuedDateMonthInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /month/i });
+    const appointmentIssuedDateYearInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /year/i });
+    await appointmentIssuedDateDayInput.fill('20');
+    await appointmentIssuedDateMonthInput.fill('08');
+    await appointmentIssuedDateYearInput.fill('2024');
   });
   await test.step('And I change the note', async () => {
     await page
@@ -127,5 +136,4 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
 
 test.afterEach(async ({ api }) => {
   await endVisit(api, visit.uuid);
-  await deletePatient(api, patient.uuid);
 });

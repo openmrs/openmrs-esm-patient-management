@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -15,13 +15,11 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
-import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { ErrorState, isDesktop as desktopLayout, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import type { BedTagData } from '../types';
-import { useBedTags } from '../summary/summary.resource';
-import BedTagForm from './new-tag-form.component';
+import { deleteBedTag, useBedTags } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
-import EditBedTagForm from './edit-tag-form.component';
 import Header from '../header/header.component';
 import styles from '../bed-administration/bed-administration-table.scss';
 
@@ -35,16 +33,67 @@ const BedTagAdministrationTable: React.FC = () => {
   const { bedTags, errorLoadingBedTags, isLoadingBedTags, isValidatingBedTags, mutateBedTags } = useBedTags();
 
   const [isBedDataLoading] = useState(false);
-  const [showBedTagsModal, setAddBedTagsModal] = useState(false);
-  const [showEditBedModal, setShowEditBedModal] = useState(false);
-  const [editData, setEditData] = useState<BedTagData>();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  const launchNewBedTagModal = () => {
+    const dispose = showModal('new-bed-tag-modal', {
+      closeModal: () => dispose(),
+      mutate: mutateBedTags,
+    });
+  };
+
+  const launchEditBedTagModal = useCallback(
+    (editData: BedTagData) => {
+      const dispose = showModal('edit-bed-tag-modal', {
+        closeModal: () => dispose(),
+        mutate: mutateBedTags,
+        editData: editData,
+      });
+    },
+    [mutateBedTags],
+  );
+
+  const handleDeleteBedTag = useCallback(
+    (bedTagId: string, reason: string, bedTagData: BedTagData, closeModal: () => void) => {
+      deleteBedTag({ bedTagId, reason })
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            title: t('bedTagDeleted', 'Bed tag deleted'),
+            subtitle: t('bedTagDeletedSuccessfully', "The bed tag '{{bedTagName}}' has been succesfully deleted", {
+              bedTagName: bedTagData.name,
+            }),
+          });
+          mutateBedTags();
+        })
+        .catch((error) => {
+          showSnackbar({
+            kind: 'error',
+            title: t('errorDeletingBedTag', 'Error deleting bed tag'),
+            subtitle: error?.message,
+          });
+        })
+        .finally(closeModal);
+    },
+    [t, mutateBedTags],
+  );
+
+  const launchDeleteBedTagModal = useCallback(
+    (bedTagData: BedTagData) => {
+      const dispose = showModal('delete-bed-tag-modal', {
+        bedTagData: bedTagData,
+        handleDeleteBedTag: handleDeleteBedTag,
+        closeModal: () => dispose(),
+      });
+    },
+    [handleDeleteBedTag],
+  );
 
   const tableHeaders = [
     {
       header: t('ids', 'ID'),
-      key: 'ids',
+      key: 'id',
     },
     {
       header: t('name', 'Name'),
@@ -58,21 +107,26 @@ const BedTagAdministrationTable: React.FC = () => {
 
   const tableRows = useMemo(() => {
     return bedTags?.map((entry) => ({
-      id: entry.uuid,
+      id: entry.id,
       name: entry?.name,
       actions: (
         <>
           <Button
             enterDelayMs={300}
             renderIcon={Edit}
-            onClick={(e) => {
-              e.preventDefault();
-              setEditData(entry);
-              setShowEditBedModal(true);
-              setAddBedTagsModal(false);
-            }}
+            onClick={() => launchEditBedTagModal(entry)}
             kind={'ghost'}
             iconDescription={t('editBedTag', 'Edit Bed Tag')}
+            hasIconOnly
+            size={responsiveSize}
+            tooltipAlignment="start"
+          />
+          <Button
+            enterDelayMs={300}
+            renderIcon={TrashCan}
+            onClick={() => launchDeleteBedTagModal(entry)}
+            kind={'ghost'}
+            iconDescription={t('deleteBedTag', 'Delete Bed Tag')}
             hasIconOnly
             size={responsiveSize}
             tooltipAlignment="start"
@@ -80,7 +134,7 @@ const BedTagAdministrationTable: React.FC = () => {
         </>
       ),
     }));
-  }, [responsiveSize, bedTags, t]);
+  }, [bedTags, t, responsiveSize, launchEditBedTagModal, launchDeleteBedTagModal]);
 
   if (isBedDataLoading || isLoadingBedTags) {
     return (
@@ -109,26 +163,12 @@ const BedTagAdministrationTable: React.FC = () => {
       <Header title={t('bedTags', 'Bed tags')} />
 
       <div className={styles.widgetCard}>
-        {showBedTagsModal ? (
-          <BedTagForm onModalChange={setAddBedTagsModal} showModal={showBedTagsModal} mutate={mutateBedTags} />
-        ) : null}
-        {showEditBedModal ? (
-          <EditBedTagForm
-            onModalChange={setShowEditBedModal}
-            showModal={showEditBedModal}
-            editData={editData}
-            mutate={mutateBedTags}
-          />
-        ) : null}
         <CardHeader title={headerTitle}>
           <span className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidatingBedTags ? <InlineLoading /> : null}</span>
           </span>
           {bedTags?.length ? (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setAddBedTagsModal(true)}>
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={launchNewBedTagModal}>
               {t('addBedTag', 'Add bed tag')}
             </Button>
           ) : null}
@@ -166,7 +206,7 @@ const BedTagAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setAddBedTagsModal(true)}>
+                      onClick={launchNewBedTagModal}>
                       {t('addBedTag', 'Add bed tag')}
                     </Button>
                   </Tile>

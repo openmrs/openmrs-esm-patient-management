@@ -1,4 +1,7 @@
 declare module '@carbon/react';
-declare module '*.css';
-declare module '*.scss';
 declare type SideNavProps = {};
+
+declare module '*.scss' {
+  const content: { [className: string]: string };
+  export default content;
+}

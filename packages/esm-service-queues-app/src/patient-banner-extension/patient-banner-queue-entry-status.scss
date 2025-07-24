@@ -1,0 +1,29 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.queueEntryStatusContainer {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.navDivider {
+  background-color: var(--brand-03);
+  width: 0.05rem;
+  height: 1.5rem;
+}
+
+.tag {
+  margin: layout.$spacing-02 0;
+  min-width: layout.$spacing-10;
+}
+
+.priorityTag {
+  @extend .tag;
+  @include type.type-style('label-01');
+  color: #943d00;
+  background-color: #ffc9a3;
+  min-width: layout.$spacing-10;
+}

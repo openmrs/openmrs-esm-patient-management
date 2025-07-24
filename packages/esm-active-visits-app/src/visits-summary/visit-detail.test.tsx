@@ -60,9 +60,9 @@ describe('VisitDetail', () => {
       visit: {
         encounters: [
           {
-            uuid: 'encounter-1',
+            uuid: '123e4567-e89b-12d3-a456-426614174000',
             encounterDateTime: '2023-07-30T12:34:56Z',
-            encounterType: { display: 'Encounter Type' },
+            encounterType: { display: 'Encounter Type', uuid: '98765432-e89b-12d3-a456-426614174001' },
             encounterProviders: [],
             obs: [],
           },
@@ -93,17 +93,17 @@ describe('VisitDetail', () => {
       visit: {
         encounters: [
           {
-            uuid: 'encounter-1',
+            uuid: '123e4567-e89b-12d3-a456-426614174000',
             encounterDateTime: '2023-07-30T12:34:56Z',
-            encounterType: { display: 'Encounter Type 1' },
+            encounterType: { display: 'Encounter Type 1', uuid: '98765432-e89b-12d3-a456-426614174001' },
             encounterProviders: [],
             obs: [],
             orders: [],
           },
           {
-            uuid: 'encounter-2',
+            uuid: '123e4567-e89b-12d3-a456-426614174001',
             encounterDateTime: '2023-07-30T13:45:00Z',
-            encounterType: { display: 'Encounter Type 2' },
+            encounterType: { display: 'Encounter Type 2', uuid: '98765432-e89b-12d3-a456-426614174002' },
             encounterProviders: [],
             obs: [],
             orders: [],

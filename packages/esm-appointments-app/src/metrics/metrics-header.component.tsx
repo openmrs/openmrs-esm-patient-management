@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
@@ -6,14 +6,14 @@ import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import { ExtensionSlot, isDesktop, launchWorkspace, navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../constants';
-import SelectedDateContext from '../hooks/selectedDateContext';
+import { useAppointmentsStore } from '../store';
 import styles from './metrics-header.scss';
 
 dayjs.extend(isToday);
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
@@ -24,12 +24,11 @@ const MetricsHeader: React.FC = () => {
       mutate: () => {}, // TODO get this to mutate properly
     };
 
-    launchWorkspace('create-appointment', { ...props });
+    launchWorkspace('appointments-form-workspace', { ...props });
   };
 
   return (
     <div className={styles.metricsContainer}>
-      <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <div className={styles.metricsContent}>
         <Button
           kind="tertiary"

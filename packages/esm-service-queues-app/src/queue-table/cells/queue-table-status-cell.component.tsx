@@ -1,5 +1,5 @@
 import React from 'react';
-import QueueStatus from '../../queue-entry-table-components/queue-status.component';
+import QueueStatus from '../components/queue-status.component';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 import { type StatusColumnConfig } from '../../config-schema';
 

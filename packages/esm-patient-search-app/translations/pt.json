@@ -36,6 +36,7 @@
   "searchingText": "Pesquisando...",
   "searchLocationPersonAttribute": "Procurar localização",
   "searchPatient": "Pesquisar Utente",
+  "searchPatientButton": "Search Patient Button",
   "searchResults": "Resultados da pesquisa",
   "searchResultsCount_one": "{{count}} resultado da pesquisa",
   "searchResultsCount_other": "{{count}} resultados da pesquisa",

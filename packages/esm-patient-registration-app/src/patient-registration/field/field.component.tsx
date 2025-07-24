@@ -16,7 +16,7 @@ export interface FieldProps {
 }
 
 export function Field({ name }: FieldProps) {
-  const config = useConfig() as RegistrationConfig;
+  const config = useConfig<RegistrationConfig>();
   if (
     !(builtInFields as ReadonlyArray<string>).includes(name) &&
     !config.fieldDefinitions.some((def) => def.id == name)

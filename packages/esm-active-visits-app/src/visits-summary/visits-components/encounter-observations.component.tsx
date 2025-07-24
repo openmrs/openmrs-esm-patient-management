@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
-import { type Observation } from '../../types';
+import { useTranslation } from 'react-i18next';
+import { type Obs } from '@openmrs/esm-framework';
 import styles from '../visit-detail-overview.scss';
 
 interface EncounterObservationsProps {
-  observations: Array<Observation>;
+  observations: Array<Obs>;
 }
 
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
@@ -15,7 +15,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   const observationsList = useMemo(() => {
     return (
       observations &&
-      observations.map((obs: Observation) => {
+      observations.map((obs) => {
         const [question, answer] = obs.display.split(':');
         return { question, answer };
       })

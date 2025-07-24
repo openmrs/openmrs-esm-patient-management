@@ -1,19 +1,18 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
+import BedTagsAdministrationForm from './bed-tags-admin-form.modal';
 import { editBedTag, useBedTags } from '../summary/summary.resource';
 import { type BedTagData, type Mutator } from '../types';
 import { type BedTagDataAdministration } from '../bed-administration/bed-administration-types';
-import BedTagsAdministrationForm from './bed-tags-admin-form.component';
 
 interface EditBedTagFormProps {
   editData: BedTagData;
   mutate: Mutator<BedTagData>;
-  onModalChange: (showModal: boolean) => void;
-  showModal: boolean;
+  closeModal: () => void;
 }
 
-const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onModalChange, showModal }) => {
+const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
   const { bedTags } = useBedTags();
   const headerTitle = t('editTag', 'Edit Tag');
@@ -32,7 +31,7 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onMod
           showSnackbar({
             kind: 'success',
             title: t('bedTagUpdated', 'Bed tag updated'),
-            subtitle: t('bedTagUpdatedSuccessfully', `${bedTagPayload.name} updated successfully`, {
+            subtitle: t('bedTagUpdatedSuccessfully', '{{bedTag}} updated successfully', {
               bedTag: bedTagPayload.name,
             }),
           });
@@ -45,11 +44,9 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onMod
             subtitle: error?.message,
           });
         })
-        .finally(() => {
-          onModalChange(false);
-        });
+        .finally(closeModal);
     },
-    [onModalChange, mutate, editData, t],
+    [editData.uuid, closeModal, t, mutate],
   );
 
   return (
@@ -60,8 +57,7 @@ const EditBedTagForm: React.FC<EditBedTagFormProps> = ({ editData, mutate, onMod
         handleCreateBedTag={handleUpdateBedTag}
         headerTitle={headerTitle}
         initialData={editData}
-        onModalChange={onModalChange}
-        showModal={showModal}
+        closeModal={closeModal}
       />
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useState } from 'react';
 import {
   Button,
   Layer,
@@ -12,9 +12,9 @@ import { TrashCan } from '@carbon/react/icons';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
-import { PatientRegistrationContext } from '../../patient-registration-context';
-import { ResourcesContext } from '../../../offline.resources';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { fetchPerson } from '../../patient-registration.resource';
+import { useResourcesContext } from '../../../resources-context';
 import { type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
@@ -39,9 +39,10 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   remove,
 }) => {
   const { t } = useTranslation();
-  const { setFieldValue } = React.useContext(PatientRegistrationContext);
+  const { setFieldValue } = usePatientRegistrationContext();
   const [isInvalid, setIsInvalid] = useState(false);
   const newRelationship = !relationship.uuid;
+  const selectId = useId();
 
   const handleRelationshipTypeChange = useCallback(
     (event) => {
@@ -123,7 +124,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
       <div className={styles.selectRelationshipType} style={{ marginBottom: '1rem' }}>
         <Layer>
           <Select
-            id="select"
+            id={selectId}
             labelText={t('relationship', 'Relationship')}
             onChange={handleRelationshipTypeChange}
             name={`relationships[${index}].relationshipType`}
@@ -159,7 +160,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 };
 
 export const RelationshipsSection = () => {
-  const { relationshipTypes } = useContext(ResourcesContext);
+  const { relationshipTypes } = useResourcesContext();
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { t } = useTranslation();
 

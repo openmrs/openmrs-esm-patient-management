@@ -1,7 +1,4 @@
-import React from 'react';
-import find from 'lodash-es/find';
-import camelCase from 'lodash-es/camelCase';
-import escapeRegExp from 'lodash-es/escapeRegExp';
+import { camelCase, escapeRegExp, find } from 'lodash-es';
 import { getConfig, messageOmrsServiceWorker, openmrsFetch, restBaseUrl, type Session } from '@openmrs/esm-framework';
 import type {
   PatientIdentifierType,
@@ -16,8 +13,6 @@ export interface Resources {
   relationshipTypes: any;
   identifierTypes: Array<PatientIdentifierType>;
 }
-
-export const ResourcesContext = React.createContext<Resources>(null);
 
 export async function fetchCurrentSession(): Promise<Session> {
   const { data } = await cacheAndFetch<Session>(`${restBaseUrl}/session`);
@@ -98,7 +93,7 @@ export async function fetchPatientIdentifierTypesWithSources(): Promise<Array<Pa
 async function fetchPatientIdentifierTypes(): Promise<Array<FetchedPatientIdentifierType>> {
   const [patientIdentifierTypesResponse, primaryIdentifierTypeResponse] = await Promise.all([
     cacheAndFetch(
-      `${restBaseUrl}/patientidentifiertype?v=custom:(display,uuid,name,format,required,uniquenessBehavior)`,
+      `${restBaseUrl}/patientidentifiertype?v=custom:(display,uuid,name,format,formatDescription,required,uniquenessBehavior)`,
     ),
     cacheAndFetch(`${restBaseUrl}/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType`),
   ]);
@@ -155,6 +150,7 @@ function mapPatientIdentifierType(patientIdentifierType, isPrimary) {
     required: patientIdentifierType.required,
     uuid: patientIdentifierType.uuid,
     format: patientIdentifierType.format,
+    formatDescription: patientIdentifierType.formatDescription,
     isPrimary,
     uniquenessBehavior: patientIdentifierType.uniquenessBehavior,
   };
