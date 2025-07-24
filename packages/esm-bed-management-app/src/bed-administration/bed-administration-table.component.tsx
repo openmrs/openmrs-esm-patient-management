@@ -20,7 +20,6 @@ import {
 import { Add, Edit } from '@carbon/react/icons';
 import {
   ErrorState,
-  WorkspaceContainer,
   isDesktop as desktopLayout,
   launchWorkspace,
   useLayoutType,
