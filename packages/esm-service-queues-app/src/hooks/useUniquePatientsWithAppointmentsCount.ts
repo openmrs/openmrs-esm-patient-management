@@ -8,8 +8,8 @@ export const useUniquePatientsWithAppointmentsCount = (locationUuid?: string) =>
   const { appointments, error } = useAppointmentsForDate();
 
   const filteredAppointments = locationUuid
-    ? appointments?.data?.filter((appt) => appt.location?.uuid === locationUuid)
-    : appointments?.data;
+    ? appointments?.data?.filter((appt) => appt.location?.uuid === locationUuid && appt?.status !== 'Cancelled')
+    : appointments?.data?.filter((appt) => appt.status !== 'Cancelled');
 
   const uniquePatientIds = new Set(filteredAppointments?.map((appointment) => appointment.patient.uuid) || []);
 
