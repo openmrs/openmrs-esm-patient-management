@@ -40,3 +40,9 @@
     font-size: unset;
   }
 }
+.tagContainer {
+  margin-top: layout.$spacing-05;
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
+}

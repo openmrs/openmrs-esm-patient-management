@@ -20,7 +20,9 @@ import {
   SelectItem,
   ComboBox,
   Form,
+  MultiSelect,
   Stack,
+  Tag,
 } from '@carbon/react';
 import classNames from 'classnames';
 import { z } from 'zod';
@@ -190,8 +192,8 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      <Stack gap={5}>
-        <div className={styles.formContainer}>
+      <div className={styles.formContainer}>
+        <Stack gap={5}>
           <ResponsiveWrapper>
             <Controller
               control={control}
@@ -343,55 +345,61 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
             <Controller
               control={control}
               name="bedTags"
-              render={({ field: { onChange, onBlur, value, ref } }) => (
+              render={({ field: { onChange, value } }) => (
                 <div>
-                  <ComboBox
+                  <MultiSelect
                     id="bedTags"
                     titleText={t('bedTags', 'Bed Tags')}
-                    placeholder={t('selectBedTags', 'Select bed tags')}
+                    label={t('selectBedTags', 'Select bed tags')}
                     items={availableBedTags}
                     itemToString={(item) => item?.name ?? ''}
-                    selectedItem={null}
-                    onChange={({ selectedItem }) => {
-                      if (
-                        selectedItem &&
-                        !value?.some((tag) => (tag.id || tag.uuid) === (selectedItem.id || selectedItem.uuid))
-                      ) {
-                        onChange([...(value || []), selectedItem]);
-                      }
-                    }}
-                    onBlur={onBlur}
-                    ref={ref}
+                    selectedItems={value || []}
+                    onChange={({ selectedItems }) => onChange(selectedItems)}
                     invalid={!!errors.bedTags?.message}
                     invalidText={errors.bedTags?.message}
                   />
+                  {value && value.length > 0 && (
+                    <div className={styles.tagContainer}>
+                      {value.map((tag, index) => (
+                        <Tag
+                          key={tag.uuid || tag.id || index}
+                          type="blue"
+                          onClose={() => {
+                            const updatedTags = value.filter((_, i) => i !== index);
+                            onChange(updatedTags);
+                          }}>
+                          {tag.name}
+                        </Tag>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             />
           </ResponsiveWrapper>
-        </div>
+        </Stack>
+      </div>
 
-        <ButtonSet
-          className={classNames({
-            [styles.tablet]: isTablet,
-            [styles.desktop]: !isTablet,
-          })}>
-          <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button
-            disabled={isSubmitting || !isDirty || !hasLocations}
-            className={styles.button}
-            kind="primary"
-            type="submit">
-            {isSubmitting ? (
-              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
-            ) : (
-              <span>{t('saveAndClose', 'Save & close')}</span>
-            )}
-          </Button>
-        </ButtonSet>
-      </Stack>
+      <ButtonSet
+        className={classNames({
+          [styles.tablet]: isTablet,
+          [styles.desktop]: !isTablet,
+        })}>
+        <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button
+          disabled={isSubmitting || !isDirty || !hasLocations}
+          className={styles.button}
+          kind="primary"
+          type="submit">
+          {isSubmitting ? (
+            <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
+          ) : (
+            <span>{t('saveAndClose', 'Save & close')}</span>
+          )}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 };

@@ -96,7 +96,6 @@
   "orderIndefiniteDuration": "Indefinite duration",
   "patientAge": "Age",
   "patientAttendingService": "Patient attending service",
-  "patientList": "Patient list",
   "patientName": "Patient name",
   "patientRemoved": "Patient removed",
   "patientRemovedFailed": "Error removing patient from queue",
