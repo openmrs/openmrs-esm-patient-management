@@ -619,7 +619,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         value={
                           value.startDate && value.recurringPatternEndDate
                             ? [value.startDate, value.recurringPatternEndDate]
-                            : [null, null]
+                            : null
                         }
                         onChange={(dateRange) => {
                           const [startDate, endDate] = dateRange;
@@ -633,10 +633,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         }}
                         startName="start"
                         endName="end"
-                        id="dateRangePickerInput"
-                        data-testid="dateRangePickerInput"
+                        id="appointmentRecurringDateRangePicker"
+                        data-testid="appointmentRecurringDateRangePicker"
                         labelText={t('dateRange', 'Set date range')}
-                        style={{ width: '100%' }}
                         invalid={Boolean(fieldState?.error?.message)}
                         invalidText={fieldState?.error?.message}
                         isRequired
