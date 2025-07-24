@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ExtensionSlot,
   OpenmrsDatePicker,
+  OpenmrsDateRangePicker,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
@@ -104,12 +105,18 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // TODO can we clean this all up to be more consistent between using Date and dayjs?
-  const defaultStartDate = appointment?.startDateTime
-    ? new Date(appointment?.startDateTime)
-    : selectedDate
-      ? new Date(selectedDate)
-      : new Date();
-  const defaultEndDate = recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
+  const defaultStartDate = useMemo(() => {
+    return appointment?.startDateTime
+      ? new Date(appointment?.startDateTime)
+      : selectedDate
+        ? new Date(selectedDate)
+        : new Date();
+  }, [appointment?.startDateTime, selectedDate]);
+
+  const defaultEndDate = useMemo(() => {
+    return recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
+  }, [recurringPattern?.endDate]);
+
   const defaultEndDateText = recurringPattern?.endDate
     ? dayjs(new Date(recurringPattern.endDate)).format(dateFormat)
     : '';
@@ -530,8 +537,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                       const previousServiceDuration = services?.find(
                         (service) => service.name === getValues('selectedService'),
                       )?.durationMins;
-                      const selectedServiceDuration = services?.find((service) => service.name === event.target.value)
-                        ?.durationMins;
+                      const selectedServiceDuration = services?.find(
+                        (service) => service.name === event.target.value,
+                      )?.durationMins;
                       if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
                         setValue('duration', selectedServiceDuration);
                       }
@@ -613,41 +621,32 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     name="appointmentDateTime"
                     control={control}
                     render={({ field: { onChange, value }, fieldState }) => (
-                      <ResponsiveWrapper>
-                        <OpenmrsDatePicker
-                          value={value.startDate}
-                          onChange={(date) => {
-                            onChange({
-                              ...value,
-                              startDate: date,
-                              startDateText: dayjs(date).format(dateFormat),
-                            });
-                          }}
-                          id="startDatePickerInput"
-                          data-testid="startDatePickerInput"
-                          labelText={t('startDate', 'Start date')}
-                          style={{ width: '100%' }}
-                          invalid={Boolean(fieldState?.error?.message)}
-                          invalidText={fieldState?.error?.message}
-                        />
-                        <OpenmrsDatePicker
-                          value={value.recurringPatternEndDate}
-                          onChange={(date) => {
-                            onChange({
-                              ...value,
-                              recurringPatternEndDate: date,
-                              recurringPatternEndDateText: dayjs(date).format(dateFormat),
-                            });
-                          }}
-                          id="endDatePickerInput"
-                          data-testid="endDatePickerInput"
-                          labelText={t('endDate', 'End date')}
-                          style={{ width: '100%' }}
-                          minDate={value.startDate || new Date()}
-                          invalid={Boolean(fieldState?.error?.message)}
-                          invalidText={fieldState?.error?.message}
-                        />
-                      </ResponsiveWrapper>
+                      <OpenmrsDateRangePicker
+                        value={
+                          value.startDate && value.recurringPatternEndDate
+                            ? [value.startDate, value.recurringPatternEndDate]
+                            : [null, null]
+                        }
+                        onChange={(dateRange) => {
+                          const [startDate, endDate] = dateRange;
+                          onChange({
+                            ...value,
+                            startDate,
+                            startDateText: startDate ? dayjs(startDate).format(dateFormat) : '',
+                            recurringPatternEndDate: endDate,
+                            recurringPatternEndDateText: endDate ? dayjs(endDate).format(dateFormat) : '',
+                          });
+                        }}
+                        startName="start"
+                        endName="end"
+                        id="dateRangePickerInput"
+                        data-testid="dateRangePickerInput"
+                        labelText={t('dateRange', 'Set date range')}
+                        style={{ width: '100%' }}
+                        invalid={Boolean(fieldState?.error?.message)}
+                        invalidText={fieldState?.error?.message}
+                        isRequired
+                      />
                     )}
                   />
                 </ResponsiveWrapper>
