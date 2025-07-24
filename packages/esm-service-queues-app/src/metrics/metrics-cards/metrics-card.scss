@@ -36,7 +36,7 @@
 .metricsContainer {
   display: flex;
   gap: layout.$spacing-05;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .metricItem {
@@ -44,29 +44,39 @@
   flex-direction: column;
 }
 
-.urgentValue {
-  @include type.type-style('heading-04');
-  color: colors.$red-50;
-}
-
-.urgentLabel {
-  @extend .totalsLabel;
-}
-
 .countGrid {
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   row-gap: layout.$spacing-03;
-  grid-template-columns: 1fr 1fr;
   align-items: flex-start;
   margin: layout.$spacing-03;
 
-  .countGridLabel {
+  .urgentLabel {
+    font-size: layout.$spacing-04 !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  .urgentValue {
+    margin: 0;
+    margin-top: layout.$spacing-01;
+    color: colors.$red-50;
+  }
+}
+
+.pcountGrid {
+  display: grid;
+  row-gap: layout.$spacing-03;
+  align-items: center;
+  margin: layout.$spacing-03;
+
+  .pcountGridLabel {
     font-size: 0.7rem !important;
     margin: 0;
     color: colors.$gray-70;
   }
 
-  .countGridValue {
+  .pcountGridValue {
     margin: 0;
     margin-top: layout.$spacing-01;
   }

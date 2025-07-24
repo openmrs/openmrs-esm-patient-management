@@ -1,14 +1,17 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { omrsDateFormat } from '../constants';
 import useSWR from 'swr';
 import { type Appointment } from '../types';
 import dayjs from 'dayjs';
 
-export const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
+export const useUniquePatientsWithAppointmentsCount = (locationUuid?: string) => {
+  const { appointments, error } = useAppointmentsForDate();
 
-export const useUniquePatientsWithAppointmentsCount = () => {
-  const { data, error } = useAppointmentsForDate();
+  const filteredAppointments = locationUuid
+    ? appointments?.data?.filter((appt) => appt.location?.uuid === locationUuid)
+    : appointments?.data;
 
-  const uniquePatientIds = new Set(data?.data?.map((appointment) => appointment.patient.uuid) || []);
+  const uniquePatientIds = new Set(filteredAppointments?.map((appointment) => appointment.patient.uuid) || []);
 
   return {
     count: uniquePatientIds.size,
@@ -23,7 +26,7 @@ export const useAppointmentsForDate = () => {
   const { data, error, isLoading, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(url, openmrsFetch);
 
   return {
-    data,
+    appointments: data,
     error,
     isLoading,
     isValidating,

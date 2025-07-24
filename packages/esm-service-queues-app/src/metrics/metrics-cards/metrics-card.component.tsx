@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
@@ -16,8 +16,8 @@ interface MetricsCardProps {
   locationUuid?: string;
   showUrgent?: boolean;
   urgentCount?: number;
-  inConsultation?: number;
-  unScheduled?: number;
+  inconsultation?: number;
+  unscheduled?: number;
   showPatientSeenMetrics?: boolean;
 }
 
@@ -31,8 +31,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   locationUuid,
   showUrgent,
   urgentCount,
-  inConsultation,
-  unScheduled,
+  inconsultation,
+  unscheduled,
   showPatientSeenMetrics,
 }) => {
   const { t } = useTranslation();
@@ -72,20 +72,20 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             <p className={styles.totalsValue}>{value}</p>
           </div>
           {showUrgent && (
-            <div className={styles.metricItem}>
+            <div className={styles.countGrid}>
               <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
               <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
             </div>
           )}
           {showPatientSeenMetrics && (
             <>
-              <div className={styles.countGrid}>
-                <label className={styles.countGridLabel}>{t('inconsultation', 'In consultation')}</label>
-                <p className={styles.countGridValue}>{inConsultation}</p>
+              <div className={styles.pcountGrid}>
+                <label className={styles.pcountGridLabel}>{t('inconsultation', 'In consultation')}</label>
+                <p className={styles.pcountGridValue}>{inconsultation}</p>
               </div>
-              <div className={styles.countGrid}>
-                <label className={styles.countGridLabel}>{t('unscheduled', 'Unscheduled')}</label>
-                <p className={styles.countGridValue}>{unScheduled ?? '0'}</p>
+              <div className={styles.pcountGrid}>
+                <label className={styles.pcountGridLabel}>{t('unscheduled', 'Unscheduled')}</label>
+                <p className={styles.pcountGridValue}>{unscheduled ?? '0'}</p>
               </div>
             </>
           )}
