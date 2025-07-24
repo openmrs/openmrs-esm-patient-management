@@ -36,21 +36,32 @@
 .metricsContainer {
   display: flex;
   gap: layout.$spacing-05;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .metricItem {
-  display: flex;
+  display: inline-block;
   flex-direction: column;
 }
 
-.urgentValue {
-  @include type.type-style('heading-04');
-  color: colors.$red-50;
-}
+.countGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: layout.$spacing-03;
+  align-items: flex-start;
+  margin: layout.$spacing-03;
 
-.urgentLabel {
-  @extend .totalsLabel;
+  .urgentLabel {
+    font-size: layout.$spacing-04 !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  .urgentValue {
+    margin: 0;
+    margin-top: layout.$spacing-01;
+    color: colors.$red-50;
+  }
 }
 
 .headerLabelContainer {

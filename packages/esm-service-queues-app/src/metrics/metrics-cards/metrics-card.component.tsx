@@ -67,7 +67,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             <p className={styles.totalsValue}>{value}</p>
           </div>
           {showUrgent && (
-            <div className={styles.metricItem}>
+            <div className={styles.countGrid}>
               <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
               <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
             </div>
