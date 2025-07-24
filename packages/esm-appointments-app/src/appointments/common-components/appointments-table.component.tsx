@@ -89,8 +89,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       key: 'serviceType',
     },
     {
-      header: t('type', 'Type'),
-      key: 'type',
+      header: t('appointmentType', 'Appointment Type'),
+      key: 'appointmentType',
     },
     {
       header: t('status', 'Status'),
@@ -116,7 +116,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     serviceType: appointment.service.name,
     location: appointment.location?.name,
     provider: appointment.provider,
-    type: appointment.appointmentKind,
+    appointmentType: t(appointment.appointmentKind, appointment.appointmentKind),
     status: <AppointmentActions appointment={appointment} />,
   }));
 
