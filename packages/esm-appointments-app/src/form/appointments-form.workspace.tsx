@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { Controller, useController, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -105,18 +105,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // TODO can we clean this all up to be more consistent between using Date and dayjs?
-  const defaultStartDate = useMemo(() => {
-    return appointment?.startDateTime
-      ? new Date(appointment?.startDateTime)
-      : selectedDate
-        ? new Date(selectedDate)
-        : new Date();
-  }, [appointment?.startDateTime, selectedDate]);
-
-  const defaultEndDate = useMemo(() => {
-    return recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
-  }, [recurringPattern?.endDate]);
-
+  const defaultStartDate = appointment?.startDateTime
+    ? new Date(appointment?.startDateTime)
+    : selectedDate
+      ? new Date(selectedDate)
+      : new Date();
+  const defaultEndDate = recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
   const defaultEndDateText = recurringPattern?.endDate
     ? dayjs(new Date(recurringPattern.endDate)).format(dateFormat)
     : '';
