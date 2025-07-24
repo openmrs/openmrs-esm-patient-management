@@ -77,7 +77,7 @@ const BedAdministrationTable: React.FC = () => {
 
   const handleAddBedWorkspace = () => {
     launchWorkspace('add-edit-bed-workspace', {
-      workspaceTitle: t('addBed', 'Add Bed'),
+      workspaceTitle: t('addBed', 'Add bed'),
       mutateBeds: mutateBedsGroupedByLocation,
     });
   };
@@ -248,7 +248,6 @@ const BedAdministrationTable: React.FC = () => {
           )}
         </DataTable>
       </div>
-      <WorkspaceContainer contextKey="bed-administration" />
     </>
   );
 };

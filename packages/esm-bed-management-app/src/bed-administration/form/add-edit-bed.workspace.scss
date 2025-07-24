@@ -22,13 +22,21 @@
 }
 
 .desktop {
-  padding-left: layout.$spacing-05;
+  padding: 0;
 }
-.buttonContainer {
-  max-width: 50%;
-}
-.inlineLoading {
+.button {
+  height: layout.$spacing-10;
   display: flex;
-  align-items: center;
-  gap: layout.$spacing-03;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset;
+  }
 }

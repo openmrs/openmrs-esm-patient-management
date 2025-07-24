@@ -17,7 +17,7 @@ import {
   InlineLoading,
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
-import { navigate, showModal, usePagination } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, showModal, usePagination } from '@openmrs/esm-framework';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
 import Header from '../header/header.component';
 import styles from './ward-with-beds.scss';
@@ -87,10 +87,10 @@ const WardWithBeds: React.FC = () => {
     }));
   }, [paginatedData]);
 
-  const openNewBedModal = () => {
-    const dispose = showModal('new-bed-modal', {
-      closeModal: () => dispose(),
-      mutate: mutate,
+  const handleAddEditBedWorkspace = () => {
+    launchWorkspace('add-edit-bed-workspace', {
+      workspaceTitle: t('addBed', 'Add bed'),
+      mutateBeds: mutate,
       defaultLocation: { display: name, uuid: location },
     });
   };
@@ -119,7 +119,10 @@ const WardWithBeds: React.FC = () => {
               <span>{t('returnToSummary', 'Return to summary')}</span>
             </Button>
             <span>{isValidating ? <InlineLoading /> : null}</span>
-            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={openNewBedModal}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              onClick={handleAddEditBedWorkspace}>
               <span>{t('addBed', 'Add bed')}</span>
             </Button>
           </div>
