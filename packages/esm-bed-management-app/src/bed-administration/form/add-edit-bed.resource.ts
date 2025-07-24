@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type BedPostPayload, type BedTag } from '../../types';
 
 interface BedForm {
   bedNumber: string;
@@ -10,22 +11,6 @@ interface BedForm {
   status: string;
   locationUuid: string;
   uuid?: string;
-}
-
-interface BedTag {
-  id?: string;
-  name: string;
-  uuid?: string;
-}
-export interface BedPostPayload {
-  uuid?: string;
-  bedNumber: string;
-  bedType: string;
-  row: number;
-  column: number;
-  status: string;
-  locationUuid: string;
-  bedTag?: BedTag[];
 }
 
 export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): Promise<FetchResponse<BedForm>> {
