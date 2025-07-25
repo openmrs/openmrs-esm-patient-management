@@ -12,7 +12,7 @@ export interface PendingItemsRowProps {
 }
 
 const PendingItemsRow: React.FC<PendingItemsRowProps> = ({ id, wardPatient }) => {
-  const { orders, showPendingItems } = useElementConfig('pendingItems', id);
+  const { orders, showPendingItems } = useElementConfig('pendingItems', id) || {};
   const [hasPendingOrders, setHasPendingOrders] = React.useState(false);
 
   const hasPendingItems = !!wardPatient?.inpatientRequest || hasPendingOrders;

@@ -25,8 +25,9 @@ const mockObsConcepts: Array<OpenmrsResource> = [
 
 const mockConfig: ActiveVisitsConfigSchema = {
   activeVisits: {
-    ...getDefaultsFromConfigSchema(configSchema).activeVisits,
+    ...getDefaultsFromConfigSchema<ActiveVisitsConfigSchema>(configSchema).activeVisits,
     obs: ['160225AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '5484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    identifiers: undefined,
   },
 };
 
