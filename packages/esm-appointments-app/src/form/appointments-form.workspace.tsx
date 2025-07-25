@@ -530,8 +530,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                       const previousServiceDuration = services?.find(
                         (service) => service.name === getValues('selectedService'),
                       )?.durationMins;
-                      const selectedServiceDuration = services?.find((service) => service.name === event.target.value)
-                        ?.durationMins;
+                      const selectedServiceDuration = services?.find(
+                        (service) => service.name === event.target.value,
+                      )?.durationMins;
                       if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
                         setValue('duration', selectedServiceDuration);
                       }
@@ -873,6 +874,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   value={value}
                   labelText={t('appointmentNoteLabel', 'Write an additional note')}
                   placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+                  maxLength={255}
                   onChange={onChange}
                   onBlur={onBlur}
                   ref={ref}
