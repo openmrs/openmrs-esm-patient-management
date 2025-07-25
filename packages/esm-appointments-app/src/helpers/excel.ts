@@ -39,7 +39,8 @@ export async function exportAppointmentsToSpreadsheet(
         Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
         Age: appointment.patient.age,
         Identifier: identifier,
-        'Appointment type': appointment.service?.name,
+        'Service type': appointment.service?.name,
+        'Appointment type': appointment.appointmentKind,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
         ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
       };
