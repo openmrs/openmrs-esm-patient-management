@@ -25,9 +25,16 @@
 }
 
 .sectionTitle {
-  @include type.type-style('heading-compact-02');
+  @include type.type-style('label-01');
   color: $text-02;
-  margin-bottom: layout.$spacing-04;
+  margin-top: layout.$spacing-04;
+  margin-bottom: layout.$spacing-02;
+}
+
+.sectionTitlePrimary {
+  @include type.type-style('label-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-02;
 }
 
 .queueEntryActionModalBody {

@@ -4,7 +4,7 @@ import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-fra
 import { useTranslation } from 'react-i18next';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import styles from './queue-table-action-cell.scss';
-import { type ConfigObject, type ActionsColumnConfig } from '../../config-schema';
+import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
 
 type ActionProps = {
   label: string;
@@ -18,7 +18,7 @@ function useActionPropsByKey() {
   const { defaultStatusConceptUuid } = useConfig<ConfigObject>().concepts;
 
   // Map action strings to component props
-  const actionPropsByKey: Record<string, ActionProps> = useMemo(() => {
+  const actionPropsByKey: Record<QueueEntryAction, ActionProps> = useMemo(() => {
     return {
       call: {
         // t('call', 'Call'),
@@ -41,6 +41,18 @@ function useActionPropsByKey() {
         text: 'Move',
         onClick: (queueEntry: QueueEntry) => {
           const dispose = showModal('move-queue-entry-modal', {
+            closeModal: () => dispose(),
+            queueEntry,
+            size: 'sm',
+          });
+        },
+      },
+      transition: {
+        // t('transition', 'Transition'),
+        label: 'transition',
+        text: 'Transition',
+        onClick: (queueEntry: QueueEntry) => {
+          const dispose = showModal('transition-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
             size: 'sm',
@@ -108,7 +120,7 @@ function useActionPropsByKey() {
   return actionPropsByKey;
 }
 
-function ActionButton({ actionKey, queueEntry }: { actionKey: string; queueEntry: QueueEntry }) {
+function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const actionPropsByKey = useActionPropsByKey();
@@ -135,7 +147,7 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: string; queueEntry
   );
 }
 
-function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: string; queueEntry: QueueEntry }) {
+function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
   const { t } = useTranslation();
   const actionPropsByKey = useActionPropsByKey();
 
@@ -186,7 +198,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
         })
         .filter(Boolean);
       let fallbackActionComponent: React.ReactNode | null = null;
-      let overflowMenuKeys: string[] = [];
+      let overflowMenuKeys: QueueEntryAction[] = [];
       if (declaredButtonComponents.length === 0) {
         const defaultAction = overflowMenu.find((actionKey) => {
           const showIf = actionPropsByKey[actionKey].showIf;

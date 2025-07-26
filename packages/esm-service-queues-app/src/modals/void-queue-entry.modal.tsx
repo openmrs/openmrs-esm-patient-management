@@ -18,8 +18,11 @@ const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, c
     <QueueEntryConfirmActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
+      showPatientName={false}
       modalParams={{
-        modalTitle: t('deleteQueueEntry', 'Delete queue entry'),
+        modalTitle: t('deleteQueueEntryForPatient', 'Delete queue entry for {{patient}}', {
+          patient: queueEntry.display,
+        }),
         modalInstruction,
         submitButtonText: t('deleteQueueEntry', 'Delete queue entry'),
         submitSuccessTitle: t('queueEntryDeleteSuccessful', 'Queue entry deleted successfully'),

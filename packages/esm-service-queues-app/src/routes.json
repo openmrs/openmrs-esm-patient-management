@@ -115,6 +115,10 @@
       "component": "moveQueueEntryModal"
     },
     {
+      "name": "transition-queue-entry-modal",
+      "component": "transitionQueueEntryModal"
+    },
+    {
       "name": "undo-transition-queue-entry-modal",
       "component": "undoTransitionQueueEntryModal"
     },

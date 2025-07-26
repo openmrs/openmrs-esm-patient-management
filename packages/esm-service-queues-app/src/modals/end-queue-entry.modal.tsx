@@ -24,7 +24,9 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('removePatientFromQueue', 'Remove patient from queue?'),
+        modalTitle: t('removePatientFromQueue', 'Remove {{patient}} from queue?', {
+          patient: queueEntry.display,
+        }),
         modalInstruction,
         submitButtonText: t('remove', 'Remove'),
         submitSuccessTitle: t('patientRemoved', 'Patient removed'),
@@ -35,7 +37,7 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
             endedAt: new Date().toISOString(),
           }),
       }}
-      isRemovingPatientFromQueue
+      showPatientName={false}
     />
   );
 };

@@ -5,20 +5,20 @@ import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import { transitionQueueEntry } from './queue-entry-actions.resource';
 import { convertTime12to24 } from '../helpers/time-helpers';
 
-interface MoveQueueEntryModalProps {
+interface TransitionQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
 }
 
-const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   return (
     <QueueEntryActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('movePatient', 'Move {{patient}}', { patient: queueEntry.display }),
-        submitButtonText: t('move', 'Move'),
+        modalTitle: t('transitionPatient', 'Transition {{patient}}', { patient: queueEntry.display }),
+        submitButtonText: t('transition', 'Transition'),
         submitSuccessTitle: t('queueEntryTransitioned', 'Queue entry transitioned'),
         submitSuccessText: t('queueEntryTransitionedSuccessfully', 'Queue entry transitioned successfully'),
         submitFailureTitle: t('queueEntryTransitionFailed', 'Error transitioning queue entry'),
@@ -39,11 +39,11 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
         disableSubmit: (queueEntry, formState) =>
           formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid,
         isEdit: false,
-        showQueuePicker: true,
-        showStatusPicker: false,
+        showQueuePicker: false,
+        showStatusPicker: true,
       }}
     />
   );
 };
 
-export default MoveQueueEntryModal;
+export default TransitionQueueEntryModal;
