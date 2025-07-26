@@ -76,7 +76,7 @@ function useActionPropsByKey() {
         label: 'removePatient',
         text: 'Remove patient',
         onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('end-queue-entry-modal', {
+          const dispose = showModal('remove-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
             size: 'sm',
@@ -88,7 +88,7 @@ function useActionPropsByKey() {
         label: 'deleteEntry',
         text: 'Delete entry',
         onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('void-queue-entry-modal', {
+          const dispose = showModal('delete-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
             size: 'sm',

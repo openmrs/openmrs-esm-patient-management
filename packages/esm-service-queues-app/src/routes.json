@@ -99,8 +99,8 @@
       "component": "editQueueEntryModal"
     },
     {
-      "name": "end-queue-entry-modal",
-      "component": "endQueueEntryModal"
+      "name": "remove-queue-entry-modal",
+      "component": "removeQueueEntryModal"
     },
     {
       "name": "transition-patient-to-latest-queue-modal",
@@ -123,8 +123,8 @@
       "component": "undoTransitionQueueEntryModal"
     },
     {
-      "name": "void-queue-entry-modal",
-      "component": "voidQueueEntryModal"
+      "name": "delete-queue-entry-modal",
+      "component": "deleteQueueEntryModal"
     }
   ],
   "workspaces": [

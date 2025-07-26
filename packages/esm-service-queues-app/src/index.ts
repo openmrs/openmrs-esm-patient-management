@@ -93,13 +93,13 @@ export const undoTransitionQueueEntryModal = getAsyncLifecycle(
   },
 );
 
-export const voidQueueEntryModal = getAsyncLifecycle(() => import('./modals/void-queue-entry.modal'), {
-  featureName: 'void queue entry of a patient',
+export const deleteQueueEntryModal = getAsyncLifecycle(() => import('./modals/delete-queue-entry.modal'), {
+  featureName: 'delete queue entry of a patient',
   moduleName,
 });
 
-export const endQueueEntryModal = getAsyncLifecycle(() => import('./modals/end-queue-entry.modal'), {
-  featureName: 'end queue entry of a patient',
+export const removeQueueEntryModal = getAsyncLifecycle(() => import('./modals/remove-queue-entry.modal'), {
+  featureName: 'remove queue entry of a patient',
   moduleName,
 });
 

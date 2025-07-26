@@ -4,12 +4,12 @@ import { type QueueEntry } from '../types';
 import { updateQueueEntry } from './queue-entry-actions.resource';
 import QueueEntryConfirmActionModal from './queue-entry-confirm-action.modal';
 
-interface EndQueueEntryModalProps {
+interface RemoveQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
 }
 
-const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+const RemoveQueueEntryModal: React.FC<RemoveQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const patient = queueEntry.display;
   const queue = queueEntry.queue.display;
@@ -42,4 +42,4 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
   );
 };
 
-export default EndQueueEntryModal;
+export default RemoveQueueEntryModal;
