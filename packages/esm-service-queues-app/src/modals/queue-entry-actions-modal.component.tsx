@@ -17,7 +17,7 @@ import {
   TextArea,
   TimePicker,
   TimePickerSelect,
-} from '@carbon/react';
+ Dropdown , Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
 import { time12HourFormatRegexPattern } from '../constants';
@@ -27,6 +27,7 @@ import { useQueues } from '../hooks/useQueues';
 import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './queue-entry-actions.scss';
+import classNames from 'classnames';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -144,6 +145,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     setFormState({ ...formState, modifyDefaultTransitionDateTime });
   };
 
+  const findPriorityIndex = (uuid: string) => {
+    return priorities.findIndex((p) => p.uuid === uuid);
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -209,39 +214,64 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     t,
   ]);
 
-  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
-
   return (
     <>
       <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>
-            <h5>{queueEntry.display}</h5>
-            <p>{modalInstruction}</p>
+            {isTransition ? (
+              <p>{modalInstruction}</p>
+            ) : (
+              <>
+                <h5>{queueEntry.display}</h5>
+                <p>{modalInstruction}</p>
+              </>
+            )}
             <section>
               <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
-              <Select
-                labelText={t('selectQueue', 'Select a queue')}
-                id="queue"
-                invalidText="Required"
-                value={formState.selectedQueue}
-                onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-                {queues?.map(({ uuid, display, location }) => (
-                  <SelectItem
-                    key={uuid}
-                    text={
-                      uuid == queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: `${display} - ${location?.display}`,
-                            interpolation: { escapeValue: false },
-                          })
-                        : `${display} - ${location?.display}`
-                    }
-                    value={uuid}
-                  />
-                ))}
-              </Select>
+              {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
+              {queues.length <= 8 ? (
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  legendText={t('selectQueue', 'Select a queue')}
+                  id="queue"
+                  invalidText="Required"
+                  valueSelected={formState.selectedQueue}
+                  orientation="vertical"
+                  onChange={(uuid) => setSelectedQueueUuid(uuid)}>
+                  {queues?.map(({ uuid, display, location }) => (
+                    <RadioButton
+                      key={uuid}
+                      labelText={
+                        uuid === queueEntry.queue.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: `${display} - ${location?.display}`,
+                            })
+                          : `${display} - ${location?.display}`
+                      }
+                      value={uuid}
+                    />
+                  ))}
+                </RadioButtonGroup>
+              ) : (
+                <Dropdown
+                  titleText={t('selectQueue', 'Select a queue')}
+                  id="queue"
+                  label={selectedQueue.display}
+                  initialSelectedItem={selectedQueue}
+                  value={formState.selectedQueue}
+                  items={queues}
+                  itemToString={(item) =>
+                    item.uuid === queueEntry.queue.uuid
+                      ? t('currentValueFormatted', '{{value}} (Current)', {
+                          value: `${item.display} - ${item.location?.display}`,
+                        })
+                      : `${item.display} - ${item.location?.display}`
+                  }
+                  onChange={({ selectedItem }) => setSelectedQueueUuid(selectedItem.uuid)}
+                />
+              )}
             </section>
 
             <section>
@@ -268,7 +298,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                         uuid == queueEntry.status.uuid
                           ? t('currentValueFormatted', '{{value}} (Current)', {
                               value: display,
-                              interpolation: { escapeValue: false },
                             })
                           : display
                       }
@@ -290,34 +319,45 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   title={t('noPrioritiesConfigured', 'No priorities configured')}
                 />
               ) : (
-                <ContentSwitcher
-                  size="sm"
-                  selectedIndex={selectedPriorityIndex}
-                  onChange={(event) => {
-                    setSelectedPriorityUuid(event.name as string);
+                <RadioButtonGroup
+                  className={styles.radioButtonGroup}
+                  valueSelected={formState.selectedPriority}
+                  onChange={(uuid) => {
+                    setSelectedPriorityUuid(uuid);
                   }}>
                   {priorities?.map(({ uuid, display }) => (
-                    <Switch
-                      role="radio"
-                      name={uuid}
-                      text={
-                        uuid == queueEntry.priority.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', {
-                              value: display,
-                              interpolation: { escapeValue: false },
-                            })
-                          : display
-                      }
+                    <RadioButton
                       key={uuid}
+                      name={display}
+                      labelText={
+                        <Tag
+                          className={classNames(styles.tag, {
+                            [styles.orange]: findPriorityIndex(uuid) === 1,
+                          })}
+                          role="radio"
+                          key={uuid}
+                          value={uuid}
+                          type={(() => {
+                            const index = findPriorityIndex(uuid);
+                            // TODO: fix priority colors. https://openmrs.atlassian.net/browse/O3-4469
+                            return index === 0 ? 'green' : index === 2 ? 'red' : '';
+                          })()}>
+                          {uuid === queueEntry.priority.uuid
+                            ? t('currentValueFormatted', '{{value}} (Current)', {
+                                value: display,
+                              })
+                            : display}
+                        </Tag>
+                      }
                       value={uuid}
                     />
                   ))}
-                </ContentSwitcher>
+                </RadioButtonGroup>
               )}
             </section>
 
             <section>
-              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+              <div className={styles.sectionTitle}>{t('comment', 'Comment')}</div>
               <TextArea
                 labelText=""
                 value={formState.prioritycomment}

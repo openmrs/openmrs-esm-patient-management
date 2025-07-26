@@ -28,6 +28,7 @@ function useActionPropsByKey() {
           const dispose = showModal('call-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
+            size: 'sm',
           });
         },
         showIf: (queueEntry: QueueEntry) => {
@@ -42,6 +43,7 @@ function useActionPropsByKey() {
           const dispose = showModal('move-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
+            size: 'sm',
           });
         },
       },
@@ -53,6 +55,7 @@ function useActionPropsByKey() {
           const dispose = showModal('edit-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
+            size: 'sm',
           });
         },
       },
