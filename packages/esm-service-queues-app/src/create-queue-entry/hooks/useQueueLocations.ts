@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { fhirBaseUrl, getLocale, openmrsFetch } from '@openmrs/esm-framework';
+import { fhirBaseUrl, getLocale, openmrsFetch, useFhirFetchAll } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 
 interface FHIRResponse {
@@ -11,14 +11,12 @@ interface FHIRResponse {
 
 export function useQueueLocations() {
   const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
-  const { data, error, isLoading } = useSWRImmutable<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useFhirFetchAll<fhir.Location>(apiUrl);
 
   const queueLocations = useMemo(
-    () =>
-      data?.data?.entry
-        ?.map((response) => response.resource)
-        .sort((a, b) => a.name.localeCompare(b.name, getLocale())) ?? [],
-    [data?.data?.entry],
+    () => data?.map((response) => response).sort((a, b) => a.name.localeCompare(b.name, getLocale())) ?? [],
+    [data],
   );
+
   return { queueLocations, isLoading, error };
 }
