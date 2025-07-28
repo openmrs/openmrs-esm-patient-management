@@ -6,11 +6,13 @@ import { useConfig } from '@openmrs/esm-framework';
 
 export const queueTablePriorityColumn: QueueTableColumnFunction = (key, header) => {
   const QueueTablePriorityCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+    const { priorityConfigs } = useConfig<ConfigObject>();
+
     return (
       <QueuePriority
         priority={queueEntry.priority}
         priorityComment={queueEntry.priorityComment}
-        priorityConfigs={useConfig<ConfigObject>().priorityConfigs}
+        priorityConfigs={priorityConfigs}
       />
     );
   };

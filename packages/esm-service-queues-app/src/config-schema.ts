@@ -523,7 +523,6 @@ export interface VisitAttributeQueueNumberColumnConfig {
 
 export type ColumnConfig = ActionsColumnConfig &
   PatientIdentifierColumnConfig &
-  PriorityColumnConfig &
   StatusColumnConfig &
   VisitAttributeQueueNumberColumnConfig;
 

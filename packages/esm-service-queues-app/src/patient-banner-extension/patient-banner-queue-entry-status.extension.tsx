@@ -5,7 +5,16 @@ import styles from './patient-banner-queue-entry-status.scss';
 import { useTranslation } from 'react-i18next';
 import { isDesktop, showModal, useLayoutType } from '@openmrs/esm-framework';
 
-// See: patient-banner-patient-info.component.tsx
+const priorityConfigs: Record<string, 'red' | 'green' | 'gray'> = {
+  emergency: 'red',
+  'not urgent': 'green',
+  default: 'gray',
+};
+
+const getTagType = (priority: string) => {
+  return priorityConfigs[priority] || priorityConfigs.default;
+};
+
 interface PatientBannerQueueEntryStatusProps {
   patientUuid: string;
   renderedFrom: string;
@@ -13,16 +22,17 @@ interface PatientBannerQueueEntryStatusProps {
 
 /**
  * This extension appears in the patient banner to indicate the patient's
- * queue entry status, with a quick link to transition them to q new queue / status
+ * queue entry status, with a quick link to transition them to a new queue / status
  */
 const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps> = ({ patientUuid, renderedFrom }) => {
   const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
   const layout = useLayoutType();
   const queueEntry = queueEntries?.[0];
   const { t } = useTranslation();
+
   const isPatientChart = renderedFrom === 'patient-chart';
   if (!isPatientChart || !queueEntry) {
-    return <></>;
+    return null;
   }
 
   const mappedPriority = queueEntry.priority.display === 'Urgent' ? 'Priority' : queueEntry.priority.display;
@@ -33,7 +43,7 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
       <span>{queueEntry.queue.name}</span>
       <Tag
         className={mappedPriority === 'Priority' ? styles.priorityTag : styles.tag}
-        type={getTagType(mappedPriority?.toLocaleLowerCase('en'))}>
+        type={getTagType(mappedPriority.toLowerCase())}>
         {mappedPriority}
       </Tag>
       <Button
@@ -49,19 +59,6 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
       </Button>
     </div>
   );
-};
-
-// The color of the priority tag should not be hard coded, see:
-// https://openmrs.atlassian.net/browse/O3-4469
-const getTagType = (priority: string) => {
-  switch (priority) {
-    case 'emergency':
-      return 'red';
-    case 'not urgent':
-      return 'green';
-    default:
-      return 'gray';
-  }
 };
 
 export default PatientBannerQueueEntryStatus;
