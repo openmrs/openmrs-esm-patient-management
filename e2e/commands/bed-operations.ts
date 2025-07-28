@@ -35,14 +35,23 @@ export const dischargePatientFromBed = async (api: APIRequestContext, id: number
   await expect(response.ok()).toBeTruthy();
 };
 
-export const deleteBed = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`bed/${uuid}`, { data: {} });
+export const deleteBed = async (api: APIRequestContext, bed: Bed) => {
+  const response = await api.delete(`bed/${bed.uuid}`);
   await expect(response.ok()).toBeTruthy();
 };
 
 export const deleteBedType = async (api: APIRequestContext, uuid: string) => {
   const response = await api.delete(`bedtype/${uuid}`, { data: {} });
   await expect(response.ok()).toBeTruthy();
+};
+
+export const updateBedStatus = async (api: APIRequestContext, bedUuid: string, status: string) => {
+  const url = `bed/${bedUuid}`;
+  const data = { status };
+
+  const response = await api.post(url, { data });
+  await expect(response.ok()).toBeTruthy();
+  return await response.json();
 };
 
 export const retireBedType = async (api: APIRequestContext, uuid: string, retireReason: string) => {

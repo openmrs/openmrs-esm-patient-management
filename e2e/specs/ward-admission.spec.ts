@@ -17,6 +17,7 @@ import {
   generateBedType,
   generateRandomBed,
   retireBedType,
+  updateBedStatus,
 } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
@@ -74,7 +75,11 @@ test('Confirming patient is admitted to ward', async ({ page }) => {
 
 test.afterEach(async ({ api }) => {
   await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  // await deleteBed(api, bed.uuid);
+
+  // Wait for discharge to fully complete
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await updateBedStatus(api, bed.uuid, 'AVAILABLE');
+  await deleteBed(api, bed);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
