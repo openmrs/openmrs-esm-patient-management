@@ -1,26 +1,40 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/colors';
 
 .radioButtonGroup {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: layout.$spacing-03;
-  min-height: layout.$spacing-10;
   width: 100%;
-  @include type.type-style('body-compact-01');
+
+  :global(.cds--radio-button-wrapper) {
+    padding-bottom: layout.$spacing-02;
+
+    :global(.cds--radio-button__label) {
+      align-items: center;
+    }
+  }
 }
 
-.radioButton {
-  padding: layout.$spacing-02 layout.$spacing-02;
-  margin: layout.$spacing-03 0;
+.tag {
+  cursor: pointer;
+  margin: 0;
+}
+
+.orange {
+  background-color: colors.$orange-20;
 }
 
 .sectionTitle {
-  @include type.type-style('heading-compact-02');
+  @include type.type-style('label-01');
   color: $text-02;
-  margin-bottom: layout.$spacing-04;
+  margin-top: layout.$spacing-04;
+  margin-bottom: layout.$spacing-02;
+}
+
+.sectionTitlePrimary {
+  @include type.type-style('label-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-02;
 }
 
 .queueEntryActionModalBody {
@@ -28,5 +42,5 @@
 }
 
 .dateTimeFields {
-  display: flex;
+  margin-top: layout.$spacing-04;
 }

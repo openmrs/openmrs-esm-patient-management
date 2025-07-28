@@ -123,6 +123,9 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
                 ))
               : ''}
             <p className={styles.p}>
+              {t('patientGender', 'Gender')}: &nbsp; {mappedQueueEntry.patientGender}
+            </p>
+            <p className={styles.p}>
               {t('patientAge', 'Age')}: &nbsp; {mappedQueueEntry.patientAge}
             </p>
             <div>
