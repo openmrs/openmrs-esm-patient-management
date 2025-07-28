@@ -38,7 +38,7 @@ test.beforeEach(async ({ api }) => {
   encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
-test('Confirming patient is admitted to ward', async ({ page }) => {
+test('Admit a patient to a ward from the admission requests', async ({ page }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
 
