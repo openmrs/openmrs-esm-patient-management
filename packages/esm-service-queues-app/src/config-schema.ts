@@ -504,7 +504,7 @@ export interface PriorityConfig {
   style: TagStyle;
 }
 
-export interface configSchema {
+export interface ConfigSchema {
   priorityConfigs: PriorityConfig[];
 }
 

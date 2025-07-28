@@ -78,7 +78,7 @@ describe('QueueTable', () => {
     renderQueueTable();
 
     const rows = screen.queryAllByRole('row');
-    expect(rows).toHaveLength(1);
+    expect(rows).toHaveLength(1); // should only have the header row
 
     const headerRow = rows[0];
     const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
