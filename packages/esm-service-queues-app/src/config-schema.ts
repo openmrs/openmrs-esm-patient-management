@@ -195,6 +195,11 @@ export const configSchema = {
     _description: 'The identifier types to be display on all patient search result page',
     _default: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
   },
+  defaultInitialServiceQueue: {
+    _type: Type.String,
+    _description: 'The name of the default service queue to be selected when the start visit form is opened',
+    _default: 'Outpatient Triage',
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -456,6 +461,7 @@ export interface ConfigObject {
     temperatureUuid: string;
     weightUuid: string;
   };
+  defaultInitialServiceQueue: string;
   contactAttributeType: Array<string>;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;
