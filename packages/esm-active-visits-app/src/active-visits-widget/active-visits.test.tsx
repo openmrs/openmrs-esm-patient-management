@@ -4,13 +4,12 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, type OpenmrsResource, useConfig } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import { type ActiveVisitsConfigSchema, configSchema } from '../config-schema';
+import { type ActiveVisit, type Observation } from '../types';
 import { useActiveVisits, useObsConcepts } from './active-visits.resource';
 import ActiveVisitsTable from './active-visits.component';
-import { type ActiveVisit, type Observation } from '../types';
 
 const mockUseActiveVisits = jest.mocked(useActiveVisits);
 const mockUseObsConcepts = jest.mocked(useObsConcepts);
-const mockIsDesktop = jest.mocked(useObsConcepts);
 const mockUseConfig = jest.mocked(useConfig<ActiveVisitsConfigSchema>);
 
 jest.mock('./active-visits.resource', () => ({
@@ -72,10 +71,6 @@ describe('ActiveVisitsTable', () => {
       error: undefined,
       totalResults: 1,
     });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   it('renders data table with standard and observation columns', () => {

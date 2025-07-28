@@ -1,5 +1,5 @@
 import React from 'react';
-import QueuePriority from '../../queue-entry-table-components/queue-priority.component';
+import QueuePriority from '../components/queue-priority.component';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 import { type PriorityColumnConfig } from '../../config-schema';
 

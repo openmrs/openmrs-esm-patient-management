@@ -31,6 +31,11 @@
       "slot": "ward-dashboard-slot"
     },
     {
+      "component": "wardView",
+      "name": "ward-view",
+      "slot": "ward-view-slot"
+    },
+    {
       "component": "wardPatientActionButtonExtension",
       "name": "ward-patient-action-button",
       "slot": "action-menu-ward-patient-items-slot"

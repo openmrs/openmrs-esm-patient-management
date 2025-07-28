@@ -20,6 +20,9 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
+const queueEntryActions = ['move', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
+type QueueEntryAction = (typeof queueEntryActions)[number];
+
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
 
@@ -52,6 +55,10 @@ const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
 const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
 
 export const defaultColumnConfig: ColumnConfig = {
+  actions: {
+    buttons: ['call'],
+    overflowMenu: ['move', 'edit', 'remove', 'undo'],
+  },
   identifierTypeUuid: defaultIdentifierTypeUuid,
   priorityConfigs: [
     {
@@ -76,7 +83,7 @@ export const defaultColumnConfig: ColumnConfig = {
 
 export const defaultQueueTable: TableDefinitions = {
   columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
-  appliedTo: [{ queue: null, status: null }],
+  appliedTo: [{ queue: '', status: '' }],
 };
 
 export const configSchema = {
@@ -188,6 +195,11 @@ export const configSchema = {
     _description: 'The identifier types to be display on all patient search result page',
     _default: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
   },
+  defaultInitialServiceQueue: {
+    _type: Type.String,
+    _description: 'The name of the default service queue to be selected when the start visit form is opened',
+    _default: 'Outpatient Triage',
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -263,6 +275,30 @@ export const configSchema = {
           _default: null,
         },
         config: {
+          actions: {
+            buttons: {
+              _type: Type.Array,
+              _default: ['call'],
+              _description:
+                'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
+                queueEntryActions.join(', '),
+              _elements: {
+                _type: Type.String,
+                _validators: [validators.oneOf(queueEntryActions)],
+              },
+            },
+            overflowMenu: {
+              _type: Type.Array,
+              _default: ['edit', 'remove', 'undo'],
+              _description:
+                'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
+                queueEntryActions.join(', '),
+              _elements: {
+                _type: Type.String,
+                _validators: [validators.oneOf(queueEntryActions)],
+              },
+            },
+          },
           identifierTypeUuid: {
             _type: Type.UUID,
             _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
@@ -334,13 +370,13 @@ export const configSchema = {
           _elements: {
             queue: {
               _type: Type.String,
-              _description: 'The UUID of the queue. If not provided, applies to all queues.',
-              _default: null,
+              _description: 'The UUID of the queue. If blank, applies to all queues.',
+              _default: '',
             },
             status: {
               _type: Type.String,
-              _description: 'The UUID of the status. If not provided, applies to all statuses.',
-              _default: null,
+              _description: 'The UUID of the status. If blank, applies to all statuses.',
+              _default: '',
             },
           },
         },
@@ -425,6 +461,7 @@ export interface ConfigObject {
     temperatureUuid: string;
     weightUuid: string;
   };
+  defaultInitialServiceQueue: string;
   contactAttributeType: Array<string>;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;
@@ -458,13 +495,17 @@ export type ColumnDefinition = {
   config: ColumnConfig;
 };
 
-export interface VisitAttributeQueueNumberColumnConfig {
-  visitQueueNumberAttributeUuid: string;
+export interface ActionsColumnConfig {
+  actions: {
+    buttons: QueueEntryAction[];
+    overflowMenu: QueueEntryAction[];
+  };
 }
 
 export interface PatientIdentifierColumnConfig {
   identifierTypeUuid: string; // uuid of the identifier type
 }
+
 export interface PriorityConfig {
   conceptUuid: string;
   color: PriorityTagColor;
@@ -484,7 +525,12 @@ export interface StatusColumnConfig {
   statusConfigs: StatusConfig[];
 }
 
-export type ColumnConfig = PatientIdentifierColumnConfig &
+export interface VisitAttributeQueueNumberColumnConfig {
+  visitQueueNumberAttributeUuid: string;
+}
+
+export type ColumnConfig = ActionsColumnConfig &
+  PatientIdentifierColumnConfig &
   PriorityColumnConfig &
   StatusColumnConfig &
   VisitAttributeQueueNumberColumnConfig;
@@ -495,5 +541,5 @@ export interface TableDefinitions {
 
   // apply the columns to tables of any of the specified queue and status
   // (if appliedTo is null, apply to all tables, including the one in the service queue app home page)
-  appliedTo?: Array<{ queue?: string; status?: string }>;
+  appliedTo?: Array<{ queue: string; status: string }>;
 }

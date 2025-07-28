@@ -1,0 +1,107 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tileContainer {
+  border: 1px solid $ui-03;
+  height: 7.875rem;
+  padding: layout.$spacing-05;
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: layout.$spacing-03;
+}
+
+.headerLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+.totalsLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-bottom: layout.$spacing-02;
+}
+
+.totalsValue {
+  @include type.type-style('heading-04');
+  color: $ui-05;
+  margin: 0;
+}
+
+.metricsContainer {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: center;
+}
+
+.metricItem {
+  display: inline-block;
+  flex-direction: column;
+}
+
+.countGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: layout.$spacing-03;
+  align-items: flex-start;
+  margin: layout.$spacing-03;
+
+  .urgentLabel {
+    font-size: layout.$spacing-04 !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  .urgentValue {
+    margin: 0;
+    margin-top: layout.$spacing-01;
+    color: colors.$red-50;
+  }
+}
+
+.headerLabelContainer {
+  display: flex;
+  height: layout.$spacing-07;
+  align-items: center;
+
+  :global(.cds--dropdown__wrapper--inline) {
+    gap: 0;
+
+    label {
+      @include type.type-style('heading-compact-01');
+      color: $text-02;
+      margin-right: layout.$spacing-03;
+    }
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    height: layout.$spacing-05;
+  }
+}
+
+.link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: $interactive-01;
+
+  svg {
+    margin-left: layout.$spacing-03;
+  }
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .link {
+    svg {
+      margin-right: layout.$spacing-03;
+      margin-left: unset;
+      transform: scale(-1, 1);
+    }
+  }
+}

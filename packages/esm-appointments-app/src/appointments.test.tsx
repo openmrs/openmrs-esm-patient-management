@@ -7,14 +7,10 @@ describe('Appointments', () => {
   it('renders the appointments dashboard', async () => {
     render(<Appointments />);
 
-    await screen.findByText(/^appointments$/i);
+    await screen.findByRole('combobox');
 
     expect(screen.getByRole('button', { name: /appointments calendar/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/dd-mmm-yyyy/i)).toBeInTheDocument();
     expect(screen.getByText(/filter appointments by service type/i)).toBeInTheDocument();
-    expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
-    expect(screen.getByText(/highest volume service/i)).toBeInTheDocument();
-    expect(screen.getByText(/providers booked/i)).toBeInTheDocument();
+    expect(screen.getByText(/appointments calendar/i)).toBeInTheDocument();
   });
 });

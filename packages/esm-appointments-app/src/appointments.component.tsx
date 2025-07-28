@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { omrsDateFormat } from './constants';
 import AppointmentTabs from './appointments/appointment-tabs.component';
 import AppointmentsHeader from './header/appointments-header.component';
-import AppointmentMetrics from './metrics/appointments-metrics.component';
-import SelectedDateContext from './hooks/selectedDateContext';
+import AppointmentMetrics from './metrics/metrics-container.component';
+import { useAppointmentsStore, setAppointmentServiceTypes, setSelectedDate } from './store';
 
 const Appointments: React.FC = () => {
   const { t } = useTranslation();
-  const [appointmentServiceType, setAppointmentServiceType] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState(dayjs().startOf('day').format(omrsDateFormat));
+  const { appointmentServiceTypes } = useAppointmentsStore();
 
   const params = useParams();
 
@@ -23,20 +22,16 @@ const Appointments: React.FC = () => {
 
   useEffect(() => {
     if (params.serviceType) {
-      setAppointmentServiceType([params.serviceType]);
+      setAppointmentServiceTypes([params.serviceType]);
     }
   }, [params.serviceType]);
 
   return (
-    <SelectedDateContext.Provider value={{ selectedDate, setSelectedDate }}>
-      <AppointmentsHeader
-        appointmentServiceType={appointmentServiceType}
-        onChange={setAppointmentServiceType}
-        title={t('appointments', 'Appointments')}
-      />
-      <AppointmentMetrics appointmentServiceType={appointmentServiceType} />
-      <AppointmentTabs appointmentServiceType={appointmentServiceType} />
-    </SelectedDateContext.Provider>
+    <>
+      <AppointmentsHeader title={t('appointments', 'Appointments')} showServiceTypeFilter />
+      <AppointmentMetrics appointmentServiceTypes={appointmentServiceTypes} />
+      <AppointmentTabs appointmentServiceTypes={appointmentServiceTypes} />
+    </>
   );
 };
 

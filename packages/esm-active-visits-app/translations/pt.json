@@ -1,18 +1,15 @@
 {
   "activeVisits": "Visitas Ativas",
-  "age": "Idade",
   "allEncounters": "Todas as consultas",
   "checkFilters": "Verifique os filtros acima",
   "diagnoses": "Diagnósticos",
   "dose": "Dose",
   "encounterType": "Tipo de Consulta",
   "endDate": "Data Final",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Filtrar tabela",
-  "gender": "Sexo",
-  "idNumber": "Número de Identificação",
   "indication": "Indicação",
   "medications": "Medicamentos",
-  "name": "Nome",
   "noActiveVisitsForLocation": "Não há visitas ativas para visualizar neste local.",
   "noDiagnosesFound": "Nenhum diagnóstico encontrado",
   "noEncountersFound": "Nenhuma consulta encontrada",
@@ -31,7 +28,6 @@
   "thereIsNoInformationToDisplayHere": "Sem informações para mostrar aqui",
   "time": "Tempo",
   "totalVisits": "Total de visitas hoje",
-  "visitStartTime": "Hora da Visita",
-  "visitSummary": "Sumário da Visita",
-  "visitType": "Tipo de Visita"
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "visitSummary": "Sumário da Visita"
 }

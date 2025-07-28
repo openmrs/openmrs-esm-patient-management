@@ -1,18 +1,15 @@
 {
   "activeVisits": "ביקורים פעילים",
-  "age": "גיל",
   "allEncounters": "כל המפגשים",
   "checkFilters": "בדוק את המסננים למעלה",
   "diagnoses": "אבחנות",
   "dose": "מנה",
   "encounterType": "סוג המפגש",
   "endDate": "End date",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "סנן טבלה",
-  "gender": "מגדר",
-  "idNumber": "מספר תעודת זהות",
   "indication": "Indication",
   "medications": "תרופות",
-  "name": "שם",
   "noActiveVisitsForLocation": "אין ביקורים פעילים להצגה במיקום זה.",
   "noDiagnosesFound": "לא נמצאו אבחנות",
   "noEncountersFound": "לא נמצאו מפגשים",
@@ -31,7 +28,6 @@
   "thereIsNoInformationToDisplayHere": "אין מידע להצגה כאן",
   "time": "זמן",
   "totalVisits": "Total Visits Today",
-  "visitStartTime": "שעת התחלת הביקור",
-  "visitSummary": "סיכום הביקור",
-  "visitType": "סוג הביקור"
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "visitSummary": "סיכום הביקור"
 }

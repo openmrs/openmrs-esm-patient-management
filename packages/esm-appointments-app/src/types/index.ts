@@ -86,12 +86,6 @@ export interface ServiceTypes {
   uuid: string;
 }
 
-export interface DashboardConfig {
-  name: string;
-  slot: string;
-  title: string;
-}
-
 export interface Observation {
   uuid: string;
   concept: {

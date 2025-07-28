@@ -1,3 +1,5 @@
+@use '@carbon/layout';
+
 .actionCellContainer {
   white-space: nowrap;
 }
@@ -9,6 +11,6 @@
 .actionsCell {
   display: flex;
   justify-content: flex-end;
-  height: 100%;
+  height: layout.$spacing-09;
   align-items: center;
 }

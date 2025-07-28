@@ -22,7 +22,8 @@
         "title": "Service queues"
       },
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 1
     },
     {
       "name": "queue-table-by-status-menu-dashboard-link",
@@ -41,23 +42,14 @@
       "slot": "service-queues-dashboard-slot"
     },
     {
-      "name": "remove-queue-entry",
-      "component": "removeQueueEntry"
-    },
-    {
-      "name": "clear-all-queue-entries",
-      "component": "clearAllQueueEntries"
+      "name": "queue-table-by-status-view",
+      "component": "queueTableByStatusView",
+      "slot": "queue-table-by-status-view-slot"
     },
     {
       "name": "previous-visit-summary-widget",
       "component": "pastVisitSummary",
       "slot": "previous-visit-summary-slot"
-    },
-
-    {
-      "name": "active-visits-row-actions",
-      "component": "activeVisitsRowActions",
-      "slot": "queue-table-serve-patient-slot"
     },
     {
       "name": "visit-form-queue-fields",
@@ -68,6 +60,29 @@
       "name": "queue-patient-info-queue-entry-status",
       "component": "patientBannerQueueEntryStatus",
       "slot": "patient-banner-tags-slot"
+    },
+    {
+      "name": "transition-overflow-menu-item",
+      "component": "transitionOverflowMenuItem",
+      "slot": "transition-overflow-menu-item-slot"
+    },
+    {
+      "name": "metrics-card-checked-in-patients",
+      "component": "metricsCardCheckedInPatients",
+      "slot": "service-queues-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "metrics-card-waiting-patients",
+      "component": "metricsCardWaitingPatients",
+      "slot": "service-queues-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "metrics-card-average-wait-time",
+      "component": "metricsCardAverageWaitTime",
+      "slot": "service-queues-metrics-slot",
+      "order": 3
     }
   ],
   "modals": [
@@ -76,12 +91,12 @@
       "component": "addProviderToRoomModal"
     },
     {
-      "name": "edit-queue-entry-modal",
-      "component": "editQueueEntryModal"
+      "name": "clear-all-queue-entries-modal",
+      "component": "clearAllQueueEntriesModal"
     },
     {
-      "name": "edit-queue-entry-status-modal",
-      "component": "editQueueEntryStatusModal"
+      "name": "edit-queue-entry-modal",
+      "component": "editQueueEntryModal"
     },
     {
       "name": "end-queue-entry-modal",
@@ -89,15 +104,15 @@
     },
     {
       "name": "transition-patient-to-latest-queue-modal",
-      "component": "transitionPatientToLatestQueue"
+      "component": "addOrMoveModal"
     },
     {
-      "name": "transition-queue-entry-modal",
-      "component": "transitionQueueEntryModal"
+      "name": "call-queue-entry-modal",
+      "component": "callQueueEntryModal"
     },
     {
-      "name": "transition-queue-entry-status-modal",
-      "component": "transitionQueueEntryStatusModal"
+      "name": "move-queue-entry-modal",
+      "component": "moveQueueEntryModal"
     },
     {
       "name": "undo-transition-queue-entry-modal",
@@ -116,7 +131,7 @@
       "type": "service-queues"
     },
     {
-      "name": "service-queues-room-form",
+      "name": "service-queues-room-workspace",
       "title": "addNewQueueServiceRoom",
       "component": "addNewQueueServiceRoomWorkspace",
       "type": "service-queues"

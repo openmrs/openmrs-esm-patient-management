@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.24.0"
+  },
+  "pages": [
+    {
+      "component": "root",
+      "route": "home",
+      "online": true,
+      "offline": true
+    }
+  ],
+  "extensions": [
+    {
+      "name": "home-nav-menu",
+      "slot": "home-sidebar-slot",
+      "component": "homeNavMenu",
+      "online": true,
+      "offline": true
+    }
+  ]
+}

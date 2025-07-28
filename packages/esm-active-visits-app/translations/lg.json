@@ -1,18 +1,15 @@
 {
   "activeVisits": "Okukyala Okukyaaliwo",
-  "age": "Emyaka gy’Obukulu",
   "allEncounters": "Okukyala Kwonna",
   "checkFilters": "Kebera Enkozesa Ezisengejja",
   "diagnoses": "Okukakasa Endwadde",
   "dose": "Obuyinza bwa Ddagala",
   "encounterType": "Engeri y’Okukyala",
   "endDate": "Olunaku lw’Enkomerero",
+  "filterActiveVisits": "Filter active visits",
   "filterTable": "Fulumya Olukalala Olusengejjeddwa",
-  "gender": "Ekitundu ky’Obuntu",
-  "idNumber": "Namba y’Omulwadde",
   "indication": "Ekigendererwa",
   "medications": "Eddagala",
-  "name": "Erinnya",
   "noActiveVisitsForLocation": "Tewali kukyala kuno kw’Omulwadde ku kifo kino",
   "noDiagnosesFound": "Tewali kuleetebwa kw’Endwadde kwafunye.",
   "noEncountersFound": "Tewali mukyala gufunye",
@@ -31,7 +28,6 @@
   "thereIsNoInformationToDisplayHere": "Tewali kalonda kalabikako kuno",
   "time": "Ekiseera",
   "totalVisits": "Okukyala Okubala Olunaku Luno",
-  "visitStartTime": "Ekiseera ky’Okutandika Okukyala",
-  "visitSummary": "Okubala okw’Okukyala",
-  "visitType": "Engeri y’Okukyala"
+  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "visitSummary": "Okubala okw’Okukyala"
 }

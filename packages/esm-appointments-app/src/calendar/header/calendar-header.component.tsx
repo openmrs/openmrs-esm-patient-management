@@ -1,16 +1,16 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
-import SelectedDateContext from '../../hooks/selectedDateContext';
+import { useAppointmentsStore } from '../../store';
 import styles from './calendar-header.scss';
 
 const CalendarHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useContext(SelectedDateContext);
+  const { selectedDate } = useAppointmentsStore();
 
   const handleClick = () => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });
