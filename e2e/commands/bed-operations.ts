@@ -6,11 +6,11 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
   const bedNumber = `B${randomString}${Math.floor(Math.random() * 100)}`;
   const bedRes = await api.post('/openmrs/ws/rest/v1/bed', {
     data: {
-      bedNumber: bedNumber.substring(0, 10),
+      bedNumber: bedNumber.substring(0, 20),
       bedType: bedType.name,
       status: 'AVAILABLE',
-      row: Math.floor(Math.random() * 10) + 1,
-      column: Math.floor(Math.random() * 10) + 1,
+      row: Math.floor(Math.random() * 18) + 1,
+      column: Math.floor(Math.random() * 18) + 1,
       locationUuid: process.env.E2E_WARD_LOCATION_UUID,
     },
   });
