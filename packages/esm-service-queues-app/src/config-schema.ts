@@ -196,6 +196,11 @@ export const configSchema = {
       _type: Type.String,
     },
   },
+  defaultInitialServiceQueue: {
+    _type: Type.String,
+    _description: 'The name of the default service queue to be selected when the start visit form is opened',
+    _default: 'Outpatient Triage',
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -457,6 +462,7 @@ export interface ConfigObject {
     temperatureUuid: string;
     weightUuid: string;
   };
+  defaultInitialServiceQueue: string;
   contactAttributeType: Array<string>;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;
