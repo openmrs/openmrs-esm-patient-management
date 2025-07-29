@@ -67,12 +67,6 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
 
 test.afterEach(async ({ api }) => {
   await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-
-  // Verify discharge worked correctly
-  const bedCheck = await api.get(`bed/${bed.uuid}`);
-  // eslint-disable-next-line no-console
-  console.log('Bed exists after discharge:', bedCheck.ok());
-
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
