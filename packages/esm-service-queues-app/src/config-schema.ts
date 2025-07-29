@@ -504,10 +504,6 @@ export interface PriorityConfig {
   style: TagStyle;
 }
 
-export interface ConfigSchema {
-  priorityConfigs: PriorityConfig[];
-}
-
 export interface StatusConfig {
   conceptUuid: string;
   iconComponent: StatusIcon;

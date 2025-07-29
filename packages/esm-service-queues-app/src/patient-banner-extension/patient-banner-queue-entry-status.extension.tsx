@@ -1,9 +1,10 @@
 import React from 'react';
-import { Tag, Button } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import styles from './patient-banner-queue-entry-status.scss';
+import QueuePriority from '../queue-table/components/queue-priority.component';
 
 interface PatientBannerQueueEntryStatusProps {
   patientUuid: string;
@@ -22,19 +23,15 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
     return null;
   }
 
-  const priorityUuid = queueEntry?.priority?.uuid;
-  const priorityDisplay = queueEntry?.priority?.display;
-  const priorityConfig = config?.priorityConfigs?.find((p: any) => p.conceptUuid === priorityUuid);
-  const tagColor = priorityConfig?.color || 'gray';
-  const tagStyle = priorityConfig?.style;
-
   return (
     <div className={styles.queueEntryStatusContainer}>
       <span className={styles.separator}>&middot;</span>
       <span>{queueEntry.queue.name}</span>
-      <Tag className={tagStyle === 'bold' ? styles.priorityTag : styles.tag} type={tagColor}>
-        {priorityDisplay}
-      </Tag>
+      <QueuePriority
+        priority={queueEntry.priority}
+        priorityComment={queueEntry.priorityComment}
+        priorityConfigs={config?.priorityConfigs}
+      />
       <Button
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}
