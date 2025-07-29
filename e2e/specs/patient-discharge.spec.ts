@@ -58,8 +58,8 @@ test('Discharge Patient From a Ward', async ({ page, api }) => {
   await test.step('And I click the "Admit patient" button', async () => {
     await page.getByRole('button', { name: /Admit patient/i }).click();
   });
-  await test.step('And I click the "Choose an option"combobox', async () => {
-    await page.getByRole('combobox', { name: 'Choose an option' }).click({timeout:30000});
+//  await test.step('And I click the "Choose an option"combobox', async () => {
+    await page.getByText('Choose an option' }).click();
   })
   await test.step('And I assign the patient to a bed', async () => {
     await expect(page.getByRole('heading', { name: 'Select a bed' })).toBeVisible();
