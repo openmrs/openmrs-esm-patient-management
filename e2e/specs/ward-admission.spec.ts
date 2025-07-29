@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import {
@@ -38,7 +39,7 @@ test.beforeEach(async ({ api }) => {
   encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
-test('Admit a patient to a ward from admission requests list', async ({ page }) => {
+test('Admit a patient to a ward from the admission requests list', async ({ page }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
 
@@ -74,11 +75,23 @@ test('Admit a patient to a ward from admission requests list', async ({ page }) 
 });
 
 test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  // Wait for discharge to fully complete
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  await updateBedStatus(api, bed.uuid, 'AVAILABLE');
-  await deleteBed(api, bed);
+  try {
+    await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  } catch (error) {
+    console.warn('Discharge failed, continuing with cleanup:', error);
+  }
+
+  // Only try to update bed status and delete bed if they still exist
+  try {
+    const bedCheck = await api.get(`bed/${bed.uuid}`);
+    if (bedCheck.ok()) {
+      await updateBedStatus(api, bed.uuid, 'AVAILABLE');
+      await deleteBed(api, bed);
+    }
+  } catch (error) {
+    console.warn('Bed cleanup failed, bed may already be deleted:', error);
+  }
+
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
