@@ -1,9 +1,9 @@
+import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
-import dayjs from 'dayjs';
 
 let visit: Visit;
 
@@ -31,7 +31,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = dayjs().add(1, 'day');
+    const tomorrow = dayjs().add(1, 'day').hour(10).minute(0).second(0);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
@@ -76,7 +76,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('And I change the date to Today', async () => {
-    const today = dayjs();
+    const today = dayjs().hour(14).minute(0).second(0);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
