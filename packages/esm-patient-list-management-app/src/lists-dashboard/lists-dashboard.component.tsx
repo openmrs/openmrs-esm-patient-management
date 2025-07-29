@@ -74,7 +74,7 @@ const ListsDashboard: React.FC = () => {
               <Tab className={styles.tab}>{t('systemLists', 'System lists')}</Tab>
               <Tab className={styles.tab}>{t('myLists', 'My lists')}</Tab>
               {/* data-testid is essential for joyride in onboarding app ! */}
-              <Tab data-testid="allListsTab" className={styles.tab}>
+              <Tab id="all-patient-lists-tab" className={styles.tab}>
                 {t('allLists', 'All lists')}
               </Tab>
             </TabList>
