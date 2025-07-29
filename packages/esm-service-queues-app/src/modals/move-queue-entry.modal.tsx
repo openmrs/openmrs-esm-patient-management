@@ -42,7 +42,9 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
           });
         },
         disableSubmit: (queueEntry, formState) =>
-          formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid,
+          formState.selectedQueue == queueEntry.queue.uuid &&
+          formState.selectedStatus == queueEntry.status.uuid &&
+          formState.selectedPriority == queueEntry.priority.uuid,
         isTransition: true,
       }}
     />
