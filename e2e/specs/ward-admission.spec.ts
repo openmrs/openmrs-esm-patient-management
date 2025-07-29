@@ -10,13 +10,12 @@ import {
   startVisit,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Encounter, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
 let visit: Visit;
 let wardPatient: Patient;
-let encounter: Encounter;
 let provider: Provider;
 let bed: Bed;
 let bedtype: BedType;
@@ -28,7 +27,7 @@ test.beforeEach(async ({ api }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Admit a patient to a ward from the admission requests list', async ({ page }) => {
@@ -68,6 +67,12 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
 
 test.afterEach(async ({ api }) => {
   await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+
+  // Verify discharge worked correctly
+  const bedCheck = await api.get(`bed/${bed.uuid}`);
+  // eslint-disable-next-line no-console
+  console.log('Bed exists after discharge:', bedCheck.ok());
+
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
