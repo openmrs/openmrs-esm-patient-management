@@ -238,12 +238,15 @@ export const configSchema = {
           ),
           validator(
             (columnDfn: ColumnDefinition) => {
-              return columnHasType(columnDfn, 'priority') || !columnDfn.config.hasOwnProperty('priorityConfigs');
+              return (
+                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid ||
+                columnHasType(columnDfn, 'patient-identifier')
+              );
             },
             (columnDfn) => {
-              return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${
-                columnDfn.columnType ?? columnDfn.id
-              }'.`;
+              return `Identifier type can only be set for 'patient-identifier' column type. Column ${
+                columnDfn.id
+              } has type '${columnDfn.columnType ?? columnDfn.id}.`;
             },
           ),
 
