@@ -14,35 +14,38 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
       locationUuid: process.env.E2E_WARD_LOCATION_UUID,
     },
   });
-  await expect(bedRes.ok()).toBeTruthy();
+  expect(bedRes.ok()).toBeTruthy();
   return await bedRes.json();
 };
 
 export const generateBedType = async (api: APIRequestContext): Promise<BedType> => {
+  const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const bedTypeName = `TestBedType_${randomString}`;
+  const shortDisplayName = `T${randomString.substring(0, 4)}`; // Max 10 chars: T + 4 chars = 5 chars
   const bedRes = await api.post('/openmrs/ws/rest/v1/bedtype', {
     data: {
-      name: 'Guplix',
-      displayName: 'Guplix',
-      description: '',
+      name: bedTypeName, // Can be longer (255 chars max)
+      displayName: shortDisplayName, // Must be ≤10 chars
+      description: 'Test bed type for automated testing',
     },
   });
-  await expect(bedRes.ok()).toBeTruthy();
+  expect(bedRes.ok()).toBeTruthy();
   return await bedRes.json();
 };
 
 export const dischargePatientFromBed = async (api: APIRequestContext, id: number, patientUuid: string) => {
   const response = await api.delete(`beds/${id}?patientUuid=${patientUuid}`);
-  await expect(response.ok()).toBeTruthy();
+  expect(response.ok()).toBeTruthy();
 };
 
 export const deleteBed = async (api: APIRequestContext, bed: Bed) => {
   const response = await api.delete(`bed/${bed.uuid}`);
-  await expect(response.ok()).toBeTruthy();
+  expect(response.ok()).toBeTruthy();
 };
 
 export const deleteBedType = async (api: APIRequestContext, uuid: string) => {
   const response = await api.delete(`bedtype/${uuid}`, { data: {} });
-  await expect(response.ok()).toBeTruthy();
+  expect(response.ok()).toBeTruthy();
 };
 
 export const updateBedStatus = async (api: APIRequestContext, bedUuid: string, status: string) => {
@@ -50,7 +53,7 @@ export const updateBedStatus = async (api: APIRequestContext, bedUuid: string, s
   const data = { status };
 
   const response = await api.post(url, { data });
-  await expect(response.ok()).toBeTruthy();
+  expect(response.ok()).toBeTruthy();
   return await response.json();
 };
 
@@ -61,5 +64,5 @@ export const retireBedType = async (api: APIRequestContext, uuid: string, retire
       retiredReason: retireReason,
     },
   });
-  await expect(response.ok()).toBeTruthy();
+  expect(response.ok()).toBeTruthy();
 };

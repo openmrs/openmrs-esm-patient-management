@@ -30,7 +30,7 @@ jq -n \
   --arg apps "$apps" \
   --arg app_names "$(echo ${app_names[@]})" \
   '{
-    "@openmrs/esm-form-engine-app": "next"
+    "@openmrs/esm-form-engine-app": "next",
     "@openmrs/esm-home-app": "next",
     "@openmrs/esm-patient-banner-app": "next",
     "@openmrs/esm-patient-chart-app": "next",

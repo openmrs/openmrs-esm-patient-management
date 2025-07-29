@@ -38,7 +38,7 @@ test.beforeEach(async ({ api }) => {
   encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
-test('Admit a patient to a ward from the admission requests', async ({ page }) => {
+test('Admit a patient to a ward from admission requests list', async ({ page }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
 
@@ -75,7 +75,6 @@ test('Admit a patient to a ward from the admission requests', async ({ page }) =
 
 test.afterEach(async ({ api }) => {
   await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-
   // Wait for discharge to fully complete
   await new Promise((resolve) => setTimeout(resolve, 1000));
   await updateBedStatus(api, bed.uuid, 'AVAILABLE');

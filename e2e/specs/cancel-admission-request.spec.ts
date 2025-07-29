@@ -70,7 +70,7 @@ test('Cancel an admission request', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await deleteBed(api, bed.uuid);
+  await deleteBed(api, bed);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
