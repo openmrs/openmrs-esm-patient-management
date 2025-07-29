@@ -5,4 +5,3 @@ export * from './provider-operations';
 export * from './cohort-operations';
 export * from './location-operations';
 export * from './bed-operations';
-//export * from './ward-operations'
