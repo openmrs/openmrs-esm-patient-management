@@ -41,6 +41,12 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await dateYearInput.fill(tomorrow.format('YYYY'));
   });
 
+  await test.step('And I set time to 10:00 AM', async () => {
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill('10:00');
+    await page.locator('#time-picker-select-1').selectOption('AM');
+  });
+
   await test.step('And I set the “Duration” to 60', async () => {
     await page.getByLabel('Duration (minutes)').fill('60');
   });
@@ -84,6 +90,12 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await dateDayInput.fill(today.format('DD'));
     await dateMonthInput.fill(today.format('MM'));
     await dateYearInput.fill(today.format('YYYY'));
+  });
+
+  await test.step('And I set time to 2:00 PM', async () => {
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill('02:00');
+    await page.locator('#time-picker-select-1').selectOption('PM');
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {
