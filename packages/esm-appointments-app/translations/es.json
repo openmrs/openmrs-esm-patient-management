@@ -59,6 +59,7 @@
   "date&Time": "Fecha y hora",
   "dateAppointmentIssuedCannotBeAfterAppointmentDate": "La fecha de emisión de la cita no puede ser posterior a la fecha de la cita",
   "dateOfBirth": "Fecha de nacimiento",
+  "dateRange": "Set date range",
   "dateScheduled": "Fecha de emisión de la cita",
   "dateScheduledDetail": "Fecha de emisión de la cita",
   "dateTime": "Fecha y Hora",
