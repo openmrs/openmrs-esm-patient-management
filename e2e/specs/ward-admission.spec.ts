@@ -1,25 +1,17 @@
-/* eslint-disable no-console */
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import {
-  endVisit,
-  startVisit,
   changeToWardLocation,
-  generateRandomPatient,
-  getProvider,
-  generateWardAdmission,
   deletePatient,
+  endVisit,
+  generateRandomPatient,
+  generateWardAdmission,
+  getProvider,
+  startVisit,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../commands/types';
-import {
-  deleteBed,
-  dischargePatientFromBed,
-  generateBedType,
-  generateRandomBed,
-  retireBedType,
-  updateBedStatus,
-} from '../commands/bed-operations';
+import { type Bed, type BedType, type Encounter, type Patient, type Provider } from '../commands/types';
+import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
 let visit: Visit;
@@ -75,23 +67,7 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
 });
 
 test.afterEach(async ({ api }) => {
-  try {
-    await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  } catch (error) {
-    console.warn('Discharge failed, continuing with cleanup:', error);
-  }
-
-  // Only try to update bed status and delete bed if they still exist
-  try {
-    const bedCheck = await api.get(`bed/${bed.uuid}`);
-    if (bedCheck.ok()) {
-      await updateBedStatus(api, bed.uuid, 'AVAILABLE');
-      await deleteBed(api, bed);
-    }
-  } catch (error) {
-    console.warn('Bed cleanup failed, bed may already be deleted:', error);
-  }
-
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);

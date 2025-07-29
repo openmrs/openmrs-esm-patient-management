@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { type APIRequestContext, expect } from '@playwright/test';
 import { type BedType, type Bed } from './types';
 
@@ -35,12 +34,10 @@ export const generateBedType = async (api: APIRequestContext): Promise<BedType> 
 };
 
 export const dischargePatientFromBed = async (api: APIRequestContext, id: number, patientUuid: string) => {
-  console.log(`Attempting to discharge patient ${patientUuid} from bed ${id}`);
   const response = await api.delete(`beds/${id}?patientUuid=${patientUuid}`);
-  console.log(`Discharge response status: ${response.status()}`);
   if (!response.ok()) {
     const errorBody = await response.text();
-    console.error(`Discharge failed:`, errorBody);
+    throw new Error(`Discharge failed: ${errorBody}`);
   }
   expect(response.ok()).toBeTruthy();
 };
