@@ -27,7 +27,7 @@ const mockConfig: ActiveVisitsConfigSchema = {
   activeVisits: {
     ...getDefaultsFromConfigSchema<ActiveVisitsConfigSchema>(configSchema).activeVisits,
     obs: ['160225AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '5484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
-    identifiers: undefined,
+    identifiers: [],
   },
 };
 

@@ -348,8 +348,9 @@ export const esmPatientRegistrationSchema = {
         dayOfMonth: {
           _type: Type.Number,
           _default: 0,
-          _description: 'The custom day of the month use on the estimated date of birth',
-          _validators: [validators.inRange(0, 30)],
+          _description:
+            'The custom day of the month use on the estimated date of birth  (0 = last day of previous month, 1-31 = specific day)',
+          _validators: [validators.inRange(0, 31)],
         },
         month: {
           _type: Type.Number,
