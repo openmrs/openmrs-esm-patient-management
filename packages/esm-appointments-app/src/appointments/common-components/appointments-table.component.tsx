@@ -44,6 +44,7 @@ import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
+import { useAppointmentColumns } from '../../hooks/useAppointmentColumns';
 import styles from './appointments-table.scss';
 
 dayjs.extend(utc);
@@ -71,28 +72,12 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { visits } = useTodaysVisits();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const headerData = [
-    {
-      header: t('patientName', 'Patient name'),
-      key: 'patientName',
-    },
-    {
-      header: t('identifier', 'Identifier'),
-      key: 'identifier',
-    },
-    {
-      header: t('location', 'Location'),
-      key: 'location',
-    },
-    {
-      header: t('serviceType', 'Service type'),
-      key: 'serviceType',
-    },
-    {
-      header: t('status', 'Status'),
-      key: 'status',
-    },
-  ];
+  const columns = useAppointmentColumns();
+
+  const headerData = columns.map((column) => ({
+    header: column.header,
+    key: column.key.replace(/-([a-z])/g, (_, char) => char.toUpperCase()),
+  }));
 
   const rowData = results?.map((appointment) => ({
     id: appointment.uuid,
@@ -106,7 +91,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     ),
     nextAppointmentDate: '--',
     identifier: patientIdentifierType
-      ? appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier
+      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
       : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,

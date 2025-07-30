@@ -1,4 +1,17 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
+
+export const appointmentColumnTypes = [
+  'patient-name',
+  'identifier',
+  'location',
+  'service-type',
+  'status',
+  'date-time',
+  'provider',
+  'actions',
+] as const;
+
+type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
 
 export const configSchema = {
   allowAllDayAppointments: {
@@ -69,6 +82,63 @@ export const configSchema = {
       'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
     _default: false,
   },
+
+  appointmentTables: {
+    _description: 'Configuration for appointment tables',
+    columnDefinitions: {
+      _type: Type.Array,
+      _default: [],
+      _description: 'Custom columns for appointment tables',
+      _elements: {
+        _validators: [
+          validator(
+            (columnDef: AppointmentColumnDefinition) =>
+              Boolean(columnDef.columnType || appointmentColumnTypes.some((c) => c == columnDef.id)),
+            (columnDef) =>
+              `No columnType provided for column with ID '${
+                columnDef.id
+              }', and the ID is not a valid columnType. Valid column types are: ${appointmentColumnTypes.join(', ')}.`,
+          ),
+        ],
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for the column',
+        },
+        columnType: {
+          _type: Type.String,
+          _description: 'The type of column, if different from the ID',
+          _validators: [validators.oneOf(appointmentColumnTypes)],
+          _default: null,
+        },
+        header: {
+          _type: Type.String,
+          _description: 'The header text for the column',
+          _default: null,
+        },
+        config: {
+          _type: Type.Object,
+          _description: 'Column-specific configuration',
+          _default: {},
+        },
+      },
+    },
+    tableDefinitions: {
+      _type: Type.Array,
+      _default: [
+        {
+          columns: ['patient-name', 'identifier', 'location', 'service-type', 'status'],
+        },
+      ],
+      _elements: {
+        columns: {
+          _type: Type.Array,
+          _elements: {
+            _type: Type.String,
+          },
+        },
+      },
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -84,8 +154,23 @@ export interface ConfigObject {
     enabled: boolean;
     customUrl: string;
   };
+  appointmentTables: {
+    columnDefinitions: Array<AppointmentColumnDefinition>;
+    tableDefinitions: Array<AppointmentTableDefinition>;
+  };
   customPatientChartUrl: string;
   includePhoneNumberInExcelSpreadsheet: boolean;
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
+}
+
+export interface AppointmentColumnDefinition {
+  id: string;
+  columnType?: AppointmentColumnType;
+  header?: string;
+  config?: Record<string, any>;
+}
+
+export interface AppointmentTableDefinition {
+  columns: Array<string>;
 }
