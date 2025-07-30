@@ -1,6 +1,6 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
-import { type Encounter } from '../types';
+import { type Encounter } from './types';
 import { type Visit } from '@openmrs/esm-framework';
 
 export const createEncounter = async (
