@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { type ConfigObject, isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import styles from './patient-banner-queue-entry-status.scss';
 import QueuePriority from '../queue-table/components/queue-priority.component';
@@ -16,7 +16,7 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
   const layout = useLayoutType();
   const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
   const queueEntry = queueEntries?.[0];
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
 
   const isPatientChart = renderedFrom === 'patient-chart';
   if (!isPatientChart || !queueEntry) {

@@ -491,7 +491,7 @@ export interface PatientIdentifierColumnConfig {
 export interface PriorityConfig {
   conceptUuid: string;
   color: PriorityTagColor;
-  style: TagStyle;
+  style: TagStyle | null;
 }
 
 export interface StatusConfig {
