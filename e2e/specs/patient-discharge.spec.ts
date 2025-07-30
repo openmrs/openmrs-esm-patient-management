@@ -32,7 +32,6 @@ test.beforeEach(async ({ api }) => {
 });
 
 test('Discharge Patient From a Ward', async ({ page, api }) => {
-  test.setTimeout(5 * 60 * 1000);
   const wardPage = new WardPage(page);
   const patientName = wardPatient.person?.display;
   await test.step('when I visit the ward page', async () => {
@@ -59,6 +58,8 @@ test('Discharge Patient From a Ward', async ({ page, api }) => {
     await page.getByRole('button', { name: /Admit patient/i }).click();
   });
  await test.step('And I click the "Choose an option"combobox', async () => {
+   await page.getByRole('combobox',{name:'Choose an option'}).click();
+    await page.waitForTimeout(2000);
   })
   await test.step('And I assign the patient to a bed', async () => {
     await expect(page.getByRole('heading', { name: 'Select a bed' })).toBeVisible();
