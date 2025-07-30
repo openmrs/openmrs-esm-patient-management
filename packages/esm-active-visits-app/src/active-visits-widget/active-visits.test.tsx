@@ -101,7 +101,7 @@ describe('ActiveVisitsTable', () => {
 
     render(<ActiveVisitsTable />);
 
-    const standardColumnHeaders = [/Visit Time/, /ID Number/, /Name/, /Gender/, /Age/, /Visit Type/];
+    const standardColumnHeaders = [/Visit Time/, /Name/, /Gender/, /Age/, /Visit Type/];
     standardColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
     });
