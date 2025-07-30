@@ -1,9 +1,9 @@
+import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
-import dayjs from 'dayjs';
 
 let visit: Visit;
 
@@ -31,7 +31,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = dayjs().add(1, 'day');
+    const tomorrow = dayjs().add(1, 'day').hour(10).minute(0).second(0);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
@@ -39,6 +39,12 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await dateDayInput.fill(tomorrow.format('DD'));
     await dateMonthInput.fill(tomorrow.format('MM'));
     await dateYearInput.fill(tomorrow.format('YYYY'));
+  });
+
+  await test.step('And I set time to 10:00 AM', async () => {
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill('10:00');
+    await page.locator('#time-picker-select-1').selectOption('AM');
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -76,7 +82,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('And I change the date to Today', async () => {
-    const today = dayjs();
+    const today = dayjs().hour(14).minute(0).second(0);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
@@ -84,6 +90,12 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await dateDayInput.fill(today.format('DD'));
     await dateMonthInput.fill(today.format('MM'));
     await dateYearInput.fill(today.format('YYYY'));
+  });
+
+  await test.step('And I set time to 2:00 PM', async () => {
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill('02:00');
+    await page.locator('#time-picker-select-1').selectOption('PM');
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {

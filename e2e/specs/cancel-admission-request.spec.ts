@@ -10,7 +10,7 @@ import {
   deletePatient,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../types';
+import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../commands/types';
 import { deleteBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
@@ -70,7 +70,7 @@ test('Cancel an admission request', async ({ page }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  await deleteBed(api, bed.uuid);
+  await deleteBed(api, bed);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);

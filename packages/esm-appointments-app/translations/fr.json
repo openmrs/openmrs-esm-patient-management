@@ -59,6 +59,7 @@
   "date&Time": "Date et heure",
   "dateAppointmentIssuedCannotBeAfterAppointmentDate": "La date du rendez-vous ne peut pas être postérieure à la date du rendez-vous",
   "dateOfBirth": "Date de naissance",
+  "dateRange": "Set date range",
   "dateScheduled": "Date de rendez vous émise",
   "dateScheduledDetail": "Date de rendez vous émise",
   "dateTime": "Date et heure",

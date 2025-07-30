@@ -1,7 +1,6 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
 import { type Encounter } from '../types';
-
 export const createEncounter = async (
   api: APIRequestContext,
   patientId: string,
