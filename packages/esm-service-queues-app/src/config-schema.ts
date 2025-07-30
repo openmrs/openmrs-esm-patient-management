@@ -279,31 +279,6 @@ export const configSchema = {
             _default: defaultIdentifierTypeUuid,
             _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
           },
-          priorityConfigs: {
-            _type: Type.Array,
-            _default: [],
-            _description:
-              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
-            _elements: {
-              conceptUuid: {
-                _type: Type.UUID,
-                _description: 'The UUID of the priority concept to configure',
-              },
-              color: {
-                _type: Type.String,
-                _default: 'gray',
-                _description:
-                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
-                _validators: [validators.oneOf(priorityTagColors)],
-              },
-              style: {
-                _type: Type.String,
-                _default: '',
-                _description: 'Style to apply to the tag',
-                _validators: [validators.oneOf(tagStyles)],
-              },
-            },
-          },
           statusConfigs: {
             _type: Type.Array,
             _default: [],
@@ -353,20 +328,6 @@ export const configSchema = {
           validator(
             (columnDfn: ColumnDefinition) => {
               return (
-                !columnDfn.config.priorityConfigs ||
-                columnDfn.config.priorityConfigs.length == 0 ||
-                columnHasType(columnDfn, 'priority')
-              );
-            },
-            (columnDfn) => {
-              return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${
-                columnDfn.columnType ?? columnDfn.id
-              }.`;
-            },
-          ),
-          validator(
-            (columnDfn: ColumnDefinition) => {
-              return (
                 !columnDfn.config.statusConfigs ||
                 columnDfn.config.statusConfigs.length == 0 ||
                 columnHasType(columnDfn, 'status')
@@ -375,7 +336,7 @@ export const configSchema = {
             (columnDfn) => {
               return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${
                 columnDfn.columnType ?? columnDfn.id
-              }.`;
+              }`;
             },
           ),
         ],
