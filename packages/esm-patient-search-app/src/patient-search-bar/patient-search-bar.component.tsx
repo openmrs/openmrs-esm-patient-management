@@ -38,11 +38,13 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
 
     return (
       <form onSubmit={handleSubmit} className={styles.searchArea}>
+        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <Search
           autoFocus
           className={styles.patientSearchInput}
           closeButtonLabelText={t('clearSearch', 'Clear')}
           data-testid="patientSearchBar"
+          data-tutorial-target="paitent-search-bar"
           labelText={t('searchForPatient', 'Search for a patient by name or identifier number')}
           onChange={(event) => handleChange(event.target.value)}
           onClear={onClear}
