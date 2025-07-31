@@ -7,12 +7,12 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
 
   const bedRes = await api.post('/openmrs/ws/rest/v1/bed', {
     data: {
-      bedNumber: bedNumber.substring(0, 20),
+      bedNumber: bedNumber.substring(0, 10),
       bedType: bedType.name,
-      status: 'AVAILABLE',
-      row: Math.floor(Math.random() * 100) + 1,
       column: Math.floor(Math.random() * 100) + 1,
       locationUuid: process.env.E2E_WARD_LOCATION_UUID,
+      row: Math.floor(Math.random() * 100) + 1,
+      status: 'AVAILABLE',
     },
   });
   expect(bedRes.ok()).toBeTruthy();
@@ -22,12 +22,12 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
 export const generateBedType = async (api: APIRequestContext): Promise<BedType> => {
   const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
   const bedTypeName = `TestBedType_${randomString}`;
-  const shortDisplayName = `T${randomString.substring(0, 4)}`; // Max 10 chars: T + 4 chars = 5 chars
+  const shortDisplayName = `T${randomString}`;
   const bedRes = await api.post('/openmrs/ws/rest/v1/bedtype', {
     data: {
-      name: bedTypeName, // Can be longer (255 chars max)
-      displayName: shortDisplayName, // Must be ≤10 chars
       description: 'Test bed type for automated testing',
+      displayName: shortDisplayName, // Must be ≤10 chars
+      name: bedTypeName, // Can be longer (255 chars max)
     },
   });
   expect(bedRes.ok()).toBeTruthy();
@@ -35,6 +35,9 @@ export const generateBedType = async (api: APIRequestContext): Promise<BedType> 
 };
 
 export const dischargePatientFromBed = async (api: APIRequestContext, id: number, patientUuid: string) => {
+  // The `id` parameter is required for REST API routing but is not used in the discharge logic - only `patientUuid` matters.
+  // This is a workaround for BED-14 where the standard delete method throws "DELETE operation not supported".
+  // See: https://openmrs.atlassian.net/browse/BED-14
   const response = await api.delete(`beds/${id}?patientUuid=${patientUuid}`);
   if (!response.ok()) {
     const errorBody = await response.text();
