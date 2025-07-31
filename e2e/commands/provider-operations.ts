@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type Provider } from '../types';
+import { type Provider } from './types';
 
 export const getProvider = async (api: APIRequestContext): Promise<Provider> => {
   const providerRes = await api.get('provider?q=admin');

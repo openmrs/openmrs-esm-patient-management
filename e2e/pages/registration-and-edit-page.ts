@@ -1,5 +1,5 @@
 import { type Page, expect } from '@playwright/test';
-import { type PatientRegistrationSex } from '../types';
+import { type PatientRegistrationSex } from '../commands/types';
 
 export class RegistrationAndEditPage {
   constructor(readonly page: Page) {}
