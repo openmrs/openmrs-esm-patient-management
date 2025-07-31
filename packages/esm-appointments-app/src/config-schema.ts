@@ -83,60 +83,12 @@ export const configSchema = {
     _default: false,
   },
 
-  appointmentTables: {
-    _description: 'Configuration for appointment tables',
-    columnDefinitions: {
-      _type: Type.Array,
-      _default: [],
-      _description: 'Custom columns for appointment tables',
-      _elements: {
-        _validators: [
-          validator(
-            (columnDef: AppointmentColumnDefinition) =>
-              Boolean(columnDef.columnType || appointmentColumnTypes.some((c) => c == columnDef.id)),
-            (columnDef) =>
-              `No columnType provided for column with ID '${
-                columnDef.id
-              }', and the ID is not a valid columnType. Valid column types are: ${appointmentColumnTypes.join(', ')}.`,
-          ),
-        ],
-        id: {
-          _type: Type.String,
-          _description: 'The unique identifier for the column',
-        },
-        columnType: {
-          _type: Type.String,
-          _description: 'The type of column, if different from the ID',
-          _validators: [validators.oneOf(appointmentColumnTypes)],
-          _default: null,
-        },
-        header: {
-          _type: Type.String,
-          _description: 'The header text for the column',
-          _default: null,
-        },
-        config: {
-          _type: Type.Object,
-          _description: 'Column-specific configuration',
-          _default: {},
-        },
-      },
-    },
-    tableDefinitions: {
-      _type: Type.Array,
-      _default: [
-        {
-          columns: ['patient-name', 'identifier', 'location', 'service-type', 'status'],
-        },
-      ],
-      _elements: {
-        columns: {
-          _type: Type.Array,
-          _elements: {
-            _type: Type.String,
-          },
-        },
-      },
+  appointmentsTableColumns: {
+    _type: Type.Array,
+    _description: 'Configurable custom columns for appointment tables)',
+    _default: ['patient-name', 'identifier', 'location', 'service-type', 'status'],
+    _elements: {
+      _type: Type.String,
     },
   },
 };
@@ -154,10 +106,7 @@ export interface ConfigObject {
     enabled: boolean;
     customUrl: string;
   };
-  appointmentTables: {
-    columnDefinitions: Array<AppointmentColumnDefinition>;
-    tableDefinitions: Array<AppointmentTableDefinition>;
-  };
+  appointmentsTableColumns: Array<string>;
   customPatientChartUrl: string;
   includePhoneNumberInExcelSpreadsheet: boolean;
   patientIdentifierType: string;
@@ -168,9 +117,4 @@ export interface AppointmentColumnDefinition {
   id: string;
   columnType?: AppointmentColumnType;
   header?: string;
-  config?: Record<string, any>;
-}
-
-export interface AppointmentTableDefinition {
-  columns: Array<string>;
 }

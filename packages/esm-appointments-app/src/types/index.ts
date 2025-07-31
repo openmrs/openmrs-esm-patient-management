@@ -193,10 +193,4 @@ export interface AppointmentTableCellComponentProps {
 export type AppointmentTableColumn = {
   key: string;
   header: string;
-  CellComponent?: React.FC<AppointmentTableCellComponentProps>;
 };
-
-export type AppointmentTableColumnFunction = (
-  key: string, // a unique key for the column
-  header?: string,
-) => AppointmentTableColumn;
