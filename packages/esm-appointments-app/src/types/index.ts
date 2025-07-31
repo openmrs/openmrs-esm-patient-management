@@ -185,11 +185,6 @@ export interface PatientDetails {
   dateOfBirth: string;
 }
 
-export interface AppointmentTableCellComponentProps {
-  appointment: Appointment;
-  config?: Record<string, any>;
-}
-
 export type AppointmentTableColumn = {
   key: string;
   header: string;
