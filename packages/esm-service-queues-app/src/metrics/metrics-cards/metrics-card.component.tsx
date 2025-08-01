@@ -16,6 +16,9 @@ interface MetricsCardProps {
   locationUuid?: string;
   showUrgent?: boolean;
   urgentCount?: number;
+  inconsultation?: number;
+  unscheduled?: number;
+  showPatientSeenMetrics?: boolean;
 }
 
 const MetricsCard: React.FC<MetricsCardProps> = ({
@@ -28,6 +31,9 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   locationUuid,
   showUrgent,
   urgentCount,
+  inconsultation,
+  unscheduled,
+  showPatientSeenMetrics,
 }) => {
   const { t } = useTranslation();
   const queueListPath =
@@ -71,6 +77,18 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
               <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
               <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
             </div>
+          )}
+          {showPatientSeenMetrics && (
+            <>
+              <div className={styles.pcountGrid}>
+                <label className={styles.pcountGridLabel}>{t('inconsultation', 'In consultation')}</label>
+                <p className={styles.pcountGridValue}>{inconsultation}</p>
+              </div>
+              <div className={styles.pcountGrid}>
+                <label className={styles.pcountGridLabel}>{t('unscheduled', 'Unscheduled')}</label>
+                <p className={styles.pcountGridValue}>{unscheduled ?? '0'}</p>
+              </div>
+            </>
           )}
         </div>
       </Tile>
