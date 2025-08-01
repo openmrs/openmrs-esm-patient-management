@@ -872,6 +872,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   value={value}
                   labelText={t('appointmentNoteLabel', 'Write an additional note')}
                   placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+                  maxLength={255}
                   onChange={onChange}
                   onBlur={onBlur}
                   ref={ref}
