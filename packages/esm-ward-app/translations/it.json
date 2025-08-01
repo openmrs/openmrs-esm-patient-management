@@ -26,7 +26,7 @@
   "emptyBed": "Letto libero",
   "emptyText": "Vuoto",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "Errore nell'annullamento della richiesta di ricovero",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Errore nella modifica dell'assegnazione del letto al paziente",
   "errorConfiguringPatientCard": "Errore nella configurazione della scheda paziente",
   "errorConfiguringPatientCardMessage": "Impossibile trovare la configurazione per {{elementType}}, id: {{id}}",
