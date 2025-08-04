@@ -83,6 +83,18 @@
       "component": "metricsCardAverageWaitTime",
       "slot": "service-queues-metrics-slot",
       "order": 3
+    },
+    {
+      "name": "queue-screen-link",
+      "component": "queueScreenLink",
+      "slot": "app-menu-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "admin-service-queues-card-link",
+      "component": "adminPageCardLink",
+      "slot": "system-admin-page-card-link-slot"
     }
   ],
   "modals": [
