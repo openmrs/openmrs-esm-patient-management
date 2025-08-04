@@ -103,6 +103,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               aria-label={t('closeSearch', 'Close Search Panel')}
               className={styles.activeSearchIconButton}
               data-testid="closeSearchIcon"
+              data-tutorial-target="close-search-icon"
               enterDelayMs={500}
               name="CloseSearchIcon"
               onClick={closePatientSearch}>
