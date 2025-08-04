@@ -4,12 +4,12 @@ import { type QueueEntry } from '../types';
 import { updateQueueEntry } from './queue-entry-actions.resource';
 import QueueEntryConfirmActionModal from './queue-entry-confirm-action.modal';
 
-interface EndQueueEntryModalProps {
+interface RemoveQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
 }
 
-const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+const RemoveQueueEntryModal: React.FC<RemoveQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const patient = queueEntry.display;
   const queue = queueEntry.queue.display;
@@ -24,7 +24,9 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('removePatientFromQueue', 'Remove patient from queue?'),
+        modalTitle: t('removePatientFromQueue', 'Remove {{patient}} from queue?', {
+          patient: queueEntry.display,
+        }),
         modalInstruction,
         submitButtonText: t('remove', 'Remove'),
         submitSuccessTitle: t('patientRemoved', 'Patient removed'),
@@ -35,9 +37,9 @@ const EndQueueEntryModal: React.FC<EndQueueEntryModalProps> = ({ queueEntry, clo
             endedAt: new Date().toISOString(),
           }),
       }}
-      isRemovingPatientFromQueue
+      showPatientName={false}
     />
   );
 };
 
-export default EndQueueEntryModal;
+export default RemoveQueueEntryModal;
