@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import MetricsCard from './metrics-card.component';
-import { updateSelectedService, useSelectedQueueLocationUuid, useSelectedService } from '../../helpers/helpers';
+import { updateSelectedService, useServiceQueuesStore } from '../../store/store';
 import { useServiceMetricsCount } from '../metrics.resource';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
 import useQueueServices from '../../hooks/useQueueService';
@@ -15,10 +15,9 @@ type ServiceListItem = Service | Concept;
 export default function WaitingPatientsExtension() {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const currentService = useSelectedService();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { selectedServiceUuid, selectedServiceDisplay, selectedQueueLocationUuid } = useServiceQueuesStore();
   const { services } = useQueueServices();
-  const { serviceCount } = useServiceMetricsCount(currentService?.serviceUuid, currentQueueLocation);
+  const { serviceCount } = useServiceMetricsCount(selectedServiceUuid, selectedQueueLocationUuid);
 
   const defaultServiceItem: Service = {
     display: `${t('all', 'All')}`,
@@ -27,12 +26,12 @@ export default function WaitingPatientsExtension() {
   const serviceItems: ServiceListItem[] = [defaultServiceItem, ...(services ?? [])];
 
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
-    return !currentService?.serviceDisplay || !currentService?.serviceUuid;
+    return !selectedServiceDisplay || !selectedServiceUuid;
   });
 
   const { totalCount, queueEntries } = useQueueEntries({
-    service: currentService?.serviceUuid,
-    location: currentQueueLocation,
+    service: selectedServiceUuid,
+    location: selectedQueueLocationUuid,
     isEnded: false,
   });
 
@@ -52,9 +51,9 @@ export default function WaitingPatientsExtension() {
     <MetricsCard
       headerLabel=""
       label={t('patients', 'Patients')}
-      locationUuid={currentQueueLocation}
-      service={currentService?.serviceDisplay}
-      serviceUuid={currentService?.serviceUuid}
+      locationUuid={selectedQueueLocationUuid}
+      service={selectedServiceDisplay}
+      serviceUuid={selectedServiceUuid}
       value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
       showUrgent={urgentCount > 0}
       urgentCount={urgentCount}>

@@ -11,13 +11,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { serviceQueuesPatientSearchWorkspace } from '../constants';
-import {
-  updateSelectedQueueStatus,
-  updateSelectedService,
-  useSelectedQueueLocationUuid,
-  useSelectedQueueStatus,
-  useSelectedService,
-} from '../helpers/helpers';
+import { updateSelectedQueueStatus, updateSelectedService, useServiceQueuesStore } from '../store/store';
 import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
@@ -28,10 +22,10 @@ import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
 
-function DefaultQueuePage() {
+function DefaultQueueTable() {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const selectedService = useSelectedService();
+  const { selectedServiceUuid } = useServiceQueuesStore();
   const [patientSearchQuery, setPatientSearchQuery] = useState('');
 
   const { isPatientSearchOpen, hidePatientSearch, showPatientSearch } = usePatientSearchVisibility();
@@ -42,7 +36,7 @@ function DefaultQueuePage() {
   }, [showPatientSearch]);
 
   return (
-    <div className={styles.defaultQueuePage}>
+    <div className={styles.defaultQueueTable}>
       <Layer className={styles.tableSection}>
         <div className={styles.headerContainer}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
@@ -71,7 +65,7 @@ function DefaultQueuePage() {
                 selectPatientAction: (selectedPatientUuid) => {
                   hidePatientSearch();
                   launchWorkspace(serviceQueuesPatientSearchWorkspace, {
-                    currentServiceQueueUuid: selectedService?.serviceUuid,
+                    currentServiceQueueUuid: selectedServiceUuid,
                     handleReturnToSearchList,
                     selectedPatientUuid,
                   });
@@ -91,19 +85,17 @@ function DefaultQueuePage() {
 function QueueTableSection() {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const selectedService = useSelectedService();
-  const currentLocationUuid = useSelectedQueueLocationUuid();
-  const selectedQueueStatus = useSelectedQueueStatus();
+  const { selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid } = useServiceQueuesStore();
   const [searchTerm, setSearchTerm] = useState('');
 
   const searchCriteria = useMemo(
     () => ({
-      service: selectedService?.serviceUuid,
-      location: currentLocationUuid,
+      service: selectedServiceUuid,
+      location: selectedQueueLocationUuid,
       isEnded: false,
-      status: selectedQueueStatus?.statusUuid,
+      status: selectedQueueStatusUuid,
     }),
-    [selectedService?.serviceUuid, currentLocationUuid, selectedQueueStatus?.statusUuid],
+    [selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid],
   );
 
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
@@ -170,7 +162,7 @@ function QueueDropdownFilter() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { services } = useQueueServices();
-  const selectedService = useSelectedService();
+  const { selectedServiceDisplay } = useServiceQueuesStore();
 
   const handleServiceChange = useCallback(({ selectedItem }) => {
     updateSelectedService(selectedItem.uuid, selectedItem?.display);
@@ -182,7 +174,7 @@ function QueueDropdownFilter() {
         id="serviceFilter"
         items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
         itemToString={(item) => (item ? item.display : '')}
-        label={selectedService?.serviceDisplay ?? t('all', 'All')}
+        label={selectedServiceDisplay ?? t('all', 'All')}
         onChange={handleServiceChange}
         size={isDesktop(layout) ? 'sm' : 'lg'}
         titleText={t('filterByService', 'Filter by service:')}
@@ -196,7 +188,7 @@ function StatusDropdownFilter() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { statuses } = useQueueStatuses();
-  const queueStatus = useSelectedQueueStatus();
+  const { selectedQueueStatusDisplay } = useServiceQueuesStore();
   const handleStatusChange = ({ selectedItem }) => {
     updateSelectedQueueStatus(selectedItem.uuid, selectedItem?.display);
   };
@@ -207,7 +199,7 @@ function StatusDropdownFilter() {
         id="statusFilter"
         items={[{ display: `${t('any', 'Any')}` }, ...(statuses ?? [])]}
         itemToString={(item) => (item ? item.display : '')}
-        label={queueStatus?.statusDisplay ?? t('all', 'All')}
+        label={selectedQueueStatusDisplay ?? t('all', 'All')}
         onChange={handleStatusChange}
         size={isDesktop(layout) ? 'sm' : 'lg'}
         titleText={t('showPatientsWithStatus', 'Show patients with status:')}
@@ -217,4 +209,4 @@ function StatusDropdownFilter() {
   );
 }
 
-export default DefaultQueuePage;
+export default DefaultQueueTable;
