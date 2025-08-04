@@ -26,7 +26,7 @@
   "emptyBed": "ცარიელი საწოლი",
   "emptyText": "ცარიელია",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "მიღების მოთხოვნის გაუქმების შეცდომა",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Error changing patient bed assignment",
   "errorConfiguringPatientCard": "პაციენტის ბარათის მორგების შეცდომა",
   "errorConfiguringPatientCardMessage": "Unable to find configuration for {{elementType}}, id: {{id}}",

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import styles from './queue-table-action-cell.scss';
 import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
+import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
 
 type ActionProps = {
   label: string;
@@ -15,7 +16,10 @@ type ActionProps = {
 };
 
 function useActionPropsByKey() {
-  const { defaultStatusConceptUuid } = useConfig<ConfigObject>().concepts;
+  const {
+    concepts: { defaultStatusConceptUuid },
+    visitQueueNumberAttributeUuid,
+  } = useConfig<ConfigObject>();
 
   // Map action strings to component props
   const actionPropsByKey: Record<QueueEntryAction, ActionProps> = useMemo(() => {
@@ -24,12 +28,20 @@ function useActionPropsByKey() {
         // t('call', 'Call'),
         label: 'call',
         text: 'Call',
-        onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('call-queue-entry-modal', {
-            closeModal: () => dispose(),
-            queueEntry,
-            size: 'sm',
-          });
+        onClick: async (queueEntry: QueueEntry) => {
+          const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
+          const callingQueueResponse = await serveQueueEntry(
+            mappedQueueEntry.queue.name,
+            mappedQueueEntry.visitQueueNumber,
+            'calling',
+          );
+          if (callingQueueResponse.ok) {
+            const dispose = showModal('call-queue-entry-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+              size: 'sm',
+            });
+          }
         },
         showIf: (queueEntry: QueueEntry) => {
           return queueEntry.status.uuid === defaultStatusConceptUuid;
@@ -116,7 +128,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [defaultStatusConceptUuid]);
+  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid]);
   return actionPropsByKey;
 }
 
