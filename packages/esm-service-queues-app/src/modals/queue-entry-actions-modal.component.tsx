@@ -27,6 +27,7 @@ import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './queue-entry-actions.scss';
 import classNames from 'classnames';
+import QueuePriority from '../queue-table/components/queue-priority.component';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -59,8 +60,14 @@ interface ModalParams {
   showStatusPicker: boolean;
 }
 
-// Modal for performing a queue entry action that requires additional form fields / inputs from user
-// Used by EditQueueEntryModal, MoveQueueEntryModal, and TransitionQueueEntryModal
+// This file has suffix .component.tsx and not .modal.tsx because it is not itself a modal;
+// rather it is a shared component that implements the UIs of a few different modals,
+// and is used by them.
+
+/**
+ * Modal for performing a queue entry action that requires additional form fields / inputs from user
+ * Used by EditQueueEntryModal, MoveQueueEntryModal, and TransitionQueueEntryModal
+ */
 export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   queueEntry,
   closeModal,
@@ -330,24 +337,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       key={uuid}
                       name={display}
                       labelText={
-                        <Tag
-                          className={classNames(styles.tag, {
-                            [styles.orange]: findPriorityIndex(uuid) === 1,
-                          })}
-                          role="radio"
-                          key={uuid}
-                          value={uuid}
-                          type={(() => {
-                            const index = findPriorityIndex(uuid);
-                            // TODO: fix priority colors. https://openmrs.atlassian.net/browse/O3-4469
-                            return index === 0 ? 'green' : index === 2 ? 'red' : '';
-                          })()}>
-                          {uuid === queueEntry.priority.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current)', {
-                                value: display,
-                              })
-                            : display}
-                        </Tag>
+                        <QueuePriority priority={{ uuid, display }} priorityConfigs={config.priorityConfigs} />
                       }
                       value={uuid}
                     />
