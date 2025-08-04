@@ -1,4 +1,4 @@
-import { Type, validator } from '@openmrs/esm-framework';
+import { type ConfigSchema, Type, validator } from '@openmrs/esm-framework';
 
 export interface ActiveVisitsConfigSchema {
   activeVisits: {
@@ -26,7 +26,7 @@ export interface AttributeDefinition {
   };
 }
 
-export const configSchema = {
+export const configSchema: ConfigSchema = {
   activeVisits: {
     identifiers: {
       _type: Type.Array,

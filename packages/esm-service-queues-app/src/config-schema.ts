@@ -1,4 +1,4 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { type ConfigSchema, Type, validator, validators } from '@openmrs/esm-framework';
 import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
@@ -87,7 +87,7 @@ export const defaultQueueTable: TableDefinitions = {
   appliedTo: [{ queue: '', status: '' }],
 };
 
-export const configSchema = {
+export const configSchema: ConfigSchema = {
   priorityConfigs: {
     _type: Type.Array,
     _default: defaultPriorityConfig,

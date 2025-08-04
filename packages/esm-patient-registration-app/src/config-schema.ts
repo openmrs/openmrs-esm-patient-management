@@ -1,4 +1,4 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { type ConfigSchema, Type, validator, validators } from '@openmrs/esm-framework';
 import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
@@ -111,7 +111,7 @@ export const builtInFields = [
   'dateAndTimeOfDeath',
 ] as const;
 
-export const esmPatientRegistrationSchema = {
+export const esmPatientRegistrationSchema: ConfigSchema = {
   sections: {
     _type: Type.Array,
     _default: ['demographics', 'contact', 'relationships'],

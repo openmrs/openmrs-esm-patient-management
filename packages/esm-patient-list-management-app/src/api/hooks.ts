@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
-import { type ConfigSchema } from '../config-schema';
+import { type PatientListManagementConfig } from '../config-schema';
 import {
   type CohortResponse,
   type CohortType,
@@ -25,7 +25,7 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     ['v', custom],
     ['totalCount', 'true'],
   ];
-  const config: ConfigSchema = useConfig();
+  const config: PatientListManagementConfig = useConfig();
 
   if (type === PatientListType.USER) {
     query.push(['cohortType', config.myListCohortTypeUUID]);
@@ -96,7 +96,7 @@ export function useAllPatientListMembers(patientListId: string) {
  * This is intended for displaying all lists to which a given patient can still be added.
  */
 export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: string) {
-  const config = useConfig() as ConfigSchema;
+  const config = useConfig() as PatientListManagementConfig;
   return useSWR(['patientListWithoutPatient', patientUuid], async () => {
     const [allLists, listsIdsOfThisPatient] = await Promise.all([
       getAllPatientLists({}, config?.myListCohortTypeUUID, config?.systemListCohortTypeUUID),

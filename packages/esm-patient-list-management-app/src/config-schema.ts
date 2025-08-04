@@ -1,6 +1,6 @@
-import { Type, validator } from '@openmrs/esm-framework';
+import { type ConfigSchema, Type, validator } from '@openmrs/esm-framework';
 
-export const configSchema = {
+export const configSchema: ConfigSchema = {
   myListCohortTypeUUID: {
     _type: Type.UUID,
     _default: 'e71857cb-33af-4f2c-86ab-7223bcfa37ad',
@@ -19,7 +19,7 @@ export const configSchema = {
   },
 };
 
-export interface ConfigSchema {
+export interface PatientListManagementConfig {
   myListCohortTypeUUID: string;
   systemListCohortTypeUUID: string;
   patientListsToShow: number;

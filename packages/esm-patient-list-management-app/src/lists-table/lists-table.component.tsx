@@ -29,7 +29,7 @@ import {
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
-import type { ConfigSchema } from '../config-schema';
+import type { PatientListManagementConfig } from '../config-schema';
 import type { PatientList } from '../api/types';
 import { starPatientList } from '../api/api-remote';
 import { CustomPagination } from './custom-pagination.component';
@@ -70,7 +70,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   const { t } = useTranslation();
   const id = useId();
   const layout = useLayoutType();
-  const config: ConfigSchema = useConfig();
+  const config: PatientListManagementConfig = useConfig();
   const pageSize = config.patientListsToShow ?? 10;
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const [searchTerm, setSearchTerm] = useState('');

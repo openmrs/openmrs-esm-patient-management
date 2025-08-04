@@ -1,6 +1,6 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
-export const esmHomeSchema = {
+export const configSchema: ConfigSchema = {
   leftNavMode: {
     _type: Type.String,
     _default: 'normal',
@@ -21,7 +21,7 @@ export const esmHomeSchema = {
   },
 };
 
-export interface ConfigSchema {
+export interface HomeConfig {
   leftNavMode: 'normal' | 'collapsed' | 'hidden';
   defaultDashboardPerRole: Record<string, string>;
 }
