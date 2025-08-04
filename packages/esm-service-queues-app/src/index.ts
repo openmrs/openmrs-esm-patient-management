@@ -67,14 +67,6 @@ export const metricsCardAverageWaitTime = getAsyncLifecycle(
   options,
 );
 
-export const addProviderToRoomModal = getAsyncLifecycle(
-  () => import('./admin/add-provider-queue-room-modal/add-provider-queue-room.modal'),
-  {
-    featureName: 'add provider queue room',
-    moduleName,
-  },
-);
-
 export const callQueueEntryModal = getAsyncLifecycle(() => import('./modals/call-modal/call-queue-entry.modal'), {
   featureName: 'call queue entry',
   moduleName,
