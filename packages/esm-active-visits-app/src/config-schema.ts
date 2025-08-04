@@ -1,4 +1,4 @@
-import { type ConfigSchema, Type, validator } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export interface ActiveVisitsConfigSchema {
   activeVisits: {

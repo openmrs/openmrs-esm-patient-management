@@ -1,4 +1,4 @@
-import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
 export const configSchema = {
   leftNavMode: {

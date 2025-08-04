@@ -1,4 +1,4 @@
-import { type ConfigSchema, Type, validator, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
