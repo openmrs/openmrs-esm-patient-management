@@ -10,7 +10,6 @@ import {
 } from '__mocks__';
 import React from 'react';
 import { renderWithSwr } from 'tools';
-import { useQueueRooms } from '../admin/add-provider-queue-room-modal/add-provider-queue-room.resource';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { useQueueEntries } from '../hooks/useQueueEntries';
@@ -19,7 +18,6 @@ import DefaultQueueTable from '../queue-table/default-queue-table.component';
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseQueueEntries = jest.mocked(useQueueEntries);
 const mockQueueLocations = jest.mocked(useQueueLocations);
-const mockUseQueueRooms = jest.mocked(useQueueRooms);
 const mockUseSession = jest.mocked(useSession);
 
 jest.mock('../hooks/useQueues', () => {
@@ -31,11 +29,6 @@ jest.mock('../hooks/useQueues', () => {
 jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
   ...jest.requireActual('../create-queue-entry/hooks/useQueueLocations'),
   useQueueLocations: jest.fn(),
-}));
-
-jest.mock('../admin/add-provider-queue-room-modal/add-provider-queue-room.resource', () => ({
-  ...jest.requireActual('../admin/add-provider-queue-room-modal/add-provider-queue-room.resource'),
-  useQueueRooms: jest.fn(),
 }));
 
 jest.mock('../hooks/useQueueEntries', () => ({
@@ -55,7 +48,6 @@ describe('DefaultQueueTable', () => {
 
   it('renders an empty state view if data is unavailable', async () => {
     mockQueueLocations.mockReturnValue({ queueLocations: [], isLoading: false, error: null });
-    mockUseQueueRooms.mockReturnValue({ rooms: [], isLoading: false, error: undefined });
     mockUseQueueEntries.mockReturnValue({
       queueEntries: [],
       isLoading: false,
@@ -80,7 +72,6 @@ describe('DefaultQueueTable', () => {
       isLoading: false,
       error: null,
     });
-    mockUseQueueRooms.mockReturnValue({ rooms: mockQueueRooms.data.results, isLoading: false, error: undefined });
     mockUseQueueEntries.mockReturnValue({
       queueEntries: mockQueueEntries,
       error: undefined,
