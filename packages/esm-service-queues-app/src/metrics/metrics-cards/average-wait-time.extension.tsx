@@ -2,12 +2,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import MetricsCard from './metrics-card.component';
 import { useAverageWaitTime } from '../metrics.resource';
-import { useSelectedService } from '../../helpers/helpers';
+import { useServiceQueuesStore } from '../../store/store';
 
 export default function AverageWaitTimeExtension() {
   const { t } = useTranslation();
-  const currentService = useSelectedService();
-  const { waitTime } = useAverageWaitTime(currentService?.serviceUuid, '');
+  const { selectedServiceUuid } = useServiceQueuesStore();
+  const { waitTime } = useAverageWaitTime(selectedServiceUuid, '');
 
   return (
     <MetricsCard

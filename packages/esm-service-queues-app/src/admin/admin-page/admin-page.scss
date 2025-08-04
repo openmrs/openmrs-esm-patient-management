@@ -30,22 +30,6 @@
   }
 }
 
-:global(.cds--data-table-container) {
-  background-color: var(--cds-layer);
-  border: 1px solid var(--cds-border-subtle);
-  border-radius: 4px;
-}
-
-:global(.cds--data-table-header) {
-  background-color: var(--cds-layer-accent);
-  color: var(--cds-text-primary);
-  font-weight: 600;
-}
-
-:global(.cds--data-table tbody tr:hover) {
-  background-color: var(--cds-layer-hover);
-}
-
 // Responsive adjustments
 @media (max-width: 768px) {
   .adminPage {

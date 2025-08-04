@@ -17,11 +17,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { postQueueEntry } from './queue-fields.resource';
-import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
+import { useServiceQueuesStore } from '../../store/store';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
@@ -52,7 +52,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
-  const { currentServiceQueueUuid } = useAddPatientToQueueContext();
+  const { selectedServiceUuid } = useServiceQueuesStore();
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const {
@@ -227,10 +227,10 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
 
   useEffect(() => {
     const service = getValues('queueService');
-    if (currentServiceQueueUuid && !service && !touchedFields.queueService) {
-      setValue('queueService', currentServiceQueueUuid, { shouldValidate: isDataLoaded });
+    if (selectedServiceUuid && !service && !touchedFields.queueService) {
+      setValue('queueService', selectedServiceUuid, { shouldValidate: isDataLoaded });
     }
-  }, [currentServiceQueueUuid, getValues, touchedFields.queueService, setValue, isDataLoaded]);
+  }, [selectedServiceUuid, getValues, touchedFields.queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
     if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService && queueLocation) {
@@ -273,6 +273,29 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
       clearErrors(['queueService', 'priority']);
     }
   }, [queueLocation, setValue, clearErrors]);
+
+// useEffect(() => {
+//   if (!control.getFieldState('queueService').isTouched) {
+//     if (selectedServiceUuid) {
+//       setValue('queueService', selectedServiceUuid, { shouldValidate: true });
+//     } else if (defaultInitialServiceQueue) {
+//       const initialServiceQueue = queues.find((q) => q.name === defaultInitialServiceQueue);
+//       setValue('queueService', initialServiceQueue?.uuid, { shouldValidate: true });
+//     }
+//   }
+// }, [defaultInitialServiceQueue, setValue, queues, selectedServiceUuid, control]);
+
+// useEffect(() => {
+//   if (
+//     !control.getFieldState('queueLocation').isTouched &&
+//     queueLocations.map((l) => l.id).includes(sessionLocation.uuid) &&
+//     queueLocation !== sessionLocation.uuid
+//   ) {
+//     setValue('queueLocation', sessionLocation.uuid, { shouldValidate: true });
+//   }
+// }, [queueLocations, sessionLocation.uuid, setValue, queueLocation, control]);
+
+
 
   return (
     /*
