@@ -167,6 +167,19 @@ export const patientBannerQueueEntryStatus = getAsyncLifecycle(
   },
 );
 
+export const queueScreenLink = getAsyncLifecycle(() => import('./queue-screen/queue-screen-link.extension'), {
+  featureName: 'queue-screen-link',
+  moduleName,
+});
+
+export const adminPageCardLink = getAsyncLifecycle(
+  () => import('./admin/admin-page-card-link/admin-page-card-link.extension'),
+  {
+    featureName: 'admin-page-card-link',
+    moduleName,
+  },
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
 
