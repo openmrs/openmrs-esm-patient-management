@@ -154,10 +154,12 @@ const ListsTable: React.FC<PatientListTableProps> = ({
       <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()} className={styles.tableContainer}>
+            {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
+
             <Table
               {...getTableProps()}
               className={styles.table}
-              data-testid="patientListsTable"
+              data-tutorial-target="patient-lists-table"
               isSortable
               useZebraStyles>
               <TableHead>
