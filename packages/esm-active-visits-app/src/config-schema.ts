@@ -26,7 +26,7 @@ export interface AttributeDefinition {
   };
 }
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   activeVisits: {
     identifiers: {
       _type: Type.Array,

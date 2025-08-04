@@ -87,7 +87,7 @@ export const defaultQueueTable: TableDefinitions = {
   appliedTo: [{ queue: '', status: '' }],
 };
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   priorityConfigs: {
     _type: Type.Array,
     _default: defaultPriorityConfig,

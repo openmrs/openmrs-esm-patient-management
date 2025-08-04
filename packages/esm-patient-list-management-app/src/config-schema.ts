@@ -1,6 +1,6 @@
 import { type ConfigSchema, Type, validator } from '@openmrs/esm-framework';
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   myListCohortTypeUUID: {
     _type: Type.UUID,
     _default: 'e71857cb-33af-4f2c-86ab-7223bcfa37ad',

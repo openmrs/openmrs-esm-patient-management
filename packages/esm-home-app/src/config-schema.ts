@@ -1,6 +1,6 @@
 import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   leftNavMode: {
     _type: Type.String,
     _default: 'normal',

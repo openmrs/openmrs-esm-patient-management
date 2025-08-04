@@ -111,7 +111,7 @@ export const builtInFields = [
   'dateAndTimeOfDeath',
 ] as const;
 
-export const esmPatientRegistrationSchema: ConfigSchema = {
+export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
     _default: ['demographics', 'contact', 'relationships'],

@@ -25,7 +25,7 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     ['v', custom],
     ['totalCount', 'true'],
   ];
-  const config: PatientListManagementConfig = useConfig();
+  const config = useConfig<PatientListManagementConfig>();
 
   if (type === PatientListType.USER) {
     query.push(['cohortType', config.myListCohortTypeUUID]);
@@ -96,7 +96,7 @@ export function useAllPatientListMembers(patientListId: string) {
  * This is intended for displaying all lists to which a given patient can still be added.
  */
 export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: string) {
-  const config = useConfig() as PatientListManagementConfig;
+  const config = useConfig<PatientListManagementConfig>();
   return useSWR(['patientListWithoutPatient', patientUuid], async () => {
     const [allLists, listsIdsOfThisPatient] = await Promise.all([
       getAllPatientLists({}, config?.myListCohortTypeUUID, config?.systemListCohortTypeUUID),

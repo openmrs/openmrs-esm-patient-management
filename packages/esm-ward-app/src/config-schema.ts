@@ -27,7 +27,7 @@ export const addressFields = [
 
 type AddressField = keyof typeof addressFields;
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   patientCardElements: {
     _description:
       'Configuration of various patient card elements. Each configured element must have a unique id, defined in the ward React component being used.',

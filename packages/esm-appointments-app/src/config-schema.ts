@@ -1,6 +1,6 @@
 import { type ConfigSchema, Type, validators } from '@openmrs/esm-framework';
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   allowAllDayAppointments: {
     _type: Type.Boolean,
     _default: false,

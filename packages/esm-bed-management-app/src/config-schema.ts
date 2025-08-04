@@ -1,6 +1,6 @@
 import { type ConfigSchema, Type } from '@openmrs/esm-framework';
 
-export const configSchema: ConfigSchema = {
+export const configSchema = {
   admissionLocationTagName: {
     _type: Type.String,
     _default: 'Admission Location',
