@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   type DefaultWorkspaceProps,
   ResponsiveWrapper,
@@ -15,7 +15,6 @@ import {
   InlineLoading,
   TextInput,
   NumberInput,
-  TextArea,
   Select,
   SelectItem,
   ComboBox,
@@ -27,10 +26,12 @@ import {
 import classNames from 'classnames';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import capitalize from 'lodash-es/capitalize';
 import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
 import { type InitialData } from '../../types';
-import { editBed, saveBed, useBedType } from './add-edit-bed.resource';
+import { editBed, saveBed, useBedType, useBedTagMappings } from './add-edit-bed.resource';
+
+const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
+type OccupancyStatus = (typeof OCCUPANCY_STATUSES)[number];
 
 type AddEditBedWorkspaceProps = DefaultWorkspaceProps & {
   bed?: InitialData;
@@ -50,10 +51,12 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   const session = useSession();
   const locationUuid = session?.sessionLocation?.uuid;
   const isTablet = useLayoutType() === 'tablet';
+  const isEditing = !!bed?.uuid;
 
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
   const { bedTags } = useBedTags();
+  const { bedTagMappings, isLoading: isLoadingBedTags } = useBedTagMappings(isEditing ? bed?.uuid : undefined);
 
   const numberInString = z.string().transform((val, ctx) => {
     const parsed = parseInt(val);
@@ -68,19 +71,16 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   });
 
   const bedFormSchema = z.object({
-    bedId: z
+    bedNumber: z
       .string()
-      .min(5, t('bedIdMinLength', 'Bed ID must be at least 5 characters'))
-      .max(255, t('bedIdMaxLength', 'Bed ID must not exceed 255 characters')),
-    description: z.string().max(255, t('descriptionMaxLength', 'Description must not exceed 255 characters')),
+      .min(1, t('bedNumberRequired', 'Bed number is required'))
+      .max(10, t('bedNumberMaxLength', 'Bed number must not exceed 10 characters')),
     bedRow: numberInString,
     bedColumn: numberInString,
     location: z
       .object({ display: z.string(), uuid: z.string() })
       .refine((value) => value.display !== '', t('selectValidLocation', 'Please select a valid location')),
-    occupancyStatus: z
-      .string()
-      .refine((value) => value !== '', t('selectValidOccupancyStatus', 'Please select a valid occupancy status')),
+    occupancyStatus: z.enum(['AVAILABLE', 'OCCUPIED']),
     bedType: z.string().refine((value) => value !== '', t('selectValidBedType', 'Please select a valid bed type')),
     bedTags: z
       .array(
@@ -106,81 +106,99 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
 
   const sessionLocation = allLocations.find((loc) => loc.uuid === locationUuid);
 
-  const defaultValues = bed
-    ? {
-        bedId: bed.bedNumber,
-        description: bed.description || '',
+  const getDefaultValues = useCallback(() => {
+    if (isEditing) {
+      return {
+        bedNumber: bed.bedNumber,
         bedRow: bed.row?.toString() || '1',
         bedColumn: bed.column?.toString() || '1',
         location: bed.location || { display: '', uuid: '' },
-        occupancyStatus: capitalize(bed.status) || 'Available',
+        occupancyStatus: (bed.status?.toUpperCase() as OccupancyStatus) || OCCUPANCY_STATUSES[0],
         bedType: bed.bedType?.name || '',
-        bedTags: bed.bedTags || [],
-      }
-    : {
-        bedId: '',
-        description: '',
-        bedRow: '1',
-        bedColumn: '1',
-        location: defaultLocation || sessionLocation || { display: '', uuid: '' },
-        occupancyStatus: 'Available',
-        bedType: '',
-        bedTags: [],
+        bedTags: bedTagMappings.length > 0 ? bedTagMappings : bed.bedTags || [],
       };
+    }
+    return {
+      bedNumber: '',
+      bedRow: '1',
+      bedColumn: '1',
+      location: defaultLocation || sessionLocation || { display: '', uuid: '' },
+      occupancyStatus: 'AVAILABLE' as OccupancyStatus,
+      bedType: '',
+      bedTags: [],
+    };
+  }, [
+    isEditing,
+    bed?.bedNumber,
+    bed?.row,
+    bed?.column,
+    bed?.location,
+    bed?.status,
+    bed?.bedType?.name,
+    bed?.bedTags,
+    bedTagMappings,
+    defaultLocation,
+    sessionLocation,
+  ]);
+
+  const defaultValues = getDefaultValues();
 
   const {
     handleSubmit,
     control,
+    reset,
     formState: { isSubmitting, isDirty, errors },
   } = useForm<BedFormType>({
     resolver: zodResolver(bedFormSchema),
     defaultValues: defaultValues,
   });
 
+  React.useEffect(() => {
+    if (isEditing && bedTagMappings.length > 0 && !isLoadingBedTags) {
+      const updatedDefaults = getDefaultValues();
+      reset(updatedDefaults);
+    }
+  }, [bedTagMappings, getDefaultValues, isLoadingBedTags, isEditing, reset]);
+
+  const createBedPayload = (data: BedFormType) => ({
+    ...(isEditing && { uuid: bed.uuid }),
+    bedNumber: data.bedNumber,
+    bedType: data.bedType,
+    status: data.occupancyStatus.toUpperCase(),
+    row: parseInt(data.bedRow.toString()),
+    column: parseInt(data.bedColumn.toString()),
+    locationUuid: data.location.uuid,
+    bedTag: (data.bedTags || []).map((tag) => ({
+      ...tag,
+      name: tag.name || '',
+    })),
+  });
+
+  const handleBedSubmission = async (bedPayload: any) => {
+    return isEditing ? await editBed({ bedPayload, bedNumber: bed.uuid }) : await saveBed({ bedPayload });
+  };
+
   const onSubmit = async (data: BedFormType) => {
-    const bedPayload = {
-      ...(bed?.uuid && { uuid: bed.uuid }),
-      bedNumber: data.bedId,
-      bedType: data.bedType,
-      description: data.description,
-      status: data.occupancyStatus.toUpperCase(),
-      row: parseInt(data.bedRow.toString()),
-      column: parseInt(data.bedColumn.toString()),
-      locationUuid: data.location.uuid,
-      bedTag: (data.bedTags || []).map((tag) => ({
-        ...tag,
-        name: tag.name || '',
-      })),
-    };
+    const bedPayload = createBedPayload(data);
 
     try {
-      let response;
+      await handleBedSubmission(bedPayload);
 
-      if (bed?.uuid) {
-        response = await editBed({
-          bedPayload,
-          bedId: bed.uuid,
-        });
-      } else {
-        response = await saveBed({ bedPayload });
-      }
+      showSnackbar({
+        title: t('success', 'Success'),
+        kind: 'success',
+        subtitle: isEditing ? t('bedUpdated', 'Bed updated successfully') : t('bedCreated', 'Bed created successfully'),
+      });
 
-      if (response.status === 201 || response.status === 200) {
-        showSnackbar({
-          title: t('success', 'Success'),
-          kind: 'success',
-          subtitle: bed?.uuid
-            ? t('bedUpdated', 'Bed updated successfully')
-            : t('bedCreated', 'Bed created successfully'),
-        });
-      }
       mutateBeds();
       closeWorkspaceWithSavedChanges();
     } catch (error: any) {
       showSnackbar({
         title: t('error', 'Error'),
         kind: 'error',
-        subtitle: error?.message ?? t('bedSaveError', 'Error saving bed'),
+        subtitle:
+          error?.message ??
+          (isEditing ? t('bedUpdateError', 'Error updating bed') : t('bedCreateError', 'Error creating bed')),
       });
     }
   };
@@ -196,35 +214,16 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
           <ResponsiveWrapper>
             <Controller
               control={control}
-              name="bedId"
+              name="bedNumber"
               render={({ field }) => (
                 <TextInput
-                  id="bedId"
-                  placeholder={t('bedIdPlaceholder', 'e.g. CHA-201')}
-                  labelText={t('bedId', 'Bed number')}
+                  id="bedNumber"
+                  placeholder={t('bedNumberPlaceholder', 'e.g. CHA-201')}
+                  labelText={t('bedNumber', 'Bed number')}
                   value={field.value}
                   onChange={field.onChange}
-                  invalid={!!errors.bedId?.message}
-                  invalidText={errors.bedId?.message}
-                />
-              )}
-            />
-          </ResponsiveWrapper>
-
-          <ResponsiveWrapper>
-            <Controller
-              control={control}
-              name="description"
-              render={({ field }) => (
-                <TextArea
-                  id="description"
-                  placeholder={t('descriptionPlaceholder', 'Enter bed description')}
-                  labelText={t('description', 'Description')}
-                  value={field.value}
-                  onChange={field.onChange}
-                  invalid={!!errors.description?.message}
-                  invalidText={errors.description?.message}
-                  rows={3}
+                  invalid={!!errors.bedNumber?.message}
+                  invalidText={errors.bedNumber?.message}
                 />
               )}
             />
@@ -312,7 +311,11 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                   invalidText={errors.occupancyStatus?.message}>
                   <SelectItem text={t('selectOccupancyStatus', 'Select occupancy status')} value="" />
                   {occupancyStatuses.map((status, index) => (
-                    <SelectItem key={`occupancy-${index}`} text={t(status.toLowerCase(), status)} value={status} />
+                    <SelectItem
+                      key={`occupancy-${index}`}
+                      text={t(status.toLowerCase(), status)}
+                      value={status.toUpperCase()}
+                    />
                   ))}
                 </Select>
               )}
@@ -344,36 +347,45 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
             <Controller
               control={control}
               name="bedTags"
-              render={({ field: { onChange, value } }) => (
-                <div>
-                  <MultiSelect
-                    id="bedTags"
-                    titleText={t('bedTags', 'Bed Tags')}
-                    label={t('selectBedTags', 'Select bed tags')}
-                    items={availableBedTags}
-                    itemToString={(item) => item?.name ?? ''}
-                    selectedItems={value || []}
-                    onChange={({ selectedItems }) => onChange(selectedItems)}
-                    invalid={!!errors.bedTags?.message}
-                    invalidText={errors.bedTags?.message}
-                  />
-                  {value && value.length > 0 && (
-                    <div className={styles.tagContainer}>
-                      {value.map((tag, index) => (
-                        <Tag
-                          key={tag.uuid || tag.id || index}
-                          type="blue"
-                          onClose={() => {
-                            const updatedTags = value.filter((_, i) => i !== index);
-                            onChange(updatedTags);
-                          }}>
-                          {tag.name}
-                        </Tag>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+              render={({ field: { onChange, value } }) => {
+                const selectedItems = (value || [])
+                  .map((tag) => {
+                    const fullTag = availableBedTags.find((t) => t.uuid === tag.uuid || t.name === tag.name);
+                    return fullTag || tag;
+                  })
+                  .filter(Boolean);
+
+                return (
+                  <div>
+                    <MultiSelect
+                      id="bedTags"
+                      titleText={t('bedTags', 'Bed Tags')}
+                      label={t('selectBedTags', 'Select bed tags')}
+                      items={availableBedTags}
+                      itemToString={(item) => item?.name ?? ''}
+                      selectedItems={selectedItems}
+                      onChange={({ selectedItems }) => onChange(selectedItems)}
+                      invalid={!!errors.bedTags?.message}
+                      invalidText={errors.bedTags?.message}
+                    />
+                    {selectedItems && selectedItems.length > 0 && (
+                      <div className={styles.tagContainer}>
+                        {selectedItems.map((tag, index) => (
+                          <Tag
+                            key={tag.uuid || tag.id || index}
+                            type="blue"
+                            onClose={() => {
+                              const updatedTags = selectedItems.filter((_, i) => i !== index);
+                              onChange(updatedTags);
+                            }}>
+                            {tag.name}
+                          </Tag>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }}
             />
           </ResponsiveWrapper>
         </Stack>
