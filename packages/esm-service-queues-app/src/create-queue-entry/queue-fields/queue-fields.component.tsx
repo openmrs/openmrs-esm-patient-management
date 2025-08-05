@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   FormGroup,
   InlineNotification,
@@ -49,8 +49,13 @@ const createQueueServiceSchema = (t: TFunction) =>
 
 const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: QueueFieldsProps) => {
   const { t } = useTranslation();
-  const schema = React.useMemo(() => createQueueServiceSchema(t), [t]);
+  const schema = useMemo(() => createQueueServiceSchema(t), [t]);
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const memoizedQueueLocations = useMemo(
+    () => queueLocations,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(queueLocations.map((l) => ({ id: l.id, name: l.name })))],
+  );
   const { sessionLocation } = useSession();
   const {
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
@@ -68,7 +73,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   } = useForm({
     defaultValues: {
       priority: defaultPriorityConceptUuid,
-      queueLocation: queueLocations[0]?.id || '',
+      queueLocation: memoizedQueueLocations[0]?.id || '',
       queueService: '',
     },
     mode: 'onChange',
@@ -78,7 +83,13 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const queueLocation = watch('queueLocation');
   const queueService = watch('queueService');
   const priority = watch('priority');
+
   const { queues, isLoading: isLoadingQueues } = useQueues(queueLocation);
+  const memoizedQueues = useMemo(
+    () => queues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(queues.map((q) => ({ uuid: q.uuid, name: q.name })))],
+  );
   const priorities = queues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
 
@@ -147,16 +158,16 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
 
   useEffect(() => {
     if (defaultInitialServiceQueue) {
-      const initialServiceQueue = queues.find((q) => q.name === defaultInitialServiceQueue);
+      const initialServiceQueue = memoizedQueues.find((queue) => queue.name === defaultInitialServiceQueue);
       setValue('queueService', initialServiceQueue?.uuid, { shouldValidate: true });
     }
-  }, [defaultInitialServiceQueue, setValue, queues]);
+  }, [defaultInitialServiceQueue, memoizedQueues, setValue]);
 
   useEffect(() => {
-    if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
+    if (memoizedQueueLocations.map((location) => location.id).includes(sessionLocation.uuid)) {
       setValue('queueLocation', sessionLocation.uuid, { shouldValidate: true });
     }
-  }, [queueLocations, sessionLocation.uuid, setValue]);
+  }, [memoizedQueueLocations, sessionLocation.uuid, setValue]);
 
   return (
     /*
@@ -184,7 +195,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   invalidText={errors.queueLocation?.message}
                   onChange={(event) => field.onChange(event.target.value)}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                  {queueLocations?.map((location) => (
+                  {memoizedQueueLocations?.map((location) => (
                     <SelectItem key={location.id} text={location.name} value={location.id}>
                       {location.name}
                     </SelectItem>
