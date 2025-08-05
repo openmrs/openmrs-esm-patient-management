@@ -47,6 +47,7 @@
   "edit": "Edit",
   "editQueueEntry": "Edit queue entry",
   "editQueueEntryForPatient": "Edit queue entry for {{patient}}",
+  "encounters": "Encounters",
   "encounterType": "Encounter type",
   "endAgeRangeInvalid": "End age range is not valid",
   "endDate": "End date",

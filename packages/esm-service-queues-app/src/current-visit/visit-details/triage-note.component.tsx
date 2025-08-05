@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { Button, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { type DiagnosisItem, type Note } from '../../types/index';
