@@ -15,7 +15,7 @@ const options = {
   featureName: 'ward',
   moduleName,
 };
-const swrRefreshInternalMs = 60000; // milliseconds
+const swrRefreshIntervalInMs = 60000;
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
@@ -119,7 +119,7 @@ export const defaultWardView = getAsyncLifecycle(() => import('./ward-view/defau
   featureName: 'default-ward-view',
   moduleName,
   swrConfig: {
-    refreshInterval: swrRefreshInternalMs,
+    refreshInterval: swrRefreshIntervalInMs,
   },
 });
 
@@ -129,7 +129,7 @@ export const maternalWardView = getAsyncLifecycle(
     featureName: 'maternal-ward-view',
     moduleName,
     swrConfig: {
-      refreshInterval: swrRefreshInternalMs,
+      refreshInterval: swrRefreshIntervalInMs,
     },
   },
 );

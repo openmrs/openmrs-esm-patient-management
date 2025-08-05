@@ -6,7 +6,7 @@ import { dashboardMeta } from './dashboard.meta';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-service-queues-app';
-const swrRefreshInternalMs = 60000; // milliseconds
+const swrRefreshIntervalInMs = 60000;
 
 const options = {
   featureName: 'service-queues',
@@ -17,7 +17,7 @@ export const root = getAsyncLifecycle(() => import('./root.component'), {
   featureName: 'service-queues-app-root',
   moduleName,
   swrConfig: {
-    refreshInterval: swrRefreshInternalMs,
+    refreshInterval: swrRefreshIntervalInMs,
   },
 });
 
@@ -29,7 +29,7 @@ export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/qu
   featureName: 'queue-table-by-status-view',
   moduleName,
   swrConfig: {
-    refreshInterval: swrRefreshInternalMs,
+    refreshInterval: swrRefreshIntervalInMs,
   },
 });
 
