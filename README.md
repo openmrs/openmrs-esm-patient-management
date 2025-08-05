@@ -1,4 +1,4 @@
-:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher: 
+:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.atlassian.net/wiki/x/IABBHg). You may find the [Map of the Project](https://openmrs.atlassian.net/wiki/x/MgBuHg) especially helpful.* :teacher:
 
 ![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-management/actions/workflows/ci.yml/badge.svg)
 
@@ -9,6 +9,7 @@ This repository contains frontend modules for O3. These modules relate to regist
 - [Active visits app](packages/esm-active-visits-app/)
 - [Appointments app](packages/esm-appointments-app/)
 - [Bed management](packages/esm-bed-management-app/)
+- [Home page](packages/esm-home-app/)
 - [Patient list management](packages/esm-patient-list-management-app)
 - [Patient registration](packages/esm-patient-registration-app)
 - [Patient search](packages/esm-patient-search-app)
@@ -17,7 +18,7 @@ This repository contains frontend modules for O3. These modules relate to regist
 
 ## Setup
 
-Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
+Check out the developer documentation [in the Wiki](https://openmrs.atlassian.net/wiki/x/IABBHg).
 
 This monorepo uses [yarn](https://yarnpkg.com).
 
@@ -78,7 +79,7 @@ yarn
 
 ## Contributing
 
-Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/contributing) guide.
+Please read our [contributing](https://openmrs.atlassian.net/wiki/x/xAL-C) guide.
 
 ## Running tests
 
@@ -148,7 +149,7 @@ Then, in a separate terminal, run:
 yarn test-e2e --headed
 ```
 
-Please read [our E2E testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/end-to-end-testing) for more information about E2E testing.
+Please read [our E2E testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) for more information about E2E testing.
 
 ### Updating Playwright
 
@@ -198,4 +199,3 @@ yarn up @openmrs/esm-patient-common-lib
 git checkout package.json
 yarn
 ```
-

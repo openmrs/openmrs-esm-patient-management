@@ -81,9 +81,9 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
       <ModalBody>
         {showPatientName ? (
           <Stack gap={4}>
-          <h5>{queueEntry.display}</h5>
-          <span>{modalInstruction}</span>
-        </Stack>
+            <h5>{queueEntry.display}</h5>
+            <span>{modalInstruction}</span>
+          </Stack>
         ) : (
           <p>{modalInstruction}</p>
         )}
