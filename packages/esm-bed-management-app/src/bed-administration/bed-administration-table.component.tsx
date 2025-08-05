@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -29,6 +29,15 @@ import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import styles from './bed-administration-table.scss';
+import { type Bed } from '../types';
+
+type WorkspaceMode = 'add' | 'edit';
+
+interface BedWorkspaceConfig {
+  workspaceTitle: string;
+  bed?: Bed;
+  mutateBeds: () => void;
+}
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -65,21 +74,32 @@ const BedAdministrationTable: React.FC = () => {
     );
   }
 
+  const handleBedWorkspace = useCallback(
+    (mode: WorkspaceMode, bed?: any) => {
+      const config: BedWorkspaceConfig = {
+        workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
+        mutateBeds: mutateBedsGroupedByLocation,
+      };
+
+      if (mode === 'edit' && bed) {
+        config.bed = bed;
+      }
+
+      launchWorkspace('add-edit-bed-workspace', config);
+    },
+    [t, mutateBedsGroupedByLocation],
+  );
+
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
+
   const filteredData = useMemo(() => {
     const flattenedData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
     return filterOption === 'ALL' ? flattenedData : flattenedData.filter((bed) => bed.status === filterOption);
   }, [bedsGroupedByLocation, filterOption]);
+
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, currentPage, goTo } = usePagination(filteredData, pageSize);
-
-  const handleAddBedWorkspace = () => {
-    launchWorkspace('add-edit-bed-workspace', {
-      workspaceTitle: t('addBed', 'Add bed'),
-      mutateBeds: mutateBedsGroupedByLocation,
-    });
-  };
 
   const tableHeaders = [
     {
@@ -112,27 +132,19 @@ const BedAdministrationTable: React.FC = () => {
       occupancyStatus: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
-        <>
-          <Button
-            enterDelayMs={300}
-            renderIcon={Edit}
-            onClick={() => {
-              launchWorkspace('add-edit-bed-workspace', {
-                workspaceTitle: t('editBed', 'Edit bed'),
-                bed,
-                mutateBeds: mutateBedsGroupedByLocation,
-              });
-            }}
-            kind={'ghost'}
-            iconDescription={t('editBed', 'Edit bed')}
-            hasIconOnly
-            size={responsiveSize}
-            tooltipPosition="right"
-          />
-        </>
+        <Button
+          enterDelayMs={300}
+          renderIcon={Edit}
+          onClick={() => handleBedWorkspace('edit', bed)}
+          kind={'ghost'}
+          iconDescription={t('editBed', 'Edit bed')}
+          hasIconOnly
+          size={responsiveSize}
+          tooltipPosition="right"
+        />
       ),
     }));
-  }, [mutateBedsGroupedByLocation, responsiveSize, paginatedData, t]);
+  }, [handleBedWorkspace, responsiveSize, paginatedData, t]);
 
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
@@ -180,7 +192,10 @@ const BedAdministrationTable: React.FC = () => {
               </div>
             ) : null}
             {paginatedData?.length ? (
-              <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddBedWorkspace}>
+              <Button
+                kind="ghost"
+                renderIcon={(props) => <Add size={16} {...props} />}
+                onClick={() => handleBedWorkspace('add')}>
                 {t('addBed', 'Add bed')}
               </Button>
             ) : null}
@@ -192,8 +207,8 @@ const BedAdministrationTable: React.FC = () => {
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader>{header.header?.content ?? header.header}</TableHeader>
+                    {headers.map((header, index) => (
+                      <TableHeader key={`header-${index}`}>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -219,7 +234,7 @@ const BedAdministrationTable: React.FC = () => {
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={handleAddBedWorkspace}>
+                      onClick={() => handleBedWorkspace('add')}>
                       {t('addBed', 'Add bed')}
                     </Button>
                   </Tile>
