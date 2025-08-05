@@ -131,7 +131,6 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   const {
     handleSubmit,
     control,
-    watch,
     formState: { isSubmitting, isDirty, errors },
   } = useForm<BedFormType>({
     resolver: zodResolver(bedFormSchema),
