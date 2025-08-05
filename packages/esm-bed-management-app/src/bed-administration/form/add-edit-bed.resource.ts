@@ -27,7 +27,7 @@ export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): P
     },
   });
 
-  if (response.status === 201 && bedPayload.bedTag && bedPayload.bedTag.length > 0) {
+  if (bedPayload.bedTag && bedPayload.bedTag.length > 0) {
     const bedUuid = response.data.uuid;
     await createBedTagMappings(bedUuid, bedPayload.bedTag);
   }
@@ -37,12 +37,12 @@ export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): P
 
 export async function editBed({
   bedPayload,
-  bedId,
+  bedNumber,
 }: {
   bedPayload: BedPostPayload;
-  bedId: string;
+  bedNumber: string;
 }): Promise<FetchResponse<BedForm>> {
-  const response = await openmrsFetch(`${restBaseUrl}/bed/${bedId}`, {
+  const response = await openmrsFetch(`${restBaseUrl}/bed/${bedNumber}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: {
@@ -56,9 +56,7 @@ export async function editBed({
     },
   });
 
-  if (response.status === 200 || response.status === 201) {
-    await updateBedTagMappings(bedId, bedPayload.bedTag || []);
-  }
+  await updateBedTagMappings(bedNumber, bedPayload.bedTag || []);
 
   return response;
 }
@@ -78,7 +76,78 @@ async function createBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise
 }
 
 async function updateBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise<void> {
-  await createBedTagMappings(bedUuid, bedTags);
+  try {
+    const existingMappingsResponse = await openmrsFetch(`${restBaseUrl}/admissionLocation?v=full`);
+    const allBeds = existingMappingsResponse.data?.results?.flatMap((location) => location.bedLayouts || []) || [];
+    const targetBed = allBeds.find((bed) => bed.bedUuid === bedUuid);
+    const existingMappings = targetBed?.bedTagMaps || [];
+
+    if (existingMappings.length > 0) {
+      const deletePromises = existingMappings.map((mapping) =>
+        openmrsFetch(`${restBaseUrl}/bedTagMap/${mapping.uuid}`, {
+          method: 'DELETE',
+        }),
+      );
+      await Promise.all(deletePromises);
+    }
+
+    if (bedTags.length > 0) {
+      await createBedTagMappings(bedUuid, bedTags);
+    }
+  } catch (error) {
+    if (error?.message?.includes?.('Tag Already Present')) {
+      throw error;
+    }
+    if (bedTags.length > 0) {
+      await createBedTagMappings(bedUuid, bedTags);
+    }
+  }
+}
+
+export async function getBedTagMappings(bedUuid: string): Promise<BedTag[]> {
+  try {
+    const response = await openmrsFetch(`${restBaseUrl}/admissionLocation?v=full`);
+    const locations = response.data?.results || [];
+
+    for (const location of locations) {
+      if (location.bedLayouts) {
+        for (const bedLayout of location.bedLayouts) {
+          if (bedLayout.bedUuid === bedUuid) {
+            return (
+              bedLayout.bedTagMaps?.map((tagMap: any) => ({
+                uuid: tagMap.bedTag?.uuid,
+                id: tagMap.bedTag?.uuid,
+                name: tagMap.bedTag?.name,
+              })) || []
+            );
+          }
+        }
+      }
+    }
+
+    return [];
+  } catch (error) {
+    throw new Error(`Failed to fetch bed tag mappings for bed UUID ${bedUuid}: ${error.message}`);
+  }
+}
+
+export function useBedTagMappings(bedUuid?: string) {
+  const shouldFetch = !!bedUuid;
+
+  const { data, error, isLoading } = useSWR<BedTag[]>(
+    shouldFetch ? `bedTagMappings-${bedUuid}` : null,
+    () => getBedTagMappings(bedUuid!),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+
+  return {
+    bedTagMappings: data || [],
+    isLoading: shouldFetch ? isLoading : false,
+    error: shouldFetch ? error : null,
+  };
 }
 
 export function useBedType() {
