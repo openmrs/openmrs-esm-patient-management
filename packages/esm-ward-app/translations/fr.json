@@ -26,7 +26,7 @@
   "emptyBed": "Lit vide",
   "emptyText": "Vide",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "Erreur d'annulation de la demande d'admission",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Erreur de changement de lit",
   "errorConfiguringPatientCard": "Erreur de configuration de la carte patient",
   "errorConfiguringPatientCardMessage": "Impossible de trouver une configuration pour {{elementType}}, id: {{id}}",

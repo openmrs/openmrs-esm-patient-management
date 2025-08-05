@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
+import { type ConfigObject } from '../../config-schema';
 
 interface AddPatientToQueueModalProps {
   modalTitle: string;
@@ -14,6 +15,7 @@ interface AddPatientToQueueModalProps {
 const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, activeVisit, closeModal }) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const config = useConfig<ConfigObject>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [callback, setCallback] = useState<{
@@ -50,7 +52,10 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
     <Form onSubmit={handleSubmit}>
       <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
-        <QueueFields setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })} />
+        <QueueFields
+          setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })}
+          defaultInitialServiceQueue={config.defaultInitialServiceQueue}
+        />
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>

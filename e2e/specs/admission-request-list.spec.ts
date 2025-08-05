@@ -3,7 +3,7 @@ import { test } from '../core';
 import { PatientChartPage } from '../pages';
 import { endVisit, startVisit, changeToWardLocation, generateRandomPatient, deletePatient } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient } from '../types';
+import { type Patient } from '../commands/types';
 
 let visit: Visit;
 let wardPatient: Patient;

@@ -3338,7 +3338,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-framework@npm:6.3.1-pre.3236, @openmrs/esm-framework@npm:^6.3.1-pre.3236":
+"@openmrs/esm-framework@npm:6.3.1-pre.3236, @openmrs/esm-framework@npm:next":
   version: 6.3.1-pre.3236
   resolution: "@openmrs/esm-framework@npm:6.3.1-pre.3236"
   dependencies:
@@ -3427,8 +3427,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/esm-patient-common-lib@npm:next":
-  version: 10.2.1-pre.8303
-  resolution: "@openmrs/esm-patient-common-lib@npm:10.2.1-pre.8303"
+  version: 10.2.1-pre.8445
+  resolution: "@openmrs/esm-patient-common-lib@npm:10.2.1-pre.8445"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     lodash-es: "npm:^4.17.21"
@@ -3437,7 +3437,7 @@ __metadata:
     "@openmrs/esm-framework": 6.x
     react: 18.x
     single-spa: 6.x
-  checksum: 10/a78399a4a436bd7f9daa0afd3434e2b7788e48b687b04c071df57d3a378708f9d73b16d0379eee63b1d143dc0e3be9ea9e1a3cae617b2c598806fb53f19b58d6
+  checksum: 10/4324ed100ecbb23cfb065dc61acc9c04a911fd7bc643c1bbf11902791d667df2828d1434ceab4fe9083f9db223c24bb791710dc8cd542499152ebf52bab5c644
   languageName: node
   linkType: hard
 
@@ -3467,7 +3467,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.11.6"
     "@carbon/react": "npm:^1.83.0"
-    "@openmrs/esm-framework": "npm:^6.3.1-pre.3236"
+    "@openmrs/esm-framework": "npm:next"
     "@playwright/test": "npm:^1.53.2"
     "@swc/core": "npm:^1.2.165"
     "@swc/jest": "npm:^0.2.29"
@@ -3505,7 +3505,7 @@ __metadata:
     jest-cli: "npm:^29.7.0"
     jest-environment-jsdom: "npm:^29.7.0"
     lint-staged: "npm:^15.2.1"
-    openmrs: "npm:^6.3.1-pre.3236"
+    openmrs: "npm:next"
     prettier: "npm:^3.1.1"
     react: "npm:^18.1.0"
     react-dom: "npm:^18.1.0"
@@ -15836,7 +15836,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openmrs@npm:^6.3.1-pre.3236":
+"openmrs@npm:next":
   version: 6.3.1-pre.3236
   resolution: "openmrs@npm:6.3.1-pre.3236"
   dependencies:

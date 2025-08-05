@@ -1,6 +1,6 @@
+import React, { type ReactNode } from 'react';
 import { getPatientName, launchWorkspaceGroup } from '@openmrs/esm-framework';
 import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
-import React, { type ReactNode } from 'react';
 import { type WardPatient } from '../types';
 import styles from './ward-patient-card.scss';
 
@@ -41,7 +41,6 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
             },
           });
         }}>
-        {/* Name will not be displayed; just there for a11y */}
         {getPatientName(patient.person)}
       </button>
     </div>

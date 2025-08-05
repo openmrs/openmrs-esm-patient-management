@@ -20,7 +20,6 @@ const configWithCustomColumns = {
         config: {
           identifierType: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
           identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
-          priorityConfigs: [],
           statusConfigs: [],
           visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
         },
@@ -167,6 +166,18 @@ describe('QueueTable', () => {
   it('supports custom styles for priority tags at column level', () => {
     mockUseConfig.mockReturnValue({
       ...configDefaults,
+      priorityConfigs: [
+        {
+          conceptUuid: mockPriorityNonUrgent.uuid,
+          color: 'blue',
+          style: 'bold',
+        },
+        {
+          conceptUuid: mockPriorityUrgent.uuid,
+          color: 'orange',
+          style: null,
+        },
+      ],
       queueTables: {
         columnDefinitions: [
           {
@@ -177,18 +188,6 @@ describe('QueueTable', () => {
                 overflowMenu: ['edit', 'remove', 'undo'],
               },
               identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
-              priorityConfigs: [
-                {
-                  conceptUuid: mockPriorityNonUrgent.uuid,
-                  color: 'blue',
-                  style: 'bold',
-                },
-                {
-                  conceptUuid: mockPriorityUrgent.uuid,
-                  color: 'orange',
-                  style: null,
-                },
-              ],
               statusConfigs: [],
               visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
             },

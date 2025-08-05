@@ -4,12 +4,12 @@ import { type QueueEntry } from '../types';
 import { voidQueueEntry } from './queue-entry-actions.resource';
 import QueueEntryConfirmActionModal from './queue-entry-confirm-action.modal';
 
-interface VoidQueueEntryModalProps {
+interface DeleteQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
 }
 
-const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+const DeleteQueueEntryModal: React.FC<DeleteQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
 
   const modalInstruction = <p>{t('confirmDeleteQueueEntry', 'Are you sure you want to delete this queue entry?')}</p>;
@@ -18,8 +18,11 @@ const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, c
     <QueueEntryConfirmActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
+      showPatientName={false}
       modalParams={{
-        modalTitle: t('deleteQueueEntry', 'Delete queue entry'),
+        modalTitle: t('deleteQueueEntryForPatient', 'Delete queue entry for {{patient}}', {
+          patient: queueEntry.display,
+        }),
         modalInstruction,
         submitButtonText: t('deleteQueueEntry', 'Delete queue entry'),
         submitSuccessTitle: t('queueEntryDeleteSuccessful', 'Queue entry deleted successfully'),
@@ -31,4 +34,4 @@ const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, c
   );
 };
 
-export default VoidQueueEntryModal;
+export default DeleteQueueEntryModal;
