@@ -15,6 +15,7 @@ const options = {
   featureName: 'ward',
   moduleName,
 };
+const swrRefreshInternalMs = 60000; // milliseconds
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
@@ -114,14 +115,23 @@ export const createAdmissionEncounterWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const defaultWardView = getAsyncLifecycle(
-  () => import('./ward-view/default-ward/default-ward-view.component'),
-  options,
-);
+export const defaultWardView = getAsyncLifecycle(() => import('./ward-view/default-ward/default-ward-view.component'), {
+  featureName: 'default-ward-view',
+  moduleName,
+  swrConfig: {
+    refreshInterval: swrRefreshInternalMs,
+  },
+});
 
 export const maternalWardView = getAsyncLifecycle(
   () => import('./ward-view/materal-ward/maternal-ward-view.component'),
-  options,
+  {
+    featureName: 'maternal-ward-view',
+    moduleName,
+    swrConfig: {
+      refreshInterval: swrRefreshInternalMs,
+    },
+  },
 );
 
 export const wardPatientWorkspaceBanner = getAsyncLifecycle(
