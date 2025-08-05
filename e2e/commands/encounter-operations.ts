@@ -1,7 +1,6 @@
-import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
-import { type Encounter } from '../types';
-import { type Visit } from '@openmrs/esm-framework';
+import { type APIRequestContext, expect } from '@playwright/test';
+import { type Encounter } from './types';
 
 export const createEncounter = async (
   api: APIRequestContext,
@@ -36,7 +35,7 @@ export const createEncounter = async (
       obs: observations,
     },
   });
-  await expect(encounterRes.ok()).toBeTruthy();
+  expect(encounterRes.ok()).toBeTruthy();
   return await encounterRes.json();
 };
 
@@ -88,12 +87,12 @@ export const generateWardAdmission = async (
       },
     },
   );
-  await expect(formRes.ok()).toBeTruthy();
+  expect(formRes.ok()).toBeTruthy();
   const encounter = await formRes.json();
   return encounter;
 };
 
-export const inWardAdmission = async (
+export const createBedAssignmentEncounter = async (
   api: APIRequestContext,
   providerId: string,
   patientId: string,
@@ -114,10 +113,11 @@ export const inWardAdmission = async (
       visit: visit,
     },
   });
-  await expect(formRes.ok()).toBeTruthy();
+  expect(formRes.ok()).toBeTruthy();
   const encounter = await formRes.json();
   return encounter;
 };
+
 export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
   await api.delete(`encounter/${uuid}`, { data: {} });
 };

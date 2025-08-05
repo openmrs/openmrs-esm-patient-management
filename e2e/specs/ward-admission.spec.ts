@@ -11,7 +11,7 @@ import {
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
-import { deleteBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
+import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
 let bed: Bed;
@@ -20,7 +20,7 @@ let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
+test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
@@ -30,9 +30,9 @@ test.beforeEach(async ({ api, page }) => {
   await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
-test('Cancel an admission request', async ({ page }) => {
-  const wardPage = new WardPage(page);
+test('Admit a patient to a ward from the admission requests list', async ({ page }) => {
   const fullName = wardPatient.person?.display;
+  const wardPage = new WardPage(page);
 
   await test.step('When I visit the patient ward page', async () => {
     await wardPage.goTo();
@@ -42,34 +42,31 @@ test('Cancel an admission request', async ({ page }) => {
     await wardPage.clickManageAdmissionRequests();
   });
 
-  await test.step('Then I should see a pending admission request for the patient', async () => {
+  await test.step('Then I verify the patient is listed in admission requests', async () => {
     await expect(page.getByText(fullName)).toBeVisible();
   });
 
-  await test.step('And when I click the "Cancel" button to cancel the request', async () => {
-    await wardPage.clickCancelButton();
+  await test.step('And I click the "Admit patient" button for the patient', async () => {
+    await page.getByRole('button', { name: 'Admit patient' }).first().click();
   });
 
-  await test.step('Then I should see the "Cancel admission request" form launched in the workspace', async () => {
-    await expect(wardPage.cancelAdmissionRequestHeading()).toBeVisible();
-    await expect(wardPage.clinicalNotesField()).toBeVisible();
+  await test.step('And I select the bed for admission', async () => {
+    await page.getByText(`${bed.bedNumber} · Empty`).click();
   });
 
-  await test.step('And I enter a reason for cancellation in the "Clinical notes" field', async () => {
-    await wardPage.clinicalNotesField().fill('This patient admission is being cancelled');
+  await test.step('And I confirm admission by clicking "Admit"', async () => {
+    await page.getByRole('button', { name: 'Admit' }).click();
   });
 
-  await test.step('And I click the "Save" button to submit the form', async () => {
-    await wardPage.clickSaveButton();
-  });
-
-  await test.step('Then I should see a success notification confirming the admission was cancelled', async () => {
-    await wardPage.expectAdmissionRequestCancelled();
+  await test.step('Then I should see a success message confirming the admission success', async () => {
+    await expect(
+      page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
+    ).toBeVisible();
   });
 });
 
 test.afterEach(async ({ api }) => {
-  await deleteBed(api, bed);
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);

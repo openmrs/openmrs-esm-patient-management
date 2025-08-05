@@ -75,6 +75,11 @@ export const moveQueueEntryModal = getAsyncLifecycle(() => import('./modals/move
   moduleName,
 });
 
+export const transitionQueueEntryModal = getAsyncLifecycle(() => import('./modals/transition-queue-entry.modal'), {
+  featureName: 'transition queue entry',
+  moduleName,
+});
+
 export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit-queue-entry.modal'), {
   featureName: 'edit queue entry of a patient',
   moduleName,
@@ -88,27 +93,27 @@ export const undoTransitionQueueEntryModal = getAsyncLifecycle(
   },
 );
 
-export const voidQueueEntryModal = getAsyncLifecycle(() => import('./modals/void-queue-entry.modal'), {
-  featureName: 'void queue entry of a patient',
+export const deleteQueueEntryModal = getAsyncLifecycle(() => import('./modals/delete-queue-entry.modal'), {
+  featureName: 'delete queue entry of a patient',
   moduleName,
 });
 
-export const endQueueEntryModal = getAsyncLifecycle(() => import('./modals/end-queue-entry.modal'), {
-  featureName: 'end queue entry of a patient',
+export const removeQueueEntryModal = getAsyncLifecycle(() => import('./modals/remove-queue-entry.modal'), {
+  featureName: 'remove queue entry of a patient',
   moduleName,
 });
 
 // This modal is declared with the name 'transition-patient-to-latest-queue-modal'.
 // It is not clear why it was named this way.
 export const addOrMoveModal = getAsyncLifecycle(() => import('./modals/add-or-move-modal/add-or-move.modal'), {
-  featureName: 'transition patient to new queue',
+  featureName: 'add or move modal',
   moduleName,
 });
 
 export const transitionOverflowMenuItem = getAsyncLifecycle(
   () => import('./add-or-move-button/add-or-move-overflow-menu-item.extension'),
   {
-    featureName: 'overflow menu with action to transition patient to a new queue',
+    featureName: 'add or move overflow menu item',
     moduleName,
   },
 );

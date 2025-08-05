@@ -4,7 +4,8 @@ import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-fra
 import { useTranslation } from 'react-i18next';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import styles from './queue-table-action-cell.scss';
-import { type ConfigObject, type ActionsColumnConfig } from '../../config-schema';
+import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
+import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
 
 type ActionProps = {
   label: string;
@@ -15,20 +16,32 @@ type ActionProps = {
 };
 
 function useActionPropsByKey() {
-  const { defaultStatusConceptUuid } = useConfig<ConfigObject>().concepts;
+  const {
+    concepts: { defaultStatusConceptUuid },
+    visitQueueNumberAttributeUuid,
+  } = useConfig<ConfigObject>();
 
   // Map action strings to component props
-  const actionPropsByKey: Record<string, ActionProps> = useMemo(() => {
+  const actionPropsByKey: Record<QueueEntryAction, ActionProps> = useMemo(() => {
     return {
       call: {
         // t('call', 'Call'),
         label: 'call',
         text: 'Call',
-        onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('call-queue-entry-modal', {
-            closeModal: () => dispose(),
-            queueEntry,
-          });
+        onClick: async (queueEntry: QueueEntry) => {
+          const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
+          const callingQueueResponse = await serveQueueEntry(
+            mappedQueueEntry.queue.name,
+            mappedQueueEntry.visitQueueNumber,
+            'calling',
+          );
+          if (callingQueueResponse.ok) {
+            const dispose = showModal('call-queue-entry-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+              size: 'sm',
+            });
+          }
         },
         showIf: (queueEntry: QueueEntry) => {
           return queueEntry.status.uuid === defaultStatusConceptUuid;
@@ -42,6 +55,19 @@ function useActionPropsByKey() {
           const dispose = showModal('move-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
+            size: 'sm',
+          });
+        },
+      },
+      transition: {
+        // t('transition', 'Transition'),
+        label: 'transition',
+        text: 'Transition',
+        onClick: (queueEntry: QueueEntry) => {
+          const dispose = showModal('transition-queue-entry-modal', {
+            closeModal: () => dispose(),
+            queueEntry,
+            size: 'sm',
           });
         },
       },
@@ -53,6 +79,7 @@ function useActionPropsByKey() {
           const dispose = showModal('edit-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
+            size: 'sm',
           });
         },
       },
@@ -61,7 +88,7 @@ function useActionPropsByKey() {
         label: 'removePatient',
         text: 'Remove patient',
         onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('end-queue-entry-modal', {
+          const dispose = showModal('remove-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
             size: 'sm',
@@ -73,7 +100,7 @@ function useActionPropsByKey() {
         label: 'deleteEntry',
         text: 'Delete entry',
         onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('void-queue-entry-modal', {
+          const dispose = showModal('delete-queue-entry-modal', {
             closeModal: () => dispose(),
             queueEntry,
             size: 'sm',
@@ -101,11 +128,11 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [defaultStatusConceptUuid]);
+  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid]);
   return actionPropsByKey;
 }
 
-function ActionButton({ actionKey, queueEntry }: { actionKey: string; queueEntry: QueueEntry }) {
+function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const actionPropsByKey = useActionPropsByKey();
@@ -132,7 +159,7 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: string; queueEntry
   );
 }
 
-function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: string; queueEntry: QueueEntry }) {
+function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
   const { t } = useTranslation();
   const actionPropsByKey = useActionPropsByKey();
 
@@ -183,7 +210,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
         })
         .filter(Boolean);
       let fallbackActionComponent: React.ReactNode | null = null;
-      let overflowMenuKeys: string[] = [];
+      let overflowMenuKeys: QueueEntryAction[] = [];
       if (declaredButtonComponents.length === 0) {
         const defaultAction = overflowMenu.find((actionKey) => {
           const showIf = actionPropsByKey[actionKey].showIf;

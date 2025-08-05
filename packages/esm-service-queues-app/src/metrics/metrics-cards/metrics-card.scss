@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .tileContainer {
@@ -23,11 +24,44 @@
 .totalsLabel {
   @include type.type-style('label-01');
   color: $text-02;
+  margin-bottom: layout.$spacing-02;
 }
 
 .totalsValue {
   @include type.type-style('heading-04');
   color: $ui-05;
+  margin: 0;
+}
+
+.metricsContainer {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: center;
+}
+
+.metricItem {
+  display: inline-block;
+  flex-direction: column;
+}
+
+.countGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: layout.$spacing-03;
+  align-items: flex-start;
+  margin: layout.$spacing-03;
+
+  .urgentLabel {
+    font-size: layout.$spacing-04 !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  .urgentValue {
+    margin: 0;
+    margin-top: layout.$spacing-01;
+    color: colors.$red-50;
+  }
 }
 
 .headerLabelContainer {

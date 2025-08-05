@@ -14,6 +14,8 @@ interface MetricsCardProps {
   service?: string;
   serviceUuid?: string;
   locationUuid?: string;
+  showUrgent?: boolean;
+  urgentCount?: number;
 }
 
 const MetricsCard: React.FC<MetricsCardProps> = ({
@@ -24,6 +26,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   service,
   serviceUuid,
   locationUuid,
+  showUrgent,
+  urgentCount,
 }) => {
   const { t } = useTranslation();
   const queueListPath =
@@ -40,7 +44,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             <label className={styles.headerLabel}>{headerLabel}</label>
             {children}
           </div>
-          {service == 'scheduled' ? (
+          {/* TODO: Uncomment this when functionality of the patient list works.*/}
+          {/* {service == 'scheduled' ? (
             <div className={styles.link}>
               <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/home`}>
                 {t('patientList', 'Patient list')}
@@ -54,11 +59,19 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
               </ConfigurableLink>
               <ArrowRight size={16} />
             </div>
-          )}
+          )} */}
         </div>
-        <div>
-          <label className={styles.totalsLabel}>{label}</label>
-          <p className={styles.totalsValue}>{value}</p>
+        <div className={styles.metricsContainer}>
+          <div className={styles.metricItem}>
+            <label className={styles.totalsLabel}>{label}</label>
+            <p className={styles.totalsValue}>{value}</p>
+          </div>
+          {showUrgent && (
+            <div className={styles.countGrid}>
+              <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
+              <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
+            </div>
+          )}
         </div>
       </Tile>
     </Layer>
