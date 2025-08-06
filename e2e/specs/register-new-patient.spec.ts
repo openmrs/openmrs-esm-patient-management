@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { deletePatient } from '../commands';
 import { RegistrationAndEditPage } from '../pages';
 import { test } from '../core';
-import { type PatientRegistrationFormValues } from '../types';
+import { type PatientRegistrationFormValues } from '../commands/types';
 
 const PATIENT_CHART_URL = /\/patient\/(?<uuid>[a-f0-9-]{36})\/chart/i;
 let patientUuid: string;

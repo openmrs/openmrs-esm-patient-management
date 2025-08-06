@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@carbon/react';
+import { Dropdown, DropdownSkeleton, InlineNotification } from '@carbon/react';
 import { useConfig, useSession, PageHeader, PageHeaderContent, ServiceQueuesPictogram } from '@openmrs/esm-framework';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import {
@@ -76,20 +76,34 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
         illustration={<ServiceQueuesPictogram />}
       />
       <div className={styles.dropdownContainer}>
-        {showLocationDropdown && (
-          <Dropdown
-            aria-label={t('selectQueueLocation', 'Select a queue location')}
-            className={styles.dropdown}
-            id="queueLocationDropdown"
-            label={currentQueueLocationName ?? t('all', 'All')}
-            items={
-              queueLocations.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations] : queueLocations
-            }
-            itemToString={(item) => (item ? item.name : '')}
-            titleText={t('location', 'Location')}
-            type="inline"
-            onChange={handleQueueLocationChange}
-          />
+        {isLoading ? (
+          <div className={styles.dropdownSkeletonContainer}>
+            <DropdownSkeleton />
+          </div>
+        ) : error ? (
+          <div className={styles.errorContainer}>
+            <InlineNotification
+              kind="error"
+              title={t('failedToLoadLocations', 'Failed to load locations')}
+              hideCloseButton
+            />
+          </div>
+        ) : (
+          showLocationDropdown && (
+            <Dropdown
+              aria-label={t('selectQueueLocation', 'Select a queue location')}
+              className={styles.dropdown}
+              id="queueLocationDropdown"
+              label={currentQueueLocationName ?? t('all', 'All')}
+              items={
+                queueLocations.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations] : queueLocations
+              }
+              itemToString={(item: { name: string } | null) => (item ? item.name : '')}
+              titleText={t('location', 'Location')}
+              type="inline"
+              onChange={handleQueueLocationChange}
+            />
+          )
         )}
         {actions}
       </div>

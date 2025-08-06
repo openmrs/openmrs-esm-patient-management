@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type Patient } from '../types';
+import { type Patient } from './types';
 
 export const generateRandomPatient = async (api: APIRequestContext, locationUuid?: string): Promise<Patient> => {
   const identifierRes = await api.post('idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier', {

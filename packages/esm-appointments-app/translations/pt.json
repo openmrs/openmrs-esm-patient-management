@@ -59,6 +59,7 @@
   "date&Time": "Data e hora",
   "dateAppointmentIssuedCannotBeAfterAppointmentDate": "A data da emissão da consulta não pode ser posterior à data da consulta",
   "dateOfBirth": "Data de nascimento",
+  "dateRange": "Set date range",
   "dateScheduled": "Data da emissão do agendamento",
   "dateScheduledDetail": "Data da emissão do agendamento",
   "dateTime": "Data e hora",

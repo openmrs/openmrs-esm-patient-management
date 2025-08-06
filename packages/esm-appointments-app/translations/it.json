@@ -59,6 +59,7 @@
   "date&Time": "Data e ora",
   "dateAppointmentIssuedCannotBeAfterAppointmentDate": "La data di emissione dell'appuntamento non può essere successiva alla data dell'appuntamento",
   "dateOfBirth": "Data di nascita",
+  "dateRange": "Set date range",
   "dateScheduled": "Data di programmazione",
   "dateScheduledDetail": "Dettaglio data di programmazione",
   "dateTime": "Data e ora",

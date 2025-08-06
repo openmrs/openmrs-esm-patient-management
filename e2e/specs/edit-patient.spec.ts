@@ -3,7 +3,7 @@ import { expect } from '@playwright/test';
 import { test } from '../core';
 import { getPatient } from '../commands';
 import { RegistrationAndEditPage } from '../pages';
-import { type PatientRegistrationFormValues } from '../types';
+import { type PatientRegistrationFormValues } from '../commands/types';
 
 const formValues: PatientRegistrationFormValues = {
   givenName: `Johnny`,

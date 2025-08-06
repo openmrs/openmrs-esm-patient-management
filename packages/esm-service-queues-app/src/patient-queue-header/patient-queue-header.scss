@@ -11,6 +11,10 @@
   padding-right: layout.$spacing-03;
 }
 
+.dropdownSkeletonContainer {
+  width: 18.75rem;
+}
+
 .dropdownContainer {
   display: flex;
   align-items: center;
