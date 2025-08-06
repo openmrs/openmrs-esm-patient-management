@@ -1,27 +1,25 @@
-import {
-  type ConfigSchema,
-  getDefaultsFromConfigSchema,
-  useAppContext,
-  useConfig,
-  useFeatureFlag,
-} from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { renderWithSwr } from 'tools';
+import { screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useAppContext, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
+import { configSchema, type WardConfigObject } from '../config-schema';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../mock';
-import { configSchema } from '../config-schema';
+import { renderWithSwr } from 'tools';
+import { type WardViewContext } from '../types';
 import { useObs } from '../hooks/useObs';
 import useWardLocation from '../hooks/useWardLocation';
-import { type WardViewContext } from '../types';
 import DefaultWardView from './default-ward/default-ward-view.component';
 import WardView from './ward-view.component';
 
-jest.mocked(useConfig).mockReturnValue({
-  ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
-});
-
+const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
 const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
+const mockUseWardLocation = jest.mocked(useWardLocation);
+const mockUseParams = jest.mocked(useParams);
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: jest.fn().mockReturnValue({}),
+}));
 
 jest.mock('../hooks/useWardLocation', () =>
   jest.fn().mockReturnValue({
@@ -31,19 +29,13 @@ jest.mock('../hooks/useWardLocation', () =>
     invalidLocation: false,
   }),
 );
+
 jest.mock('../hooks/useObs', () => ({
   useObs: jest.fn(),
 }));
 
-const mockUseWardLocation = jest.mocked(useWardLocation);
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn().mockReturnValue({}),
-}));
-const mockUseParams = useParams as jest.Mock;
-
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+
 //@ts-ignore
 jest.mocked(useObs).mockReturnValue({
   data: [],
@@ -52,7 +44,13 @@ jest.mocked(useObs).mockReturnValue({
 const intersectionObserverMock = () => ({
   observe: () => null,
 });
+
 window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock);
+
+beforeEach(() => {
+  const config = getDefaultsFromConfigSchema<WardConfigObject>(configSchema);
+  mockUseConfig.mockReturnValue(config);
+});
 
 describe('WardView', () => {
   let replacedProperty: jest.ReplaceProperty<any> | null = null;
