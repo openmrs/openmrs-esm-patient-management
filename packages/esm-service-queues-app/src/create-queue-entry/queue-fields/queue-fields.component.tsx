@@ -48,9 +48,8 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const schema = useMemo(() => createQueueServiceSchema(t), [t]);
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const memoizedQueueLocations = useMemo(
-    () => queueLocations,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(queueLocations.map((l) => ({ id: l.id, name: l.name })))],
+    () => queueLocations.map((l) => ({ id: l.id, name: l.name })),
+    [queueLocations],
   );
   const { sessionLocation } = useSession();
   const {
@@ -83,54 +82,46 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
 
   const { queues, isLoading: isLoadingQueues } = useQueues(queueLocation);
   const memoizedQueues = useMemo(
-    () => queues,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(queues.map((q) => ({ uuid: q.uuid, name: q.name })))],
+    () => queues.map((q) => ({ uuid: q.uuid, name: q.name, allowedPriorities: q.allowedPriorities })),
+    [queues],
   );
   const priorities = useMemo(() => {
-    return queues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
-  }, [queues, queueService]);
+    return memoizedQueues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
+  }, [memoizedQueues, queueService]);
 
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
 
   const onSubmit = useCallback(
     async (visit: Visit) => {
       try {
-        const formValues = getValues();
         const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
-
         if (!isFormValid) {
           const errorMessages = Object.entries(errors)
             .map(([field, error]) => `${field}: ${error?.message ?? 'Invalid'}`)
             .join('\n');
-
           showSnackbar({
             title: t('formValidationFailed', 'Form validation failed'),
             kind: 'error',
             isLowContrast: false,
             subtitle: errorMessages,
           });
-
           return Promise.reject(new Error(`Form validation failed:\n${errorMessages}`));
         }
-
+        const formValues = getValues();
         if (!formValues.queueLocation || !formValues.queueService || !formValues.priority) {
           const missingFields = [];
           if (!formValues.queueLocation) missingFields.push('Queue Location');
           if (!formValues.queueService) missingFields.push('Queue Service');
           if (!formValues.priority) missingFields.push('Priority');
-
           const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
             fields: missingFields.join(', '),
           });
-
           showSnackbar({
             title: t('incompleteForm', 'Incomplete form'),
             kind: 'error',
             isLowContrast: false,
             subtitle: errorMessage,
           });
-
           return Promise.reject(new Error(errorMessage));
         }
 
@@ -191,11 +182,9 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   useEffect(() => {
     if (memoizedQueueLocations.length > 0 && !queueLocation) {
       const sessionLocationMatch = memoizedQueueLocations.find((location) => location.id === sessionLocation?.uuid);
-
-      if (sessionLocationMatch) {
-        setValue('queueLocation', sessionLocationMatch.id, { shouldValidate: true });
-      } else {
-        setValue('queueLocation', memoizedQueueLocations[0].id, { shouldValidate: true });
+      const initialLocation = sessionLocationMatch ? sessionLocationMatch.id : memoizedQueueLocations[0].id;
+      if (queueLocation !== initialLocation) {
+        setValue('queueLocation', initialLocation, { shouldValidate: true });
       }
     }
   }, [memoizedQueueLocations, queueLocation, sessionLocation?.uuid, setValue]);
@@ -209,7 +198,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   useEffect(() => {
     if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService) {
       const initialServiceQueue = memoizedQueues.find((queue) => queue.name === defaultInitialServiceQueue);
-      if (initialServiceQueue) {
+      if (initialServiceQueue && queueService !== initialServiceQueue.uuid) {
         setValue('queueService', initialServiceQueue.uuid, { shouldValidate: true });
       }
     }
@@ -232,7 +221,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
         const defaultPriority = priorities.find((p) => p.uuid === defaultPriorityConceptUuid) || priorities[0];
         setValue('priority', defaultPriority.uuid, { shouldValidate: true });
       }
-    } else if (queueService && priorities.length === 0) {
+    } else if (queueService && priorities.length === 0 && priority !== '') {
       setValue('priority', '', { shouldValidate: false });
     }
   }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue]);
@@ -281,7 +270,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           render={({ field }) =>
             isLoadingQueues ? (
               <SelectSkeleton />
-            ) : !queues?.length ? (
+            ) : !memoizedQueues?.length ? (
               <InlineNotification
                 kind="error"
                 lowContrast
