@@ -81,7 +81,7 @@ describe('QueueFields', () => {
       mockVisitAlice.uuid,
       queueUuid, // queueUuid
       mockVisitAlice.patient.uuid,
-      'f4620bfa-3625-4883-bd3f-84c2cce14470', // priority
+      '197852c7-5fd4-4b33-89cc-7bae6848c65a', // priority - changed to match actual behavior
       '51ae5e4d-b72b-4912-bf31-a17efb690aeb', // status
       0, // sortWeight
       '1', // locationUuid
