@@ -73,7 +73,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   } = useForm({
     defaultValues: {
       priority: defaultPriorityConceptUuid,
-      queueLocation: memoizedQueueLocations[0]?.id || '',
+      queueLocation: '',
       queueService: '',
     },
     mode: 'onChange',
@@ -90,7 +90,10 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(queues.map((q) => ({ uuid: q.uuid, name: q.name })))],
   );
-  const priorities = queues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
+  const priorities = useMemo(() => {
+    return queues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
+  }, [queues, queueService]);
+
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
 
   const onSubmit = useCallback(
@@ -151,23 +154,53 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   }, [onSubmit, setOnSubmit]);
 
   useEffect(() => {
-    if (currentServiceQueueUuid) {
+    if (memoizedQueueLocations.length > 0 && !queueLocation) {
+      const sessionLocationMatch = memoizedQueueLocations.find((location) => location.id === sessionLocation?.uuid);
+
+      if (sessionLocationMatch) {
+        setValue('queueLocation', sessionLocationMatch.id, { shouldValidate: true });
+      } else {
+        setValue('queueLocation', memoizedQueueLocations[0].id, { shouldValidate: true });
+      }
+    }
+  }, [memoizedQueueLocations, queueLocation, sessionLocation?.uuid, setValue]);
+
+  useEffect(() => {
+    if (currentServiceQueueUuid && currentServiceQueueUuid !== queueService) {
       setValue('queueService', currentServiceQueueUuid, { shouldValidate: true });
     }
-  }, [currentServiceQueueUuid, setValue]);
+  }, [currentServiceQueueUuid, queueService, setValue]);
 
   useEffect(() => {
-    if (defaultInitialServiceQueue) {
+    if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService) {
       const initialServiceQueue = memoizedQueues.find((queue) => queue.name === defaultInitialServiceQueue);
-      setValue('queueService', initialServiceQueue?.uuid, { shouldValidate: true });
+      if (initialServiceQueue) {
+        setValue('queueService', initialServiceQueue.uuid, { shouldValidate: true });
+      }
     }
-  }, [defaultInitialServiceQueue, memoizedQueues, setValue]);
+  }, [defaultInitialServiceQueue, memoizedQueues, queueService, setValue]);
 
   useEffect(() => {
-    if (memoizedQueueLocations.map((location) => location.id).includes(sessionLocation.uuid)) {
-      setValue('queueLocation', sessionLocation.uuid, { shouldValidate: true });
+    if (queueLocation && queueService) {
+      const isServiceValid = memoizedQueues.some((queue) => queue.uuid === queueService);
+      if (!isServiceValid) {
+        setValue('queueService', '', { shouldValidate: true });
+        setValue('priority', defaultPriorityConceptUuid, { shouldValidate: true });
+      }
     }
-  }, [memoizedQueueLocations, sessionLocation.uuid, setValue]);
+  }, [queueLocation, memoizedQueues, queueService, setValue, defaultPriorityConceptUuid]);
+
+  useEffect(() => {
+    if (queueService && priorities.length > 0) {
+      const isPriorityValid = priorities.some((p) => p.uuid === priority);
+      if (!isPriorityValid) {
+        const defaultPriority = priorities.find((p) => p.uuid === defaultPriorityConceptUuid) || priorities[0];
+        setValue('priority', defaultPriority.uuid, { shouldValidate: true });
+      }
+    } else if (queueService && priorities.length === 0) {
+      setValue('priority', '', { shouldValidate: false });
+    }
+  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue]);
 
   return (
     /*
@@ -230,7 +263,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                 invalidText={errors.queueService?.message}
                 onChange={(event) => field.onChange(event.target.value)}>
                 <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" />
-                {queues?.map((service) => (
+                {memoizedQueues?.map((service) => (
                   <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
                     {service.name}
                   </SelectItem>
