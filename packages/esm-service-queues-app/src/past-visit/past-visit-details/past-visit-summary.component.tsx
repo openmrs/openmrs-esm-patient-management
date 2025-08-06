@@ -2,15 +2,8 @@ import React, { useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
-import {
-  formatDatetime,
-  formatTime,
-  parseDate,
-  type Encounter,
-  type Obs,
-  type OpenmrsResource,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { formatTime, parseDate, type Encounter, type Obs, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import { type OrderItem, type Order, type Note, type DiagnosisItem } from '../../types/index';
 import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
 import EncounterList from './encounter-list.component';
@@ -33,13 +26,14 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
   const { t } = useTranslation();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const isTablet = useLayoutType() === 'tablet';
+  const config = useConfig<ConfigObject>();
 
   const encountersToDisplay = useMemo(
     () =>
       encounters
         ? encounters?.map((encounter: Encounter) => ({
             id: encounter?.uuid,
-            datetime: formatDatetime(parseDate(encounter?.encounterDatetime)),
+            datetime: encounter?.encounterDatetime || null,
             encounterType: encounter?.encounterType?.display,
             form: encounter?.form,
             obs: encounter?.obs,
@@ -82,12 +76,14 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
       // Extract diagnoses and notes from observations
       const processObservations = (observations: Obs[], useObsTime = false) => {
         observations.forEach((obs: Obs) => {
-          if (obs?.concept?.display === 'Visit Diagnoses') {
-            const problemListObs = obs.groupMembers?.find((mem) => mem.concept?.display === 'PROBLEM LIST');
+          if (obs?.concept?.uuid === config.concepts.visitDiagnosesConceptUuid) {
+            const problemListObs = obs.groupMembers?.find(
+              (member) => member.concept?.uuid === config.concepts.problemListConceptUuid,
+            );
             const diagnosisValue = problemListObs?.value;
             const diagnosis =
-              typeof diagnosisValue === 'object' && diagnosisValue && 'display' in diagnosisValue
-                ? (diagnosisValue as OpenmrsResource).display
+              typeof diagnosisValue === 'object' && diagnosisValue !== null && 'display' in diagnosisValue
+                ? diagnosisValue.display
                 : String(diagnosisValue || '');
 
             diagnoses.push({
@@ -126,7 +122,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
       vitalsToRetrieve.push(encounter);
     });
     return [medications, notes, diagnoses, vitalsToRetrieve];
-  }, [encounters]);
+  }, [encounters, config.concepts.problemListConceptUuid, config.concepts.visitDiagnosesConceptUuid]);
 
   const tabsClasses = classNames(styles.verticalTabs, {
     [styles.tabletTabs]: isTablet,

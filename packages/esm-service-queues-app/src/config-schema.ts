@@ -170,6 +170,10 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    problemListConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
     respiratoryRateUuid: {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -177,6 +181,10 @@ export const configSchema = {
     temperatureUuid: {
       _type: Type.ConceptUuid,
       _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    visitDiagnosesConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     weightUuid: {
       _type: Type.ConceptUuid,
@@ -444,9 +452,11 @@ export interface ConfigObject {
     historicalObsConceptUuid: Array<string>;
     oxygenSaturationUuid: string;
     pulseUuid: string;
+    problemListConceptUuid: string;
     respiratoryRateUuid: string;
     systolicBloodPressureUuid: string;
     temperatureUuid: string;
+    visitDiagnosesConceptUuid: string;
     weightUuid: string;
   };
   defaultInitialServiceQueue: string;
