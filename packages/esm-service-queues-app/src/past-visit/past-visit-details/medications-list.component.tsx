@@ -1,95 +1,100 @@
 import React from 'react';
 import classNames from 'classnames';
-import capitalize from 'lodash-es/capitalize';
+import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
-import { Tile } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { getDosage } from '../past-visit.resource';
 import { type OrderItem } from '../../types/index';
 import styles from './past-visit-summary.scss';
+
 interface MedicationProps {
   medications: Array<OrderItem>;
 }
+
 const Medications: React.FC<MedicationProps> = ({ medications }) => {
   const { t } = useTranslation();
 
+  if (medications.length === 0) {
+    return (
+      <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noMedicationsFound', 'No medications found')}</p>
+    );
+  }
+
   return (
-    <div>
-      {medications.length > 0 ? (
-        medications.map(
-          (medication: OrderItem, ind) =>
-            medication.order?.dose &&
-            medication.order?.orderType?.display === 'Drug Order' && (
+    <div className={styles.medicationRecord}>
+      {medications.map(
+        (medication) =>
+          medication?.order?.dose && (
+            <React.Fragment key={medication.order.uuid}>
               <div className={styles.medicationContainer}>
-                <Tile className={styles.medicationTile}>
-                  <p className={styles.medicationRecord}>
-                    <strong>{capitalize(medication.order.drug?.name)}</strong> &mdash;{' '}
-                    {medication.order.drug?.strength?.toLowerCase()}
-                    &mdash; {medication.order.doseUnits?.display?.toLowerCase()} &mdash;{' '}
-                    <span>
-                      <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
-                    </span>
+                <div>
+                  <p className={styles.bodyLong01}>
+                    <strong>{capitalize(medication?.order?.drug?.display)}</strong>{' '}
+                    {medication?.order?.drug?.strength && (
+                      <>&mdash; {medication?.order?.drug?.strength?.toLowerCase()}</>
+                    )}{' '}
+                    {medication?.order?.doseUnits?.display && (
+                      <>&mdash; {medication?.order?.doseUnits?.display?.toLowerCase()}</>
+                    )}{' '}
+                  </p>
+                  <p className={styles.bodyLong01}>
+                    <span className={styles.label01}> {t('dose', 'Dose')} </span>{' '}
                     <span className={styles.dosage}>
-                      {getDosage(medication.order.drug?.strength, medication.order?.dose)?.toLowerCase()}
+                      {medication?.order?.dose} {medication?.order?.doseUnits?.display?.toLowerCase()}
                     </span>{' '}
-                    &mdash; {medication.order.route?.display?.toLowerCase()} &mdash;{' '}
-                    {medication.order.frequency?.display?.toLowerCase()} &mdash;{' '}
-                    {!medication.order.duration
+                    {medication.order?.route?.display && (
+                      <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} &mdash; </span>
+                    )}
+                    {medication?.order?.frequency?.display?.toLowerCase()} &mdash;{' '}
+                    {!medication?.order?.duration
                       ? t('orderIndefiniteDuration', 'Indefinite duration')
                       : t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
-                          duration: medication.order.duration,
-                          durationUnit: medication.order.durationUnits?.display?.toLowerCase(),
+                          duration: medication?.order?.duration,
+                          durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
                         })}
-                    {medication.order?.numRefills !== 0 && (
+                    {medication?.order?.numRefills !== 0 && (
                       <span>
-                        <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
-                        {medication.order.numRefills}
+                        <span className={styles.label01}> &mdash; {t('refills', 'Refills')}</span>{' '}
+                        {medication?.order?.numRefills}
                         {''}
                       </span>
                     )}
-                    {medication.order?.dosingInstructions && (
-                      <span> &mdash; {medication.order?.dosingInstructions.toLocaleLowerCase()}</span>
+                    {medication?.order?.dosingInstructions && (
+                      <span> &mdash; {medication?.order?.dosingInstructions?.toLowerCase()}</span>
                     )}
-                    {medication.order?.orderReasonNonCoded ? (
+                  </p>
+                  <p className={styles.bodyLong01}>
+                    {medication?.order?.orderReasonNonCoded ? (
                       <span>
-                        &mdash; <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-                        {medication.order?.orderReasonNonCoded}
+                        <span className={styles.label01}>{t('indication', 'Indication')}</span>{' '}
+                        {medication?.order?.orderReasonNonCoded}{' '}
                       </span>
                     ) : null}
-                    {medication.order?.quantity ? (
+                    {medication?.order?.orderReasonNonCoded && medication?.order?.quantity && <>&mdash;</>}
+                    {medication?.order?.quantity ? (
                       <span>
-                        <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-                        {medication.order?.quantity}
+                        <span className={styles.label01}> {t('quantity', 'Quantity')}</span>{' '}
+                        {medication?.order?.quantity}
                       </span>
                     ) : null}
-                    {medication.order?.dateStopped ? (
+                    {medication?.order?.dateStopped ? (
                       <span className={styles.bodyShort01}>
                         <span className={styles.label01}>
-                          {medication.order?.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
+                          {medication?.order?.quantity ? ` — ` : ''} {t('endDate', 'End date')}
                         </span>{' '}
-                        {formatDate(new Date(medication.order?.dateStopped))}
+                        {formatDate(new Date(medication?.order?.dateStopped))}
                       </span>
                     ) : null}
                   </p>
-                </Tile>
-                <p className={styles.metadata}>
-                  {medication.time} ·{' '}
-                  {medication.provider.name ? (
-                    <span>
-                      {' '}
-                      {medication.provider && medication.provider.name},{' '}
-                      {medication.provider && medication.provider.role}{' '}
-                    </span>
-                  ) : null}{' '}
-                  ·{' '}
-                </p>
+                </div>
               </div>
-            ),
-        )
-      ) : (
-        <p className={classNames(styles.bodyLong01, styles.text02)}>
-          {t('noMedicationsFound', 'No medications found')}
-        </p>
+
+              <p className={styles.metadata}>
+                {medication?.time}
+                {medication?.provider?.name && <> &middot; {medication?.provider?.name}</>}
+                {medication?.provider?.role && <>, {medication?.provider?.role}</>}
+              </p>
+            </React.Fragment>
+          ),
       )}
     </div>
   );
