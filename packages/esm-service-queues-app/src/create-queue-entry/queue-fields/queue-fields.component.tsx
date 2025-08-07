@@ -21,6 +21,7 @@ import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
+import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
@@ -123,12 +124,25 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           mutateQueueEntries();
         })
         .catch((error) => {
-          showSnackbar({
-            title: t('queueEntryError', 'Error adding patient to the queue'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: error?.message,
-          });
+          // Check if this is a duplicate patient error with fallback handling
+          const errorMessage = error?.responseBody?.error?.message || error?.message || '';
+          const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
+
+          if (isDuplicatePatientError) {
+            showSnackbar({
+              title: t('queueEntryDuplicateError', 'Patient already in queue'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: t('queueEntryDuplicateMessage', 'A queue entry for this patient already exists'),
+            });
+          } else {
+            showSnackbar({
+              title: t('queueEntryError', 'Error adding patient to the queue'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
+          }
           throw error;
         });
     },

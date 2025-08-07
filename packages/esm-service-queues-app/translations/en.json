@@ -118,6 +118,8 @@
   "queueEntryAddedSuccessfully": "Queue entry added successfully",
   "queueEntryDeleteFailed": "Error deleting queue entry",
   "queueEntryDeleteSuccessful": "Queue entry deleted successfully",
+  "queueEntryDuplicateError": "Patient already in queue",
+  "queueEntryDuplicateMessage": "A queue entry for this patient already exists",
   "queueEntryEdited": "Queue entry edited",
   "queueEntryEditedSuccessfully": "Queue entry edited successfully",
   "queueEntryEditingFailed": "Error editing queue entry",
