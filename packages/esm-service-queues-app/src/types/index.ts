@@ -1,5 +1,5 @@
-import { type Visit, type OpenmrsResource, type Location, type Patient } from '@openmrs/esm-framework';
 import type React from 'react';
+import { type Visit, type OpenmrsResource, type Location, type Obs, type Patient } from '@openmrs/esm-framework';
 import { type ColumnConfig } from '../config-schema';
 
 export interface Attribute {
@@ -83,6 +83,7 @@ export interface Order {
   drug: {
     uuid: string;
     name: string;
+    display: string;
     strength: string;
   };
   duration: number;
@@ -217,7 +218,7 @@ export interface FormattedEncounter {
   datetime: string;
   encounterType: string;
   form: OpenmrsResource;
-  obs: Array<Observation>;
+  obs: Array<Obs>;
   provider: string;
 }
 
