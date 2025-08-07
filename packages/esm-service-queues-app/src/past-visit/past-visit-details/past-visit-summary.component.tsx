@@ -89,7 +89,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
             diagnoses.push({
               diagnosis,
             });
-          } else if (obs?.concept?.display === 'General patient note') {
+          } else if (config.concepts.generalPatientNoteConceptUuid === obs?.concept?.uuid) {
             notes.push({
               note: String(obs.value || ''),
               provider: {
@@ -122,7 +122,12 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
       vitalsToRetrieve.push(encounter);
     });
     return [medications, notes, diagnoses, vitalsToRetrieve];
-  }, [encounters, config.concepts.problemListConceptUuid, config.concepts.visitDiagnosesConceptUuid]);
+  }, [
+    config.concepts.generalPatientNoteConceptUuid,
+    config.concepts.problemListConceptUuid,
+    config.concepts.visitDiagnosesConceptUuid,
+    encounters,
+  ]);
 
   const tabsClasses = classNames(styles.verticalTabs, {
     [styles.tabletTabs]: isTablet,
