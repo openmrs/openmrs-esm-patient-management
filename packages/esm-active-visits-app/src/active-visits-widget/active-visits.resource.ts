@@ -1,28 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { last } from 'lodash-es';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import last from 'lodash-es/last';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import {
   type FetchResponse,
+  type OpenmrsResource,
+  type Visit,
   formatDatetime,
   openmrsFetch,
-  type OpenmrsResource,
   parseDate,
   restBaseUrl,
   useConfig,
   useSession,
-  type Visit,
 } from '@openmrs/esm-framework';
+import { type ActiveVisitsConfigSchema } from '../config-schema';
 import { type ActiveVisit, type VisitResponse } from '../types';
 
 dayjs.extend(isToday);
 
 export function useActiveVisits() {
   const session = useSession();
-  const config = useConfig();
+  const config = useConfig<ActiveVisitsConfigSchema>();
   const sessionLocation = session?.sessionLocation?.uuid;
 
   const customRepresentation =
@@ -246,7 +247,8 @@ export function useActiveVisitsSorting(tableRows: Array<any>) {
 
 export function useTableHeaders(obsConcepts: OpenmrsResource[]) {
   const { t } = useTranslation();
-  const config = useConfig();
+  const config = useConfig<ActiveVisitsConfigSchema>();
+
   return useMemo(() => {
     let headersIndex = 0;
 

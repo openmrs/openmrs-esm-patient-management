@@ -11,12 +11,12 @@ import {
 import type { DashboardConfig } from '../types/index';
 import styles from './dashboard-container.scss';
 import classNames from 'classnames';
-import { type ConfigSchema } from '../config-schema';
+import { type HomeConfig } from '../config-schema';
 
 export default function DashboardContainer() {
   const params = useParams();
   const layout = useLayoutType();
-  const { leftNavMode } = useConfig<ConfigSchema>();
+  const { leftNavMode } = useConfig<HomeConfig>();
   const assignedExtensions = useAssignedExtensions('homepage-dashboard-slot');
 
   const ungroupedDashboards = assignedExtensions.map((e) => e.meta).filter((e) => Object.keys(e).length) || [];

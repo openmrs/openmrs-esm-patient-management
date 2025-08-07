@@ -1,30 +1,35 @@
+import React from 'react';
 import { getDefaultsFromConfigSchema, useAppContext, useConfig } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
-import { mockPatientAlice, mockVisitAlice } from '__mocks__';
-import React from 'react';
-import { renderWithSwr } from 'tools';
+import { configSchema, type WardConfigObject } from '../../config-schema';
 import { mockInpatientAdmissionAlice } from '../../../../../__mocks__/inpatient-admission';
+import { mockPatientAlice, mockVisitAlice } from '__mocks__';
 import { mockWardBeds } from '../../../../../__mocks__/wardBeds.mock';
 import { mockWardViewContext } from '../../../mock';
-import { configSchema, type WardConfigObject } from '../../config-schema';
+import { renderWithSwr } from 'tools';
 import { useObs } from '../../hooks/useObs';
 import { type WardPatient, type WardViewContext } from '../../types';
 import MaternalWardPatientCard from './maternal-ward-patient-card.component';
 
+const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
+
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+
 jest.mock('../../hooks/useObs', () => ({
   useObs: jest.fn(),
 }));
+
 jest.mock('../../ward-patient-card/row-elements/ward-patient-obs.resource', () => ({
   useConceptToTagColorMap: jest.fn(),
 }));
 
-const defaultConfig: WardConfigObject = getDefaultsFromConfigSchema(configSchema);
-
-jest.mocked(useConfig).mockReturnValue(defaultConfig);
 //@ts-ignore
 jest.mocked(useObs).mockReturnValue({
   data: [],
+});
+
+beforeEach(() => {
+  mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema<WardConfigObject>(configSchema));
 });
 
 describe('MaternalWardPatientCard', () => {
