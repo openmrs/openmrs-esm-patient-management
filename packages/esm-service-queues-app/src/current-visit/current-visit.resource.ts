@@ -6,11 +6,9 @@ import { type ObsMetaInfo } from '../types/index';
 export function useVisit(visitUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-    'orders:(uuid,dateActivated,' +
-    'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
-    'dose,route:(uuid,display),frequency:(uuid,display),' +
-    'duration,durationUnits:(uuid,display),numRefills,' +
-    'orderType:(uuid,display),orderer:(uuid,person:(uuid,display))),' +
+    // Use default representation for orders to safely include subclass-specific fields (e.g., DrugOrder)
+    // without requesting properties that are not present on other subclasses (e.g., TestOrder).
+    'orders,' +
     'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
     'value:(uuid,display)),value),encounterType:(uuid,display),' +
@@ -42,29 +40,23 @@ export function calculateBMI(weight: number, height: number): number {
   }
 }
 
-export function assessValue(value: number, range: ObsMetaInfo): ObservationInterpretation {
-  if (range?.hiCritical && value >= range.hiCritical) {
-    return 'critically_high';
-  }
+export function assessValue(value: number | undefined, range?: ObsMetaInfo): ObservationInterpretation {
+  if (range && value) {
+    if (range.hiCritical && value >= range.hiCritical) {
+      return 'critically_high';
+    }
 
-  if (range?.hiAbsolute && value >= range.hiAbsolute) {
-    return 'critically_high';
-  }
+    if (range.hiNormal && value > range.hiNormal) {
+      return 'high';
+    }
 
-  if (range?.hiNormal && value > range.hiNormal) {
-    return 'high';
-  }
+    if (range.lowCritical && value <= range.lowCritical) {
+      return 'critically_low';
+    }
 
-  if (range?.lowCritical && value <= range.lowCritical) {
-    return 'critically_low';
-  }
-
-  if (range?.lowAbsolute && value <= range.lowAbsolute) {
-    return 'critically_low';
-  }
-
-  if (range?.lowNormal && value < range.lowNormal) {
-    return 'low';
+    if (range.lowNormal && value < range.lowNormal) {
+      return 'low';
+    }
   }
 
   return 'normal';

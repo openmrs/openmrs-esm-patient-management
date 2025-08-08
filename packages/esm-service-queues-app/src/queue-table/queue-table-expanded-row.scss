@@ -1,0 +1,26 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tabList {
+  position: sticky;
+  top: layout.$spacing-09;
+  z-index: 10;
+  border-bottom: 2px solid $ui-03;
+
+  & :global(.cds--tabs__nav-link) {
+    border-bottom: none !important;
+  }
+}
+
+.tab {
+  height: 2.5rem;
+
+  &:active,
+  &:focus {
+    outline: none !important;
+  }
+
+  &[aria-selected='true'] {
+    border-bottom: 3px solid var(--brand-03) !important;
+  }
+}

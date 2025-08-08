@@ -150,6 +150,12 @@ export const configSchema = {
       _default: defaultEmergencyPriorityUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
     },
+    generalPatientNoteConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      _description:
+        'The UUID of the free text note field intended to capture unstructured description of the patient encounter',
+    },
     heightUuid: {
       _type: Type.ConceptUuid,
       _default: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -170,6 +176,10 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    problemListConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
     respiratoryRateUuid: {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -177,6 +187,10 @@ export const configSchema = {
     temperatureUuid: {
       _type: Type.ConceptUuid,
       _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    visitDiagnosesConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     weightUuid: {
       _type: Type.ConceptUuid,
@@ -440,13 +454,16 @@ export interface ConfigObject {
     defaultTransitionStatus: string;
     diastolicBloodPressureUuid: string;
     emergencyPriorityConceptUuid: string;
+    generalPatientNoteConceptUuid: string;
     heightUuid: string;
     historicalObsConceptUuid: Array<string>;
     oxygenSaturationUuid: string;
     pulseUuid: string;
+    problemListConceptUuid: string;
     respiratoryRateUuid: string;
     systolicBloodPressureUuid: string;
     temperatureUuid: string;
+    visitDiagnosesConceptUuid: string;
     weightUuid: string;
   };
   defaultInitialServiceQueue: string;
