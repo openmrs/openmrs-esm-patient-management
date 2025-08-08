@@ -27,7 +27,6 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
             {t('scheduledToday', 'Scheduled for today')} <Tag type="blue"> {t('onTime', 'On time')}</Tag>
           </div>
         </div>
-
         <div className={styles.visitContainer}>
           <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} />
         </div>
