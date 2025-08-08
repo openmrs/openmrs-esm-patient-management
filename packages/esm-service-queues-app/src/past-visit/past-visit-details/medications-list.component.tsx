@@ -19,9 +19,18 @@ const Medications: React.FC<MedicationProps> = ({ medications }) => {
     );
   }
 
+  const drugOrders = medications.filter(
+    (m) => m.order?.orderType?.display === 'Drug Order' && m.order?.action !== 'DISCONTINUE',
+  );
+
+  // Only keep leaf orders (those not referenced by another order's previousOrder)
+  const medicationsToDisplay = drugOrders.filter(
+    (m) => !drugOrders.some((o2) => o2.order?.previousOrder?.uuid === m.order?.uuid),
+  );
+
   return (
     <div className={styles.medicationRecord}>
-      {medications.map(
+      {medicationsToDisplay.map(
         (medication) =>
           medication?.order?.dose && (
             <React.Fragment key={medication.order.uuid}>

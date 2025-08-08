@@ -73,6 +73,10 @@ export interface Order {
   uuid: string;
   dateActivated: string;
   dateStopped?: Date | null;
+  action?: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | string;
+  previousOrder?: {
+    uuid: string;
+  } | null;
   dose: number;
   dosingInstructions: string | null;
   dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
