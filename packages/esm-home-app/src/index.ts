@@ -1,5 +1,5 @@
 import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
-import { esmHomeSchema } from './config-schema';
+import { configSchema } from './config-schema';
 import homeNavMenuComponent from './side-menu/side-menu.component';
 import rootComponent from './root.component';
 
@@ -18,5 +18,5 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const homeNavMenu = getSyncLifecycle(homeNavMenuComponent, options);
 
 export function startupApp() {
-  defineConfigSchema(moduleName, esmHomeSchema);
+  defineConfigSchema(moduleName, configSchema);
 }

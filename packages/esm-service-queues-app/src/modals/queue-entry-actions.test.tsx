@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react';
 import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
-import VoidQueueEntryModal from './void-queue-entry.modal';
+import DeleteQueueEntryModal from './delete-queue-entry.modal';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
@@ -57,7 +57,7 @@ describe('VoidQueueEntryModal', () => {
     const closeModal = jest.fn();
     const user = userEvent.setup();
 
-    renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
@@ -71,7 +71,7 @@ describe('VoidQueueEntryModal', () => {
 
     const user = userEvent.setup();
 
-    renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
+    renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Delete queue entry/ });
     expect(submitButton).toBeEnabled();

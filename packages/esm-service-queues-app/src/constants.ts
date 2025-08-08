@@ -10,3 +10,6 @@ export const datePickerFormat = 'd/m/Y';
 export const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
 export const serviceQueuesPatientSearchWorkspace = 'create-queue-entry-workspace';
+
+// Error codes
+export const DUPLICATE_QUEUE_ENTRY_ERROR_CODE = '[queue.entry.duplicate.patient]';

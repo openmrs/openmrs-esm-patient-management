@@ -34,11 +34,11 @@ const AddOrMoveModal: React.FC<AddOrMoveModalProps> = ({ closeModal, activeVisit
   return (
     <>
       {queueEntry ? (
-        <MoveQueueEntryModal
-          queueEntry={queueEntry}
-          closeModal={closeModal}
-          modalTitle={t('transitionLatestQueueEntry', "Transition patient's latest queue entry")}
-        />
+        // TODO: I don't know whether this is supposed to be used to change which queue
+        // the patient is in (move) or to update the patient's status (transition).
+        // I think this is a Palladium thing.
+        // https://github.com/openmrs/openmrs-esm-patient-management/pull/1516
+        <MoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />
       ) : (
         <AddPatientToQueueModal
           modalTitle={t('addPatientToQueue', 'Add patient to queue')}

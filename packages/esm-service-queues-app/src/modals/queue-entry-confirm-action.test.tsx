@@ -4,9 +4,9 @@ import { screen } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import EndQueueEntryModal from './end-queue-entry.modal';
+import RemoveQueueEntryModal from './remove-queue-entry.modal';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
-import VoidQueueEntryModal from './void-queue-entry.modal';
+import DeleteQueueEntryModal from './delete-queue-entry.modal';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
@@ -60,7 +60,7 @@ describe('VoidQueueEntryModal', () => {
     const closeModal = jest.fn();
     const user = userEvent.setup();
 
-    renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
@@ -72,7 +72,7 @@ describe('VoidQueueEntryModal', () => {
     } as unknown as FetchResponse);
 
     const user = userEvent.setup();
-    renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
+    renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Delete queue entry/ });
     expect(submitButton).toBeEnabled();
@@ -94,7 +94,7 @@ describe('EndQueueEntryModal', () => {
     const closeModal = jest.fn();
     const user = userEvent.setup();
 
-    renderWithSwr(<EndQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+    renderWithSwr(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe('EndQueueEntryModal', () => {
 
     const user = userEvent.setup();
 
-    renderWithSwr(<EndQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
+    renderWithSwr(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Remove/ });
     expect(submitButton).toBeEnabled();

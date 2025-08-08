@@ -2,11 +2,11 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAssignedExtensions, useConfig, useSession } from '@openmrs/esm-framework';
 import { type DashboardConfig } from './types/index';
-import { type ConfigSchema } from './config-schema';
+import { type HomeConfig } from './config-schema';
 
 export function DefaultDashboardRedirect() {
   const assignedExtensions = useAssignedExtensions('homepage-dashboard-slot');
-  const { defaultDashboardPerRole } = useConfig<ConfigSchema>();
+  const { defaultDashboardPerRole } = useConfig<HomeConfig>();
   const session = useSession();
   const roles = session?.user?.roles;
   const defaultDashboard =

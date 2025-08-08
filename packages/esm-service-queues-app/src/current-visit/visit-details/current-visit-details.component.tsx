@@ -66,7 +66,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
     <div className={styles.wrapper}>
       <div className={styles.visitContainer}>
         <StructuredListWrapper className={styles.structuredList}>
-          <StructuredListHead></StructuredListHead>
+          <StructuredListHead />
           <StructuredListBody>
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('triageNote', 'Triage note')}</StructuredListCell>
@@ -74,7 +74,6 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
                 <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
               </StructuredListCell>
             </StructuredListRow>
-
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('vitals', 'Vitals')}</StructuredListCell>
               <StructuredListCell>

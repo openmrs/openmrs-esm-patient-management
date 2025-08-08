@@ -20,8 +20,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('editQueueEntry', 'Edit queue entry'),
-        modalInstruction: t('editQueueEntryInstruction', 'Edit fields of existing queue entry'),
+        modalTitle: t('editQueueEntryForPatient', 'Edit queue entry for {{patient}}', { patient: queueEntry.display }),
         submitButtonText: t('editQueueEntry', 'Edit queue entry'),
         submitSuccessTitle: t('queueEntryEdited', 'Queue entry edited'),
         submitSuccessText: t('queueEntryEditedSuccessfully', 'Queue entry edited successfully'),
@@ -43,7 +42,9 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
           });
         },
         disableSubmit: () => false,
-        isTransition: false,
+        isEdit: true,
+        showQueuePicker: true,
+        showStatusPicker: true,
       }}
     />
   );
