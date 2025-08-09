@@ -71,5 +71,13 @@
       "name": "new-bed-type-modal",
       "component": "newBedTypeModal"
     }
+  ],
+   "workspaces": [
+    {
+        "name": "add-edit-bed-workspace",
+        "title": "Add/Edit Bed",
+        "component": "addEditBed",
+        "type": "workspace"
+    }
   ]
 }
