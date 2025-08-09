@@ -24,6 +24,7 @@ const defaultProps = {
   promptBeforeClosing: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   setTitle: jest.fn(),
+  onAppointmentSave: jest.fn(),
 };
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
@@ -170,6 +171,64 @@ describe('AppointmentForm', () => {
       subtitle: 'It is now visible on the Appointments page',
       title: 'Appointment scheduled',
     });
+  });
+
+  it('calls onAppointmentSave upon successfully scheduling an appointment', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+
+    const expectedAppointment = {
+      appointmentKind: 'Scheduled',
+      comments: '',
+      dateAppointmentScheduled: expect.stringMatching(dateTimeRegex),
+      endDateTime: expect.stringMatching(dateTimeRegex),
+      locationUuid: 'b1a8b05e-3542-4037-bbd3-998ee9c40574',
+      patientUuid: mockPatient.id,
+      providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66' }],
+      serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+      startDateTime: expect.stringMatching(dateTimeRegex),
+      status: '',
+      uuid: undefined,
+    };
+
+    mockSaveAppointment.mockResolvedValue({
+      status: 200,
+      statusText: 'Ok',
+      data: expectedAppointment,
+    } as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
+    const dateInput = screen.getByRole('textbox', { name: /^date$/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    const timeInput = screen.getByRole('textbox', { name: /time/i });
+    const timeFormat = screen.getByRole('combobox', { name: /time/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(locationSelect, ['Inpatient Ward']);
+    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+    await user.selectOptions(providerSelect, ['doctor - James Cook']);
+
+    const date = '2024-01-04';
+    const time = '09:30';
+
+    fireEvent.change(dateInput, { target: { value: date } });
+    await user.type(timeInput, time);
+    await user.selectOptions(timeFormat, 'AM');
+    await user.click(dateAppointmentIssuedInput);
+    fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
+    await user.click(saveButton);
+
+    expect(defaultProps.onAppointmentSave).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onAppointmentSave).toHaveBeenCalledWith(expectedAppointment);
   });
 
   it('renders an error snackbar if there was a problem scheduling an appointment', async () => {
