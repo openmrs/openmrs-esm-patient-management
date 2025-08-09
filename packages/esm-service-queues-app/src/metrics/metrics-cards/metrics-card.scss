@@ -64,6 +64,24 @@
   }
 }
 
+.pcountGrid {
+  display: grid;
+  row-gap: layout.$spacing-03;
+  align-items: center;
+  margin: layout.$spacing-03;
+
+  .pcountGridLabel {
+    font-size: 0.7rem !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  .pcountGridValue {
+    margin: 0;
+    margin-top: layout.$spacing-01;
+  }
+}
+
 .headerLabelContainer {
   display: flex;
   height: layout.$spacing-07;
