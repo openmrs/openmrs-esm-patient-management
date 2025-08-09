@@ -66,6 +66,9 @@ export function useAppointmentSearchResults(data: Appointment[], searchString: s
         if (appointment.patient.identifier?.toLowerCase()?.includes(lowerCaseSearch)) {
           return true;
         }
+        if (appointment.appointmentKind?.toLowerCase()?.includes(lowerCaseSearch)) {
+          return true;
+        }
         return false;
       });
     }

@@ -89,6 +89,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       key: 'serviceType',
     },
     {
+      header: t('appointmentType', 'Appointment Type'),
+      key: 'appointmentType',
+    },
+    {
       header: t('status', 'Status'),
       key: 'status',
     },
@@ -106,12 +110,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     ),
     nextAppointmentDate: '--',
     identifier: patientIdentifierType
-      ? appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier
+      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
       : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
     location: appointment.location?.name,
     provider: appointment.provider,
+    appointmentType: t(appointment.appointmentKind, appointment.appointmentKind),
     status: <AppointmentActions appointment={appointment} />,
   }));
 
