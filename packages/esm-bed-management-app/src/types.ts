@@ -143,12 +143,12 @@ export interface BedTag {
 }
 
 export interface BedPostPayload {
-  uuid: string;
+  uuid?: string;
   bedNumber: string;
   bedType: string;
   row: number;
   column: number;
-  status: string;
+  status?: string;
   locationUuid: string;
   bedTag?: BedTag[];
 }
