@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type BedPostPayload, type BedTag } from '../../types';
+import { type BedPostPayload, type BedTag, type BedTagMap } from '../../types';
 
 interface BedForm {
   bedNumber: string;
@@ -116,7 +116,7 @@ export async function getBedTagMappings(bedUuid: string): Promise<BedTag[]> {
         for (const bedLayout of location.bedLayouts) {
           if (bedLayout.bedUuid === bedUuid) {
             return (
-              bedLayout.bedTagMaps?.map((tagMap: any) => ({
+              bedLayout.bedTagMaps?.map((tagMap: BedTagMap) => ({
                 uuid: tagMap.bedTag?.uuid,
                 id: tagMap.bedTag?.uuid,
                 name: tagMap.bedTag?.name,

@@ -105,3 +105,9 @@
     margin-right: -50%;
   }
 }
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}

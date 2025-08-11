@@ -18,10 +18,10 @@ import {
 } from '@carbon/react';
 import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import { ErrorState, isDesktop as desktopLayout, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import type { BedTypeData } from '../types';
+import { deleteBedType, useBedTypes } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
-import { deleteBedType, useBedTypes } from '../summary/summary.resource';
-import type { BedTypeData } from '../types';
 import styles from '../bed-administration/bed-administration-table.scss';
 
 const BedTypeAdministrationTable: React.FC = () => {
@@ -223,16 +223,18 @@ const BedTypeAdministrationTable: React.FC = () => {
                   </Tile>
                 </div>
               ) : null}
-              <Pagination
-                page={currentPage}
-                pageSize={pageSize}
-                pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={bedTypes.length}
-                onChange={({ page, pageSize }) => {
-                  setCurrentPage(page);
-                  setPageSize(pageSize);
-                }}
-              />
+              <div className={styles.paginationContainer}>
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={[10, 20, 30, 40, 50]}
+                  totalItems={bedTypes.length}
+                  onChange={({ page, pageSize }) => {
+                    setCurrentPage(page);
+                    setPageSize(pageSize);
+                  }}
+                />
+              </div>
             </TableContainer>
           )}
         </DataTable>

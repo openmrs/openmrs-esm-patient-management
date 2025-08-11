@@ -34,14 +34,10 @@ const WardWithBeds: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, goTo, currentPage } = usePagination(bedsData, pageSize);
 
-  if (isLoadingBeds) {
-    <p>{t('loading', 'Loading...')}</p>;
-  }
-
   const tableHeaders = [
     {
       id: 0,
-      header: t('id', 'ID'),
+      header: t('bedId', 'Bed ID'),
       key: 'id',
     },
     {
@@ -100,6 +96,7 @@ const WardWithBeds: React.FC = () => {
   return (
     <>
       <Header title={name ? name : '--'} />
+
       {isLoadingBeds && (
         <div className={styles.container}>
           <DataTableSkeleton role="progressbar" zebra />

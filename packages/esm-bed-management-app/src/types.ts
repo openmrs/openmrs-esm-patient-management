@@ -142,6 +142,11 @@ export interface BedTag {
   uuid?: string;
 }
 
+export interface BedTagMap {
+  uuid: string;
+  bedTag: BedTag;
+}
+
 export interface BedPostPayload {
   uuid?: string;
   bedNumber: string;
