@@ -8,7 +8,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
-import styles from './add-edit-bed.workspace.scss';
+import styles from './bed-form.workspace.scss';
 import {
   ButtonSet,
   Button,
@@ -28,7 +28,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
 import { type BedPostPayload, type InitialData } from '../../types';
-import { editBed, saveBed, useBedType, useBedTagMappings } from './add-edit-bed.resource';
+import { editBed, saveBed, useBedType, useBedTagMappings } from './bed-form.resource';
 
 const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
 type OccupancyStatus = (typeof OCCUPANCY_STATUSES)[number];

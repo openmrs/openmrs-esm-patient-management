@@ -89,7 +89,7 @@ const WardWithBeds: React.FC = () => {
   }, [paginatedData]);
 
   const handleAddEditBedWorkspace = (mode: WorkspaceMode, bed?: Bed) => {
-    launchWorkspace('add-edit-bed-workspace', {
+    launchWorkspace('bed-admin-form-workspace', {
       workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
       mutateBeds: mutate,
       defaultLocation: { display: name, uuid: location },

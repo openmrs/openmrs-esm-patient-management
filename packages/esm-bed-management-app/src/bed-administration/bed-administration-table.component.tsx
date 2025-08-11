@@ -85,7 +85,7 @@ const BedAdministrationTable: React.FC = () => {
         config.bed = bed;
       }
 
-      launchWorkspace('add-edit-bed-workspace', config);
+      launchWorkspace('bed-admin-form-workspace', config);
     },
     [t, mutateBedsGroupedByLocation],
   );

@@ -72,12 +72,12 @@
       "component": "newBedTypeModal"
     }
   ],
-   "workspaces": [
+    "workspaces": [
     {
-        "name": "add-edit-bed-workspace",
-        "title": "Add or edit bed",
-        "component": "addEditBed",
-        "type": "workspace"
+       "name": "bed-admin-form-workspace",
+       "title": "Add or edit bed",
+       "component": "bedAdminForm",
+       "type": "workspace"
     }
   ]
 }
