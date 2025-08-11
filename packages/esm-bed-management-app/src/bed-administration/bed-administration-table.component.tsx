@@ -75,7 +75,7 @@ const BedAdministrationTable: React.FC = () => {
   }
 
   const handleBedWorkspace = useCallback(
-    (mode: WorkspaceMode, bed?: any) => {
+    (mode: WorkspaceMode, bed?: Bed) => {
       const config: BedWorkspaceConfig = {
         workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
         mutateBeds: mutateBedsGroupedByLocation,
@@ -208,7 +208,7 @@ const BedAdministrationTable: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     {headers.map((header, index) => (
-                      <TableHeader key={`header-${index}`}>{header.header?.content ?? header.header}</TableHeader>
+                      <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
