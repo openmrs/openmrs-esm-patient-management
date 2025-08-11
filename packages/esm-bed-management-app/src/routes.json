@@ -75,7 +75,7 @@
    "workspaces": [
     {
         "name": "add-edit-bed-workspace",
-        "title": "Add/Edit Bed",
+        "title": "Add or edit bed",
         "component": "addEditBed",
         "type": "workspace"
     }

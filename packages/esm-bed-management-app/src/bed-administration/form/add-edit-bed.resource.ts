@@ -37,12 +37,12 @@ export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): P
 
 export async function editBed({
   bedPayload,
-  bedNumber,
+  bedUuid,
 }: {
   bedPayload: BedPostPayload;
-  bedNumber: string;
+  bedUuid: string;
 }): Promise<FetchResponse<BedForm>> {
-  const response = await openmrsFetch(`${restBaseUrl}/bed/${bedNumber}`, {
+  const response = await openmrsFetch(`${restBaseUrl}/bed/${bedUuid}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: {
@@ -56,7 +56,7 @@ export async function editBed({
     },
   });
 
-  await updateBedTagMappings(bedNumber, bedPayload.bedTag || []);
+  await updateBedTagMappings(bedUuid, bedPayload.bedTag || []);
 
   return response;
 }

@@ -27,7 +27,7 @@ import classNames from 'classnames';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
-import { type InitialData } from '../../types';
+import { type BedPostPayload, type InitialData } from '../../types';
 import { editBed, saveBed, useBedType, useBedTagMappings } from './add-edit-bed.resource';
 
 const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
@@ -153,7 +153,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
     defaultValues: defaultValues,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isEditing && bedTagMappings.length > 0 && !isLoadingBedTags) {
       const updatedDefaults = getDefaultValues();
       reset(updatedDefaults);
@@ -174,8 +174,8 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
     })),
   });
 
-  const handleBedSubmission = async (bedPayload: any) => {
-    return isEditing ? await editBed({ bedPayload, bedNumber: bed.uuid }) : await saveBed({ bedPayload });
+  const handleBedSubmission = async (bedPayload: BedPostPayload) => {
+    return isEditing ? await editBed({ bedPayload, bedUuid: bed.uuid }) : await saveBed({ bedPayload });
   };
 
   const onSubmit = async (data: BedFormType) => {
@@ -202,7 +202,6 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
       });
     }
   };
-
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
@@ -220,6 +219,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                   id="bedNumber"
                   placeholder={t('bedNumberPlaceholder', 'e.g. CHA-201')}
                   labelText={t('bedNumber', 'Bed number')}
+                  helperText={t('bedNumberMaxCharsHelper', 'Maximum 10 characters')}
                   value={field.value}
                   onChange={field.onChange}
                   invalid={!!errors.bedNumber?.message}
@@ -304,7 +304,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
               render={({ field }) => (
                 <Select
                   id="occupancyStatus"
-                  labelText={t('occupancyStatus', 'Occupancy Status')}
+                  labelText={t('occupancyStatus', 'Occupancy status')}
                   value={field.value}
                   onChange={field.onChange}
                   invalid={!!errors.occupancyStatus?.message}
@@ -332,6 +332,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                   labelText={t('bedType', 'Bed Type')}
                   value={field.value}
                   onChange={field.onChange}
+                  disabled={!availableBedTypes.length}
                   invalid={!!errors.bedType?.message}
                   invalidText={errors.bedType?.message}>
                   <SelectItem text={t('selectBedType', 'Select bed type')} value="" />
@@ -363,6 +364,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                       label={t('selectBedTags', 'Select bed tags')}
                       items={availableBedTags}
                       itemToString={(item) => item?.name ?? ''}
+                      disabled={!availableBedTags.length}
                       selectedItems={selectedItems}
                       onChange={({ selectedItems }) => onChange(selectedItems)}
                       invalid={!!errors.bedTags?.message}

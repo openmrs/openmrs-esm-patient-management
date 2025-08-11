@@ -17,10 +17,11 @@ import {
   InlineLoading,
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
-import { launchWorkspace, navigate, showModal, usePagination } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, usePagination } from '@openmrs/esm-framework';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
 import Header from '../header/header.component';
 import styles from './ward-with-beds.scss';
+import { type Bed, type WorkspaceMode } from '../types';
 
 type RouteParams = { location: string };
 
@@ -87,11 +88,12 @@ const WardWithBeds: React.FC = () => {
     }));
   }, [paginatedData]);
 
-  const handleAddEditBedWorkspace = () => {
+  const handleAddEditBedWorkspace = (mode: WorkspaceMode, bed?: Bed) => {
     launchWorkspace('add-edit-bed-workspace', {
-      workspaceTitle: t('addBed', 'Add bed'),
+      workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
       mutateBeds: mutate,
       defaultLocation: { display: name, uuid: location },
+      ...(mode === 'edit' && bed ? { bed } : {}),
     });
   };
 

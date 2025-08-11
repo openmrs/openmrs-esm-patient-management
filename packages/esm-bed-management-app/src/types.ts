@@ -195,3 +195,5 @@ export interface BedDetails extends Bed {
     identifiers: Array<{ identifier: string }>;
   };
 }
+
+export type WorkspaceMode = 'add' | 'edit';
