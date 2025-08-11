@@ -48,20 +48,12 @@
       "component": "deleteBedTypeModal"
     },
     {
-      "name": "edit-bed-modal",
-      "component": "editBedModal"
-    },
-    {
       "name": "edit-bed-tag-modal",
       "component": "editBedTagModal"
     },
     {
       "name": "edit-bed-type-modal",
       "component": "editBedTypeModal"
-    },
-    {
-      "name": "new-bed-modal",
-      "component": "newBedModal"
     },
     {
       "name": "new-bed-tag-modal",
@@ -74,9 +66,9 @@
   ],
     "workspaces": [
     {
-       "name": "bed-admin-form-workspace",
+       "name": "bed-form-workspace",
        "title": "Add or edit bed",
-       "component": "bedAdminForm",
+       "component": "bedFormWorkspace",
        "type": "workspace"
     }
   ]

@@ -1,45 +1,46 @@
 import React, { useCallback, useEffect } from 'react';
-import {
-  type DefaultWorkspaceProps,
-  ResponsiveWrapper,
-  useLayoutType,
-  useSession,
-  showSnackbar,
-} from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Controller, useForm } from 'react-hook-form';
-import styles from './bed-form.workspace.scss';
+import { useTranslation } from 'react-i18next';
 import {
-  ButtonSet,
   Button,
+  ButtonSet,
+  ComboBox,
+  Form,
   InlineLoading,
-  TextInput,
+  MultiSelect,
   NumberInput,
   Select,
   SelectItem,
-  ComboBox,
-  Form,
-  MultiSelect,
   Stack,
   Tag,
+  TextInput,
 } from '@carbon/react';
-import classNames from 'classnames';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
+import {
+  type DefaultWorkspaceProps,
+  getCoreTranslation,
+  ResponsiveWrapper,
+  showSnackbar,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type BedPostPayload, type InitialData } from '../../types';
+import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
 import { editBed, saveBed, useBedType, useBedTagMappings } from './bed-form.resource';
+import styles from './bed-form.workspace.scss';
 
 const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
 type OccupancyStatus = (typeof OCCUPANCY_STATUSES)[number];
 
-type AddEditBedWorkspaceProps = DefaultWorkspaceProps & {
+type BedFormWorkspaceProps = DefaultWorkspaceProps & {
   bed?: InitialData;
   mutateBeds: () => void;
   defaultLocation?: { display: string; uuid: string };
 };
 
-const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
+const BedFormWorkspace: React.FC<BedFormWorkspaceProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -48,11 +49,10 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   defaultLocation,
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const locationUuid = session?.sessionLocation?.uuid;
-  const isTablet = useLayoutType() === 'tablet';
   const isEditing = !!bed?.uuid;
-
   const { admissionLocations } = useLocationsWithAdmissionTag();
   const { bedTypes } = useBedType();
   const { bedTags } = useBedTags();
@@ -103,8 +103,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   const availableBedTags = bedTags ? bedTags : [];
   const allLocations = admissionLocations || [];
   const hasLocations = allLocations.length > 0;
-
-  const sessionLocation = allLocations.find((loc) => loc.uuid === locationUuid);
+  const sessionLocation = allLocations.find((location) => location.uuid === locationUuid);
 
   const getDefaultValues = useCallback(() => {
     if (isEditing) {
@@ -160,6 +159,10 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
     }
   }, [bedTagMappings, getDefaultValues, isLoadingBedTags, isEditing, reset]);
 
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty, promptBeforeClosing]);
+
   const createBedPayload = (data: BedFormType) => ({
     ...(isEditing && { uuid: bed.uuid }),
     bedNumber: data.bedNumber,
@@ -174,9 +177,8 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
     })),
   });
 
-  const handleBedSubmission = async (bedPayload: BedPostPayload) => {
-    return isEditing ? await editBed({ bedPayload, bedUuid: bed.uuid }) : await saveBed({ bedPayload });
-  };
+  const handleBedSubmission = async (bedPayload: BedPostPayload) =>
+    isEditing ? await editBed({ bedPayload, bedUuid: bed.uuid }) : await saveBed({ bedPayload });
 
   const onSubmit = async (data: BedFormType) => {
     const bedPayload = createBedPayload(data);
@@ -192,19 +194,21 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
 
       mutateBeds();
       closeWorkspaceWithSavedChanges();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const subtitle =
+        error instanceof Error && error.message
+          ? error.message
+          : isEditing
+            ? t('bedUpdateError', 'Error updating bed')
+            : t('bedCreateError', 'Error creating bed');
+
       showSnackbar({
         title: t('error', 'Error'),
         kind: 'error',
-        subtitle:
-          error?.message ??
-          (isEditing ? t('bedUpdateError', 'Error updating bed') : t('bedCreateError', 'Error creating bed')),
+        subtitle,
       });
     }
   };
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
@@ -216,19 +220,18 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
               name="bedNumber"
               render={({ field }) => (
                 <TextInput
-                  id="bedNumber"
-                  placeholder={t('bedNumberPlaceholder', 'e.g. CHA-201')}
-                  labelText={t('bedNumber', 'Bed number')}
                   helperText={t('bedNumberMaxCharsHelper', 'Maximum 10 characters')}
-                  value={field.value}
-                  onChange={field.onChange}
+                  id="bedNumber"
                   invalid={!!errors.bedNumber?.message}
                   invalidText={errors.bedNumber?.message}
+                  labelText={t('bedNumber', 'Bed number')}
+                  onChange={field.onChange}
+                  placeholder={t('bedNumberPlaceholder', 'e.g. CHA-201')}
+                  value={field.value}
                 />
               )}
             />
           </ResponsiveWrapper>
-
           <div className={styles.rowContainer}>
             <ResponsiveWrapper>
               <Controller
@@ -236,13 +239,13 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                 name="bedRow"
                 render={({ field }) => (
                   <NumberInput
-                    id="bedRow"
-                    label={t('bedRow', 'Bed row')}
                     hideSteppers
-                    value={field.value}
-                    onChange={(e, { value }) => field.onChange(value.toString())}
+                    id="bedRow"
                     invalid={!!errors.bedRow?.message}
                     invalidText={errors.bedRow?.message}
+                    label={t('bedRow', 'Bed row')}
+                    onChange={(e, { value }) => field.onChange(value.toString())}
+                    value={field.value}
                   />
                 )}
               />
@@ -255,13 +258,13 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                 name="bedColumn"
                 render={({ field }) => (
                   <NumberInput
-                    id="bedColumn"
-                    label={t('bedColumn', 'Bed column')}
                     hideSteppers
-                    value={field.value}
-                    onChange={(e, { value }) => field.onChange(value.toString())}
+                    id="bedColumn"
                     invalid={!!errors.bedColumn?.message}
                     invalidText={errors.bedColumn?.message}
+                    label={t('bedColumn', 'Bed column')}
+                    onChange={(e, { value }) => field.onChange(value.toString())}
+                    value={field.value}
                   />
                 )}
               />
@@ -275,28 +278,27 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                 name="location"
                 render={({ field: { onChange, onBlur, value, ref } }) => (
                   <ComboBox
+                    disabled={!hasLocations}
                     id="location"
-                    titleText={t('location', 'Location')}
+                    invalid={!!errors.location?.message}
+                    invalidText={errors.location?.message}
+                    items={allLocations}
+                    itemToString={(location) => location?.display ?? ''}
+                    onBlur={onBlur}
+                    onChange={({ selectedItem }) => onChange(selectedItem)}
                     placeholder={
                       hasLocations
                         ? t('selectLocation', 'Select a location')
                         : t('noLocationsAvailable', 'No locations available')
                     }
-                    items={allLocations}
-                    itemToString={(location) => location?.display ?? ''}
-                    selectedItem={value}
-                    onChange={({ selectedItem }) => onChange(selectedItem)}
-                    onBlur={onBlur}
                     ref={ref}
-                    invalid={!!errors.location?.message}
-                    invalidText={errors.location?.message}
-                    disabled={!hasLocations}
+                    selectedItem={value}
+                    titleText={t('location', 'Location')}
                   />
                 )}
               />
             </div>
           </ResponsiveWrapper>
-
           <ResponsiveWrapper>
             <Controller
               control={control}
@@ -304,11 +306,11 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
               render={({ field }) => (
                 <Select
                   id="occupancyStatus"
-                  labelText={t('occupancyStatus', 'Occupancy status')}
-                  value={field.value}
-                  onChange={field.onChange}
                   invalid={!!errors.occupancyStatus?.message}
-                  invalidText={errors.occupancyStatus?.message}>
+                  invalidText={errors.occupancyStatus?.message}
+                  labelText={t('occupancyStatus', 'Occupancy status')}
+                  onChange={field.onChange}
+                  value={field.value}>
                   <SelectItem text={t('selectOccupancyStatus', 'Select occupancy status')} value="" />
                   {occupancyStatuses.map((status, index) => (
                     <SelectItem
@@ -328,13 +330,13 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
               name="bedType"
               render={({ field }) => (
                 <Select
-                  id="bedType"
-                  labelText={t('bedType', 'Bed Type')}
-                  value={field.value}
-                  onChange={field.onChange}
                   disabled={!availableBedTypes.length}
+                  id="bedType"
                   invalid={!!errors.bedType?.message}
-                  invalidText={errors.bedType?.message}>
+                  invalidText={errors.bedType?.message}
+                  labelText={t('bedType', 'Bed Type')}
+                  onChange={field.onChange}
+                  value={field.value}>
                   <SelectItem text={t('selectBedType', 'Select bed type')} value="" />
                   {availableBedTypes.map((bedType, index) => (
                     <SelectItem key={`bedType-${index}`} text={bedType.name} value={bedType.name} />
@@ -359,16 +361,16 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
                 return (
                   <div>
                     <MultiSelect
-                      id="bedTags"
-                      titleText={t('bedTags', 'Bed Tags')}
-                      label={t('selectBedTags', 'Select bed tags')}
-                      items={availableBedTags}
-                      itemToString={(item) => item?.name ?? ''}
                       disabled={!availableBedTags.length}
-                      selectedItems={selectedItems}
-                      onChange={({ selectedItems }) => onChange(selectedItems)}
+                      id="bedTags"
                       invalid={!!errors.bedTags?.message}
                       invalidText={errors.bedTags?.message}
+                      items={availableBedTags}
+                      itemToString={(item) => item?.name ?? ''}
+                      label={t('selectBedTags', 'Select bed tags')}
+                      onChange={({ selectedItems }) => onChange(selectedItems)}
+                      selectedItems={selectedItems}
+                      titleText={t('bedTags', 'Bed Tags')}
                     />
                     {selectedItems && selectedItems.length > 0 && (
                       <div className={styles.tagContainer}>
@@ -392,18 +394,17 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
           </ResponsiveWrapper>
         </Stack>
       </div>
-
       <ButtonSet
         className={classNames({
           [styles.tablet]: isTablet,
           [styles.desktop]: !isTablet,
         })}>
         <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button
-          disabled={isSubmitting || !isDirty || !hasLocations}
           className={styles.button}
+          disabled={isSubmitting || !isDirty || !hasLocations}
           kind="primary"
           type="submit">
           {isSubmitting ? (
@@ -417,4 +418,4 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   );
 };
 
-export default AddEditBedWorkspace;
+export default BedFormWorkspace;

@@ -62,16 +62,18 @@ export async function editBed({
 }
 
 async function createBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise<void> {
-  const mappingPromises = bedTags.map((tag) =>
-    openmrsFetch(`${restBaseUrl}/bedTagMap`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: {
-        bed: bedUuid,
-        bedTag: tag.uuid || tag.id,
-      },
-    }),
-  );
+  const mappingPromises = bedTags
+    .filter((tag) => Boolean(tag.uuid))
+    .map((tag) =>
+      openmrsFetch(`${restBaseUrl}/bedTagMap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          bed: bedUuid,
+          bedTag: tag.uuid,
+        },
+      }),
+    );
   await Promise.all(mappingPromises);
 }
 

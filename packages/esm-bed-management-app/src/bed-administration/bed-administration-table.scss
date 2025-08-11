@@ -6,19 +6,6 @@
   background-color: colors.$white-0;
   border: 1px solid colors.$gray-20;
   margin: layout.$spacing-06;
-
-  @media (min-width: 66rem) {
-    :global(.cds--modal-container) {
-      max-height: 100%;
-      width: 60%;
-    }
-  }
-
-  @media (min-width: 42rem) {
-    :global(.cds--modal-container) {
-      max-height: 100%;
-    }
-  }
 }
 
 .flexContainer {

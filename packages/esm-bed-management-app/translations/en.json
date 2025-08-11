@@ -39,7 +39,6 @@
   "bedTypeUpdatedSuccessfully": "{{bedType}} updated successfully",
   "bedUpdated": "Bed updated",
   "bedUpdateError": "Error updating bed",
-  "cancel": "Cancel",
   "checkFilters": "Check the filters above",
   "createBedTag": "Create bed tag",
   "createBedType": "Create bed type",

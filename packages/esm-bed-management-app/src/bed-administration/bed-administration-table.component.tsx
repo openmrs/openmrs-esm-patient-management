@@ -25,11 +25,11 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
+import { type Bed } from '../types';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import styles from './bed-administration-table.scss';
-import { type Bed } from '../types';
 
 type WorkspaceMode = 'add' | 'edit';
 
@@ -85,7 +85,7 @@ const BedAdministrationTable: React.FC = () => {
         config.bed = bed;
       }
 
-      launchWorkspace('bed-admin-form-workspace', config);
+      launchWorkspace('bed-form-workspace', config);
     },
     [t, mutateBedsGroupedByLocation],
   );
@@ -181,13 +181,14 @@ const BedAdministrationTable: React.FC = () => {
             {paginatedData?.length ? (
               <div className={styles.filterContainer}>
                 <Dropdown
+                  autoAlign
                   id="occupancyStatus"
                   initialSelectedItem={'All'}
+                  items={['All', 'Available', 'Occupied']}
                   label=""
+                  onChange={handleBedStatusChange}
                   titleText={t('filterByOccupancyStatus', 'Filter by occupancy status') + ':'}
                   type="inline"
-                  items={['All', 'Available', 'Occupied']}
-                  onChange={handleBedStatusChange}
                 />
               </div>
             ) : null}
@@ -207,7 +208,7 @@ const BedAdministrationTable: React.FC = () => {
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
-                    {headers.map((header, index) => (
+                    {headers.map((header) => (
                       <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
