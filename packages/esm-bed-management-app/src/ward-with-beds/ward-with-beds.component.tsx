@@ -5,23 +5,23 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  InlineLoading,
   Pagination,
-  TableContainer,
   Table,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tag,
-  InlineLoading,
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
 import { launchWorkspace, navigate, usePagination } from '@openmrs/esm-framework';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
+import { type Bed, type WorkspaceMode } from '../types';
 import Header from '../header/header.component';
 import styles from './ward-with-beds.scss';
-import { type Bed, type WorkspaceMode } from '../types';
 
 type RouteParams = { location: string };
 
@@ -88,8 +88,8 @@ const WardWithBeds: React.FC = () => {
     }));
   }, [paginatedData]);
 
-  const handleAddEditBedWorkspace = (mode: WorkspaceMode, bed?: Bed) => {
-    launchWorkspace('bed-admin-form-workspace', {
+  const handleLaunchBedFormWorkspace = (mode: WorkspaceMode, bed?: Bed) => {
+    launchWorkspace('bed-form-workspace', {
       workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
       mutateBeds: mutate,
       defaultLocation: { display: name, uuid: location },
@@ -124,7 +124,7 @@ const WardWithBeds: React.FC = () => {
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={handleAddEditBedWorkspace}>
+              onClick={handleLaunchBedFormWorkspace}>
               <span>{t('addBed', 'Add bed')}</span>
             </Button>
           </div>

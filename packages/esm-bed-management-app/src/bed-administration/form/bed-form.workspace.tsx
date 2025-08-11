@@ -1,45 +1,46 @@
 import React, { useCallback, useEffect } from 'react';
+import classNames from 'classnames';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import {
+  Button,
+  ButtonSet,
+  ComboBox,
+  Form,
+  InlineLoading,
+  MultiSelect,
+  NumberInput,
+  Select,
+  SelectItem,
+  Stack,
+  Tag,
+  TextInput,
+} from '@carbon/react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type DefaultWorkspaceProps,
   ResponsiveWrapper,
   useLayoutType,
   useSession,
   showSnackbar,
+  getCoreTranslation,
 } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
-import styles from './bed-form.workspace.scss';
-import {
-  ButtonSet,
-  Button,
-  InlineLoading,
-  TextInput,
-  NumberInput,
-  Select,
-  SelectItem,
-  ComboBox,
-  Form,
-  MultiSelect,
-  Stack,
-  Tag,
-} from '@carbon/react';
-import classNames from 'classnames';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
 import { type BedPostPayload, type InitialData } from '../../types';
+import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
 import { editBed, saveBed, useBedType, useBedTagMappings } from './bed-form.resource';
+import styles from './bed-form.workspace.scss';
 
 const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
 type OccupancyStatus = (typeof OCCUPANCY_STATUSES)[number];
 
-type AddEditBedWorkspaceProps = DefaultWorkspaceProps & {
+type BedFormWorkspaceProps = DefaultWorkspaceProps & {
   bed?: InitialData;
   mutateBeds: () => void;
   defaultLocation?: { display: string; uuid: string };
 };
 
-const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
+const BedFormWorkspace: React.FC<BedFormWorkspaceProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -399,7 +400,7 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
           [styles.desktop]: !isTablet,
         })}>
         <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button
           disabled={isSubmitting || !isDirty || !hasLocations}
@@ -417,4 +418,4 @@ const AddEditBedWorkspace: React.FC<AddEditBedWorkspaceProps> = ({
   );
 };
 
-export default AddEditBedWorkspace;
+export default BedFormWorkspace;
