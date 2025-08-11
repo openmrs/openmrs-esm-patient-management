@@ -1,7 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel-link.component';
-import AddEditBedWorkspace from './bed-administration/form/add-edit-bed.workspace';
 
 const moduleName = '@openmrs/esm-bed-management-app';
 
