@@ -110,19 +110,47 @@ export interface BedTypeData {
   description: string;
 }
 
+export interface InitialData {
+  uuid: string;
+  bedNumber: string;
+  status: string;
+  description: string;
+  row: number;
+  column: number;
+  location: {
+    display: string;
+    uuid: string;
+  };
+  bedType: {
+    name: string;
+  };
+  bedTags: Array<{
+    uuid: string;
+    name: string;
+  }>;
+}
+
 export interface BedTagData {
   id?: string;
   uuid: string;
   name: string;
 }
 
+export interface BedTag {
+  id?: string;
+  name: string;
+  uuid?: string;
+}
+
 export interface BedPostPayload {
+  uuid?: string;
   bedNumber: string;
   bedType: string;
   row: number;
   column: number;
-  status: string;
+  status?: string;
   locationUuid: string;
+  bedTag?: BedTag[];
 }
 
 export interface BedTagPayload {
@@ -167,3 +195,5 @@ export interface BedDetails extends Bed {
     identifiers: Array<{ identifier: string }>;
   };
 }
+
+export type WorkspaceMode = 'add' | 'edit';
