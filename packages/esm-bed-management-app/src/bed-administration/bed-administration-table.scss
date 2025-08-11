@@ -3,6 +3,7 @@
 @use '@carbon/type';
 
 .widgetCard {
+  background-color: colors.$white-0;
   border: 1px solid colors.$gray-20;
   margin: layout.$spacing-06;
 
@@ -18,12 +19,6 @@
       max-height: 100%;
     }
   }
-}
-
-.widgetCard {
-  background-color: colors.$white-0;
-  border: 1px solid colors.$gray-20;
-  margin: layout.$spacing-06;
 }
 
 .flexContainer {

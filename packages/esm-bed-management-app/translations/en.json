@@ -14,6 +14,7 @@
   "bedName": "Bed name",
   "bedNamePlaceholder": "Name of this bed",
   "bedNumber": "Bed number",
+  "bedNumberMaxCharsHelper": "Maximum 10 characters",
   "bedNumberMaxLength": "Bed number must not exceed 10 characters",
   "bedNumberPlaceholder": "e.g. CHA-201",
   "bedNumberRequired": "Bed number is required",
