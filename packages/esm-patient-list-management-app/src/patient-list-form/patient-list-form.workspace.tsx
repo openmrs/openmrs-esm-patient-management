@@ -3,6 +3,7 @@ import { Button, ButtonSet, Dropdown, Layer, TextArea, TextInput } from '@carbon
 import { type TFunction, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import {
+  getCoreTranslation,
   OpenmrsFetchError,
   showSnackbar,
   useLayoutType,
@@ -10,9 +11,14 @@ import {
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
 import type { NewCohortData, NewCohortDataPayload, OpenmrsCohort } from '../api/types';
-import { createPatientList, extractErrorMessagesFromResponse, type ErrorObject } from '../api/api-remote';
+import {
+  createPatientList,
+  editPatientList,
+  extractErrorMessagesFromResponse,
+  type ErrorObject,
+} from '../api/api-remote';
 import { useCohortTypes } from '../api/hooks';
-import styles from './create-edit-patient-list.scss';
+import styles from './patient-list-form.scss';
 
 const createCohortSchema = (t: TFunction) => {
   return z.object({
@@ -27,11 +33,13 @@ const createCohortSchema = (t: TFunction) => {
 
 type CohortFormData = z.infer<ReturnType<typeof createCohortSchema>>;
 
-export interface CreatePatientListWorkspaceProps {
+export interface PatientListFormWorkspaceProps extends DefaultWorkspaceProps {
+  patientListDetails?: OpenmrsCohort;
   onSuccess?: () => void;
 }
 
-const CreatePatientListWorkspace: React.FC<CreatePatientListWorkspaceProps & DefaultWorkspaceProps> = ({
+const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
+  patientListDetails,
   onSuccess = () => {},
   closeWorkspace,
 }) => {
@@ -41,7 +49,8 @@ const CreatePatientListWorkspace: React.FC<CreatePatientListWorkspaceProps & Def
   const session = useSession();
   const { t } = useTranslation();
   const cohortSchema = createCohortSchema(t);
-  const { listCohortTypes } = useCohortTypes() ?? {};
+  const { listCohortTypes = [] } =
+    useCohortTypes() ?? ({} as { listCohortTypes?: Array<{ uuid: string; display: string }> });
   const { user } = session;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cohortDetails, setCohortDetails] = useState<CohortFormData>({
@@ -70,12 +79,16 @@ const CreatePatientListWorkspace: React.FC<CreatePatientListWorkspaceProps & Def
   );
 
   useEffect(() => {
-    setCohortDetails({
-      name: '',
-      description: '',
-      cohortType: '',
-    });
-  }, [user]);
+    if (patientListDetails) {
+      setCohortDetails({
+        name: patientListDetails?.name || '',
+        description: patientListDetails?.description || '',
+        cohortType: patientListDetails?.cohortType?.uuid || '',
+      });
+    } else {
+      setCohortDetails({ name: '', description: '', cohortType: '' });
+    }
+  }, [user, patientListDetails]);
 
   const handleSubmit = useCallback(() => {
     if (!validateForm(cohortDetails)) {
@@ -84,47 +97,64 @@ const CreatePatientListWorkspace: React.FC<CreatePatientListWorkspaceProps & Def
 
     setIsSubmitting(true);
 
-    createPatientList({
-      ...cohortDetails,
-      location: session?.sessionLocation?.uuid,
-    } as NewCohortDataPayload)
-      .then(() => {
-        showSnackbar({
-          title: t('created', 'Created'),
-          subtitle: `${t('listCreated', 'List created successfully')}`,
-          kind: 'success',
-          isLowContrast: true,
-        });
-        onSuccess();
-        setIsSubmitting(false);
-        closeWorkspace();
-      })
-      .catch((error) => {
-        const errorDescription =
-          OpenmrsFetchError && error instanceof OpenmrsFetchError
-            ? typeof error.responseBody === 'string'
-              ? error.responseBody
-              : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
-            : error?.message;
+    const onError = (error: unknown) => {
+      const errorDescription =
+        OpenmrsFetchError && error instanceof OpenmrsFetchError
+          ? typeof error.responseBody === 'string'
+            ? error.responseBody
+            : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+          : (error as any)?.message;
 
-        showSnackbar({
-          title: t('errorCreatingList', 'Error creating list'),
-          subtitle: errorDescription,
-          kind: 'error',
-        });
-        setIsSubmitting(false);
+      showSnackbar({
+        title: patientListDetails
+          ? t('errorUpdatingList', 'Error updating list')
+          : t('errorCreatingList', 'Error creating list'),
+        subtitle: errorDescription,
+        kind: 'error',
       });
-  }, [closeWorkspace, cohortDetails, onSuccess, session.sessionLocation?.uuid, t, validateForm]);
+      setIsSubmitting(false);
+    };
 
-  const handleChange = useCallback(
-    ({ currentTarget }: SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setCohortDetails((cohortDetails) => ({
+    if (patientListDetails) {
+      editPatientList(patientListDetails.uuid, cohortDetails as NewCohortData)
+        .then(() => {
+          showSnackbar({
+            title: t('updated', 'Updated'),
+            subtitle: t('listUpdated', 'List updated successfully'),
+            kind: 'success',
+            isLowContrast: true,
+          });
+          onSuccess();
+          setIsSubmitting(false);
+          closeWorkspace();
+        })
+        .catch(onError);
+    } else {
+      createPatientList({
         ...cohortDetails,
-        [currentTarget?.name]: currentTarget?.value,
-      }));
-    },
-    [setCohortDetails],
-  );
+        location: session?.sessionLocation?.uuid,
+      } as NewCohortDataPayload)
+        .then(() => {
+          showSnackbar({
+            title: t('created', 'Created'),
+            subtitle: `${t('listCreated', 'List created successfully')}`,
+            kind: 'success',
+            isLowContrast: true,
+          });
+          onSuccess();
+          setIsSubmitting(false);
+          closeWorkspace();
+        })
+        .catch(onError);
+    }
+  }, [closeWorkspace, cohortDetails, onSuccess, patientListDetails, session.sessionLocation?.uuid, t, validateForm]);
+
+  const handleChange = useCallback(({ currentTarget }: SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setCohortDetails((prevDetails) => ({
+      ...prevDetails,
+      [currentTarget?.name]: currentTarget?.value,
+    }));
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -134,13 +164,13 @@ const CreatePatientListWorkspace: React.FC<CreatePatientListWorkspaceProps & Def
           <Layer level={responsiveLevel}>
             <TextInput
               id={`${id}-input`}
+              invalid={!!validationErrors.name}
+              invalidText={validationErrors.name}
               labelText={t('newPatientListNameLabel', 'List name')}
               name="name"
               onChange={handleChange}
               placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
               value={cohortDetails?.name}
-              invalid={!!validationErrors.name}
-              invalidText={validationErrors.name}
             />
           </Layer>
         </div>
@@ -179,16 +209,20 @@ const CreatePatientListWorkspace: React.FC<CreatePatientListWorkspaceProps & Def
           </Layer>
         </div>
       </div>
-      <ButtonSet className={styles.buttonsGroup}>
+      <ButtonSet className={styles.buttonSet}>
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary" size="xl">
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button className={styles.button} onClick={handleSubmit} size="xl" disabled={isSubmitting}>
-          {isSubmitting ? t('submitting', 'Submitting') : t('createList', 'Create list')}
+          {isSubmitting
+            ? t('submitting', 'Submitting')
+            : patientListDetails
+              ? t('editList', 'Edit list')
+              : t('createList', 'Create list')}
         </Button>
       </ButtonSet>
     </div>
   );
 };
 
-export default CreatePatientListWorkspace;
+export default PatientListFormWorkspace;

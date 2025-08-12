@@ -3,12 +3,12 @@ import classnames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
 import Header from '../header/header.component';
 import ListsTable from '../lists-table/lists-table.component';
 import styles from './lists-dashboard.scss';
-import { launchWorkspace } from '@openmrs/esm-framework';
 
 const TabIndices = {
   STARRED_LISTS: 0,
@@ -41,9 +41,12 @@ const ListsDashboard: React.FC = () => {
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
+
   useEffect(() => {
-    if (search) {
-      launchWorkspace('create-patient-list-workspace', {
+    const params = new URLSearchParams(search);
+    const shouldOpenCreate = params.get('create') === 'true' || params.get('new_cohort') === 'true';
+    if (shouldOpenCreate) {
+      launchWorkspace('patient-list-form-workspace', {
         workspaceTitle: t('newPatientListHeader', 'New patient list'),
       });
     }
@@ -59,7 +62,7 @@ const ListsDashboard: React.FC = () => {
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
-        <Header handleShowNewListOverlay={() => {}} onCreateSuccess={() => mutate()} />
+        <Header onCreateSuccess={() => mutate()} />
         <div className={styles.tabsContainer}>
           <Tabs
             className={styles.tabs}
@@ -91,7 +94,6 @@ const ListsDashboard: React.FC = () => {
           </div>
         </div>
       </section>
-      <section></section>
     </main>
   );
 };

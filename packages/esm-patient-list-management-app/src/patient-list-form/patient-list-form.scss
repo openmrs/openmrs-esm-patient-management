@@ -1,0 +1,34 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content {
+  padding: layout.$spacing-05;
+}
+
+.header {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-05;
+}
+
+.input {
+  margin-top: layout.$spacing-07;
+}
+
+.buttonSet {
+  margin-top: auto;
+  justify-self: end;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}

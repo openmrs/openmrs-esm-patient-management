@@ -1,9 +1,8 @@
-/* eslint-disable playwright/no-skipped-test */
 import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import { addPatientToCohort, deleteCohort, generateRandomCohort, removePatientFromCohort } from '../commands';
-import { type Cohort, type CohortMember, type Patient } from '../commands/types';
+import { type Cohort, type CohortMember } from '../commands/types';
 
 let cohortMember: CohortMember;
 let cohortUuid: string;
@@ -13,7 +12,7 @@ test.beforeEach(async ({ api }) => {
   cohort = await generateRandomCohort(api);
 });
 
-test.skip('Create and edit a patient list', async ({ page }) => {
+test('Create and edit a patient list', async ({ page }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I visit the patient lists page', async () => {
@@ -58,7 +57,7 @@ test.skip('Create and edit a patient list', async ({ page }) => {
   });
 });
 
-test.skip('Manage patients in a list', async ({ api, page, patient }) => {
+test('Manage patients in a list', async ({ api, page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step("When I visit a specific patient list's page", async () => {

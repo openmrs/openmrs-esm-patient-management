@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
+import { showModal } from '@openmrs/esm-framework';
 import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
 import { getByTextWithMarkup } from 'tools';
@@ -11,6 +12,7 @@ const mockUsePatientListDetails = jest.mocked(usePatientListDetails);
 const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
 const mockDeletePatientList = jest.mocked(deletePatientList);
 const mockUseCohortTypes = jest.mocked(useCohortTypes);
+const mockShowModal = jest.mocked(showModal);
 
 jest.mock('../api/hooks', () => ({
   usePatientListDetails: jest.fn(),
@@ -126,13 +128,9 @@ describe('ListDetails', () => {
     await userEvent.click(screen.getByText('Actions'));
     await userEvent.click(screen.getByText(/delete patient list/i));
 
-    expect(screen.getByText(/Are you sure you want to delete this patient list/i)).toBeInTheDocument();
-    expect(screen.getByText('Delete')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-
-    // eslint-disable-next-line testing-library/no-node-access
-    expect(screen.getByText('Delete').closest('button')).toBeEnabled();
-
-    await userEvent.click(screen.getByText('Cancel'));
+    expect(mockShowModal).toHaveBeenCalledWith(
+      'delete-patient-list-modal',
+      expect.objectContaining({ listName: expect.any(String), onConfirm: expect.any(Function) }),
+    );
   });
 });

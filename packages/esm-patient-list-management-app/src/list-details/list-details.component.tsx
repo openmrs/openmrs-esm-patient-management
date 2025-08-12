@@ -2,9 +2,17 @@ import React, { useState, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Modal, OverflowMenuItem } from '@carbon/react';
+import { OverflowMenuItem } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
-import { navigate, formatDate, parseDate, showSnackbar, CustomOverflowMenu , launchWorkspace } from '@openmrs/esm-framework';
+import {
+  navigate,
+  formatDate,
+  parseDate,
+  showSnackbar,
+  CustomOverflowMenu,
+  launchWorkspace,
+  showModal,
+} from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
@@ -16,6 +24,8 @@ interface ListDetails {
   sex: string;
   startDate: string;
   uuid: string;
+  membershipUuid?: string;
+  mobile?: string | null;
 }
 
 const ListDetails = () => {
@@ -24,7 +34,8 @@ const ListDetails = () => {
   const patientListUuid = params.patientListUuid;
   const [currentPage, setPageCount] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(10);
-  const [searchString, setSearchString] = useState('');
+  const [searchString] = useState('');
+
   const { listDetails, mutateListDetails } = usePatientListDetails(patientListUuid);
   const { listMembers, isLoadingListMembers, mutateListMembers } = usePatientListMembers(
     patientListUuid,
@@ -32,9 +43,6 @@ const ListDetails = () => {
     (currentPage - 1) * currentPageSize,
     currentPageSize,
   );
-
-  const [showEditPatientListDetailOverlay, setEditPatientListDetailOverlay] = useState(false);
-  const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 
   const patients: Array<ListDetails> = useMemo(
     () =>
@@ -63,7 +71,7 @@ const ListDetails = () => {
         header: t('name', 'Name'),
         link: {
           getUrl: (patient) =>
-            patient?.uuid ? `${window.spaBase}/patient/${patient?.uuid}/chart/` : window?.location?.href,
+            patient?.uuid ? `${window.getOpenmrsSpaBase()}patient/${patient?.uuid}/chart/` : window?.location?.href,
         },
       },
       {
@@ -86,31 +94,40 @@ const ListDetails = () => {
     [t],
   );
 
-  const handleDelete = useCallback(() => {
-    setShowDeleteConfirmationModal(true);
-  }, []);
+  const handleEditPatientList = useCallback(() => {
+    launchWorkspace('patient-list-form-workspace', {
+      workspaceTitle: t('editPatientListHeader', 'Edit patient list'),
+      patientListDetails: listDetails,
+      onSuccess: mutateListDetails,
+    });
+  }, [listDetails, mutateListDetails, t]);
 
-  const confirmDeletePatientList = useCallback(() => {
-    deletePatientList(patientListUuid)
-      .then(() => {
-        showSnackbar({
-          title: t('deleted', 'Deleted'),
-          subtitle: `${t('deletedPatientList', 'Deleted patient list')}: ${listDetails?.name}`,
-          kind: 'success',
-          isLowContrast: true,
-        });
-
-        navigate({ to: window.getOpenmrsSpaBase() + 'home/patient-lists' });
-      })
-      .catch((e) =>
-        showSnackbar({
-          title: t('errorDeletingList', 'Error deleting patient list'),
-          subtitle: e?.message,
-          kind: 'error',
-        }),
-      )
-      .finally(() => setShowDeleteConfirmationModal(false));
-  }, [patientListUuid, listDetails, t]);
+  const handleDeletePatientList = useCallback(() => {
+    const dispose = showModal('delete-patient-list-modal', {
+      listName: listDetails?.name,
+      listSize: listDetails?.size,
+      onConfirm: async () => {
+        await deletePatientList(patientListUuid)
+          .then(() => {
+            showSnackbar({
+              title: t('deleted', 'Deleted'),
+              subtitle: `${t('deletedPatientList', 'Deleted patient list')}: ${listDetails?.name}`,
+              kind: 'success',
+              isLowContrast: true,
+            });
+            navigate({ to: window.getOpenmrsSpaBase() + 'home/patient-lists' });
+          })
+          .catch((e) =>
+            showSnackbar({
+              title: t('errorDeletingList', 'Error deleting patient list'),
+              subtitle: e?.message,
+              kind: 'error',
+            }),
+          );
+      },
+      close: () => dispose(),
+    });
+  }, [listDetails?.name, listDetails?.size, patientListUuid, t]);
 
   return (
     <main className={styles.container}>
@@ -135,19 +152,13 @@ const ListDetails = () => {
             <OverflowMenuItem
               className={styles.menuItem}
               itemText={t('editNameDescription', 'Edit name or description')}
-              onClick={() => {
-                launchWorkspace('edit-patient-list-workspace', {
-                  workspaceTitle: t('editPatientListHeader', 'Edit patient list'),
-                  patientListDetails: listDetails,
-                  onSuccess: mutateListDetails,
-                });
-              }}
+              onClick={handleEditPatientList}
             />
             <OverflowMenuItem
               className={styles.menuItem}
-              itemText={t('deletePatientList', 'Delete patient list')}
-              onClick={handleDelete}
               isDelete
+              itemText={t('deletePatientList', 'Delete patient list')}
+              onClick={handleDeletePatientList}
             />
           </CustomOverflowMenu>
         </div>
@@ -155,13 +166,13 @@ const ListDetails = () => {
       <section>
         <div className={styles.tableContainer}>
           <ListDetailsTable
-            patients={patients}
             cohortUuid={patientListUuid}
             columns={headers}
-            isLoading={isLoadingListMembers}
             isFetching={!listMembers}
-            mutateListMembers={mutateListMembers}
+            isLoading={isLoadingListMembers}
             mutateListDetails={mutateListDetails}
+            mutateListMembers={mutateListMembers}
+            patients={patients}
             pagination={{
               usePagination: listDetails?.size > currentPageSize,
               currentPage,
@@ -176,30 +187,6 @@ const ListDetails = () => {
             }}
           />
         </div>
-        {showEditPatientListDetailOverlay && null}
-        {showDeleteConfirmationModal && (
-          <Modal
-            className={styles.modal}
-            open
-            danger
-            modalHeading={t('confirmDeletePatientList', 'Are you sure you want to delete this patient list?')}
-            primaryButtonText="Delete"
-            secondaryButtonText="Cancel"
-            onRequestClose={() => setShowDeleteConfirmationModal(false)}
-            onRequestSubmit={confirmDeletePatientList}
-            primaryButtonDisabled={false}>
-            {listDetails?.size > 0 ? (
-              <p>
-                {t('patientListMemberCount', 'This list has {{count}} patients', {
-                  count: listDetails.size,
-                })}
-                .
-              </p>
-            ) : (
-              <p>{t('emptyList', 'This list has no patients')}</p>
-            )}
-          </Modal>
-        )}
       </section>
     </main>
   );

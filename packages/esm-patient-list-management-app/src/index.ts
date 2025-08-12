@@ -40,12 +40,23 @@ export const listDetailsTable = getAsyncLifecycle(() => import('./list-details-t
   moduleName,
 });
 
-export const createPatientListWorkspace = getAsyncLifecycle(
-  () => import('./create-edit-patient-list/create-patient-list.workspace'),
-  options,
+export const removePatientFromListModal = getAsyncLifecycle(
+  () => import('./modals/remove-patient-from-list/remove-patient-from-list.modal'),
+  {
+    featureName: 'patient-actions-modal',
+    moduleName,
+  },
 );
 
-export const editPatientListWorkspace = getAsyncLifecycle(
-  () => import('./create-edit-patient-list/edit-patient-list.workspace'),
+export const deletePatientListModal = getAsyncLifecycle(
+  () => import('./modals/delete-patient-list/delete-patient-list.modal'),
+  {
+    featureName: 'patient-actions-modal',
+    moduleName,
+  },
+);
+
+export const patientListFormWorkspace = getAsyncLifecycle(
+  () => import('./patient-list-form/patient-list-form.workspace'),
   options,
 );

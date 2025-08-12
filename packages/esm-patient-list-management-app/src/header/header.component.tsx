@@ -6,14 +6,13 @@ import { PageHeader, PageHeaderContent, PatientListsPictogram, launchWorkspace }
 import styles from './header.scss';
 
 interface HeaderProps {
-  handleShowNewListOverlay: () => void;
   onCreateSuccess?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ handleShowNewListOverlay, onCreateSuccess }) => {
+const Header: React.FC<HeaderProps> = ({ onCreateSuccess }) => {
   const { t } = useTranslation();
   const openCreateListWorkspace = () =>
-    launchWorkspace('create-patient-list-workspace', {
+    launchWorkspace('patient-list-form-workspace', {
       workspaceTitle: t('newPatientListHeader', 'New patient list'),
       onSuccess: onCreateSuccess,
     });
@@ -25,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ handleShowNewListOverlay, onCreateSucce
         className={styles.newListButton}
         data-openmrs-role="New List"
         kind="ghost"
-        iconDescription="Add"
+        iconDescription={t('add', 'Add')}
         renderIcon={(props) => <Add {...props} size={16} />}
         onClick={openCreateListWorkspace}
         size="sm">
