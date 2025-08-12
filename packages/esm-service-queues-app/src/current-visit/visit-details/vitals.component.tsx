@@ -36,7 +36,6 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               <div className={styles.vitalValuesWrapper}>
                 <p className={styles.vitalValues}>{vitalsToDisplay.temperature ? vitalsToDisplay.temperature : '--'}</p>
                 <p className={styles.unit}>{conceptUnits.get(config.concepts.temperatureUuid) ?? ''}</p>
-                <p>{}</p>
               </div>
             </Tile>
             <Tile className={styles.tile}>
@@ -44,7 +43,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               <div className={styles.vitalValuesWrapper}>
                 <p className={styles.vitalValues}>
                   {vitalsToDisplay.systolic ? vitalsToDisplay.systolic : '--'} /
-                  {vitalsToDisplay.systolic ? vitalsToDisplay.diastolic : '--'}
+                  {vitalsToDisplay.diastolic ? vitalsToDisplay.diastolic : '--'}
                 </p>
                 <p className={styles.unit}>{conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}</p>
               </div>
@@ -133,7 +132,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
             </Tile>
           </div>
           <p className={styles.subHeading}>
-            {vitalsToDisplay.provider?.name ? <span> {vitalsToDisplay.provider.name} </span> : null} ·{' '}
+            {vitalsToDisplay.provider?.name ? <span>{vitalsToDisplay.provider.name} · </span> : null}
             {vitalsToDisplay.time}
           </p>
         </div>
@@ -141,9 +140,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
         <div>
           {visitType === 'currentVisit' ? (
             <div>
-              <p className={styles.emptyText}>
-                {t('vitalsNotRecordedForVisit', 'Vitals has not been recorded for this patient for this visit')}
-              </p>
+              <p className={styles.emptyText}>{t('noVitalsRecorded', 'No vitals have been recorded in this visit')}</p>
               <Button
                 size="sm"
                 kind="ghost"

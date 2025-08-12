@@ -44,7 +44,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             <label className={styles.headerLabel}>{headerLabel}</label>
             {children}
           </div>
-          {service == 'scheduled' ? (
+          {/* TODO: Uncomment this when functionality of the patient list works.*/}
+          {/* {service == 'scheduled' ? (
             <div className={styles.link}>
               <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/home`}>
                 {t('patientList', 'Patient list')}
@@ -58,7 +59,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
               </ConfigurableLink>
               <ArrowRight size={16} />
             </div>
-          )}
+          )} */}
         </div>
         <div className={styles.metricsContainer}>
           <div className={styles.metricItem}>
@@ -66,7 +67,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             <p className={styles.totalsValue}>{value}</p>
           </div>
           {showUrgent && (
-            <div className={styles.metricItem}>
+            <div className={styles.countGrid}>
               <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
               <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
             </div>

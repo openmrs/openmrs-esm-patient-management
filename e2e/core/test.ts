@@ -1,6 +1,6 @@
 import { type APIRequestContext, type Page, test as base } from '@playwright/test';
 import { api } from '../fixtures';
-import { type Patient } from '../types';
+import { type Patient } from '../commands/types';
 import { generateRandomPatient, deletePatient } from '../commands';
 
 // This file sets up our custom test harness using the custom fixtures.

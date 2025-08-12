@@ -26,7 +26,7 @@
   "emptyBed": "Empty bed",
   "emptyText": "Empty",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "Error cancelling admission request",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Error changing patient bed assignment",
   "errorConfiguringPatientCard": "Error configuring patient card",
   "errorConfiguringPatientCardMessage": "Unable to find configuration for {{elementType}}, id: {{id}}",

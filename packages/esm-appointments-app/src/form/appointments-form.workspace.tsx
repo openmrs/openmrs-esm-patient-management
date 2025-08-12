@@ -25,6 +25,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ExtensionSlot,
   OpenmrsDatePicker,
+  OpenmrsDateRangePicker,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
@@ -613,35 +614,32 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <ResponsiveWrapper>
-                        <DatePicker
-                          datePickerType="range"
-                          dateFormat={datePickerFormat}
-                          value={[value.startDate, value.recurringPatternEndDate]}
-                          onChange={([startDate, endDate]) => {
-                            onChange({
-                              startDate: new Date(startDate),
-                              recurringPatternEndDate: new Date(endDate),
-                              recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
-                              startDateText: dayjs(new Date(startDate)).format(dateFormat),
-                            });
-                          }}>
-                          <DatePickerInput
-                            id="startDatePickerInput"
-                            labelText={t('startDate', 'Start date')}
-                            style={{ width: '100%' }}
-                            value={watch('appointmentDateTime').startDateText}
-                          />
-                          <DatePickerInput
-                            id="endDatePickerInput"
-                            labelText={t('endDate', 'End date')}
-                            style={{ width: '100%' }}
-                            placeholder={datePickerPlaceHolder}
-                            value={watch('appointmentDateTime').recurringPatternEndDateText}
-                          />
-                        </DatePicker>
-                      </ResponsiveWrapper>
+                    render={({ field: { onChange, value }, fieldState }) => (
+                      <OpenmrsDateRangePicker
+                        value={
+                          value.startDate && value.recurringPatternEndDate
+                            ? [value.startDate, value.recurringPatternEndDate]
+                            : null
+                        }
+                        onChange={(dateRange) => {
+                          const [startDate, endDate] = dateRange;
+                          onChange({
+                            ...value,
+                            startDate,
+                            startDateText: startDate ? dayjs(startDate).format(dateFormat) : '',
+                            recurringPatternEndDate: endDate,
+                            recurringPatternEndDateText: endDate ? dayjs(endDate).format(dateFormat) : '',
+                          });
+                        }}
+                        startName="start"
+                        endName="end"
+                        id="appointmentRecurringDateRangePicker"
+                        data-testid="appointmentRecurringDateRangePicker"
+                        labelText={t('dateRange', 'Set date range')}
+                        invalid={Boolean(fieldState?.error?.message)}
+                        invalidText={fieldState?.error?.message}
+                        isRequired
+                      />
                     )}
                   />
                 </ResponsiveWrapper>

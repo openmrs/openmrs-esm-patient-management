@@ -1,5 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import { ExtensionSlot, useFeatureFlag } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

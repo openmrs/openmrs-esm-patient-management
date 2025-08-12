@@ -99,7 +99,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     [addViewedPatientAndCloseSearchResults, config.search.patientChartUrl],
   );
   const focusedResult = useArrowNavigation(
-    !recentPatients ? searchedPatients?.length ?? 0 : recentPatients?.length ?? 0,
+    !recentPatients ? (searchedPatients?.length ?? 0) : (recentPatients?.length ?? 0),
     handlePatientSelection,
     handleFocusToInput,
     -1,
@@ -171,14 +171,22 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           ref={searchInputRef}
         />
 
+        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
+
         {!isSearchPage && hasSearchTerm && (
-          <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
+          <div
+            className={styles.floatingSearchResultsContainer}
+            data-testid="floatingSearchResultsContainer"
+            data-tutorial-target="floating-search-results-container">
             <PatientSearch query={debouncedSearchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
           </div>
         )}
 
         {!isSearchPage && !hasSearchTerm && showRecentlySearchedPatients && (
-          <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
+          <div
+            className={styles.floatingSearchResultsContainer}
+            data-testid="floatingSearchResultsContainer"
+            data-tutorial-target="floating-search-results-container">
             <RecentlySearchedPatients ref={bannerContainerRef} {...recentPatientSearchResponse} />
           </div>
         )}
