@@ -868,11 +868,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               control={control}
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <TextArea
+                  enableCounter
                   id="appointmentNote"
                   value={value}
                   labelText={t('appointmentNoteLabel', 'Write an additional note')}
                   placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-                  maxLength={255}
+                  maxCount={255}
                   onChange={onChange}
                   onBlur={onBlur}
                   ref={ref}
