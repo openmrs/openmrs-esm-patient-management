@@ -90,6 +90,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   }, [memoizedQueues, queueService]);
 
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
+  const isDataLoaded = !isLoadingQueueLocations && !isLoadingQueues;
 
   const onSubmit = useCallback(
     async (visit: Visit) => {
@@ -105,14 +106,22 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
             isLowContrast: false,
             subtitle: errorMessages,
           });
-          return Promise.reject(new Error(`Form validation failed:\n${errorMessages}`));
+          throw new Error(`Form validation failed:\n${errorMessages}`);
         }
+
         const formValues = getValues();
         if (!formValues.queueLocation || !formValues.queueService || !formValues.priority) {
           const missingFields = [];
-          if (!formValues.queueLocation) missingFields.push('Queue Location');
-          if (!formValues.queueService) missingFields.push('Queue Service');
-          if (!formValues.priority) missingFields.push('Priority');
+          if (!formValues.queueLocation) {
+            missingFields.push(t('queueLocation', 'Queue Location'));
+          }
+          if (!formValues.queueService) {
+            missingFields.push(t('service', 'Service'));
+          }
+          if (!formValues.priority) {
+            missingFields.push(t('priority', 'Priority'));
+          }
+
           const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
             fields: missingFields.join(', '),
           });
@@ -122,7 +131,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
             isLowContrast: false,
             subtitle: errorMessage,
           });
-          return Promise.reject(new Error(errorMessage));
+          throw new Error(errorMessage);
         }
 
         return postQueueEntry(
@@ -183,48 +192,46 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     if (memoizedQueueLocations.length > 0 && !queueLocation) {
       const sessionLocationMatch = memoizedQueueLocations.find((location) => location.id === sessionLocation?.uuid);
       const initialLocation = sessionLocationMatch ? sessionLocationMatch.id : memoizedQueueLocations[0].id;
-      if (queueLocation !== initialLocation) {
-        setValue('queueLocation', initialLocation, { shouldValidate: true });
-      }
+      setValue('queueLocation', initialLocation, { shouldValidate: isDataLoaded });
     }
-  }, [memoizedQueueLocations, queueLocation, sessionLocation?.uuid, setValue]);
+  }, [memoizedQueueLocations, queueLocation, sessionLocation?.uuid, setValue, isDataLoaded]);
 
   useEffect(() => {
     if (currentServiceQueueUuid && currentServiceQueueUuid !== queueService) {
-      setValue('queueService', currentServiceQueueUuid, { shouldValidate: true });
+      setValue('queueService', currentServiceQueueUuid, { shouldValidate: isDataLoaded });
     }
-  }, [currentServiceQueueUuid, queueService, setValue]);
+  }, [currentServiceQueueUuid, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
     if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService) {
       const initialServiceQueue = memoizedQueues.find((queue) => queue.name === defaultInitialServiceQueue);
       if (initialServiceQueue && queueService !== initialServiceQueue.uuid) {
-        setValue('queueService', initialServiceQueue.uuid, { shouldValidate: true });
+        setValue('queueService', initialServiceQueue.uuid, { shouldValidate: isDataLoaded });
       }
     }
-  }, [defaultInitialServiceQueue, memoizedQueues, queueService, setValue]);
+  }, [defaultInitialServiceQueue, memoizedQueues, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
     if (queueLocation && queueService) {
       const isServiceValid = memoizedQueues.some((queue) => queue.uuid === queueService);
       if (!isServiceValid) {
-        setValue('queueService', '', { shouldValidate: true });
-        setValue('priority', defaultPriorityConceptUuid, { shouldValidate: true });
+        setValue('queueService', '', { shouldValidate: isDataLoaded });
+        setValue('priority', defaultPriorityConceptUuid, { shouldValidate: isDataLoaded });
       }
     }
-  }, [queueLocation, memoizedQueues, queueService, setValue, defaultPriorityConceptUuid]);
+  }, [queueLocation, memoizedQueues, queueService, setValue, defaultPriorityConceptUuid, isDataLoaded]);
 
   useEffect(() => {
     if (queueService && priorities.length > 0) {
       const isPriorityValid = priorities.some((p) => p.uuid === priority);
       if (!isPriorityValid) {
         const defaultPriority = priorities.find((p) => p.uuid === defaultPriorityConceptUuid) || priorities[0];
-        setValue('priority', defaultPriority.uuid, { shouldValidate: true });
+        setValue('priority', defaultPriority.uuid, { shouldValidate: isDataLoaded });
       }
     } else if (queueService && priorities.length === 0 && priority !== '') {
       setValue('priority', '', { shouldValidate: false });
     }
-  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue]);
+  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue, isDataLoaded]);
 
   return (
     <Stack gap={5}>
@@ -246,8 +253,8 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   onChange={(event) => {
                     field.onChange(event.target.value);
                     if (event.target.value !== queueLocation) {
-                      setValue('queueService', '', { shouldValidate: true });
-                      setValue('priority', defaultPriorityConceptUuid, { shouldValidate: true });
+                      setValue('queueService', '', { shouldValidate: isDataLoaded });
+                      setValue('priority', defaultPriorityConceptUuid, { shouldValidate: isDataLoaded });
                     }
                   }}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
@@ -287,7 +294,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                 onChange={(event) => {
                   field.onChange(event.target.value);
                   if (event.target.value !== queueService) {
-                    setValue('priority', defaultPriorityConceptUuid, { shouldValidate: true });
+                    setValue('priority', defaultPriorityConceptUuid, { shouldValidate: isDataLoaded });
                   }
                 }}>
                 <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" />
