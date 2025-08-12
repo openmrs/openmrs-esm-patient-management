@@ -29,18 +29,9 @@ export interface QueueFieldsProps {
 
 const createQueueServiceSchema = (t: TFunction) =>
   z.object({
-    queueLocation: z
-      .string({ required_error: t('queueLocationRequired', 'Queue location is required') })
-      .trim()
-      .min(1, t('queueLocationRequired', 'Queue location is required')),
-    queueService: z
-      .string({ required_error: t('queueServiceRequired', 'Queue service is required') })
-      .trim()
-      .min(1, t('queueServiceRequired', 'Queue service is required')),
-    priority: z
-      .string({ required_error: t('priorityIsRequired', 'Priority is required') })
-      .trim()
-      .min(1, t('priorityIsRequired', 'Priority is required')),
+    queueLocation: z.string().trim(),
+    queueService: z.string().trim(),
+    priority: z.string().trim(),
   });
 
 const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: QueueFieldsProps) => {
@@ -66,9 +57,10 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     trigger,
     watch,
     getValues,
+    clearErrors,
   } = useForm({
     defaultValues: {
-      priority: defaultPriorityConceptUuid,
+      priority: '',
       queueLocation: '',
       queueService: '',
     },
@@ -92,29 +84,35 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
   const isDataLoaded = !isLoadingQueueLocations && !isLoadingQueues;
 
+  const hasCompleteQueueEntry = queueLocation && queueService && priority;
+
   const onSubmit = useCallback(
     async (visit: Visit) => {
       try {
-        const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
-        if (!isFormValid) {
-          const errorMessages = Object.entries(errors)
-            .map(([field, error]) => `${field}: ${error?.message ?? 'Invalid'}`)
-            .join('\n');
-          showSnackbar({
-            title: t('formValidationFailed', 'Form validation failed'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: errorMessages,
-          });
-          throw new Error(`Form validation failed:\n${errorMessages}`);
+        if (!hasCompleteQueueEntry) {
+          if (!queueLocation) {
+            return Promise.resolve();
+          }
+
+          const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
+          if (!isFormValid) {
+            const errorMessages = Object.entries(errors)
+              .map(([field, error]) => `${field}: ${error?.message ?? 'Invalid'}`)
+              .join('\n');
+            showSnackbar({
+              title: t('formValidationFailed', 'Form validation failed'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: errorMessages,
+            });
+            throw new Error(`Form validation failed:\n${errorMessages}`);
+          }
         }
 
         const formValues = getValues();
-        if (!formValues.queueLocation || !formValues.queueService || !formValues.priority) {
+
+        if (queueLocation && (!formValues.queueService || !formValues.priority)) {
           const missingFields = [];
-          if (!formValues.queueLocation) {
-            missingFields.push(t('queueLocation', 'Queue Location'));
-          }
           if (!formValues.queueService) {
             missingFields.push(t('service', 'Service'));
           }
@@ -134,34 +132,38 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           throw new Error(errorMessage);
         }
 
-        return postQueueEntry(
-          visit.uuid,
-          formValues.queueService,
-          visit.patient.uuid,
-          formValues.priority,
-          defaultStatusConceptUuid,
-          sortWeight,
-          formValues.queueLocation,
-          visitQueueNumberAttributeUuid,
-        )
-          .then(() => {
-            showSnackbar({
-              kind: 'success',
-              isLowContrast: true,
-              title: t('addedPatientToQueue', 'Added patient to queue'),
-              subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
+        if (formValues.queueLocation && formValues.queueService && formValues.priority) {
+          return postQueueEntry(
+            visit.uuid,
+            formValues.queueService,
+            visit.patient.uuid,
+            formValues.priority,
+            defaultStatusConceptUuid,
+            sortWeight,
+            formValues.queueLocation,
+            visitQueueNumberAttributeUuid,
+          )
+            .then(() => {
+              showSnackbar({
+                kind: 'success',
+                isLowContrast: true,
+                title: t('addedPatientToQueue', 'Added patient to queue'),
+                subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
+              });
+              mutateQueueEntries();
+            })
+            .catch((error) => {
+              showSnackbar({
+                title: t('queueEntryError', 'Error adding patient to the queue'),
+                kind: 'error',
+                isLowContrast: false,
+                subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
+              });
+              throw error;
             });
-            mutateQueueEntries();
-          })
-          .catch((error) => {
-            showSnackbar({
-              title: t('queueEntryError', 'Error adding patient to the queue'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
-            });
-            throw error;
-          });
+        }
+
+        return Promise.resolve();
       } catch (error) {
         showSnackbar({
           title: t('unexpectedError', 'Unexpected error'),
@@ -181,6 +183,8 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
       visitQueueNumberAttributeUuid,
       errors,
       getValues,
+      hasCompleteQueueEntry,
+      queueLocation,
     ],
   );
 
@@ -189,49 +193,52 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   }, [onSubmit, setOnSubmit]);
 
   useEffect(() => {
-    if (memoizedQueueLocations.length > 0 && !queueLocation) {
-      const sessionLocationMatch = memoizedQueueLocations.find((location) => location.id === sessionLocation?.uuid);
-      const initialLocation = sessionLocationMatch ? sessionLocationMatch.id : memoizedQueueLocations[0].id;
-      setValue('queueLocation', initialLocation, { shouldValidate: isDataLoaded });
-    }
-  }, [memoizedQueueLocations, queueLocation, sessionLocation?.uuid, setValue, isDataLoaded]);
-
-  useEffect(() => {
     if (currentServiceQueueUuid && currentServiceQueueUuid !== queueService) {
       setValue('queueService', currentServiceQueueUuid, { shouldValidate: isDataLoaded });
     }
   }, [currentServiceQueueUuid, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
-    if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService) {
+    if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService && queueLocation) {
       const initialServiceQueue = memoizedQueues.find((queue) => queue.name === defaultInitialServiceQueue);
       if (initialServiceQueue && queueService !== initialServiceQueue.uuid) {
         setValue('queueService', initialServiceQueue.uuid, { shouldValidate: isDataLoaded });
       }
     }
-  }, [defaultInitialServiceQueue, memoizedQueues, queueService, setValue, isDataLoaded]);
+  }, [defaultInitialServiceQueue, memoizedQueues, queueService, setValue, isDataLoaded, queueLocation]);
 
   useEffect(() => {
     if (queueLocation && queueService) {
       const isServiceValid = memoizedQueues.some((queue) => queue.uuid === queueService);
       if (!isServiceValid) {
         setValue('queueService', '', { shouldValidate: isDataLoaded });
-        setValue('priority', defaultPriorityConceptUuid, { shouldValidate: isDataLoaded });
+        setValue('priority', '', { shouldValidate: isDataLoaded });
       }
     }
-  }, [queueLocation, memoizedQueues, queueService, setValue, defaultPriorityConceptUuid, isDataLoaded]);
+  }, [queueLocation, memoizedQueues, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
     if (queueService && priorities.length > 0) {
       const isPriorityValid = priorities.some((p) => p.uuid === priority);
       if (!isPriorityValid) {
         const defaultPriority = priorities.find((p) => p.uuid === defaultPriorityConceptUuid) || priorities[0];
-        setValue('priority', defaultPriority.uuid, { shouldValidate: isDataLoaded });
+        setValue('priority', defaultPriority.uuid, { shouldValidate: false });
       }
     } else if (queueService && priorities.length === 0 && priority !== '') {
       setValue('priority', '', { shouldValidate: false });
+    } else if (!queueService && priority !== '') {
+      setValue('priority', '', { shouldValidate: false });
+      clearErrors('priority');
     }
-  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue, isDataLoaded]);
+  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue, clearErrors]);
+
+  useEffect(() => {
+    if (!queueLocation) {
+      setValue('queueService', '', { shouldValidate: false });
+      setValue('priority', '', { shouldValidate: false });
+      clearErrors(['queueService', 'priority']);
+    }
+  }, [queueLocation, setValue, clearErrors]);
 
   return (
     <Stack gap={5}>
@@ -253,8 +260,10 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   onChange={(event) => {
                     field.onChange(event.target.value);
                     if (event.target.value !== queueLocation) {
-                      setValue('queueService', '', { shouldValidate: isDataLoaded });
-                      setValue('priority', defaultPriorityConceptUuid, { shouldValidate: isDataLoaded });
+                      setValue('queueService', '', { shouldValidate: false });
+                      setValue('priority', '', { shouldValidate: false });
+                      // Clear any existing errors when location changes
+                      clearErrors(['queueService', 'priority']);
                     }
                   }}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
@@ -270,46 +279,49 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
         </FormGroup>
       </ResponsiveWrapper>
 
-      <FormGroup legendText={t('service', 'Service')}>
-        <Controller
-          name="queueService"
-          control={control}
-          render={({ field }) =>
-            isLoadingQueues ? (
-              <SelectSkeleton />
-            ) : !memoizedQueues?.length ? (
-              <InlineNotification
-                kind="error"
-                lowContrast
-                subtitle={t('configureServices', 'Please configure services to continue.')}
-                title={t('noServicesConfigured', 'No services configured')}
-              />
-            ) : (
-              <Select
-                {...field}
-                labelText=""
-                id="queueService"
-                invalid={!!errors.queueService}
-                invalidText={errors.queueService?.message}
-                onChange={(event) => {
-                  field.onChange(event.target.value);
-                  if (event.target.value !== queueService) {
-                    setValue('priority', defaultPriorityConceptUuid, { shouldValidate: isDataLoaded });
-                  }
-                }}>
-                <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" />
-                {memoizedQueues?.map((service) => (
-                  <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
-                    {service.name}
-                  </SelectItem>
-                ))}
-              </Select>
-            )
-          }
-        />
-      </FormGroup>
+      {queueLocation && (
+        <FormGroup legendText={t('service', 'Service')}>
+          <Controller
+            name="queueService"
+            control={control}
+            render={({ field }) =>
+              isLoadingQueues ? (
+                <SelectSkeleton />
+              ) : !memoizedQueues?.length ? (
+                <InlineNotification
+                  kind="error"
+                  lowContrast
+                  subtitle={t('configureServices', 'Please configure services to continue.')}
+                  title={t('noServicesConfigured', 'No services configured')}
+                />
+              ) : (
+                <Select
+                  {...field}
+                  labelText=""
+                  id="queueService"
+                  invalid={!!errors.queueService}
+                  invalidText={errors.queueService?.message}
+                  onChange={(event) => {
+                    field.onChange(event.target.value);
+                    if (event.target.value !== queueService) {
+                      setValue('priority', '', { shouldValidate: false });
+                      clearErrors('priority');
+                    }
+                  }}>
+                  <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" />
+                  {memoizedQueues?.map((service) => (
+                    <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
+                </Select>
+              )
+            }
+          />
+        </FormGroup>
+      )}
 
-      {queueService && (
+      {queueLocation && queueService && (
         <FormGroup legendText={t('priority', 'Priority')}>
           <Controller
             name="priority"
