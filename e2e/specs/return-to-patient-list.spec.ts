@@ -1,4 +1,3 @@
-/* eslint-disable playwright/no-skipped-test */
 import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
@@ -13,7 +12,7 @@ test.beforeEach(async ({ api, patient }) => {
   cohortMembership = await addPatientToCohort(api, cohort.uuid, patient.uuid);
 });
 
-test.skip('Return to patient list from the patient chart', async ({ page, patient }) => {
+test('Return to patient list from the patient chart', async ({ page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I navigate to the patient list', async () => {
@@ -39,10 +38,7 @@ test.skip('Return to patient list from the patient chart', async ({ page, patien
   });
 });
 
-test.skip('Return to patient list after navigating to visits page from the patient chart', async ({
-  page,
-  patient,
-}) => {
+test('Return to patient list after navigating to visits page from the patient chart', async ({ page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I navigate to the patient list', async () => {
@@ -76,7 +72,7 @@ test.skip('Return to patient list after navigating to visits page from the patie
   });
 });
 
-test.skip('Return to patient list after navigating to visits and refreshing the page', async ({ page, patient }) => {
+test('Return to patient list after navigating to visits and refreshing the page', async ({ page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
   await test.step('When I navigate to the patient list', async () => {
@@ -114,7 +110,7 @@ test.skip('Return to patient list after navigating to visits and refreshing the 
   });
 });
 
-test.skip('Return to patient list from the patient chart on a new tab', async ({ page, context, patient }) => {
+test('Return to patient list from the patient chart on a new tab', async ({ page, context, patient }) => {
   const patientListPage = new PatientListsPage(page);
   const locator = page.locator('table tbody tr td:nth-child(1) a');
   const pagePromise = context.waitForEvent('page');
