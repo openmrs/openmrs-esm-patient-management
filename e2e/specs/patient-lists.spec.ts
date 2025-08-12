@@ -23,13 +23,14 @@ test('Create and edit a patient list', async ({ page }) => {
   const patientListName = `Cohort ${Math.floor(Math.random() * 10000)}`;
   const patientListDescription = `Cohort Description ${Math.floor(Math.random() * 10000)}`;
 
-  await test.step('Then I create a new list', async () => {
+  await test.step('When I create a new list', async () => {
     await patientListPage.addNewPatientList(patientListName, patientListDescription);
   });
 
-  await test.step("And then I navigate to the new list's page", async () => {
+  await test.step("And I navigate to the new list's page", async () => {
     await patientListPage.allListsButton().click();
     await patientListPage.searchPatientList(patientListName);
+    await expect(patientListPage.patientListsTable().getByText(patientListName)).toBeVisible();
     await patientListPage.patientListsTable().getByText(patientListName).click();
   });
 
