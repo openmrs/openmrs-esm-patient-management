@@ -6,22 +6,32 @@ import { dashboardMeta } from './dashboard.meta';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-service-queues-app';
+const swrRefreshIntervalInMs = 60000;
 
 const options = {
-  featureName: 'outpatient',
+  featureName: 'service-queues',
   moduleName,
 };
 
-export const root = getAsyncLifecycle(() => import('./root.component'), options);
+export const root = getAsyncLifecycle(() => import('./root.component'), {
+  featureName: 'service-queues-app-root',
+  moduleName,
+  swrConfig: {
+    refreshInterval: swrRefreshIntervalInMs,
+  },
+});
 
 export const queueTableByStatusMenu = getAsyncLifecycle(
   () => import('./queue-table/queue-table-by-status-menu.component'),
   options,
 );
-export const queueTableByStatusView = getAsyncLifecycle(
-  () => import('./views/queue-table-by-status-view.component'),
-  options,
-);
+export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/queue-table-by-status-view.component'), {
+  featureName: 'queue-table-by-status-view',
+  moduleName,
+  swrConfig: {
+    refreshInterval: swrRefreshIntervalInMs,
+  },
+});
 
 export const queueList = getAsyncLifecycle(
   () => import('./queue-patient-linelists/queue-services-table.component'),
