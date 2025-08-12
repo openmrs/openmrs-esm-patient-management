@@ -4,10 +4,9 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Modal, OverflowMenuItem } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
-import { navigate, formatDate, parseDate, showSnackbar, CustomOverflowMenu } from '@openmrs/esm-framework';
+import { navigate, formatDate, parseDate, showSnackbar, CustomOverflowMenu , launchWorkspace } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
-import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
 import styles from './list-details.scss';
 
@@ -136,7 +135,13 @@ const ListDetails = () => {
             <OverflowMenuItem
               className={styles.menuItem}
               itemText={t('editNameDescription', 'Edit name or description')}
-              onClick={() => setEditPatientListDetailOverlay(true)}
+              onClick={() => {
+                launchWorkspace('edit-patient-list-workspace', {
+                  workspaceTitle: t('editPatientListHeader', 'Edit patient list'),
+                  patientListDetails: listDetails,
+                  onSuccess: mutateListDetails,
+                });
+              }}
             />
             <OverflowMenuItem
               className={styles.menuItem}
@@ -171,14 +176,7 @@ const ListDetails = () => {
             }}
           />
         </div>
-        {showEditPatientListDetailOverlay && (
-          <CreateEditPatientList
-            close={() => setEditPatientListDetailOverlay(false)}
-            isEditing
-            patientListDetails={listDetails}
-            onSuccess={mutateListDetails}
-          />
-        )}
+        {showEditPatientListDetailOverlay && null}
         {showDeleteConfirmationModal && (
           <Modal
             className={styles.modal}

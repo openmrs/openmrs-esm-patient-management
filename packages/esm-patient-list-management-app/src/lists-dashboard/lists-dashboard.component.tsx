@@ -1,14 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import classnames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
-import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
 import Header from '../header/header.component';
 import ListsTable from '../lists-table/lists-table.component';
 import styles from './lists-dashboard.scss';
+import { launchWorkspace } from '@openmrs/esm-framework';
 
 const TabIndices = {
   STARRED_LISTS: 0,
@@ -41,14 +41,13 @@ const ListsDashboard: React.FC = () => {
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
-  const [showCreatePatientList, setShowCreatePatientList] = useState(!!search);
-  const handleShowNewListOverlay = () => {
-    setShowCreatePatientList(true);
-  };
-
-  const handleHideNewListOverlay = () => {
-    setShowCreatePatientList(false);
-  };
+  useEffect(() => {
+    if (search) {
+      launchWorkspace('create-patient-list-workspace', {
+        workspaceTitle: t('newPatientListHeader', 'New patient list'),
+      });
+    }
+  }, [search, t]);
 
   const tableHeaders = [
     { id: 1, key: 'display', header: t('listName', 'List name') },
@@ -60,7 +59,7 @@ const ListsDashboard: React.FC = () => {
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
-        <Header handleShowNewListOverlay={handleShowNewListOverlay} />
+        <Header handleShowNewListOverlay={() => {}} onCreateSuccess={() => mutate()} />
         <div className={styles.tabsContainer}>
           <Tabs
             className={styles.tabs}
@@ -92,9 +91,7 @@ const ListsDashboard: React.FC = () => {
           </div>
         </div>
       </section>
-      <section>
-        {showCreatePatientList && <CreateEditPatientList close={handleHideNewListOverlay} onSuccess={() => mutate()} />}
-      </section>
+      <section></section>
     </main>
   );
 };

@@ -29,6 +29,22 @@
       "component": "addPatientToPatientListMenuItem"
     }
   ],
+  "workspaces": [
+    {
+      "name": "create-patient-list-workspace",
+      "component": "createPatientListWorkspace",
+      "title": "newPatientListHeader",
+      "type": "patient-lists",
+      "width": "wider"
+    },
+    {
+      "name": "edit-patient-list-workspace",
+      "component": "editPatientListWorkspace",
+      "title": "editPatientListHeader",
+      "type": "patient-lists",
+      "width": "wider"
+    }
+  ],
   "modals": [
     {
       "name": "add-patient-to-patient-list-modal",

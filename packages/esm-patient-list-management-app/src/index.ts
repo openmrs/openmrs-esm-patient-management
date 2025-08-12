@@ -39,3 +39,13 @@ export const listDetailsTable = getAsyncLifecycle(() => import('./list-details-t
   featureName: 'patient-table',
   moduleName,
 });
+
+export const createPatientListWorkspace = getAsyncLifecycle(
+  () => import('./create-edit-patient-list/create-patient-list.workspace'),
+  options,
+);
+
+export const editPatientListWorkspace = getAsyncLifecycle(
+  () => import('./create-edit-patient-list/edit-patient-list.workspace'),
+  options,
+);
