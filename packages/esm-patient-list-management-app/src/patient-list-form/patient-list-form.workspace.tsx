@@ -23,9 +23,11 @@ import styles from './patient-list-form.scss';
 const createCohortSchema = (t: TFunction) => {
   return z.object({
     name: z
-      .string()
-      .min(1, { message: t('cohortNameRequired', 'Cohort name is required') })
-      .trim(),
+      .string({
+        required_error: t('cohortNameRequired', 'Cohort name is required'),
+      })
+      .trim()
+      .min(1, t('cohortNameRequired', 'Cohort name is required')),
     cohortType: z.string().optional(),
     description: z.string().optional(),
   });
@@ -196,8 +198,10 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
         <div className={styles.input}>
           <Layer level={responsiveLevel}>
             <TextArea
+              enableCounter
               id={`${id}-textarea`}
               labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
+              maxCount={255}
               name="description"
               onChange={handleChange}
               placeholder={t(

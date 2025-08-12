@@ -1,11 +1,16 @@
+import { test } from '../core';
 import { type APIRequestContext, expect } from '@playwright/test';
 import { type Cohort, type CohortMember } from './types';
 
 export const generateRandomCohort = async (api: APIRequestContext): Promise<Cohort> => {
+  const suffix = `${test.info().project.name}-${test.info().workerIndex}-${Date.now().toString(36)}`;
+  const patientListName = `Patient list — ${suffix}`;
+  const patientListDescription = `Automated test (run ${suffix})`;
+
   const cohortRes = await api.post('cohortm/cohort', {
     data: {
-      name: `Cohort ${Math.floor(Math.random() * 10000)}`,
-      description: `Cohort description ${Math.floor(Math.random() * 10000)}`,
+      name: patientListName,
+      description: patientListDescription,
       cohortType: 'e71857cb-33af-4f2c-86ab-7223bcfa37ad',
       groupCohort: false,
       startDate: new Date().toISOString(),
@@ -29,20 +34,18 @@ export const deleteCohort = async (api: APIRequestContext, uuid: string) => {
   await api.delete(`cohortm/cohort/${uuid}?purge=true`);
 };
 
-// commands/addPatientToCohort.ts
-function formatAsOpenmrsDate(date: Date): string {
-  // "yyyy-MM-dd'T'HH:mm:ss.SSS+0000" (OpenMRS-friendly)
+const formatAsOpenmrsDate = (date: Date): string => {
   const pad = (n: number, w = 2) => String(n).padStart(w, '0');
-  const tz = -date.getTimezoneOffset(); // minutes east of UTC
-  const sign = tz >= 0 ? '+' : '-';
-  const hh = pad(Math.trunc(Math.abs(tz) / 60));
-  const mm = pad(Math.abs(tz) % 60);
+  const timezoneOffset = -date.getTimezoneOffset();
+  const sign = timezoneOffset >= 0 ? '+' : '-';
+  const hh = pad(Math.trunc(Math.abs(timezoneOffset) / 60));
+  const mm = pad(Math.abs(timezoneOffset) % 60);
   return (
     `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
     `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.` +
     `${String(date.getMilliseconds()).padStart(3, '0')}${sign}${hh}${mm}`
   );
-}
+};
 
 export async function addPatientToCohort(
   api: APIRequestContext,

@@ -20,8 +20,9 @@ test('Create and edit a patient list', async ({ page }) => {
   });
 
   // Create a new patient list
-  const patientListName = `Cohort ${Math.floor(Math.random() * 10000)}`;
-  const patientListDescription = `Cohort Description ${Math.floor(Math.random() * 10000)}`;
+  const suffix = `${test.info().project.name}-${test.info().workerIndex}-${Date.now().toString(36)}`;
+  const patientListName = `Patient list — ${suffix}`;
+  const patientListDescription = `Automated test (run ${suffix})`;
 
   await test.step('When I create a new list', async () => {
     await patientListPage.addNewPatientList(patientListName, patientListDescription);
@@ -39,8 +40,8 @@ test('Create and edit a patient list', async ({ page }) => {
     const [, extractedUuid] = /patient-lists\/([\w\d-]+)/.exec(page.url());
     cohortUuid = extractedUuid;
 
-    await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListName));
-    await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListDescription));
+    await expect(patientListPage.patientListHeader()).toContainText(patientListName);
+    await expect(patientListPage.patientListHeader()).toContainText(patientListDescription);
     await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
   });
 
@@ -53,8 +54,8 @@ test('Create and edit a patient list', async ({ page }) => {
   });
 
   await test.step('Then I should see the updated information about the list', async () => {
-    await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(editedPatientListName));
-    await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(editedPatientListDescription));
+    await expect(patientListPage.patientListHeader()).toContainText(editedPatientListName);
+    await expect(patientListPage.patientListHeader()).toContainText(editedPatientListDescription);
   });
 });
 
