@@ -14,13 +14,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { postQueueEntry } from './queue-fields.resource';
 import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
+import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
@@ -42,7 +43,6 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     () => queueLocations.map((l) => ({ id: l.id, name: l.name })),
     [queueLocations],
   );
-  const { sessionLocation } = useSession();
   const {
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
     visitQueueNumberAttributeUuid,
@@ -52,7 +52,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
 
   const {
     control,
-    formState: { errors },
+    formState: { errors, touchedFields, isSubmitted },
     setValue,
     trigger,
     watch,
@@ -153,12 +153,24 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
               mutateQueueEntries();
             })
             .catch((error) => {
-              showSnackbar({
-                title: t('queueEntryError', 'Error adding patient to the queue'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
-              });
+              const errorMessage = error?.responseBody?.error?.message || error?.message || '';
+              const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
+
+              if (isDuplicatePatientError) {
+                showSnackbar({
+                  title: t('patientAlreadyInQueue', 'Patient already in queue'),
+                  kind: 'warning',
+                  isLowContrast: false,
+                  subtitle: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
+                });
+              } else {
+                showSnackbar({
+                  title: t('queueEntryError', 'Error adding patient to the queue'),
+                  kind: 'error',
+                  isLowContrast: false,
+                  subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
+                });
+              }
               throw error;
             });
         }
@@ -193,10 +205,11 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   }, [onSubmit, setOnSubmit]);
 
   useEffect(() => {
-    if (currentServiceQueueUuid && currentServiceQueueUuid !== queueService) {
+    const service = getValues('queueService');
+    if (currentServiceQueueUuid && !service && !touchedFields.queueService) {
       setValue('queueService', currentServiceQueueUuid, { shouldValidate: isDataLoaded });
     }
-  }, [currentServiceQueueUuid, queueService, setValue, isDataLoaded]);
+  }, [currentServiceQueueUuid, getValues, touchedFields.queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
     if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService && queueLocation) {
@@ -255,14 +268,13 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   {...field}
                   labelText=""
                   id="queueLocation"
-                  invalid={!!errors.queueLocation}
+                  invalid={!!errors.queueLocation && (touchedFields.queueLocation || isSubmitted)}
                   invalidText={errors.queueLocation?.message}
                   onChange={(event) => {
                     field.onChange(event.target.value);
                     if (event.target.value !== queueLocation) {
                       setValue('queueService', '', { shouldValidate: false });
                       setValue('priority', '', { shouldValidate: false });
-                      // Clear any existing errors when location changes
                       clearErrors(['queueService', 'priority']);
                     }
                   }}>
@@ -299,7 +311,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   {...field}
                   labelText=""
                   id="queueService"
-                  invalid={!!errors.queueService}
+                  invalid={!!errors.queueService && (touchedFields.queueService || isSubmitted)}
                   invalidText={errors.queueService?.message}
                   onChange={(event) => {
                     field.onChange(event.target.value);
