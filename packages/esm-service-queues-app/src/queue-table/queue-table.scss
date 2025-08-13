@@ -139,10 +139,6 @@
 }
 
 .expandedActiveVisitRow {
-  :global(.cds--tab-content) {
-    padding: layout.$spacing-03 0;
-  }
-
   td {
     padding: layout.$spacing-03;
 

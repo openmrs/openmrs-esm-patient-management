@@ -20,9 +20,7 @@ const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseSession = jest.mocked(useSession);
 
 jest.mock('../hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({
-    queueLocations: [{ id: '1', name: 'Location 1' }],
-  })),
+  useQueueLocations: jest.fn(() => ({ queueLocations: [{ id: '1', name: 'Location 1' }] })),
 }));
 
 jest.mock('../../hooks/useQueues', () => {
@@ -41,9 +39,7 @@ jest.mock('../../hooks/useQueues', () => {
 });
 
 jest.mock('./queue-fields.resource', () => {
-  return {
-    postQueueEntry: jest.fn(),
-  };
+  return { postQueueEntry: jest.fn() };
 });
 
 const mockPostQueueEntry = jest.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
@@ -52,9 +48,7 @@ describe('QueueFields', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseSession.mockReturnValue(mockSession.data);
-    mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
-    });
+    mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema) });
   });
 
   it('renders the form fields and returns the set values', async () => {
@@ -67,6 +61,10 @@ describe('QueueFields', () => {
     render(<QueueFields setOnSubmit={setOnSubmit} />);
 
     expect(screen.getByRole('group', { name: /queue location/i })).toBeInTheDocument();
+
+    const locationSelect = screen.getByTitle(/select a queue location/i);
+    await user.selectOptions(locationSelect, '1');
+
     expect(screen.getByRole('group', { name: /service/i })).toBeInTheDocument();
 
     const queueUuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
@@ -79,13 +77,13 @@ describe('QueueFields', () => {
     await onSubmit(mockVisitAlice);
     expect(mockPostQueueEntry).toHaveBeenCalledWith(
       mockVisitAlice.uuid,
-      queueUuid, // queueUuid
+      queueUuid,
       mockVisitAlice.patient.uuid,
-      'f4620bfa-3625-4883-bd3f-84c2cce14470', // priority
-      '51ae5e4d-b72b-4912-bf31-a17efb690aeb', // status
-      0, // sortWeight
-      '1', // locationUuid
-      null, // visitQueueNumberAttributeUuid
+      '197852c7-5fd4-4b33-89cc-7bae6848c65a',
+      '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
+      0,
+      '1',
+      null,
     );
   });
 });

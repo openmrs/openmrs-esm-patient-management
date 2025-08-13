@@ -108,7 +108,7 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
       return queueTablePatientAgeColumn(id, translatedHeader ?? t('age', 'Age'));
     }
     case 'priority': {
-      return queueTablePriorityColumn(id, translatedHeader ?? t('priority', 'Priority'), columnDef.config);
+      return queueTablePriorityColumn(id, translatedHeader ?? t('priority', 'Priority'));
     }
     case 'status': {
       return queueTableStatusColumn(id, translatedHeader ?? t('status', 'Status'), columnDef.config);

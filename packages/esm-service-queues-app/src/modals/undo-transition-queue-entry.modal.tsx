@@ -39,8 +39,11 @@ const UndoTransitionQueueEntryModal: React.FC<UndoTransitionQueueEntryModalProps
     <QueueEntryConfirmActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
+      showPatientName={false}
       modalParams={{
-        modalTitle: t('undoTransition', 'Undo transition'),
+        modalTitle: t('undoTransitionForPatient', 'Undo transition for {{patient}}', {
+          patient: queueEntry.display,
+        }),
         modalInstruction,
         submitButtonText: t('undoTransition', 'Undo transition'),
         submitSuccessTitle: t('undoQueueEntryTransitionSuccess', 'Undo transition success'),

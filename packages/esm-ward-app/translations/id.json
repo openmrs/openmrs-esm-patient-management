@@ -26,7 +26,7 @@
   "emptyBed": "Tempat tidur kosong",
   "emptyText": "Kosong",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "Gagal membatalkan permintaan penerimaan",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Gagal mengubah penugasan tempat tidur pasien",
   "errorConfiguringPatientCard": "Gagal mengonfigurasi kartu pasien",
   "errorConfiguringPatientCardMessage": "Tidak dapat menemukan konfigurasi untuk {{elementType}}, id: {{id}}",
