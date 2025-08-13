@@ -34,9 +34,9 @@ export default function WaitingPatientsExtension() {
     service: currentService?.serviceUuid,
     location: currentQueueLocation,
     isEnded: false,
+    status: 'WAITING',
   });
 
-  // Calculate urgent cases count
   const urgentCount = queueEntries.filter((entry) => entry.priority?.display?.toLowerCase() === 'urgent').length;
 
   const handleServiceChange = ({ selectedItem }) => {
@@ -69,7 +69,7 @@ export default function WaitingPatientsExtension() {
           label={t('patients', 'Patients')}
           value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
         />
-        <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount} color="red" small />
+        <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount > 0 ? urgentCount : null} color="red" small />
       </MetricsCardBody>
     </MetricsCard>
   );
