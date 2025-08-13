@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import MetricsCard from './metrics-card.component';
+import { MetricsCard, MetricsCardBody, MetricsCardHeader, MetricsCardItem } from './metrics-card.component';
 import { updateSelectedService, useSelectedQueueLocationUuid, useSelectedService } from '../../helpers/helpers';
 import { useServiceMetricsCount } from '../metrics.resource';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
@@ -49,28 +49,28 @@ export default function WaitingPatientsExtension() {
   };
 
   return (
-    <MetricsCard
-      headerLabel=""
-      label={t('patients', 'Patients')}
-      locationUuid={currentQueueLocation}
-      service={currentService?.serviceDisplay}
-      serviceUuid={currentService?.serviceUuid}
-      value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
-      showUrgent={urgentCount > 0}
-      urgentCount={urgentCount}>
-      <Dropdown
-        id="inline"
-        initialSelectedItem={defaultServiceItem}
-        items={serviceItems}
-        itemToString={(item) =>
-          item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
-        }
-        label=""
-        onChange={handleServiceChange}
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        titleText={`${t('waitingFor', 'Waiting for')}:`}
-        type="inline"
-      />
+    <MetricsCard>
+      <MetricsCardHeader title={t('waitingFor', 'Waiting for') + ':'}>
+        <Dropdown
+          id="inline"
+          initialSelectedItem={defaultServiceItem}
+          items={serviceItems}
+          itemToString={(item) =>
+            item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
+          }
+          label=""
+          onChange={handleServiceChange}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          type="inline"
+        />
+      </MetricsCardHeader>
+      <MetricsCardBody>
+        <MetricsCardItem
+          label={t('patients', 'Patients')}
+          value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
+        />
+        <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount} color="red" small />
+      </MetricsCardBody>
     </MetricsCard>
   );
 }
