@@ -158,32 +158,6 @@ function QueueTableSection() {
   );
 }
 
-function QueueDropdownFilter() {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { services } = useQueueServices();
-  const { selectedServiceDisplay } = useServiceQueuesStore();
-
-  const handleServiceChange = useCallback(({ selectedItem }) => {
-    updateSelectedService(selectedItem.uuid, selectedItem?.display);
-  }, []);
-
-  return (
-    <div className={styles.filterContainer}>
-      <Dropdown
-        id="serviceFilter"
-        items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
-        itemToString={(item) => (item ? item.display : '')}
-        label={selectedServiceDisplay ?? t('all', 'All')}
-        onChange={handleServiceChange}
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        titleText={t('filterByService', 'Filter by service:')}
-        type="inline"
-      />
-    </div>
-  );
-}
-
 function StatusDropdownFilter() {
   const { t } = useTranslation();
   const layout = useLayoutType();
