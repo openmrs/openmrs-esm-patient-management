@@ -43,7 +43,7 @@
     "react-hook-form": "^7.54.0"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "6.x",
+    "@openmrs/esm-framework": "7.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
     "react-router-dom": "6.x",
