@@ -254,6 +254,13 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   }, [queueLocation, setValue, clearErrors]);
 
   return (
+    /*
+     * Do not style this component directly. It is used in multiple contexts:
+     * 1. As an extension in the Visit form in the Patient Chart
+     * 2. In the Add patient to queue modal
+     *
+     * Instead, use the parent component's styling context or create a wrapper component with specific styles.
+     */
     <Stack gap={5}>
       <ResponsiveWrapper>
         <FormGroup legendText={t('queueLocation', 'Queue Location')}>
@@ -332,6 +339,8 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           />
         </FormGroup>
       )}
+      {/* Status section of the form would go here; historical version of this code can be found at
+      https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
       {queueLocation && queueService && (
         <FormGroup legendText={t('priority', 'Priority')}>
