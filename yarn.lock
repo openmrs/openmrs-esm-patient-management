@@ -3132,7 +3132,7 @@ __metadata:
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     dayjs: 1.x
     react: ^18.1.0
     react-dom: ^18.1.0
@@ -3207,8 +3207,8 @@ __metadata:
     yup: "npm:^0.32.11"
     zod: "npm:^3.24.1"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-patient-common-lib": 11.x
     react: 18.x
     react-dom: 18.x
     react-i18next: 11.x
@@ -3229,7 +3229,7 @@ __metadata:
     webpack: "npm:^5.99.9"
     zod: "npm:^3.24.1"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -3390,7 +3390,7 @@ __metadata:
   dependencies:
     webpack: "npm:^5.74.0"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3453,7 +3453,7 @@ __metadata:
     webpack: "npm:^5.99.9"
     zod: "npm:^3.24.1"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3536,7 +3536,7 @@ __metadata:
     webpack: "npm:^5.99.9"
     yup: "npm:^0.29.1"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -3555,7 +3555,7 @@ __metadata:
     react-hook-form: "npm:^7.54.0"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3619,7 +3619,7 @@ __metadata:
     webpack: "npm:^5.99.9"
     zod: "npm:^3.24.1"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3715,7 +3715,7 @@ __metadata:
     webpack: "npm:^5.99.9"
     zod: "npm:^3.24.1"
   peerDependencies:
-    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-framework": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
