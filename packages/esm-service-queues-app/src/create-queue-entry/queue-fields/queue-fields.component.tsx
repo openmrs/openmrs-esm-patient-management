@@ -35,6 +35,10 @@ const createQueueServiceSchema = (t: TFunction) =>
     priority: z.string().trim(),
   });
 
+/**
+ * This component contains form fields for starting a patient's queue entry.
+ */
+
 const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: QueueFieldsProps) => {
   const { t } = useTranslation();
   const schema = useMemo(() => createQueueServiceSchema(t), [t]);
