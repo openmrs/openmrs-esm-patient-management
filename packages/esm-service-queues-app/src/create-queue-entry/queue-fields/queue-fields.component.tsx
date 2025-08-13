@@ -14,7 +14,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { postQueueEntry } from './queue-fields.resource';
 import { useAddPatientToQueueContext } from '../add-patient-to-queue-context';
@@ -42,6 +42,7 @@ const createQueueServiceSchema = (t: TFunction) =>
 const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: QueueFieldsProps) => {
   const { t } = useTranslation();
   const schema = useMemo(() => createQueueServiceSchema(t), [t]);
+  const { sessionLocation } = useSession();
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const memoizedQueueLocations = useMemo(
     () => queueLocations.map((l) => ({ id: l.id, name: l.name })),
@@ -207,6 +208,22 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   useEffect(() => {
     setOnSubmit?.(onSubmit);
   }, [onSubmit, setOnSubmit]);
+
+  useEffect(() => {
+    const currentQueueLocation = getValues('queueLocation');
+
+    if (
+      sessionLocation?.uuid &&
+      !currentQueueLocation &&
+      !touchedFields.queueLocation &&
+      memoizedQueueLocations.length > 0
+    ) {
+      const locationExists = memoizedQueueLocations.some((loc) => loc.id === sessionLocation.uuid);
+      if (locationExists) {
+        setValue('queueLocation', sessionLocation.uuid, { shouldValidate: isDataLoaded });
+      }
+    }
+  }, [sessionLocation, memoizedQueueLocations, getValues, touchedFields.queueLocation, setValue, isDataLoaded]);
 
   useEffect(() => {
     const service = getValues('queueService');
