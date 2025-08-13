@@ -31,7 +31,7 @@ const Summary: React.FC = () => {
               headerLabel={admissionLocation.ward.display}
               label={t('beds', 'Beds')}
               value={admissionLocation?.totalBeds}>
-              {admissionLocation?.totalBeds && (
+              {(admissionLocation?.totalBeds ?? 0) > 0 && (
                 <div className={styles.link}>
                   <ConfigurableLink className={styles.link} to={routeSegment}>
                     {t('viewBeds', 'View beds')}

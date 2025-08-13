@@ -8,21 +8,16 @@ import { convertTime12to24 } from '../helpers/time-helpers';
 interface MoveQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
-  modalTitle?: string;
 }
 
-const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, closeModal, modalTitle }) => {
+const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   return (
     <QueueEntryActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: modalTitle || t('movePatient', 'Move patient'),
-        modalInstruction: t(
-          'transitionPatientStatusOrQueue',
-          'Select a new status or queue for patient to transition to.',
-        ),
+        modalTitle: t('movePatient', 'Move {{patient}}', { patient: queueEntry.display }),
         submitButtonText: t('move', 'Move'),
         submitSuccessTitle: t('queueEntryTransitioned', 'Queue entry transitioned'),
         submitSuccessText: t('queueEntryTransitionedSuccessfully', 'Queue entry transitioned successfully'),
@@ -42,8 +37,12 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
           });
         },
         disableSubmit: (queueEntry, formState) =>
-          formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid,
-        isTransition: true,
+          formState.selectedQueue == queueEntry.queue.uuid &&
+          formState.selectedStatus == queueEntry.status.uuid &&
+          formState.selectedPriority == queueEntry.priority.uuid,
+        isEdit: false,
+        showQueuePicker: true,
+        showStatusPicker: false,
       }}
     />
   );

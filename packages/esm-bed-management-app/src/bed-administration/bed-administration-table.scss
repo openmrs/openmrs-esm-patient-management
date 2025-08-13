@@ -3,29 +3,28 @@
 @use '@carbon/type';
 
 .widgetCard {
+  background-color: colors.$white-0;
   border: 1px solid colors.$gray-20;
   margin: layout.$spacing-06;
-
-  @media (min-width: 66rem) {
-    :global(.cds--modal-container) {
-      max-height: 100%;
-      width: 60%;
-    }
-  }
-
-  @media (min-width: 42rem) {
-    :global(.cds--modal-container) {
-      max-height: 100%;
-    }
-  }
 }
 
 .flexContainer {
   display: flex;
   justify-content: space-between;
-  padding: 0 layout.$spacing-05;
-  margin-top: layout.$spacing-07;
-  margin-left: layout.$spacing-03;
+  align-items: center;
+  padding: layout.$spacing-05;
+}
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+}
+
+.headerActions {
+  display: flex;
+  gap: layout.$spacing-03;
+  align-items: center;
 }
 
 .filterContainer {
@@ -104,5 +103,11 @@
   &::after {
     left: layout.$spacing-03;
     margin-right: -50%;
+  }
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
   }
 }

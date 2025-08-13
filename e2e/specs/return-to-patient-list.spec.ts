@@ -3,7 +3,7 @@ import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import { addPatientToCohort, deleteCohort, generateRandomCohort, removePatientFromCohort } from '../commands';
-import { type Cohort, type CohortMember, type Patient } from '../types';
+import { type Cohort, type CohortMember, type Patient } from '../commands/types';
 
 let cohortMembership: CohortMember;
 let cohort: Cohort;

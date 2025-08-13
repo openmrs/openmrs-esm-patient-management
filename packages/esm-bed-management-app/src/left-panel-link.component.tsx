@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import last from 'lodash-es/last';
+import classNames from 'classnames';
+import { last } from 'lodash-es';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 
@@ -19,14 +20,16 @@ function LinkExtension({ config }: { config: LinkConfig }) {
     return regex.test(value);
   };
 
+  // When navigating to a specific ward, the last URL segment is a location UUID.
+  // Treat that as being on the summary (root) section so the Summary link becomes active.
   if (isUUID(urlSegment)) {
-    urlSegment = 'summary';
+    urlSegment = 'bed-management';
   }
 
   return (
     <ConfigurableLink
       to={`${window.getOpenmrsSpaBase()}bed-management${name && name !== 'bed-management' ? `/${name}` : ''}`}
-      className={`cds--side-nav__link ${name === urlSegment && 'active-left-nav-link'}`}>
+      className={classNames('cds--side-nav__link', name === urlSegment && 'active-left-nav-link')}>
       {title}
     </ConfigurableLink>
   );

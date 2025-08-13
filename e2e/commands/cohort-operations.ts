@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type Cohort, type CohortMember } from '../types';
+import { type Cohort, type CohortMember } from './types';
 
 export const generateRandomCohort = async (api: APIRequestContext): Promise<Cohort> => {
   const cohortRes = await api.post('cohortm/cohort', {

@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { ExtensionSlot, useLayoutType, type Visit } from '@openmrs/esm-framework';

@@ -2,12 +2,12 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useConfig, useLeftNav } from '@openmrs/esm-framework';
 import DashboardContainer from './dashboard-container/dashboard-container.component';
-import { type ConfigSchema } from './config-schema';
+import { type HomeConfig } from './config-schema';
 import { DefaultDashboardRedirect } from './default-dashboard-redirect.component';
 
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
-  const { leftNavMode } = useConfig<ConfigSchema>();
+  const { leftNavMode } = useConfig<HomeConfig>();
   useLeftNav({
     name: 'homepage-dashboard-slot',
     basePath: spaBasePath,
