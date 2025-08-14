@@ -1,5 +1,24 @@
 import { Type, validators } from '@openmrs/esm-framework';
 
+export const appointmentColumnTypes = [
+  // t('patientName', 'Patient name')
+  'patientName',
+  // t('identifier', 'Identifier')
+  'identifier',
+  // t('location', 'Location')
+  'location',
+  // t('serviceType', 'Service type')
+  'serviceType',
+  // t('status', 'Status')
+  'status',
+  // t('dateTime', 'Date & time')
+  'dateTime',
+  // t('provider', 'Provider')
+  'provider',
+] as const;
+
+type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
+
 export const configSchema = {
   allowAllDayAppointments: {
     _type: Type.Boolean,
@@ -77,12 +96,23 @@ export const configSchema = {
     _description:
       'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
   },
+  appointmentsTableColumns: {
+    _type: Type.Array,
+    _description:
+      'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
+    _default: ['patientName', 'identifier', 'location', 'serviceType', 'status'],
+    _elements: {
+      _type: Type.String,
+      _validators: [validators.oneOf(appointmentColumnTypes)],
+    },
+  },
 };
 
 export interface ConfigObject {
   allowAllDayAppointments: boolean;
   appointmentStatuses: Array<string>;
   appointmentTypes: Array<string>;
+  appointmentsTableColumns: Array<string>;
   checkInButton: {
     enabled: boolean;
     showIfActiveVisit: boolean;
@@ -97,3 +127,8 @@ export interface ConfigObject {
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
 }
+
+export type AppointmentTableColumn = {
+  header: string;
+  key: string;
+};
