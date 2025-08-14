@@ -96,7 +96,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
     location: appointment.location?.name,
-    provider: appointment.provider,
+    provider: appointment.providers?.[0]?.name ?? '--',
     status: <AppointmentActions appointment={appointment} />,
   }));
 
