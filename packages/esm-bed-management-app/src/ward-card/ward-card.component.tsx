@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Layer, Tile } from '@carbon/react';
 import styles from './ward-card.scss';
 
@@ -14,7 +15,7 @@ interface WardCardProps {
 
 const WardCard: React.FC<WardCardProps> = ({ children, headerLabel, label, value }) => {
   return (
-    <Layer className={`${children && styles.cardWithChildren} ${styles.container}`}>
+    <Layer className={classNames(children && styles.cardWithChildren, styles.container)}>
       <Tile className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>

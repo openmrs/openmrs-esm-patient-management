@@ -2,24 +2,71 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.medicationContainer {
-  margin-bottom: layout.$spacing-06;
+.wrapper {
+  background-color: $ui-background;
+  display: grid;
+  grid-template-columns: max-content auto;
+  margin: layout.$spacing-05 0;
+
+  :global(.cds--tabs) {
+    min-height: 8rem;
+  }
 }
 
-.medicationRecord {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  @include type.type-style('body-01');
-  color: $text-02;
+.verticalTabs {
+  margin: layout.$spacing-04 0;
+
+  &:global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
+    margin-left: 0;
+  }
+
+  > ul {
+    flex-direction: column !important;
+  }
 }
 
-.medicationTile {
-  width: 100% !important;
+.verticalTabList {
+  :global(.cds--tab--list) {
+    flex-direction: column;
+    max-height: fit-content;
+    overflow-x: visible;
+  }
+}
+
+.desktopTabs {
+  button {
+    height: layout.$spacing-07;
+  }
+}
+
+.tabletTabs {
+  button {
+    height: layout.$spacing-09;
+  }
+}
+
+.selectedTab > button {
+  border-left: 3px solid var(--brand-03) !important;
+  border-bottom: 0 !important;
+  font-weight: 600 !important;
 }
 
 .bodyLong01 {
   @include type.type-style('body-01');
+}
+
+.text02 {
+  color: $text-02;
+}
+
+.medicationContainer {
+  margin-bottom: layout.$spacing-03;
+}
+
+.medicationRecord {
+  align-items: center;
+  @include type.type-style('body-01');
+  color: $text-02;
 }
 
 .bodyShort02 {
@@ -28,7 +75,6 @@
 
 .dosage {
   @include type.type-style('heading-compact-01');
-  margin-left: layout.$spacing-03;
 }
 
 .date {
@@ -39,13 +85,14 @@
 .metadata {
   @include type.type-style('label-01');
   color: $text-02;
-  margin: layout.$spacing-02 0;
+  margin: layout.$spacing-03 0 layout.$spacing-05;
 }
 
 .label01 {
   @include type.type-style('label-01');
   color: $text-02;
   margin: layout.$spacing-02 0;
+  text-transform: uppercase;
 }
 
 .notesSubHeading {
@@ -55,4 +102,34 @@
 
 .notesContainer {
   margin: layout.$spacing-05 0 layout.$spacing-05;
+}
+
+.tab {
+  outline: 0;
+  outline-offset: 0;
+  min-height: layout.$spacing-07 !important;
+  height: layout.$spacing-07 !important;
+
+  button {
+    min-height: layout.$spacing-07 !important;
+    height: layout.$spacing-07 !important;
+  }
+
+  &:active,
+  &:focus {
+    outline: layout.$spacing-01 solid var(--brand-03) !important;
+  }
+
+  &[aria-selected='true'] {
+    border-left: 3px solid var(--brand-03);
+    border-bottom: none;
+    font-weight: 600;
+    margin-left: 0 !important;
+  }
+
+  &[aria-selected='false'] {
+    border-bottom: none;
+    border-left: layout.$spacing-01 solid $ui-03;
+    margin-left: 0 !important;
+  }
 }

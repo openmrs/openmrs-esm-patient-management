@@ -19,6 +19,17 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
   return await bedRes.json();
 };
 
+export const bedAllocation = async (api: APIRequestContext, patientId: string, encounterUuid: string): Promise<Bed> => {
+  const bedRes = await api.post('/openmrs/ws/rest/v1/beds/1', {
+    data: {
+      patientUuid: patientId,
+      encounterUuid: encounterUuid,
+    },
+  });
+  expect(bedRes.ok()).toBeTruthy();
+  return await bedRes.json();
+};
+
 export const generateBedType = async (api: APIRequestContext): Promise<BedType> => {
   const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
   const bedTypeName = `TestBedType_${randomString}`;

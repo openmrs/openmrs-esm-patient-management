@@ -16,15 +16,15 @@ const Notes: React.FC<NotesProps> = ({ notes, diagnoses }) => {
   return (
     <div>
       {diagnoses.length > 0
-        ? diagnoses.map((d: DiagnosisItem, ind) => (
-            <Tag type="blue" size="md">
+        ? diagnoses.map((d: DiagnosisItem, i) => (
+            <Tag key={`diagnosis-${d.diagnosis}-${i}`} type="blue" size="md">
               {d.diagnosis}
             </Tag>
           ))
         : null}
       {notes.length ? (
-        notes.map((note: Note, index) => (
-          <div key={`note-` + index}>
+        notes.map((note: Note, i) => (
+          <div key={`note-${note.time}-${note.provider.name}-${i}`}>
             <p className={styles.notesContainer}>{note.note}</p>
             <p className={styles.notesSubHeading}>
               {note.provider.name ? <span> {note.provider.name} </span> : null} · {note.time}

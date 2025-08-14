@@ -25,8 +25,9 @@ const mockObsConcepts: Array<OpenmrsResource> = [
 
 const mockConfig: ActiveVisitsConfigSchema = {
   activeVisits: {
-    ...getDefaultsFromConfigSchema(configSchema).activeVisits,
+    ...getDefaultsFromConfigSchema<ActiveVisitsConfigSchema>(configSchema).activeVisits,
     obs: ['160225AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '5484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    identifiers: [],
   },
 };
 
@@ -100,7 +101,7 @@ describe('ActiveVisitsTable', () => {
 
     render(<ActiveVisitsTable />);
 
-    const standardColumnHeaders = [/Visit Time/, /ID Number/, /Name/, /Gender/, /Age/, /Visit Type/];
+    const standardColumnHeaders = [/Visit Time/, /Name/, /Gender/, /Age/, /Visit Type/];
     standardColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
     });

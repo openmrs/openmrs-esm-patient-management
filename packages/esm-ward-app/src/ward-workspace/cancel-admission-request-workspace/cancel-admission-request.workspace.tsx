@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { getCoreTranslation, ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
@@ -18,7 +18,6 @@ export default function CancelAdmissionRequestWorkspace({
 }: WardPatientWorkspaceProps) {
   const { patient, visit } = wardPatient ?? {};
   const { t } = useTranslation();
-  const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
@@ -42,15 +41,14 @@ export default function CancelAdmissionRequestWorkspace({
 
   type FormValues = z.infer<typeof zodSchema>;
 
-  const formDefaultValues: Partial<FormValues> = {
-    note: '',
-  };
-
   const {
     formState: { errors, isDirty },
     control,
     handleSubmit,
-  } = useForm<FormValues>({ resolver: zodResolver(zodSchema), defaultValues: formDefaultValues });
+  } = useForm<FormValues>({
+    resolver: zodResolver(zodSchema),
+    defaultValues: { note: '' },
+  });
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -60,7 +58,6 @@ export default function CancelAdmissionRequestWorkspace({
   const onSubmit = useCallback(
     (values: FormValues) => {
       setIsSubmitting(true);
-      setShowErrorNotifications(false);
       const obs: Array<ObsPayload> = [
         {
           concept: emrConfiguration?.consultFreeTextCommentsConcept?.uuid,
@@ -83,7 +80,7 @@ export default function CancelAdmissionRequestWorkspace({
         })
         .catch((err: Error) => {
           showSnackbar({
-            title: t('Error cancelling admission request', 'Error cancelling admission request'),
+            title: t('errorCancellingAdmissionRequest', 'Error cancelling admission request'),
             subtitle: err.message,
             kind: 'error',
           });
@@ -110,10 +107,10 @@ export default function CancelAdmissionRequestWorkspace({
 
   const onError = useCallback(() => {
     setIsSubmitting(false);
-    setShowErrorNotifications(true);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) return null;
+
   return (
     <div className={styles.flexWrapper}>
       <WardPatientWorkspaceBanner wardPatient={wardPatient} />
@@ -136,34 +133,32 @@ export default function CancelAdmissionRequestWorkspace({
             </div>
           )}
           <div className={styles.field}>
-            <h2 className={styles.productiveHeading02}>{t('clinicalNotes', 'Clinical notes')}</h2>
             <Controller
               name="note"
               control={control}
               render={({ field, fieldState: { error } }) => (
                 <ResponsiveWrapper>
-                  <TextArea {...field} labelText={''} />
+                  <TextArea
+                    {...field}
+                    id="clinical-notes"
+                    labelText={t('clinicalNotes', 'Clinical notes')}
+                    invalid={!!error}
+                    invalidText={error?.message}
+                  />
                 </ResponsiveWrapper>
               )}
             />
           </div>
-          {showErrorNotifications && (
-            <div className={styles.notifications}>
-              {Object.values(errors).map((error) => (
-                <InlineNotification key={error.message} lowContrast subtitle={error?.message} hideCloseButton />
-              ))}
-            </div>
-          )}
         </div>
         <ButtonSet className={styles.buttonSet}>
           <Button size="xl" kind="secondary" onClick={closeWorkspaceWithSavedChanges}>
-            {t('cancel', 'Cancel')}
+            {getCoreTranslation('cancel')}
           </Button>
           <Button
             type="submit"
             size="xl"
             disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !patient}>
-            {t('save', 'Save')}
+            {getCoreTranslation('save')}
           </Button>
         </ButtonSet>
       </Form>

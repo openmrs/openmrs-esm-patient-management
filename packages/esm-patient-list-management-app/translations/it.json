@@ -56,7 +56,7 @@
   "noOfPatients": "Numero di pazienti",
   "noPatientsInList": "Non ci sono pazienti in questa lista",
   "openPatientList": "Aggiungi alla lista",
-  "patientAddedToList": "Patient added to list",
+  "patientAddedToList": "Paziente aggiunto alla lista",
   "patientAlreadyInList": "This patient is already in the list",
   "patientListMemberCount_one": "Questa lista contiene {{count}} paziente",
   "patientListMemberCount_other": "Questa lista contiene {{count}} pazienti",

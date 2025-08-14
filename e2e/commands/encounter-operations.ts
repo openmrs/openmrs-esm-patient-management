@@ -1,6 +1,6 @@
-import { type APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
 import { type Encounter } from '../types';
+import { type APIRequestContext, expect } from '@playwright/test';
 export const createEncounter = async (
   api: APIRequestContext,
   patientId: string,
@@ -34,7 +34,7 @@ export const createEncounter = async (
       obs: observations,
     },
   });
-  await expect(encounterRes.ok()).toBeTruthy();
+  expect(encounterRes.ok()).toBeTruthy();
   return await encounterRes.json();
 };
 

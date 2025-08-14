@@ -1,25 +1,24 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import {
-  endVisit,
-  startVisit,
   changeToWardLocation,
-  generateRandomPatient,
-  getProvider,
-  generateWardAdmission,
   deletePatient,
+  endVisit,
+  generateRandomPatient,
+  generateWardAdmission,
+  getProvider,
+  startVisit,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Patient, type Encounter, type Provider, type Bed, type BedType } from '../commands/types';
+import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
 import { deleteBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
-let visit: Visit;
-let wardPatient: Patient;
-let encounter: Encounter;
-let provider: Provider;
 let bed: Bed;
 let bedtype: BedType;
+let provider: Provider;
+let visit: Visit;
+let wardPatient: Patient;
 
 test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
@@ -28,7 +27,7 @@ test.beforeEach(async ({ api, page }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Cancel an admission request', async ({ page }) => {
@@ -53,11 +52,11 @@ test('Cancel an admission request', async ({ page }) => {
 
   await test.step('Then I should see the "Cancel admission request" form launched in the workspace', async () => {
     await expect(wardPage.cancelAdmissionRequestHeading()).toBeVisible();
-    await expect(wardPage.clinicalNotesHeading()).toBeVisible();
+    await expect(wardPage.clinicalNotesField()).toBeVisible();
   });
 
-  await test.step('And I enter a reason for cancellation in the "Admission notes" field', async () => {
-    await wardPage.fillAdmissionNotes('This patient admission is being cancelled');
+  await test.step('And I enter a reason for cancellation in the "Clinical notes" field', async () => {
+    await wardPage.clinicalNotesField().fill('This patient admission is being cancelled');
   });
 
   await test.step('And I click the "Save" button to submit the form', async () => {

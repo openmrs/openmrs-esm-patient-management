@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 import { saveBedType, useBedTypes, useLocationsWithAdmissionTag } from '../summary/summary.resource';
 import type { BedType, BedTypeData, Mutator } from '../types';
+import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 
 interface BedTypeFormProps {
   mutate: Mutator<BedType>;

@@ -13,7 +13,7 @@ import {
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
-import { type ConfigSchema } from '../config-schema';
+import { type PatientListManagementConfig } from '../config-schema';
 import {
   type AddPatientData,
   type AddablePatientListViewModel,
@@ -315,7 +315,7 @@ export async function findFakePatientListsWithoutPatient(
 
 export function useAddablePatientLists(patientUuid: string) {
   const { t } = useTranslation();
-  const config = useConfig<ConfigSchema>();
+  const config = useConfig<PatientListManagementConfig>();
   return useSWR(['addablePatientLists', patientUuid], async () => {
     // Using Promise.allSettled instead of Promise.all here because some distros might not have the
     // cohort module installed, leading to the real patient list call failing.

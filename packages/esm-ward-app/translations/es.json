@@ -26,7 +26,7 @@
   "emptyBed": "Cama vacía",
   "emptyText": "Vacío",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "Error al cancelar solicitud de admisión",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Error al cambiar asignación de la cama del paciente",
   "errorConfiguringPatientCard": "Error al configurar la tarjeta del paciente",
   "errorConfiguringPatientCardMessage": "No se pudo encontrar la configuración para {{elementType}}, id: {{id}}",

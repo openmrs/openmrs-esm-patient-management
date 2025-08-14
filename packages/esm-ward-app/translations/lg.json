@@ -26,7 +26,7 @@
   "emptyBed": "Ekitanda okutali omuntu",
   "emptyText": "Tekirimu",
   "encounterDisplay": "{{Engeri y'ensisinkagano}} {{Olunaku lw'ensisinkagano}}",
-  "Error cancelling admission request": "Wabaddewo ensobi mu kusazaamu okusaba okuyingizibwa mu ddwaliro",
+  "errorCancellingAdmissionRequest": "Error cancelling admission request",
   "errorChangingPatientBedAssignment": "Ensobi mu kukyusa ekitanda ky’omulwadde",
   "errorConfiguringPatientCard": "Ensobi mu kutereeza ekaadi y’omulwadde",
   "errorConfiguringPatientCardMessage": "Unable to find configuration for {{elementType}}, id: {{id}}",
