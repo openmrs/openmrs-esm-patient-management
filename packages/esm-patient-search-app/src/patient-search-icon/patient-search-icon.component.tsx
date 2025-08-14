@@ -97,11 +97,13 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               patientClickSideEffect={closePatientSearch}
             />
           )}
+
           <div className={styles.closeButton}>
             <HeaderGlobalAction
               aria-label={t('closeSearch', 'Close Search Panel')}
               className={styles.activeSearchIconButton}
               data-testid="closeSearchIcon"
+              data-tutorial-target="close-search-icon"
               enterDelayMs={500}
               name="CloseSearchIcon"
               onClick={closePatientSearch}>
@@ -111,10 +113,12 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
         </>
       ) : (
         <div>
+          {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
           <HeaderGlobalAction
             aria-label={t('searchPatient', 'Search patient')}
             className={styles.searchIconButton}
             data-testid="searchPatientIcon"
+            data-tutorial-target="search-patient-icon"
             enterDelayMs={500}
             name="SearchPatientIcon"
             onClick={handleShowSearchInput}

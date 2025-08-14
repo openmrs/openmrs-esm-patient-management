@@ -26,7 +26,7 @@
   "emptyBed": "Pat liber",
   "emptyText": "Gol",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
-  "Error cancelling admission request": "Eroare la anularea cererii de internare",
+  "errorCancellingAdmissionRequest": "Eroare la anularea cererii de internare",
   "errorChangingPatientBedAssignment": "Eroare la schimbarea patului pacientului",
   "errorConfiguringPatientCard": "Eroare la configurarea cardului pacientului",
   "errorConfiguringPatientCardMessage": "Nu s-a găsit configurația pentru {{elementType}}, id: {{id}}",

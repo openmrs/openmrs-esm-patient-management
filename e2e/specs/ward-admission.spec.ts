@@ -14,11 +14,11 @@ import { type Bed, type BedType, type Patient, type Provider } from '../commands
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
-let visit: Visit;
-let wardPatient: Patient;
-let provider: Provider;
 let bed: Bed;
 let bedtype: BedType;
+let provider: Provider;
+let visit: Visit;
+let wardPatient: Patient;
 
 test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);
@@ -50,7 +50,7 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
     await page.getByRole('button', { name: 'Admit patient' }).first().click();
   });
 
-  await test.step('And I select the ward/location for admission', async () => {
+  await test.step('And I select the bed for admission', async () => {
     await page.getByText(`${bed.bedNumber} · Empty`).click();
   });
 
@@ -58,7 +58,7 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
     await page.getByRole('button', { name: 'Admit' }).click();
   });
 
-  await test.step('Then I see the success message confirms admission', async () => {
+  await test.step('Then I should see a success message confirming the admission success', async () => {
     await expect(
       page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
     ).toBeVisible();

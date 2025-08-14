@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { useLeftNav } from '@openmrs/esm-framework';
+import { useLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import BedAdministrationTable from './bed-administration/bed-administration-table.component';
 import BedTagAdministrationTable from './bed-tag/bed-tag-administration-table.component';
 import BedTypeAdministrationTable from './bed-type/bed-type-administration-table.component';
@@ -27,6 +27,7 @@ const Root: React.FC = () => {
           <Route path="/bed-types" element={<BedTypeAdministrationTable />} />
         </Routes>
       </main>
+      <WorkspaceContainer contextKey="bed-management" />
     </BrowserRouter>
   );
 };
