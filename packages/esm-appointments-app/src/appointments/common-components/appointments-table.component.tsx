@@ -65,34 +65,19 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
+  const config = useConfig<ConfigObject>();
+  const { appointmentsTableColumns } = config;
   const searchResults = useAppointmentSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
   const { visits } = useTodaysVisits();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const headerData = [
-    {
-      header: t('patientName', 'Patient name'),
-      key: 'patientName',
-    },
-    {
-      header: t('identifier', 'Identifier'),
-      key: 'identifier',
-    },
-    {
-      header: t('location', 'Location'),
-      key: 'location',
-    },
-    {
-      header: t('serviceType', 'Service type'),
-      key: 'serviceType',
-    },
-    {
-      header: t('status', 'Status'),
-      key: 'status',
-    },
-  ];
+
+  const headerData = appointmentsTableColumns.map((columnKey) => ({
+    header: t(columnKey, columnKey),
+    key: columnKey,
+  }));
 
   const rowData = results?.map((appointment) => ({
     id: appointment.uuid,
@@ -106,12 +91,12 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     ),
     nextAppointmentDate: '--',
     identifier: patientIdentifierType
-      ? appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier
+      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
       : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
     location: appointment.location?.name,
-    provider: appointment.provider,
+    provider: appointment.providers?.[0]?.name ?? '--',
     status: <AppointmentActions appointment={appointment} />,
   }));
 
