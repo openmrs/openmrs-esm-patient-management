@@ -1,14 +1,20 @@
 import { Type, validators } from '@openmrs/esm-framework';
 
 export const appointmentColumnTypes = [
+  // t('patientName', 'Patient name')
   'patientName',
+  // t('identifier', 'Identifier')
   'identifier',
+  // t('location', 'Location')
   'location',
+  // t('serviceType', 'Service type')
   'serviceType',
+  // t('status', 'Status')
   'status',
-  'date-time',
+  // t('dateTime', 'Date & time')
+  'dateTime',
+  // t('provider', 'Provider')
   'provider',
-  'actions',
 ] as const;
 
 type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
