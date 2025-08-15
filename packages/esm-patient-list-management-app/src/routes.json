@@ -25,8 +25,8 @@
     },
     {
       "name": "add-patient-to-patient-list-button",
-      "slot": "patient-actions-slot",
-      "component": "addPatientToPatientListMenuItem"
+      "component": "addPatientToPatientListMenuItem",
+      "slot": "patient-actions-slot"
     }
   ],
   "modals": [
