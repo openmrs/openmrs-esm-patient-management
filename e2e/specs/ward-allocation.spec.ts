@@ -32,7 +32,7 @@ test('I will allocate bed to a ward', async ({ page }) => {
     await page.getByText('Create bed tag').click();
     await wardAllocation.bedTagNameInput().fill(bedTag.name);
     await wardAllocation.saveButton().click();
-    await expect(page.getByText(bedTag.name)).toBeVisible();
+    await expect(page.getByText(bedTag.name).nth(0)).toBeVisible();
   });
 
   await test.step('I will go to the Bed type page', async () => {
