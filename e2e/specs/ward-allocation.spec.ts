@@ -52,7 +52,7 @@ test('I will allocate bed to a ward', async ({ page }) => {
   await test.step('I will enter the description and save', async () => {
     await wardAllocation.descriptionInput().fill(bedType.description);
     await wardAllocation.saveButton().click();
-    await expect(page.getByText(bedType.displayName)).toBeVisible();
+    await expect(page.getByText(bedType.displayName).nth(0)).toBeVisible();
   });
   await test.step('I will go to the bed administration page', async () => {
     await wardAllocation.goto('bed-management/bed-administration');
@@ -91,7 +91,7 @@ test('I will allocate bed to a ward', async ({ page }) => {
 
   await test.step('i will save the bed', async () => {
     await wardAllocation.saveAndCloseButton().click();
-    await expect(page.getByText(bed.bedNumber)).toBeVisible();
+    await expect(page.getByText(bed.bedNumber).nth(0)).toBeVisible();
   });
 });
 test.afterEach(async ({ api }) => {
