@@ -81,6 +81,12 @@ export const updateBedStatus = async (api: APIRequestContext, bedUuid: string, s
   return await response.json();
 };
 
+export const bedLocation = async (api: APIRequestContext) => {
+  const locationRes = await api.get(`/openmrs/ws/rest/v1/location/${process.env.E2E_WARD_LOCATION_UUID}`);
+  expect(locationRes.ok()).toBeTruthy();
+  return await locationRes.json();
+};
+
 export const retireBedType = async (api: APIRequestContext, uuid: string, retireReason: string) => {
   const response = await api.put(`bedtype/${uuid}`, {
     data: {
@@ -89,4 +95,44 @@ export const retireBedType = async (api: APIRequestContext, uuid: string, retire
     },
   });
   expect(response.ok()).toBeTruthy();
+  return await response.json();
+};
+
+export const generateBedTag = async (api: APIRequestContext) => {
+  const bedTagName = `Tag_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const response = await api.post('/openmrs/ws/rest/v1/bedTag', {
+    data: {
+      name: bedTagName,
+    },
+  });
+  expect(response.ok()).toBeTruthy();
+  return await response.json();
+};
+
+export const resolveBedTypeUuidByName = async (api: APIRequestContext, name: string): Promise<string | undefined> => {
+  const res = await api.get(`bedtype?v=default&name=${encodeURIComponent(name)}`);
+  if (!res.ok()) return undefined;
+  const json = await res.json();
+  const found = json?.results?.find((t: any) => t.name === name);
+  return found?.uuid;
+};
+
+export const resolveBedUuidByNumberAndLocation = async (
+  api: APIRequestContext,
+  bedNumber: string,
+  locationUuid: string,
+): Promise<string | undefined> => {
+  const res = await api.get(`bed?locationUuid=${locationUuid}&v=full`);
+  if (!res.ok()) return undefined;
+  const json = await res.json();
+  const found = json?.results?.find((b: any) => b.bedNumber === bedNumber);
+  return found?.uuid;
+};
+
+export const resolveBedTagUuidByName = async (api: APIRequestContext, name: string): Promise<string | undefined> => {
+  const res = await api.get(`bedTag?v=default&name=${encodeURIComponent(name)}`);
+  if (!res.ok()) return undefined;
+  const json = await res.json();
+  const found = json?.results?.find((t: any) => t.name === name);
+  return found?.uuid;
 };
