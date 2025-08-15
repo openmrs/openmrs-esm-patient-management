@@ -108,6 +108,12 @@ function QueueTableSection() {
 
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 
+  // When returning to this view via client-side navigation, force a refetch via the
+  // existing event mechanism used by the data hook.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+  }, []);
+
   useEffect(() => {
     if (error?.message) {
       showSnackbar({

@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
-import styles from './queue-table-action-cell.scss';
 import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import styles from './queue-table-action-cell.scss';
 
 type ActionProps = {
   label: string;
@@ -20,6 +21,7 @@ function useActionPropsByKey() {
     concepts: { defaultStatusConceptUuid },
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   // Map action strings to component props
   const actionPropsByKey: Record<QueueEntryAction, ActionProps> = useMemo(() => {
@@ -36,6 +38,7 @@ function useActionPropsByKey() {
             'calling',
           );
           if (callingQueueResponse.ok) {
+            await mutateQueueEntries();
             const dispose = showModal('call-queue-entry-modal', {
               closeModal: () => dispose(),
               queueEntry,
@@ -128,7 +131,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid]);
+  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
   return actionPropsByKey;
 }
 
