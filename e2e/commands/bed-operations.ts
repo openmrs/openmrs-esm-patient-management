@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type BedType, type Bed, BedTag } from './types';
+import { type BedType, type Bed } from './types';
 
 export const generateRandomBed = async (api: APIRequestContext, bedType: BedType): Promise<Bed> => {
   const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -95,10 +95,11 @@ export const retireBedType = async (api: APIRequestContext, uuid: string, retire
     },
   });
   expect(response.ok()).toBeTruthy();
+  return await response.json();
 };
 
 export const generateBedTag = async (api: APIRequestContext) => {
-  const bedTagName = `Tag${Math.floor(Math.random() * 10)}`;
+  const bedTagName = `Tag_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const response = await api.post('/openmrs/ws/rest/v1/bedTag', {
     data: {
       name: bedTagName,
@@ -106,4 +107,32 @@ export const generateBedTag = async (api: APIRequestContext) => {
   });
   expect(response.ok()).toBeTruthy();
   return await response.json();
+};
+
+export const resolveBedTypeUuidByName = async (api: APIRequestContext, name: string): Promise<string | undefined> => {
+  const res = await api.get(`bedtype?v=default&name=${encodeURIComponent(name)}`);
+  if (!res.ok()) return undefined;
+  const json = await res.json();
+  const found = json?.results?.find((t: any) => t.name === name);
+  return found?.uuid;
+};
+
+export const resolveBedUuidByNumberAndLocation = async (
+  api: APIRequestContext,
+  bedNumber: string,
+  locationUuid: string,
+): Promise<string | undefined> => {
+  const res = await api.get(`bed?locationUuid=${locationUuid}&v=full`);
+  if (!res.ok()) return undefined;
+  const json = await res.json();
+  const found = json?.results?.find((b: any) => b.bedNumber === bedNumber);
+  return found?.uuid;
+};
+
+export const resolveBedTagUuidByName = async (api: APIRequestContext, name: string): Promise<string | undefined> => {
+  const res = await api.get(`bedTag?v=default&name=${encodeURIComponent(name)}`);
+  if (!res.ok()) return undefined;
+  const json = await res.json();
+  const found = json?.results?.find((t: any) => t.name === name);
+  return found?.uuid;
 };
