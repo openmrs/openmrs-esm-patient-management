@@ -5,7 +5,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
 import { type Resources } from '../../offline.resources';
-import type { AddressTemplate, FormValues } from '../patient-registration.types';
+import type { AddressTemplate, NameTemplate, FormValues } from '../patient-registration.types';
 import { PatientRegistrationContextProvider } from '../patient-registration-context';
 import { ResourcesContextProvider } from '../../resources-context';
 import { renderWithContext } from 'tools';
@@ -21,6 +21,9 @@ const predefinedAddressTemplate = {
   value:
     '<org.openmrs.layout.address.AddressTemplate>\r\n     <nameMappings class="properties">\r\n       <property name="postalCode" value="Location.postalCode"/>\r\n       <property name="address2" value="Location.address2"/>\r\n       <property name="address1" value="Location.address1"/>\r\n       <property name="country" value="Location.country"/>\r\n       <property name="stateProvince" value="Location.stateProvince"/>\r\n       <property name="cityVillage" value="Location.cityVillage"/>\r\n     </nameMappings>\r\n     <sizeMappings class="properties">\r\n       <property name="postalCode" value="4"/>\r\n       <property name="address1" value="40"/>\r\n       <property name="address2" value="40"/>\r\n       <property name="country" value="10"/>\r\n       <property name="stateProvince" value="10"/>\r\n       <property name="cityVillage" value="10"/>\r\n       <asset name="cityVillage" value="10"/>\r\n     </sizeMappings>\r\n     <lineByLineFormat>\r\n       <string>address1 address2</string>\r\n       <string>cityVillage stateProvince postalCode</string>\r\n       <string>country</string>\r\n     </lineByLineFormat>\r\n     <elementDefaults class="properties">\r\n            <property name="country" value=""/>\r\n     </elementDefaults>\r\n     <elementRegex class="properties">\r\n            <property name="address1" value="[a-zA-Z]+$"/>\r\n     </elementRegex>\r\n     <elementRegexFormats class="properties">\r\n            <property name="address1" value="Countries can only be letters"/>\r\n     </elementRegexFormats>\r\n   </org.openmrs.layout.address.AddressTemplate>',
 };
+
+const predefinedNameTemplate =
+  '{"displayName":"Single Field","codeName":"xshort","country":null,"lines":[[{"isToken":"IS_NAME_TOKEN","displayText":"Name","codeName":"givenName","displaySize":"30"}]],"lineByLineFormat":["givenName"],"nameMappings":{"givenName":"Name"},"sizeMappings":{"givenName":"30"},"elementDefaults":null,"elementRegex":null,"elementRegexFormats":null,"requiredElements":null}';
 
 const mockIdentifierTypes = [
   {
@@ -85,6 +88,7 @@ const mockIdentifierTypes = [
 
 const mockResourcesContextValue: Resources = {
   addressTemplate: predefinedAddressTemplate as unknown as AddressTemplate,
+  nameTemplate: predefinedNameTemplate as unknown as NameTemplate,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
