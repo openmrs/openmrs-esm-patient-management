@@ -15,8 +15,8 @@
       }
     },
     {
-      "component": "root",
       "name": "patient-lists-dashboard",
+      "component": "root",
       "slot": "patient-lists-dashboard-slot"
     },
     {
@@ -25,14 +25,30 @@
     },
     {
       "name": "add-patient-to-patient-list-button",
-      "slot": "patient-actions-slot",
-      "component": "addPatientToPatientListMenuItem"
+      "component": "addPatientToPatientListMenuItem",
+      "slot": "patient-actions-slot"
     }
   ],
   "modals": [
     {
       "name": "add-patient-to-patient-list-modal",
       "component": "addPatientToListModal"
+    },
+    {
+      "name": "remove-patient-from-list-modal",
+      "component": "removePatientFromListModal"
+    },
+    {
+      "name": "delete-patient-list-modal",
+      "component": "deletePatientListModal"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "patient-list-form-workspace",
+      "component": "patientListFormWorkspace",
+      "title": "patientListFormHeader",
+      "type": "patient-lists"
     }
   ]
 }

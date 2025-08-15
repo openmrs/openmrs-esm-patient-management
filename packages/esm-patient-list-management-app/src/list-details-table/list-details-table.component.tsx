@@ -4,11 +4,9 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  type DataTableRow,
   DataTableSkeleton,
   InlineLoading,
   Layer,
-  Modal,
   Pagination,
   Search,
   Table,
@@ -19,18 +17,20 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  type DataTableRow,
 } from '@carbon/react';
 import {
   AddIcon,
   ArrowLeftIcon,
-  TrashCanIcon,
   ConfigurableLink,
-  useLayoutType,
+  ExtensionSlot,
   isDesktop,
   showSnackbar,
-  useDebounce,
-  ExtensionSlot,
+  showModal,
   toOmrsIsoString,
+  TrashCanIcon,
+  useDebounce,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import { addPatientToList, removePatientFromList } from '../api/api-remote';
 import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
@@ -177,10 +177,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   const patientListsPath = window.getOpenmrsSpaBase() + 'home/patient-lists';
 
   const [isDeleting, setIsDeleting] = useState(false);
-  const [membershipUuid, setMembershipUuid] = useState('');
-  const [patientName, setPatientName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm);
 
   const filteredPatients = useMemo(() => {
@@ -220,31 +217,45 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     [columns, filteredPatients],
   );
 
-  const handleRemovePatientFromList = useCallback(async () => {
-    setIsDeleting(true);
+  const handleRemovePatientFromList = useCallback(
+    async (membershipUuidToRemove: string) => {
+      setIsDeleting(true);
 
-    try {
-      await removePatientFromList(membershipUuid);
-      mutateListMembers();
-      mutateListDetails();
+      try {
+        await removePatientFromList(membershipUuidToRemove);
+        mutateListMembers();
+        mutateListDetails();
 
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'success',
-        subtitle: t('listUpToDate', 'The list is now up to date'),
-        title: t('patientRemovedFromList', 'Patient removed from list'),
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('listUpToDate', 'The list is now up to date'),
+          title: t('patientRemovedFromList', 'Patient removed from list'),
+        });
+      } catch (error) {
+        showSnackbar({
+          kind: 'error',
+          subtitle: error?.message,
+          title: t('errorRemovingPatientFromList', 'Failed to remove patient from list'),
+        });
+      }
+
+      setIsDeleting(false);
+    },
+    [mutateListDetails, mutateListMembers, t],
+  );
+
+  const handleLaunchRemovePatientFromListModal = useCallback(
+    async (currentPatient) => {
+      const dispose = showModal('remove-patient-from-list-modal', {
+        patientName: currentPatient.name,
+        membershipUuid: currentPatient.membershipUuid,
+        onConfirm: async (membershipUuidToRemove: string) => handleRemovePatientFromList(membershipUuidToRemove),
+        close: () => dispose(),
       });
-    } catch (error) {
-      showSnackbar({
-        kind: 'error',
-        subtitle: error?.message,
-        title: t('errorRemovingPatientFromList', 'Failed to remove patient from list'),
-      });
-    }
-
-    setIsDeleting(false);
-    setShowConfirmationModal(false);
-  }, [membershipUuid, mutateListDetails, mutateListMembers, t]);
+    },
+    [handleRemovePatientFromList],
+  );
 
   const handleAddPatientToList = useCallback(
     async (patient) => {
@@ -383,17 +394,13 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Button
-                              kind="ghost"
                               hasIconOnly
-                              renderIcon={TrashCanIcon}
                               iconDescription={t('removeFromList', 'Remove from list')}
+                              kind="ghost"
+                              onClick={() => handleLaunchRemovePatientFromListModal(currentPatient)}
+                              renderIcon={TrashCanIcon}
                               size={responsiveSize}
                               tooltipPosition="left"
-                              onClick={() => {
-                                setMembershipUuid(currentPatient.membershipUuid);
-                                setPatientName(currentPatient.name);
-                                setShowConfirmationModal(true);
-                              }}
                             />
                           </TableCell>
                         </TableRow>
@@ -431,25 +438,6 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
             />
           )}
         </div>
-        {showConfirmationModal && (
-          <Modal
-            className={styles.modal}
-            open
-            danger
-            modalHeading={t(
-              'removePatientFromListConfirmation',
-              'Are you sure you want to remove {{patientName}} from this list?',
-              {
-                patientName: patientName,
-              },
-            )}
-            primaryButtonText={t('removeFromList', 'Remove from list')}
-            secondaryButtonText={t('cancel', 'Cancel')}
-            onRequestClose={() => setShowConfirmationModal(false)}
-            onRequestSubmit={handleRemovePatientFromList}
-            primaryButtonDisabled={isDeleting}
-          />
-        )}
       </>
     );
   }

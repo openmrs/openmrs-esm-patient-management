@@ -1,11 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import classnames from 'classnames';
-import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
-import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
 import Header from '../header/header.component';
 import ListsTable from '../lists-table/lists-table.component';
 import styles from './lists-dashboard.scss';
@@ -40,33 +38,25 @@ const ListsDashboard: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(TabIndices.STARRED_LISTS);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
-  const { search } = useLocation();
-  const [showCreatePatientList, setShowCreatePatientList] = useState(!!search);
-  const handleShowNewListOverlay = () => {
-    setShowCreatePatientList(true);
-  };
 
-  const handleHideNewListOverlay = () => {
-    setShowCreatePatientList(false);
-  };
-
-  const tableHeaders = [
-    { id: 1, key: 'display', header: t('listName', 'List name') },
-    { id: 2, key: 'type', header: t('listType', 'List type') },
-    { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
-    { id: 4, key: 'isStarred', header: '' },
-  ];
+  const tableHeaders = useMemo(
+    () => [
+      { id: 1, key: 'display', header: t('listName', 'List name') },
+      { id: 2, key: 'type', header: t('listType', 'List type') },
+      { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
+      { id: 4, key: 'isStarred', header: '' },
+    ],
+    [t],
+  );
 
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
-        <Header handleShowNewListOverlay={handleShowNewListOverlay} />
+        <Header onCreateSuccess={() => mutate()} />
         <div className={styles.tabsContainer}>
           <Tabs
             className={styles.tabs}
-            onChange={({ selectedIndex }) => {
-              setSelectedTab(selectedIndex);
-            }}
+            onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
             selectedIndex={selectedTab}
             tabContentClassName={styles.hiddenTabsContent}>
             <TabList className={styles.tablist} aria-label="List tabs" contained>
@@ -84,16 +74,13 @@ const ListsDashboard: React.FC = () => {
               error={error}
               headers={tableHeaders}
               isLoading={isLoading}
-              key={patientListFilter.label}
+              key={`tab-${selectedTab}`}
               listType={patientListFilter.label}
               patientLists={patientLists}
               refetch={mutate}
             />
           </div>
         </div>
-      </section>
-      <section>
-        {showCreatePatientList && <CreateEditPatientList close={handleHideNewListOverlay} onSuccess={() => mutate()} />}
       </section>
     </main>
   );
