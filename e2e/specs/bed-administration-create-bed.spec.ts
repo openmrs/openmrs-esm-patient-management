@@ -1,7 +1,11 @@
 import { expect } from '@playwright/test';
 import { type Location } from '@openmrs/esm-framework';
 import { bedLocation, deleteBed, retireBedType } from '../commands';
-import { resolveBedTagUuidByName, resolveBedTypeUuidByName } from '../commands/bed-operations';
+import {
+  resolveBedTagUuidByName,
+  resolveBedTypeUuidByName,
+  resolveBedUuidByNumberAndLocation,
+} from '../commands/bed-operations';
 import { test } from '../core';
 import { type BedTag, type Bed, type BedType } from '../commands/types';
 import { BedAdministrationPage } from '../pages/bed-administration-page';
@@ -68,7 +72,10 @@ test('Create a bed with a type, tag and location', async ({ page, api }) => {
   });
 
   await test.step('And I click the "Add bed" button', async () => {
-    await page.getByRole('button', { name: 'Add bed' }).click();
+    await page
+      .locator('[class*="headerActions"]')
+      .getByRole('button', { name: /^Add bed$/ })
+      .click();
   });
 
   await test.step('And I enter the bed number, row and column', async () => {
@@ -104,10 +111,17 @@ test('Create a bed with a type, tag and location', async ({ page, api }) => {
     await bedAdministration.saveAndCloseButton().click();
     const table = page.getByRole('table');
     await expect(table).toContainText(bed.bedNumber);
+    const bedUuid = await resolveBedUuidByNumberAndLocation(api, bed.bedNumber, location.uuid);
+    expect(bedUuid, 'Expected to resolve bed UUID after creating bed via UI').toBeTruthy();
+    (bed as any).uuid = bedUuid as string;
   });
 });
 
 test.afterEach(async ({ api }) => {
-  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
-  await deleteBed(api, bed);
+  if (bedType?.uuid) {
+    await retireBedType(api, bedType.uuid, 'Retired during automated testing');
+  }
+  if (bed?.uuid) {
+    await deleteBed(api, bed);
+  }
 });

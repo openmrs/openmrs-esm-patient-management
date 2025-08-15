@@ -7,6 +7,10 @@ export class BedAdministrationPage {
     await this.page.goto(url);
   }
 
+  async openBedAdministration() {
+    await this.goto('bed-management/bed-administration');
+  }
+
   async openBedManagement() {
     await this.goto('bed-management');
   }
@@ -19,16 +23,12 @@ export class BedAdministrationPage {
     await this.goto('bed-management/bed-types');
   }
 
-  async openBedAdministration() {
-    await this.goto('bed-management/bed-administration');
-  }
-
   readonly bedTagNameInput = () => this.page.locator('#bedTag');
   readonly bedNumberInput = () => this.page.locator('#bedNumber');
   readonly bedRowInput = () => this.page.locator('#bedRow');
   readonly bedColumnInput = () => this.page.locator('#bedColumn');
   readonly bedLocationInput = () => this.page.locator('#location');
-  readonly occupancyStatusInput = () => this.page.getByLabel(/occupancy status/i);
+  readonly occupancyStatusInput = () => this.page.locator('form select#occupancyStatus');
   readonly bedTypeInput = () => this.page.locator('#bedType');
   readonly bedTagsMultiSelect = () => this.page.locator('#bedTags');
   readonly bedNameInput = () => this.page.locator('#bedName');
