@@ -305,7 +305,7 @@ const BedFormWorkspace: React.FC<BedFormWorkspaceProps> = ({
               name="occupancyStatus"
               render={({ field }) => (
                 <Select
-                  id="occupancyStatus"
+                  id="occupyStatus"
                   invalid={!!errors.occupancyStatus?.message}
                   invalidText={errors.occupancyStatus?.message}
                   labelText={t('occupancyStatus', 'Occupancy status')}

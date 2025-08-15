@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type BedType, type Bed } from './types';
+import { type BedType, type Bed, BedTag } from './types';
 
 export const generateRandomBed = async (api: APIRequestContext, bedType: BedType): Promise<Bed> => {
   const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -81,6 +81,12 @@ export const updateBedStatus = async (api: APIRequestContext, bedUuid: string, s
   return await response.json();
 };
 
+export const bedLocation = async (api: APIRequestContext) => {
+  const locationRes = await api.get(`/openmrs/ws/rest/v1/location/${process.env.E2E_WARD_LOCATION_UUID}`);
+  expect(locationRes.ok()).toBeTruthy();
+  return await locationRes.json();
+};
+
 export const retireBedType = async (api: APIRequestContext, uuid: string, retireReason: string) => {
   const response = await api.put(`bedtype/${uuid}`, {
     data: {
@@ -89,4 +95,15 @@ export const retireBedType = async (api: APIRequestContext, uuid: string, retire
     },
   });
   expect(response.ok()).toBeTruthy();
+};
+
+export const generateBedTag = async (api: APIRequestContext) => {
+  const bedTagName = `Tag${Math.floor(Math.random() * 10)}`;
+  const response = await api.post('/openmrs/ws/rest/v1/bedTag', {
+    data: {
+      name: bedTagName,
+    },
+  });
+  expect(response.ok()).toBeTruthy();
+  return await response.json();
 };
