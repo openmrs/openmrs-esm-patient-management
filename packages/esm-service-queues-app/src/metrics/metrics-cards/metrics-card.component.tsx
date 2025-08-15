@@ -1,81 +1,86 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
-  label: string;
-  value: number | string;
-  headerLabel: string;
   children?: React.ReactNode;
-  service?: string;
-  serviceUuid?: string;
-  locationUuid?: string;
-  showUrgent?: boolean;
-  urgentCount?: number;
 }
 
-const MetricsCard: React.FC<MetricsCardProps> = ({
-  label,
-  value,
-  headerLabel,
-  children,
-  service,
-  serviceUuid,
-  locationUuid,
-  showUrgent,
-  urgentCount,
-}) => {
-  const { t } = useTranslation();
-  const queueListPath =
-    window.getOpenmrsSpaBase() + `home/service-queues/queue-list/${service}/${serviceUuid}/${locationUuid}`;
-
+export const MetricsCard: React.FC<MetricsCardProps> = ({ children }) => {
   return (
     <Layer
       className={classNames({
         cardWithChildren: children,
       })}>
-      <Tile className={styles.tileContainer}>
-        <div className={styles.tileHeader}>
-          <div className={styles.headerLabelContainer}>
-            <label className={styles.headerLabel}>{headerLabel}</label>
-            {children}
-          </div>
-          {/* TODO: Uncomment this when functionality of the patient list works.*/}
-          {/* {service == 'scheduled' ? (
-            <div className={styles.link}>
-              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/home`}>
-                {t('patientList', 'Patient list')}
-              </ConfigurableLink>
-              <ArrowRight size={16} />
-            </div>
-          ) : service == 'waitTime' ? null : (
-            <div className={styles.link}>
-              <ConfigurableLink className={styles.link} to={queueListPath}>
-                {t('patientList', 'Patient list')}
-              </ConfigurableLink>
-              <ArrowRight size={16} />
-            </div>
-          )} */}
-        </div>
-        <div className={styles.metricsContainer}>
-          <div className={styles.metricItem}>
-            <label className={styles.totalsLabel}>{label}</label>
-            <p className={styles.totalsValue}>{value}</p>
-          </div>
-          {showUrgent && (
-            <div className={styles.countGrid}>
-              <label className={styles.urgentLabel}>{t('urgent', 'Urgent')}</label>
-              <p className={styles.urgentValue}>{urgentCount ?? '0'}</p>
-            </div>
-          )}
-        </div>
-      </Tile>
+      <Tile className={styles.tileContainer}>{children}</Tile>
     </Layer>
   );
 };
 
-export default MetricsCard;
+interface MetricsCardHeaderProps {
+  title: string;
+  children?: React.ReactNode;
+  link?: string;
+  linkText?: string;
+}
+
+export const MetricsCardHeader: React.FC<MetricsCardHeaderProps> = ({ title, children, link, linkText }) => {
+  return (
+    <div className={styles.tileHeader}>
+      <div className={styles.headerLabelContainer}>
+        <label className={styles.headerLabel}>{title}</label>
+        {children}
+      </div>
+      {link && (
+        <div className={styles.link}>
+          <ConfigurableLink className={styles.link} to={link}>
+            {linkText}
+          </ConfigurableLink>
+          <ArrowRight size={16} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface MetricsCardBodyProps {
+  children?: React.ReactNode;
+}
+
+export const MetricsCardBody: React.FC<MetricsCardBodyProps> = ({ children }) => {
+  return <div className={styles.metricsContainer}>{children}</div>;
+};
+
+interface MetricsCardItemProps {
+  label: string;
+  /** If the value is null, the item will not be rendered. */
+  value: number | string | null;
+  small?: boolean;
+  color?: 'default' | 'red';
+}
+
+export const MetricsCardItem: React.FC<MetricsCardItemProps> = ({ label, value, small, color }) => {
+  if (value === null) {
+    return null;
+  }
+
+  return (
+    <div
+      className={classNames(styles.metricItem, {
+        [styles.smallItem]: small,
+        [styles.mainItem]: !small,
+      })}>
+      <span className={styles.metricLabel}>{label}</span>
+      <p
+        className={classNames(styles.metricValue, {
+          [styles.red]: color === 'red',
+          [styles.smallValue]: small,
+        })}>
+        {value}
+      </p>
+    </div>
+  );
+};
