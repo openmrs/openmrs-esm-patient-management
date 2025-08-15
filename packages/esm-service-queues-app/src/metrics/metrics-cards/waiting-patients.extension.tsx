@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { MetricsCard, MetricsCardBody, MetricsCardHeader, MetricsCardItem } from './metrics-card.component';
 import { updateSelectedService, useSelectedQueueLocationUuid, useSelectedService } from '../../helpers/helpers';
 import { useServiceMetricsCount } from '../metrics.resource';
@@ -9,6 +9,7 @@ import { useQueueEntries } from '../../hooks/useQueueEntries';
 import useQueueServices from '../../hooks/useQueueService';
 import { type Service } from '../metrics-container.component';
 import { type Concept } from '../../types';
+import { type ConfigObject } from '../../config-schema';
 
 type ServiceListItem = Service | Concept;
 
@@ -19,6 +20,9 @@ export default function WaitingPatientsExtension() {
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { services } = useQueueServices();
   const { serviceCount } = useServiceMetricsCount(currentService?.serviceUuid, currentQueueLocation);
+  const {
+    concepts: { defaultStatusConceptUuid },
+  } = useConfig<ConfigObject>();
 
   const defaultServiceItem: Service = {
     display: `${t('all', 'All')}`,
@@ -34,7 +38,7 @@ export default function WaitingPatientsExtension() {
     service: currentService?.serviceUuid,
     location: currentQueueLocation,
     isEnded: false,
-    status: 'WAITING',
+    status: defaultStatusConceptUuid,
   });
 
   const urgentCount = queueEntries.filter((entry) => entry.priority?.display?.toLowerCase() === 'urgent').length;
