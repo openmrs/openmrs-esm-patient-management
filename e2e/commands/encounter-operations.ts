@@ -31,7 +31,7 @@ export const createEncounter = async (
         },
       ],
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-      encounterType: process.env.ENCOUNTER_TYPE_UUID,
+      encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
       obs: observations,
     },
   });
@@ -39,7 +39,6 @@ export const createEncounter = async (
   return await encounterRes.json();
 };
 
-// Kept single declaration of deleteEncounter at the bottom of this file
 export const generateWardAdmission = async (
   api: APIRequestContext,
   providerId: string,
