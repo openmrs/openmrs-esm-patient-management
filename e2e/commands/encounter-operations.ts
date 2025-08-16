@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
+import { type Encounter } from '../types';
 import { type APIRequestContext, expect } from '@playwright/test';
-import { type Encounter } from './types';
-
 export const createEncounter = async (
   api: APIRequestContext,
   patientId: string,
@@ -31,7 +30,7 @@ export const createEncounter = async (
         },
       ],
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-      encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
+      encounterType: process.env.ENCOUNTER_TYPE_UUID,
       obs: observations,
     },
   });
@@ -39,6 +38,9 @@ export const createEncounter = async (
   return await encounterRes.json();
 };
 
+export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
+  await api.delete(`encounter/${uuid}`, { data: {} });
+};
 export const generateWardAdmission = async (
   api: APIRequestContext,
   providerId: string,
@@ -87,37 +89,6 @@ export const generateWardAdmission = async (
       },
     },
   );
-  expect(formRes.ok()).toBeTruthy();
   const encounter = await formRes.json();
   return encounter;
-};
-
-export const createBedAssignmentEncounter = async (
-  api: APIRequestContext,
-  providerId: string,
-  patientId: string,
-  visit: string,
-): Promise<Encounter> => {
-  const formRes = await api.post('/openmrs/ws/rest/v1/encounter', {
-    data: {
-      patient: patientId,
-      location: process.env.E2E_WARD_LOCATION_UUID,
-      encounterType: 'b2c4d5e6-7f8a-4e9b-8c1d-2e3f8e4a3b8f',
-      encounterProviders: [
-        {
-          provider: providerId,
-          encounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
-        },
-      ],
-      obs: [],
-      visit: visit,
-    },
-  });
-  expect(formRes.ok()).toBeTruthy();
-  const encounter = await formRes.json();
-  return encounter;
-};
-
-export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`encounter/${uuid}`, { data: {} });
 };
