@@ -159,7 +159,8 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div data-tutorial-target="patient-list-form" className={styles.container}>
+      {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
       <div className={styles.content}>
         <h4 className={styles.header}>{t('configureList', 'Configure your patient list using the fields below')}</h4>
         <div>
