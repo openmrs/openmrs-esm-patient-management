@@ -57,8 +57,8 @@
 
 .refineSearchDialogGenderSexRow {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  grid-gap: layout.$spacing-11;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: layout.$spacing-05;
   padding: 0 layout.$spacing-05;
 }
 
