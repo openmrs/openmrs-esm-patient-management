@@ -2,12 +2,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+
+const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
 
 jest.mock('../../field/name/name-field.component', () => {
   return {
@@ -41,6 +43,14 @@ jest.mock('../../field/id/id-field.component', () => {
 
 describe('Demographics section', () => {
   beforeEach(() => {
+    mockUseFeatureFlag.mockImplementation((flagName) => {
+      switch (flagName) {
+        case 'name-template-layout':
+          return false;
+        default:
+          return false;
+      }
+    });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
