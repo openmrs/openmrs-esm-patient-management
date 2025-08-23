@@ -199,6 +199,7 @@
   "totalPatients": "Total Patients",
   "transition": "Transition",
   "transitionPatient": "Transition {{patient}}",
+  "transitionPatientAction": "Transition patient",
   "triageForm": "ទម្រង់បែងចែកជំងឺដំបូង",
   "triageFormNotCompleted": "Triage form has not been completed for this visit",
   "triageNote": "កំណត់ចំណាំរបស់ការបែងចែកជំងឺដំបូង",
