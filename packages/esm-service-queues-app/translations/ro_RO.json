@@ -199,6 +199,7 @@
   "totalPatients": "Total pacienți",
   "transition": "Tranziție",
   "transitionPatient": "Tranziționează {{patient}}",
+  "transitionPatientAction": "Transition patient",
   "triageForm": "Formular triere",
   "triageFormNotCompleted": "Formularul de triaj nu a fost completat pentru această vizită",
   "triageNote": "Notă triere",

@@ -199,6 +199,7 @@
   "totalPatients": "პაციენტები სულ",
   "transition": "Transition",
   "transitionPatient": "Transition {{patient}}",
+  "transitionPatientAction": "Transition patient",
   "triageForm": "პაციენტების დახარისხების ფორმა",
   "triageFormNotCompleted": "Triage form has not been completed for this visit",
   "triageNote": "პაციენტების დახარისხების შენიშვნა",
