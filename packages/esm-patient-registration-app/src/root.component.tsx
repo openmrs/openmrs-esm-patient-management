@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import useSWRImmutable from 'swr/immutable';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom';
 import { Grid, Row } from '@carbon/react';
-import { ExtensionSlot, useConnectivity, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useSession, WorkspaceContainer } from '@openmrs/esm-framework';
 import {
   fetchAddressTemplate,
   fetchAllRelationshipTypes,
@@ -14,6 +14,10 @@ import { FormManager } from './patient-registration/form-manager';
 import { PatientRegistration } from './patient-registration/patient-registration.component';
 import styles from './root.scss';
 
+function PatientRegistrationWorkspaceContainer() {
+  const { patientUuid } = useParams();
+  return <WorkspaceContainer contextKey={patientUuid ?? 'new'} />;
+}
 export default function Root() {
   const isOnline = useConnectivity();
   const currentSession = useSession();
@@ -48,11 +52,21 @@ export default function Root() {
             <Routes>
               <Route
                 path="patient-registration"
-                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={!isOnline} />}
+                element={
+                  <>
+                    <PatientRegistration savePatientForm={savePatientForm} isOffline={!isOnline} />
+                    <PatientRegistrationWorkspaceContainer />
+                  </>
+                }
               />
               <Route
                 path="patient/:patientUuid/edit"
-                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={!isOnline} />}
+                element={
+                  <>
+                    <PatientRegistration savePatientForm={savePatientForm} isOffline={!isOnline} />
+                    <PatientRegistrationWorkspaceContainer />
+                  </>
+                }
               />
             </Routes>
           </BrowserRouter>

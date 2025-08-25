@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom';
 import { useLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import BedAdministrationTable from './bed-administration/bed-administration-table.component';
 import BedTagAdministrationTable from './bed-tag/bed-tag-administration-table.component';
@@ -9,6 +9,10 @@ import LeftPanel from './left-panel/left-panel.component';
 import WardWithBeds from './ward-with-beds/ward-with-beds.component';
 import styles from './root.scss';
 
+function BedManagementWorkspaceContainer() {
+  const { bedId } = useParams();
+  return <WorkspaceContainer contextKey={bedId ?? 'default'} />;
+}
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
   const bedManagementBasename = window.getOpenmrsSpaBase() + 'bed-management';
@@ -25,9 +29,9 @@ const Root: React.FC = () => {
           <Route path="/bed-administration" element={<BedAdministrationTable />} />
           <Route path="/bed-tags" element={<BedTagAdministrationTable />} />
           <Route path="/bed-types" element={<BedTypeAdministrationTable />} />
+          <Route path="/:bedId" element={<BedManagementWorkspaceContainer />} />
         </Routes>
       </main>
-      <WorkspaceContainer contextKey="bed-management" />
     </BrowserRouter>
   );
 };
