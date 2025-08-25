@@ -199,6 +199,7 @@
   "totalPatients": "Nombre total de patients",
   "transition": "Transition",
   "transitionPatient": "Transition {{patient}}",
+  "transitionPatientAction": "Transition patient",
   "triageForm": "Formulaire de triage",
   "triageFormNotCompleted": "Triage form has not been completed for this visit",
   "triageNote": "Note de triage",

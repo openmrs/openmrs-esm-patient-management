@@ -199,6 +199,7 @@
   "totalPatients": "Total Patients",
   "transition": "Transition",
   "transitionPatient": "Transition {{patient}}",
+  "transitionPatientAction": "Transition patient",
   "triageForm": "分诊表",
   "triageFormNotCompleted": "Triage form has not been completed for this visit",
   "triageNote": "分诊记录",
