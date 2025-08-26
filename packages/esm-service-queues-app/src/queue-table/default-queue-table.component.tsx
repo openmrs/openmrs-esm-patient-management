@@ -11,11 +11,10 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { serviceQueuesPatientSearchWorkspace } from '../constants';
-import { updateSelectedQueueStatus, updateSelectedService, useServiceQueuesStore } from '../store/store';
+import { updateSelectedQueueStatus, useServiceQueuesStore } from '../store/store';
 import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
-import useQueueServices from '../hooks/useQueueService';
 import usePatientSearchVisibility from '../hooks/usePatientSearchVisibility';
 import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
@@ -88,15 +87,14 @@ function QueueTableSection() {
   const { selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid } = useServiceQueuesStore();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const searchCriteria = useMemo(
-    () => ({
+  const searchCriteria = useMemo(() => {
+    return {
       service: selectedServiceUuid,
       location: selectedQueueLocationUuid,
       isEnded: false,
       status: selectedQueueStatusUuid,
-    }),
-    [selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid],
-  );
+    };
+  }, [selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid]);
 
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 

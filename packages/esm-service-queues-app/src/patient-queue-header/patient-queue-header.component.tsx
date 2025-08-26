@@ -24,13 +24,21 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   const { queueLocations, isLoading, error } = useQueueLocations();
   const { dashboardTitle } = useConfig<ConfigObject>();
   const userSession = useSession();
-  const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay, selectedServiceUuid } = useServiceQueuesStore();
+  const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay, selectedServiceUuid } =
+    useServiceQueuesStore();
   const { queues } = useQueues();
   const showLocationDropdown = showFilters && queueLocations.length > 1;
   const showServiceDropdown = showFilters && queues.length > 1;
 
-  const queueOptions = useMemo(() => {
-    const options = queues.map((queue) => ({ id: queue.service.uuid, name: queue.name }));
+  const serviceOptions = useMemo(() => {
+    const options = queues
+      .map((queue) => ({ id: queue.service.uuid, name: queue.service.display }))
+      .reduce((acc, curr) => {
+        if (!acc.some((option) => option.id === curr.id)) {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
     return options.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...options] : options;
   }, [queues, t]);
 
@@ -125,13 +133,13 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
         )}
         {showServiceDropdown && (
           <Dropdown
-            aria-label={t('selectQueueService', 'Select a queue service')}
+            aria-label={t('selectService', 'Select a service')}
             className={styles.dropdown}
-            id="queueServiceDropdown"
+            id="serviceDropdown"
             label={selectedServiceDisplay ?? t('all', 'All')}
-            items={queueOptions}
+            items={serviceOptions}
             itemToString={(item) => item?.name}
-            titleText={t('queue', 'Queue')}
+            titleText={t('service', 'Service')}
             type="inline"
             onChange={handleServiceChange}
             value={selectedServiceUuid}
