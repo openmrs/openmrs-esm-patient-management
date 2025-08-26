@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
-import ListDetailsTable from './list-details-table.component';
+import { render, screen } from '@testing-library/react';
 import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { addPatientToList } from '../api/api-remote';
+import ListDetailsTable from './list-details-table.component';
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -114,15 +114,15 @@ describe('ListDetailsTable', () => {
   it('renders add patient button slot', () => {
     render(
       <ListDetailsTable
-        patients={patients}
-        columns={columns}
-        pagination={pagination}
-        isLoading={false}
         autoFocus={false}
+        cohortUuid="test-cohort"
+        columns={columns}
         isFetching={false}
+        isLoading={false}
         mutateListDetails={jest.fn()}
         mutateListMembers={jest.fn()}
-        cohortUuid="test-cohort"
+        pagination={pagination}
+        patients={patients}
       />,
     );
 

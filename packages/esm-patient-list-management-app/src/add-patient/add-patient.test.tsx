@@ -14,7 +14,7 @@ jest.mock('../api/api-remote', () => ({
   useAddablePatientLists: jest.fn(),
 }));
 
-describe('AddPatient', () => {
+describe('AddPatientModal', () => {
   beforeEach(() => {
     mockUseAddablePatientLists.mockReturnValue({
       data: [
@@ -84,7 +84,7 @@ describe('AddPatient', () => {
     await user.click(createNewListButton);
 
     expect(mockNavigate).toHaveBeenCalledWith({
-      to: window.getOpenmrsSpaBase() + 'home/patient-lists?new_cohort=true',
+      to: window.getOpenmrsSpaBase() + 'home/patient-lists?create=true',
     });
   });
 

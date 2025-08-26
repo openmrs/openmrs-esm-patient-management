@@ -22,7 +22,7 @@ export class WardPage {
   }
 
   async goTo() {
-    await this.page.goto(`/openmrs/spa/home/ward`);
+    await this.page.goto('home/ward');
   }
 
   async clickManageAdmissionRequests() {

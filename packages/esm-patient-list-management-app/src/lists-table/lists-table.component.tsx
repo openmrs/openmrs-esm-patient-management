@@ -160,6 +160,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
               {...getTableProps()}
               className={styles.table}
               data-tutorial-target="patient-lists-table"
+              data-testid="patientListsTable"
               isSortable
               useZebraStyles>
               <TableHead>

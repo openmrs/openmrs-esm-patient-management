@@ -39,3 +39,24 @@ export const listDetailsTable = getAsyncLifecycle(() => import('./list-details-t
   featureName: 'patient-table',
   moduleName,
 });
+
+export const removePatientFromListModal = getAsyncLifecycle(
+  () => import('./modals/remove-patient-from-list/remove-patient-from-list.modal'),
+  {
+    featureName: 'patient-actions-modal',
+    moduleName,
+  },
+);
+
+export const deletePatientListModal = getAsyncLifecycle(
+  () => import('./modals/delete-patient-list/delete-patient-list.modal'),
+  {
+    featureName: 'patient-actions-modal',
+    moduleName,
+  },
+);
+
+export const patientListFormWorkspace = getAsyncLifecycle(
+  () => import('./patient-list-form/patient-list-form.workspace'),
+  options,
+);

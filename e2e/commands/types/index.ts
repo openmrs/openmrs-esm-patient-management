@@ -236,3 +236,9 @@ export interface BedType {
 }
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+
+export interface BedTag {
+  id?: string;
+  name: string;
+  uuid?: string;
+}

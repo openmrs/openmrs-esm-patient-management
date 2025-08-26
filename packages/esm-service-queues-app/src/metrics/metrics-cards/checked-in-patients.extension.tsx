@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import MetricsCard from './metrics-card.component';
+import { MetricsCard, MetricsCardHeader, MetricsCardBody, MetricsCardItem } from './metrics-card.component';
 import { useActiveVisits } from '../metrics.resource';
 
 export default function CheckedInPatientsExtension() {
@@ -8,11 +8,11 @@ export default function CheckedInPatientsExtension() {
   const { isLoading, activeVisitsCount } = useActiveVisits();
 
   return (
-    <MetricsCard
-      headerLabel={t('checkedInPatients', 'Checked in patients')}
-      label={t('patients', 'Patients')}
-      service="scheduled"
-      value={isLoading ? '--' : activeVisitsCount}
-    />
+    <MetricsCard>
+      <MetricsCardHeader title={t('checkedInPatients', 'Checked in patients')} />
+      <MetricsCardBody>
+        <MetricsCardItem label={t('patients', 'Patients')} value={isLoading ? '--' : activeVisitsCount} />
+      </MetricsCardBody>
+    </MetricsCard>
   );
 }

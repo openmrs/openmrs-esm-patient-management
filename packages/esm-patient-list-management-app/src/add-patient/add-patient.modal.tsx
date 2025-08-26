@@ -33,7 +33,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 
   const handleCreateNewList = useCallback(() => {
     navigate({
-      to: window.getOpenmrsSpaBase() + 'home/patient-lists?new_cohort=true',
+      to: window.getOpenmrsSpaBase() + 'home/patient-lists?create=true',
     });
 
     closeModal();
