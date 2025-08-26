@@ -274,29 +274,6 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     }
   }, [queueLocation, setValue, clearErrors]);
 
-// useEffect(() => {
-//   if (!control.getFieldState('queueService').isTouched) {
-//     if (selectedServiceUuid) {
-//       setValue('queueService', selectedServiceUuid, { shouldValidate: true });
-//     } else if (defaultInitialServiceQueue) {
-//       const initialServiceQueue = queues.find((q) => q.name === defaultInitialServiceQueue);
-//       setValue('queueService', initialServiceQueue?.uuid, { shouldValidate: true });
-//     }
-//   }
-// }, [defaultInitialServiceQueue, setValue, queues, selectedServiceUuid, control]);
-
-// useEffect(() => {
-//   if (
-//     !control.getFieldState('queueLocation').isTouched &&
-//     queueLocations.map((l) => l.id).includes(sessionLocation.uuid) &&
-//     queueLocation !== sessionLocation.uuid
-//   ) {
-//     setValue('queueLocation', sessionLocation.uuid, { shouldValidate: true });
-//   }
-// }, [queueLocations, sessionLocation.uuid, setValue, queueLocation, control]);
-
-
-
   return (
     /*
      * Do not style this component directly. It is used in multiple contexts:

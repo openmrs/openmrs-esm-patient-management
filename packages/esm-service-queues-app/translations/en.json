@@ -171,6 +171,7 @@
   "selectQueueRoomLocation": "Select a queue room location",
   "selectQueueRoomService": "Select a queue room service",
   "selectQueueService": "Select a queue service",
+  "selectService": "Select a service",
   "selectServiceType": "Select a service type",
   "serve": "Serve",
   "servePatient": "Serve patient",
