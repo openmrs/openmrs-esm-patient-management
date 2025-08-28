@@ -3,13 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from './config-schema';
 import Home from './home.component';
+import { updateSelectedQueueLocationName } from './store/store';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-
-jest.mock('./helpers/helpers', () => ({
-  ...jest.requireActual('./helpers/helpers'),
-  useSelectedQueueLocationName: jest.fn(() => 'Test Location'),
-}));
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -17,6 +13,10 @@ mockUseConfig.mockReturnValue({
 });
 
 describe('Home Component', () => {
+  beforeEach(() => {
+    updateSelectedQueueLocationName('Test Location');
+  });
+
   it('renders PatientQueueHeader, ClinicMetrics when activeTicketScreen is not "screen"', () => {
     // Mock window.location.pathname
     const originalLocation = window.location;

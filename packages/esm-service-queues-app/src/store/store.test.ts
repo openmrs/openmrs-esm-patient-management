@@ -1,4 +1,4 @@
-import { updateValueInSessionStorage } from './helpers';
+import { updateValueInSessionStorage } from './store';
 
 describe('Testing updateValueInSessionStorage', () => {
   beforeEach(() => {

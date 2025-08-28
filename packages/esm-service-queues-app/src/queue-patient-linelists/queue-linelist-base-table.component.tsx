@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -31,7 +31,6 @@ import {
 } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
 import { type FilterTypes } from '../types';
-import { getGender } from '../helpers/functions';
 
 /**
  * FIXME Temporarily moved here
@@ -237,5 +236,20 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
     </div>
   );
 };
+
+function getGender(gender: string, t: TFunction) {
+  switch (gender) {
+    case 'M':
+      return t('male', 'Male');
+    case 'F':
+      return t('female', 'Female');
+    case 'O':
+      return t('other', 'Other');
+    case 'U':
+      return t('unknown', 'Unknown');
+    default:
+      return gender;
+  }
+}
 
 export default QueuePatientBaseTable;

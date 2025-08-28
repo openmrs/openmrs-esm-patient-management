@@ -3,23 +3,22 @@ import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { MetricsCard, MetricsCardBody, MetricsCardHeader, MetricsCardItem } from './metrics-card.component';
-import { updateSelectedService, useSelectedQueueLocationUuid, useSelectedService } from '../../helpers/helpers';
 import { useServiceMetricsCount } from '../metrics.resource';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
 import useQueueServices from '../../hooks/useQueueService';
 import { type Service } from '../metrics-container.component';
 import { type Concept } from '../../types';
 import { type ConfigObject } from '../../config-schema';
+import { updateSelectedService, useServiceQueuesStore } from '../../store/store';
 
 type ServiceListItem = Service | Concept;
 
 export default function WaitingPatientsExtension() {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const currentService = useSelectedService();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { selectedServiceUuid, selectedServiceDisplay, selectedQueueLocationUuid } = useServiceQueuesStore();
   const { services } = useQueueServices();
-  const { serviceCount } = useServiceMetricsCount(currentService?.serviceUuid, currentQueueLocation);
+  const { serviceCount } = useServiceMetricsCount(selectedServiceUuid, selectedQueueLocationUuid);
   const {
     concepts: { defaultStatusConceptUuid },
   } = useConfig<ConfigObject>();
@@ -31,12 +30,12 @@ export default function WaitingPatientsExtension() {
   const serviceItems: ServiceListItem[] = [defaultServiceItem, ...(services ?? [])];
 
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
-    return !currentService?.serviceDisplay || !currentService?.serviceUuid;
+    return !selectedServiceDisplay || !selectedServiceUuid;
   });
 
   const { totalCount, queueEntries } = useQueueEntries({
-    service: currentService?.serviceUuid,
-    location: currentQueueLocation,
+    service: selectedServiceUuid,
+    location: selectedQueueLocationUuid,
     isEnded: false,
     status: defaultStatusConceptUuid,
   });
