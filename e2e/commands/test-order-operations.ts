@@ -35,7 +35,7 @@ export const CreatePatientWithOrderedLabOrders = async (api: APIRequestContext):
   };
 };
 
-export const CreatePatientWithOrderedLabOrdersAndBedAssignment = async (
+export const createPatientWithOrderedLabOrdersAndBedAssignment = async (
   api: APIRequestContext,
 ): Promise<LabOrderWithBedResults> => {
   const patient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
