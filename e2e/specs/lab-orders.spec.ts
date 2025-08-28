@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Bed, type BedType, type Encounter, type Patient, type Provider } from '../commands/types';
 import {
-  CreatePatientWithOrderedLabOrdersAndBedAssignment,
+  createPatientWithOrderedLabOrdersAndBedAssignment,
   cleanupLabOrderWithBed,
   changeToWardLocation,
 } from '../commands';
@@ -21,7 +21,7 @@ let generatedData: any;
 
 test.beforeEach(async ({ api }) => {
   await changeToWardLocation(api);
-  generatedData = await CreatePatientWithOrderedLabOrdersAndBedAssignment(api);
+  generatedData = await createPatientWithOrderedLabOrdersAndBedAssignment(api);
   bed = generatedData.bed;
   bedType = generatedData.bedType;
   provider = generatedData.provider;
