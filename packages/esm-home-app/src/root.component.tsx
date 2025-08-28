@@ -36,6 +36,7 @@ const Root: React.FC = () => {
         </BrowserRouter>
       </main>
     </>
+
   );
 };
 
