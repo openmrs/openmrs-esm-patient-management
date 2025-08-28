@@ -30,7 +30,7 @@ test.beforeEach(async ({ api }) => {
   encounter = generatedData.encounter;
 });
 
-test('view lab orders in the patient Card in the Ward App', async ({ api, page }) => {
+test('View lab orders in the patient Card in the Ward App', async ({ api, page }) => {
   const wardPage = new WardPage(page);
   const patientName = wardPatient.person?.display;
   await test.step('When I navigate to the Ward App page', async () => {
