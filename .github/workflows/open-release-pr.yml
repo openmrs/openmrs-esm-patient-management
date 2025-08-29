@@ -56,12 +56,13 @@ jobs:
           yarn release ${{ inputs.release_type }}
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
+          
+      - name: Run tests on release changes
+        run: yarn verify
+        
       - name: Create PR with release changes
         id: cpr
         uses: peter-evans/create-pull-request@v7
-        env:
-          HUSKY: 0
         with:
           # branch name is unique per run
           branch: "release/v${{ steps.release.outputs.version }}-${{ github.run_id }}"
