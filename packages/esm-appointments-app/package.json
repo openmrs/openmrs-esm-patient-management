@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-appointments-app",
-  "version": "9.1.0",
+  "version": "9.1.1",
   "description": "Appointments front-end module for O3",
   "browser": "dist/openmrs-esm-appointments-app.js",
   "main": "src/index.ts",
@@ -48,7 +48,7 @@
     "zod": "^3.24.1"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "7.x",
+    "@openmrs/esm-framework": "8.x",
     "@openmrs/esm-patient-common-lib": "11.x",
     "react": "18.x",
     "react-dom": "18.x",
