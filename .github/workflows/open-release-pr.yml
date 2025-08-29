@@ -28,12 +28,6 @@ jobs:
           # Fetch full history so tools that read tags/changelog (if any) work
           fetch-depth: 0
 
-      - name: Disable git hooks for CI
-        # Point hooks to an empty path so all git hooks are skipped (commit, push, etc.)
-        run: |
-          git config core.hooksPath /dev/null
-          git config --list --show-origin
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
