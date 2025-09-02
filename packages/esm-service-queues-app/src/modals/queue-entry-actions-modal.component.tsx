@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
+  Dropdown,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -14,20 +16,17 @@ import {
   TextArea,
   TimePicker,
   TimePickerSelect,
-  Dropdown,
-  Tag,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
-import { time12HourFormatRegexPattern } from '../constants';
-import { convertTime12to24, type amPm } from './time-helpers';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
+import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
 import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
-import styles from './queue-entry-actions.scss';
-import classNames from 'classnames';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { convertTime12to24, type amPm } from './time-helpers';
+import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -103,8 +102,15 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<{
+    type: 'duplicate' | 'error';
+    message: string;
+    title?: string;
+  } | null>(null);
 
   const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
+
+  const clearSubmissionError = () => setSubmissionError(null);
 
   const statuses = selectedQueue?.allowedStatuses;
   const hasNoStatusesConfigured = selectedQueue && statuses.length == 0;
@@ -112,6 +118,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   const hasNoPrioritiesConfigured = selectedQueue && priorities.length == 0;
 
   const setSelectedQueueUuid = (selectedQueueUuid: string) => {
+    clearSubmissionError();
     const newSelectedQueue = queues.find((q) => q.uuid == selectedQueueUuid);
     const { allowedStatuses, allowedPriorities } = newSelectedQueue;
     const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid == formState.selectedPriority);
@@ -128,10 +135,12 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   };
 
   const setSelectedPriorityUuid = (selectedPriorityUuid: string) => {
+    clearSubmissionError();
     setFormState({ ...formState, selectedPriority: selectedPriorityUuid });
   };
 
   const setSelectedStatusUuid = (selectedStatusUuid: string) => {
+    clearSubmissionError();
     setFormState({ ...formState, selectedStatus: selectedStatusUuid });
   };
 
@@ -155,10 +164,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     setFormState({ ...formState, modifyDefaultTransitionDateTime });
   };
 
-  const findPriorityIndex = (uuid: string) => {
-    return priorities.findIndex((p) => p.uuid === uuid);
-  };
-
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -179,11 +184,22 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         }
       })
       .catch((error) => {
-        showSnackbar({
-          title: submitFailureTitle,
-          kind: 'error',
-          subtitle: error?.message,
-        });
+        const errorMessage = error?.responseBody?.error?.message || error?.message || '';
+        const isDuplicateQueueEntryError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
+
+        if (isDuplicateQueueEntryError) {
+          setSubmissionError({
+            type: 'duplicate',
+            message: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
+            title: t('patientAlreadyInQueue', 'Patient already in queue'),
+          });
+        } else {
+          setSubmissionError({
+            type: 'error',
+            message: error?.message || t('unknownError', 'An unknown error occurred'),
+            title: submitFailureTitle,
+          });
+        }
       })
       .finally(() => {
         setIsSubmitting(false);
@@ -397,6 +413,16 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 </div>
               )}
             </section>
+
+            {submissionError && (
+              <InlineNotification
+                kind="error"
+                lowContrast={false}
+                title={submissionError.title || t('queueEntryError', 'Error updating queue entry')}
+                subtitle={submissionError.message}
+                onClose={() => setSubmissionError(null)}
+              />
+            )}
           </Stack>
         </div>
       </ModalBody>
