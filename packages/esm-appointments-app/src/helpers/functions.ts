@@ -1,7 +1,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { useEffect, useState } from 'react';
 import { type AppointmentSummary, type Appointment } from '../types';
-import { configSchema } from '../config-schema';
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
   const groupedAppointments = appointmentSummary?.map(({ countMap, serviceName }) => ({
@@ -80,3 +80,86 @@ export const getGender = (gender, t) => {
       return gender;
   }
 };
+
+export async function fetchPatientFromRestApi(patientUuid: string) {
+  try {
+    const { data } = await openmrsFetch(`${restBaseUrl}/patient/${patientUuid}?v=full`);
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export function extractPhoneFromPersonAttributes(restPatientData: any): string {
+  if (!restPatientData?.person?.attributes || !Array.isArray(restPatientData.person.attributes)) {
+    return '--';
+  }
+
+  const phoneValues = restPatientData.person.attributes
+    .filter(
+      (attr: any) =>
+        attr?.attributeType?.display === 'Telephone Number' ||
+        attr?.attributeType?.name === 'Telephone Number' ||
+        attr?.attributeType?.display === 'Telephone contact' ||
+        attr?.attributeType?.name === 'Telephone contact' ||
+        attr?.attributeType?.display?.toLowerCase().includes('phone') ||
+        attr?.attributeType?.display?.toLowerCase().includes('telephone') ||
+        attr?.attributeType?.display?.toLowerCase().includes('mobile') ||
+        attr?.attributeType?.display?.toLowerCase().includes('contact'),
+    )
+    .map((attr: any) => attr?.value)
+    .filter(Boolean);
+
+  return phoneValues.length > 0 ? phoneValues.join(', ') : '--';
+}
+
+export function extractPhoneFromFhirTelecom(patientInfo: any): string {
+  if (!patientInfo?.telecom || !Array.isArray(patientInfo.telecom)) {
+    return '--';
+  }
+
+  const phoneValues = patientInfo.telecom
+    .filter(
+      (telecom: any) =>
+        telecom?.system === 'phone' ||
+        telecom?.system === 'mobile' ||
+        (telecom?.use && (telecom.use === 'mobile' || telecom.use === 'home' || telecom.use === 'work')),
+    )
+    .map((telecom: any) => telecom?.value)
+    .filter(Boolean);
+
+  return phoneValues.length > 0 ? phoneValues.join(', ') : '--';
+}
+
+export function usePatientPhone(patient: any) {
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+
+  useEffect(() => {
+    const extractPhone = async () => {
+      if (patient?.id) {
+        try {
+          const fhirPhone = extractPhoneFromFhirTelecom(patient);
+          if (fhirPhone && fhirPhone !== '--') {
+            setPhoneNumber(fhirPhone);
+            return;
+          }
+
+          const restPatient = await fetchPatientFromRestApi(patient.id);
+          if (restPatient) {
+            const restPhone = extractPhoneFromPersonAttributes(restPatient);
+            setPhoneNumber(restPhone);
+          } else {
+            setPhoneNumber('--');
+          }
+        } catch (error) {
+          console.error('Error extracting phone number:', error);
+          setPhoneNumber('--');
+        }
+      }
+    };
+
+    extractPhone();
+  }, [patient]);
+
+  return phoneNumber;
+}

@@ -82,7 +82,7 @@ export const configSchema = {
   },
   includePhoneNumberInExcelSpreadsheet: {
     _type: Type.Boolean,
-    _default: false,
+    _default: true,
     _description: 'Whether to include phone numbers in the exported Excel spreadsheet',
   },
   patientIdentifierType: {
