@@ -4,6 +4,7 @@ import Home from './home.component';
 import ServicesTable from './queue-patient-linelists/queue-services-table.component';
 import QueueScreen from './queue-screen/queue-screen.component';
 import QueueTableByStatusView from './views/queue-table-by-status-view.component';
+import AdminPage from './admin/admin-page/admin-page.component';
 
 const Root: React.FC = () => {
   const serviceQueuesBasename = window.getOpenmrsSpaBase() + 'home/service-queues';
@@ -16,6 +17,7 @@ const Root: React.FC = () => {
           <Route path="/queue-table-by-status/:queueUuid" element={<QueueTableByStatusViewWrapper />} />
           <Route path="/screen" element={<QueueScreen />} />
           <Route path="/queue-list/:service/:serviceUuid/:locationUuid" element={<ServicesTable />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </BrowserRouter>
     </main>
