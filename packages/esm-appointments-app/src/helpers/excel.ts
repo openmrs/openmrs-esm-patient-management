@@ -1,8 +1,7 @@
 import { writeFile, utils, type WorkSheet } from 'xlsx';
-import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framework';
+import { fetchCurrentPatient, formatDate } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
-import { type ConfigObject } from '../config-schema';
-import { moduleName } from '../constants';
+import { fetchPatientFromRestApi, extractPhoneFromPersonAttributes, extractPhoneFromFhirTelecom } from './functions';
 
 type RowData = {
   id: string; // Corresponds to the UUID of an appointment
@@ -20,19 +19,17 @@ export async function exportAppointmentsToSpreadsheet(
   rowData: Array<RowData>,
   fileName = 'Appointments',
 ) {
-  const config = await getConfig<ConfigObject>(moduleName);
-  const includePhoneNumbers = config.includePhoneNumberInExcelSpreadsheet ?? false;
-
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
       const matchingAppointment = rowData.find((row) => row.id === appointment.uuid);
       const identifier = matchingAppointment?.identifier ?? appointment.patient.identifier;
 
       const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
-      const phoneNumber =
-        includePhoneNumbers && patientInfo?.telecom
-          ? patientInfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
-          : '';
+      const restPatientData = await fetchPatientFromRestApi(appointment.patient.uuid);
+      let phoneNumber = extractPhoneFromPersonAttributes(restPatientData);
+      if (phoneNumber === '--') {
+        phoneNumber = extractPhoneFromFhirTelecom(patientInfo);
+      }
 
       return {
         'Patient name': appointment.patient.name,
@@ -41,7 +38,7 @@ export async function exportAppointmentsToSpreadsheet(
         Identifier: identifier,
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
+        'Telephone number': phoneNumber,
       };
     }),
   );
