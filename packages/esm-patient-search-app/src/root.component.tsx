@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PatientSearchPageComponent from './patient-search-page/patient-search-page.component';
 import { WorkspaceContainer } from '@openmrs/esm-framework';
+import PatientSearchPageComponent from './patient-search-page/patient-search-page.component';
 
 const PatientSearchRootComponent: React.FC = () => {
   return (
