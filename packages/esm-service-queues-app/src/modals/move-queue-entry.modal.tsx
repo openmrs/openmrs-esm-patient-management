@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../types';
 import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import { transitionQueueEntry } from './queue-entry-actions.resource';
-import { convertTime12to24 } from '../helpers/time-helpers';
+import { convertTime12to24 } from './time-helpers';
 
 interface MoveQueueEntryModalProps {
   queueEntry: QueueEntry;

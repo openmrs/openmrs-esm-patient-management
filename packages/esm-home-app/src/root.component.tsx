@@ -15,16 +15,14 @@ const Root: React.FC = () => {
   });
 
   return (
-    <>
-      <main className="omrs-main-content">
-        <BrowserRouter basename={window.spaBase}>
-          <Routes>
-            <Route path="/home" element={<DefaultDashboardRedirect />} />
-            <Route path="/home/:dashboard/*" element={<DashboardContainer />} />
-          </Routes>
-        </BrowserRouter>
-      </main>
-    </>
+    <main className="omrs-main-content">
+      <BrowserRouter basename={window.spaBase}>
+        <Routes>
+          <Route path="/home" element={<DefaultDashboardRedirect />} />
+          <Route path="/home/:dashboard/*" element={<DashboardContainer />} />
+        </Routes>
+      </BrowserRouter>
+    </main>
   );
 };
 
