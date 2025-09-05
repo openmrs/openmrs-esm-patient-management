@@ -88,7 +88,7 @@ test('Swap the patient to another bed', async ({ page }) => {
     await bedAdministration.occupancyStatusInput().selectOption({ value: 'AVAILABLE' });
     await bedAdministration.bedTypeInput().selectOption(uniqueTypeName1);
     await bedAdministration.bedTagsMultiSelect().click();
-    await page.getByText(uniqueTagName1).nth(0).click();
+    await page.getByText(uniqueTagName1).first().click();
     await page.keyboard.press('Tab');
     await bedAdministration.saveAndCloseButton().click();
   });
