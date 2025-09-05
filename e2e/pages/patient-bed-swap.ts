@@ -1,6 +1,6 @@
 import { type Page } from '@playwright/test';
 
-export class PatientTransferPage {
+export class PatientBedSwapPage {
   constructor(readonly page: Page) {}
   async goto(url: string) {
     await this.page.goto(url);
@@ -9,7 +9,6 @@ export class PatientTransferPage {
     await this.goto('home/ward');
   }
   readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
-  readonly searchInput = () => this.page.getByPlaceholder('Search locations');
-  readonly textArea = () => this.page.getByRole('textbox', { name: 'Notes' });
+  readonly swapButton = () => this.page.getByRole('button', { name: 'Bed swap' });
   readonly saveButton = () => this.page.getByRole('button', { name: /Save/i });
 }
