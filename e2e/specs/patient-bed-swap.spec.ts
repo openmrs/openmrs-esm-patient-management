@@ -30,6 +30,7 @@ let provider: Provider;
 let wardPatient: Patient;
 let uniqueTagName1 = `Tag_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 let uniqueTypeName1 = `Type_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+const bedNumber = `B_${Date.now().toString().slice(-6)}`.slice(0, 10);
 test.beforeEach(async ({ api }) => {
   location = await bedLocation(api);
   await changeToWardLocation(api);
@@ -77,7 +78,6 @@ test('Swap the patient to another bed', async ({ page }) => {
   await test.step('And i will create a bed', async () => {
     await bedAdministration.openBedAdministration();
     await page.getByRole('button', { name: /Add bed/i }).click();
-    const bedNumber = `B_${Date.now().toString().slice(-6)}`.slice(0, 10);
     await bedAdministration.bedNumberInput().fill(bedNumber);
     await bedAdministration.bedRowInput().fill('1');
     await bedAdministration.bedColumnInput().fill('1');
@@ -98,7 +98,7 @@ test('Swap the patient to another bed', async ({ page }) => {
     await page.getByText(fullName).click();
     await patientBedSwap.transferButton().click();
     await patientBedSwap.swapButton().click();
-    await page.getByText(`${bed.bedNumber} · Empty`).click();
+    await page.getByText(`${bedNumber} · Empty`).click();
     await patientBedSwap.saveButton().click();
   });
   await test.step('And i will confirm bed swap', async () => {
