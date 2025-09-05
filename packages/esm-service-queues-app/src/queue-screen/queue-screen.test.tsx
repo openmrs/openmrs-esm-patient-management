@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useActiveTickets } from './useActiveTickets';
 import QueueScreen from './queue-screen.component';
+import { updateSelectedQueueLocationName, updateSelectedQueueLocationUuid } from '../store/store';
 
 const mockUseActiveTickets = jest.mocked(useActiveTickets);
 
@@ -9,12 +10,13 @@ jest.mock('./useActiveTickets', () => ({
   useActiveTickets: jest.fn(),
 }));
 
-jest.mock('../helpers/helpers', () => ({
-  useSelectedQueueLocationName: jest.fn().mockReturnValue('Room A'),
-  useSelectedQueueLocationUuid: jest.fn().mockReturnValue(''),
-}));
-
 describe('QueueScreen component', () => {
+
+  beforeEach(() => {
+    updateSelectedQueueLocationName('Room A');
+    updateSelectedQueueLocationUuid('123');
+  });
+
   test('renders loading skeleton when data is loading', () => {
     mockUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined, mutate: jest.fn() });
 

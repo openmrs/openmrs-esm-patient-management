@@ -44,7 +44,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     <>
       <PatientQueueHeader
         title={!isLoadingQueue ? selectedQueue?.display : <SkeletonText />}
-        showLocationDropdown={false}
+        showFilters={false}
         actions={
           <div className={styles.headerButtons}>
             <ExtensionSlot
