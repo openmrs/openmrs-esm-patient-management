@@ -43,7 +43,7 @@ test('Add a patient note to an inpatient admission', async ({ page }) => {
   });
 
   await test.step('Then I verify the patient has a pending admission request', async () => {
-    await expect(page.getByText(fullName)).toBeVisible();
+    await page.getByText(fullName).waitFor({ state: 'visible' });
   });
 
   await test.step('And I click the "Admit patient" button for the patient', async () => {
