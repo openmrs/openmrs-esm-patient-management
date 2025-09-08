@@ -9,6 +9,6 @@ export class PatientBedSwapPage {
     await this.goto('home/ward');
   }
   readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
-  readonly swapButton = () => this.page.getByRole('button', { name: 'Bed swap' });
+  readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
   readonly saveButton = () => this.page.getByRole('button', { name: /Save/i });
 }

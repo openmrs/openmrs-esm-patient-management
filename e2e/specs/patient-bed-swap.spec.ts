@@ -28,7 +28,7 @@ let bed: Bed;
 let bedtype: BedType;
 let provider: Provider;
 let wardPatient: Patient;
-let uniqueTagName1 = `Tag_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+let uniqueTagName1 = `Tag_${Math.random().toString(36).slice(2, 6)}`;
 let uniqueTypeName1 = `Type_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 const bedNumber = `B_${Date.now().toString().slice(-6)}`.slice(0, 10);
 test.beforeEach(async ({ api }) => {
@@ -58,7 +58,6 @@ test('Swap the patient to another bed', async ({ page }) => {
   });
   await test.step('And i will create a bed tag for the bed', async () => {
     await bedAdministration.openBedTags();
-    let uniqueTagName1 = `Tag_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     await page.getByRole('button', { name: /create bed tag/i }).click();
     await bedAdministration.bedTagNameInput().fill(uniqueTagName1);
     await bedAdministration.saveButton().click();
@@ -95,7 +94,8 @@ test('Swap the patient to another bed', async ({ page }) => {
   await test.step('Then i swap a patient to another bed', async () => {
     const fullName = wardPatient.person?.display;
     await wardPage.goTo();
-    await page.getByText(fullName).click();
+    const patientUuid = wardPatient.uuid;
+    await page.getByTestId(`ward-patient-card-${patientUuid}`).click();
     await patientBedSwap.transferButton().click();
     await patientBedSwap.swapButton().click();
     await page.getByText(`${bedNumber} · Empty`).click();
