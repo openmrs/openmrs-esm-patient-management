@@ -4,7 +4,7 @@ import { type QueueEntry } from '../types';
 import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import { updateQueueEntry } from './queue-entry-actions.resource';
 import { useQueues } from '../hooks/useQueues';
-import { convertTime12to24 } from '../helpers/time-helpers';
+import { convertTime12to24 } from './time-helpers';
 
 interface EditQueueEntryModalProps {
   queueEntry: QueueEntry;

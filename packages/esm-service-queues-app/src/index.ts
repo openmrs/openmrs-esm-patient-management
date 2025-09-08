@@ -67,14 +67,6 @@ export const metricsCardAverageWaitTime = getAsyncLifecycle(
   options,
 );
 
-export const addProviderToRoomModal = getAsyncLifecycle(
-  () => import('./admin/add-provider-queue-room-modal/add-provider-queue-room.modal'),
-  {
-    featureName: 'add provider queue room',
-    moduleName,
-  },
-);
-
 export const callQueueEntryModal = getAsyncLifecycle(() => import('./modals/call-modal/call-queue-entry.modal'), {
   featureName: 'call queue entry',
   moduleName,
@@ -163,6 +155,19 @@ export const patientBannerQueueEntryStatus = getAsyncLifecycle(
   () => import('./patient-banner-extension/patient-banner-queue-entry-status.extension'),
   {
     featureName: 'patient-info-queue-entry-status',
+    moduleName,
+  },
+);
+
+export const queueScreenLink = getAsyncLifecycle(() => import('./queue-screen/queue-screen-link.extension'), {
+  featureName: 'queue-screen-link',
+  moduleName,
+});
+
+export const adminPageCardLink = getAsyncLifecycle(
+  () => import('./admin/admin-page-card-link/admin-page-card-link.extension'),
+  {
+    featureName: 'admin-page-card-link',
     moduleName,
   },
 );

@@ -19,13 +19,13 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
-import { convertTime12to24, type amPm } from '../helpers/time-helpers';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
+import { useQueues } from '../hooks/useQueues';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
 import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
-import { useMutateQueueEntries } from '../hooks/useQueueEntries';
-import { useQueues } from '../hooks/useQueues';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { convertTime12to24, type amPm } from './time-helpers';
 import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
