@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-management",
-  "version": "9.1.1",
+  "version": "9.1.2",
   "private": true,
   "description": "Patient management microfrontend for the OpenMRS 3.x frontend",
   "workspaces": [
