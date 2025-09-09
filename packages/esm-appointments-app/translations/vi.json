@@ -149,6 +149,7 @@
   "todays": "Hôm nay",
   "TUE": "TUE",
   "type": "Loại",
+  "unknownError": "An unknown error occurred",
   "unscheduled": "Không theo lịch trình",
   "unscheduledAppointments": "Cuộc hẹn không theo lịch trình",
   "unscheduledAppointments_lower": "cuộc hẹn không theo lịch trình",
