@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
@@ -28,13 +28,17 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   const [switchedView, setSwitchedView] = useState(false);
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
-  const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
+  const startDate = useMemo(() => dayjs().subtract(6, 'month').toISOString(), []);
   const {
     data: appointmentsData,
     error,
     isLoading,
     isValidating,
-  } = usePatientAppointments(patientUuid, startDate, new AbortController());
+  } = usePatientAppointments(
+    patientUuid,
+    startDate,
+    useMemo(() => new AbortController(), []),
+  );
 
   const handleLaunchAppointmentsForm = () => {
     if (
@@ -114,6 +118,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
               </Layer>
             );
           }
+
           if (contentSwitcherValue === AppointmentTypes.TODAY) {
             if (appointmentsData.todaysAppointments?.length) {
               return (
