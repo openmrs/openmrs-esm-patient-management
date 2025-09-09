@@ -103,7 +103,7 @@ test('Swap the patient to another bed', async ({ page }) => {
   });
   await test.step('And i will confirm bed swap', async () => {
     await wardPage.goTo();
-    await expect(page.getByText(bed.bedNumber)).toBeVisible();
+    await expect(page.getByText(bedNumber)).toBeVisible();
   });
 });
 test.afterEach(async ({ api }) => {
