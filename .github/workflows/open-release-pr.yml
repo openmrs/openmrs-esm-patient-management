@@ -22,46 +22,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
         with:
           # Fetch full history so tools that read tags/changelog (if any) work
           fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: 🛠️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.x'
+          cache: 'yarn'
 
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: 📦 Install dependencies if cache miss
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: 📦 Install dependencies
         run: yarn install --immutable
 
-      - name: Run release
+      - name: 🚀 Run release
         id: release
         run: |
           yarn release ${{ inputs.release_type }}
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
-      - name: Run tests on release changes
+
+      - name: 🧪 Run tests on release changes
         run: yarn verify
-        
-      - name: Create PR with release changes
+
+      - name: 📝 Create PR with release changes
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
           # branch name is unique per run
-          branch: "release/v${{ steps.release.outputs.version }}-${{ github.run_id }}"
-          commit-message: "chore(release): v${{ steps.release.outputs.version }}"
-          title: "(chore) Release v${{ steps.release.outputs.version }}"
+          branch: 'release/v${{ steps.release.outputs.version }}-${{ github.run_id }}'
+          commit-message: 'chore(release): v${{ steps.release.outputs.version }}'
+          title: '(chore) Release v${{ steps.release.outputs.version }}'
           body: |
             This PR was created automatically via **workflow_dispatch**.
 
@@ -75,6 +68,6 @@ jobs:
             release
             automated-pr
           delete-branch: true
-          author: "OpenMRS Bot <infrastructure@openmrs.org>"
-          committer: "OpenMRS Bot <infrastructure@openmrs.org>"
+          author: 'OpenMRS Bot <infrastructure@openmrs.org>'
+          committer: 'OpenMRS Bot <infrastructure@openmrs.org>'
           token: ${{ secrets.OMRS_BOT_GH_TOKEN || secrets.GITHUB_TOKEN }}
