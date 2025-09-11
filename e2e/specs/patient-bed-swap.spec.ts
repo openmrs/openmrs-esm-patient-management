@@ -28,9 +28,10 @@ let bed: Bed;
 let bedtype: BedType;
 let provider: Provider;
 let wardPatient: Patient;
-let uniqueTagName1 = `Tag_${Math.random().toString(36).slice(2, 6)}`;
-let uniqueTypeName1 = `Type_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+let bedTagName = `Tag_${Math.random().toString(36).slice(2, 6)}`;
+let bedTypeName = `Type_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 const bedNumber = `B_${Date.now().toString().slice(-6)}`.slice(0, 10);
+
 test.beforeEach(async ({ api }) => {
   location = await bedLocation(api);
   await changeToWardLocation(api);
@@ -59,18 +60,18 @@ test('Swap the patient to another bed', async ({ page }) => {
   await test.step('And i will create a bed tag for the bed', async () => {
     await bedAdministration.openBedTags();
     await page.getByRole('button', { name: /create bed tag/i }).click();
-    await bedAdministration.bedTagNameInput().fill(uniqueTagName1);
+    await bedAdministration.bedTagNameInput().fill(bedTagName);
     await bedAdministration.saveButton().click();
   });
   await test.step('And i will create bed type for the bed', async () => {
     await bedAdministration.openBedTypes();
 
-    const displayName1 = uniqueTypeName1.slice(0, 10);
-    const description1 = `E2E ${uniqueTypeName1}`;
+    const bedDisplayName = bedTypeName.slice(0, 10);
+    const description = `E2E ${bedTypeName}`;
     await page.getByRole('button', { name: /add bed type/i }).click();
-    await bedAdministration.bedNameInput().fill(uniqueTypeName1);
-    await bedAdministration.displayNameInput().fill(displayName1);
-    await bedAdministration.descriptionInput().fill(description1);
+    await bedAdministration.bedNameInput().fill(bedTypeName);
+    await bedAdministration.displayNameInput().fill(bedDisplayName);
+    await bedAdministration.descriptionInput().fill(description);
     await bedAdministration.saveButton().click();
   });
 
@@ -85,12 +86,17 @@ test('Swap the patient to another bed', async ({ page }) => {
     await page.getByRole('listbox').waitFor({ state: 'visible' });
     await page.getByRole('option', { name: location.name, exact: true }).first().click();
     await bedAdministration.occupancyStatusInput().selectOption({ value: 'AVAILABLE' });
-    await bedAdministration.bedTypeInput().selectOption(uniqueTypeName1);
+    await bedAdministration.bedTypeInput().selectOption(bedTypeName);
     await bedAdministration.bedTagsMultiSelect().click();
-    await page.getByText(uniqueTagName1).first().click();
+    await page.getByText(bedTagName).first().click();
     await page.keyboard.press('Tab');
     await bedAdministration.saveAndCloseButton().click();
   });
+  await test.step('And i confirm the bed is created', async () => {
+    const table = page.getByRole('table');
+    await expect(table).toContainText(bed.bedNumber);
+  });
+
   await test.step('Then i swap a patient to another bed', async () => {
     const fullName = wardPatient.person?.display;
     await wardPage.goTo();
@@ -104,6 +110,7 @@ test('Swap the patient to another bed', async ({ page }) => {
   await test.step('And i will confirm bed swap', async () => {
     await wardPage.goTo();
     await expect(page.getByText(bedNumber)).toBeVisible();
+    await expect(page.getByText(`${bed.bedNumber} · Empty`)).toBeVisible();
   });
 });
 test.afterEach(async ({ api }) => {
