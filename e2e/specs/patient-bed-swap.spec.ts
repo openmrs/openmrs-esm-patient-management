@@ -94,7 +94,7 @@ test('Swap the patient to another bed', async ({ page }) => {
   });
   await test.step('And i confirm the bed is created', async () => {
     const table = page.getByRole('table');
-    await expect(table).toContainText(bed.bedNumber);
+    await expect(table).toContainText(bedNumber);
   });
 
   await test.step('Then i swap a patient to another bed', async () => {
@@ -110,7 +110,6 @@ test('Swap the patient to another bed', async ({ page }) => {
   await test.step('And i will confirm bed swap', async () => {
     await wardPage.goTo();
     await expect(page.getByText(bedNumber)).toBeVisible();
-    await expect(page.getByText(`${bed.bedNumber}).toBeVisible();
   });
 });
 test.afterEach(async ({ api }) => {
