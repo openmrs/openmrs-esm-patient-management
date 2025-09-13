@@ -85,3 +85,9 @@
 .notifications {
   margin-top: layout.$spacing-05;
 }
+
+.relatedPatientTransferSwapOption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-05;
+}

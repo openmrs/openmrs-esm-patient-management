@@ -42,7 +42,7 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
 
   const card = (
     <>
-      <WardPatientCard wardPatient={wardPatient}>
+      <WardPatientCard wardPatient={wardPatient} relatedTransferPatients={childrenOfWardPatientInSameBed}>
         <MaternalWardPatientCardHeader {...{ wardPatient }} />
         <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
           <WardPatientTimeOnWard
@@ -55,10 +55,15 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
         <MotherChildRow {...props} />
       </WardPatientCard>
       {childrenOfWardPatientInSameBed?.map((childWardPatient) => {
+        // for eahch child, includes the mother and the child's siblings
+        const relatedTransferPatients = [
+          wardPatient,
+          ...childrenOfWardPatientInSameBed.filter((wp) => wp.patient.uuid !== childWardPatient.patient.uuid),
+        ];
         return (
           <React.Fragment key={childWardPatient.patient.uuid}>
             <MotherChildBedShareDivider />
-            <WardPatientCard wardPatient={childWardPatient}>
+            <WardPatientCard wardPatient={childWardPatient} relatedTransferPatients={relatedTransferPatients}>
               <MaternalWardPatientCardHeader wardPatient={childWardPatient} />
               <PendingItemsRow id={'pending-items'} wardPatient={childWardPatient} />
             </WardPatientCard>

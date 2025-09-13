@@ -15,6 +15,10 @@ const TransferSection = {
 
 type TransferSectionValues = (typeof TransferSection)[keyof typeof TransferSection];
 
+/**
+ * This workspace opens the form to either transfer a patient to a different ward location
+ * or to change their currently assigned bed
+ */
 export default function PatientTransferAndSwapWorkspace(props: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
   const [selectedSection, setSelectedSection] = useState<TransferSectionValues>(TransferSection.TRANSFER);

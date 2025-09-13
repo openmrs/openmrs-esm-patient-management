@@ -1,6 +1,8 @@
 import {
   Button,
   ButtonSet,
+  Checkbox,
+  CheckboxGroup,
   Form,
   InlineNotification,
   RadioButton,
@@ -15,11 +17,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import useWardLocation from '../../hooks/useWardLocation';
 import LocationSelector from '../../location-selector/location-selector.component';
 import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
+import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
+import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
 
 /**
  * Form to fill out for:
@@ -31,6 +34,7 @@ export default function PatientAdmitOrTransferForm({
   closeWorkspaceWithSavedChanges,
   wardPatient,
   promptBeforeClosing,
+  relatedTransferPatients,
 }: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
@@ -44,6 +48,7 @@ export default function PatientAdmitOrTransferForm({
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
+  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
 
   const zodSchema = useMemo(
     () =>
@@ -112,12 +117,28 @@ export default function PatientAdmitOrTransferForm({
         });
       }
 
-      createEncounter(patient, emrConfiguration.transferRequestEncounterType, visit?.uuid, [
-        {
-          concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
-          groupMembers: obs,
-        },
-      ])
+      const wardPatientsToTransfer = [
+        wardPatient,
+        ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
+      ];
+
+      Promise.all(
+        wardPatientsToTransfer.map(async (wardPatientToTransfer) => {
+          const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToTransfer;
+
+          return createEncounter(
+            patientToTransfer,
+            emrConfiguration.transferRequestEncounterType,
+            patientToTransferVisit?.uuid,
+            [
+              {
+                concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+                groupMembers: obs,
+              },
+            ],
+          );
+        }),
+      )
         .then(() => {
           showSnackbar({
             title: t('patientTransferRequestCreated', 'Patient transfer request created'),
@@ -142,10 +163,11 @@ export default function PatientAdmitOrTransferForm({
       createEncounter,
       dispositionsWithTypeTransfer,
       emrConfiguration,
-      patient,
       t,
       wardPatientGroupDetails,
-      visit?.uuid,
+      selectedRelatedPatient,
+      relatedTransferPatients,
+      wardPatient,
     ],
   );
 
@@ -194,6 +216,32 @@ export default function PatientAdmitOrTransferForm({
             hideCloseButton={true}
             title={t('patientCurrentlyNotAdmitted', 'Patient currently not admitted')}
           />
+        )}
+        {relatedTransferPatients?.length > 0 && (
+          <div>
+            <CheckboxGroup legendText={t('alsoTransfer', 'Also transfer:')}>
+              {relatedTransferPatients?.map(({ patient: relatedPatient }) => (
+                <Checkbox
+                  checked={selectedRelatedPatient.includes(relatedPatient.uuid)}
+                  className={styles.checkbox}
+                  id={relatedPatient.uuid}
+                  key={'also-transfer-' + relatedPatient.uuid}
+                  labelText={
+                    <div className={styles.relatedPatientTransferSwapOption}>
+                      <WardPatientName patient={relatedPatient} />
+                      <WardPatientIdentifier id="patient-identifier" patient={relatedPatient} />
+                    </div>
+                  }
+                  onChange={(_, { checked, id }) => {
+                    const currentValue = selectedRelatedPatient;
+                    setCheckedRelatedPatient(
+                      checked ? [...currentValue, id] : currentValue.filter((item) => item !== id),
+                    );
+                  }}
+                />
+              ))}
+            </CheckboxGroup>
+          </div>
         )}
         <div className={styles.field}>
           <h2 className={styles.productiveHeading02}>{t('selectALocation', 'Select a location')}</h2>
