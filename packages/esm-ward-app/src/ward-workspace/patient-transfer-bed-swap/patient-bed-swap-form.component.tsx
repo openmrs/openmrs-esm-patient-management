@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, InlineNotification , CheckboxGroup , Checkbox , Stack } from '@carbon/react';
+import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import classNames from 'classnames';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -17,7 +17,7 @@ export default function PatientBedSwapForm({
   promptBeforeClosing,
   closeWorkspaceWithSavedChanges,
   wardPatient,
-  relatedTransferPatients,
+  relatedTransferPatients = [],
 }: WardPatientWorkspaceProps) {
   const { patient, visit } = wardPatient;
   const { t } = useTranslation();

@@ -34,7 +34,7 @@ export default function PatientAdmitOrTransferForm({
   closeWorkspaceWithSavedChanges,
   wardPatient,
   promptBeforeClosing,
-  relatedTransferPatients,
+  relatedTransferPatients = [],
 }: WardPatientWorkspaceProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
