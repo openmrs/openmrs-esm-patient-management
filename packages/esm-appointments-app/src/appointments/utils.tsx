@@ -78,3 +78,9 @@ export function filterByServiceType(appointmentList: Array<Appointment>, appoint
     ? appointmentList.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
     : appointmentList;
 }
+
+export function filterByProvider(appointmentList: Array<Appointment>, appointmentProviders: Array<string>) {
+  return appointmentProviders?.length > 0
+    ? appointmentList.filter(({ providers }) => appointmentProviders.includes(providers[0].uuid))
+    : appointmentList;
+}
