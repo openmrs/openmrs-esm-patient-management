@@ -98,7 +98,7 @@ export const configSchema = {
   },
   showProviderColumn: {
     _type: Type.Boolean,
-    _default: true,
+    _default: false,
     _description: 'Whether to show the the provider column and filter if Provider column is true',
   },
   appointmentsTableColumns: {
