@@ -19,13 +19,17 @@ dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
   appointmentServiceTypes?: Array<string>;
+  appointmentProviders?: Array<string>;
 }
 
 type DateType = 'pastDate' | 'today' | 'futureDate';
 
 const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceTypes }) => {
+const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
+  appointmentServiceTypes,
+  appointmentProviders,
+}) => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
@@ -91,6 +95,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
           return (
             <ExtensionWrapper
               appointmentServiceTypes={appointmentServiceTypes}
+              appointmentProviders={appointmentProviders}
               currentTab={currentTab}
               date={selectedDate}
               dateType={dateType}
@@ -134,6 +139,7 @@ function ExtensionWrapper({
   extension,
   currentTab,
   appointmentServiceTypes,
+  appointmentProviders,
   date,
   dateType,
   showExtensionTab,
@@ -142,6 +148,7 @@ function ExtensionWrapper({
   extension: ConnectedExtension;
   currentTab: string;
   appointmentServiceTypes: Array<string>;
+  appointmentProviders: Array<string>;
   date: string;
   dateType: DateType;
   showExtensionTab: (extension: string) => void;
@@ -174,6 +181,7 @@ function ExtensionWrapper({
         state={{
           date,
           appointmentServiceTypes,
+          appointmentProviders,
           status: extension.config?.status,
           title: extension.config?.title,
         }}

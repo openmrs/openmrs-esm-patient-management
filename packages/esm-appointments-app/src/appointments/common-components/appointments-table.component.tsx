@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -66,7 +66,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
   const config = useConfig<ConfigObject>();
-  const { appointmentsTableColumns } = config;
+  const { appointmentsTableColumns, showProviderColumn } = config;
   const searchResults = useAppointmentSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
@@ -74,7 +74,15 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
-  const headerData = appointmentsTableColumns.map((columnKey) => ({
+  const newAppointmentsTableColumns = useMemo(() => {
+    const columns = [...appointmentsTableColumns];
+    if (showProviderColumn) {
+      columns.push('provider');
+    }
+    return columns;
+  }, [showProviderColumn, appointmentsTableColumns]);
+
+  const headerData = newAppointmentsTableColumns.map((columnKey) => ({
     header: t(columnKey, columnKey),
     key: columnKey,
   }));
@@ -197,8 +205,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBody>
                   {rows.map((row) => {
                     const matchingAppointment = appointments.find((appointment) => appointment.uuid === row.id);
-                    const patientUuid = matchingAppointment.patient?.uuid;
-                    const visitDate = dayjs(matchingAppointment.startDateTime);
+                    const patientUuid = matchingAppointment?.patient?.uuid;
+                    const visitDate = dayjs(matchingAppointment?.startDateTime);
                     const isFutureAppointment = visitDate.isAfter(dayjs());
                     const isTodayAppointment = visitDate.isToday();
                     const hasActiveVisitToday = visits?.some(
