@@ -7,9 +7,15 @@ import styles from './ward-patient-card.scss';
 interface Props {
   children: ReactNode;
   wardPatient: WardPatient;
+
+  /**
+   * Related patients that are in the same bed as wardPatient. On transfer or bed swap
+   * these related patients have the option to be transferred / swapped together
+   */
+  relatedTransferPatients?: WardPatient[];
 }
 
-const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
+const WardPatientCard: React.FC<Props> = ({ children, wardPatient, relatedTransferPatients }) => {
   const { patient } = wardPatient;
 
   return (
@@ -23,6 +29,7 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient }) => {
               wardPatient,
               patient,
               patientUuid: patient.uuid,
+              relatedTransferPatients,
             },
             onWorkspaceGroupLaunch: () => {
               const store = getPatientChartStore();

@@ -14,10 +14,19 @@ jobs:
       TURBO_TEAM: ${{ github.repository_owner }}
 
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🚀 Setup a local cache server for Turborepo
+      - name: 🛠️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 🚀 Setup Turborepo cache server
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

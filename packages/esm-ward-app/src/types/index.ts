@@ -52,6 +52,12 @@ export type WardPatient = {
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   wardPatient: WardPatient;
+
+  /**
+   * Related patients that are in the same bed as wardPatient. On transfer or bed swap
+   * these related patients have the option to be transferred / swapped together
+   */
+  relatedTransferPatients?: WardPatient[];
 }
 
 // server-side types defined in openmrs-module-bedmanagement:

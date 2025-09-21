@@ -149,6 +149,7 @@
   "todays": "Aujourd’hui: ",
   "TUE": "MAR",
   "type": "Type",
+  "unknownError": "An unknown error occurred",
   "unscheduled": "Non programmé",
   "unscheduledAppointments": "Rendez-vous non-planifiés",
   "unscheduledAppointments_lower": "rendez-vous non-planifiés",
