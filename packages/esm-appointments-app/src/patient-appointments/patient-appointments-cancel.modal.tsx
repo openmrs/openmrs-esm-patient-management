@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
@@ -16,31 +17,46 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { mutate } = usePatientAppointments(patientUuid, new Date().toUTCString(), new AbortController());
+  const startDate = useMemo(() => dayjs().subtract(6, 'month').toISOString(), []);
+  const { mutate } = usePatientAppointments(
+    patientUuid,
+    startDate,
+    useMemo(() => new AbortController(), []),
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCancelAppointment = async () => {
     setIsSubmitting(true);
 
-    changeAppointmentStatus('Cancelled', appointmentUuid)
-      .then(() => {
-        mutate();
-        closeCancelModal();
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
-          title: t('appointmentCancelled', 'Appointment cancelled'),
-        });
-      })
-      .catch((err) => {
-        showSnackbar({
-          title: t('appointmentCancelError', 'Error cancelling appointment'),
-          kind: 'error',
-          isLowContrast: true,
-          subtitle: err?.message,
-        });
+    try {
+      await changeAppointmentStatus('Cancelled', appointmentUuid);
+      mutate();
+      closeCancelModal();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        subtitle: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
+        title: t('appointmentCancelled', 'Appointment cancelled'),
       });
+    } catch (err) {
+      const rawErrorMessage =
+        err?.responseBody?.error?.message ||
+        err?.responseBody?.message ||
+        err?.message ||
+        t('unknownError', 'An unknown error occurred');
+
+      // Remove square brackets from the error message
+      const errorMessage = rawErrorMessage.replace(/^\[|\]$/g, '');
+
+      showSnackbar({
+        title: t('appointmentCancelError', 'Error cancelling appointment'),
+        kind: 'error',
+        isLowContrast: false,
+        subtitle: errorMessage,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

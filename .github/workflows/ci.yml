@@ -23,21 +23,16 @@ jobs:
       actions: read
 
     steps:
-      - uses: actions/checkout@v4
-      - name: 🟢 Setup Node.js
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: '20.x'
+          cache: 'yarn'
 
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: 🚀 Setup local cache server for Turborepo
@@ -66,22 +61,17 @@ jobs:
     if: ${{ github.event_name == 'push' && github.repository_owner == 'openmrs' }}
 
     steps:
-      - uses: actions/checkout@v4
-      - name: 🟢 Setup Node.js
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: '20.x'
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: 🚀 Setup a local cache server for Turborepo
@@ -120,22 +110,17 @@ jobs:
     if: ${{ github.event_name == 'release' && github.repository_owner == 'openmrs' }}
 
     steps:
-      - uses: actions/checkout@v4
-      - name: 🟢 Setup Node.js
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: '20.x'
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - run: yarn turbo run build --color

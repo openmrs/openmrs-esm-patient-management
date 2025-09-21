@@ -149,6 +149,7 @@
   "todays": "Azi",
   "TUE": "MAR",
   "type": "Tip",
+  "unknownError": "An unknown error occurred",
   "unscheduled": "Neprogramat",
   "unscheduledAppointments": "Programări neprogramate",
   "unscheduledAppointments_lower": "programări neprogramate",

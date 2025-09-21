@@ -22,34 +22,26 @@ jobs:
 
     steps:
       # Step 1: Check out repository
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
       # Step 2: Setup Node.js environment
-      - name: 🟢 Setup Node.js
+      - name: 🛠️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.x'
+          cache: 'yarn'
 
-      # Step 3: Cache dependencies
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
-      # Step 4: Install dependencies if cache miss
+      # Step 3: Install dependencies
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      # Step 5: Run dependency update check
+      # Step 4: Run dependency update check
       - name: ✅ Check for updates
         run: node ./tools/update-openmrs-deps.mjs
 
-      # Step 6: Create PR with updates if necessary
-      - name: ⬆️ Create PR if necessary
+      # Step 5: Create PR with updates if necessary
+      - name: 📝 Create PR if necessary
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
@@ -78,14 +70,14 @@ jobs:
             automated-pr
           delete-branch: true    # Clean up branch after merge
 
-      # Step 7: Auto-approve the PR if created or updated
+      # Step 6: Auto-approve the PR if created or updated
       - name: ✅ Auto approve PR
         if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
         run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 8: Auto-merge the PR if created or updated
+      # Step 7: Auto-merge the PR if created or updated
       - name: 🔀 Auto merge PR
         if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
         run: gh pr merge --auto --squash "${{ steps.cpr.outputs.pull-request-number }}"
