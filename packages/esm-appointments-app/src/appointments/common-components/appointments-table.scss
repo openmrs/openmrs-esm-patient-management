@@ -157,3 +157,32 @@ html[dir='rtl'] {
   @include type.type-style('body-compact-01');
   color: $text-02;
 }
+
+.filtersContainer {
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background-color: colors.$gray-10;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.filterRow {
+  display: flex;
+  gap: layout.$spacing-04;
+  margin-bottom: layout.$spacing-04;
+  flex-wrap: wrap;
+}
+
+.filterRow > * {
+  flex: 1;
+  min-width: 200px;
+}
+
+// Responsive design for mobile
+@media (max-width: 672px) {
+  .filterRow {
+    flex-direction: column;
+  }
+
+  .filterRow > * {
+    min-width: 100%;
+  }
+}

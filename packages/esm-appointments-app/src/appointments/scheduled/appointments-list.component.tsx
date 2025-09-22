@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { filterByServiceType } from '../utils';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 
@@ -20,18 +19,16 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
 }) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
 
-  const appointmentsFilteredByServiceType = filterByServiceType(appointmentList, appointmentServiceTypes).map(
-    (appointment) => ({
-      id: appointment.uuid,
-      ...appointment,
-    }),
-  );
+  const appointmentsWithId = appointmentList.map((appointment) => ({
+    id: appointment.uuid,
+    ...appointment,
+  }));
 
   const activeAppointments = useMemo(() => {
     return excludeCancelledAppointments
-      ? appointmentsFilteredByServiceType.filter((appointment) => appointment.status !== 'Cancelled')
-      : appointmentsFilteredByServiceType;
-  }, [excludeCancelledAppointments, appointmentsFilteredByServiceType]);
+      ? appointmentsWithId.filter((appointment) => appointment.status !== 'Cancelled')
+      : appointmentsWithId;
+  }, [excludeCancelledAppointments, appointmentsWithId]);
 
   return (
     <AppointmentsTable

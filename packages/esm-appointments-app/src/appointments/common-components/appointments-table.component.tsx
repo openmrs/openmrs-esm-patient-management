@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -8,6 +8,7 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  MultiSelect,
   OverflowMenu,
   OverflowMenuItem,
   Pagination,
@@ -39,7 +40,8 @@ import {
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
-import { type Appointment } from '../../types';
+import { type Appointment, AppointmentStatus } from '../../types';
+import { useAppointmentServices } from '../../hooks/useAppointmentService';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
@@ -65,9 +67,43 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const config = useConfig<ConfigObject>();
   const { appointmentsTableColumns } = config;
-  const searchResults = useAppointmentSearchResults(appointments, searchString);
+  const { serviceTypes: allServices } = useAppointmentServices();
+  const serviceOptions = useMemo(() => {
+    return (
+      allServices
+        ?.map((service) => ({
+          id: service.uuid,
+          label: service.name,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)) ?? []
+    );
+  }, [allServices]);
+
+  const statusOptions = useMemo(() => {
+    return Object.values(AppointmentStatus).map((status) => ({
+      id: status,
+      label: t(status.toLowerCase(), status),
+    }));
+  }, [t]);
+
+  // Filter appointments by service and status
+  const filteredAppointments = useMemo(() => {
+    let filtered = appointments;
+    if (selectedServices.length > 0) {
+      filtered = filtered.filter((appointment) => selectedServices.includes(appointment.service.uuid));
+    }
+    if (selectedStatuses.length > 0) {
+      filtered = filtered.filter((appointment) => selectedStatuses.includes(appointment.status));
+    }
+
+    return filtered;
+  }, [appointments, selectedServices, selectedStatuses]);
+
+  const searchResults = useAppointmentSearchResults(filteredAppointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
   const { visits } = useTodaysVisits();
@@ -141,6 +177,36 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           <h4>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h4>
         </div>
       </Tile>
+      <div className={styles.filtersContainer}>
+        <div className={styles.filterRow}>
+          <MultiSelect
+            id="serviceFilter"
+            items={serviceOptions}
+            itemToString={(item) => (item ? item.label : '')}
+            label={t('filterByService', 'Filter by Service')}
+            onChange={({ selectedItems }) => {
+              const selectedUuids = selectedItems.map((item) => item.id);
+              setSelectedServices(selectedUuids);
+            }}
+            selectedItems={serviceOptions.filter((item) => selectedServices.includes(item.id))}
+            size={responsiveSize}
+            type="inline"
+          />
+          <MultiSelect
+            id="statusFilter"
+            items={statusOptions}
+            itemToString={(item) => (item ? item.label : '')}
+            label={t('filterByStatus', 'Filter by Status')}
+            onChange={({ selectedItems }) => {
+              const selectedStatusValues = selectedItems.map((item) => item.id);
+              setSelectedStatuses(selectedStatusValues);
+            }}
+            selectedItems={statusOptions.filter((item) => selectedStatuses.includes(item.id))}
+            size={responsiveSize}
+            type="inline"
+          />
+        </div>
+      </div>
       <div className={styles.toolbar}>
         <Search
           className={styles.searchbar}
