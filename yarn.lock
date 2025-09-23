@@ -3134,8 +3134,8 @@ __metadata:
   peerDependencies:
     "@openmrs/esm-framework": 8.x
     dayjs: 1.x
-    react: ^18.1.0
-    react-dom: ^18.1.0
+    react: 18.x
+    react-dom: 18.x
     react-i18next: 11.x
     swr: 2.x
   languageName: unknown
@@ -3388,7 +3388,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-home-app@workspace:packages/esm-home-app"
   dependencies:
-    webpack: "npm:^5.74.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@openmrs/esm-framework": 8.x
     react: 18.x
@@ -3556,7 +3556,7 @@ __metadata:
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@openmrs/esm-framework": 8.x
-    react: ^18.1.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     swr: 2.x
@@ -3620,7 +3620,7 @@ __metadata:
     zod: "npm:^3.24.1"
   peerDependencies:
     "@openmrs/esm-framework": 8.x
-    react: ^18.1.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     swr: 2.x
@@ -3716,7 +3716,7 @@ __metadata:
     zod: "npm:^3.24.1"
   peerDependencies:
     "@openmrs/esm-framework": 8.x
-    react: ^18.1.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     swr: 2.x
@@ -20521,7 +20521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.74.0, webpack@npm:^5.99.9":
+"webpack@npm:^5.99.9":
   version: 5.99.9
   resolution: "webpack@npm:5.99.9"
   dependencies:
