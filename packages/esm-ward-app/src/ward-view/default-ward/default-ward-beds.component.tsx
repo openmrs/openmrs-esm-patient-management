@@ -7,7 +7,7 @@ import DefaultWardPatientCard from './default-ward-patient-card.component';
 
 function DefaultWardBeds() {
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
+  const { bedLayouts, wardAdmittedPatientsWithBed, inpatientAdmissionsByPatientUuid } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
@@ -18,12 +18,13 @@ function DefaultWardBeds() {
         const { patient, visit, currentInpatientRequest } = inpatientAdmission;
         return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
       } else {
+        const admissionElsewhere = inpatientAdmissionsByPatientUuid.get(patient.uuid);
         // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
         return {
           patient: patient,
-          visit: null,
+          visit: admissionElsewhere?.visit,
           bed,
-          inpatientAdmission: null, // populate after BED-13
+          inpatientAdmission: admissionElsewhere,
           inpatientRequest: null,
         };
       }

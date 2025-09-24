@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type WardPatient } from '../../types';
+import { WardViewContext, type WardPatient } from '../../types';
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
 import MaternalWardPatientCardHeader from './maternal-ward-patient-card-header.component';
 import maternalWardPatientCardStyles from './maternal-ward-patient-card.scss';
@@ -12,6 +12,7 @@ import WardPatientCard from '../../ward-patient-card/ward-patient-card.component
 import WardPatientObs from '../../ward-patient-card/row-elements/ward-patient-obs.component';
 import WardPatientTimeOnWard from '../../ward-patient-card/row-elements/ward-patient-time-on-ward.component';
 import styles from '../../ward-patient-card/ward-patient-card.scss';
+import IncorrectAdmissionWarningRow from '../../ward-patient-card/card-rows/incorrect-admission-warning-row.component';
 
 export interface MaternalWardPatientCardProps {
   /**
@@ -50,6 +51,7 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
           />
           <WardPatientObs id={'gravida'} patient={patient} visit={visit} />
         </div>
+        <IncorrectAdmissionWarningRow wardPatient={wardPatient} />
         <PendingItemsRow id={'pending-items'} wardPatient={wardPatient} />
         <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
         <MotherChildRow {...props} />

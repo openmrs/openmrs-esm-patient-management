@@ -8,7 +8,7 @@ import MaternalWardPatientCard from './maternal-ward-patient-card.component';
 const MaternalWardBeds: React.FC<MotherChildRelationships> = (motherChildRelationships) => {
   const { motherByChildUuid, isLoading: isLoadingMotherChildRelationships } = motherChildRelationships ?? {};
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const { bedLayouts, wardAdmittedPatientsWithBed } = wardPatientGroupDetails ?? {};
+  const { bedLayouts, wardAdmittedPatientsWithBed, inpatientAdmissionsByPatientUuid } = wardPatientGroupDetails ?? {};
 
   const wardBeds = bedLayouts?.map((bedLayout) => {
     const { patients: patientsInCurrentBed } = bedLayout;
@@ -22,13 +22,14 @@ const MaternalWardBeds: React.FC<MotherChildRelationships> = (motherChildRelatio
           const { patient, visit, currentInpatientRequest } = inpatientAdmission;
           return { patient, visit, bed, inpatientAdmission, inpatientRequest: currentInpatientRequest || null };
         } else {
+          const admissionElsewhere = inpatientAdmissionsByPatientUuid.get(patient.uuid);
           // for some reason this patient is in a bed but not in the list of admitted patients,
           // so we need to use the patient data from the bed endpoint
           return {
             patient: patient,
-            visit: null,
+            visit: admissionElsewhere?.visit,
             bed,
-            inpatientAdmission: null,
+            inpatientAdmission: admissionElsewhere,
             inpatientRequest: null,
           };
         }

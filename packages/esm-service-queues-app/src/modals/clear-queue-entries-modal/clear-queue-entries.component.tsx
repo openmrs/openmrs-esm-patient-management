@@ -33,8 +33,8 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) =
       size={isDesktop(layout) ? 'sm' : 'lg'}
       kind="ghost"
       onClick={launchClearAllQueueEntriesModal}
-      iconDescription={t('clearQueue', 'Clear queue')}>
-      {t('clearQueue', 'Clear queue')}
+      iconDescription={t('clearQueueEntries', 'Clear queue entries')}>
+      {t('clearQueueEntries', 'Clear queue entries')}
     </Button>
   );
 };

@@ -24,10 +24,10 @@ describe('ClearQueueEntriesModal Component', () => {
   it('renders the component with warning message', () => {
     renderClearQueueEntriesModal();
 
-    expect(screen.getByRole('heading', { name: 'Service queue' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Service queues' })).toBeInTheDocument();
     expect(screen.getByText('Clear all queue entries?')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Clear queue')).toBeInTheDocument();
+    expect(screen.getByText('Clear queue entries')).toBeInTheDocument();
   });
 
   it('should close modal when the cancel button is clicked', async () => {
