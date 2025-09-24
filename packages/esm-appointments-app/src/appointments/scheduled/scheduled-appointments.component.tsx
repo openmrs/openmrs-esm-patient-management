@@ -75,16 +75,19 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
 
   return (
     <>
-      <ContentSwitcher
-        className={styles.switcher}
-        size={responsiveSize}
-        onChange={({ name }) => setCurrentTab(name)}
-        selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
-        selectionMode="manual">
-        {panelsToShow.map((panel) => (
-          <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
-        ))}
-      </ContentSwitcher>
+      {/* Hide the ContentSwitcher UI but keep the logic */}
+      <div style={{ display: 'none' }}>
+        <ContentSwitcher
+          className={styles.switcher}
+          size={responsiveSize}
+          onChange={({ name }) => setCurrentTab(name)}
+          selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
+          selectionMode="manual">
+          {panelsToShow.map((panel) => (
+            <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
+          ))}
+        </ContentSwitcher>
+      </div>
 
       <ExtensionSlot name={scheduledAppointmentsPanelsSlot}>
         {(extension) => {
@@ -97,6 +100,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
               extension={extension}
               hideExtensionTab={hideExtension}
               showExtensionTab={showExtension}
+              panelsToShow={panelsToShow}
             />
           );
         }}
@@ -138,6 +142,7 @@ function ExtensionWrapper({
   dateType,
   showExtensionTab,
   hideExtensionTab,
+  panelsToShow,
 }: {
   extension: ConnectedExtension;
   currentTab: string;
@@ -146,6 +151,7 @@ function ExtensionWrapper({
   dateType: DateType;
   showExtensionTab: (extension: string) => void;
   hideExtensionTab: (extension: string) => void;
+  panelsToShow: Array<any>;
 }) {
   const currentConfig = useRef(null);
   const currentDateType = useRef(dateType);
@@ -164,17 +170,16 @@ function ExtensionWrapper({
         : hideExtensionTab(extension.name);
     }
   }, [extension, dateType, showExtensionTab, hideExtensionTab]);
+  // Only show the first extension to avoid duplicate tables
+  const isFirstExtension = panelsToShow.length > 0 && extension.name === panelsToShow[0].name;
 
   return (
-    <div
-      key={extension.name}
-      className={styles.container}
-      style={{ display: currentTab === extension.name ? 'block' : 'none' }}>
+    <div key={extension.name} className={styles.container} style={{ display: isFirstExtension ? 'block' : 'none' }}>
       <Extension
         state={{
           date,
           appointmentServiceTypes,
-          status: extension.config?.status,
+          status: undefined,
           title: extension.config?.title,
         }}
       />
