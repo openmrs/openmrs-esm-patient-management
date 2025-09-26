@@ -6,11 +6,11 @@ import { omrsDateFormat } from './constants';
 import AppointmentTabs from './appointments/appointment-tabs.component';
 import AppointmentsHeader from './header/appointments-header.component';
 import AppointmentMetrics from './metrics/metrics-container.component';
-import { useAppointmentsStore, setAppointmentServiceTypes, setSelectedDate } from './store';
+import { useAppointmentsStore, setAppointmentServiceTypes, setSelectedDate, setAppointmentProviders } from './store';
 
 const Appointments: React.FC = () => {
   const { t } = useTranslation();
-  const { appointmentServiceTypes } = useAppointmentsStore();
+  const { appointmentServiceTypes, appointmentProviders } = useAppointmentsStore();
 
   const params = useParams();
 
@@ -26,11 +26,17 @@ const Appointments: React.FC = () => {
     }
   }, [params.serviceType]);
 
+  useEffect(() => {
+    if (params.appointmentProviders) {
+      setAppointmentProviders([params.appointmentProviders]);
+    }
+  }, [params.appointmentProviders]);
+
   return (
     <>
       <AppointmentsHeader title={t('appointments', 'Appointments')} showServiceTypeFilter />
       <AppointmentMetrics appointmentServiceTypes={appointmentServiceTypes} />
-      <AppointmentTabs appointmentServiceTypes={appointmentServiceTypes} />
+      <AppointmentTabs appointmentServiceTypes={appointmentServiceTypes} appointmentProviders={appointmentProviders} />
     </>
   );
 };
