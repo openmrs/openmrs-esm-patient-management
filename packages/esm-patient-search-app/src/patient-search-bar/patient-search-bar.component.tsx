@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
 
@@ -31,9 +32,15 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
         event.preventDefault();
         if (searchTerm && searchTerm.trim()) {
           onSubmit(searchTerm.trim());
+        } else {
+          showSnackbar({
+            kind: 'info',
+            title: t('emptySearchTerm', 'Search term cannot be empty'),
+            timeoutInMs: 1500,
+          });
         }
       },
-      [onSubmit, searchTerm],
+      [onSubmit, searchTerm, t],
     );
 
     return (
