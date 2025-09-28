@@ -13,33 +13,43 @@ mockUseConfig.mockReturnValue({
 });
 
 describe('Home Component', () => {
+  //this helps us to restore the original window.location after each test
+  let originalLocation: Location;
   beforeEach(() => {
+    //here we have stored the actuallocation object when we have not mocked it yet
+    originalLocation = window.location;
     updateSelectedQueueLocationName('Test Location');
   });
-
+  afterEach(() => {
+    //here we have stored the riginal window.location after every test so that we overcome test leakage
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: originalLocation,
+    });
+  });
   it('renders PatientQueueHeader, ClinicMetrics when activeTicketScreen is not "screen"', () => {
-    // Mock window.location.pathname
-    const originalLocation = window.location;
-    delete window.location;
-    window.location = { pathname: '/some-path' } as Location;
+    //here we override the window.location.pathname to simulate a non screen route
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...originalLocation, pathname: '/some-path' },
+    });
 
+    //here we are rendering the Home component
     render(<Home />);
 
-    // Assert that the expected components are rendered
+    // expecte the header element to be in the document
     expect(screen.getByTestId('patient-queue-header')).toBeInTheDocument();
-
-    // Clean up the mock
-    window.location = originalLocation;
   });
 
   it('renders QueueScreen when activeTicketScreen is "screen"', () => {
-    const originalLocation = window.location;
-    delete window.location;
-    window.location = { pathname: '/some-path/screen' } as Location;
-
+    //here we use the override window.location.pathname to simulate the screen route
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...originalLocation, pathname: '/some-path/screen' },
+    });
+    //here we still render the component
     render(<Home />);
+    //here the queue message is expected to be in the document
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
-
-    window.location = originalLocation;
   });
 });
