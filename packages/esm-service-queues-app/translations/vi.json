@@ -154,6 +154,7 @@
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
   "queueStatus": "Trạng thái hàng đợi",
+  "queueTable": "Queue table",
   "refills": "Nạp lại",
   "remove": "Remove",
   "removePatient": "Xóa bệnh nhân",

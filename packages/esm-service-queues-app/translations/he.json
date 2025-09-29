@@ -154,6 +154,7 @@
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
   "queueStatus": "מצב התור",
+  "queueTable": "Queue table",
   "refills": "חידושים",
   "remove": "Remove",
   "removePatient": "Remove patient",
