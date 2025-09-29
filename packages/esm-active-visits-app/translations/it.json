@@ -6,7 +6,7 @@
   "dose": "Dose",
   "encounterType": "Tipo di consulto",
   "endDate": "Data di fine",
-  "filterActiveVisits": "Filter active visits",
+  "filterActiveVisits": "Filtra visite attive",
   "filterTable": "Filtra tabella",
   "indication": "Indicazione",
   "medications": "Farmaci",
@@ -28,6 +28,6 @@
   "thereIsNoInformationToDisplayHere": "Non ci sono informazioni da visualizzare qui",
   "time": "Orario",
   "totalVisits": "Visite totali di oggi",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "viewPatientChartFor": "Mostra la Cartella Clinica di {{patientName}}",
   "visitSummary": "Riepilogo della visita"
 }
