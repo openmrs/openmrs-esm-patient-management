@@ -13,39 +13,23 @@ mockUseConfig.mockReturnValue({
 });
 
 describe('Home Component', () => {
-  let originalLocation: Location;
-
   beforeEach(() => {
-    originalLocation = window.location;
     updateSelectedQueueLocationName('Test Location');
   });
 
-  afterEach(() => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: originalLocation,
-    });
-  });
-
-  it('renders PatientQueueHeader, ClinicMetrics when activeTicketScreen is not "screen"', () => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { ...originalLocation, pathname: '/some-path' },
-    });
-
+  it('renders the service queues dashboard', () => {
     render(<Home />);
 
-    expect(screen.getByTestId('patient-queue-header')).toBeInTheDocument();
-  });
+    expect(screen.getByRole('heading', { name: /patients currently in queue/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /show patients with status/i })).toBeInTheDocument();
+    expect(screen.getByRole('search', { name: /search this list/i })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /clear queue entries/i })).toBeInTheDocument();
 
-  it('renders QueueScreen when activeTicketScreen is "screen"', () => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { ...originalLocation, pathname: '/some-path/screen' },
+    const expectedColumnHeaders = [/name/, /priority/, /coming from/, /status/, /queue/, /wait time/, /actions/];
+
+    expectedColumnHeaders.forEach((header) => {
+      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
-
-    render(<Home />);
-
-    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
   });
 });

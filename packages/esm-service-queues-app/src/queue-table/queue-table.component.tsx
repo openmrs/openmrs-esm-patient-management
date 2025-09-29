@@ -117,7 +117,7 @@ function QueueTable({
                 </TableToolbar>
               )}
             </div>
-            <Table {...getTableProps()} className={styles.queueTable}>
+            <Table {...getTableProps()} aria-label={t('queueTable', 'Queue table')} className={styles.queueTable}>
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
