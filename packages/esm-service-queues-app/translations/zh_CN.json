@@ -154,6 +154,7 @@
   "queueServiceCreated": "队列服务已创建",
   "queueServiceCreatedSuccessfully": "队列服务已成功创建",
   "queueStatus": "队列状态",
+  "queueTable": "Queue table",
   "refills": "补充处方",
   "remove": "删除",
   "removePatient": "移除患者",

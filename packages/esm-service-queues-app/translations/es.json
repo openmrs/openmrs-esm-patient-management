@@ -154,6 +154,7 @@
   "queueServiceCreated": "Servicio de cola creado",
   "queueServiceCreatedSuccessfully": "Servicio de cola creado exitosamente",
   "queueStatus": "Estado de la cola",
+  "queueTable": "Queue table",
   "refills": "Reabastecimiento",
   "remove": "Quitar",
   "removePatient": "Quitar paciente",
