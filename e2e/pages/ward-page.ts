@@ -31,11 +31,12 @@ export class WardPage {
 
   async waitForAdmissionRequest(patientName: string) {
     // Wait for the admission request to appear in the list
+    // Note: API polling in test setup ensures data is available, so shorter timeout is sufficient
     await this.page
       .locator('[class*="admissionRequestCard"]')
       .filter({ hasText: patientName })
       .first()
-      .waitFor({ state: 'visible', timeout: 30000 });
+      .waitFor({ state: 'visible', timeout: 5000 });
   }
 
   async clickPatientNotesButton() {
