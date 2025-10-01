@@ -29,6 +29,15 @@ export class WardPage {
     await this.manageAdmissionRequestsButton().click();
   }
 
+  async waitForAdmissionRequest(patientName: string) {
+    // Wait for the admission request to appear in the list
+    await this.page
+      .locator('[class*="admissionRequestCard"]')
+      .filter({ hasText: patientName })
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 });
+  }
+
   async clickPatientNotesButton() {
     await this.page.getByRole('button', { name: 'Patient Note' }).click();
   }
