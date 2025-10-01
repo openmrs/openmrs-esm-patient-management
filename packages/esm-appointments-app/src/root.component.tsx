@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { WorkspaceContainer } from '@openmrs/esm-framework';
 import AppointmentsCalendarView from './calendar/appointments-calendar-view.component';
 import Appointments from './appointments.component';
 import PatientAppointmentsOverview from './patient-appointments/patient-appointments-overview.component';
-import { WorkspaceContainer } from '@openmrs/esm-framework';
+
 const RootComponent: React.FC = () => {
   const appointmentsBasename = window.getOpenmrsSpaBase() + 'home/appointments';
 

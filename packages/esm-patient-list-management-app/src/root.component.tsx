@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { BrowserRouter, Route, Routes, useParams, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { WorkspaceContainer, launchWorkspace } from '@openmrs/esm-framework';
 import ListDetails from './list-details/list-details.component';
 import ListsDashboard from './lists-dashboard/lists-dashboard.component';
+
 const AutoLaunchPatientListWorkspace: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();

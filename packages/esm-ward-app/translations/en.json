@@ -123,6 +123,5 @@
   "typeOfTransfer": "Type of transfer",
   "unknown": "Unknown",
   "visitNoteSaved": "Patient note saved",
-  "wardClinicalNotePlaceholder": "Write any notes here",
-  "wards": "Wards"
+  "wardClinicalNotePlaceholder": "Write any notes here"
 }

@@ -8,6 +8,7 @@ import Home from './home.component';
 import LeftPanel from './left-panel/left-panel.component';
 import WardWithBeds from './ward-with-beds/ward-with-beds.component';
 import styles from './root.scss';
+
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
   const bedManagementBasename = window.getOpenmrsSpaBase() + 'bed-management';
