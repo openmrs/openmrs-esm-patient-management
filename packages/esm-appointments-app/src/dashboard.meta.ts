@@ -1,17 +1,16 @@
-import { Calendar } from '@carbon/react/icons';
-
 export const dashboardMeta = {
-  name: 'appointments',
+  path: 'appointments',
   slot: 'clinical-appointments-dashboard-slot',
   title: 'Appointments',
-};
+  basePath: `${window.spaBase}/home`,
+} as const;
 
 export const appointmentCalendarDashboardMeta = {
-  name: 'calendar',
+  path: 'calendar',
   slot: 'clinical-appointments-dashboard-slot',
   title: 'Appointments Calendar',
-  renderIcon: Calendar,
-};
+  basePath: `${window.spaBase}/home`,
+} as const;
 
 export const patientChartDashboardMeta = {
   slot: 'patient-chart-appointments-dashboard-slot',
@@ -19,4 +18,4 @@ export const patientChartDashboardMeta = {
   title: 'Appointments',
   path: 'Appointments',
   icon: 'omrs-icon-event-schedule',
-};
+} as const;

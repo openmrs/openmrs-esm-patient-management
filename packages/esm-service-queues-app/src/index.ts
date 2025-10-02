@@ -1,6 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createDashboardLink } from './createDashboardLink.component';
+import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');

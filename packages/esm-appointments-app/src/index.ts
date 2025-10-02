@@ -6,7 +6,7 @@ import {
   registerBreadcrumbs,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createDashboardLink } from './createDashboardLink.component';
+import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta, appointmentCalendarDashboardMeta, patientChartDashboardMeta } from './dashboard.meta';
 import {
   cancelledAppointmentsPanelConfigSchema,
