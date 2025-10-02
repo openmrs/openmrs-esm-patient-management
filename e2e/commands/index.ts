@@ -5,3 +5,4 @@ export * from './location-operations';
 export * from './patient-operations';
 export * from './provider-operations';
 export * from './visit-operations';
+export * from './test-order-operations';
