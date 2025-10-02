@@ -20,6 +20,7 @@ const swrRefreshIntervalInMs = 60000;
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
+// t('wards', 'Wards')
 export const wardDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const wardView = getAsyncLifecycle(() => import('./ward-view/ward-view.component'), options);

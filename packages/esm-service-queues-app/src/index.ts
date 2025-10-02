@@ -40,6 +40,7 @@ export const queueList = getAsyncLifecycle(
 
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
+// t('serviceQueues', 'Service queues')
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const clearAllQueueEntriesModal = getAsyncLifecycle(

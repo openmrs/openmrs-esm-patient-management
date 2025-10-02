@@ -8,7 +8,7 @@ export const dashboardMeta = {
 export const appointmentCalendarDashboardMeta = {
   path: 'calendar',
   slot: 'clinical-appointments-dashboard-slot',
-  title: 'Appointments Calendar',
+  title: 'Appointments calendar',
   basePath: `${window.spaBase}/home`,
 } as const;
 

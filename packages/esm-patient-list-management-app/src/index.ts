@@ -33,6 +33,7 @@ export const addPatientToPatientListMenuItem = getAsyncLifecycle(
   },
 );
 
+// t('patientLists', 'Patient lists')
 export const patientListDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const listDetailsTable = getAsyncLifecycle(() => import('./list-details-table/list-details-table.component'), {
