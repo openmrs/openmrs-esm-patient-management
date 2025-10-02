@@ -1,19 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  closeWorkspace,
-  ExtensionSlot,
-  isDesktop,
-  useAssignedExtensions,
-  useConfig,
   useLayoutType,
-  useWorkspaces,
+  isDesktop,
+  ExtensionSlot,
   WorkspaceContainer,
+  useConfig,
+  useAssignedExtensions,
+  closeWorkspace,
+  useWorkspaces,
 } from '@openmrs/esm-framework';
 import type { DashboardConfig } from '../types/index';
-import { type HomeConfig } from '../config-schema';
-import classNames from 'classnames';
 import styles from './dashboard-container.scss';
+import classNames from 'classnames';
+import { type HomeConfig } from '../config-schema';
 
 export default function DashboardContainer() {
   const params = useParams();
@@ -25,9 +25,8 @@ export default function DashboardContainer() {
   const dashboards = ungroupedDashboards as Array<DashboardConfig>;
   const activeDashboard = dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
   const { workspaces } = useWorkspaces();
-  const prevDashboardRef = useRef<string | undefined>(params?.dashboard);
-
-  useEffect(() => {
+  const prevDashboardRef = React.useRef<string | undefined>(params?.dashboard);
+  React.useEffect(() => {
     if (prevDashboardRef.current && prevDashboardRef.current !== params?.dashboard) {
       if (Array.isArray(workspaces) && workspaces.length) {
         workspaces.forEach((workspace) => {
