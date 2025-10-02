@@ -142,7 +142,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
                 <StructuredListCell>
                   <RadioButton
                     className={styles.radioButton}
-                    labelText=""
+                    labelText={t('selectDate', 'Select date')}
                     id={`radio-${index}`}
                     name="appointmentRadio"
                     value={appointment.uuid}

@@ -365,7 +365,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             <section>
               <div className={styles.sectionTitle}>{t('comment', 'Comment')}</div>
               <TextArea
-                labelText=""
+                labelText={t('selectDate', 'Select date')}
                 value={formState.prioritycomment}
                 onChange={(e) => setPriorityComment(e.target.value)}
                 placeholder={t('enterCommentHere', 'Enter comment here')}

@@ -92,7 +92,7 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
                   id="age"
                   labelA="Off"
                   labelB="On"
-                  labelText=""
+                  labelText={t('selectDate', 'Select date')}
                 />
               </Layer>
               <Layer className={styles.numberInputs}>
