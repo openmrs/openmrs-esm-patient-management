@@ -154,6 +154,7 @@
   "queueServiceCreated": "Service de file d'attente créé",
   "queueServiceCreatedSuccessfully": "Service de file d'attente créé avec succès",
   "queueStatus": "Statut de la file d'attente",
+  "queueTable": "Queue table",
   "refills": "Recharges",
   "remove": "Supprimer",
   "removePatient": "Retirer le patient",
