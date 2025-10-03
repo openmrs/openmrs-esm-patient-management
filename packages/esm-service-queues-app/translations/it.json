@@ -154,6 +154,7 @@
   "queueServiceCreated": "Servizio di coda creato",
   "queueServiceCreatedSuccessfully": "Servizio di coda creato con successo",
   "queueStatus": "Stato della coda",
+  "queueTable": "Queue table",
   "refills": "Rinnovi della prescrizione",
   "remove": "Rimuovi",
   "removePatient": "Rimuovi paziente",

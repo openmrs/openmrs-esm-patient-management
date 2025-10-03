@@ -116,5 +116,5 @@ export const createBedAssignmentEncounter = async (
 };
 
 export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`encounter/${uuid}`, { data: {} });
+  await api.delete(`encounter/${uuid}`);
 };

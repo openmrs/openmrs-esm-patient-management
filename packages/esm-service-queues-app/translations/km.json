@@ -154,6 +154,7 @@
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
   "queueStatus": "ស្ថានភាពជួរ",
+  "queueTable": "Queue table",
   "refills": "ការបំពេញបន្ថែម",
   "remove": "Remove",
   "removePatient": "Remove patient",

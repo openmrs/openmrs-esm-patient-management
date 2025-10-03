@@ -154,6 +154,7 @@
   "queueServiceCreated": "Layanan antrian dibuat",
   "queueServiceCreatedSuccessfully": "Layanan antrian berhasil dibuat",
   "queueStatus": "Status antrian",
+  "queueTable": "Queue table",
   "refills": "Isi ulang",
   "remove": "Hapus",
   "removePatient": "Hapus pasien",

@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from './config-schema';
-import Home from './home.component';
 import { updateSelectedQueueLocationName } from './store/store';
+import Home from './home.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
@@ -17,29 +17,19 @@ describe('Home Component', () => {
     updateSelectedQueueLocationName('Test Location');
   });
 
-  it('renders PatientQueueHeader, ClinicMetrics when activeTicketScreen is not "screen"', () => {
-    // Mock window.location.pathname
-    const originalLocation = window.location;
-    delete window.location;
-    window.location = { pathname: '/some-path' } as Location;
-
+  it('renders the service queues dashboard', () => {
     render(<Home />);
 
-    // Assert that the expected components are rendered
-    expect(screen.getByTestId('patient-queue-header')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /patients currently in queue/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /show patients with status/i })).toBeInTheDocument();
+    expect(screen.getByRole('search', { name: /search this list/i })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /clear queue entries/i })).toBeInTheDocument();
 
-    // Clean up the mock
-    window.location = originalLocation;
-  });
+    const expectedColumnHeaders = [/name/, /priority/, /coming from/, /status/, /queue/, /wait time/, /actions/];
 
-  it('renders QueueScreen when activeTicketScreen is "screen"', () => {
-    const originalLocation = window.location;
-    delete window.location;
-    window.location = { pathname: '/some-path/screen' } as Location;
-
-    render(<Home />);
-    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
-
-    window.location = originalLocation;
+    expectedColumnHeaders.forEach((header) => {
+      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+    });
   });
 });

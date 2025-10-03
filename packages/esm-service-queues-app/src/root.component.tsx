@@ -14,10 +14,10 @@ const Root: React.FC = () => {
       <BrowserRouter basename={serviceQueuesBasename}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/queue-list/:service/:serviceUuid/:locationUuid" element={<ServicesTable />} />
           <Route path="/queue-table-by-status/:queueUuid" element={<QueueTableByStatusViewWrapper />} />
           <Route path="/screen" element={<QueueScreen />} />
-          <Route path="/queue-list/:service/:serviceUuid/:locationUuid" element={<ServicesTable />} />
-          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </BrowserRouter>
     </main>

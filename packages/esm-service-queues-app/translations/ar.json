@@ -154,6 +154,7 @@
   "queueServiceCreated": "Queue service created",
   "queueServiceCreatedSuccessfully": "Queue service created successfully",
   "queueStatus": "حالة الطابور",
+  "queueTable": "Queue table",
   "refills": "إعادة التعبئة",
   "remove": "Remove",
   "removePatient": "Remove patient",

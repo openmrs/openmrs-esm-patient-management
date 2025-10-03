@@ -6,6 +6,6 @@ export class AppointmentsPage {
   readonly appointmentsTable = () => this.page.getByTestId('table');
 
   async goto(uuid: string) {
-    await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/Appointments`);
+    await this.page.goto(`${process.env.E2E_BASE_URL}/spa/patient/${uuid}/chart/Appointments`);
   }
 }
