@@ -6,3 +6,7 @@
   justify-content: center;
   align-items: center;
 }
+
+.darkPlaceholder ::placeholder {
+  color: #393939 !important;
+}

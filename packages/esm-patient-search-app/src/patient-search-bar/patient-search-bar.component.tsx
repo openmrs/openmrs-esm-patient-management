@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
@@ -16,7 +16,9 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
   ({ buttonProps, initialSearchTerm = '', onChange, onClear, onSubmit, isCompact }, ref) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+    const [isInputClicked, setIsInputClicked] = useState(false);
     const responsiveSize = isCompact ? 'sm' : 'lg';
+    const inputRef = useRef(null);
 
     const handleChange = useCallback(
       (value: string) => {
@@ -27,21 +29,33 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
     );
 
     const handleSubmit = useCallback(
-      (event: React.FormEvent<HTMLFormElement>) => {
+      (event) => {
         event.preventDefault();
         if (searchTerm && searchTerm.trim()) {
           onSubmit(searchTerm.trim());
+        } else {
+          setIsInputClicked(true);
+          inputRef.current.focus();
         }
       },
       [onSubmit, searchTerm],
     );
+
+    useEffect(() => {
+      if (isInputClicked) {
+        const timeout = setTimeout(() => {
+          setIsInputClicked(false);
+        }, 5000);
+        return () => clearTimeout(timeout);
+      }
+    }, [isInputClicked]);
 
     return (
       <form onSubmit={handleSubmit} className={styles.searchArea}>
         {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <Search
           autoFocus
-          className={styles.patientSearchInput}
+          className={`${styles.patientSearchInput} ${isInputClicked ? styles.darkPlaceholder : ''}`}
           closeButtonLabelText={t('clearSearch', 'Clear')}
           data-testid="patientSearchBar"
           data-tutorial-target="patient-search-bar"
@@ -49,7 +63,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
           onChange={(event) => handleChange(event.target.value)}
           onClear={onClear}
           placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
-          ref={ref}
+          ref={inputRef}
           size={responsiveSize}
           value={searchTerm}
         />
