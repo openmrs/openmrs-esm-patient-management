@@ -90,8 +90,8 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
                   aria-label={t('age', 'Age')}
                   defaultToggled
                   id="age"
-                  labelA={t("off", "Off"})
-                  labelB={t("on", "On")}
+                  labelA={t('off', 'Off')}
+                  labelB={t('on', 'On')}
                   labelText=""
                 />
               </Layer>
