@@ -143,7 +143,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
                   <RadioButton
                     className={styles.radioButton}
                     hideLabel
-		            labelText={appointment.service?.name || t('appointment', 'Appointment')}
+                    labelText={appointment.service?.name || t('appointment', 'Appointment')}
                     id={`radio-${index}`}
                     name="appointmentRadio"
                     value={appointment.uuid}
