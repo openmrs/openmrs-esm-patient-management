@@ -91,7 +91,7 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
                   defaultToggled
                   id="age"
                   labelA={t("off", "Off"})
-                  labelB="On"
+                  labelB={t("on", "On")}
                   labelText={t('selectDate', 'Select date')}
                 />
               </Layer>
