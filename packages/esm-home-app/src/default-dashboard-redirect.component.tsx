@@ -16,5 +16,9 @@ export function DefaultDashboardRedirect() {
   const dashboards = ungroupedDashboards as Array<DashboardConfig>;
   const activeDashboard = dashboards.find((dashboard) => dashboard.name === defaultDashboard);
 
+  if (!activeDashboard && dashboards.length > 0) {
+    return <Navigate to={`/home/${dashboards[0].name}`} />;
+  }
+
   return <Navigate to={`/home/${activeDashboard.name}`} />;
 }
