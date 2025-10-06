@@ -19,3 +19,10 @@ window.matchMedia = jest.fn().mockImplementation(() => {
     removeEventListener: () => {},
   };
 });
+
+// Mock ResizeObserver for Carbon components
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
