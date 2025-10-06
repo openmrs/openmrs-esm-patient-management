@@ -154,6 +154,7 @@
   "queueServiceCreated": "Serviço de fila criado",
   "queueServiceCreatedSuccessfully": "Serviço de fila criado com sucesso",
   "queueStatus": "Status da fila",
+  "queueTable": "Queue table",
   "refills": "Recargas",
   "remove": "Remove",
   "removePatient": "Remover paciente",
