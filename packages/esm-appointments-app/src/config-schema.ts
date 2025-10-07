@@ -94,6 +94,11 @@ export const configSchema = {
       _validators: [validators.oneOf(appointmentColumnTypes)],
     },
   },
+  filterProvidersByAppointmentSupportedEnabled: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to filter providers by appointment supported enabled',
+  },
 };
 
 export interface ConfigObject {
@@ -115,4 +120,5 @@ export interface ConfigObject {
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
   showEarlyAppointmentsTab: boolean;
+  filterProvidersByAppointmentSupportedEnabled: boolean;
 }

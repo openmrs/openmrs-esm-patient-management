@@ -154,6 +154,13 @@ export interface Provider {
   response?: string;
   person: OpenmrsResource;
   name?: string;
+  retired?: boolean;
+  attributes?: Array<{
+    attributeType: OpenmrsResource;
+    display: string;
+    uuid: string;
+    value: string | number;
+  }>;
 }
 
 export enum DurationPeriod {
