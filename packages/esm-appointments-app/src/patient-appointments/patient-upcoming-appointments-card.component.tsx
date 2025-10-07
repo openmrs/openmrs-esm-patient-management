@@ -93,7 +93,13 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
 
   const appointments = todaysAppointments
     .concat(futureAppointments)
-    .filter((appointment) => appointment.status !== 'CheckedIn');
+    .filter(
+      (appointment) =>
+        appointment.status !== 'CheckedIn' &&
+        appointment.status !== 'Cancelled' &&
+        appointment.status !== 'Completed' &&
+        appointment.status !== 'Missed',
+    );
 
   const handleRadioChange = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
