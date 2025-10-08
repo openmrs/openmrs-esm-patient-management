@@ -8,5 +8,15 @@
 }
 
 .darkPlaceholder ::placeholder {
-  color: #393939 !important;
+  animation: fade-dark 1s;
+  color: $text-02 !important;
+}
+
+@keyframes fade-dark {
+  from {
+    color: initial;
+  }
+  to {
+    color: $text-02 !important;
+  }
 }

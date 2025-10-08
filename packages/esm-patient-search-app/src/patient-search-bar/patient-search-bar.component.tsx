@@ -1,5 +1,6 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
 
@@ -20,6 +21,8 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
     const responsiveSize = isCompact ? 'sm' : 'lg';
     const inputRef = useRef(null);
 
+    useImperativeHandle(ref, () => inputRef.current!);
+
     const handleChange = useCallback(
       (value: string) => {
         setSearchTerm(value);
@@ -29,7 +32,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
     );
 
     const handleSubmit = useCallback(
-      (event) => {
+      (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (searchTerm && searchTerm.trim()) {
           onSubmit(searchTerm.trim());
@@ -45,7 +48,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
       if (isInputClicked) {
         const timeout = setTimeout(() => {
           setIsInputClicked(false);
-        }, 5000);
+        }, 3000);
         return () => clearTimeout(timeout);
       }
     }, [isInputClicked]);
@@ -55,7 +58,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
         {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <Search
           autoFocus
-          className={`${styles.patientSearchInput} ${isInputClicked ? styles.darkPlaceholder : ''}`}
+          className={classNames(styles.patientSearchInput, { [styles.darkPlaceholder]: isInputClicked })}
           closeButtonLabelText={t('clearSearch', 'Clear')}
           data-testid="patientSearchBar"
           data-tutorial-target="patient-search-bar"
