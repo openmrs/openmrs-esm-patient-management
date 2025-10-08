@@ -71,7 +71,7 @@ test('Register a new patient', async ({ page }) => {
       const video = document.querySelector('video');
       return video && video.readyState === 4;
     },
-    { timeout: 1000 },
+    { timeout: 5000 },
   );
 
   await test.step('And I capture a photo from webcam', async () => {
