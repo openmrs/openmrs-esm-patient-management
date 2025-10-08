@@ -4,6 +4,7 @@
   "add": "Add",
   "age": "Age",
   "allDay": "All day",
+  "appointment": "Appointment",
   "appointmentCancelError": "Error cancelling appointment",
   "appointmentCancelled": "Appointment Cancelled",
   "appointmentCancelledSuccessfully": "Appointment cancelled successfully",
