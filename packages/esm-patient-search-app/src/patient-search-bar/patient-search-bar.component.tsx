@@ -20,6 +20,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
     const [isInputClicked, setIsInputClicked] = useState(false);
     const responsiveSize = isCompact ? 'sm' : 'lg';
     const inputRef = useRef(null);
+    const isSubmitFromButton = useRef(false);
 
     useImperativeHandle(ref, () => inputRef.current!);
 
@@ -36,13 +37,23 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
         event.preventDefault();
         if (searchTerm && searchTerm.trim()) {
           onSubmit(searchTerm.trim());
-        } else {
+        } else if (isSubmitFromButton.current) {
+          // Only set input clicked state if the submit was triggered by button click
           setIsInputClicked(true);
           inputRef.current.focus();
+          // Reset the flag
+          isSubmitFromButton.current = false;
+        } else {
+          // If it's from Enter key, just submit without visual effect
+          isSubmitFromButton.current = false;
         }
       },
       [onSubmit, searchTerm],
     );
+
+    const handleButtonClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+      isSubmitFromButton.current = true;
+    }, []);
 
     useEffect(() => {
       if (isInputClicked) {
@@ -70,7 +81,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
           size={responsiveSize}
           value={searchTerm}
         />
-        <Button kind="secondary" onClick={handleSubmit} {...buttonProps} size={responsiveSize} type="submit">
+        <Button kind="secondary" onMouseDown={handleButtonClick} {...buttonProps} size={responsiveSize} type="submit">
           {t('search', 'Search')}
         </Button>
       </form>
