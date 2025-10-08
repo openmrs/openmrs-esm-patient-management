@@ -16,7 +16,7 @@ import styles from './compact-patient-banner.scss';
 
 interface ClickablePatientContainerProps {
   children: React.ReactNode;
-  patient: SearchedPatient;
+  patient: fhir.Patient;
 }
 
 interface CompactPatientBannerProps {
@@ -28,21 +28,18 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
     return patients.map(mapToFhirPatient);
   }, [patients]);
 
-  const renderPatient = useCallback(
-    (patient: fhir.Patient, index: number) => {
-      const patientName = getPatientName(patient);
+  const renderPatient = useCallback((patient: fhir.Patient) => {
+    const patientName = getPatientName(patient);
 
-      return (
-        <ClickablePatientContainer key={patient.id} patient={patients[index]}>
-          <div className={styles.patientAvatar} role="img">
-            <PatientPhoto patientUuid={patient.id} patientName={patientName} />
-          </div>
-          <PatientBannerPatientInfo patient={patient} />
-        </ClickablePatientContainer>
-      );
-    },
-    [patients],
-  );
+    return (
+      <ClickablePatientContainer key={patient.id} patient={patient}>
+        <div className={styles.patientAvatar} role="img">
+          <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+        </div>
+        <PatientBannerPatientInfo patient={patient} />
+      </ClickablePatientContainer>
+    );
+  }, []);
 
   return <div ref={ref}>{fhirMappedPatients.map(renderPatient)}</div>;
 });
@@ -50,7 +47,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
   const config = useConfig<PatientSearchConfig>();
-  const isDeceased = Boolean(patient?.person?.deathDate);
+  const isDeceased = patient?.deceasedBoolean;
 
   if (nonNavigationSelectPatientAction) {
     return (
@@ -58,10 +55,10 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
         className={classNames(styles.patientSearchResult, styles.patientSearchResultButton, {
           [styles.deceased]: isDeceased,
         })}
-        key={patient.uuid}
+        key={patient.id}
         onClick={() => {
-          nonNavigationSelectPatientAction(patient.uuid);
-          patientClickSideEffect?.(patient.uuid);
+          nonNavigationSelectPatientAction(patient.id, patient);
+          patientClickSideEffect?.(patient.id, patient);
         }}>
         {children}
       </button>
@@ -73,10 +70,10 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
       className={classNames(styles.patientSearchResult, {
         [styles.deceased]: isDeceased,
       })}
-      key={patient.uuid}
-      onBeforeNavigate={() => patientClickSideEffect?.(patient.uuid)}
+      key={patient.id}
+      onBeforeNavigate={() => patientClickSideEffect?.(patient.id, patient)}
       to={interpolateString(config.search.patientChartUrl, {
-        patientUuid: patient.uuid,
+        patientUuid: patient.id,
       })}>
       {children}
     </ConfigurableLink>
