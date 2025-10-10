@@ -132,12 +132,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   // t('durationErrorMessage', 'Duration should be greater than zero')
   const appointmentsFormSchema = z
     .object({
-      duration: z
-        .number()
-        .nullable()
-        .refine((duration) => (isAllDayAppointment ? true : duration > 0), {
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-        }),
+      duration: z.union([z.number(), z.null()]).optional(),
+      isAllDayAppointment: z.boolean().default(false),
       location: z.string().refine((value) => value !== '', {
         message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
       }),
@@ -207,7 +203,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
           'Date appointment issued cannot be after the appointment date',
         ),
       },
-    );
+    )
+    .superRefine((data, ctx) => {
+      // If not all-day, duration must be > 0
+      if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
+        ctx.addIssue({
+          path: ['duration'],
+          code: z.ZodIssueCode.custom,
+          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+        });
+      }
+    });
 
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
@@ -426,7 +432,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
-    const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
+    const endDatetime = isAllDayAppointment
+      ? dayjs(startDate).endOf('day').toDate()
+      : dayjs(startDatetime).add(duration, 'minutes').toDate();
 
     return {
       appointmentKind: selectedAppointmentType,
@@ -601,13 +609,19 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
-                  <Toggle
-                    id="allDayToggle"
-                    labelB={t('yes', 'Yes')}
-                    labelA={t('no', 'No')}
-                    labelText={t('allDay', 'All day')}
-                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
-                    toggled={isAllDayAppointment}
+                  <Controller
+                    name="isAllDayAppointment"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Toggle
+                        id="allDayToggle"
+                        labelA={t('no', 'No')}
+                        labelB={t('yes', 'Yes')}
+                        labelText={t('allDay', 'All day')}
+                        toggled={setIsAllDayAppointment(value)}
+                        onToggle={onChange}
+                      />
+                    )}
                   />
                 )}
                 <ResponsiveWrapper>
@@ -644,7 +658,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!isAllDayAppointment && (
+                {!watch('isAllDayAppointment') && (
                   <TimeAndDuration control={control} errors={errors} services={services} watch={watch} t={t} />
                 )}
 
@@ -723,13 +737,19 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             {!isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
-                  <Toggle
-                    id="allDayToggle"
-                    labelB={t('yes', 'Yes')}
-                    labelA={t('no', 'No')}
-                    labelText={t('allDay', 'All day')}
-                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
-                    toggled={isAllDayAppointment}
+                  <Controller
+                    name="isAllDayAppointment"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Toggle
+                        id="allDayToggle"
+                        labelA={t('no', 'No')}
+                        labelB={t('yes', 'Yes')}
+                        labelText={t('allDay', 'All day')}
+                        toggled={setIsAllDayAppointment(value)}
+                        onToggle={onChange}
+                      />
+                    )}
                   />
                 )}
                 <ResponsiveWrapper>
@@ -758,7 +778,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!isAllDayAppointment && (
+                {!watch('isAllDayAppointment') && (
                   <TimeAndDuration control={control} services={services} watch={watch} t={t} errors={errors} />
                 )}
               </div>
