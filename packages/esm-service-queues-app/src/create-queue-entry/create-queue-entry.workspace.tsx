@@ -52,7 +52,7 @@ const CreateQueueEntryWorkspace: React.FC<PatientSearchProps> = ({
       <AddPatientToQueueContextProvider value={{ currentServiceQueueUuid }}>
         <div className={styles.patientBannerContainer}>
           <div className={styles.patientBanner}>
-            <div className={styles.patientPhoto} role="img">
+            <div className={styles.patientPhoto} role="img" aria-label="text">
               <PatientPhoto patientUuid={patient.id} patientName={patientName} />
             </div>
             <PatientBannerPatientInfo patient={patient} />
