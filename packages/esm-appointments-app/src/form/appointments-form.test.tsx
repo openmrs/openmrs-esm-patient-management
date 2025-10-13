@@ -60,6 +60,7 @@ describe('AppointmentForm', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
     });
     mockUseLocations.mockReturnValue(mockLocations.data.results);
     mockUseSession.mockReturnValue(mockSession.data);
@@ -70,6 +71,10 @@ describe('AppointmentForm', () => {
       isValidating: false,
     });
   });
+  const getAllDayToggle = () => {
+    const toggles = screen.queryAllByRole('switch');
+    return toggles.find((toggle) => toggle.getAttribute('id') === 'allDayToggle');
+  };
 
   it('renders the appointments form', async () => {
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
@@ -240,5 +245,100 @@ describe('AppointmentForm', () => {
       subtitle: 'Internal Server Error',
       title: 'Error scheduling appointment',
     });
+  });
+
+  it('renders all-day toggle when allowAllDayAppointments is enabled', async () => {
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    const allDayToggle = getAllDayToggle();
+    expect(allDayToggle).toBeDefined();
+    expect(allDayToggle).toBeInTheDocument();
+  });
+
+  it('does not render all-day toggle when allowAllDayAppointments is disabled', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: false,
+    });
+
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    // Query by test ID since the toggle might not be present
+    const allDayToggles = screen.queryAllByRole('switch');
+    const allDayToggle = allDayToggles.find((toggle) => toggle.getAttribute('id') === 'allDayToggle');
+
+    expect(allDayToggle).toBeUndefined();
+  });
+
+  it('hides time and duration fields when all-day toggle is enabled', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    // Initially, time and duration fields should be visible
+    expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /duration \(minutes\)/i })).toBeInTheDocument();
+
+    // Toggle all-day appointment
+    const allDayToggle = getAllDayToggle();
+    await user.click(allDayToggle);
+
+    // Time and duration fields should be hidden
+    expect(screen.queryByRole('textbox', { name: /time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /duration \(minutes\)/i })).not.toBeInTheDocument();
+  });
+
+  it('does not require duration validation for all-day appointments', async () => {
+    const user = userEvent.setup();
+
+    mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
+    const dateInput = screen.getByRole('textbox', { name: /^date$/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    const allDayToggle = getAllDayToggle();
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(locationSelect, ['Inpatient Ward']);
+    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+    await user.selectOptions(providerSelect, ['doctor - James Cook']);
+
+    const date = '2024-01-04';
+
+    fireEvent.change(dateInput, { target: { value: date } });
+    await user.click(dateAppointmentIssuedInput);
+    fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
+
+    // Enable all-day appointment
+    await user.click(allDayToggle);
+
+    await user.click(saveButton);
+
+    // Should not show duration error message
+    expect(screen.queryByText(/duration should be greater than zero/i)).not.toBeInTheDocument();
+
+    expect(mockSaveAppointment).toHaveBeenCalledTimes(1);
   });
 });
