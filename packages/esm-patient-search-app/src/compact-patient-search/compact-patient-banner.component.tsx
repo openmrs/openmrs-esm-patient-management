@@ -47,7 +47,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
   const config = useConfig<PatientSearchConfig>();
-  const isDeceased = patient?.deceasedBoolean;
+  const isDeceased = Boolean(patient?.deceasedDateTime);
 
   if (nonNavigationSelectPatientAction) {
     return (
