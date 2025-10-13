@@ -94,7 +94,6 @@ function calculateAgeFromBirthDate(birthDate?: string): number {
 
     return Math.max(0, age);
   } catch (error) {
-    console.error('Error calculating age:', error);
     return 0;
   }
 }

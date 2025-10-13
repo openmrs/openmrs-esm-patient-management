@@ -137,7 +137,6 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
       const userProperties = data?.data?.userProperties;
 
       if (!patientUuid || !userProperties) {
-        console.warn('Cannot update recently viewed patients: missing patient UUID or user properties');
         return;
       }
 
