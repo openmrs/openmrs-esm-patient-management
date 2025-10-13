@@ -169,7 +169,6 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
         await mutate();
       } catch (error) {
         await mutate();
-        console.error('Failed to update recently viewed patients:', error);
         throw error;
       }
     },
