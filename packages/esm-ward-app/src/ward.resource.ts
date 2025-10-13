@@ -21,7 +21,7 @@ export function useCreateEncounter() {
       encounterProviders: [
         {
           provider: currentProvider?.uuid,
-          encounterRole: emrConfiguration.clinicianEncounterRole.uuid,
+          encounterRole: emrConfiguration?.clinicianEncounterRole?.uuid,
         },
       ],
       obs,
