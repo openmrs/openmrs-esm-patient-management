@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { SearchedPatient } from '../types';
+import type { SearchedPatient, Address, Identifier } from '../types';
 
 const getGender = (gender: string) => {
   switch (gender) {
@@ -69,5 +69,92 @@ export function mapToFhirPatient(patient: SearchedPatient) {
           value: phone.value.toString(),
           use: 'mobile',
         })) ?? [],
+  };
+}
+
+function calculateAgeFromBirthDate(birthDate?: string): number {
+  if (!birthDate) {
+    return 0;
+  }
+
+  try {
+    const dob = new Date(birthDate);
+
+    if (isNaN(dob.getTime())) {
+      return 0;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+
+    return Math.max(0, age);
+  } catch (error) {
+    console.error('Error calculating age:', error);
+    return 0;
+  }
+}
+
+export function mapSearchedPatientFromFhir(patient: fhir.Patient): SearchedPatient {
+  const name = (patient.name && patient.name[0]) || ({} as fhir.HumanName);
+  const address = (patient.address && patient.address[0]) || ({} as fhir.Address);
+
+  const personNameDisplay = name?.text || [...(name?.given || []), name?.family].filter(Boolean).join(' ');
+
+  const mappedAddress: Address = {
+    preferred: true,
+    voided: false,
+    address1: address?.text || [address?.line?.[0], address?.line?.[1]].filter(Boolean).join(' '),
+    cityVillage: address?.city || '',
+    country: address?.country || '',
+    postalCode: address?.postalCode || '',
+    stateProvince: address?.state || '',
+  };
+
+  const mappedIdentifiers: Array<Identifier> = (patient.identifier || []).map((id) => ({
+    display: id.value || '',
+    identifier: id.value || '',
+    identifierType: {
+      uuid: (id.type?.coding && id.type.coding[0]?.code) || '',
+      display: id.type?.text || id.type?.coding?.[0]?.display || '',
+    } as any,
+    location: { uuid: '', display: '' } as any,
+    uuid: id.id || uuidv4(),
+    preferred: id.use === 'official',
+  }));
+
+  const phoneAttributes = (patient.telecom || [])
+    .filter((t) => t.system === 'phone' && t.value)
+    .map((phone) => ({
+      attributeType: {
+        uuid: 'phone-attribute-uuid',
+        display: 'Telephone Number',
+      },
+      value: phone.value || '',
+      uuid: uuidv4(),
+    }));
+
+  return {
+    uuid: patient.id || '',
+    identifiers: mappedIdentifiers,
+    person: {
+      addresses: [mappedAddress],
+      age: calculateAgeFromBirthDate(patient.birthDate),
+      birthdate: patient.birthDate || '',
+      gender: (patient.gender as string) || 'unknown',
+      dead: Boolean(patient.deceasedBoolean || patient.deceasedDateTime),
+      deathDate: (patient.deceasedDateTime as string) || null,
+      personName: {
+        display: personNameDisplay || '',
+        givenName: (name?.given && (name.given[0] as string)) || '',
+        familyName: (name?.family as string) || '',
+        middleName: (name?.given && (name.given[1] as string)) || '',
+      },
+    },
+    attributes: phoneAttributes,
   };
 }

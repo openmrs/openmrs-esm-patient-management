@@ -1,39 +1,57 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
-import type { PatientSearchResponse, SearchedPatient, User } from './types';
-
-type InfinitePatientSearchResponse = FetchResponse<{
-  results: Array<SearchedPatient>;
-  links: Array<{ rel: 'prev' | 'next' }>;
-  totalCount: number;
-}>;
-
-const patientProperties = [
-  'patientId',
-  'uuid',
-  'identifiers',
-  'display',
-  'patientIdentifier:(uuid,identifier)',
-  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate)',
-  'attributes:(value,attributeType:(uuid,display))',
-];
-
-const patientSearchCustomRepresentation = `custom:(${patientProperties.join(',')})`;
+import { openmrsFetch, useSession, type FetchResponse, restBaseUrl, fhirBaseUrl } from '@openmrs/esm-framework';
+import type { PatientSearchResponse, User, FHIRPatientSearchResponse } from './types';
+import { mapSearchedPatientFromFhir } from './utils/fhir-mapper';
 
 /**
- * A custom React hook for implementing infinite scrolling patient search.
+ * @param query - The trimmed search query
+ * @returns Object with parameter name and value
+ */
+function getSearchParameter(query: string): { param: string; value: string } {
+  const isNumeric = /^\d+$/.test(query);
+  const hasAlphanumeric = /(?=.*[a-z])(?=.*\d)/i.test(query);
+  const isWithSpecialCharacters = /^[A-Z0-9\-\/_\.#]+$/i.test(query) && /[\-\/_\.#]/.test(query);
+
+  const param = isNumeric || hasAlphanumeric || isWithSpecialCharacters ? 'identifier' : 'name:contains';
+
+  return { param, value: query };
+}
+
+/**
+ * Builds FHIR search URL parameters for patient search.
+ */
+function buildSearchParams(searchQuery: string, includeDead: boolean, pageSize: number): URLSearchParams {
+  const params = new URLSearchParams();
+
+  if (searchQuery?.trim()) {
+    const { param, value } = getSearchParameter(searchQuery.trim());
+    params.append(param, value);
+  }
+
+  !includeDead && params.append('death-date:missing', 'true');
+
+  params.append('_count', pageSize.toString());
+  params.append('_total', 'accurate');
+
+  return params;
+}
+
+/**
+ * A custom React hook for implementing infinite scrolling patient search using FHIR.
+ * searches by name OR identifier based on input pattern.
  *
  * @param searchQuery - The string to search for in patient records.
+
  * @param includeDead - Whether to include deceased patients in the search results.
  * @param isSearching - Whether the search should be active. Defaults to true.
- * @param resultsToFetch - The number of results to fetch per page. Defaults to 10.
- * @param customRepresentation - Custom representation string for the patient data. Defaults to patientSearchCustomRepresentation.
+ * @param pageSize - The number of results to fetch per page. Defaults to 10.
  *
  * @returns An object containing:
  *   - data: Array of patient search results
  *   - isLoading: Boolean indicating if the initial data is loading
+ *   - isLoadingMore: Boolean indicating if additional pages are being loaded
  *   - fetchError: Any error that occurred during fetching
  *   - hasMore: Boolean indicating if there are more results to load
  *   - isValidating: Boolean indicating if new data is being loaded
@@ -45,54 +63,48 @@ export function useInfinitePatientSearch(
   searchQuery: string,
   includeDead: boolean,
   isSearching: boolean = true,
-  resultsToFetch: number = 10,
-  customRepresentation: string = patientSearchCustomRepresentation,
+  pageSize: number = 10,
 ): PatientSearchResponse {
   const getUrl = useCallback(
-    (
-      page: number,
-      prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
-    ) => {
-      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
-        return null;
+    (page: number, prevPageData: FetchResponse<FHIRPatientSearchResponse>) => {
+      if (page === 0) {
+        const params = buildSearchParams(searchQuery, includeDead, pageSize);
+        return `${fhirBaseUrl}/Patient?${params.toString()}`;
       }
 
-      const baseUrl = `${restBaseUrl}/patient`;
-      const params = new URLSearchParams({
-        q: searchQuery,
-        v: customRepresentation,
-        includeDead: includeDead.toString(),
-        limit: resultsToFetch.toString(),
-        totalCount: 'true',
-        ...(page ? { startIndex: (page * resultsToFetch).toString() } : {}),
-      });
-
-      return `${baseUrl}?${params.toString()}`;
+      const nextLink = prevPageData?.data?.link?.find((link) => link.relation === 'next');
+      return nextLink?.url ?? null;
     },
-    [searchQuery, customRepresentation, includeDead, resultsToFetch],
+    [searchQuery, includeDead, pageSize],
   );
 
-  const shouldFetch = isSearching && searchQuery;
+  const shouldFetch = isSearching && searchQuery?.trim();
 
-  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
-    shouldFetch ? getUrl : null,
-    openmrsFetch,
+  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<
+    FetchResponse<FHIRPatientSearchResponse>,
+    Error
+  >(shouldFetch ? getUrl : null, openmrsFetch);
+
+  const mappedData = useMemo(
+    () => data?.flatMap((res) => res.data?.entry?.map((e) => mapSearchedPatientFromFhir(e.resource)) ?? []) ?? null,
+    [data],
   );
 
-  const mappedData = data?.flatMap((res) => res.data?.results ?? []) ?? null;
+  const hasMore = useMemo(() => data?.at(-1)?.data?.link?.some((link) => link.relation === 'next') ?? false, [data]);
 
   return useMemo(
     () => ({
       data: mappedData,
-      isLoading,
+      isLoading: isLoading && !data,
+      isLoadingMore: isLoading && !!data,
       fetchError: error,
-      hasMore: data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
+      hasMore,
       isValidating,
       setPage: setSize,
       currentPage: size,
-      totalResults: data?.[0]?.data?.totalCount ?? 0,
+      totalResults: data?.[0]?.data?.total ?? 0,
     }),
-    [mappedData, isLoading, error, data, isValidating, setSize, size],
+    [mappedData, isLoading, data, error, hasMore, isValidating, setSize, size],
   );
 }
 
@@ -110,38 +122,59 @@ export function useInfinitePatientSearch(
 export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean = false) {
   const { user } = useSession();
   const userUuid = user?.uuid;
-  const shouldFetchRecentlyViewedPatients = showRecentlySearchedPatients && userUuid;
+  const shouldFetch = showRecentlySearchedPatients && userUuid;
   const url = `${restBaseUrl}/user/${userUuid}`;
 
-  // This request will be loaded from the SWR cache as a preload request happens ahead  when the user hovers over the search icon.
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(
-    shouldFetchRecentlyViewedPatients ? url : null,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(shouldFetch ? url : null, openmrsFetch);
 
-  const userProperties = data?.data?.userProperties;
   const patientsVisited = useMemo(
-    () => userProperties?.patientsVisited?.split(',').filter(Boolean) ?? [],
-    [userProperties],
+    () => data?.data?.userProperties?.patientsVisited?.split(',').filter(Boolean) ?? [],
+    [data?.data?.userProperties?.patientsVisited],
   );
 
   const updateRecentlyViewedPatients = useCallback(
-    (patientUuid: string) => {
-      const uniquePatients = Array.from(new Set([patientUuid, ...patientsVisited]));
-      const mostRecentPatients = uniquePatients.slice(0, 10);
-      const newUserProperties = { ...userProperties, patientsVisited: mostRecentPatients.join(',') };
+    async (patientUuid: string) => {
+      const userProperties = data?.data?.userProperties;
 
-      return openmrsFetch(url, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: {
-          userProperties: newUserProperties,
-        },
-      });
+      if (!patientUuid || !userProperties) {
+        console.warn('Cannot update recently viewed patients: missing patient UUID or user properties');
+        return;
+      }
+
+      const uniquePatients = Array.from(new Set([patientUuid, ...patientsVisited])).slice(0, 10);
+      const newUserProperties = {
+        ...userProperties,
+        patientsVisited: uniquePatients.join(','),
+      };
+
+      mutate(
+        (current) =>
+          current
+            ? {
+                ...current,
+                data: {
+                  ...current.data,
+                  userProperties: newUserProperties,
+                },
+              }
+            : current,
+        false,
+      );
+
+      try {
+        await openmrsFetch(url, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: { userProperties: newUserProperties },
+        });
+        await mutate();
+      } catch (error) {
+        await mutate();
+        console.error('Failed to update recently viewed patients:', error);
+        throw error;
+      }
     },
-    [patientsVisited, url, userProperties],
+    [data?.data?.userProperties, patientsVisited, url, mutate],
   );
 
   return useMemo(
@@ -157,16 +190,17 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 }
 
 /**
- * A custom React hook for fetching patient data from a REST API based on a list of patient UUIDs.
+ * A custom React hook for fetching patient data from a FHIR API based on a list of patient UUIDs.
+ * Optimized to fetch multiple patients in batches rather than one at a time.
  *
  * @param patientUuids - An array of patient UUIDs to fetch data for. If null, no data will be fetched.
  * @param isSearching - A boolean flag to determine if the search should be performed. Defaults to true.
- * @param resultsToFetch - The number of results to fetch at a time. Defaults to 10.
- * @param customRepresentation - A string representing the custom representation of patient data to fetch. Defaults to a predefined value 'v'.
+ * @param batchSize - The number of patients to fetch per batch. Defaults to 10.
  *
  * @returns An object containing:
  *   - data: An array of fetched patient data
  *   - isLoading: A boolean indicating if the initial data is being loaded
+ *   - isLoadingMore: A boolean indicating if additional batches are being loaded
  *   - fetchError: Any error that occurred during fetching
  *   - hasMore: A boolean indicating if there are more patients to load
  *   - isValidating: A boolean indicating if new data is being loaded
@@ -174,48 +208,52 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
  *   - currentPage: The current page of results
  *   - totalResults: The total number of patients to be fetched
  */
-
-export function useRestPatients(
-  patientUuids: string[] | null,
-  isSearching: boolean = true,
-  resultsToFetch: number = 10,
-  customRepresentation: string = patientSearchCustomRepresentation,
-) {
+export function useFhirPatients(patientUuids: string[] | null, isSearching: boolean = true, batchSize: number = 10) {
   const getPatientUrl = useCallback(
-    (index: number) => {
-      if (patientUuids && index < patientUuids.length) {
-        return `${restBaseUrl}/patient/${patientUuids[index]}?v=${customRepresentation}`;
-      } else {
-        return null;
-      }
+    (page: number) => {
+      if (!patientUuids || page < 0) return null;
+
+      const startIndex = page * batchSize;
+      const batchUuids = patientUuids.slice(startIndex, startIndex + batchSize);
+
+      return batchUuids.length === 0 ? null : `${fhirBaseUrl}/Patient?_id=${batchUuids.join(',')}&_count=${batchSize}`;
     },
-    [patientUuids, customRepresentation],
+    [patientUuids, batchSize],
   );
 
   const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
 
-  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<FetchResponse<SearchedPatient>, Error>(
-    shouldFetch ? getPatientUrl : null,
-    openmrsFetch,
-    {
-      keepPreviousData: true,
-      initialSize: patientUuids ? Math.min(resultsToFetch, patientUuids.length) : 0,
-    },
+  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<
+    FetchResponse<FHIRPatientSearchResponse>,
+    Error
+  >(shouldFetch ? getPatientUrl : null, openmrsFetch, {
+    keepPreviousData: true,
+    initialSize: 1,
+    revalidateFirstPage: false,
+  });
+
+  const mappedData = useMemo(
+    () => data?.flatMap((res) => res.data?.entry?.map((e) => mapSearchedPatientFromFhir(e.resource)) ?? []) ?? null,
+    [data],
   );
 
-  const mappedData = data?.flatMap((res) => res.data) ?? null;
+  const hasMore = useMemo(
+    () => (patientUuids ? (mappedData?.length ?? 0) < patientUuids.length : false),
+    [patientUuids, mappedData],
+  );
 
   return useMemo(
     () => ({
       data: mappedData,
-      isLoading,
+      isLoading: isLoading && !data,
+      isLoadingMore: isLoading && !!data,
       fetchError: error,
-      hasMore: patientUuids ? size < patientUuids.length : false,
+      hasMore,
       isValidating,
       setPage: setSize,
       currentPage: size,
       totalResults: patientUuids?.length ?? 0,
     }),
-    [mappedData, isLoading, error, patientUuids, size, isValidating, setSize],
+    [mappedData, isLoading, data, error, hasMore, isValidating, setSize, size, patientUuids],
   );
 }
