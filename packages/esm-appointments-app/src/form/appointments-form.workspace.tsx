@@ -752,7 +752,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         style={{ width: '100%' }}
                         invalid={Boolean(fieldState?.error?.message)}
                         invalidText={fieldState?.error?.message}
-                        // minDate={new Date()}
+                        minDate={new Date()}
                       />
                     )}
                   />

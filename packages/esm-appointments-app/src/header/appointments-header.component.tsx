@@ -38,6 +38,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServi
           labelText=""
           onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
           value={dayjs(selectedDate).toDate()}
+          minDate={new Date()}
         />
         {showServiceTypeFilter && (
           <MultiSelect
