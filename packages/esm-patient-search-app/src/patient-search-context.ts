@@ -6,13 +6,13 @@ export interface PatientSearchContextProps {
    * dashboard. If null/undefined, patient results will be links to the
    * patient dashboard.
    */
-  nonNavigationSelectPatientAction?: (patientUuid: string) => void;
+  nonNavigationSelectPatientAction?: (patientUuid: string, patient: fhir.Patient) => void;
   /**
    * A function to execute when the user clicks on a patient result. Will
    * be executed whether or not nonNavigationSelectPatientAction is defined,
    * just before navigation (or after nonNavigationSelectPatientAction is called).
    */
-  patientClickSideEffect?: ((patientUuid: string) => void) | (() => void);
+  patientClickSideEffect?: ((patientUuid: string, patient: fhir.Patient) => void) | (() => void);
   handleReturnToSearchList?: () => void;
   showPatientSearch?: () => void;
   hidePatientSearch?: () => void;
