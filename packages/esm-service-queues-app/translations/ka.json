@@ -101,6 +101,8 @@
   "noVitalsFound": "სასიცოცხლო მონაცემები არმოჩენილი არაა",
   "noVitalsRecorded": "No vitals have been recorded in this visit",
   "now": "Now",
+  "off": "Off",
+  "on": "On",
   "onTime": "დროულად",
   "orderDurationAndUnit": "{{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "გაურკვეველი ხანგრძლივობა",
