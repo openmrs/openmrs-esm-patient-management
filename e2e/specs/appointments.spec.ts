@@ -5,7 +5,15 @@ import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
 
-// Helper function to get business day with specific hour
+/**
+ * Returns a business day (Mon-Fri) for scheduling appointments.
+ * If the target date falls on a weekend, advances to the next Monday.
+ * Note: Does not account for public holidays.
+ *
+ * @param daysFromToday - Number of days to add from today (0 = today)
+ * @param hour - Hour to set (24-hour format)
+ * @returns A dayjs object set to a business day with the specified hour
+ */
 const getBusinessDay = (daysToAdd: number = 1, hour: number = 10) => {
   let targetDate = dayjs().add(daysToAdd, 'day');
 
