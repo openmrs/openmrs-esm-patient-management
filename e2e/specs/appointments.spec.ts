@@ -5,8 +5,8 @@ import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
 
-// Helper function to get next business day with specific hour
-const getNextBusinessDay = (daysToAdd: number = 1, hour: number = 10) => {
+// Helper function to get business day with specific hour
+const getBusinessDay = (daysToAdd: number = 1, hour: number = 10) => {
   let targetDate = dayjs().add(daysToAdd, 'day');
 
   // If the target date falls on a weekend, move to next Monday
@@ -18,7 +18,6 @@ const getNextBusinessDay = (daysToAdd: number = 1, hour: number = 10) => {
 };
 
 let visit: Visit;
-
 test.beforeEach(async ({ api, patient }) => {
   visit = await startVisit(api, patient.uuid);
 });
@@ -43,7 +42,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = getNextBusinessDay(1, 10);
+    const tomorrow = getBusinessDay(1, 10);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
@@ -94,7 +93,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('And I change the date to Today', async () => {
-    const today = getNextBusinessDay(0, 14);
+    const today = getBusinessDay(0, 14);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
