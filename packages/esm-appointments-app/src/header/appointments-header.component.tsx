@@ -35,7 +35,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServi
         <OpenmrsDatePicker
           data-testid="appointment-date-picker"
           id="appointment-date-picker"
-          labelText={t('selectDate', 'Select date')}
+          labelText=""
           onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
           value={dayjs(selectedDate).toDate()}
         />
