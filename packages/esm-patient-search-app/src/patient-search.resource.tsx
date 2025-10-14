@@ -6,31 +6,21 @@ import type { PatientSearchResponse, User, FHIRPatientSearchResponse } from './t
 import { mapSearchedPatientFromFhir } from './utils/fhir-mapper';
 
 /**
- * @param query - The trimmed search query
- * @returns Object with parameter name and value
+ * Building URL parameters for patient search.
+ * Uses the custom "openmrsPatients" query name with the 'q' parameter.
  */
-function getSearchParameter(query: string): { param: string; value: string } {
-  const isNumeric = /^\d+$/.test(query);
-  const hasAlphanumeric = /(?=.*[a-z])(?=.*\d)/i.test(query);
-  const isWithSpecialCharacters = /^[A-Z0-9\-\/_\.#]+$/i.test(query) && /[\-\/_\.#]/.test(query);
-
-  const param = isNumeric || hasAlphanumeric || isWithSpecialCharacters ? 'identifier' : 'name:contains';
-
-  return { param, value: query };
-}
-
-/**
- * Builds FHIR search URL parameters for patient search.
- */
-function buildSearchParams(searchQuery: string, includeDead: boolean, pageSize: number): URLSearchParams {
+function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean, pageSize: number): URLSearchParams {
   const params = new URLSearchParams();
 
+  params.append('_query', 'openmrsPatients');
+
   if (searchQuery?.trim()) {
-    const { param, value } = getSearchParameter(searchQuery.trim());
-    params.append(param, value);
+    params.append('q', searchQuery.trim());
   }
 
-  !includeDead && params.append('death-date:missing', 'true');
+  if (!includeDead) {
+    params.append('deceased', 'false');
+  }
 
   params.append('_count', pageSize.toString());
   params.append('_total', 'accurate');
@@ -39,11 +29,10 @@ function buildSearchParams(searchQuery: string, includeDead: boolean, pageSize: 
 }
 
 /**
- * A custom React hook for implementing infinite scrolling patient search using FHIR.
- * searches by name OR identifier based on input pattern.
+ * Implementing infinite scrolling patient search using OpenMRS custom search.
+ * Uses the 'openmrsPatients' query with the 'q' parameter for flexible searching.
  *
  * @param searchQuery - The string to search for in patient records.
-
  * @param includeDead - Whether to include deceased patients in the search results.
  * @param isSearching - Whether the search should be active. Defaults to true.
  * @param pageSize - The number of results to fetch per page. Defaults to 10.
@@ -68,12 +57,13 @@ export function useInfinitePatientSearch(
   const getUrl = useCallback(
     (page: number, prevPageData: FetchResponse<FHIRPatientSearchResponse>) => {
       if (page === 0) {
-        const params = buildSearchParams(searchQuery, includeDead, pageSize);
+        const params = buildOpenmrsSearchParams(searchQuery, includeDead, pageSize);
         return `${fhirBaseUrl}/Patient?${params.toString()}`;
       }
 
-      const nextLink = prevPageData?.data?.link?.find((link) => link.relation === 'next');
-      return nextLink?.url ?? null;
+      const params = buildOpenmrsSearchParams(searchQuery, includeDead, pageSize);
+      params.set('_getpagesoffset', (page * pageSize).toString());
+      return `${fhirBaseUrl}/Patient?${params.toString()}`;
     },
     [searchQuery, includeDead, pageSize],
   );
@@ -90,7 +80,11 @@ export function useInfinitePatientSearch(
     [data],
   );
 
-  const hasMore = useMemo(() => data?.at(-1)?.data?.link?.some((link) => link.relation === 'next') ?? false, [data]);
+  const hasMore = useMemo(() => {
+    const total = data?.[0]?.data?.total ?? 0;
+    const loadedCount = mappedData?.length ?? 0;
+    return loadedCount < total;
+  }, [data, mappedData]);
 
   return useMemo(
     () => ({
