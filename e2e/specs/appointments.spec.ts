@@ -5,8 +5,27 @@ import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
 
-let visit: Visit;
+/**
+ * Returns a business day (Mon-Fri) for scheduling appointments.
+ * If the target date falls on a weekend, advances to the next Monday.
+ * Note: Does not account for public holidays.
+ *
+ * @param daysFromToday - Number of days to add from today (0 = today)
+ * @param hour - Hour to set (24-hour format)
+ * @returns A dayjs object set to a business day with the specified hour
+ */
+const getBusinessDay = (daysFromToday: number, hour: number): dayjs.Dayjs => {
+  let targetDate = dayjs().add(daysFromToday, 'day');
 
+  // If the target date falls on a weekend, move to next Monday
+  while (targetDate.day() === 0 || targetDate.day() === 6) {
+    targetDate = targetDate.add(1, 'day');
+  }
+
+  return targetDate.hour(hour).minute(0).second(0).millisecond(0);
+};
+
+let visit: Visit;
 test.beforeEach(async ({ api, patient }) => {
   visit = await startVisit(api, patient.uuid);
 });
@@ -30,15 +49,15 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByLabel('Select an appointment type').selectOption('Scheduled');
   });
 
-  await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = dayjs().add(1, 'day').hour(10).minute(0).second(0);
+  await test.step('And I set the appointment date to the next business day', async () => {
+    const nextBusinessDay = getBusinessDay(1, 10);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
     const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
-    await dateDayInput.fill(tomorrow.format('DD'));
-    await dateMonthInput.fill(tomorrow.format('MM'));
-    await dateYearInput.fill(tomorrow.format('YYYY'));
+    await dateDayInput.fill(nextBusinessDay.format('DD'));
+    await dateMonthInput.fill(nextBusinessDay.format('MM'));
+    await dateYearInput.fill(nextBusinessDay.format('YYYY'));
   });
 
   await test.step('And I set time to 10:00 AM', async () => {
@@ -81,15 +100,15 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByLabel('Select a service').selectOption('General Medicine service');
   });
 
-  await test.step('And I change the date to Today', async () => {
-    const today = dayjs().hour(14).minute(0).second(0);
+  await test.step('And I change the date to today (or next business day if weekend)', async () => {
+    const targetDate = getBusinessDay(0, 14);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
     const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
-    await dateDayInput.fill(today.format('DD'));
-    await dateMonthInput.fill(today.format('MM'));
-    await dateYearInput.fill(today.format('YYYY'));
+    await dateDayInput.fill(targetDate.format('DD'));
+    await dateMonthInput.fill(targetDate.format('MM'));
+    await dateYearInput.fill(targetDate.format('YYYY'));
   });
 
   await test.step('And I set time to 2:00 PM', async () => {
@@ -103,13 +122,14 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('I set the Date appointment issued', async () => {
+    const appointmentIssuedDate = getBusinessDay(0, 9); // Today at 9 AM
     const appointmentIssuedDateInput = page.getByTestId('dateAppointmentScheduledPickerInput');
     const appointmentIssuedDateDayInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /day/i });
     const appointmentIssuedDateMonthInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /month/i });
     const appointmentIssuedDateYearInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /year/i });
-    await appointmentIssuedDateDayInput.fill('20');
-    await appointmentIssuedDateMonthInput.fill('08');
-    await appointmentIssuedDateYearInput.fill('2024');
+    await appointmentIssuedDateDayInput.fill(appointmentIssuedDate.format('DD'));
+    await appointmentIssuedDateMonthInput.fill(appointmentIssuedDate.format('MM'));
+    await appointmentIssuedDateYearInput.fill(appointmentIssuedDate.format('YYYY'));
   });
   await test.step('And I change the note', async () => {
     await page
