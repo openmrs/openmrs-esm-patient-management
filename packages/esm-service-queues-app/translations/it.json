@@ -101,6 +101,8 @@
   "noVitalsFound": "Nessun parametro vitale trovato",
   "noVitalsRecorded": "Nessun parametro vitale è stato registrato in questa visita",
   "now": "Ora",
+  "off": "Off",
+  "on": "On",
   "onTime": "In orario",
   "orderDurationAndUnit": "per {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Durata indefinita",

@@ -101,6 +101,8 @@
   "noVitalsFound": "Não foram encontrados sinais vitais",
   "noVitalsRecorded": "No vitals have been recorded in this visit",
   "now": "Now",
+  "off": "Off",
+  "on": "On",
   "onTime": "Em tempo",
   "orderDurationAndUnit": "para {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Duração indefinida",
