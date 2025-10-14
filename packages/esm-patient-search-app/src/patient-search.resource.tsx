@@ -1,15 +1,21 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
-import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useSession, type FetchResponse, restBaseUrl, fhirBaseUrl } from '@openmrs/esm-framework';
-import type { PatientSearchResponse, User, FHIRPatientSearchResponse } from './types';
+import {
+  openmrsFetch,
+  useSession,
+  type FetchResponse,
+  restBaseUrl,
+  fhirBaseUrl,
+  useFhirInfinite,
+} from '@openmrs/esm-framework';
+import type { PatientSearchResponse, User } from './types';
 import { mapSearchedPatientFromFhir } from './utils/fhir-mapper';
 
 /**
- * Building URL parameters for patient search.
+ * Builds OpenMRS custom search URL parameters for patient search.
  * Uses the custom "openmrsPatients" query name with the 'q' parameter.
  */
-function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean, pageSize: number): URLSearchParams {
+function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean): URLSearchParams {
   const params = new URLSearchParams();
 
   params.append('_query', 'openmrsPatients');
@@ -21,9 +27,6 @@ function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean, pag
   if (!includeDead) {
     params.append('deceased', 'false');
   }
-
-  params.append('_count', pageSize.toString());
-  params.append('_total', 'accurate');
 
   return params;
 }
@@ -54,51 +57,42 @@ export function useInfinitePatientSearch(
   isSearching: boolean = true,
   pageSize: number = 10,
 ): PatientSearchResponse {
-  const getUrl = useCallback(
-    (page: number, prevPageData: FetchResponse<FHIRPatientSearchResponse>) => {
-      if (page === 0) {
-        const params = buildOpenmrsSearchParams(searchQuery, includeDead, pageSize);
-        return `${fhirBaseUrl}/Patient?${params.toString()}`;
-      }
-
-      const params = buildOpenmrsSearchParams(searchQuery, includeDead, pageSize);
-      params.set('_getpagesoffset', (page * pageSize).toString());
-      return `${fhirBaseUrl}/Patient?${params.toString()}`;
-    },
-    [searchQuery, includeDead, pageSize],
-  );
-
   const shouldFetch = isSearching && searchQuery?.trim();
 
-  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<
-    FetchResponse<FHIRPatientSearchResponse>,
-    Error
-  >(shouldFetch ? getUrl : null, openmrsFetch);
+  const url = useMemo(() => {
+    if (!shouldFetch) return null;
+    const params = buildOpenmrsSearchParams(searchQuery, includeDead);
+    return `${fhirBaseUrl}/Patient?${params.toString()}`;
+  }, [shouldFetch, searchQuery, includeDead]);
 
-  const mappedData = useMemo(
-    () => data?.flatMap((res) => res.data?.entry?.map((e) => mapSearchedPatientFromFhir(e.resource)) ?? []) ?? null,
-    [data],
+  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } = useFhirInfinite<fhir.Patient>(
+    url ?? '',
+    {
+      immutable: true,
+    },
   );
 
-  const hasMore = useMemo(() => {
-    const total = data?.[0]?.data?.total ?? 0;
-    const loadedCount = mappedData?.length ?? 0;
-    return loadedCount < total;
-  }, [data, mappedData]);
+  const mappedData = useMemo(() => data?.map((patient) => mapSearchedPatientFromFhir(patient)) ?? null, [data]);
+
+  const totalResults = useMemo(() => {
+    return totalCount ?? mappedData?.length ?? 0;
+  }, [totalCount, mappedData]);
 
   return useMemo(
     () => ({
       data: mappedData,
-      isLoading: isLoading && !data,
-      isLoadingMore: isLoading && !!data,
+      isLoading: isLoading,
+      isLoadingMore: isValidating && !!data,
       fetchError: error,
-      hasMore,
-      isValidating,
-      setPage: setSize,
-      currentPage: size,
-      totalResults: data?.[0]?.data?.total ?? 0,
+      hasMore: hasMore ?? false,
+      isValidating: isValidating,
+      setPage: async () => {
+        loadMore();
+        return [];
+      },
+      totalResults,
     }),
-    [mappedData, isLoading, data, error, hasMore, isValidating, setSize, size],
+    [mappedData, isLoading, isValidating, data, error, hasMore, loadMore, totalResults],
   );
 }
 
@@ -183,7 +177,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 
 /**
  * A custom React hook for fetching patient data from a FHIR API based on a list of patient UUIDs.
- * Optimized to fetch multiple patients in batches rather than one at a time.
+ * Uses batch fetching for efficiency with useFhirInfinite.
  *
  * @param patientUuids - An array of patient UUIDs to fetch data for. If null, no data will be fetched.
  * @param isSearching - A boolean flag to determine if the search should be performed. Defaults to true.
@@ -201,51 +195,34 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
  *   - totalResults: The total number of patients to be fetched
  */
 export function useFhirPatients(patientUuids: string[] | null, isSearching: boolean = true, batchSize: number = 10) {
-  const getPatientUrl = useCallback(
-    (page: number) => {
-      if (!patientUuids || page < 0) return null;
-
-      const startIndex = page * batchSize;
-      const batchUuids = patientUuids.slice(startIndex, startIndex + batchSize);
-
-      return batchUuids.length === 0 ? null : `${fhirBaseUrl}/Patient?_id=${batchUuids.join(',')}&_count=${batchSize}`;
-    },
-    [patientUuids, batchSize],
-  );
-
   const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
 
-  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<
-    FetchResponse<FHIRPatientSearchResponse>,
-    Error
-  >(shouldFetch ? getPatientUrl : null, openmrsFetch, {
-    keepPreviousData: true,
-    initialSize: 1,
-    revalidateFirstPage: false,
+  const url = useMemo(() => {
+    if (!shouldFetch || !patientUuids) return null;
+
+    return `${fhirBaseUrl}/Patient?_id=${patientUuids.join(',')}&_count=${batchSize}`;
+  }, [shouldFetch, patientUuids, batchSize]);
+
+  const { data, error, isLoading, isValidating, hasMore, loadMore } = useFhirInfinite<fhir.Patient>(url ?? '', {
+    immutable: true,
   });
 
-  const mappedData = useMemo(
-    () => data?.flatMap((res) => res.data?.entry?.map((e) => mapSearchedPatientFromFhir(e.resource)) ?? []) ?? null,
-    [data],
-  );
-
-  const hasMore = useMemo(
-    () => (patientUuids ? (mappedData?.length ?? 0) < patientUuids.length : false),
-    [patientUuids, mappedData],
-  );
+  const mappedData = useMemo(() => data?.map((patient) => mapSearchedPatientFromFhir(patient)) ?? null, [data]);
 
   return useMemo(
     () => ({
       data: mappedData,
-      isLoading: isLoading && !data,
-      isLoadingMore: isLoading && !!data,
+      isLoading: isLoading,
+      isLoadingMore: isValidating && !!data,
       fetchError: error,
-      hasMore,
-      isValidating,
-      setPage: setSize,
-      currentPage: size,
+      hasMore: hasMore ?? false,
+      isValidating: isValidating,
+      setPage: async () => {
+        loadMore();
+        return [];
+      },
       totalResults: patientUuids?.length ?? 0,
     }),
-    [mappedData, isLoading, data, error, hasMore, isValidating, setSize, size, patientUuids],
+    [mappedData, isLoading, isValidating, data, error, hasMore, loadMore, patientUuids],
   );
 }
