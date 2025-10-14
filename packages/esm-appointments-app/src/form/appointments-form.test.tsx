@@ -60,7 +60,6 @@ describe('AppointmentForm', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       appointmentTypes: ['Scheduled', 'WalkIn'],
-      allowAllDayAppointments: true,
     });
     mockUseLocations.mockReturnValue(mockLocations.data.results);
     mockUseSession.mockReturnValue(mockSession.data);
@@ -248,6 +247,11 @@ describe('AppointmentForm', () => {
   });
 
   it('renders all-day toggle when allowAllDayAppointments is enabled', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
+    });
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
@@ -280,23 +284,39 @@ describe('AppointmentForm', () => {
   });
 
   it('hides time and duration fields when all-day toggle is enabled', async () => {
-    const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
+    });
 
+    const user = userEvent.setup();
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
-    // Initially, time and duration fields should be visible
+    // When allowAllDayAppointments is true, the toggle starts as ON (toggled)
+    // So time and duration fields should already be hidden initially
+    const allDayToggle = getAllDayToggle();
+    expect(allDayToggle).toBeChecked(); // Verify it's already toggled on
+
+    // Time and duration fields should already be hidden
+    expect(screen.queryByRole('textbox', { name: /time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /duration \(minutes\)/i })).not.toBeInTheDocument();
+
+    // Now toggle it OFF to show the fields
+    await user.click(allDayToggle);
+
+    // After toggling OFF, time and duration fields should now be visible
     expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /duration \(minutes\)/i })).toBeInTheDocument();
 
-    // Toggle all-day appointment
-    const allDayToggle = getAllDayToggle();
+    // Toggle it back ON to hide them again
     await user.click(allDayToggle);
 
-    // Time and duration fields should be hidden
+    // Fields should be hidden again
     expect(screen.queryByRole('textbox', { name: /time/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('spinbutton', { name: /duration \(minutes\)/i })).not.toBeInTheDocument();
   });

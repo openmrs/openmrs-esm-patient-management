@@ -97,7 +97,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
-  const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -133,7 +132,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const appointmentsFormSchema = z
     .object({
       duration: z.union([z.number(), z.null()]).optional(),
-      isAllDayAppointment: z.boolean().default(false),
+      isAllDayAppointment: z.boolean(),
       location: z.string().refine((value) => value !== '', {
         message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
       }),
@@ -256,6 +255,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       },
       formIsRecurringAppointment: isRecurringAppointment,
       dateAppointmentScheduled: defaultDateAppointmentScheduled,
+      isAllDayAppointment: allowAllDayAppointments,
     },
   });
 
@@ -432,7 +432,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
-    const endDatetime = isAllDayAppointment
+    const endDatetime = allowAllDayAppointments
       ? dayjs(startDate).endOf('day').toDate()
       : dayjs(startDatetime).add(duration, 'minutes').toDate();
 
@@ -618,7 +618,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         labelA={t('no', 'No')}
                         labelB={t('yes', 'Yes')}
                         labelText={t('allDay', 'All day')}
-                        toggled={setIsAllDayAppointment(value)}
+                        toggled={value}
                         onToggle={onChange}
                       />
                     )}
@@ -746,7 +746,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         labelA={t('no', 'No')}
                         labelB={t('yes', 'Yes')}
                         labelText={t('allDay', 'All day')}
-                        toggled={setIsAllDayAppointment(value)}
+                        toggled={value}
                         onToggle={onChange}
                       />
                     )}
