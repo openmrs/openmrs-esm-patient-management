@@ -48,7 +48,6 @@ function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean): UR
  *   - hasMore: Boolean indicating if there are more results to load
  *   - isValidating: Boolean indicating if new data is being loaded
  *   - setPage: Function to load the next page of results
- *   - currentPage: The current page number
  *   - totalResults: The total number of results for the search query
  */
 export function useInfinitePatientSearch(
@@ -57,26 +56,33 @@ export function useInfinitePatientSearch(
   isSearching: boolean = true,
   pageSize: number = 10,
 ): PatientSearchResponse {
-  const shouldFetch = isSearching && searchQuery?.trim();
+  const shouldFetch = isSearching && !!searchQuery?.trim();
 
   const url = useMemo(() => {
     if (!shouldFetch) return null;
+
     const params = buildOpenmrsSearchParams(searchQuery, includeDead);
     return `${fhirBaseUrl}/Patient?${params.toString()}`;
   }, [shouldFetch, searchQuery, includeDead]);
 
-  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } = useFhirInfinite<fhir.Patient>(
-    url ?? '',
-    {
-      immutable: true,
-    },
-  );
+  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } = useFhirInfinite<fhir.Patient>(url, {
+    immutable: true,
+  });
 
-  const mappedData = useMemo(() => data?.map((patient) => mapSearchedPatientFromFhir(patient)) ?? null, [data]);
+  const mappedData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+
+    return data.filter((patient) => patient != null).map((patient) => mapSearchedPatientFromFhir(patient));
+  }, [data]);
 
   const totalResults = useMemo(() => {
     return totalCount ?? mappedData?.length ?? 0;
   }, [totalCount, mappedData]);
+
+  const handleSetPage = useCallback(async () => {
+    loadMore();
+    return [];
+  }, [loadMore]);
 
   return useMemo(
     () => ({
@@ -86,13 +92,10 @@ export function useInfinitePatientSearch(
       fetchError: error,
       hasMore: hasMore ?? false,
       isValidating: isValidating,
-      setPage: async () => {
-        loadMore();
-        return [];
-      },
+      setPage: handleSetPage,
       totalResults,
     }),
-    [mappedData, isLoading, isValidating, data, error, hasMore, loadMore, totalResults],
+    [mappedData, isLoading, isValidating, data, error, hasMore, handleSetPage, totalResults],
   );
 }
 
@@ -191,7 +194,6 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
  *   - hasMore: A boolean indicating if there are more patients to load
  *   - isValidating: A boolean indicating if new data is being loaded
  *   - setPage: A function to load more data
- *   - currentPage: The current page of results
  *   - totalResults: The total number of patients to be fetched
  */
 export function useFhirPatients(patientUuids: string[] | null, isSearching: boolean = true, batchSize: number = 10) {
@@ -203,11 +205,20 @@ export function useFhirPatients(patientUuids: string[] | null, isSearching: bool
     return `${fhirBaseUrl}/Patient?_id=${patientUuids.join(',')}&_count=${batchSize}`;
   }, [shouldFetch, patientUuids, batchSize]);
 
-  const { data, error, isLoading, isValidating, hasMore, loadMore } = useFhirInfinite<fhir.Patient>(url ?? '', {
+  const { data, error, isLoading, isValidating, hasMore, loadMore } = useFhirInfinite<fhir.Patient>(url, {
     immutable: true,
   });
 
-  const mappedData = useMemo(() => data?.map((patient) => mapSearchedPatientFromFhir(patient)) ?? null, [data]);
+  const mappedData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+
+    return data.filter((patient) => patient != null).map((patient) => mapSearchedPatientFromFhir(patient));
+  }, [data]);
+
+  const handleSetPage = useCallback(async () => {
+    loadMore();
+    return [];
+  }, [loadMore]);
 
   return useMemo(
     () => ({
@@ -217,12 +228,9 @@ export function useFhirPatients(patientUuids: string[] | null, isSearching: bool
       fetchError: error,
       hasMore: hasMore ?? false,
       isValidating: isValidating,
-      setPage: async () => {
-        loadMore();
-        return [];
-      },
+      setPage: handleSetPage,
       totalResults: patientUuids?.length ?? 0,
     }),
-    [mappedData, isLoading, isValidating, data, error, hasMore, loadMore, patientUuids],
+    [mappedData, isLoading, isValidating, data, error, hasMore, handleSetPage, patientUuids],
   );
 }
