@@ -81,10 +81,4 @@ export class WardPage {
       .getByText(new RegExp(`${patientName}\\s+has been successfully admitted and assigned to bed ${bedNumber}`, 'i'))
       .waitFor({ state: 'visible' });
   }
-  async admitPatient(bedNumber: string) {
-    await this.manageAdmissionRequestsButton().click();
-    await this.page.getByRole('button', { name: 'Admit patient' }).first().click();
-    await this.page.getByText(`${bedNumber} · Empty`).click();
-    await this.page.getByRole('button', { name: 'Admit' }).click();
-  }
 }

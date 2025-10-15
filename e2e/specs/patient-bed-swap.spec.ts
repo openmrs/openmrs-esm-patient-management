@@ -1,8 +1,6 @@
-import { type Location, type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
-import { test } from '../core';
+import { expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
 import {
-  bedLocation,
   changeToWardLocation,
   deletePatient,
   dischargePatientFromBed,
@@ -15,56 +13,100 @@ import {
   retireBedType,
   startVisit,
 } from '../commands';
+import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { test } from '../core';
 import { WardPage } from '../pages';
-import { expect } from '@playwright/test';
 
-let location: Location;
-let visit: Visit;
 let bed: Bed;
-let bedToSwap: Bed;
-let bedToSwapType: BedType;
 let bedtype: BedType;
 let provider: Provider;
+let swapBed: Bed;
+let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api }) => {
-  location = await bedLocation(api);
   await changeToWardLocation(api);
-  bedToSwapType = await generateBedType(api);
-  bedToSwap = await generateRandomBed(api, bedToSwapType);
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
+  swapBed = await generateRandomBed(api, bedtype); // Generate the bed we'll swap to
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
-test('Swap the patient to another bed', async ({ page }) => {
+
+test('Swap a patient from one bed to another', async ({ page }) => {
   const wardPage = new WardPage(page);
-  await test.step('Admit a patient to  ward', async () => {
+  const fullName = wardPatient.person?.display;
+
+  await test.step('When I visit the patient ward page', async () => {
     await wardPage.goTo();
-    await wardPage.admitPatient(bed.bedNumber);
   });
 
-  await test.step('Then i swap a patient to another bed', async () => {
-    const fullName = wardPatient.person?.display;
-    await wardPage.goTo();
-    const patientUuid = wardPatient.uuid;
-    await page.getByTestId(`ward-patient-card-${patientUuid}`).click();
+  await test.step('And I click the "Manage" button to view pending admission requests', async () => {
+    await wardPage.clickManageAdmissionRequests();
+  });
+
+  await test.step('Then I should see the patient in the pending admission requests list', async () => {
+    await wardPage.waitForAdmissionRequest(fullName);
+    await expect(page.getByText(fullName)).toBeVisible();
+  });
+
+  await test.step('And I click the "Admit patient" button for the patient', async () => {
+    await wardPage.clickAdmitPatientButton(fullName);
+  });
+
+  await test.step('And I select the bed for admission', async () => {
+    await page.getByRole('combobox', { name: /choose an option/i }).click();
+    await page.getByRole('option', { name: `${bed.bedNumber} · Empty` }).click();
+  });
+
+  await test.step('And I confirm admission by clicking "Admit"', async () => {
+    await page.getByRole('button', { name: 'Admit' }).click();
+  });
+
+  await test.step('Then I should see a success message confirming the admission success', async () => {
+    await expect(
+      page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
+    ).toBeVisible();
+  });
+
+  await test.step('And I should see the patient in the ward view', async () => {
+    await wardPage.waitForPatientInWardView(fullName);
+  });
+
+  await test.step('And I click on the patient card to open the ward patient workspace', async () => {
+    await wardPage.clickPatientCard(fullName);
+  });
+
+  await test.step('And I swap the patient from the original bed to the destination bed', async () => {
     await wardPage.transferButton().click();
     await wardPage.swapButton().click();
-    await page.getByText(`${bedToSwap.bedNumber} · Empty`).click();
-    await wardPage.saveButton().click();
+    await page.getByRole('combobox', { name: /choose an option/i }).click();
+    await page.getByRole('option', { name: `${swapBed.bedNumber} · Empty` }).click();
+    await wardPage.swapButton().click();
   });
-  await test.step('And i will confirm bed swap', async () => {
-    await wardPage.goTo();
-    await expect(page.getByText(bedToSwap.bedNumber)).toBeVisible();
+
+  await test.step('Then I should see a success notification confirming the bed swap', async () => {
+    await expect(page.getByText(/patient assigned to new bed/i)).toBeVisible();
+    await expect(page.getByText(new RegExp(`${fullName}.*assigned to bed ${swapBed.bedNumber}`))).toBeVisible();
+  });
+
+  await test.step('And the patient should be in the new bed', async () => {
+    await wardPage.waitForPatientInWardView(fullName);
+    await expect(page.getByText(fullName, { exact: true })).toBeVisible();
+  });
+
+  await test.step('And the original bed should be empty', async () => {
+    const originalBedLocator = page.locator('[class*="emptyBed"]', { has: page.getByText(bed.bedNumber) });
+    await expect(originalBedLocator).toBeVisible();
+    await expect(originalBedLocator.getByText(/empty bed/i)).toBeVisible();
   });
 });
+
 test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  await dischargePatientFromBed(api, swapBed.id, wardPatient.uuid);
   await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
-  await retireBedType(api, bedToSwapType.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
 });
