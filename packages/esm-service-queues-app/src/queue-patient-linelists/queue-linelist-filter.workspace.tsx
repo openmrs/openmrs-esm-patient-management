@@ -129,11 +129,11 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
               <Layer>
                 <OpenmrsDatePicker
-                  value={returnDate}
-                  onChange={setReturnDate}
-                  id="returnDate"
                   data-testid="returnDate"
+                  id="returnDate"
                   labelText={t('date', 'Date')}
+                  onChange={setReturnDate}
+                  value={returnDate}
                 />
               </Layer>
               <Button
