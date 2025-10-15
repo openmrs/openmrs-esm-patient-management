@@ -3,12 +3,14 @@ import useSWR from 'swr';
 import {
   openmrsFetch,
   useSession,
+  useConfig,
   type FetchResponse,
   restBaseUrl,
   fhirBaseUrl,
   useFhirInfinite,
 } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, User } from './types';
+import type { PatientSearchConfig } from './config-schema';
 import { mapSearchedPatientFromFhir } from './utils/fhir-mapper';
 
 /**
@@ -57,6 +59,7 @@ export function useInfinitePatientSearch(
   pageSize: number = 10,
 ): PatientSearchResponse {
   const shouldFetch = isSearching && !!searchQuery?.trim();
+  const config = useConfig<PatientSearchConfig>();
 
   const url = useMemo(() => {
     if (!shouldFetch) return null;
@@ -72,8 +75,10 @@ export function useInfinitePatientSearch(
   const mappedData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    return data.filter((patient) => patient != null).map((patient) => mapSearchedPatientFromFhir(patient));
-  }, [data]);
+    return data
+      .filter((patient) => patient != null)
+      .map((patient) => mapSearchedPatientFromFhir(patient, config?.contactAttributeType));
+  }, [data, config?.contactAttributeType]);
 
   const totalResults = useMemo(() => {
     return totalCount ?? mappedData?.length ?? 0;
@@ -199,6 +204,8 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 export function useFhirPatients(patientUuids: string[] | null, isSearching: boolean = true, batchSize: number = 10) {
   const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
 
+  const config = useConfig<PatientSearchConfig>();
+
   const url = useMemo(() => {
     if (!shouldFetch || !patientUuids) return null;
 
@@ -212,8 +219,10 @@ export function useFhirPatients(patientUuids: string[] | null, isSearching: bool
   const mappedData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    return data.filter((patient) => patient != null).map((patient) => mapSearchedPatientFromFhir(patient));
-  }, [data]);
+    return data
+      .filter((patient) => patient != null)
+      .map((patient) => mapSearchedPatientFromFhir(patient, config?.contactAttributeType));
+  }, [data, config?.contactAttributeType]);
 
   const handleSetPage = useCallback(async () => {
     loadMore();

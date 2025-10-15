@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
 import type { SearchedPatient, Address, Identifier } from '../types';
 
 const getGender = (gender: string) => {
@@ -98,7 +99,13 @@ function calculateAgeFromBirthDate(birthDate?: string): number {
   }
 }
 
-export function mapSearchedPatientFromFhir(patient: fhir.Patient): SearchedPatient {
+/**
+ * Maps a FHIR Patient resource to the OpenMRS SearchedPatient format
+ * @param patient - FHIR Patient resource
+ * @param contactAttributeType - Array of contact attribute type UUIDs from config [telephoneUuid, emailUuid]
+ * @returns SearchedPatient object
+ */
+export function mapSearchedPatientFromFhir(patient: fhir.Patient, contactAttributeType?: string[]): SearchedPatient {
   const name = (patient.name && patient.name[0]) || ({} as fhir.HumanName);
   const address = (patient.address && patient.address[0]) || ({} as fhir.Address);
 
@@ -120,17 +127,22 @@ export function mapSearchedPatientFromFhir(patient: fhir.Patient): SearchedPatie
     identifierType: {
       uuid: (id.type?.coding && id.type.coding[0]?.code) || '',
       display: id.type?.text || id.type?.coding?.[0]?.display || '',
-    } as any,
-    location: { uuid: '', display: '' } as any,
+    } as OpenmrsResource,
+    location: {
+      uuid: '',
+      display: '',
+    } as OpenmrsResource,
     uuid: id.id || uuidv4(),
     preferred: id.use === 'official',
   }));
+
+  const telephoneAttributeTypeUuid = contactAttributeType?.[0];
 
   const phoneAttributes = (patient.telecom || [])
     .filter((t) => t.system === 'phone' && t.value)
     .map((phone) => ({
       attributeType: {
-        uuid: 'phone-attribute-uuid',
+        uuid: telephoneAttributeTypeUuid || '',
         display: 'Telephone Number',
       },
       value: phone.value || '',
