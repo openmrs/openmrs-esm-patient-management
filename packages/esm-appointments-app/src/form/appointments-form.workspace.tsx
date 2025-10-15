@@ -425,6 +425,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       appointmentNote,
       appointmentStatus,
       dateAppointmentScheduled,
+      isAllDayAppointment,
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
@@ -432,7 +433,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
-    const endDatetime = allowAllDayAppointments
+    const endDatetime = isAllDayAppointment
       ? dayjs(startDate).endOf('day').toDate()
       : dayjs(startDatetime).add(duration, 'minutes').toDate();
 
