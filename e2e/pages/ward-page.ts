@@ -9,6 +9,8 @@ export class WardPage {
   readonly clinicalNotesField = () => this.page.getByRole('textbox', { name: /clinical notes/i });
   readonly wardAdmissionNoteField = () => this.page.getByRole('textbox', { name: /write your notes/i });
   readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
+  readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
+  readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
 
   async clickPatientCard(patientName: string) {
     // Wait for patient to be loaded - use first() to avoid strict mode violation
@@ -78,5 +80,11 @@ export class WardPage {
     await this.page
       .getByText(new RegExp(`${patientName}\\s+has been successfully admitted and assigned to bed ${bedNumber}`, 'i'))
       .waitFor({ state: 'visible' });
+  }
+  async admitPatient(bedNumber: string) {
+    await this.manageAdmissionRequestsButton().click();
+    await this.page.getByRole('button', { name: 'Admit patient' }).first().click();
+    await this.page.getByText(`${bedNumber} · Empty`).click();
+    await this.page.getByRole('button', { name: 'Admit' }).click();
   }
 }
