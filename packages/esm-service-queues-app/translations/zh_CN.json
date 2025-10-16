@@ -101,6 +101,8 @@
   "noVitalsFound": "未找到就诊记录",
   "noVitalsRecorded": "此次就诊未记录该患者的生命体征",
   "now": "现在",
+  "off": "Off",
+  "on": "On",
   "onTime": "准时",
   "orderDurationAndUnit": "持续 {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "无限期",

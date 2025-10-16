@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   InlineLoading,
   MultiSelect,
@@ -651,7 +649,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         id="appointmentRecurringDateRangePicker"
                         data-testid="appointmentRecurringDateRangePicker"
                         labelText={t('dateRange', 'Set date range')}
-                        invalid={Boolean(fieldState?.error?.message)}
+                        invalid={!!fieldState?.error?.message}
                         invalidText={fieldState?.error?.message}
                         isRequired
                       />
@@ -759,21 +757,20 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     control={control}
                     render={({ field, fieldState }) => (
                       <OpenmrsDatePicker
-                        {...field}
-                        value={field.value.startDate}
+                        data-testid="datePickerInput"
+                        id="datePickerInput"
+                        invalid={!!fieldState?.error?.message}
+                        invalidText={fieldState?.error?.message}
+                        labelText={t('date', 'Date')}
+                        onBlur={field.onBlur}
                         onChange={(date) => {
                           field.onChange({
                             ...field.value,
                             startDate: date,
                           });
                         }}
-                        id="datePickerInput"
-                        data-testid="datePickerInput"
-                        labelText={t('date', 'Date')}
                         style={{ width: '100%' }}
-                        invalid={Boolean(fieldState?.error?.message)}
-                        invalidText={fieldState?.error?.message}
-                        // minDate={new Date()}
+                        value={field.value.startDate}
                       />
                     )}
                   />
@@ -812,10 +809,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     invalid={!!errors?.appointmentStatus}
                     invalidText={errors?.appointmentStatus?.message}
                     labelText={t('selectAppointmentStatus', 'Select status')}
+                    onBlur={onBlur}
                     onChange={onChange}
-                    value={value}
                     ref={ref}
-                    onBlur={onBlur}>
+                    value={value}>
                     <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
                     {appointmentStatuses?.length > 0 &&
                       appointmentStatuses.map((appointmentStatus, index) => (
@@ -843,8 +840,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   labelText={t('selectProvider', 'Select a provider')}
                   onChange={onChange}
                   onBlur={onBlur}
-                  value={value}
-                  ref={ref}>
+                  ref={ref}
+                  value={value}>
                   <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
                   {providers?.providers?.length > 0 &&
                     providers?.providers?.map((provider) => (
@@ -866,14 +863,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               render={({ field, fieldState }) => (
                 <div style={{ width: '100%' }}>
                   <OpenmrsDatePicker
-                    {...field}
-                    invalid={Boolean(fieldState?.error?.message)}
-                    invalidText={fieldState?.error?.message}
-                    maxDate={new Date()}
-                    id="dateAppointmentScheduledPickerInput"
                     data-testid="dateAppointmentScheduledPickerInput"
-                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    id="dateAppointmentScheduledPickerInput"
+                    invalid={!!fieldState?.error?.message}
+                    invalidText={fieldState?.error?.message}
+                    labelText={t('dateAppointmentIssued', 'Date appointment issued')}
+                    maxDate={new Date()}
                     style={{ width: '100%' }}
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    value={field.value}
                   />
                 </div>
               )}

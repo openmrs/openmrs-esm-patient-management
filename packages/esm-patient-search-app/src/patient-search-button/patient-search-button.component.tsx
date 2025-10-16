@@ -13,7 +13,7 @@ interface PatientSearchButtonProps {
   isOpen?: boolean;
   searchQuery?: string;
   searchQueryUpdatedAction?: (query: string) => {};
-  selectPatientAction?: (patientUuid: string) => {};
+  selectPatientAction?: (patientUuid: string, patient: fhir.Patient) => {};
   showPatientSearch?: () => void;
   workspaceTitle?: string;
 }
