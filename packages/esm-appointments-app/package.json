@@ -52,7 +52,7 @@
     "@openmrs/esm-patient-common-lib": "11.x",
     "react": "18.x",
     "react-dom": "18.x",
-    "react-i18next": "11.x",
+    "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
