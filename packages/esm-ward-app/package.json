@@ -46,7 +46,7 @@
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",
     "react": "18.x",
-    "react-i18next": "11.x",
+    "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
