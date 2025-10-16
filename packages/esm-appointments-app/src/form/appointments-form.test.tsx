@@ -343,7 +343,14 @@ describe('AppointmentForm', () => {
   it('does not require duration validation for all-day appointments', async () => {
     const user = userEvent.setup();
 
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
+    });
+
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
@@ -370,8 +377,9 @@ describe('AppointmentForm', () => {
     await user.click(dateAppointmentIssuedInput);
     fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
 
-    // Enable all-day appointment
-    await user.click(allDayToggle);
+    // Enable all-day appointment - toggle OFF first since it defaults to ON when allowAllDayAppointments is true
+    await user.click(allDayToggle); // Toggle OFF
+    await user.click(allDayToggle); // Toggle back ON to enable all-day
 
     await user.click(saveButton);
 
