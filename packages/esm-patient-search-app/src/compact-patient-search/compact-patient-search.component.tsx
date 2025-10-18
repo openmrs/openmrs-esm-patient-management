@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { navigate, interpolateString, useConfig, useSession, useDebounce, showSnackbar } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
 import { type SearchedPatient } from '../types';
-import { useRecentlyViewedPatients, useInfinitePatientSearch, useRestPatients } from '../patient-search.resource';
+import { useRecentlyViewedPatients, useInfinitePatientSearch, useFhirPatients } from '../patient-search.resource';
 import { PatientSearchContextProvider } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from './patient-search.component';
@@ -51,7 +51,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     updateRecentlyViewedPatients,
   } = useRecentlyViewedPatients(showRecentlySearchedPatients);
 
-  const recentPatientSearchResponse = useRestPatients(recentlyViewedPatientUuids, !hasSearchTerm);
+  const recentPatientSearchResponse = useFhirPatients(recentlyViewedPatientUuids, !hasSearchTerm);
   const { data: recentPatients, fetchError } = recentPatientSearchResponse;
 
   const handleFocusToInput = useCallback(() => {
