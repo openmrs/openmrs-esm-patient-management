@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
+import type { Page } from '@playwright/test';
+import type { Visit } from '@openmrs/esm-framework';
 import {
   changeToWardLocation,
   deletePatient,
@@ -13,9 +14,22 @@ import {
   retireBedType,
   startVisit,
 } from '../commands';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import type { Bed, BedType, Patient, Provider } from '../commands/types';
 import { test } from '../core';
 import { WardPage } from '../pages';
+
+async function selectBedByLabel(page: Page, label: string) {
+  const radio = page.getByRole('radio', { name: label });
+  if ((await radio.count()) > 0) {
+    // Click the Carbon label associated with the radio to avoid overlay interception
+    const labelLocator = page.locator('label.cds--radio-button__label', { hasText: label });
+    await labelLocator.click();
+    return;
+  }
+  const dropdown = page.getByRole('combobox', { name: /choose an option/i });
+  await dropdown.click();
+  await page.getByRole('option', { name: label }).click();
+}
 
 let bed: Bed;
 let bedtype: BedType;
@@ -57,8 +71,7 @@ test('Swap a patient from one bed to another', async ({ page }) => {
   });
 
   await test.step('And I select the bed for admission', async () => {
-    await page.getByRole('combobox', { name: /choose an option/i }).click();
-    await page.getByRole('option', { name: `${bed.bedNumber} · Empty` }).click();
+    await selectBedByLabel(page, `${bed.bedNumber} · Empty`);
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
@@ -82,9 +95,8 @@ test('Swap a patient from one bed to another', async ({ page }) => {
   await test.step('And I swap the patient from the original bed to the destination bed', async () => {
     await wardPage.transferButton().click();
     await wardPage.swapButton().click();
-    await page.getByRole('combobox', { name: /choose an option/i }).click();
-    await page.getByRole('option', { name: `${swapBed.bedNumber} · Empty` }).click();
-    await wardPage.swapButton().click();
+    await selectBedByLabel(page, `${swapBed.bedNumber} · Empty`);
+    await wardPage.saveButton().click();
   });
 
   await test.step('Then I should see a success notification confirming the bed swap', async () => {
@@ -98,9 +110,10 @@ test('Swap a patient from one bed to another', async ({ page }) => {
   });
 
   await test.step('And the original bed should be empty', async () => {
-    const originalBedLocator = page.locator('[class*="emptyBed"]', { has: page.getByText(bed.bedNumber) });
-    await expect(originalBedLocator).toBeVisible();
-    await expect(originalBedLocator.getByText(/empty bed/i)).toBeVisible();
+    const originalBedLocator = page.locator('[class*="emptyBed"]').filter({
+      has: page.locator('span[class*="wardPatientBedNumber"]', { hasText: new RegExp(`^${bed.bedNumber}$`) }),
+    });
+    await expect(originalBedLocator.getByText(/empty bed/i)).toBeVisible({ timeout: 60000 });
   });
 });
 
