@@ -145,8 +145,10 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await expect(page.getByText(/appointment edited/i)).toBeVisible();
   });
 
-  await test.step('When I click the "Today" tab', async () => {
-    await page.getByRole('tab', { name: /today/i }).click();
+  await test.step('When I open the tab containing the edited appointment', async () => {
+    const targetDate = getBusinessDay(0, 14);
+    const isToday = targetDate.isSame(dayjs(), 'day');
+    await page.getByRole('tab', { name: isToday ? /today/i : /upcoming/i }).click();
   });
 
   await test.step('Then I click the options kebab menu in the appointment', async () => {

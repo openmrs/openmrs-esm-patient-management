@@ -4,7 +4,6 @@ import { type Bed, type BedType, type Encounter, type Patient, type Provider } f
 import {
   changeToWardLocation,
   changeToDefaultLocation,
-  deleteBed,
   dischargePatientFromBed,
   deletePatient,
   endVisit,
