@@ -38,6 +38,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
             status: statuses.find((s) => s.uuid == formState.selectedStatus),
             priority: priorities.find((p) => p.uuid == formState.selectedPriority),
             priorityComment: formState.prioritycomment,
+            ...(formState.selectedProvider && { providerWaitingFor: { uuid: formState.selectedProvider } }),
             ...(formState.modifyDefaultTransitionDateTime ? { startedAt: startAtDate.toISOString() } : {}),
           });
         },

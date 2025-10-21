@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
+import { useProviders } from '../hooks/useProviders';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
 import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
@@ -38,6 +39,7 @@ interface FormState {
   selectedQueue: string;
   selectedPriority: string;
   selectedStatus: string;
+  selectedProvider: string;
   prioritycomment: string;
   modifyDefaultTransitionDateTime: boolean;
   transitionDate: Date;
@@ -94,6 +96,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
+    selectedProvider: queueEntry.providerWaitingFor?.uuid ?? '',
     prioritycomment: queueEntry.priorityComment ?? '',
     modifyDefaultTransitionDateTime: false,
     transitionDate: initialTransitionDate,
@@ -101,6 +104,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
   });
   const { queues } = useQueues();
+  const { providers, isLoading: isLoadingProviders } = useProviders();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<{
     type: 'duplicate' | 'error';
@@ -142,6 +146,11 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   const setSelectedStatusUuid = (selectedStatusUuid: string) => {
     clearSubmissionError();
     setFormState({ ...formState, selectedStatus: selectedStatusUuid });
+  };
+
+  const setSelectedProviderUuid = (selectedProviderUuid: string) => {
+    clearSubmissionError();
+    setFormState({ ...formState, selectedProvider: selectedProviderUuid });
   };
 
   const setPriorityComment = (prioritycomment: string) => {
@@ -330,6 +339,32 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 )}
               </section>
             )}
+
+            <section>
+              <div className={styles.sectionTitle}>{t('provider', 'Provider')}</div>
+              {isLoadingProviders ? (
+                <InlineNotification kind="info" lowContrast subtitle={t('loading', 'Loading...')} />
+              ) : (
+                <Dropdown
+                  id="provider"
+                  label={
+                    providers.find((p) => p.uuid === formState.selectedProvider)?.display ||
+                    t('selectProvider', 'Select a provider (optional)')
+                  }
+                  initialSelectedItem={providers.find((p) => p.uuid === formState.selectedProvider)}
+                  value={formState.selectedProvider}
+                  items={[{ uuid: '', display: t('selectProvider', 'Select a provider (optional)') }, ...providers]}
+                  itemToString={(item) =>
+                    item?.uuid === queueEntry.providerWaitingFor?.uuid && item?.uuid
+                      ? t('currentValueFormatted', '{{value}} (Current)', {
+                          value: item.display || item.person?.display,
+                        })
+                      : item?.display || item?.person?.display || ''
+                  }
+                  onChange={({ selectedItem }) => setSelectedProviderUuid(selectedItem?.uuid || '')}
+                />
+              )}
+            </section>
 
             <section>
               <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
