@@ -47,6 +47,7 @@
   "female": "Female",
   "fetchingEmrConfigurationFailed": "Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.",
   "fetchingPatientNotesFailed": "Fetching patient notes failed. Try refreshing the page or contact your system administrator.",
+  "fetchingVisitFailed": "Failed to load patient visit information. Please try again.",
   "freeBeds": "Free beds",
   "freeBedsMetricValue": "{{ metricValue }}",
   "hours_one": "{{count}} hour",

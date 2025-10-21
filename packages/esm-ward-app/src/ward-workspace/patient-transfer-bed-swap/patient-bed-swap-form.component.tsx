@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import classNames from 'classnames';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { showSnackbar, useAppContext, useVisit } from '@openmrs/esm-framework';
+import { assignPatientToBed, removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { assignPatientToBed, useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import BedSelector from '../bed-selector.component';
-import styles from './patient-transfer-swap.scss';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
+import styles from './patient-transfer-swap.scss';
 
 export default function PatientBedSwapForm({
   promptBeforeClosing,
@@ -19,7 +19,7 @@ export default function PatientBedSwapForm({
   wardPatient,
   relatedTransferPatients = [],
 }: WardPatientWorkspaceProps) {
-  const { patient, visit } = wardPatient;
+  const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -28,6 +28,9 @@ export default function PatientBedSwapForm({
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
+
+  // Get the active visit for the patient
+  const { activeVisit, isLoading: isLoadingVisit, error: errorLoadingVisit } = useVisit(patient.uuid);
 
   const zodSchema = useMemo(
     () =>
@@ -45,7 +48,6 @@ export default function PatientBedSwapForm({
     formState: { errors, isDirty },
     control,
     handleSubmit,
-    getValues,
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema) });
 
   useEffect(() => {
@@ -60,6 +62,7 @@ export default function PatientBedSwapForm({
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
       setIsSubmitting(true);
       setShowErrorNotifications(false);
+
       const wardPatientsToSwap = [
         wardPatient,
         ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
@@ -67,14 +70,21 @@ export default function PatientBedSwapForm({
 
       Promise.all(
         wardPatientsToSwap.map(async (wardPatientToSwap) => {
-          const { patient: patientToSwap, visit: patientToSwapVisit } = wardPatientToSwap;
+          const { patient: patientToSwap } = wardPatientToSwap;
+
+          // Use the active visit for the main patient, or fall back to wardPatient.visit for related patients
+          const visitToUse = patientToSwap.uuid === patient.uuid ? activeVisit : wardPatientToSwap.visit;
+
+          if (!visitToUse?.uuid) {
+            throw new Error(`Visit UUID is missing for patient ${patientToSwap.uuid}`);
+          }
 
           const response = await createEncounter(
             patientToSwap,
             emrConfiguration.bedAssignmentEncounterType,
-            patientToSwapVisit.uuid,
+            visitToUse.uuid,
           );
-          if (response.ok) {
+          if (response.ok && response.data) {
             if (bedSelected) {
               return assignPatientToBed(values.bedId, patientToSwap.uuid, response.data.uuid);
             } else {
@@ -89,6 +99,10 @@ export default function PatientBedSwapForm({
                 return Promise.resolve({ ok: true });
               }
             }
+          } else {
+            throw new Error(
+              `Failed to create encounter for patient ${patientToSwap.uuid}: ${response.statusText || 'Unknown error'}`,
+            );
           }
         }),
       )
@@ -138,6 +152,7 @@ export default function PatientBedSwapForm({
       selectedRelatedPatient,
       relatedTransferPatients,
       wardPatient,
+      activeVisit,
     ],
   );
 
@@ -145,21 +160,28 @@ export default function PatientBedSwapForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return null;
+  }
+
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
       className={classNames(styles.formContainer, styles.workspaceContent)}>
       <Stack gap={4}>
-        {errorFetchingEmrConfiguration && (
+        {(errorFetchingEmrConfiguration || errorLoadingVisit) && (
           <div className={styles.formError}>
             <InlineNotification
               kind="error"
               title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
-              subtitle={t(
-                'fetchingEmrConfigurationFailed',
-                'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
-              )}
+              subtitle={
+                errorFetchingEmrConfiguration
+                  ? t(
+                      'fetchingEmrConfigurationFailed',
+                      'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
+                    )
+                  : t('fetchingVisitFailed', 'Failed to load patient visit information. Please try again.')
+              }
               lowContrast
               hideCloseButton
             />
@@ -180,7 +202,7 @@ export default function PatientBedSwapForm({
                         <WardPatientIdentifier id="patient-identifier" patient={relatedPatient} />
                       </div>
                     }
-                    onChange={(_, { checked, id }) => {
+                    onChange={(_event, { checked, id }) => {
                       const currentValue = selectedRelatedPatient;
                       setCheckedRelatedPatient(
                         checked ? [...currentValue, id] : currentValue.filter((item) => item !== id),
@@ -225,7 +247,13 @@ export default function PatientBedSwapForm({
         <Button
           type="submit"
           size="xl"
-          disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration}>
+          disabled={
+            isLoadingEmrConfiguration ||
+            isSubmitting ||
+            errorFetchingEmrConfiguration ||
+            isLoadingVisit ||
+            errorLoadingVisit
+          }>
           {t('save', 'Save')}
         </Button>
       </ButtonSet>
