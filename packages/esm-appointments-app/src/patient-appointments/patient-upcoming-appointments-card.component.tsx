@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import {
   InlineLoading,
@@ -11,12 +12,11 @@ import {
   StructuredListWrapper,
 } from '@carbon/react';
 import { formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
-import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import styles from './patient-upcoming-appointments-card.scss';
-import dayjs from 'dayjs';
+import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 import { type Appointment } from '../types';
 import { useMutateAppointments } from '../form/appointments-form.resource';
+import styles from './patient-upcoming-appointments-card.scss';
 
 interface VisitFormCallbacks {
   onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
@@ -44,7 +44,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   patientChartConfig,
 }) => {
   const { t } = useTranslation();
-  const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
+  const startDate = useMemo(() => dayjs().subtract(6, 'month').toISOString(), []);
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment>(null);
   const { mutateAppointments } = useMutateAppointments();
@@ -102,12 +102,13 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   };
 
   if (!patientChartConfig.showUpcomingAppointments) {
-    return <></>;
+    return null;
   }
 
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
+
   if (isLoading) {
     return (
       <span>
@@ -141,7 +142,8 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
                 <StructuredListCell>
                   <RadioButton
                     className={styles.radioButton}
-                    labelText=""
+                    hideLabel
+                    labelText={appointment.service?.name || t('appointment', 'Appointment')}
                     id={`radio-${index}`}
                     name="appointmentRadio"
                     value={appointment.uuid}
@@ -159,11 +161,11 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
 
   return (
     <InlineNotification
-      kind={'info'}
-      lowContrast
       className={styles.inlineNotification}
-      title={t('upcomingAppointments', 'Upcoming appointments')}
+      kind="info"
+      lowContrast
       subtitle={t('noUpcomingAppointments', 'No upcoming appointments found')}
+      title={t('upcomingAppointments', 'Upcoming appointments')}
     />
   );
 };

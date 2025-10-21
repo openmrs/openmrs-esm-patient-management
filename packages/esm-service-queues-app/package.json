@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-service-queues-app",
-  "version": "9.1.1",
+  "version": "9.2.0",
   "description": "Outpatient front-end module for O3",
   "browser": "dist/openmrs-esm-service-queues-app.js",
   "main": "src/index.ts",
@@ -46,8 +46,8 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",
-    "react": "^18.1.0",
-    "react-i18next": "11.x",
+    "react": "18.x",
+    "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },

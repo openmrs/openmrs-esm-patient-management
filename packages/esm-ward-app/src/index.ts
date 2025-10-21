@@ -7,7 +7,8 @@ import {
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { moduleName } from './constant';
-import { createDashboardLink } from './createDashboardLink.component';
+import { createDashboardLink } from './createDashboardLink';
+import { dashboardMeta } from './dashboard.meta';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -19,11 +20,12 @@ const swrRefreshIntervalInMs = 60000;
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'ward', title: 'wards' }), options);
+// t('wards', 'Wards')
+export const wardDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const wardView = getAsyncLifecycle(() => import('./ward-view/ward-view.component'), options);
 
-// t('admissionRequests', 'Admission Requests')
+// t('admissionRequests', 'Admission requests')
 export const admissionRequestWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/admission-request-workspace/admission-requests.workspace'),
   options,

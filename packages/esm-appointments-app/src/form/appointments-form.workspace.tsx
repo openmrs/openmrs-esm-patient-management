@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   InlineLoading,
   MultiSelect,
@@ -97,7 +95,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
-  const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -132,12 +129,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   // t('durationErrorMessage', 'Duration should be greater than zero')
   const appointmentsFormSchema = z
     .object({
-      duration: z
-        .number()
-        .nullable()
-        .refine((duration) => (isAllDayAppointment ? true : duration > 0), {
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-        }),
+      duration: z.union([z.number(), z.null()]).optional(),
+      isAllDayAppointment: z.boolean(),
       location: z.string().refine((value) => value !== '', {
         message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
       }),
@@ -207,7 +200,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
           'Date appointment issued cannot be after the appointment date',
         ),
       },
-    );
+    )
+    .superRefine((data, ctx) => {
+      // If not all-day, duration must be > 0
+      if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
+        ctx.addIssue({
+          path: ['duration'],
+          code: z.ZodIssueCode.custom,
+          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+        });
+      }
+    });
 
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
@@ -250,6 +253,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       },
       formIsRecurringAppointment: isRecurringAppointment,
       dateAppointmentScheduled: defaultDateAppointmentScheduled,
+      isAllDayAppointment: allowAllDayAppointments,
     },
   });
 
@@ -419,6 +423,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       appointmentNote,
       appointmentStatus,
       dateAppointmentScheduled,
+      isAllDayAppointment,
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
@@ -426,7 +431,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
-    const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
+    const endDatetime = isAllDayAppointment
+      ? dayjs(startDate).endOf('day').toDate()
+      : dayjs(startDatetime).add(duration, 'minutes').toDate();
 
     return {
       appointmentKind: selectedAppointmentType,
@@ -601,13 +608,19 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
-                  <Toggle
-                    id="allDayToggle"
-                    labelB={t('yes', 'Yes')}
-                    labelA={t('no', 'No')}
-                    labelText={t('allDay', 'All day')}
-                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
-                    toggled={isAllDayAppointment}
+                  <Controller
+                    name="isAllDayAppointment"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Toggle
+                        id="allDayToggle"
+                        labelA={t('no', 'No')}
+                        labelB={t('yes', 'Yes')}
+                        labelText={t('allDay', 'All day')}
+                        toggled={value}
+                        onToggle={onChange}
+                      />
+                    )}
                   />
                 )}
                 <ResponsiveWrapper>
@@ -636,7 +649,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         id="appointmentRecurringDateRangePicker"
                         data-testid="appointmentRecurringDateRangePicker"
                         labelText={t('dateRange', 'Set date range')}
-                        invalid={Boolean(fieldState?.error?.message)}
+                        invalid={!!fieldState?.error?.message}
                         invalidText={fieldState?.error?.message}
                         isRequired
                       />
@@ -644,7 +657,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!isAllDayAppointment && (
+                {!watch('isAllDayAppointment') && (
                   <TimeAndDuration control={control} errors={errors} services={services} watch={watch} t={t} />
                 )}
 
@@ -723,13 +736,19 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             {!isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
-                  <Toggle
-                    id="allDayToggle"
-                    labelB={t('yes', 'Yes')}
-                    labelA={t('no', 'No')}
-                    labelText={t('allDay', 'All day')}
-                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
-                    toggled={isAllDayAppointment}
+                  <Controller
+                    name="isAllDayAppointment"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Toggle
+                        id="allDayToggle"
+                        labelA={t('no', 'No')}
+                        labelB={t('yes', 'Yes')}
+                        labelText={t('allDay', 'All day')}
+                        toggled={value}
+                        onToggle={onChange}
+                      />
+                    )}
                   />
                 )}
                 <ResponsiveWrapper>
@@ -738,27 +757,26 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     control={control}
                     render={({ field, fieldState }) => (
                       <OpenmrsDatePicker
-                        {...field}
-                        value={field.value.startDate}
+                        data-testid="datePickerInput"
+                        id="datePickerInput"
+                        invalid={!!fieldState?.error?.message}
+                        invalidText={fieldState?.error?.message}
+                        labelText={t('date', 'Date')}
+                        onBlur={field.onBlur}
                         onChange={(date) => {
                           field.onChange({
                             ...field.value,
                             startDate: date,
                           });
                         }}
-                        id="datePickerInput"
-                        data-testid="datePickerInput"
-                        labelText={t('date', 'Date')}
                         style={{ width: '100%' }}
-                        invalid={Boolean(fieldState?.error?.message)}
-                        invalidText={fieldState?.error?.message}
-                        // minDate={new Date()}
+                        value={field.value.startDate}
                       />
                     )}
                   />
                 </ResponsiveWrapper>
 
-                {!isAllDayAppointment && (
+                {!watch('isAllDayAppointment') && (
                   <TimeAndDuration control={control} services={services} watch={watch} t={t} errors={errors} />
                 )}
               </div>
@@ -791,10 +809,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     invalid={!!errors?.appointmentStatus}
                     invalidText={errors?.appointmentStatus?.message}
                     labelText={t('selectAppointmentStatus', 'Select status')}
+                    onBlur={onBlur}
                     onChange={onChange}
-                    value={value}
                     ref={ref}
-                    onBlur={onBlur}>
+                    value={value}>
                     <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
                     {appointmentStatuses?.length > 0 &&
                       appointmentStatuses.map((appointmentStatus, index) => (
@@ -822,8 +840,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   labelText={t('selectProvider', 'Select a provider')}
                   onChange={onChange}
                   onBlur={onBlur}
-                  value={value}
-                  ref={ref}>
+                  ref={ref}
+                  value={value}>
                   <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
                   {providers?.providers?.length > 0 &&
                     providers?.providers?.map((provider) => (
@@ -845,14 +863,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               render={({ field, fieldState }) => (
                 <div style={{ width: '100%' }}>
                   <OpenmrsDatePicker
-                    {...field}
-                    invalid={Boolean(fieldState?.error?.message)}
-                    invalidText={fieldState?.error?.message}
-                    maxDate={new Date()}
-                    id="dateAppointmentScheduledPickerInput"
                     data-testid="dateAppointmentScheduledPickerInput"
-                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    id="dateAppointmentScheduledPickerInput"
+                    invalid={!!fieldState?.error?.message}
+                    invalidText={fieldState?.error?.message}
+                    labelText={t('dateAppointmentIssued', 'Date appointment issued')}
+                    maxDate={new Date()}
                     style={{ width: '100%' }}
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    value={field.value}
                   />
                 </div>
               )}

@@ -13,7 +13,7 @@ import {
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockUseAppointmentServiceData, mockSession, mockLocations, mockProviders } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import { saveAppointment } from './appointments-form.resource';
+import { saveAppointment, checkAppointmentConflict } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
 import AppointmentForm from './appointments-form.workspace';
 
@@ -28,6 +28,7 @@ const defaultProps = {
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockSaveAppointment = jest.mocked(saveAppointment);
+const mockCheckAppointmentConflict = jest.mocked(checkAppointmentConflict);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
@@ -37,6 +38,7 @@ const mockUseSession = jest.mocked(useSession);
 jest.mock('./appointments-form.resource', () => ({
   ...jest.requireActual('./appointments-form.resource'),
   saveAppointment: jest.fn(),
+  checkAppointmentConflict: jest.fn(),
 }));
 
 jest.mock('../hooks/useProviders', () => ({
@@ -70,6 +72,10 @@ describe('AppointmentForm', () => {
       isValidating: false,
     });
   });
+  const getAllDayToggle = () => {
+    const toggles = screen.queryAllByRole('switch');
+    return toggles.find((toggle) => toggle.getAttribute('id') === 'allDayToggle');
+  };
 
   it('renders the appointments form', async () => {
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
@@ -114,6 +120,7 @@ describe('AppointmentForm', () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
@@ -132,6 +139,10 @@ describe('AppointmentForm', () => {
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
+
+    // Wait for service selection to update duration field
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
@@ -139,10 +150,13 @@ describe('AppointmentForm', () => {
     const time = '09:30';
 
     fireEvent.change(dateInput, { target: { value: date } });
-    await user.type(timeInput, time);
+    fireEvent.change(timeInput, { target: { value: time } });
     await user.selectOptions(timeFormat, 'AM');
     await user.click(dateAppointmentIssuedInput);
     fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
+
+    // Wait a bit for form state to update
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await user.click(saveButton);
 
     expect(mockSaveAppointment).toHaveBeenCalledTimes(1);
@@ -184,6 +198,7 @@ describe('AppointmentForm', () => {
     };
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockRejectedValue(error);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
@@ -202,6 +217,10 @@ describe('AppointmentForm', () => {
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
+
+    // Wait for service selection to update duration field
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
@@ -213,6 +232,10 @@ describe('AppointmentForm', () => {
     await user.click(dateAppointmentIssuedInput);
     fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
     await user.selectOptions(timeFormat, 'AM');
+
+    // Wait a bit for form state to update
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     await user.click(saveButton);
 
     expect(mockSaveAppointment).toHaveBeenCalledTimes(1);
@@ -240,5 +263,129 @@ describe('AppointmentForm', () => {
       subtitle: 'Internal Server Error',
       title: 'Error scheduling appointment',
     });
+  });
+
+  it('renders all-day toggle when allowAllDayAppointments is enabled', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
+    });
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    const allDayToggle = getAllDayToggle();
+    expect(allDayToggle).toBeDefined();
+    expect(allDayToggle).toBeInTheDocument();
+  });
+
+  it('does not render all-day toggle when allowAllDayAppointments is disabled', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: false,
+    });
+
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    // Query by test ID since the toggle might not be present
+    const allDayToggles = screen.queryAllByRole('switch');
+    const allDayToggle = allDayToggles.find((toggle) => toggle.getAttribute('id') === 'allDayToggle');
+
+    expect(allDayToggle).toBeUndefined();
+  });
+
+  it('hides time and duration fields when all-day toggle is enabled', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
+    });
+
+    const user = userEvent.setup();
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    // When allowAllDayAppointments is true, the toggle starts as ON (toggled)
+    // So time and duration fields should already be hidden initially
+    const allDayToggle = getAllDayToggle();
+    expect(allDayToggle).toBeChecked(); // Verify it's already toggled on
+
+    // Time and duration fields should already be hidden
+    expect(screen.queryByRole('textbox', { name: /time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /duration \(minutes\)/i })).not.toBeInTheDocument();
+
+    // Now toggle it OFF to show the fields
+    await user.click(allDayToggle);
+
+    // After toggling OFF, time and duration fields should now be visible
+    expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /duration \(minutes\)/i })).toBeInTheDocument();
+
+    // Toggle it back ON to hide them again
+    await user.click(allDayToggle);
+
+    // Fields should be hidden again
+    expect(screen.queryByRole('textbox', { name: /time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /duration \(minutes\)/i })).not.toBeInTheDocument();
+  });
+
+  it('does not require duration validation for all-day appointments', async () => {
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      allowAllDayAppointments: true,
+    });
+
+    mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
+    mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
+    const dateInput = screen.getByRole('textbox', { name: /^date$/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    const allDayToggle = getAllDayToggle();
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(locationSelect, ['Inpatient Ward']);
+    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+    await user.selectOptions(providerSelect, ['doctor - James Cook']);
+
+    const date = '2024-01-04';
+
+    fireEvent.change(dateInput, { target: { value: date } });
+    await user.click(dateAppointmentIssuedInput);
+    fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
+
+    // Enable all-day appointment - toggle OFF first since it defaults to ON when allowAllDayAppointments is true
+    await user.click(allDayToggle); // Toggle OFF
+    await user.click(allDayToggle); // Toggle back ON to enable all-day
+
+    await user.click(saveButton);
+
+    // Should not show duration error message
+    expect(screen.queryByText(/duration should be greater than zero/i)).not.toBeInTheDocument();
+
+    expect(mockSaveAppointment).toHaveBeenCalledTimes(1);
   });
 });

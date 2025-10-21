@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-list-management-app",
-  "version": "9.1.1",
+  "version": "9.2.0",
   "description": "Microfrontend for managing patient lists in O3",
   "browser": "dist/openmrs-esm-patient-list-management-app.js",
   "main": "src/index.ts",
@@ -47,7 +47,7 @@
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",
     "react": "18.x",
-    "react-i18next": "11.x",
+    "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-home-app",
-  "version": "9.1.1",
+  "version": "9.2.0",
   "description": "Homepage microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-home-app.js",
   "main": "src/index.ts",
@@ -38,11 +38,11 @@
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",
     "react": "18.x",
-    "react-i18next": "11.x",
+    "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
-    "webpack": "^5.74.0"
+    "webpack": "^5.99.9"
   }
 }

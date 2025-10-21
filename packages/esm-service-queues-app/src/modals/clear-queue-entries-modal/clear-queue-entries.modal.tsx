@@ -46,7 +46,7 @@ const ClearQueueEntriesModal: React.FC<ClearQueueEntriesModalProps> = ({ queueEn
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('serviceQueue', 'Service queue')}
+        label={t('serviceQueues', 'Service queues')}
         title={t('clearAllQueueEntries', 'Clear all queue entries?')}
       />
       <ModalBody>
@@ -66,7 +66,7 @@ const ClearQueueEntriesModal: React.FC<ClearQueueEntriesModalProps> = ({ queueEn
           <ButtonSkeleton />
         ) : (
           <Button kind="danger" onClick={handleClearQueueBatchRequest}>
-            {t('clearQueue', 'Clear queue')}
+            {t('clearQueueEntries', 'Clear queue entries')}
           </Button>
         )}
       </ModalFooter>

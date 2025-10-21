@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 import { type WardPatientWorkspaceProps } from '../../types';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import PatientAdmitOrTransferForm from '../patient-transfer-bed-swap/patient-admit-or-transfer-request-form.component';
