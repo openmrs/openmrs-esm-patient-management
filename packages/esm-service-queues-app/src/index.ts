@@ -173,6 +173,11 @@ export const adminPageCardLink = getAsyncLifecycle(
   },
 );
 
+export const serviceQueuesAdminPage = getAsyncLifecycle(() => import('./admin/admin-page/admin-page.component'), {
+  featureName: 'service-queues-admin-page',
+  moduleName,
+});
+
 export function startupApp() {
   registerBreadcrumbs([]);
 
