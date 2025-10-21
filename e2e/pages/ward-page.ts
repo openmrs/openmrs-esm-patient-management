@@ -9,6 +9,8 @@ export class WardPage {
   readonly clinicalNotesField = () => this.page.getByRole('textbox', { name: /clinical notes/i });
   readonly wardAdmissionNoteField = () => this.page.getByRole('textbox', { name: /write your notes/i });
   readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
+  readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
+  readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
 
   async clickPatientCard(patientName: string) {
     // Wait for patient to be loaded - use first() to avoid strict mode violation
