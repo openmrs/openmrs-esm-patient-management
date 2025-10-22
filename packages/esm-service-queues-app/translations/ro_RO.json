@@ -101,6 +101,8 @@
   "noVitalsFound": "Nu au fost găsite semne vitale",
   "noVitalsRecorded": "Nu au fost înregistrate semne vitale în această vizită",
   "now": "Acum",
+  "off": "Off",
+  "on": "On",
   "onTime": "La timp",
   "orderDurationAndUnit": "pentru {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Durată nedeterminată",
