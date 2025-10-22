@@ -49,7 +49,7 @@ test.beforeEach(async ({ api }) => {
   await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
 });
 
-test('Swap a patient from one bed to another', async ({ page }) => {
+test('Swap a patient from one bed to another', async ({ page, api }) => {
   const wardPage = new WardPage(page);
   const fullName = wardPatient.person?.display;
 
@@ -83,6 +83,47 @@ test('Swap a patient from one bed to another', async ({ page }) => {
       page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
     ).toBeVisible();
   });
+
+  // Poll the admission API to verify the patient's visit data is available before the UI loads ward data.
+  // This prevents race conditions where the UI caches incomplete admission data before the backend has fully indexed it.
+  const maxAttempts = 10;
+  const delayMs = 1000;
+  let admissionIndexed = false;
+
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const admissionResponse = await api.get(
+      `emrapi/inpatient/admission?currentInpatientLocation=${process.env.E2E_WARD_LOCATION_UUID}`,
+    );
+
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (admissionResponse.ok()) {
+      const data = await admissionResponse.json();
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      const results = data.results || [];
+      admissionIndexed = results.some(
+        (admission: any) => admission.patient?.uuid === wardPatient.uuid && admission.visit?.uuid,
+      );
+
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      if (admissionIndexed) {
+        break;
+      }
+    }
+
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (attempt < maxAttempts - 1) {
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(delayMs);
+    }
+  }
+
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (!admissionIndexed) {
+    throw new Error(
+      `Admission for patient ${wardPatient.uuid} not fully indexed after ${maxAttempts} attempts. Visit data may be missing.`,
+    );
+  }
 
   await test.step('And I should see the patient in the ward view', async () => {
     await wardPage.waitForPatientInWardView(fullName);
