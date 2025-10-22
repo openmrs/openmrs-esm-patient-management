@@ -102,7 +102,7 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
       // eslint-disable-next-line playwright/no-conditional-in-test
       const results = data.results || [];
       admissionIndexed = results.some(
-        (admission: any) => admission.patient?.uuid === wardPatient.uuid && admission.visit?.uuid,
+        (admission) => admission.visit?.patient?.uuid === wardPatient.uuid && admission.visit?.uuid,
       );
 
       // eslint-disable-next-line playwright/no-conditional-in-test
