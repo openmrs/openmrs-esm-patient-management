@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { showSnackbar, useAppContext, useVisit } from '@openmrs/esm-framework';
+import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { assignPatientToBed, removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import BedSelector from '../bed-selector.component';
@@ -19,7 +19,7 @@ export default function PatientBedSwapForm({
   wardPatient,
   relatedTransferPatients = [],
 }: WardPatientWorkspaceProps) {
-  const { patient } = wardPatient;
+  const { patient, visit } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -28,9 +28,6 @@ export default function PatientBedSwapForm({
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
-
-  // Get the active visit for the patient
-  const { activeVisit, isLoading: isLoadingVisit, error: errorLoadingVisit } = useVisit(patient.uuid);
 
   const zodSchema = useMemo(
     () =>
@@ -70,21 +67,14 @@ export default function PatientBedSwapForm({
 
       Promise.all(
         wardPatientsToSwap.map(async (wardPatientToSwap) => {
-          const { patient: patientToSwap } = wardPatientToSwap;
-
-          // Use the active visit for the main patient, or fall back to wardPatient.visit for related patients
-          const visitToUse = patientToSwap.uuid === patient.uuid ? activeVisit : wardPatientToSwap.visit;
-
-          if (!visitToUse?.uuid) {
-            throw new Error(`Visit UUID is missing for patient ${patientToSwap.uuid}`);
-          }
+          const { patient: patientToSwap, visit: patientToSwapVisit } = wardPatientToSwap;
 
           const response = await createEncounter(
             patientToSwap,
             emrConfiguration.bedAssignmentEncounterType,
-            visitToUse.uuid,
+            patientToSwapVisit.uuid,
           );
-          if (response.ok && response.data) {
+          if (response.ok) {
             if (bedSelected) {
               return assignPatientToBed(values.bedId, patientToSwap.uuid, response.data.uuid);
             } else {
@@ -99,10 +89,6 @@ export default function PatientBedSwapForm({
                 return Promise.resolve({ ok: true });
               }
             }
-          } else {
-            throw new Error(
-              `Failed to create encounter for patient ${patientToSwap.uuid}: ${response.statusText || 'Unknown error'}`,
-            );
           }
         }),
       )
@@ -152,7 +138,6 @@ export default function PatientBedSwapForm({
       selectedRelatedPatient,
       relatedTransferPatients,
       wardPatient,
-      activeVisit,
     ],
   );
 
@@ -169,19 +154,15 @@ export default function PatientBedSwapForm({
       onSubmit={handleSubmit(onSubmit, onError)}
       className={classNames(styles.formContainer, styles.workspaceContent)}>
       <Stack gap={4}>
-        {(errorFetchingEmrConfiguration || errorLoadingVisit) && (
+        {errorFetchingEmrConfiguration && (
           <div className={styles.formError}>
             <InlineNotification
               kind="error"
               title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
-              subtitle={
-                errorFetchingEmrConfiguration
-                  ? t(
-                      'fetchingEmrConfigurationFailed',
-                      'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
-                    )
-                  : t('fetchingVisitFailed', 'Failed to load patient visit information. Please try again.')
-              }
+              subtitle={t(
+                'fetchingEmrConfigurationFailed',
+                'Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.',
+              )}
               lowContrast
               hideCloseButton
             />
@@ -247,13 +228,7 @@ export default function PatientBedSwapForm({
         <Button
           type="submit"
           size="xl"
-          disabled={
-            isLoadingEmrConfiguration ||
-            isSubmitting ||
-            errorFetchingEmrConfiguration ||
-            isLoadingVisit ||
-            errorLoadingVisit
-          }>
+          disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration}>
           {t('save', 'Save')}
         </Button>
       </ButtonSet>
