@@ -121,7 +121,6 @@ export const transitionOverflowMenuItem = getAsyncLifecycle(
   },
 );
 
-// t('addNewQueueService', 'Add New Queue Service')
 export const addNewQueueServiceWorkspace = getAsyncLifecycle(
   () => import('./admin/queue-services/queue-service-form.workspace'),
   {
@@ -130,7 +129,6 @@ export const addNewQueueServiceWorkspace = getAsyncLifecycle(
   },
 );
 
-// t('addNewQueueServiceRoom', 'Add new queue service room')
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./admin/queue-rooms/queue-room-form.workspace'),
   {

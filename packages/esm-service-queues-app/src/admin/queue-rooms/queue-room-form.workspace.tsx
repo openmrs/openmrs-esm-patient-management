@@ -19,11 +19,12 @@ import {
   TextInput,
 } from '@carbon/react';
 import {
-  type DefaultWorkspaceProps,
   getCoreTranslation,
   restBaseUrl,
   showSnackbar,
   useLayoutType,
+  Workspace2,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { saveQueueRoom } from './queue-room.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
@@ -54,7 +55,7 @@ const createQueueRoomSchema = (t: TFunction) =>
 
 type QueueRoomFormData = z.infer<ReturnType<typeof createQueueRoomSchema>>;
 
-const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
+const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const {
@@ -99,91 +100,93 @@ const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      <Stack gap={4} className={styles.grid}>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={control}
-              name="queueRoomName"
-              render={({ field }) => (
-                <TextInput
-                  {...field}
-                  id="queueRoomName"
-                  invalid={!!errors.queueRoomName}
-                  invalidText={errors.queueRoomName?.message}
-                  labelText={t('queueRoomName', 'Queue room name')}
-                />
-              )}
-            />
-          </Layer>
-        </Column>
+    <Workspace2 title={t('addNewQueueServiceRoom', 'Add new queue service room')}>
+      <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <Stack gap={4} className={styles.grid}>
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                control={control}
+                name="queueRoomName"
+                render={({ field }) => (
+                  <TextInput
+                    {...field}
+                    id="queueRoomName"
+                    invalid={!!errors.queueRoomName}
+                    invalidText={errors.queueRoomName?.message}
+                    labelText={t('queueRoomName', 'Queue room name')}
+                  />
+                )}
+              />
+            </Layer>
+          </Column>
 
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              name="queueLocation"
-              control={control}
-              render={({ field: { onChange, value, ...field } }) => (
-                <Select
-                  {...field}
-                  id="queueRoomLocation"
-                  invalid={!!errors.queueLocation}
-                  invalidText={errors.queueLocation?.message}
-                  labelText={t('queueLocation', 'Queue location')}
-                  onChange={(e) => onChange(e.target.value)}
-                  value={value || ''}>
-                  <SelectItem text={t('selectQueueRoomLocation', 'Select a queue room location')} value="" />
-                  {queueLocations?.map((location) => (
-                    <SelectItem key={location.id} text={location.name} value={location.id}>
-                      {location.name}
-                    </SelectItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </Layer>
-        </Column>
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                name="queueLocation"
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                  <Select
+                    {...field}
+                    id="queueRoomLocation"
+                    invalid={!!errors.queueLocation}
+                    invalidText={errors.queueLocation?.message}
+                    labelText={t('queueLocation', 'Queue location')}
+                    onChange={(e) => onChange(e.target.value)}
+                    value={value || ''}>
+                    <SelectItem text={t('selectQueueRoomLocation', 'Select a queue room location')} value="" />
+                    {queueLocations?.map((location) => (
+                      <SelectItem key={location.id} text={location.name} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </Layer>
+          </Column>
 
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              name="queueRoomService"
-              control={control}
-              render={({ field: { onChange, value, ...field } }) => (
-                <Select
-                  {...field}
-                  id="queueRoomService"
-                  invalid={!!errors.queueRoomService}
-                  invalidText={errors.queueRoomService?.message}
-                  labelText={t('queueRoomService', 'Queue room service')}
-                  onChange={(e) => onChange(e.target.value)}
-                  value={value || ''}>
-                  <SelectItem text={t('selectQueueRoomService', 'Select a queue room service')} value="" />
-                  {queues?.map((service) => (
-                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                      {service.display}
-                    </SelectItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </Layer>
-        </Column>
-      </Stack>
-      <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
-          {getCoreTranslation('cancel', 'Cancel')}
-        </Button>
-        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} />
-          ) : (
-            <span>{getCoreTranslation('save', 'Save')}</span>
-          )}{' '}
-        </Button>
-      </ButtonSet>
-    </Form>
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                name="queueRoomService"
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                  <Select
+                    {...field}
+                    id="queueRoomService"
+                    invalid={!!errors.queueRoomService}
+                    invalidText={errors.queueRoomService?.message}
+                    labelText={t('queueRoomService', 'Queue room service')}
+                    onChange={(e) => onChange(e.target.value)}
+                    value={value || ''}>
+                    <SelectItem text={t('selectQueueRoomService', 'Select a queue room service')} value="" />
+                    {queues?.map((service) => (
+                      <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                        {service.display}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </Layer>
+          </Column>
+        </Stack>
+        <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
+          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+            {getCoreTranslation('cancel', 'Cancel')}
+          </Button>
+          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{getCoreTranslation('save', 'Save')}</span>
+            )}{' '}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 

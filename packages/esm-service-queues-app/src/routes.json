@@ -144,31 +144,51 @@
       "component": "deleteQueueEntryModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
+    {
+      "name": "create-queue-entry-workspace",
+      "component": "createQueueEntryWorkspace",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "queue-patient-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "queue-patient-search-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "add-queue-entry"
+    },
     {
       "name": "service-queues-service-form",
       "title": "addNewQueueService",
       "component": "addNewQueueServiceWorkspace",
-      "type": "service-queues"
+      "window": "add-queue"
     },
     {
       "name": "service-queues-room-workspace",
       "title": "addNewQueueServiceRoom",
       "component": "addNewQueueServiceRoomWorkspace",
-      "type": "service-queues"
-    },
-    {
-      "name": "service-queues-linelist-filter",
-      "title": "filter",
-      "component": "queueLinelistFilterWorkspace",
-      "type": "service-queues"
-    },
-    {
-      "name": "create-queue-entry-workspace",
-      "title": "addPatientToQueue",
-      "component": "createQueueEntryWorkspace",
-      "type": "service-queues",
-      "width": "wider"
+      "window": "add-queue-room"
     }
-  ]
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "add-queue-entry",
+      "group": "service-queues"
+    },
+    {
+      "name": "add-queue",
+      "group": "service-queues"
+    },
+    {
+      "name": "add-queue-room",
+      "group": "service-queues"
+    }
+  ],
+  "workspaceGroups2": [{
+    "name": "service-queues"
+  }]
+
 }

@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Form, Row } from '@carbon/react';
-import { ExtensionSlot, useLayoutType, type Visit } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, type Workspace2DefinitionProps, type Visit } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import QueueFields from '../queue-fields/queue-fields.component';
 import styles from './existing-visit-form.scss';
 
 interface ExistingVisitFormProps {
-  closeWorkspace: () => void;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handleReturnToSearchList?: () => void;
   visit: Visit;
 }
@@ -16,7 +16,7 @@ interface ExistingVisitFormProps {
  * This is the form that appears when clicking on a search result in the "Add patient to queue" workspace,
  * when the patient already has an active visit.
  */
-const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorkspace, handleReturnToSearchList }) => {
+const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,14 +25,6 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   const [callback, setCallback] = useState<{
     submitQueueEntry: (visit: Visit) => Promise<unknown>;
   } | null>(null);
-
-  const handleCloseWorkspace = useCallback(() => {
-    if (handleReturnToSearchList) {
-      handleReturnToSearchList();
-    } else {
-      closeWorkspace();
-    }
-  }, [closeWorkspace, handleReturnToSearchList]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
@@ -47,7 +39,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
       callback
         .submitQueueEntry(visit)
         .then(() => {
-          closeWorkspace();
+          closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
           mutateQueueEntries();
         })
         .finally(() => {
@@ -81,7 +73,10 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
           <QueueFields setOnSubmit={handleSetOnSubmit} />
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={handleCloseWorkspace}>
+          <Button
+            className={styles.button}
+            kind="secondary"
+            onClick={() => closeWorkspace({ discardUnsavedChanges: false })}>
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting || !callback} kind="primary" type="submit">
