@@ -77,10 +77,11 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
       });
 
       closeWorkspace();
-      await Promise.all([
-        mutate(`${restBaseUrl}/queue?${data.userLocation}`),
-        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`),
-      ]);
+
+      // Mutate the correct SWR cache key used by useQueuesMutable hook
+      const customRepresentation =
+        'custom:(uuid,display,name,description,service:(uuid,display),allowedPriorities:(uuid,display),allowedStatuses:(uuid,display),location:(uuid,display))';
+      await mutate(`${restBaseUrl}/queue?v=${customRepresentation}`);
     } catch (error) {
       showSnackbar({
         title: t('errorCreatingQueueService', 'Error creating queue service'),
