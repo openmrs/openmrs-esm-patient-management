@@ -36,6 +36,16 @@ export const patientSearchWorkspace = getAsyncLifecycle(
   options,
 );
 
+export const patientSearchWorkspace2 = getAsyncLifecycle(
+  () => import('./patient-search-workspace/patient-search2.workspace'),
+  options,
+);
+
+export const patientSearchStartVisitButton2 = getAsyncLifecycle(
+  () => import('./patient-search-page/patient-banner/banner/start-visit-button2.component'),
+  options,
+);
+
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
