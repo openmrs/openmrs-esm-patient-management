@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectSkeleton,
   Stack,
-} from '@carbon/react';
+ ComboBox } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { type TFunction } from 'i18next';
@@ -385,19 +385,20 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   isLoadingProviders ? (
                     <SelectSkeleton />
                   ) : (
-                    <Select
-                      {...field}
-                      labelText=""
+                    <ComboBox
                       id="provider"
-                      invalid={!!errors.provider && (touchedFields.provider || isSubmitted)}
-                      invalidText={errors.provider?.message}>
-                      <SelectItem text={t('selectProvider', 'Select a provider (optional)')} value="" />
-                      {memoizedProviders?.map((prov) => (
-                        <SelectItem key={prov.uuid} text={prov.display} value={prov.uuid}>
-                          {prov.display}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                      titleText=""
+                      placeholder={t('searchProviders', 'Search providers...')}
+                      items={memoizedProviders}
+                      itemToString={(item) => (item ? item.display : '')}
+                      selectedItem={memoizedProviders.find((item) => item.uuid === field.value) || null}
+                      onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid || '')}
+                      shouldFilterItem={({ item, inputValue }) => {
+                        if (!inputValue) return true;
+                        const text = (item?.display || '').toLowerCase();
+                        return text.includes(inputValue.toLowerCase());
+                      }}
+                    />
                   )
                 }
               />
