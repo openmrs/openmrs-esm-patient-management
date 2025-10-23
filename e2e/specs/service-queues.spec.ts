@@ -47,7 +47,10 @@ test('Add patient with visit to queue', async ({ api, page, patient }) => {
   });
 
   await test.step('When I fill out the form and submit', async () => {
-    await page.getByRole('group', { name: 'Service' }).getByLabel('').click();
+    await page
+      .getByRole('group', { name: 'Queue Location' })
+      .getByLabel('')
+      .selectOption('44c3efb0-2583-4c80-a79e-1f756a03c0a1');
     await page
       .getByRole('group', { name: 'Service' })
       .getByLabel('')

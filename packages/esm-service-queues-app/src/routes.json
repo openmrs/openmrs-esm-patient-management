@@ -162,13 +162,11 @@
     },
     {
       "name": "service-queues-service-form",
-      "title": "addNewQueueService",
       "component": "addNewQueueServiceWorkspace",
       "window": "add-queue"
     },
     {
       "name": "service-queues-room-workspace",
-      "title": "addNewQueueServiceRoom",
       "component": "addNewQueueServiceRoomWorkspace",
       "window": "add-queue-room"
     }
