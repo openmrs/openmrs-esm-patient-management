@@ -1,8 +1,8 @@
 import { writeFile, utils, type WorkSheet } from 'xlsx';
-import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framework';
+import { fetchCurrentPatient, formatDate, useConfig } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { moduleName } from '../constants';
+import { extractPhoneFromFhirTelecom, fetchPatientFromRestApi, extractPhoneFromPersonAttributes } from './functions';
 
 type RowData = {
   id: string; // Corresponds to the UUID of an appointment
@@ -14,35 +14,42 @@ type RowData = {
  * @param {Array<Appointment>} appointments - The list of appointments to export.
  * @param {Array} rowData - The current rows of the table as rendered in the UI.
  * @param {string} [fileName] - The name of the downloaded file
+ * @param {ConfigObject} [config] - Configuration object
  */
 export async function exportAppointmentsToSpreadsheet(
   appointments: Array<Appointment>,
   rowData: Array<RowData>,
   fileName = 'Appointments',
+  config?: ConfigObject,
 ) {
-  const config = await getConfig<ConfigObject>(moduleName);
-  const includePhoneNumbers = config.includePhoneNumberInExcelSpreadsheet ?? false;
-
   const appointmentsJSON = await Promise.all(
     appointments.map(async (appointment: Appointment) => {
       const matchingAppointment = rowData.find((row) => row.id === appointment.uuid);
       const identifier = matchingAppointment?.identifier ?? appointment.patient.identifier;
+      let phoneNumber = '--';
+      if (config?.includePhoneNumberInExcelSpreadsheet) {
+        const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
+        phoneNumber = extractPhoneFromFhirTelecom(patientInfo);
+        if (phoneNumber === '--') {
+          const restPatient = await fetchPatientFromRestApi(appointment.patient.uuid);
+          if (restPatient) {
+            phoneNumber = extractPhoneFromPersonAttributes(restPatient);
+          }
+        }
+      }
 
-      const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
-      const phoneNumber =
-        includePhoneNumbers && patientInfo?.telecom
-          ? patientInfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
-          : '';
-
-      return {
+      const appointmentData: Record<string, any> = {
         'Patient name': appointment.patient.name,
         Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
         Age: appointment.patient.age,
         Identifier: identifier,
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
       };
+      if (config?.includePhoneNumberInExcelSpreadsheet) {
+        appointmentData['Telephone number'] = phoneNumber;
+      }
+      return appointmentData;
     }),
   );
 
