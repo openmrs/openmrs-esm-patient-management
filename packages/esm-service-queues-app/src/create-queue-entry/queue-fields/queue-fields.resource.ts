@@ -29,10 +29,34 @@ export async function postQueueEntry(
   sortWeight: number,
   locationUuid: string,
   visitQueueNumberAttributeUuid: string,
+  providerUuid?: string,
 ) {
   const abortController = new AbortController();
 
   await Promise.all([generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, visitQueueNumberAttributeUuid)]);
+
+  const queueEntry: any = {
+    status: {
+      uuid: status,
+    },
+    priority: {
+      uuid: priority,
+    },
+    queue: {
+      uuid: queueUuid,
+    },
+    patient: {
+      uuid: patientUuid,
+    },
+    startedAt: new Date(),
+    sortWeight: sortWeight,
+  };
+
+  if (providerUuid) {
+    queueEntry.providerWaitingFor = {
+      uuid: providerUuid,
+    };
+  }
 
   return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
@@ -42,22 +66,7 @@ export async function postQueueEntry(
     signal: abortController.signal,
     body: {
       visit: { uuid: visitUuid },
-      queueEntry: {
-        status: {
-          uuid: status,
-        },
-        priority: {
-          uuid: priority,
-        },
-        queue: {
-          uuid: queueUuid,
-        },
-        patient: {
-          uuid: patientUuid,
-        },
-        startedAt: new Date(),
-        sortWeight: sortWeight,
-      },
+      queueEntry,
     },
   });
 }

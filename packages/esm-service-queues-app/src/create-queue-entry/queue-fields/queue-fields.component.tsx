@@ -21,6 +21,7 @@ import { postQueueEntry } from './queue-fields.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
+import { useProviders } from '../../hooks/useProviders';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
 import { useServiceQueuesStore } from '../../store/store';
 
@@ -34,6 +35,7 @@ const createQueueServiceSchema = (t: TFunction) =>
     queueLocation: z.string().trim(),
     queueService: z.string().trim(),
     priority: z.string().trim(),
+    provider: z.string().optional(),
   });
 
 /**
@@ -48,6 +50,11 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const memoizedQueueLocations = useMemo(
     () => queueLocations.map((l) => ({ id: l.id, name: l.name })),
     [queueLocations],
+  );
+  const { providers, isLoading: isLoadingProviders } = useProviders();
+  const memoizedProviders = useMemo(
+    () => providers.map((p) => ({ uuid: p.uuid, display: p.display || p.person?.display })),
+    [providers],
   );
   const {
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
@@ -69,6 +76,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
       priority: '',
       queueLocation: '',
       queueService: '',
+      provider: '',
     },
     mode: 'onChange',
     resolver: zodResolver(schema),
@@ -77,6 +85,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const queueLocation = watch('queueLocation');
   const queueService = watch('queueService');
   const priority = watch('priority');
+  const provider = watch('provider');
 
   const { queues, isLoading: isLoadingQueues } = useQueues(queueLocation);
   const memoizedQueues = useMemo(
@@ -148,6 +157,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
             sortWeight,
             formValues.queueLocation,
             visitQueueNumberAttributeUuid,
+            formValues.provider || undefined,
           )
             .then(() => {
               showSnackbar({
@@ -365,41 +375,71 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
       https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
       {queueLocation && queueService && (
-        <FormGroup legendText={t('priority', 'Priority')}>
-          <Controller
-            name="priority"
-            control={control}
-            render={({ field }) =>
-              isLoadingQueues ? (
-                <RadioButtonGroup>
-                  <RadioButtonSkeleton />
-                  <RadioButtonSkeleton />
-                  <RadioButtonSkeleton />
-                </RadioButtonGroup>
-              ) : !priorities?.length ? (
-                <InlineNotification
-                  kind="error"
-                  lowContrast
-                  title={t('noPrioritiesForServiceTitle', 'No priorities available')}>
-                  {t(
-                    'noPrioritiesForService',
-                    'The selected service does not have any allowed priorities. This is an error in configuration. Please contact your system administrator.',
-                  )}
-                </InlineNotification>
-              ) : (
-                <RadioButtonGroup
-                  {...field}
-                  id="priority"
-                  valueSelected={field.value}
-                  onChange={(uuid) => field.onChange(uuid)}>
-                  {priorities.map(({ uuid, display }) => (
-                    <RadioButton key={uuid} labelText={display} value={uuid} />
-                  ))}
-                </RadioButtonGroup>
-              )
-            }
-          />
-        </FormGroup>
+        <>
+          <ResponsiveWrapper>
+            <FormGroup legendText={t('provider', 'Provider')}>
+              <Controller
+                name="provider"
+                control={control}
+                render={({ field }) =>
+                  isLoadingProviders ? (
+                    <SelectSkeleton />
+                  ) : (
+                    <Select
+                      {...field}
+                      labelText=""
+                      id="provider"
+                      invalid={!!errors.provider && (touchedFields.provider || isSubmitted)}
+                      invalidText={errors.provider?.message}>
+                      <SelectItem text={t('selectProvider', 'Select a provider (optional)')} value="" />
+                      {memoizedProviders?.map((prov) => (
+                        <SelectItem key={prov.uuid} text={prov.display} value={prov.uuid}>
+                          {prov.display}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )
+                }
+              />
+            </FormGroup>
+          </ResponsiveWrapper>
+
+          <FormGroup legendText={t('priority', 'Priority')}>
+            <Controller
+              name="priority"
+              control={control}
+              render={({ field }) =>
+                isLoadingQueues ? (
+                  <RadioButtonGroup>
+                    <RadioButtonSkeleton />
+                    <RadioButtonSkeleton />
+                    <RadioButtonSkeleton />
+                  </RadioButtonGroup>
+                ) : !priorities?.length ? (
+                  <InlineNotification
+                    kind="error"
+                    lowContrast
+                    title={t('noPrioritiesForServiceTitle', 'No priorities available')}>
+                    {t(
+                      'noPrioritiesForService',
+                      'The selected service does not have any allowed priorities. This is an error in configuration. Please contact your system administrator.',
+                    )}
+                  </InlineNotification>
+                ) : (
+                  <RadioButtonGroup
+                    {...field}
+                    id="priority"
+                    valueSelected={field.value}
+                    onChange={(uuid) => field.onChange(uuid)}>
+                    {priorities.map(({ uuid, display }) => (
+                      <RadioButton key={uuid} labelText={display} value={uuid} />
+                    ))}
+                  </RadioButtonGroup>
+                )
+              }
+            />
+          </FormGroup>
+        </>
       )}
     </Stack>
   );
