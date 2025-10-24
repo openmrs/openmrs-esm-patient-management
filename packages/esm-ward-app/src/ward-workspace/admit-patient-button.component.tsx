@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import {
   ArrowRightIcon,
@@ -7,8 +9,6 @@ import {
   useFeatureFlag,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import useWardLocation from '../hooks/useWardLocation';
 import type { DispositionType, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../types';
 import { useAdmitPatient } from '../ward.resource';
@@ -64,11 +64,12 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
           });
         }
         onAdmitPatientSuccess();
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : t('unknownError', 'An unknown error occurred');
         showSnackbar({
           kind: 'error',
           title: t('errorCreatingEncounter', 'Failed to admit patient'),
-          subtitle: err.message,
+          subtitle: errorMessage,
         });
       } finally {
         setIsAdmitting(false);
@@ -79,7 +80,7 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   const disabledButton = isLoadingEmrConfiguration || errorFetchingEmrConfiguration || disabled || isAdmitting;
   return (
     <Button kind="ghost" renderIcon={ArrowRightIcon} size={responsiveSize} disabled={disabledButton} onClick={onAdmit}>
-      {dispositionType == 'ADMIT' || disabledButton
+      {dispositionType === 'ADMIT' || disabledButton
         ? t('admitPatient', 'Admit patient')
         : t('transferPatient', 'Transfer patient')}
     </Button>
