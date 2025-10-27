@@ -2,14 +2,22 @@ import React from 'react';
 import { useSession } from '@openmrs/esm-framework';
 import { Tag } from '@carbon/react';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 export const QueueTableProviderCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+  const { t } = useTranslation();
   const session = useSession();
   const currentProviderUuid = session?.currentProvider?.uuid;
   const assignedProvider = queueEntry.providerWaitingFor;
 
   if (!assignedProvider) {
-    return <>--</>;
+    return (
+      <>
+        <Tag type="red" size="m" style={{ marginLeft: '0.5rem' }}>
+          {t('noProviderAssigned', 'No Provider Assigned')}
+        </Tag>
+      </>
+    );
   }
 
   const isAssignedToCurrentProvider = currentProviderUuid && assignedProvider.uuid === currentProviderUuid;
@@ -18,14 +26,13 @@ export const QueueTableProviderCell = ({ queueEntry }: QueueTableCellComponentPr
   return (
     <>
       {assignedProvider.display}
-      {isAssignedToCurrentProvider && (
-        <Tag type="green" size="sm" style={{ marginLeft: '0.5rem' }}>
-          You
+      {isAssignedToCurrentProvider ? (
+        <Tag type="green" size="m" style={{ marginLeft: '0.5rem' }}>
+          {t('you', 'You')}
         </Tag>
-      )}
-      {isAssignedToOtherProvider && (
-        <Tag type="blue" size="sm" style={{ marginLeft: '0.5rem' }}>
-          Assigned
+      ) : (
+        <Tag type="blue" size="m" style={{ marginLeft: '0.5rem' }}>
+          {t('assigned', 'Assigned')}
         </Tag>
       )}
     </>
