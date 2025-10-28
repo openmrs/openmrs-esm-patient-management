@@ -6,6 +6,7 @@ import {
   Button,
   ButtonSet,
   Form,
+  FormGroup,
   InlineLoading,
   MultiSelect,
   NumberInput,
@@ -37,6 +38,7 @@ import {
 } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
+import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import {
   checkAppointmentConflict,
   saveAppointment,
@@ -44,17 +46,9 @@ import {
   useAppointmentService,
   useMutateAppointments,
 } from './appointments-form.resource';
-import {
-  appointmentLocationTagName,
-  dateFormat,
-  datePickerFormat,
-  datePickerPlaceHolder,
-  moduleName,
-  weekDays,
-} from '../constants';
-import { useProviders } from '../hooks/useProviders';
-import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
+import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
 import { useAppointmentsStore } from '../store';
+import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
 import styles from './appointments-form.scss';
 
@@ -202,12 +196,23 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       },
     )
     .superRefine((data, ctx) => {
-      // If not all-day, duration must be > 0
+      // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
       if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
         ctx.addIssue({
           path: ['duration'],
           code: z.ZodIssueCode.custom,
           message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+        });
+      }
+      if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
+        ctx.addIssue({
+          path: ['duration'],
+          code: z.ZodIssueCode.custom,
+          message: translateFrom(
+            moduleName,
+            'durationMaxErrorMessage',
+            'Duration cannot exceed 1440 minutes (24 hours)',
+          ),
         });
       }
     });
@@ -476,19 +481,18 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
 
   return (
     <Form onSubmit={handleSubmit(handleSaveAppointment)}>
-      <Stack gap={4}>
-        {patient && (
-          <ExtensionSlot
-            name="patient-header-slot"
-            state={{
-              patient,
-              patientUuid: patientUuid,
-              hideActionsOverflow: true,
-            }}
-          />
-        )}
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('location', 'Location')}</span>
+      {patient && (
+        <ExtensionSlot
+          name="patient-header-slot"
+          state={{
+            patient,
+            patientUuid: patientUuid,
+            hideActionsOverflow: true,
+          }}
+        />
+      )}
+      <Stack className={styles.formWrapper} gap={6}>
+        <FormGroup className={styles.formGroup} legendText={t('location', 'Location')}>
           <ResponsiveWrapper>
             <Controller
               name="location"
@@ -514,9 +518,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               )}
             />
           </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('service', 'Service')}</span>
+        </FormGroup>
+        <FormGroup className={styles.formGroup} legendText={t('service', 'Service')}>
           <ResponsiveWrapper>
             <Controller
               name="selectedService"
@@ -560,9 +563,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               )}
             />
           </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('appointmentType_title', 'Appointment Type')}</span>
+        </FormGroup>
+        <FormGroup className={styles.formGroup} legendText={t('appointmentType_title', 'Appointment Type')}>
           <ResponsiveWrapper>
             <Controller
               name="appointmentType"
@@ -589,21 +591,21 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               )}
             />
           </ResponsiveWrapper>
-        </section>
+        </FormGroup>
 
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('recurringAppointment', 'Recurring Appointment')}</span>
-          <Toggle
-            id="recurringToggle"
-            labelB={t('yes', 'Yes')}
-            labelA={t('no', 'No')}
-            labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
-            onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
-          />
-        </section>
+        <FormGroup className={styles.formGroup} legendText={t('recurringAppointment', 'Recurring Appointment')}>
+          <div>
+            <Toggle
+              id="recurringToggle"
+              labelB={t('yes', 'Yes')}
+              labelA={t('no', 'No')}
+              labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
+              onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
+            />
+          </div>
+        </FormGroup>
 
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
+        <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Date & Time')}>
           <div className={styles.dateTimeFields}>
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
@@ -673,7 +675,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                         max={356}
                         label={t('repeatEvery', 'Repeat every')}
                         invalidText={t('invalidNumber', 'Number is not valid')}
-                        size="md"
                         value={value}
                         onBlur={onBlur}
                         onChange={(e) => {
@@ -782,10 +783,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               </div>
             )}
           </div>
-        </section>
+        </FormGroup>
 
         {getValues('selectedService') && (
-          <section className={styles.formGroup}>
+          <FormGroup className={styles.formGroup} legendText="">
             <ResponsiveWrapper>
               <Workload
                 appointmentDate={watch('appointmentDateTime').startDate}
@@ -793,12 +794,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                 selectedService={watch('selectedService')}
               />
             </ResponsiveWrapper>
-          </section>
+          </FormGroup>
         )}
 
         {context !== 'creating' ? (
-          <section className={styles.formGroup}>
-            <span className={styles.heading}>{t('appointmentStatus', 'Appointment Status')}</span>
+          <FormGroup className={styles.formGroup} legendText={t('appointmentStatus', 'Appointment Status')}>
             <ResponsiveWrapper>
               <Controller
                 name="appointmentStatus"
@@ -824,11 +824,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                 )}
               />
             </ResponsiveWrapper>
-          </section>
+          </FormGroup>
         ) : null}
 
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('provider', 'Provider')}</span>
+        <FormGroup className={styles.formGroup} legendText={t('provider', 'Provider')}>
           <ResponsiveWrapper>
             <Controller
               name="provider"
@@ -853,9 +852,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               )}
             />
           </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
+        </FormGroup>
+
+        <FormGroup
+          className={styles.formGroup}
+          legendText={t('dateAppointmentScheduled', 'Date appointment scheduled')}>
           <ResponsiveWrapper>
             <Controller
               name="dateAppointmentScheduled"
@@ -869,19 +870,18 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                     invalidText={fieldState?.error?.message}
                     labelText={t('dateAppointmentIssued', 'Date appointment issued')}
                     maxDate={new Date()}
-                    style={{ width: '100%' }}
                     onBlur={field.onBlur}
                     onChange={field.onChange}
+                    style={{ width: '100%' }}
                     value={field.value}
                   />
                 </div>
               )}
             />
           </ResponsiveWrapper>
-        </section>
+        </FormGroup>
 
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('note', 'Note')}</span>
+        <FormGroup className={styles.formGroup} legendText={t('note', 'Note')}>
           <ResponsiveWrapper>
             <Controller
               name="appointmentNote"
@@ -901,7 +901,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
               )}
             />
           </ResponsiveWrapper>
-        </section>
+        </FormGroup>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
@@ -960,19 +960,19 @@ function TimeAndDuration({ t, watch, control, services, errors }) {
           control={control}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
+              allowEmpty
               disableWheel
               hideSteppers
               id="duration"
               invalid={!!errors?.duration}
               invalidText={errors?.duration?.message}
               label={t('durationInMinutes', 'Duration (minutes)')}
-              max={1440}
-              min={0}
               onBlur={onBlur}
-              onChange={(event) => onChange(event.target.value === '' ? null : Number(event.target.value))}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onChange(event.target.value === '' ? null : Number(event.target.value))
+              }
               ref={ref}
-              size="md"
-              value={value}
+              value={value ?? ''}
             />
           )}
         />
