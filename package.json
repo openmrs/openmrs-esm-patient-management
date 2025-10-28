@@ -18,7 +18,7 @@
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@carbon/react": "^1.83.0",
-    "@openmrs/esm-framework": "next",
+    "@openmrs/esm-framework": "^8.0.1-pre.3459",
     "@playwright/test": "^1.53.2",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.29",
@@ -56,7 +56,7 @@
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.1",
-    "openmrs": "next",
+    "openmrs": "^8.0.1-pre.3459",
     "prettier": "^3.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

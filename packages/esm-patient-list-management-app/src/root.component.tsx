@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useSearchParams, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { WorkspaceContainer, launchWorkspace } from '@openmrs/esm-framework';
 import ListDetails from './list-details/list-details.component';
+import ActiveVisitsList from './list-details/active-visits-details.component';
 import ListsDashboard from './lists-dashboard/lists-dashboard.component';
 
 const AutoLaunchPatientListWorkspace: React.FC = () => {
@@ -27,6 +28,19 @@ const AutoLaunchPatientListWorkspace: React.FC = () => {
   return null;
 };
 
+/**
+ * Router component that determines which list details component to render
+ */
+const ListDetailsRouter: React.FC = () => {
+  const { patientListUuid } = useParams<{ patientListUuid: string }>();
+
+  if (patientListUuid === 'active-visits-system-list') {
+    return <ActiveVisitsList />;
+  }
+
+  return <ListDetails />;
+};
+
 const RootComponent: React.FC = () => {
   const patientListsBasename = window.getOpenmrsSpaBase() + 'home/patient-lists';
 
@@ -35,7 +49,7 @@ const RootComponent: React.FC = () => {
       <AutoLaunchPatientListWorkspace />
       <Routes>
         <Route path="/" element={<ListsDashboard />} />
-        <Route path="/:patientListUuid" element={<ListDetails />} />
+        <Route path="/:patientListUuid" element={<ListDetailsRouter />} />
       </Routes>
       <WorkspaceContainer contextKey="patient-lists" />
     </BrowserRouter>
