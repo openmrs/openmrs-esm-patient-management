@@ -90,8 +90,8 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
                   aria-label={t('age', 'Age')}
                   defaultToggled
                   id="age"
-                  labelA="Off"
-                  labelB="On"
+                  labelA={t('off', 'Off')}
+                  labelB={t('on', 'On')}
                   labelText=""
                 />
               </Layer>
@@ -129,11 +129,11 @@ const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
               <Layer>
                 <OpenmrsDatePicker
-                  value={returnDate}
-                  onChange={setReturnDate}
-                  id="returnDate"
                   data-testid="returnDate"
+                  id="returnDate"
                   labelText={t('date', 'Date')}
+                  onChange={setReturnDate}
+                  value={returnDate}
                 />
               </Layer>
               <Button

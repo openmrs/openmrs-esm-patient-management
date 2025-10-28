@@ -70,10 +70,10 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
       const notePayload: EncounterPayload = {
         patient: patientUuid,
         location: locationUuid,
-        encounterType: emrConfiguration?.inpatientNoteEncounterType.uuid,
+        encounterType: emrConfiguration?.inpatientNoteEncounterType?.uuid,
         encounterProviders: [
           {
-            encounterRole: emrConfiguration?.clinicianEncounterRole.uuid,
+            encounterRole: emrConfiguration?.clinicianEncounterRole?.uuid,
             provider: providerUuid,
           },
         ],
@@ -111,9 +111,9 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
     },
     [
       closeWorkspaceWithSavedChanges,
-      emrConfiguration?.clinicianEncounterRole.uuid,
-      emrConfiguration?.consultFreeTextCommentsConcept.uuid,
-      emrConfiguration?.inpatientNoteEncounterType.uuid,
+      emrConfiguration?.clinicianEncounterRole?.uuid,
+      emrConfiguration?.consultFreeTextCommentsConcept?.uuid,
+      emrConfiguration?.inpatientNoteEncounterType?.uuid,
       locationUuid,
       patientUuid,
       providerUuid,

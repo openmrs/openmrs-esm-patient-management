@@ -5,8 +5,7 @@
 
 .header {
   background-color: $ui-02;
-  border: 1px solid $ui-03;
-  border-left: 0;
+  border-block: 1px solid $ui-03;
   display: flex;
   justify-content: space-between;
   align-items: center;

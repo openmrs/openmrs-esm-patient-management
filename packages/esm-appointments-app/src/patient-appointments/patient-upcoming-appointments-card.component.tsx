@@ -142,7 +142,8 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
                 <StructuredListCell>
                   <RadioButton
                     className={styles.radioButton}
-                    labelText=""
+                    hideLabel
+                    labelText={appointment.service?.name || t('appointment', 'Appointment')}
                     id={`radio-${index}`}
                     name="appointmentRadio"
                     value={appointment.uuid}

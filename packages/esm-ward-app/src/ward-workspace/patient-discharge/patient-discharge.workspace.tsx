@@ -19,7 +19,7 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
   const submitDischarge = useCallback(() => {
     setIsSubmitting(true);
 
-    createEncounter(wardPatient?.patient, emrConfiguration.exitFromInpatientEncounterType, wardPatient?.visit.uuid)
+    createEncounter(wardPatient?.patient, emrConfiguration.exitFromInpatientEncounterType, wardPatient?.visit?.uuid)
       .then((response) => {
         if (response?.ok) {
           if (wardPatient?.bed?.id) {
@@ -46,11 +46,14 @@ export default function PatientDischargeWorkspace(props: WardPatientWorkspacePro
       .finally(() => {
         setIsSubmitting(false);
         closeWorkspaceWithSavedChanges();
-        wardPatientGroupDetails.mutate();
+        wardPatientGroupDetails?.mutate?.();
       });
   }, [createEncounter, wardPatient, emrConfiguration, t, closeWorkspaceWithSavedChanges, wardPatientGroupDetails]);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return null;
+  }
+
   return (
     <div className={styles.workspaceContent}>
       <div className={styles.patientWorkspaceBanner}>

@@ -21,7 +21,7 @@ import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
   children: React.ReactNode;
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
 interface PatientBannerProps {
@@ -56,7 +56,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           [styles.activePatientContainer]: !isDeceased,
         })}
         role="banner">
-        <ClickablePatientContainer patientUuid={patientUuid}>
+        <ClickablePatientContainer patient={fhirMappedPatient}>
           <div className={styles.patientAvatar} role="img">
             <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
           </div>
@@ -109,18 +109,19 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   );
 };
 
-const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientContainerProps) => {
+const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
   const config = useConfig<PatientSearchConfig>();
+  const patientUuid = patient.id;
 
   const handleClick = useCallback(() => {
-    nonNavigationSelectPatientAction(patientUuid);
-    patientClickSideEffect?.(patientUuid);
-  }, [nonNavigationSelectPatientAction, patientClickSideEffect, patientUuid]);
+    nonNavigationSelectPatientAction(patientUuid, patient);
+    patientClickSideEffect?.(patientUuid, patient);
+  }, [nonNavigationSelectPatientAction, patientClickSideEffect, patientUuid, patient]);
 
   const handleBeforeNavigate = useCallback(() => {
-    patientClickSideEffect?.(patientUuid);
-  }, [patientClickSideEffect, patientUuid]);
+    patientClickSideEffect?.(patientUuid, patient);
+  }, [patientClickSideEffect, patientUuid, patient]);
 
   if (nonNavigationSelectPatientAction) {
     return (

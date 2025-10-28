@@ -50,11 +50,11 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   const successPayload = {
     encounterProviders: expect.arrayContaining([
       {
-        encounterRole: emrConfigurationMock.clinicianEncounterRole.uuid,
+        encounterRole: emrConfigurationMock?.clinicianEncounterRole?.uuid,
         provider: undefined,
       },
     ]),
-    encounterType: emrConfigurationMock.inpatientNoteEncounterType.uuid,
+    encounterType: emrConfigurationMock?.inpatientNoteEncounterType?.uuid,
     location: undefined,
     obs: expect.arrayContaining([
       {

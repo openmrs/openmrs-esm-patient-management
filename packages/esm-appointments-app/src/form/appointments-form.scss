@@ -4,25 +4,14 @@
 
 $openmrs-background-grey: #ededed;
 
+.formWrapper {
+  margin: layout.$spacing-05;
+}
+
 .formGroup {
-  display: flex;
-  margin-bottom: layout.$spacing-02;
-  padding: layout.$spacing-05;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .formGroup {
-  flex-direction: column;
-}
-
-:global(.omrs-breakpoint-lt-desktop) .formGroup {
-  flex-direction: row;
-
-  .heading {
-    flex: 1;
-  }
-
-  div {
-    flex: 3;
+  legend:global(.cds--label) {
+    @include type.type-style('heading-compact-02');
+    color: colors.$gray-70;
   }
 }
 
@@ -74,7 +63,6 @@ $openmrs-background-grey: #ededed;
 
 .weekSelect {
   max-inline-size: fit-content;
-  padding-top: layout.$spacing-03;
 }
 
 .errorMessage {

@@ -11,7 +11,8 @@ import {
   Stack,
 } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { type TFunction } from 'i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
