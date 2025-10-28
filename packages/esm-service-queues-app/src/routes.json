@@ -95,6 +95,11 @@
       "name": "admin-service-queues-card-link",
       "component": "adminPageCardLink",
       "slot": "system-admin-page-card-link-slot"
+    },
+    {
+      "component": "serviceQueuesAdminPage",
+      "name": "service-queues-admin",
+      "slot": "service-queues-admin-page-slot"
     }
   ],
   "modals": [
