@@ -137,6 +137,7 @@ export function mapSearchedPatientFromFhir(patient: fhir.Patient, contactAttribu
   }));
 
   const telephoneAttributeTypeUuid = contactAttributeType?.[0];
+  const emailAttributeTypeUuid = contactAttributeType?.[1];
 
   const phoneAttributes = (patient.telecom || [])
     .filter((t) => t.system === 'phone' && t.value)
@@ -148,6 +149,17 @@ export function mapSearchedPatientFromFhir(patient: fhir.Patient, contactAttribu
       value: phone.value || '',
       uuid: uuidv4(),
     }));
+
+  const emailAttributes = (patient.telecom || [])
+  .filter((t) => t.system === 'email' && t.value)
+  .map((email) => ({
+    attributeType: {
+      uuid: emailAttributeTypeUuid || '',
+      display: 'Email',
+    },
+    value: email.value || '',
+    uuid: uuidv4(),
+  }));
 
   return {
     uuid: patient.id || '',
@@ -166,6 +178,6 @@ export function mapSearchedPatientFromFhir(patient: fhir.Patient, contactAttribu
         middleName: (name?.given && (name.given[1] as string)) || '',
       },
     },
-    attributes: phoneAttributes,
+    attributes: [...phoneAttributes, ...emailAttributes],
   };
 }
