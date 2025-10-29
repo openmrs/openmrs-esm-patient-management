@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { WorkspaceContainer } from '@openmrs/esm-framework';
 import WardView from './ward-view/ward-view.component';
 
 const Root: React.FC = () => {
-  // t('wards', 'Wards')
   const wardViewBasename = window.getOpenmrsSpaBase() + 'home/ward';
 
   return (
@@ -13,6 +13,7 @@ const Root: React.FC = () => {
           <Route path="/" element={<WardView />} />
           <Route path="/:locationUuid" element={<WardView />} />
         </Routes>
+        <WorkspaceContainer contextKey="ward" />
       </BrowserRouter>
     </main>
   );
