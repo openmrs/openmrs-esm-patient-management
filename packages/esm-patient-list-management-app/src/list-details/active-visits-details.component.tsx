@@ -14,30 +14,42 @@ const ActiveVisitsList: React.FC = () => {
   const { activeVisits, isLoading, totalResults } = useActiveVisits();
 
   const patients = useMemo(() => {
-    if (!activeVisits?.length) {
+    if (!activeVisits || activeVisits.length === 0) {
       return [];
     }
 
-    const startIndex = (currentPage - 1) * currentPageSize;
-    const paginated = activeVisits.slice(startIndex, startIndex + currentPageSize);
+    const visits = activeVisits as Array<any>;
 
-    return paginated.map((visit) => ({
-      name: visit.name || visit.patientName || 'Unknown',
-      identifier: visit.idNumber || visit.identifier || 'N/A',
-      sex: visit.gender || visit.sex || '',
-      startDate: (() => {
-        const rawStart = visit.visitStartTime || visit.startDatetime || visit.visitStartDatetime || visit.startDate;
-        return typeof rawStart === 'string' ? formatDate(parseDate(rawStart)) : null;
-      })(),
-      uuid: visit.patientUuid || (typeof visit.patient === 'string' ? visit.patient : visit.patient?.uuid),
-      membershipUuid: visit.visitUuid || visit.uuid || visit.id,
-      mobile: (() => {
-        const p = typeof visit.patient === 'string' ? undefined : (visit.patient as any);
-        return (
-          p?.person?.attributes?.find((attr: any) => attr?.attributeType?.display === 'Telephone Number')?.value ?? null
-        );
-      })(),
-    }));
+    const startIndex = (currentPage - 1) * currentPageSize;
+    const paginated = visits.slice(startIndex, startIndex + currentPageSize);
+
+    return paginated.map((visit) => {
+      const rawStartDate = visit.startDatetime || visit.visitStartTime;
+      let startDate = null;
+
+      if (rawStartDate) {
+        try {
+          startDate = formatDate(parseDate(rawStartDate));
+        } catch (e) {
+          startDate = rawStartDate;
+        }
+      }
+
+      const phoneAttr = visit.patient?.person?.attributes?.find(
+        (attr: any) => attr?.attributeType?.display === 'Telephone Number',
+      );
+      const mobile = phoneAttr?.value || null;
+
+      return {
+        name: visit.patient?.person?.display || visit.name || 'Unknown',
+        identifier: visit.patient?.identifiers?.[0]?.identifier || visit.idNumber || 'N/A',
+        sex: visit.gender || visit.sex || '',
+        startDate: startDate,
+        uuid: visit.patient?.uuid || visit.patientUuid,
+        membershipUuid: `visit-${visit.uuid}`,
+        mobile: mobile,
+      };
+    });
   }, [activeVisits, currentPage, currentPageSize]);
 
   const headers = useMemo(
@@ -82,7 +94,6 @@ const ActiveVisitsList: React.FC = () => {
             {totalResults} {t('patients', 'patients')}
           </div>
         </div>
-        {/* No actions menu for system list */}
       </section>
       <section>
         <div className={styles.tableContainer}>
