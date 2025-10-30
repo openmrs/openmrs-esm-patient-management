@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { Button, InlineLoading, Link } from '@carbon/react';
+import { Button, InlineLoading, Link, InlineNotification } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,7 @@ import { type SavePatientForm, SavePatientTransactionManager } from './form-mana
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
+import ClientRegistryLookupSection from './client-registry/client-registry-search.component';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -56,6 +57,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [patientUuidMap] = usePatientUuidMap({}, isLoadingPatientToEdit, patientToEdit, uuidOfPatientToEdit);
 
   const [target, setTarget] = useState<undefined | string>();
+  const [isClientVerified, setIsClientVerified] = useState(false);
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
 
   const location = currentSession?.sessionLocation?.uuid;
@@ -243,13 +245,28 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             </div>
             <div className={styles.infoGrid}>
               <PatientRegistrationContextProvider value={createContextValue(props)}>
-                {sections.map((section, index) => (
-                  <SectionWrapper
-                    key={`registration-section-${section.id}`}
-                    sectionDefinition={section}
-                    index={index}
-                  />
-                ))}
+                <div>
+                  {!isClientVerified && !inEditMode && (
+                    <div className={styles.notificationSpacing} style={{ marginTop: '1rem' }}>
+                      <InlineNotification
+                        title="Verification required"
+                        subtitle="Please complete Client Registry OTP verification before proceeding with registration."
+                        kind="info"
+                        lowContrast
+                      />
+                    </div>
+                  )}
+
+                  <ClientRegistryLookupSection onClientVerified={() => setIsClientVerified(true)} />
+
+                  {sections.map((section, index) => (
+                    <SectionWrapper
+                      key={`registration-section-${section.id}`}
+                      sectionDefinition={section}
+                      index={index}
+                    />
+                  ))}
+                </div>
               </PatientRegistrationContextProvider>
             </div>
           </div>

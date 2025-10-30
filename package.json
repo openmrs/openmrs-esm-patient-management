@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "start": "openmrs develop",
-    "dev": "openmrs develop --backend=https://staging.ampath.or.ke --api-url=/openmrs --config-url=https://ngx.ampath.or.ke/o3-config.json --sources=packages/esm-patient-registration-app --port=9000",
+    "dev": "openmrs develop --backend=https://staging.ampath.or.ke --api-url=/openmrs --config-file=./local-config.json --sources=packages/esm-patient-registration-app --port=9000",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
