@@ -4,6 +4,7 @@ import { omrsDateFormat } from './constants';
 
 export const appointmentsStore = createGlobalStore('appointments-app', {
   appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
+  appointmentProviders: getFromLocalStorage('openmrs:appointments:providers') || [],
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
 });
 
@@ -13,6 +14,10 @@ export function useAppointmentsStore() {
 
 export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
   appointmentsStore.setState({ appointmentServiceTypes: serviceTypes });
+}
+
+export function setAppointmentProviders(providers: Array<string>) {
+  appointmentsStore.setState({ appointmentProviders: providers });
 }
 
 export function setSelectedDate(date: string) {
@@ -25,9 +30,8 @@ export function setSelectedDate(date: string) {
   appointmentsStore.setState({ selectedDate: date });
 }
 
-/* Set up localStorage serialization */
-
 let lastValueOfAppointmentServiceTypes = getFromLocalStorage('openmrs:appointments:serviceTypes');
+let lastValueOfAppointmentProviders = getFromLocalStorage('openmrs:appointments:providers');
 
 function getFromLocalStorage(key: string) {
   const value = localStorage.getItem(key);
@@ -42,5 +46,12 @@ appointmentsStore.subscribe(({ appointmentServiceTypes }) => {
   if (lastValueOfAppointmentServiceTypes !== appointmentServiceTypes) {
     setInLocalStorage('openmrs:appointments:serviceTypes', appointmentServiceTypes);
     lastValueOfAppointmentServiceTypes = appointmentServiceTypes;
+  }
+});
+
+appointmentsStore.subscribe(({ appointmentProviders }) => {
+  if (lastValueOfAppointmentServiceTypes !== appointmentProviders) {
+    setInLocalStorage('openmrs:appointments:providers', appointmentProviders);
+    lastValueOfAppointmentProviders = appointmentProviders;
   }
 });
