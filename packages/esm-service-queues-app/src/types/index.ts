@@ -466,7 +466,7 @@ export interface QueueEntry {
   patient: Patient;
   priority: Concept;
   priorityComment: string | null;
-  providerWaitingFor: Provider;
+  providerWaitingFor?: Provider;
   queue: Queue;
   startedAt: string;
   status: Concept;

@@ -54,12 +54,6 @@ export async function postQueueEntry(
     ...(providerUuid && { providerWaitingFor: { uuid: providerUuid } }),
   };
 
-  if (providerUuid) {
-    queueEntry.providerWaitingFor = {
-      uuid: providerUuid,
-    };
-  }
-
   return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
     headers: {

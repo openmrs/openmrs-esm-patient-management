@@ -125,7 +125,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
                 'This patient is assigned to {{provider}}. You can only serve patients assigned to you or unassigned patients.',
                 { provider: queueEntry.providerWaitingFor?.display },
               )}
-              style={{ marginBottom: '1rem' }}
+              className={styles.tagWithMarginBotton}
             />
           )}
           <section className={styles.modalBody}>

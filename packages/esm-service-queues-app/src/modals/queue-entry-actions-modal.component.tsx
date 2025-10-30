@@ -355,7 +355,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   value={formState.selectedProvider}
                   items={[{ uuid: '', display: t('selectProvider', 'Select a provider (optional)') }, ...providers]}
                   itemToString={(item) =>
-                    item?.uuid === queueEntry.providerWaitingFor?.uuid && item?.uuid
+                    item?.uuid && item.uuid === queueEntry.providerWaitingFor?.uuid && item?.uuid
                       ? t('currentValueFormatted', '{{value}} (Current)', {
                           value: item.display || item.person?.display,
                         })

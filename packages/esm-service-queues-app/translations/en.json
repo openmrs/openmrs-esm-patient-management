@@ -10,12 +10,10 @@
   "age": "Age",
   "aListOfPatients": "A list of patients waiting for ",
   "all": "All",
-  "assigned": "Assigned",
-  "you": "You",
-  "noProviderAssigned": "No Specific Provider Assigned",
   "and": "And",
   "any": "Any",
   "applyFilters": "Apply filters",
+  "assigned": "Assigned",
   "averageWaitTime": "Average wait time today",
   "backToSearchResults": "Back to search results",
   "between": "Between",
@@ -98,6 +96,7 @@
   "noPrioritiesConfigured": "No priorities configured",
   "noPrioritiesForService": "The selected service does not have any allowed priorities. This is an error in configuration. Please contact your system administrator.",
   "noPrioritiesForServiceTitle": "No priorities available",
+  "noProviderAssigned": "No Specific Provider Assigned",
   "noServicesConfigured": "No services configured",
   "noStatusConfigured": "No status configured",
   "notableConfig": "No table configuration",
@@ -224,5 +223,6 @@
   "vitals": "Vitals",
   "vitalsForm": "Vitals form",
   "waitingFor": "Waiting for",
-  "weight": "Weight"
+  "weight": "Weight",
+  "you": "You"
 }
