@@ -67,10 +67,11 @@ export interface FHIRPatientSearchResponse {
 }
 
 export interface PatientSearchResponse {
-  currentPage: number;
+  currentPage?: number;
   data?: Array<SearchedPatient>;
   fetchError: Error;
   hasMore: boolean;
+  isLoadingMore?: boolean;
   isLoading: boolean;
   isValidating: boolean;
   setPage: (page: number | ((_page: number) => number)) => Promise<unknown[] | undefined>;
