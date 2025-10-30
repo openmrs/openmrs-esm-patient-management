@@ -58,6 +58,22 @@ export function generateIdentifier(source: string) {
   });
 }
 
+export async function generateAmrsUniversalIdentifier() {
+  const abortController = new AbortController();
+  const resp = await openmrsFetch(`https://ngx.ampath.or.ke/amrs-id-generator/generateidentifier`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: {
+      user: 1,
+    },
+    signal: abortController.signal,
+  });
+  const data = await resp.json();
+  return data['identifier'] ?? '';
+}
+
 export function deletePersonName(nameUuid: string, personUuid: string) {
   const abortController = new AbortController();
 
