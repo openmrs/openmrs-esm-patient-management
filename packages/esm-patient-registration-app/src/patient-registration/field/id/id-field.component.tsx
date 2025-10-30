@@ -30,7 +30,7 @@ export function setIdentifierSource(
     selectedSource: identifierSource,
     autoGeneration,
     identifierValue:
-      autoGeneration && !manualEntryEnabled
+      (autoGeneration && !manualEntryEnabled) || (!autoGeneration && !manualEntryEnabled)
         ? 'auto-generated'
         : identifierValue !== 'auto-generated'
           ? identifierValue

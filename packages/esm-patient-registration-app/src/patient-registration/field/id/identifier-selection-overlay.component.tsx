@@ -70,7 +70,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
     [initialFormValues.identifiers, values.identifiers],
   );
 
-  const handleSelectingIdentifierSource = (identifierType: PatientIdentifierType, sourceUuid) =>
+  const handleSelectingIdentifierSource = (identifierType: PatientIdentifierType, sourceUuid) => {
     setUnsavedIdentifierTypes((unsavedIdentifierTypes) => ({
       ...unsavedIdentifierTypes,
       [identifierType.fieldName]: {
@@ -82,6 +82,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
         ),
       },
     }));
+  };
 
   const identifierTypeFields = useMemo(
     () =>

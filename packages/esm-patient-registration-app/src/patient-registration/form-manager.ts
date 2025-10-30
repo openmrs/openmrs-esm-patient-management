@@ -25,6 +25,7 @@ import {
   deletePatientIdentifier,
   deletePersonName,
   deleteRelationship,
+  generateAmrsUniversalIdentifier,
   generateIdentifier,
   getDatetime,
   saveEncounter,
@@ -242,14 +243,17 @@ export class FormManager {
 
         const autoGenerationManualEntry =
           autoGeneration && selectedSource?.autoGenerationOption?.manualEntryEnabled && !!identifierValue;
-
-        const identifier =
-          !autoGeneration || autoGenerationManualEntry
-            ? identifierValue
-            : await (
-                await generateIdentifier(selectedSource.uuid)
-              ).data.identifier;
-
+        let identifier;
+        if (identifierTypeUuid === '58a4732e-1359-11df-a1f1-0026b9348838') {
+          identifier = await generateAmrsUniversalIdentifier();
+        } else {
+          identifier =
+            !autoGeneration || autoGenerationManualEntry
+              ? identifierValue
+              : await (
+                  await generateIdentifier(selectedSource.uuid)
+                ).data.identifier;
+        }
         const identifierToCreate = {
           uuid: identifierUuid,
           identifier,
