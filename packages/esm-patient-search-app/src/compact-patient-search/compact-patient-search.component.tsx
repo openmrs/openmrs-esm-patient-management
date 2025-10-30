@@ -51,7 +51,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     updateRecentlyViewedPatients,
   } = useRecentlyViewedPatients(showRecentlySearchedPatients);
 
-  const recentPatientSearchResponse = useFhirPatients(recentlyViewedPatientUuids, !hasSearchTerm);
+  const recentPatientSearchResponse = useFhirPatients(recentlyViewedPatientUuids);
   const { data: recentPatients, fetchError } = recentPatientSearchResponse;
 
   const handleFocusToInput = useCallback(() => {

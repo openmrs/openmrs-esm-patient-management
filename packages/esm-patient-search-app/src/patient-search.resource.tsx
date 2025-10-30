@@ -8,6 +8,7 @@ import {
   restBaseUrl,
   fhirBaseUrl,
   useFhirInfinite,
+  useFhirFetchAll,
 } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, User } from './types';
 import type { PatientSearchConfig } from './config-schema';
@@ -185,36 +186,25 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 
 /**
  * A custom React hook for fetching patient data from a FHIR API based on a list of patient UUIDs.
- * Uses batch fetching for efficiency with useFhirInfinite.
+ * Uses useFhirFetchAll to fetch all patients at once.
  *
  * @param patientUuids - An array of patient UUIDs to fetch data for. If null, no data will be fetched.
- * @param isSearching - A boolean flag to determine if the search should be performed. Defaults to true.
- * @param batchSize - The number of patients to fetch per batch. Defaults to 10.
  *
  * @returns An object containing:
  *   - data: An array of fetched patient data
- *   - isLoading: A boolean indicating if the initial data is being loaded
- *   - isLoadingMore: A boolean indicating if additional batches are being loaded
+ *   - isLoading: A boolean indicating if the data is being loaded
  *   - fetchError: Any error that occurred during fetching
- *   - hasMore: A boolean indicating if there are more patients to load
- *   - isValidating: A boolean indicating if new data is being loaded
- *   - setPage: A function to load more data
- *   - totalResults: The total number of patients to be fetched
  */
-export function useFhirPatients(patientUuids: string[] | null, isSearching: boolean = true, batchSize: number = 10) {
-  const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
-
+export function useFhirPatients(patientUuids: string[] | null) {
   const config = useConfig<PatientSearchConfig>();
+  const shouldFetch = patientUuids !== null && patientUuids.length > 0;
 
   const url = useMemo(() => {
     if (!shouldFetch || !patientUuids) return null;
+    return `${fhirBaseUrl}/Patient?_id=${patientUuids.join(',')}`;
+  }, [shouldFetch, patientUuids]);
 
-    return `${fhirBaseUrl}/Patient?_id=${patientUuids.join(',')}&_count=${batchSize}`;
-  }, [shouldFetch, patientUuids, batchSize]);
-
-  const { data, error, isLoading, isValidating, hasMore, loadMore } = useFhirInfinite<fhir.Patient>(url, {
-    immutable: true,
-  });
+  const { data, error, isLoading } = useFhirFetchAll<fhir.Patient>(url);
 
   const mappedData = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -224,22 +214,12 @@ export function useFhirPatients(patientUuids: string[] | null, isSearching: bool
       .map((patient) => mapSearchedPatientFromFhir(patient, config?.contactAttributeType));
   }, [data, config?.contactAttributeType]);
 
-  const handleSetPage = useCallback(async () => {
-    loadMore();
-    return [];
-  }, [loadMore]);
-
   return useMemo(
     () => ({
       data: mappedData,
-      isLoading: isLoading,
-      isLoadingMore: isValidating && !!data,
+      isLoading,
       fetchError: error,
-      hasMore: hasMore ?? false,
-      isValidating: isValidating,
-      setPage: handleSetPage,
-      totalResults: patientUuids?.length ?? 0,
     }),
-    [mappedData, isLoading, isValidating, data, error, hasMore, handleSetPage, patientUuids],
+    [mappedData, isLoading, error],
   );
 }
