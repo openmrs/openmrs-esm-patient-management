@@ -142,7 +142,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/appointment edited/i)).toBeVisible();
+    await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
 
   await test.step('When I open the tab containing the edited appointment', async () => {
@@ -164,7 +164,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/appointment cancelled successfully/i)).toBeVisible();
+    await expect(page.getByText('Appointment cancelled successfully', { exact: true })).toBeVisible();
   });
 });
 
