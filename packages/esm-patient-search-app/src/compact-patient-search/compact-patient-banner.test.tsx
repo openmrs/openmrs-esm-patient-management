@@ -73,4 +73,41 @@ describe('CompactPatientBanner', () => {
     expect(screen.getByRole('img')).toBeInTheDocument();
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
   });
+
+  it('handles an array of valid patients', () => {
+    const multiplePatients: Array<SearchedPatient> = [
+      ...patients,
+      {
+        ...patients[0],
+        uuid: 'test-patient-uuid-2',
+        person: {
+          ...patients[0].person,
+          personName: {
+            display: 'Doe, Jane',
+            givenName: 'Jane',
+            middleName: '',
+            familyName: 'Doe',
+          },
+        },
+      },
+    ];
+
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        <CompactPatientBanner patients={multiplePatients} />
+      </PatientSearchContext.Provider>,
+    );
+
+    expect(screen.getAllByRole('img')).toHaveLength(2);
+  });
+
+  it('renders empty state when patients array is empty', () => {
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        <CompactPatientBanner patients={[]} />
+      </PatientSearchContext.Provider>,
+    );
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
 });
