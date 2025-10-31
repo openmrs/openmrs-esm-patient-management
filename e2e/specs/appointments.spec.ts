@@ -117,20 +117,10 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.locator('#time-picker-select-1').selectOption('PM');
   });
 
-  await test.step('And I set the “Duration” of the appointment”', async () => {
+  await test.step('And I set the "Duration" of the appointment"', async () => {
     await page.getByLabel('Duration (minutes)').fill('80');
   });
 
-  await test.step('I set the Date appointment issued', async () => {
-    const appointmentIssuedDate = getBusinessDay(0, 9); // Today at 9 AM
-    const appointmentIssuedDateInput = page.getByTestId('dateAppointmentScheduledPickerInput');
-    const appointmentIssuedDateDayInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /day/i });
-    const appointmentIssuedDateMonthInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /month/i });
-    const appointmentIssuedDateYearInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /year/i });
-    await appointmentIssuedDateDayInput.fill(appointmentIssuedDate.format('DD'));
-    await appointmentIssuedDateMonthInput.fill(appointmentIssuedDate.format('MM'));
-    await appointmentIssuedDateYearInput.fill(appointmentIssuedDate.format('YYYY'));
-  });
   await test.step('And I change the note', async () => {
     await page
       .getByPlaceholder('Write any additional points here')
