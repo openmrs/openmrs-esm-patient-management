@@ -85,7 +85,7 @@ export function useInfinitePatientSearch(
   const mappedData =
     data
       ?.flatMap((res) => res.data?.results ?? [])
-      ?.filter((patient): patient is SearchedPatient => patient != null && patient.person != null) ?? null;
+      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
 
   return useMemo(
     () => ({
@@ -215,7 +215,7 @@ export function useRestPatients(
   const mappedData =
     data
       ?.flatMap((res) => res.data)
-      ?.filter((patient): patient is SearchedPatient => patient != null && patient.person != null) ?? null;
+      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
 
   return useMemo(
     () => ({
