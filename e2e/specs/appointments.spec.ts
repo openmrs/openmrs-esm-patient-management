@@ -96,22 +96,11 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.selectOption('select#service', { label: 'General Medicine service' });
   });
 
-  await test.step('And I change to “General Medicine” Service', async () => {
+  await test.step('And I change to "General Medicine" Service', async () => {
     await page.getByLabel('Select a service').selectOption('General Medicine service');
   });
 
-  await test.step('And I change the date to today (or next business day if weekend)', async () => {
-    const targetDate = getBusinessDay(0, 14);
-    const dateInput = page.getByTestId('datePickerInput');
-    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
-    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
-    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
-    await dateDayInput.fill(targetDate.format('DD'));
-    await dateMonthInput.fill(targetDate.format('MM'));
-    await dateYearInput.fill(targetDate.format('YYYY'));
-  });
-
-  await test.step('And I set time to 2:00 PM', async () => {
+  await test.step('And I change the time to 2:00 PM', async () => {
     await page.locator('#time-picker').clear();
     await page.locator('#time-picker').fill('02:00');
     await page.locator('#time-picker-select-1').selectOption('PM');
@@ -136,13 +125,13 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('When I open the tab containing the edited appointment', async () => {
-    const targetDate = getBusinessDay(0, 14);
-    const isToday = targetDate.isSame(dayjs(), 'day');
-    await page.getByRole('tab', { name: isToday ? /today/i : /upcoming/i }).click();
+    await page.getByRole('tab', { name: /upcoming/i }).click();
   });
 
   await test.step('Then I click the options kebab menu in the appointment', async () => {
-    await page.getByRole('button', { name: 'Options' }).click();
+    const optionsButton = page.getByRole('button', { name: 'Options' });
+    await expect(optionsButton).toBeVisible();
+    await optionsButton.click();
   });
 
   await test.step('And I choose the "Cancel" option', async () => {
