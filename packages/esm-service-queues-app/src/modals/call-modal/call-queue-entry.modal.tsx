@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ModalBody, ModalFooter, ModalHeader, Tag } from '@carbon/react';
-import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { Button, InlineNotification, ModalBody, ModalFooter, ModalHeader, Tag } from '@carbon/react';
+import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
 import { requeueQueueEntry } from './call-queue-entry.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { canProviderWorkOnQueueEntry } from '../../helpers/provider-access';
 import { type QueueEntry } from '../../types';
 import styles from './call-queue-entry.scss';
 
@@ -22,6 +23,9 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const defaultTransitionStatus = config.concepts.defaultTransitionStatus;
+  const session = useSession();
+  const currentProviderUuid = session?.currentProvider?.uuid;
+  const canWork = canProviderWorkOnQueueEntry(queueEntry, currentProviderUuid);
 
   const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, config.visitQueueNumberAttributeUuid);
 
@@ -111,6 +115,19 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
       <ModalHeader closeModal={closeModal} title={t('servePatient', 'Serve patient')} />
       <ModalBody className={styles.modalBody}>
         <div>
+          {!canWork && (
+            <InlineNotification
+              kind="warning"
+              lowContrast
+              title={t('patientAssignedToAnotherProvider', 'Patient assigned to another provider')}
+              subtitle={t(
+                'patientAssignedToAnotherProviderMessage',
+                'This patient is assigned to {{provider}}. You can only serve patients assigned to you or unassigned patients.',
+                { provider: queueEntry.providerWaitingFor?.display },
+              )}
+              className={styles.tagWithMarginBotton}
+            />
+          )}
           <section className={styles.modalBody}>
             <p className={styles.p}>
               {t('patientName', 'Patient name')}: &nbsp; {mappedQueueEntry.name}
@@ -140,7 +157,9 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
         <Button kind="secondary" onClick={() => handleRequeuePatient()}>
           {t('requeue', 'Requeue')}
         </Button>
-        <Button onClick={() => launchEditPriorityModal()}>{t('serve', 'Serve')}</Button>
+        <Button disabled={!canWork} onClick={() => launchEditPriorityModal()}>
+          {t('serve', 'Serve')}
+        </Button>
       </ModalFooter>
     </div>
   );

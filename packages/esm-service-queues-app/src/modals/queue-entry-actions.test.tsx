@@ -26,6 +26,16 @@ jest.mock('../hooks/useQueueEntries', () => {
   };
 });
 
+jest.mock('../hooks/useProviders', () => ({
+  useProviders: jest.fn(() => ({
+    providers: [
+      { uuid: 'provider-1', display: 'Dr. Smith', person: { display: 'Dr. Smith' } },
+      { uuid: 'provider-2', display: 'Dr. Jones', person: { display: 'Dr. Jones' } },
+    ],
+    isLoading: false,
+  })),
+}));
+
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {

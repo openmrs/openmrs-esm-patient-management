@@ -16,6 +16,7 @@ import { queueTableNameColumn } from './queue-table-name-cell.component';
 import { queueTablePatientAgeColumn } from './queue-table-patient-age-cell.component';
 import { queueTablePatientIdentifierColumn } from './queue-table-patient-identifier-cell.component';
 import { queueTablePriorityColumn } from './queue-table-priority-cell.component';
+import { queueTableProviderColumn } from './queue-table-provider-cell.component';
 import { queueTableQueueNameColumn } from './queue-table-queue-name-cell.component';
 import { queueTableStatusColumn } from './queue-table-status-cell.component';
 import { queueTableVisitAttributeQueueNumberColumn } from './queue-table-visit-attribute-queue-number-cell.component';
@@ -110,6 +111,9 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
     }
     case 'priority': {
       return queueTablePriorityColumn(id, translatedHeader ?? t('priority', 'Priority'));
+    }
+    case 'provider': {
+      return queueTableProviderColumn(id, translatedHeader ?? t('provider', 'Provider'));
     }
     case 'status': {
       return queueTableStatusColumn(id, translatedHeader ?? t('status', 'Status'), columnDef.config);
