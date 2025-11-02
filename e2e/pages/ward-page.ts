@@ -12,13 +12,16 @@ export class WardPage {
 
   async clickPatientCard(patientName: string) {
     // Wait for patient to be loaded - use first() to avoid strict mode violation
-    await this.page
-      .locator(`[class*="wardPatientCard"]:has-text("${patientName}")`)
-      .first()
-      .waitFor({ state: 'visible' });
+    const cardLocator = this.page.locator(`[class*="wardPatientCard"]:has-text("${patientName}")`).first();
 
-    // Click the patient card directly
-    await this.page.locator(`[class*="wardPatientCard"]:has-text("${patientName}")`).first().click({ force: true });
+    // Wait for the card to be visible with a reasonable timeout
+    await cardLocator.waitFor({ state: 'visible', timeout: 10000 });
+
+    // Scroll into view if needed
+    await cardLocator.scrollIntoViewIfNeeded();
+
+    // Click the patient card directly without force option
+    await cardLocator.click();
   }
 
   async goTo() {
