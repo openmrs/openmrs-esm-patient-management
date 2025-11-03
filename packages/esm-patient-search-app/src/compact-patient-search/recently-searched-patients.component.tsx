@@ -1,11 +1,11 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
-import type { SearchedPatient } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
+import type { SearchedPatient } from '../types';
 
 interface RecentPatientSearchProps {
   data: SearchedPatient[];
@@ -17,7 +17,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
   ({ data: searchResults, fetchError, isLoading }, ref) => {
     const { t } = useTranslation();
 
-    if (!searchResults && isLoading) {
+    if (!searchResults?.length && isLoading) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
