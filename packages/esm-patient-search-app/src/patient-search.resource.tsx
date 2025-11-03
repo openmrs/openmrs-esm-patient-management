@@ -69,9 +69,7 @@ export function useInfinitePatientSearch(
     return `${fhirBaseUrl}/Patient?${params.toString()}`;
   }, [shouldFetch, searchQuery, includeDead]);
 
-  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } = useFhirInfinite<fhir.Patient>(url, {
-    immutable: true,
-  });
+  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } = useFhirInfinite<fhir.Patient>(url);
 
   const mappedData = useMemo(() => {
     if (!data || data.length === 0) return [];
