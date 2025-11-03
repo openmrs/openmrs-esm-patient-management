@@ -9,6 +9,7 @@ export const appointmentColumnTypes = [
   'dateTime',
   'provider',
 ] as const;
+import { appointmentColumnTypes } from './constants';
 
 type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
 
