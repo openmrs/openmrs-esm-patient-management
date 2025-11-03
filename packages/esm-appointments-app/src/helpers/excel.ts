@@ -4,17 +4,14 @@ import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { getPatientPhoneNumber } from './functions';
 
-type RowData = {
-  id: string; // Corresponds to the UUID of an appointment
-  identifier?: string; // Optional identifier property
-} & Record<string, unknown>; // Allow for other dynamic properties
+type RowData = { id: string; identifier?: string } & Record<string, unknown>;
 
 /**
- * Exports the provided appointments as an Excel spreadsheet.
- * @param {Array<Appointment>} appointments - The list of appointments to export.
- * @param {Array} rowData - The current rows of the table as rendered in the UI.
- * @param {string} [fileName] - The name of the downloaded file
- * @param {ConfigObject} [config] - Configuration object
+ *
+ * @param {Array<Appointment>} appointments
+ * @param {Array} rowData
+ * @param {string} [fileName]
+ * @param {ConfigObject} [config]
  */
 export async function exportAppointmentsToSpreadsheet(
   appointments: Array<Appointment>,
@@ -52,9 +49,8 @@ export async function exportAppointmentsToSpreadsheet(
 }
 
 /**
-Exports unscheduled appointments as an Excel spreadsheet.
-@param {Array<Object>} unscheduledAppointments - The list of unscheduled appointments to export.
-@param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
+@param {Array<Object>} unscheduledAppointments
+@param {string} fileName
 */
 export function exportUnscheduledAppointmentsToSpreadsheet(
   unscheduledAppointments: Array<any>,

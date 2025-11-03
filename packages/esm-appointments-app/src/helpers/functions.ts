@@ -1,9 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { openmrsFetch, restBaseUrl, fetchCurrentPatient } from '@openmrs/esm-framework';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { type AppointmentSummary, type Appointment } from '../types';
 
-// FHIR2 R4 endpoint - true FHIR2 implementation
 async function fetchPatientFromFhir2(patientUuid: string): Promise<any> {
   if (!patientUuid) {
     return null;
@@ -126,7 +125,6 @@ export function extractPhoneFromPersonAttributes(restPatientData: any): string {
       const name = (attr.attributeType.name || '').toLowerCase();
       const description = (attr.attributeType.description || '').toLowerCase();
 
-      // Check for various phone-related terms
       const phoneTerms = ['phone', 'telephone', 'mobile', 'contact', 'cell'];
 
       return phoneTerms.some((term) => display.includes(term) || name.includes(term) || description.includes(term));
@@ -142,10 +140,8 @@ export function extractPhoneFromPersonAttributes(restPatientData: any): string {
     return '--';
   }
 
-  // Sort by priority (mobile first, then others)
   phoneAttributes.sort((a, b) => a.priority - b.priority);
 
-  // Return the highest priority phone(s)
   const topPriority = phoneAttributes[0].priority;
   const topPhones = phoneAttributes.filter((phone) => phone.priority === topPriority).map((phone) => phone.value);
 
@@ -158,7 +154,6 @@ export async function getPatientPhoneNumber(patientUuid: string): Promise<string
   }
 
   try {
-    // Step 1: Try FHIR2 R4 endpoint directly
     const fhir2Patient = await fetchPatientFromFhir2(patientUuid);
     if (fhir2Patient) {
       const fhir2Phone = extractPhoneFromFhirTelecom(fhir2Patient);
@@ -167,7 +162,6 @@ export async function getPatientPhoneNumber(patientUuid: string): Promise<string
       }
     }
 
-    // Step 2: Try framework FHIR function (fallback)
     const fhirPatient = await fetchCurrentPatient(patientUuid);
     if (fhirPatient) {
       const fhirPhone = extractPhoneFromFhirTelecom(fhirPatient);
@@ -176,7 +170,6 @@ export async function getPatientPhoneNumber(patientUuid: string): Promise<string
       }
     }
 
-    // Step 3: Fallback to REST API
     const restPatient = await fetchPatientFromRestApi(patientUuid);
     if (restPatient) {
       return extractPhoneFromPersonAttributes(restPatient);
@@ -198,7 +191,7 @@ function getPriorityForPhoneType(typeName: string): number {
   if (type.includes('emergency')) return 5;
   if (type.includes('telephone') || type.includes('phone')) return 6;
 
-  return 9; // Default priority for unknown types
+  return 9;
 }
 
 export function extractPhoneFromFhirTelecom(patientInfo: any): string {
@@ -208,13 +201,11 @@ export function extractPhoneFromFhirTelecom(patientInfo: any): string {
 
   const phoneContacts = patientInfo.telecom
     .filter((telecom: any) => {
-      // Check for phone system
       if (telecom?.system === 'phone') return true;
       if (telecom?.system === 'mobile') return true;
 
-      // Check for phone use types
       if (telecom?.use && ['mobile', 'home', 'work', 'temp'].includes(telecom.use)) {
-        return telecom.system === 'phone' || !telecom.system; // Accept if system is phone or undefined
+        return telecom.system === 'phone' || !telecom.system;
       }
 
       return false;
@@ -230,7 +221,6 @@ export function extractPhoneFromFhirTelecom(patientInfo: any): string {
     return '--';
   }
 
-  // Prioritize mobile phones, then home, then work, then others
   const priorityOrder = ['mobile', 'home', 'work', 'temp', 'unspecified'];
 
   phoneContacts.sort((a, b) => {
@@ -239,7 +229,6 @@ export function extractPhoneFromFhirTelecom(patientInfo: any): string {
     return (aPriority === -1 ? 999 : aPriority) - (bPriority === -1 ? 999 : bPriority);
   });
 
-  // Return the highest priority phone number, or all if multiple with same priority
   const topPriorityUse = phoneContacts[0].use;
   const topPriorityPhones = phoneContacts
     .filter((contact) => contact.use === topPriorityUse)
@@ -252,57 +241,52 @@ export function usePatientPhone(patient: any) {
   const [phoneNumber, setPhoneNumber] = useState<string>('--');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const extractPhone = async () => {
-      // Reset state
-      setIsLoading(true);
-      setPhoneNumber('--');
+  const extractPhone = useCallback(async () => {
+    setIsLoading(true);
+    setPhoneNumber('--');
 
-      // Check if we have a valid patient
-      if (!patient?.id && !patient?.uuid) {
+    if (!patient?.id && !patient?.uuid) {
+      setIsLoading(false);
+      return;
+    }
+
+    const patientId = patient.id || patient.uuid;
+
+    try {
+      const fhir2Patient = await fetchPatientFromFhir2(patientId);
+      if (fhir2Patient) {
+        const fhir2Phone = extractPhoneFromFhirTelecom(fhir2Patient);
+        if (fhir2Phone && fhir2Phone !== '--') {
+          setPhoneNumber(fhir2Phone);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      const fhirPhone = extractPhoneFromFhirTelecom(patient);
+      if (fhirPhone && fhirPhone !== '--') {
+        setPhoneNumber(fhirPhone);
         setIsLoading(false);
         return;
       }
 
-      const patientId = patient.id || patient.uuid;
-
-      try {
-        // Step 1: Try FHIR2 R4 directly first  
-        const fhir2Patient = await fetchPatientFromFhir2(patientId);
-        if (fhir2Patient) {
-          const fhir2Phone = extractPhoneFromFhirTelecom(fhir2Patient);
-          if (fhir2Phone && fhir2Phone !== '--') {
-            setPhoneNumber(fhir2Phone);
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        // Step 2: Try framework FHIR function
-        const fhirPhone = extractPhoneFromFhirTelecom(patient);
-        if (fhirPhone && fhirPhone !== '--') {
-          setPhoneNumber(fhirPhone);
-          setIsLoading(false);
-          return;
-        }
-
-        // Step 3: Fallback to REST API for person attributes
-        const restPatient = await fetchPatientFromRestApi(patientId);
-        if (restPatient) {
-          const restPhone = extractPhoneFromPersonAttributes(restPatient);
-          setPhoneNumber(restPhone);
-        } else {
-          setPhoneNumber('--');
-        }
-      } catch (error) {
+      const restPatient = await fetchPatientFromRestApi(patientId);
+      if (restPatient) {
+        const restPhone = extractPhoneFromPersonAttributes(restPatient);
+        setPhoneNumber(restPhone);
+      } else {
         setPhoneNumber('--');
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (error) {
+      setPhoneNumber('--');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [patient]);
 
+  useEffect(() => {
     extractPhone();
-  }, [patient?.id, patient?.uuid]);
+  }, [extractPhone]);
 
   return { phoneNumber, isLoading };
 }
