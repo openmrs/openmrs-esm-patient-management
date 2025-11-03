@@ -1,8 +1,8 @@
 import { writeFile, utils, type WorkSheet } from 'xlsx';
-import { fetchCurrentPatient, formatDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { extractPhoneFromFhirTelecom, fetchPatientFromRestApi, extractPhoneFromPersonAttributes } from './functions';
+import { getPatientPhoneNumber } from './functions';
 
 type RowData = {
   id: string; // Corresponds to the UUID of an appointment
@@ -28,14 +28,7 @@ export async function exportAppointmentsToSpreadsheet(
       const identifier = matchingAppointment?.identifier ?? appointment.patient.identifier;
       let phoneNumber = '--';
       if (config?.includePhoneNumberInExcelSpreadsheet) {
-        const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
-        phoneNumber = extractPhoneFromFhirTelecom(patientInfo);
-        if (phoneNumber === '--') {
-          const restPatient = await fetchPatientFromRestApi(appointment.patient.uuid);
-          if (restPatient) {
-            phoneNumber = extractPhoneFromPersonAttributes(restPatient);
-          }
-        }
+        phoneNumber = await getPatientPhoneNumber(appointment.patient.uuid);
       }
 
       const appointmentData: Record<string, any> = {
@@ -78,9 +71,7 @@ export function exportUnscheduledAppointmentsToSpreadsheet(
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
 
-  writeFile(workbook, `${fileName}.xlsx`, {
-    compression: true,
-  });
+  writeFile(workbook, `${fileName}.xlsx`, { compression: true });
 }
 
 function createWorksheet(data: any[]) {

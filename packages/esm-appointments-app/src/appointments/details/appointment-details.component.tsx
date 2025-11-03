@@ -16,7 +16,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
   const [isEnabledQuery, setIsEnabledQuery] = useState(false);
   const { appointmentsCount, isLoading } = usePatientAppointmentHistory(appointment.patient.uuid);
   const { patient } = usePatient(appointment.patient.uuid);
-  const phoneNumber = usePatientPhone(patient);
+  const { phoneNumber, isLoading: phoneLoading } = usePatientPhone(patient);
 
   useEffect(() => {
     if (!isLoading) {
@@ -46,7 +46,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           </div>
           <div className={styles.labelContainer}>
             <p className={styles.labelBold}>{t('phoneNumber', 'Phone number')}: </p>
-            <p className={styles.label}>{phoneNumber || '--'}</p>
+            <p className={styles.label}>{phoneLoading ? t('loading', 'Loading...') : phoneNumber || '--'}</p>
           </div>
           {patient && patient?.birthDate ? (
             <div className={styles.labelContainer}>

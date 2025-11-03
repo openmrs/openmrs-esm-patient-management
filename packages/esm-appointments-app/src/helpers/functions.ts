@@ -1,7 +1,21 @@
 import dayjs, { type Dayjs } from 'dayjs';
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, fetchCurrentPatient } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
 import { type AppointmentSummary, type Appointment } from '../types';
+
+// FHIR2 R4 endpoint - true FHIR2 implementation
+async function fetchPatientFromFhir2(patientUuid: string): Promise<any> {
+  if (!patientUuid) {
+    return null;
+  }
+
+  try {
+    const { data } = await openmrsFetch(`/openmrs/ws/fhir2/R4/Patient/${patientUuid}`);
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
   const groupedAppointments = appointmentSummary?.map(({ countMap, serviceName }) => ({
@@ -81,9 +95,18 @@ export const getGender = (gender, t) => {
   }
 };
 
-export async function fetchPatientFromRestApi(patientUuid: string) {
+export async function fetchPatientFromRestApi(patientUuid: string): Promise<any> {
+  if (!patientUuid) {
+    return null;
+  }
+
   try {
     const { data } = await openmrsFetch(`${restBaseUrl}/patient/${patientUuid}?v=full`);
+
+    if (!data) {
+      return null;
+    }
+
     return data;
   } catch (error) {
     return null;
@@ -95,22 +118,87 @@ export function extractPhoneFromPersonAttributes(restPatientData: any): string {
     return '--';
   }
 
-  const phoneValues = restPatientData.person.attributes
-    .filter(
-      (attr: any) =>
-        attr?.attributeType?.display === 'Telephone Number' ||
-        attr?.attributeType?.name === 'Telephone Number' ||
-        attr?.attributeType?.display === 'Telephone contact' ||
-        attr?.attributeType?.name === 'Telephone contact' ||
-        attr?.attributeType?.display?.toLowerCase().includes('phone') ||
-        attr?.attributeType?.display?.toLowerCase().includes('telephone') ||
-        attr?.attributeType?.display?.toLowerCase().includes('mobile') ||
-        attr?.attributeType?.display?.toLowerCase().includes('contact'),
-    )
-    .map((attr: any) => attr?.value)
-    .filter(Boolean);
+  const phoneAttributes = restPatientData.person.attributes
+    .filter((attr: any) => {
+      if (!attr?.attributeType) return false;
 
-  return phoneValues.length > 0 ? phoneValues.join(', ') : '--';
+      const display = (attr.attributeType.display || '').toLowerCase();
+      const name = (attr.attributeType.name || '').toLowerCase();
+      const description = (attr.attributeType.description || '').toLowerCase();
+
+      // Check for various phone-related terms
+      const phoneTerms = ['phone', 'telephone', 'mobile', 'contact', 'cell'];
+
+      return phoneTerms.some((term) => display.includes(term) || name.includes(term) || description.includes(term));
+    })
+    .map((attr: any) => ({
+      value: attr?.value?.trim(),
+      type: attr?.attributeType?.display || attr?.attributeType?.name || 'Unknown',
+      priority: getPriorityForPhoneType(attr?.attributeType?.display || attr?.attributeType?.name || ''),
+    }))
+    .filter((phone: any) => phone.value && phone.value.length > 0);
+
+  if (phoneAttributes.length === 0) {
+    return '--';
+  }
+
+  // Sort by priority (mobile first, then others)
+  phoneAttributes.sort((a, b) => a.priority - b.priority);
+
+  // Return the highest priority phone(s)
+  const topPriority = phoneAttributes[0].priority;
+  const topPhones = phoneAttributes.filter((phone) => phone.priority === topPriority).map((phone) => phone.value);
+
+  return topPhones.join(', ');
+}
+
+export async function getPatientPhoneNumber(patientUuid: string): Promise<string> {
+  if (!patientUuid) {
+    return '--';
+  }
+
+  try {
+    // Step 1: Try FHIR2 R4 endpoint directly
+    const fhir2Patient = await fetchPatientFromFhir2(patientUuid);
+    if (fhir2Patient) {
+      const fhir2Phone = extractPhoneFromFhirTelecom(fhir2Patient);
+      if (fhir2Phone && fhir2Phone !== '--') {
+        return fhir2Phone;
+      }
+    }
+
+    // Step 2: Try framework FHIR function (fallback)
+    const fhirPatient = await fetchCurrentPatient(patientUuid);
+    if (fhirPatient) {
+      const fhirPhone = extractPhoneFromFhirTelecom(fhirPatient);
+      if (fhirPhone && fhirPhone !== '--') {
+        return fhirPhone;
+      }
+    }
+
+    // Step 3: Fallback to REST API
+    const restPatient = await fetchPatientFromRestApi(patientUuid);
+    if (restPatient) {
+      return extractPhoneFromPersonAttributes(restPatient);
+    }
+
+    return '--';
+  } catch (error) {
+    return '--';
+  }
+}
+
+function getPriorityForPhoneType(typeName: string): number {
+  const type = typeName.toLowerCase();
+
+  if (type.includes('mobile') || type.includes('cell')) return 1;
+  if (type.includes('primary') || type.includes('main')) return 2;
+  if (type.includes('home') || type.includes('residence')) return 3;
+  if (type.includes('work') || type.includes('office') || type.includes('business')) return 4;
+  if (type.includes('emergency')) return 5;
+  if (type.includes('telephone') || type.includes('phone')) return 6;
+
+  return 9; // Default priority for unknown types
 }
 
 export function extractPhoneFromFhirTelecom(patientInfo: any): string {
@@ -118,48 +206,103 @@ export function extractPhoneFromFhirTelecom(patientInfo: any): string {
     return '--';
   }
 
-  const phoneValues = patientInfo.telecom
-    .filter(
-      (telecom: any) =>
-        telecom?.system === 'phone' ||
-        telecom?.system === 'mobile' ||
-        (telecom?.use && (telecom.use === 'mobile' || telecom.use === 'home' || telecom.use === 'work')),
-    )
-    .map((telecom: any) => telecom?.value)
-    .filter(Boolean);
+  const phoneContacts = patientInfo.telecom
+    .filter((telecom: any) => {
+      // Check for phone system
+      if (telecom?.system === 'phone') return true;
+      if (telecom?.system === 'mobile') return true;
 
-  return phoneValues.length > 0 ? phoneValues.join(', ') : '--';
+      // Check for phone use types
+      if (telecom?.use && ['mobile', 'home', 'work', 'temp'].includes(telecom.use)) {
+        return telecom.system === 'phone' || !telecom.system; // Accept if system is phone or undefined
+      }
+
+      return false;
+    })
+    .map((telecom: any) => ({
+      value: telecom?.value?.trim(),
+      use: telecom?.use || 'unspecified',
+      system: telecom?.system || 'phone',
+    }))
+    .filter((contact: any) => contact.value && contact.value.length > 0);
+
+  if (phoneContacts.length === 0) {
+    return '--';
+  }
+
+  // Prioritize mobile phones, then home, then work, then others
+  const priorityOrder = ['mobile', 'home', 'work', 'temp', 'unspecified'];
+
+  phoneContacts.sort((a, b) => {
+    const aPriority = priorityOrder.indexOf(a.use);
+    const bPriority = priorityOrder.indexOf(b.use);
+    return (aPriority === -1 ? 999 : aPriority) - (bPriority === -1 ? 999 : bPriority);
+  });
+
+  // Return the highest priority phone number, or all if multiple with same priority
+  const topPriorityUse = phoneContacts[0].use;
+  const topPriorityPhones = phoneContacts
+    .filter((contact) => contact.use === topPriorityUse)
+    .map((contact) => contact.value);
+
+  return topPriorityPhones.join(', ');
 }
 
 export function usePatientPhone(patient: any) {
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('--');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const extractPhone = async () => {
-      if (patient?.id) {
-        try {
-          const fhirPhone = extractPhoneFromFhirTelecom(patient);
-          if (fhirPhone && fhirPhone !== '--') {
-            setPhoneNumber(fhirPhone);
+      // Reset state
+      setIsLoading(true);
+      setPhoneNumber('--');
+
+      // Check if we have a valid patient
+      if (!patient?.id && !patient?.uuid) {
+        setIsLoading(false);
+        return;
+      }
+
+      const patientId = patient.id || patient.uuid;
+
+      try {
+        // Step 1: Try FHIR2 R4 directly first  
+        const fhir2Patient = await fetchPatientFromFhir2(patientId);
+        if (fhir2Patient) {
+          const fhir2Phone = extractPhoneFromFhirTelecom(fhir2Patient);
+          if (fhir2Phone && fhir2Phone !== '--') {
+            setPhoneNumber(fhir2Phone);
+            setIsLoading(false);
             return;
           }
+        }
 
-          const restPatient = await fetchPatientFromRestApi(patient.id);
-          if (restPatient) {
-            const restPhone = extractPhoneFromPersonAttributes(restPatient);
-            setPhoneNumber(restPhone);
-          } else {
-            setPhoneNumber('--');
-          }
-        } catch (error) {
-          console.error('Error extracting phone number:', error);
+        // Step 2: Try framework FHIR function
+        const fhirPhone = extractPhoneFromFhirTelecom(patient);
+        if (fhirPhone && fhirPhone !== '--') {
+          setPhoneNumber(fhirPhone);
+          setIsLoading(false);
+          return;
+        }
+
+        // Step 3: Fallback to REST API for person attributes
+        const restPatient = await fetchPatientFromRestApi(patientId);
+        if (restPatient) {
+          const restPhone = extractPhoneFromPersonAttributes(restPatient);
+          setPhoneNumber(restPhone);
+        } else {
           setPhoneNumber('--');
         }
+      } catch (error) {
+        setPhoneNumber('--');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     extractPhone();
-  }, [patient]);
+  }, [patient?.id, patient?.uuid]);
 
-  return phoneNumber;
+  return { phoneNumber, isLoading };
 }

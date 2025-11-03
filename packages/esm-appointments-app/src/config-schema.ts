@@ -29,19 +29,13 @@ export const configSchema = {
     _type: Type.Array,
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
     _description: 'Configurable appointment status (status of appointments)',
-    _elements: {
-      _type: Type.String,
-      _description: 'Status of an appointment',
-    },
+    _elements: { _type: Type.String, _description: 'Status of an appointment' },
   },
   appointmentTypes: {
     _type: Type.Array,
     _default: ['Scheduled'],
     _description: 'Configurable appointment types (types of appointments)',
-    _elements: {
-      _type: Type.String,
-      _description: 'Type of an appointment',
-    },
+    _elements: { _type: Type.String, _description: 'Type of an appointment' },
   },
   checkInButton: {
     enabled: {
@@ -101,10 +95,7 @@ export const configSchema = {
     _description:
       'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
     _default: ['patientName', 'identifier', 'location', 'serviceType', 'status'],
-    _elements: {
-      _type: Type.String,
-      _validators: [validators.oneOf(appointmentColumnTypes)],
-    },
+    _elements: { _type: Type.String, _validators: [validators.oneOf(appointmentColumnTypes)] },
   },
 };
 
@@ -113,22 +104,12 @@ export interface ConfigObject {
   appointmentStatuses: Array<string>;
   appointmentTypes: Array<string>;
   appointmentsTableColumns: Array<string>;
-  checkInButton: {
-    enabled: boolean;
-    showIfActiveVisit: boolean;
-    customUrl: string;
-  };
-  checkOutButton: {
-    enabled: boolean;
-    customUrl: string;
-  };
+  checkInButton: { enabled: boolean; showIfActiveVisit: boolean; customUrl: string };
+  checkOutButton: { enabled: boolean; customUrl: string };
   customPatientChartUrl: string;
   includePhoneNumberInExcelSpreadsheet: boolean;
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
 }
 
-export type AppointmentTableColumn = {
-  header: string;
-  key: string;
-};
+export type AppointmentTableColumn = { header: string; key: string };
