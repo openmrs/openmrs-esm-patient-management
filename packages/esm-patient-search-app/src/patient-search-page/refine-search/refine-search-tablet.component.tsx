@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
+import { Button, InlineNotification } from '@carbon/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@openmrs/esm-framework';
 import { type Control } from 'react-hook-form';
 import { type AdvancedPatientSearchState, type SearchFieldConfig, type SearchFieldType } from '../../types';
@@ -19,6 +19,7 @@ interface RefineSearchTabletProps {
   control: Control<AdvancedPatientSearchState>;
   config: PatientSearchConfig;
   isTablet: boolean;
+  validationError: string;
   onResetFields: () => void;
   onToggleDialog: () => void;
   onSubmit: (evt: React.FormEvent) => void;
@@ -30,6 +31,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
   control,
   config,
   isTablet,
+  validationError,
   onResetFields,
   onToggleDialog,
   onSubmit,
@@ -140,6 +142,13 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
               </Button>
             </div>
             <form onSubmit={onSubmit} role="refine-search-tablet">
+              {validationError && (
+                <div className={styles.padded}>
+                  <InlineNotification kind="error" title={t('error', 'Error')} lowContrast>
+                    {validationError}
+                  </InlineNotification>
+                </div>
+              )}
               {renderSearchFields}
               <div className={classNames(styles.buttonSet, styles.paddedButtons)}>
                 <Button kind="secondary" size="xl" onClick={onResetFields} className={styles.button}>
