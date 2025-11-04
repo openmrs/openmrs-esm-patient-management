@@ -75,11 +75,13 @@ export function useWardPatientGrouping() {
       inpatientAdmissionAtCurrentLocationResponse.isLoading ||
       inpatientRequestResponse.isLoading ||
       inpatientAdmissionsAtOtherLocationsResponse.isLoading,
-    mutate() {
-      admissionLocationResponse?.mutate();
-      inpatientAdmissionAtCurrentLocationResponse?.mutate();
-      inpatientRequestResponse?.mutate();
-      inpatientAdmissionsAtOtherLocationsResponse?.mutate();
+    async mutate() {
+      await Promise.all([
+        admissionLocationResponse?.mutate(),
+        inpatientAdmissionAtCurrentLocationResponse?.mutate(),
+        inpatientRequestResponse?.mutate(),
+        inpatientAdmissionsAtOtherLocationsResponse?.mutate(),
+      ]);
     },
   };
 }
