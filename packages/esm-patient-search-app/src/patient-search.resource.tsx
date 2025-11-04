@@ -12,15 +12,13 @@ import {
 } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, User } from './types';
 import type { PatientSearchConfig } from './config-schema';
-import { mapSearchedPatientFromFhir } from './utils/fhir-mapper';
 
 /**
- * Builds OpenMRS custom search URL parameters for patient search.
- * Uses the custom "openmrsPatients" query name with the 'q' parameter.
+ * Builds FHIR-compatible search parameters for patient search.
+ * Uses the FHIR Patient resource and OpenMRS _query parameter.
  */
 function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean): URLSearchParams {
   const params = new URLSearchParams();
-
   params.append('_query', 'openmrsPatients');
 
   if (searchQuery?.trim()) {
@@ -35,23 +33,8 @@ function buildOpenmrsSearchParams(searchQuery: string, includeDead: boolean): UR
 }
 
 /**
- * Implementing infinite scrolling patient search using OpenMRS custom search.
- * Uses the 'openmrsPatients' query with the 'q' parameter for flexible searching.
  *
- * @param searchQuery - The string to search for in patient records.
- * @param includeDead - Whether to include deceased patients in the search results.
- * @param isSearching - Whether the search should be active. Defaults to true.
- * @param pageSize - The number of results to fetch per page. Defaults to 10.
- *
- * @returns An object containing:
- *   - data: Array of patient search results
- *   - isLoading: Boolean indicating if the initial data is loading
- *   - isLoadingMore: Boolean indicating if additional pages are being loaded
- *   - fetchError: Any error that occurred during fetching
- *   - hasMore: Boolean indicating if there are more results to load
- *   - isValidating: Boolean indicating if new data is being loaded
- *   - setPage: Function to load the next page of results
- *   - totalResults: The total number of results for the search query
+ * Returns FHIR Patient objects directly.
  */
 export function useInfinitePatientSearch(
   searchQuery: string,
@@ -60,28 +43,18 @@ export function useInfinitePatientSearch(
   pageSize: number = 10,
 ): PatientSearchResponse {
   const shouldFetch = isSearching && !!searchQuery?.trim();
-  const config = useConfig<PatientSearchConfig>();
 
   const url = useMemo(() => {
     if (!shouldFetch) return null;
-
     const params = buildOpenmrsSearchParams(searchQuery, includeDead);
+    params.append('_count', pageSize.toString());
     return `${fhirBaseUrl}/Patient?${params.toString()}`;
-  }, [shouldFetch, searchQuery, includeDead]);
+  }, [shouldFetch, searchQuery, includeDead, pageSize]);
 
-  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } = useFhirInfinite<fhir.Patient>(url);
+  const { data, error, isLoading, isValidating, hasMore, loadMore, totalCount } =
+    useFhirInfinite<fhir.Patient>(url);
 
-  const mappedData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-
-    return data
-      .filter((patient) => patient != null)
-      .map((patient) => mapSearchedPatientFromFhir(patient, config?.contactAttributeType));
-  }, [data, config?.contactAttributeType]);
-
-  const totalResults = useMemo(() => {
-    return totalCount ?? mappedData?.length ?? 0;
-  }, [totalCount, mappedData]);
+  const totalResults = useMemo(() => totalCount ?? data?.length ?? 0, [totalCount, data]);
 
   const handleSetPage = useCallback(async () => {
     loadMore();
@@ -90,29 +63,21 @@ export function useInfinitePatientSearch(
 
   return useMemo(
     () => ({
-      data: mappedData,
-      isLoading: isLoading,
+      data: data ?? [],
+      isLoading,
       isLoadingMore: isValidating && !!data,
       fetchError: error,
       hasMore: hasMore ?? false,
-      isValidating: isValidating,
+      isValidating,
       setPage: handleSetPage,
       totalResults,
     }),
-    [mappedData, isLoading, isValidating, data, error, hasMore, handleSetPage, totalResults],
+    [data, isLoading, isValidating, error, hasMore, handleSetPage, totalResults],
   );
 }
 
 /**
- * A custom React hook for managing and retrieving the list of recently viewed patients.
- *
- * @param showRecentlySearchedPatients - A boolean flag to enable/disable the feature. Defaults to false.
- * @returns An object containing:
- *   - error: Any error that occurred during fetching
- *   - isLoadingPatients: Boolean indicating if the data is being loaded
- *   - recentlyViewedPatientUuids: Array of UUIDs of recently viewed patients
- *   - updateRecentlyViewedPatients: Function to update the list with a new patient UUID
- *   - mutateUserProperties: Function to trigger a re-fetch of user properties
+ * Retrieves and updates recently viewed patients for the logged-in user.
  */
 export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean = false) {
   const { user } = useSession();
@@ -120,7 +85,10 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
   const shouldFetch = showRecentlySearchedPatients && userUuid;
   const url = `${restBaseUrl}/user/${userUuid}`;
 
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(shouldFetch ? url : null, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(
+    shouldFetch ? url : null,
+    openmrsFetch,
+  );
 
   const patientsVisited = useMemo(
     () => data?.data?.userProperties?.patientsVisited?.split(',').filter(Boolean) ?? [],
@@ -131,25 +99,17 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
     async (patientUuid: string) => {
       const userProperties = data?.data?.userProperties;
 
-      if (!patientUuid || !userProperties) {
-        return;
-      }
+      if (!patientUuid || !userProperties) return;
 
       const uniquePatients = Array.from(new Set([patientUuid, ...patientsVisited])).slice(0, 10);
-      const newUserProperties = {
-        ...userProperties,
-        patientsVisited: uniquePatients.join(','),
-      };
+      const newUserProperties = { ...userProperties, patientsVisited: uniquePatients.join(',') };
 
       mutate(
         (current) =>
           current
             ? {
                 ...current,
-                data: {
-                  ...current.data,
-                  userProperties: newUserProperties,
-                },
+                data: { ...current.data, userProperties: newUserProperties },
               }
             : current,
         false,
@@ -183,19 +143,10 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 }
 
 /**
- * A custom React hook for fetching patient data from a FHIR API based on a list of patient UUIDs.
- * Uses useFhirFetchAll to fetch all patients at once.
- *
- * @param patientUuids - An array of patient UUIDs to fetch data for. If null, no data will be fetched.
- *
- * @returns An object containing:
- *   - data: An array of fetched patient data
- *   - isLoading: A boolean indicating if the data is being loaded
- *   - fetchError: Any error that occurred during fetching
+ * Fetches multiple FHIR Patient resources by ID.
  */
 export function useFhirPatients(patientUuids: string[] | null) {
-  const config = useConfig<PatientSearchConfig>();
-  const shouldFetch = patientUuids !== null && patientUuids.length > 0;
+  const shouldFetch = !!patientUuids?.length;
 
   const url = useMemo(() => {
     if (!shouldFetch || !patientUuids) return null;
@@ -204,20 +155,12 @@ export function useFhirPatients(patientUuids: string[] | null) {
 
   const { data, error, isLoading } = useFhirFetchAll<fhir.Patient>(url);
 
-  const mappedData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-
-    return data
-      .filter((patient) => patient != null)
-      .map((patient) => mapSearchedPatientFromFhir(patient, config?.contactAttributeType));
-  }, [data, config?.contactAttributeType]);
-
   return useMemo(
     () => ({
-      data: mappedData,
+      data: data ?? [],
       isLoading,
       fetchError: error,
     }),
-    [mappedData, isLoading, error],
+    [data, isLoading, error],
   );
 }
