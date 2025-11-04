@@ -128,14 +128,14 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
           });
         },
       )
-      .finally(async () => {
-        await wardPatientGroupDetails?.mutate?.();
+      .finally(() => {
         setIsSubmitting(false);
+        wardPatientGroupDetails?.mutate?.();
         closeWorkspaceWithSavedChanges();
       });
   };
 
-  const onError = useCallback((values) => {
+  const onError = useCallback(() => {
     setShowErrorNotifications(true);
     setIsSubmitting(false);
   }, []);
