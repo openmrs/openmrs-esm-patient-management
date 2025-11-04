@@ -18,7 +18,7 @@ describe('RecentlySearchedPatients', () => {
   const birthdate = '1990-01-01T00:00:00.000+0000';
   const age = dayjs().diff(birthdate, 'years');
   
-  // Mock FHIR Patient instead of SearchedPatient
+  // Mock FHIR Patient
   const mockSearchResults: Array<fhir.Patient> = [
     {
       resourceType: 'Patient',
