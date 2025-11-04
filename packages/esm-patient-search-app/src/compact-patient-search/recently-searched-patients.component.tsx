@@ -5,10 +5,9 @@ import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
-import type { SearchedPatient } from '../types';
 
 interface RecentPatientSearchProps {
-  data: SearchedPatient[];
+  data: fhir.Patient[];
   fetchError: any;
   isLoading: boolean;
 }

@@ -43,11 +43,11 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     (event, index: number) => {
       event.preventDefault();
       if (selectPatientAction) {
-        selectPatientAction(patients[index].uuid);
+        selectPatientAction(patients[index].id);
       } else {
         navigate({
           to: interpolateString(config.search.patientChartUrl, {
-            patientUuid: patients[index].uuid,
+            patientUuid: patients[index].id,
           }),
         });
       }

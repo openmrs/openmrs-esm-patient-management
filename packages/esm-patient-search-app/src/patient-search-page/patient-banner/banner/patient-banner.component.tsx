@@ -14,9 +14,7 @@ import {
   useVisit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
-import { type SearchedPatient } from '../../../types';
 import { usePatientSearchContext } from '../../../patient-search-context';
-import { mapToFhirPatient } from '../../../utils/fhir-mapper';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -25,7 +23,7 @@ interface ClickablePatientContainerProps {
 }
 
 interface PatientBannerProps {
-  patient: SearchedPatient;
+  patient: fhir.Patient;
   patientUuid: string;
   hideActionsOverflow?: boolean;
 }
@@ -37,8 +35,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const { nonNavigationSelectPatientAction, showPatientSearch, hidePatientSearch, handleReturnToSearchList } =
     usePatientSearchContext();
 
-  const patientName = patient.person.personName.display;
-  const isDeceased = !!patient.person.deathDate;
+  const patientName =
+    patient.name?.[0]?.text ??
+    `${patient.name?.[0]?.given?.join(' ') ?? ''} ${patient.name?.[0]?.family ?? ''}`.trim();
+
+  const isDeceased = !!(patient.deceasedBoolean || patient.deceasedDateTime);
 
   const [showContactDetails, setShowContactDetails] = useState(false);
 
@@ -46,66 +47,62 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     setShowContactDetails((value) => !value);
   }, []);
 
-  const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
-
   return (
-    <>
-      <div
-        className={classNames(styles.container, {
-          [styles.deceasedPatientContainer]: isDeceased,
-          [styles.activePatientContainer]: !isDeceased,
-        })}
-        role="banner">
-        <ClickablePatientContainer patient={fhirMappedPatient}>
-          <div className={styles.patientAvatar} role="img">
-            <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
-          </div>
-          <PatientBannerPatientInfo patient={fhirMappedPatient} />
-        </ClickablePatientContainer>
-        <div className={styles.actionButtons}>
-          <PatientBannerToggleContactDetailsButton
-            className={styles.toggleContactDetailsButton}
-            showContactDetails={showContactDetails}
-            toggleContactDetails={handleToggleContactDetails}
-          />
-          <div className={styles.rightActions}>
-            {!hideActionsOverflow ? (
-              <PatientBannerActionsMenu
-                actionsSlotName="patient-search-actions-slot"
-                additionalActionsSlotState={{
-                  selectPatientAction: nonNavigationSelectPatientAction,
-                  launchPatientChart: true,
-                }}
-                patient={fhirMappedPatient}
-                patientUuid={patientUuid}
-              />
-            ) : null}
-            {!isDeceased && !activeVisit && (
-              <ExtensionSlot
-                name="start-visit-button-slot"
-                state={{
-                  handleReturnToSearchList,
-                  hidePatientSearch,
-                  patientUuid,
-                  showPatientSearch,
-                }}
-              />
-            )}
-          </div>
+    <div
+      className={classNames(styles.container, {
+        [styles.deceasedPatientContainer]: isDeceased,
+        [styles.activePatientContainer]: !isDeceased,
+      })}
+      role="banner">
+      <ClickablePatientContainer patient={patient}>
+        <div className={styles.patientAvatar} role="img">
+          <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
         </div>
-        <div>
-          {showContactDetails && (
-            <div
-              className={classNames(styles.contactDetails, {
-                [styles.deceasedContactDetails]: isDeceased,
-                [styles.tabletContactDetails]: isTablet,
-              })}>
-              <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
-            </div>
+        <PatientBannerPatientInfo patient={patient} />
+      </ClickablePatientContainer>
+
+      <div className={styles.actionButtons}>
+        <PatientBannerToggleContactDetailsButton
+          className={styles.toggleContactDetailsButton}
+          showContactDetails={showContactDetails}
+          toggleContactDetails={handleToggleContactDetails}
+        />
+        <div className={styles.rightActions}>
+          {!hideActionsOverflow ? (
+            <PatientBannerActionsMenu
+              actionsSlotName="patient-search-actions-slot"
+              additionalActionsSlotState={{
+                selectPatientAction: nonNavigationSelectPatientAction,
+                launchPatientChart: true,
+              }}
+              patient={patient}
+              patientUuid={patientUuid}
+            />
+          ) : null}
+          {!isDeceased && !activeVisit && (
+            <ExtensionSlot
+              name="start-visit-button-slot"
+              state={{
+                handleReturnToSearchList,
+                hidePatientSearch,
+                patientUuid,
+                showPatientSearch,
+              }}
+            />
           )}
         </div>
       </div>
-    </>
+
+      {showContactDetails && (
+        <div
+          className={classNames(styles.contactDetails, {
+            [styles.deceasedContactDetails]: isDeceased,
+            [styles.tabletContactDetails]: isTablet,
+          })}>
+          <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -134,38 +131,36 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
         {children}
       </button>
     );
-  } else {
-    return (
-      <ConfigurableLink
-        className={styles.patientBanner}
-        onBeforeNavigate={handleBeforeNavigate}
-        to={config.search.patientChartUrl}
-        templateParams={{ patientUuid: patientUuid }}>
-        {children}
-      </ConfigurableLink>
-    );
   }
-};
 
-export const PatientBannerSkeleton = () => {
   return (
-    <div className={styles.container} role="banner">
-      <div className={styles.patientBanner}>
-        <SkeletonIcon className={styles.patientAvatar} />
-        <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
-          <div className={styles.flexRow}>
-            <SkeletonText />
-          </div>
-          <div className={styles.identifiers}>
-            <SkeletonText />
-          </div>
-        </div>
-      </div>
-      <div className={styles.emptyStateActionButtonsContainer}>
-        <SkeletonText />
-      </div>
-    </div>
+    <ConfigurableLink
+      className={styles.patientBanner}
+      onBeforeNavigate={handleBeforeNavigate}
+      to={config.search.patientChartUrl}
+      templateParams={{ patientUuid }}>
+      {children}
+    </ConfigurableLink>
   );
 };
+
+export const PatientBannerSkeleton = () => (
+  <div className={styles.container} role="banner">
+    <div className={styles.patientBanner}>
+      <SkeletonIcon className={styles.patientAvatar} />
+      <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
+        <div className={styles.flexRow}>
+          <SkeletonText />
+        </div>
+        <div className={styles.identifiers}>
+          <SkeletonText />
+        </div>
+      </div>
+    </div>
+    <div className={styles.emptyStateActionButtonsContainer}>
+      <SkeletonText />
+    </div>
+  </div>
+);
 
 export default PatientBanner;
