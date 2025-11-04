@@ -1,28 +1,5 @@
 import type { OpenmrsResource } from '@openmrs/esm-framework';
 
-export interface SearchedPatient {
-  uuid: string;
-  identifiers: Array<Identifier>;
-  person: {
-    addresses: Array<Address>;
-    age: number;
-    birthdate: string;
-    gender: string;
-    dead: boolean;
-    deathDate: string | null;
-    personName: {
-      display: string;
-      givenName: string;
-      familyName: string;
-      middleName: string;
-    };
-  };
-  attributes: Array<{
-    value: OpenmrsResource | string;
-    attributeType: { uuid: string; display: string };
-  }>;
-}
-
 export interface Identifier {
   display: string;
   identifier: string;
@@ -68,8 +45,8 @@ export interface FHIRPatientSearchResponse {
 
 export interface PatientSearchResponse {
   currentPage?: number;
-  data?: Array<SearchedPatient>;
-  fetchError: Error;
+  data?: fhir.Patient[];
+  fetchError: Error | null;
   hasMore: boolean;
   isLoadingMore?: boolean;
   isLoading: boolean;
