@@ -23,6 +23,11 @@ interface CompactPatientBannerProps {
 
 const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
   const renderPatient = useCallback((patient: fhir.Patient) => {
+    
+    if (!patient || !patient.id) {
+      return null;
+    }
+    
     const patientName = getPatientName(patient);
 
     return (

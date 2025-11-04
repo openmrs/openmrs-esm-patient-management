@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
@@ -9,7 +8,6 @@ import CompactPatientBanner from './compact-patient-banner.component';
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 
 const birthDate = '1990-01-01';
-const age = dayjs().diff(birthDate, 'years');
 
 const patients: fhir.Patient[] = [
   {

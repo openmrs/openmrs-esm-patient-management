@@ -11,7 +11,6 @@ import {
   useFhirFetchAll,
 } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, User } from './types';
-import type { PatientSearchConfig } from './config-schema';
 
 /**
  * Builds FHIR-compatible search parameters for patient search.

@@ -12,7 +12,7 @@ interface PatientSearchProps extends PatientSearchResponse {
 }
 
 const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
+  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults, query }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
 
@@ -49,6 +49,8 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
       };
     }, []);
 
+    const hasValidQuery = query && query.trim().length >= 2;
+
     if (isLoading) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
@@ -80,7 +82,9 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
       );
     }
 
-    if (searchResults?.length) {
+    const validPatients = searchResults?.filter(patient => patient && patient.id) ?? [];
+
+    if (validPatients.length > 0) {
       return (
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
@@ -89,7 +93,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
+            <CompactPatientBanner patients={validPatients} ref={ref} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
@@ -106,14 +110,29 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
           <Layer>
             <Tile className={styles.emptySearchResultsTile}>
               <EmptyDataIllustration />
-              <p className={styles.emptyResultText}>
-                {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-              </p>
-              <p className={styles.actionText}>
-                <span>
-                  {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
-                </span>
-              </p>
+              {!hasValidQuery ? (
+                <>
+                  <p className={styles.emptyResultText}>
+                    {t('enterPatientDetails', 'Enter a patient name or identifier to search')}
+                  </p>
+                  <p className={styles.actionText}>
+                    <span>
+                      {t('searchInstructions', 'Search by patient name, identifier, or unique ID number')}
+                    </span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className={styles.emptyResultText}>
+                    {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
+                  </p>
+                  <p className={styles.actionText}>
+                    <span>
+                      {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+                    </span>
+                  </p>
+                </>
+              )}
             </Tile>
           </Layer>
         </div>
