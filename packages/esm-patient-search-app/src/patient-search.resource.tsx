@@ -79,7 +79,13 @@ export function useInfinitePatientSearch(
     openmrsFetch,
   );
 
-  const mappedData = data?.flatMap((res) => res.data?.results ?? []) ?? null;
+  // Filter out null patients and patients with null person property to prevent errors
+  // when components access patient.person properties. This filtering happens at the source
+  // (in the hook) to ensure all consumers receive clean, valid data.
+  const mappedData =
+    data
+      ?.flatMap((res) => res.data?.results ?? [])
+      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
 
   return useMemo(
     () => ({
@@ -203,7 +209,13 @@ export function useRestPatients(
     },
   );
 
-  const mappedData = data?.flatMap((res) => res.data) ?? null;
+  // Filter out null patients and patients with null person property to prevent errors
+  // when components access patient.person properties. This filtering happens at the source
+  // (in the hook) to ensure all consumers receive clean, valid data.
+  const mappedData =
+    data
+      ?.flatMap((res) => res.data)
+      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
 
   return useMemo(
     () => ({
