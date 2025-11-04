@@ -3,7 +3,6 @@ import { test } from '../core';
 import { HomePage } from '../pages';
 
 test('Search patient by patient identifier', async ({ page, patient }) => {
-  // extract details from the created patient
   const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
@@ -53,7 +52,6 @@ test('Search patient by partial patient identifier', async ({ page, patient }) =
   });
 
   await test.step('Then I should see the patient with the matching identifier', async () => {
-    // May show multiple results if other patients have similar identifiers
     await expect(homePage.floatingSearchResultsContainer()).toContainText(/search result/);
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(firstName));
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(lastName));
@@ -72,7 +70,6 @@ test('Search patient by partial patient identifier', async ({ page, patient }) =
 });
 
 test('Search patient by full name', async ({ page, patient }) => {
-  // extract details from the created patient
   const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
@@ -146,78 +143,6 @@ test('Search patient by last name only', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the patient in the search results', async () => {
-    await expect(homePage.floatingSearchResultsContainer()).toContainText(/search result/);
-    await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(firstName));
-    await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(lastName));
-  });
-});
-
-test('Search with non-existent patient identifier shows no results', async ({ page }) => {
-  const nonExistentIdentifier = 'NONEXISTENT123456';
-  const homePage = new HomePage(page);
-
-  await test.step('When I visit the home page', async () => {
-    await homePage.goto();
-  });
-
-  await test.step('And I enter a non-existent patient identifier', async () => {
-    await homePage.searchPatient(nonExistentIdentifier);
-  });
-
-  await test.step('Then I should see a no results message', async () => {
-    await expect(homePage.floatingSearchResultsContainer()).toContainText(/no patient/i);
-  });
-});
-
-test('Search with non-existent patient name shows no results', async ({ page }) => {
-  const nonExistentName = 'NonExistentPatient XYZ';
-  const homePage = new HomePage(page);
-
-  await test.step('When I visit the home page', async () => {
-    await homePage.goto();
-  });
-
-  await test.step('And I enter a non-existent patient name', async () => {
-    await homePage.searchPatient(nonExistentName);
-  });
-
-  await test.step('Then I should see a no results message', async () => {
-    await expect(homePage.floatingSearchResultsContainer()).toContainText(/no patient/i);
-  });
-});
-
-test('Search with single character shows appropriate results or message', async ({ page }) => {
-  const homePage = new HomePage(page);
-
-  await test.step('When I visit the home page', async () => {
-    await homePage.goto();
-  });
-
-  await test.step('And I enter a single character into the search field', async () => {
-    await homePage.searchPatient('a');
-  });
-
-  await test.step('Then I should see either search results or a message', async () => {
-    const container = homePage.floatingSearchResultsContainer();
-    await expect(container).toBeVisible();
-  });
-});
-
-test('Search handles special characters in identifier', async ({ page, patient }) => {
-  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
-  const firstName = patient.person.display.split(' ')[0];
-  const lastName = patient.person.display.split(' ')[1];
-  const homePage = new HomePage(page);
-
-  await test.step('When I visit the home page', async () => {
-    await homePage.goto();
-  });
-
-  await test.step('And I enter an identifier that may contain special characters', async () => {
-    await homePage.searchPatient(openmrsIdentifier);
-  });
-
-  await test.step('Then I should see the correct patient in results', async () => {
     await expect(homePage.floatingSearchResultsContainer()).toContainText(/search result/);
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(firstName));
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(lastName));

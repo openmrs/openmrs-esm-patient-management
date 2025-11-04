@@ -30,15 +30,4 @@ export class HomePage {
   async clickOnVisitSummaryTab() {
     await this.page.getByRole('tab', { name: 'Visit Summary' }).click();
   }
-
-  async clearSearch() {
-    await this.patientSearchBar().clear();
-  }
-
-  async scrollSearchResults() {
-    await this.floatingSearchResultsContainer().evaluate((element) => {
-      element.scrollTop = element.scrollHeight;
-    });
-    await this.page.waitForTimeout(1000);
-  }
 }
