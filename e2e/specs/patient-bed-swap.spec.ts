@@ -9,7 +9,7 @@ import {
   generateBedType,
   generateRandomBed,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   retireBedType,
   startVisit,
@@ -46,7 +46,7 @@ test.beforeEach(async ({ api }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Swap a patient from one bed to another', async ({ page, api }) => {
@@ -70,7 +70,7 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     await wardPage.clickAdmitPatientButton(fullName);
   });
 
-  await test.step('And I select the bed for admission', async () => {
+  await test.step('And I select a bed to assign to the patient', async () => {
     await selectBedByLabel(page, `${bed.bedNumber} · Empty`);
   });
 
@@ -78,7 +78,7 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     await page.getByRole('button', { name: 'Admit' }).click();
   });
 
-  await test.step('Then I should see a success message confirming the admission success', async () => {
+  await test.step('Then I should see a success message confirming the patient was admitted and assigned to bed', async () => {
     await expect(
       page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
     ).toBeVisible();
@@ -92,10 +92,19 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     await wardPage.clickPatientCard(fullName);
   });
 
-  await test.step('And I swap the patient from the original bed to the destination bed', async () => {
+  await test.step('And I click the "Transfers" button to open the transfer workspace', async () => {
     await wardPage.transferButton().click();
+  });
+
+  await test.step('And I click the "Bed swap" tab', async () => {
     await wardPage.swapButton().click();
+  });
+
+  await test.step('And I select the destination bed', async () => {
     await selectBedByLabel(page, `${swapBed.bedNumber} · Empty`);
+  });
+
+  await test.step('And I click "Save" to complete the bed swap', async () => {
     await wardPage.saveButton().click();
   });
 
