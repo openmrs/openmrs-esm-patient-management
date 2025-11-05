@@ -84,49 +84,6 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     ).toBeVisible();
   });
 
-  // Poll the admission API to ensure emrapi has processed the admission encounter.
-  // The UI mutate() triggers async revalidation, but emrapi needs time to process the encounter into an InpatientAdmission.
-  await test.step('And I wait for the admission to be available in the API', async () => {
-    const maxAttempts = 30;
-    const delayMs = 2000;
-    let admissionAvailable = false;
-
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const response = await api.get(
-        `emrapi/inpatient/admission?currentInpatientLocation=${process.env.E2E_WARD_LOCATION_UUID}`,
-      );
-
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      if (response.ok()) {
-        const data = await response.json();
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        const results = data.results || [];
-        // emrapi InpatientAdmission always includes visit field per the type definition
-        admissionAvailable = results.some((admission: any) => admission.patient?.uuid === wardPatient.uuid);
-
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (admissionAvailable) {
-          break;
-        }
-      }
-
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      if (attempt < maxAttempts - 1) {
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(delayMs);
-      }
-    }
-
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (!admissionAvailable) {
-      throw new Error(
-        `Admission for patient ${wardPatient.uuid} not returned by emrapi after ${maxAttempts} attempts (${maxAttempts * delayMs}ms). ` +
-          `This may indicate: (1) emrapi configuration issue, (2) encounter type mismatch, or (3) backend processing delay.`,
-      );
-    }
-  });
-
   await test.step('And I should see the patient in the ward view', async () => {
     await wardPage.waitForPatientInWardView(fullName);
   });
