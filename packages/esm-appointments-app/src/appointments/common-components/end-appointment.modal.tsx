@@ -4,6 +4,7 @@ import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../form/appointments-form.resource';
+import { AccessibleModal } from '../../components';
 
 interface EndAppointmentModalProps {
   patientUuid: string;
@@ -71,12 +72,17 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
   }, [activeVisit, appointmentUuid, closeModal, mutate, mutateAppointments, t]);
 
   return (
-    <>
+    <AccessibleModal
+      isOpen={true}
+      onClose={closeModal}
+      modalHeadingId="end-appointment-modal-title"
+      modalDescriptionId="end-appointment-modal-body">
       <ModalHeader
         closeModal={closeModal}
         title={t('endAppointmentConfirmation', 'Are you sure you want to check the patient out for this appointment?')}
+        id="end-appointment-modal-title"
       />
-      <ModalBody>
+      <ModalBody id="end-appointment-modal-body">
         <p>
           {activeVisit
             ? t(
@@ -94,7 +100,7 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
           {t('checkOut', 'Check out')}
         </Button>
       </ModalFooter>
-    </>
+    </AccessibleModal>
   );
 };
 
