@@ -128,9 +128,9 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
           });
         },
       )
-      .finally(() => {
+      .finally(async () => {
+        await wardPatientGroupDetails?.mutate?.();
         setIsSubmitting(false);
-        wardPatientGroupDetails?.mutate?.();
         closeWorkspaceWithSavedChanges();
       });
   };
