@@ -87,8 +87,8 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
   // Poll the admission API to ensure emrapi has processed the admission encounter.
   // The UI mutate() triggers async revalidation, but emrapi needs time to process the encounter into an InpatientAdmission.
   await test.step('And I wait for the admission to be available in the API', async () => {
-    const maxAttempts = 20;
-    const delayMs = 1000;
+    const maxAttempts = 30;
+    const delayMs = 2000;
     let admissionAvailable = false;
 
     // eslint-disable-next-line playwright/no-conditional-in-test
@@ -121,7 +121,8 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (!admissionAvailable) {
       throw new Error(
-        `Admission for patient ${wardPatient.uuid} not returned by emrapi after ${maxAttempts} attempts (${maxAttempts * delayMs}ms)`,
+        `Admission for patient ${wardPatient.uuid} not returned by emrapi after ${maxAttempts} attempts (${maxAttempts * delayMs}ms). ` +
+          `This may indicate: (1) emrapi configuration issue, (2) encounter type mismatch, or (3) backend processing delay.`,
       );
     }
   });
