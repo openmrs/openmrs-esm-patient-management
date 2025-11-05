@@ -2,6 +2,7 @@ import React from 'react';
 import { DataTableSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useActiveTickets } from './useActiveTickets';
+import { useServiceQueuesStore } from '../store/store';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
@@ -9,7 +10,9 @@ interface QueueScreenProps {}
 
 const QueueScreen: React.FC<QueueScreenProps> = () => {
   const { t } = useTranslation();
-  const { activeTickets, isLoading, error } = useActiveTickets();
+  const { selectedQueueLocationUuid } = useServiceQueuesStore();
+
+  const { activeTickets, isLoading, error } = useActiveTickets(selectedQueueLocationUuid);
 
   if (isLoading) {
     return <DataTableSkeleton row={5} className={styles.queueScreen} role="progressbar" />;
