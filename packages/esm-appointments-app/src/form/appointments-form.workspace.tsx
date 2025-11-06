@@ -659,9 +659,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!watch('isAllDayAppointment') && (
-                  <TimeAndDuration control={control} errors={errors} services={services} watch={watch} t={t} />
-                )}
+                {!watch('isAllDayAppointment') && <TimeAndDuration control={control} errors={errors} t={t} />}
 
                 <ResponsiveWrapper>
                   <Controller
@@ -777,9 +775,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!watch('isAllDayAppointment') && (
-                  <TimeAndDuration control={control} services={services} watch={watch} t={t} errors={errors} />
-                )}
+                {!watch('isAllDayAppointment') && <TimeAndDuration control={control} t={t} errors={errors} />}
               </div>
             )}
           </div>
@@ -915,9 +911,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   );
 };
 
-function TimeAndDuration({ t, watch, control, services, errors }) {
-  const defaultDuration = services?.find((service) => service.name === watch('selectedService'))?.durationMins || null;
-
+function TimeAndDuration({ t, control, errors }) {
   return (
     <>
       <ResponsiveWrapper>
