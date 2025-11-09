@@ -100,6 +100,11 @@
       "component": "serviceQueuesAdminPage",
       "name": "service-queues-admin",
       "slot": "service-queues-admin-page-slot"
+    },
+    {
+      "component": "queueScreen",
+      "name": "queue-screen",
+      "slot": "queue-screen-slot"
     }
   ],
   "modals": [
