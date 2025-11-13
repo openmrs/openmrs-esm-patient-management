@@ -269,7 +269,7 @@ function useStarredLists() {
 
   const setInitialStarredLists = useCallback(() => {
     const starredPatientLists = currentUser?.userProperties?.starredPatientLists ?? '';
-    setStarredLists(starredPatientLists.split(','));
+    setStarredLists(starredPatientLists.split(',').filter(Boolean));
   }, [currentUser?.userProperties?.starredPatientLists, setStarredLists]);
 
   const updateUserProperties = useCallback(
