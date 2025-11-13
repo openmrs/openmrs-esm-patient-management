@@ -15,6 +15,7 @@ export interface AddablePatientListViewModel {
 }
 
 export interface PatientList {
+  location: { uuid: string; display: string };
   id: string;
   display: string;
   description: string;
