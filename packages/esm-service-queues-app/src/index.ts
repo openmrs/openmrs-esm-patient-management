@@ -176,6 +176,11 @@ export const serviceQueuesAdminPage = getAsyncLifecycle(() => import('./admin/ad
   moduleName,
 });
 
+export const queueScreen = getAsyncLifecycle(() => import('./queue-screen/queue-screen.component'), {
+  featureName: 'queue-screen',
+  moduleName,
+});
+
 export function startupApp() {
   registerBreadcrumbs([]);
 
