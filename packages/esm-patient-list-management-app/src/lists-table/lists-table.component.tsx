@@ -7,6 +7,7 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  Dropdown,
   InlineLoading,
   Layer,
   Search,
@@ -71,12 +72,49 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   const id = useId();
   const layout = useLayoutType();
   const config = useConfig<PatientListManagementConfig>();
+  const { sessionLocation } = useSession();
   const pageSize = config.patientListsToShow ?? 10;
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const [searchTerm, setSearchTerm] = useState('');
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
 
   const { toggleStarredList, starredLists } = useStarredLists();
+
+  const allLocationsItem = useMemo(() => ({ id: 'all', label: t('allLocations', 'All Locations') }), [t]);
+
+  const [selectedLocation, setSelectedLocation] = useState<string>(() => {
+    if (config.defaultToCurrentLocation && sessionLocation?.uuid) {
+      return sessionLocation.uuid;
+    }
+    return allLocationsItem.id;
+  });
+
+  const locationOptions = useMemo(() => {
+    const locationsMap = new Map<string, string>();
+    patientLists.forEach((list) => {
+      if (list.location) {
+        locationsMap.set(list.location.uuid, list.location.display);
+      }
+    });
+    if (sessionLocation?.uuid) {
+      locationsMap.set(sessionLocation.uuid, sessionLocation.display);
+    }
+    const sortedLocations = Array.from(locationsMap.entries())
+      .map(([uuid, display]) => ({ id: uuid, label: display }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    return [allLocationsItem, ...sortedLocations];
+  }, [patientLists, sessionLocation, allLocationsItem]);
+
+  const initialDropdownItem = useMemo(() => {
+    return locationOptions.find((loc) => loc.id === selectedLocation) || allLocationsItem;
+  }, [selectedLocation, locationOptions, allLocationsItem]);
+
+  const locationFilteredLists = useMemo(() => {
+    if (selectedLocation === 'all') {
+      return patientLists;
+    }
+    return patientLists.filter((list) => list.location?.uuid === selectedLocation);
+  }, [patientLists, selectedLocation]);
 
   function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
@@ -85,14 +123,14 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
   const filteredLists: Array<PatientList> = useMemo(() => {
     if (!searchTerm) {
-      return patientLists;
+      return locationFilteredLists;
     }
 
     return fuzzy
-      .filter(searchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
+      .filter(searchTerm, locationFilteredLists, { extract: (list) => `${list.display} ${list.type}` })
       .sort((r1, r2) => r1.score - r2.score)
       .map((result) => result.original);
-  }, [patientLists, searchTerm]);
+  }, [locationFilteredLists, searchTerm]);
 
   const { key, order } = sortParams;
   const sortedData =
@@ -139,17 +177,31 @@ const ListsTable: React.FC<PatientListTableProps> = ({
     <>
       <div id="tableToolBar" className={styles.searchContainer}>
         <div>{isValidating && <InlineLoading />}</div>
-        <Layer>
-          <Search
-            className={styles.searchbox}
-            id={`${id}-search`}
-            labelText=""
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            placeholder={t('searchThisList', 'Search this list')}
-            size={responsiveSize}
-            value={searchTerm}
-          />
-        </Layer>
+        <div className={styles.filterContainer}>
+          <Layer>
+            <Dropdown
+              id="location-filter-dropdown"
+              initialSelectedItem={initialDropdownItem}
+              items={locationOptions}
+              label=""
+              onChange={({ selectedItem }) => setSelectedLocation(selectedItem.id)}
+              titleText={t('filterByLocation', 'Filter by location')}
+              type="inline"
+              className={styles.locationFilter}
+            />
+          </Layer>
+          <Layer>
+            <Search
+              className={styles.searchbox}
+              id={`${id}-search`}
+              labelText=""
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              placeholder={t('searchThisList', 'Search this list')}
+              size={responsiveSize}
+              value={searchTerm}
+            />
+          </Layer>
+        </div>
       </div>
       <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getTableContainerProps }) => (

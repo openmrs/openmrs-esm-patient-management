@@ -20,7 +20,7 @@ interface PatientListResponse {
 }
 
 export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
-  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
+  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType,location:(uuid,display))';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
@@ -71,6 +71,7 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     description: cohort.description,
     type: cohort.cohortType?.display,
     size: cohort.size,
+    location: cohort.location,
   }));
   const { user } = useSession();
 
