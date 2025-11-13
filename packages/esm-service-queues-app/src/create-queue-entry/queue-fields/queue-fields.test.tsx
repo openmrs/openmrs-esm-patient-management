@@ -79,7 +79,7 @@ describe('QueueFields', () => {
       mockVisitAlice.uuid,
       queueUuid,
       mockVisitAlice.patient.uuid,
-      '197852c7-5fd4-4b33-89cc-7bae6848c65a',
+      '',
       '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
       0,
       '1',

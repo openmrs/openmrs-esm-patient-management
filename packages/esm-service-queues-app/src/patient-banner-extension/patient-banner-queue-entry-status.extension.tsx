@@ -28,8 +28,8 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
       <span className={styles.separator}>&middot;</span>
       <span>{queueEntry.queue.name}</span>
       <QueuePriority
-        priority={queueEntry.priority}
-        priorityComment={queueEntry.priorityComment}
+        priority={queueEntry?.priority}
+        priorityComment={queueEntry?.priorityComment}
         priorityConfigs={config?.priorityConfigs}
       />
       <Button

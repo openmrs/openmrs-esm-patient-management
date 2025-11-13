@@ -6,12 +6,16 @@ import { type Concept } from '../../types';
 import classNames from 'classnames';
 
 interface QueuePriorityProps {
-  priority: Concept;
+  priority?: Concept;
   priorityComment?: string;
   priorityConfigs: PriorityConfig[];
 }
 
 const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment, priorityConfigs }) => {
+  if (!priority) {
+    return null;
+  }
+
   const priorityConfig = priorityConfigs.find((c) => c.conceptUuid === priority.uuid);
 
   const tag = (

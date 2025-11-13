@@ -33,7 +33,7 @@ const createQueueServiceSchema = (t: TFunction) =>
   z.object({
     queueLocation: z.string().trim(),
     queueService: z.string().trim(),
-    priority: z.string().trim(),
+    priority: z.string().trim().optional().or(z.literal('')),
   });
 
 /**
@@ -90,7 +90,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
   const isDataLoaded = !isLoadingQueueLocations && !isLoadingQueues;
 
-  const hasCompleteQueueEntry = queueLocation && queueService && priority;
+  const hasCompleteQueueEntry = queueLocation && queueService;
 
   const onSubmit = useCallback(
     async (visit: Visit) => {
@@ -117,14 +117,8 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
 
         const formValues = getValues();
 
-        if (queueLocation && (!formValues.queueService || !formValues.priority)) {
-          const missingFields = [];
-          if (!formValues.queueService) {
-            missingFields.push(t('service', 'Service'));
-          }
-          if (!formValues.priority) {
-            missingFields.push(t('priority', 'Priority'));
-          }
+        if (queueLocation && !formValues.queueService) {
+          const missingFields = [t('service', 'Service')];
 
           const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
             fields: missingFields.join(', '),
@@ -138,12 +132,12 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           throw new Error(errorMessage);
         }
 
-        if (formValues.queueLocation && formValues.queueService && formValues.priority) {
+        if (formValues.queueLocation && formValues.queueService) {
           return postQueueEntry(
             visit.uuid,
             formValues.queueService,
             visit.patient.uuid,
-            formValues.priority,
+            formValues.priority || '',
             defaultStatusConceptUuid,
             sortWeight,
             formValues.queueLocation,
@@ -253,20 +247,11 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   }, [queueLocation, memoizedQueues, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
-    if (queueService && priorities.length > 0) {
-      const isPriorityValid = priorities.some((p) => p.uuid === priority);
-      if (!isPriorityValid) {
-        const defaultPriority = priorities.find((p) => p.uuid === defaultPriorityConceptUuid) || priorities[0];
-        setValue('priority', defaultPriority.uuid, { shouldValidate: false });
-      }
-    } else if (queueService && priorities.length === 0 && priority !== '') {
-      setValue('priority', '', { shouldValidate: false });
-    } else if (!queueService && priority !== '') {
+    if (!queueService || priorities.length === 0) {
       setValue('priority', '', { shouldValidate: false });
       clearErrors('priority');
     }
-  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue, clearErrors]);
-
+  }, [queueService, priorities, setValue, clearErrors]);
   useEffect(() => {
     if (!queueLocation) {
       setValue('queueService', '', { shouldValidate: false });

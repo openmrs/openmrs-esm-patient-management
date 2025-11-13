@@ -92,7 +92,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   const initialTransitionDate = isEdit ? new Date(queueEntry.startedAt) : new Date();
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
-    selectedPriority: queueEntry.priority.uuid,
+    selectedPriority: queueEntry?.priority?.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
     modifyDefaultTransitionDateTime: false,
