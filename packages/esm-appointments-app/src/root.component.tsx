@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { WorkspaceContainer } from '@openmrs/esm-framework';
 import AppointmentsCalendarView from './calendar/appointments-calendar-view.component';
 import Appointments from './appointments.component';
 import PatientAppointmentsOverview from './patient-appointments/patient-appointments-overview.component';
@@ -18,6 +19,7 @@ const RootComponent: React.FC = () => {
           <Route path="/calendar/:date" element={<AppointmentsCalendarView />} />
           <Route path="/patient/:patientUuid" element={<PatientAppointmentsOverview />} />
         </Routes>
+        <WorkspaceContainer contextKey="appointments" />
       </BrowserRouter>
     </main>
   );
