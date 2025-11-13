@@ -81,7 +81,16 @@ describe('QueueTable', () => {
     expect(rows).toHaveLength(1); // should only have the header row
 
     const headerRow = rows[0];
-    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
+    const expectedHeaders = [
+      /name/i,
+      /coming from/i,
+      /priority/i,
+      /provider/i,
+      /status/i,
+      /queue/i,
+      /wait time/i,
+      /actions/i,
+    ];
     const headers = within(headerRow).getAllByRole('columnheader');
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
@@ -135,7 +144,16 @@ describe('QueueTable', () => {
 
     const rows = screen.queryAllByRole('row');
     const headerRow = rows[0];
-    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
+    const expectedHeaders = [
+      /name/i,
+      /coming from/i,
+      /priority/i,
+      /provider/i,
+      /status/i,
+      /queue/i,
+      /wait time/i,
+      /actions/i,
+    ];
     const headers = within(headerRow).getAllByRole('columnheader');
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);

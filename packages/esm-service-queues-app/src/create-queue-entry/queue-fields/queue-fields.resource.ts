@@ -1,4 +1,5 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type QueueEntryPayload } from '../../types';
 
 export async function generateVisitQueueNumber(
   location: string,
@@ -29,10 +30,29 @@ export async function postQueueEntry(
   sortWeight: number,
   locationUuid: string,
   visitQueueNumberAttributeUuid: string,
+  providerUuid?: string,
 ) {
   const abortController = new AbortController();
 
   await Promise.all([generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, visitQueueNumberAttributeUuid)]);
+
+  const queueEntry: QueueEntryPayload['queueEntry'] = {
+    status: {
+      uuid: status,
+    },
+    priority: {
+      uuid: priority,
+    },
+    queue: {
+      uuid: queueUuid,
+    },
+    patient: {
+      uuid: patientUuid,
+    },
+    startedAt: new Date(),
+    sortWeight: sortWeight,
+    ...(providerUuid && { providerWaitingFor: { uuid: providerUuid } }),
+  };
 
   return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
@@ -42,22 +62,7 @@ export async function postQueueEntry(
     signal: abortController.signal,
     body: {
       visit: { uuid: visitUuid },
-      queueEntry: {
-        status: {
-          uuid: status,
-        },
-        priority: {
-          uuid: priority,
-        },
-        queue: {
-          uuid: queueUuid,
-        },
-        patient: {
-          uuid: patientUuid,
-        },
-        startedAt: new Date(),
-        sortWeight: sortWeight,
-      },
+      queueEntry,
     },
   });
 }
