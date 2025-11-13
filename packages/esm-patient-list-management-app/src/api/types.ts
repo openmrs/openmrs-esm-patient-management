@@ -15,11 +15,11 @@ export interface AddablePatientListViewModel {
 }
 
 export interface PatientList {
-  location: { uuid: string; display: string };
   id: string;
   display: string;
   description: string;
   type: string;
+  location: { uuid: string; display: string };
   size: number;
   options?: Array<PatientListOption>;
 }
