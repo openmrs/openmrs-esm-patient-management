@@ -21,6 +21,7 @@
   "male": "Male",
   "monthOfBirth": "Month of Birth",
   "nextPage": "Next page",
+  "noFiltersAppliedError": "Please apply at least one filter to refine your search.",
   "noPatientChartsFoundMessage": "Sorry, no patient charts were found",
   "other": "Other",
   "postcode": "Postcode",
