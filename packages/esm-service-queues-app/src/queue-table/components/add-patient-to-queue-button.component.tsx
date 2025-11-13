@@ -28,7 +28,6 @@ const AddPatientToQueueButton: React.FC<{}> = () => {
             ) {
               launchChildWorkspace(serviceQueuesPatientSearchWorkspace, {
                 currentServiceQueueUuid: selectedServiceUuid,
-                handleReturnToSearchList: null,
                 selectedPatientUuid: patient.id,
               });
             },

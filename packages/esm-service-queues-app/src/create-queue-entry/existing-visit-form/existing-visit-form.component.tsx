@@ -8,7 +8,6 @@ import styles from './existing-visit-form.scss';
 
 interface ExistingVisitFormProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
-  handleReturnToSearchList?: () => void;
   visit: Visit;
 }
 
