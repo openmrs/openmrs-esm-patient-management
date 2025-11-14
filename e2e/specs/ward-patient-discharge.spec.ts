@@ -10,7 +10,7 @@ import {
   generateBedType,
   generateRandomBed,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
   retireBedType,
@@ -32,7 +32,7 @@ test.beforeEach(async ({ api }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  encounter = await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Discharge a patient from a ward', async ({ page, api }) => {

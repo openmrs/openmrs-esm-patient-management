@@ -39,7 +39,7 @@ export const createEncounter = async (
   return await encounterRes.json();
 };
 
-export const generateWardAdmission = async (
+export const generateWardAdmissionRequest = async (
   api: APIRequestContext,
   providerId: string,
   patientId: string,
