@@ -9,7 +9,7 @@ const moduleName = '@openmrs/esm-service-queues-app';
 const swrRefreshIntervalInMs = 60000;
 
 const options = {
-  featureName: 'service-queues',
+  featureName: 'serviceQueues',
   moduleName,
 };
 
