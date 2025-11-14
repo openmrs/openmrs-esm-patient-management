@@ -5,7 +5,7 @@ import { serviceQueuesPatientSearchWorkspace } from '../../constants';
 import { useTranslation } from 'react-i18next';
 import { useServiceQueuesStore } from '../../store/store';
 
-const AddPatientToQueueButton: React.FC<{}> = () => {
+const AddPatientToQueueButton: React.FC = () => {
   const { t } = useTranslation();
   const { selectedServiceUuid } = useServiceQueuesStore();
 

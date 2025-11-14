@@ -61,6 +61,5 @@ export const deletePatient = async (api: APIRequestContext, uuid: string) => {
 };
 
 export function getPatientIdentifierStr(patient: Patient) {
-  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
-  return openmrsIdentifier;
+  return patient.identifiers[0].display.split('=')[1].trim();
 }

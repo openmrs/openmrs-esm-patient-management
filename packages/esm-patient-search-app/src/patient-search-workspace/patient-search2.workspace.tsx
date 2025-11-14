@@ -34,8 +34,8 @@ const PatientSearchWorkspace2: React.FC<
     search: { disableTabletSearchOnKeyUp },
   } = useConfig<PatientSearchConfig>();
   const [searchTerm, setSearchTerm] = useState(initialQuery);
-  const showSearchResults = Boolean(searchTerm?.trim());
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const showSearchResults = Boolean(debouncedSearchTerm?.trim());
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
