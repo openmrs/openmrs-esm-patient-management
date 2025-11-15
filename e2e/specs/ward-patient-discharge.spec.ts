@@ -80,6 +80,8 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   await test.step('Then I see the patient in the ward', async () => {
     await expect(page.getByRole('heading', { name: 'Inpatient Ward' })).toBeVisible();
     await expect(page.getByText(patientName, { exact: true })).toBeVisible();
+    // Wait for the patient card to be fully rendered after admission
+    await wardPage.waitForPatientInWardView(patientName);
   });
 
   await test.step("And when I click the patient's card to open the patient workspace", async () => {

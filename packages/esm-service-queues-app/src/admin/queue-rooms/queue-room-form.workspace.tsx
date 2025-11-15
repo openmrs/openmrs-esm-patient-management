@@ -87,7 +87,9 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
         subtitle: t('queueRoomCreatedSuccessfully', 'Queue room created successfully'),
       });
 
-      await mutate(`${restBaseUrl}/queueroom`);
+      // Mutate the correct SWR cache key used by useQueueRooms hook
+      const customRepresentation = 'custom:(uuid,display,name,description,queue:(uuid,display))';
+      await mutate(`${restBaseUrl}/queue-room?v=${customRepresentation}`);
       closeWorkspace();
     } catch (error) {
       showSnackbar({
