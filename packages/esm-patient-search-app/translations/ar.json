@@ -4,6 +4,7 @@
   "apply": "تطبيق",
   "clear": "مسح",
   "clearSearch": "مسح البحث",
+  "close": "Close",
   "closeSearch": "Close Search Panel",
   "countOfFiltersApplied_one": "{{count}} filters applied",
   "countOfFiltersApplied_other": "{{count}} filters applied",

@@ -1,4 +1,5 @@
 {
+  "addPatientToWard": "Add patient to ward",
   "admissionRequestCancelled": "Permintaan penerimaan dibatalkan.",
   "admissionRequests": "Permintaan penerimaan",
   "admissionRequestsCount_one": "{{count}} permintaan penerimaan",
@@ -72,6 +73,7 @@
   "notesRequiredForCancellingRequest": "Catatan diperlukan untuk membatalkan permintaan penerimaan atau transfer",
   "Orders": "Perintah",
   "other": "Lainnya",
+  "Patient": "patient",
   "patientAdmittedButBedNotAssigned": "Pasien berhasil diterima tetapi gagal menetapkan tempat tidur",
   "patientAdmittedSuccessfully": "Pasien berhasil diterima",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} telah berhasil diterima dan ditetapkan ke tempat tidur {{bedNumber}}",
@@ -83,6 +85,7 @@
   "patientCurrentlyNotAdmitted": "Pasien saat ini tidak diterima",
   "patienthasNoActiveVisit": "Pasien tidak memiliki kunjungan aktif",
   "patientHasPendingAdmissionRequest": "Pasien sudah memiliki permintaan penerimaan tertunda ke lokasi {{location}}",
+  "PatientNote": "Patient Note",
   "patientNoteNowVisible": "Sekarang seharusnya terlihat di riwayat catatan",
   "patientNoteSaveError": "Gagal menyimpan catatan pasien",
   "patientNotesDidntLoad": "Catatan pasien tidak dimuat",
@@ -92,6 +95,7 @@
   "patientUnassignedFromBed": "Pasien tidak ditetapkan ke tempat tidur",
   "patientUnassignedFromBedDetail": "{{patientName}} sekarang tidak ditetapkan ke tempat tidur",
   "patientWasDischarged": "Pasien telah dipulangkan",
+  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Menunggu pemulangan",
   "pendingOut": "Menunggu keluar",
   "pendingOutMetricValue": "{{ metricValue }}",
@@ -122,6 +126,7 @@
   "transferType": "Jenis transfer",
   "typeOfTransfer": "Jenis transfer",
   "unknown": "Tidak diketahui",
+  "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Catatan kunjungan disimpan",
   "wardClinicalNotePlaceholder": "Tulis catatan di sini",
   "wards": "Bangsal"

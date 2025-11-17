@@ -4,6 +4,7 @@
   "apply": "应用",
   "clear": "清除",
   "clearSearch": "清除",
+  "close": "Close",
   "closeSearch": "关闭搜索面板",
   "countOfFiltersApplied_one": "{{count}} filters applied",
   "countOfFiltersApplied_other": "{{count}} filters applied",

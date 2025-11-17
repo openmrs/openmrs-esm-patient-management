@@ -4,6 +4,7 @@
   "apply": "გადატარება",
   "clear": "გასუფთავება",
   "clearSearch": "გასუფთავება",
+  "close": "Close",
   "closeSearch": "ძებნის პანელის დახურვა",
   "countOfFiltersApplied_one": "გადატარებულია {{count}} ფილტრი",
   "countOfFiltersApplied_other": "გადატარებულია {{count}} ფილტრი",

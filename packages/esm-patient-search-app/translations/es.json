@@ -4,6 +4,7 @@
   "apply": "Aplicar",
   "clear": "Borrar",
   "clearSearch": "Borrar",
+  "close": "Close",
   "closeSearch": "Cerrar Panel de Búsqueda",
   "countOfFiltersApplied_one": "{{count}} filtros aplicados",
   "countOfFiltersApplied_other": "{{count}} filtros aplicados",

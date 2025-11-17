@@ -1,4 +1,5 @@
 {
+  "addPatientToWard": "Add patient to ward",
   "admissionRequestCancelled": "Demande d'admission annulée.",
   "admissionRequests": "Demandes d'admission",
   "admissionRequestsCount_one": "{{count}} demande d'admission",
@@ -72,6 +73,7 @@
   "notesRequiredForCancellingRequest": "Les notes sont obligatoires pour annuler une admission ou un transfert",
   "Orders": "Prescriptions",
   "other": "Autre",
+  "Patient": "patient",
   "patientAdmittedButBedNotAssigned": "Le patient est admis mais le lit n'a pas pu être assigné",
   "patientAdmittedSuccessfully": "Patient admis",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} est admis et assigné au lit {{bedNumber}}",
@@ -83,6 +85,7 @@
   "patientCurrentlyNotAdmitted": "Patient currently not admitted",
   "patienthasNoActiveVisit": "Le patient n'a pas de visite en cours",
   "patientHasPendingAdmissionRequest": "Le patient a déjà une demande d'admission pour {{location}}",
+  "PatientNote": "Patient Note",
   "patientNoteNowVisible": "Maintenant visible dans l'historique de notes",
   "patientNoteSaveError": "Echec d'enregistrement des notes",
   "patientNotesDidntLoad": "Impossible d’afficher les notes du patient",
@@ -92,6 +95,7 @@
   "patientUnassignedFromBed": "Lit libéré",
   "patientUnassignedFromBedDetail": "{{patientName}} n'est plus attribué au lit",
   "patientWasDischarged": "Patient sorti",
+  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Pending Discharge",
   "pendingOut": "En attente de sortie",
   "pendingOutMetricValue": "{{ metricValue }}",
@@ -122,6 +126,7 @@
   "transferType": "Type de transfert",
   "typeOfTransfer": "Type de transfert",
   "unknown": "Inconnu",
+  "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Note enregistrée",
   "wardClinicalNotePlaceholder": "Indiquez les notes ici",
   "wards": "Admissions"
