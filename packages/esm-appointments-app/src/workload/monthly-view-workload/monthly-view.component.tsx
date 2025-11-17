@@ -1,7 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { formatDate, getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import { parseDate, toCalendar, createCalendar, getLocalTimeZone } from '@internationalized/date';
 import { monthDays } from '../../helpers';
 import { useAppointmentsStore } from '../../store';

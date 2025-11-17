@@ -17,7 +17,7 @@ import MonthlyViewWorkload from './monthly-workload-view.component';
 import MonthlyHeader from './monthly-header.component';
 import styles from '../appointments-calendar-view-view.scss';
 
-dayjs.extend(isBetween);
+// dayjs.extend(isBetween);
 
 interface MonthlyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;

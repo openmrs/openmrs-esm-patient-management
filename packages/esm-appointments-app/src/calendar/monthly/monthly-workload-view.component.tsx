@@ -1,16 +1,9 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { User } from '@carbon/react/icons';
-import {
-  parseDate,
-  type CalendarDate,
-  toCalendar,
-  createCalendar,
-  parseAbsolute,
-  getLocalTimeZone,
-  toCalendarDate,
-} from '@internationalized/date';
-import { navigate, useLayoutType, getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
+import { parseDate, type CalendarDate, toCalendar, createCalendar } from '@internationalized/date';
+import { navigate, useLayoutType } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import { spaHomePage } from '../../constants';
 import { isSameCalendarMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';

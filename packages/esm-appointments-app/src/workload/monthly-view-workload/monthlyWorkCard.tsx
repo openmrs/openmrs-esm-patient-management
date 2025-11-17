@@ -1,7 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
-import { useLayoutType, getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
+import { useLayoutType } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import {
   parseDate,
   type CalendarDate,

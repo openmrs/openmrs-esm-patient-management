@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { formatDate, getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import { parseDate, toCalendar, createCalendar } from '@internationalized/date';
 import { useAppointmentsStore, setSelectedDate } from '../../store';
 import DaysOfWeekCard from './days-of-week.component';

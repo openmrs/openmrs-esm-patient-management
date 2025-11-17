@@ -7,7 +7,7 @@ import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import { useAppointmentsStore, setSelectedDate } from '../store';
-import { getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
