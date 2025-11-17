@@ -261,7 +261,7 @@
 }
 
 .emptyStateContent {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;

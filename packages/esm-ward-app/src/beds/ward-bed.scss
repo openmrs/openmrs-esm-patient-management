@@ -26,6 +26,6 @@
 }
 
 .emptyBedText {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('heading-compact-02');
   color: vars.$text-02;
 }
