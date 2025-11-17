@@ -1,4 +1,5 @@
 {
+  "addPatientToWard": "Add patient to ward",
   "admissionRequestCancelled": "Cererea de internare a fost anulată.",
   "admissionRequests": "Cereri de internare",
   "admissionRequestsCount_one": "{{count}} cerere de internare",
@@ -72,6 +73,7 @@
   "notesRequiredForCancellingRequest": "Este necesară o notă pentru anularea cererii de internare sau transfer",
   "Orders": "Comenzi",
   "other": "Altul",
+  "Patient": "patient",
   "patientAdmittedButBedNotAssigned": "Pacientul a fost internat cu succes, dar nu a fost atribuit un pat",
   "patientAdmittedSuccessfully": "Pacient internat cu succes",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} a fost internat cu succes și atribuit patului {{bedNumber}}",
@@ -83,6 +85,7 @@
   "patientCurrentlyNotAdmitted": "Pacientul nu este internat în prezent",
   "patienthasNoActiveVisit": "Pacientul nu are o vizită activă",
   "patientHasPendingAdmissionRequest": "Pacientul are deja o cerere de internare în așteptare către locația {{location}}",
+  "PatientNote": "Patient Note",
   "patientNoteNowVisible": "Aceasta ar trebui să fie vizibilă acum în istoricul notelor",
   "patientNoteSaveError": "Eroare la salvarea notei pacientului",
   "patientNotesDidntLoad": "Notele pacientului nu au fost încărcate",
@@ -92,6 +95,7 @@
   "patientUnassignedFromBed": "Pacientul a fost eliberat de la pat",
   "patientUnassignedFromBedDetail": "{{patientName}} nu mai este atribuit unui pat",
   "patientWasDischarged": "Pacientul a fost externat",
+  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Externare în așteptare",
   "pendingOut": "Părăsire în așteptare",
   "pendingOutMetricValue": "{{ metricValue }}",
@@ -122,6 +126,7 @@
   "transferType": "Tip de transfer",
   "typeOfTransfer": "Tipul transferului",
   "unknown": "Necunoscut",
+  "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Nota pacientului a fost salvată",
   "wardClinicalNotePlaceholder": "Scrie orice notițe aici",
   "wards": "Salonae"

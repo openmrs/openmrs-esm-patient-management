@@ -1,4 +1,5 @@
 {
+  "addPatientToWard": "Add patient to ward",
   "admissionRequestCancelled": "Richiesta di ricovero annullata.",
   "admissionRequests": "Richieste di ricovero",
   "admissionRequestsCount_one": "{{count}} richiesta di ricovero",
@@ -72,6 +73,7 @@
   "notesRequiredForCancellingRequest": "Note obbligatorie per annullare la richiesta di ricovero o trasferimento",
   "Orders": "Ordini",
   "other": "Altro",
+  "Patient": "patient",
   "patientAdmittedButBedNotAssigned": "Paziente ricoverato con successo, ma assegnazione del letto non riuscita",
   "patientAdmittedSuccessfully": "Paziente ricoverato con successo",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} è stato ricoverato con successo e assegnato al letto {{bedNumber}}",
@@ -83,6 +85,7 @@
   "patientCurrentlyNotAdmitted": "Il paziente non è attualmente ricoverato",
   "patienthasNoActiveVisit": "Il paziente non ha visite attive",
   "patientHasPendingAdmissionRequest": "Il paziente ha già una richiesta di ricovero in sospeso per la posizione {{location}}",
+  "PatientNote": "Patient Note",
   "patientNoteNowVisible": "Ora dovrebbe essere visibile nella cronologia delle note",
   "patientNoteSaveError": "Errore nel salvataggio della nota del paziente",
   "patientNotesDidntLoad": "Le note del paziente non sono state caricate",
@@ -92,6 +95,7 @@
   "patientUnassignedFromBed": "Paziente disassegnato dal letto",
   "patientUnassignedFromBedDetail": "{{patientName}} non è più assegnato a un letto",
   "patientWasDischarged": "Paziente dimesso",
+  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Dimissione in sospeso",
   "pendingOut": "Uscita in sospeso",
   "pendingOutMetricValue": "{{ metricValue }}",
@@ -122,6 +126,7 @@
   "transferType": "Tipo di trasferimento",
   "typeOfTransfer": "Tipo di trasferimento",
   "unknown": "Sconosciuto",
+  "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Nota del paziente salvata",
   "wardClinicalNotePlaceholder": "Scrivi qui eventuali note",
   "wards": "Reparti"

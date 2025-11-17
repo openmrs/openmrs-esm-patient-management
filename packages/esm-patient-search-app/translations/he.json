@@ -4,6 +4,7 @@
   "apply": "החל",
   "clear": "נקה",
   "clearSearch": "נקה",
+  "close": "Close",
   "closeSearch": "Close Search Panel",
   "countOfFiltersApplied_one": "{{count}} filters applied",
   "countOfFiltersApplied_other": "{{count}} filters applied",

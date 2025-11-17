@@ -1,4 +1,5 @@
 {
+  "addPatientToWard": "Add patient to ward",
   "admissionRequestCancelled": "Okusaba okuyingizibwa mu ddwaliro kusaziddwamu",
   "admissionRequests": "Okusaba okuyingizibwa mu ddwaliro",
   "admissionRequestsCount_one": "Okusaba {{kumu}}",
@@ -72,6 +73,7 @@
   "notesRequiredForCancellingRequest": "Ebigambo byetaagibwa okusazaamu okusaba",
   "Orders": "Ebiragiro",
   "other": "Ekirala",
+  "Patient": "patient",
   "patientAdmittedButBedNotAssigned": "Omulwadde ayingiziddwa naye takyasindikiddwa ku kitanda",
   "patientAdmittedSuccessfully": "Omulwadde ayingiziddwa bulungi",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} has been successfully admitted and assigned to bed {{bedNumber}}",
@@ -83,6 +85,7 @@
   "patientCurrentlyNotAdmitted": "Omulwadde tayingiziddwa",
   "patienthasNoActiveVisit": "Omulwadde talina kulambula kwakolebwa",
   "patientHasPendingAdmissionRequest": "Patient already has a pending admission request to location {{location}}",
+  "PatientNote": "Patient Note",
   "patientNoteNowVisible": "Kiyina okuba nga kati kilabikila mu byawandikibwa<br>",
   "patientNoteSaveError": "Ensobi mu kutereka ebigambo by’omulwadde",
   "patientNotesDidntLoad": "Ebigambo by’omulwadde tebileetedwa",
@@ -92,6 +95,7 @@
   "patientUnassignedFromBed": "Omulwadde aggyiddwa ku kitanda",
   "patientUnassignedFromBedDetail": "{{erinya ly'omulwadde}}Omulwadde kati aggyiddwa ku kitanda bulungi",
   "patientWasDischarged": "Omulwadde yasindikibwa okuva mu ddwaliro",
+  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Okusindikibwa kulindirira",
   "pendingOut": "Okufulumizibwa kulindirira",
   "pendingOutMetricValue": "{{Omuwendo gw’abalindirira okufuluma}}",
@@ -122,6 +126,7 @@
   "transferType": "Enkola y’okutwalibwa",
   "typeOfTransfer": "Engeri y'okutwalibwa",
   "unknown": "Tekimanyiddwa",
+  "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Ebigambo by’okulambula biterekeddwa",
   "wardClinicalNotePlaceholder": "Wandiia ebigambo wano",
   "wards": "Ebifo omwawulirwa abalwadde"

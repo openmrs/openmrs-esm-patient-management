@@ -4,6 +4,7 @@
   "apply": "Appliquer",
   "clear": "Effacer",
   "clearSearch": "Effacer",
+  "close": "Close",
   "closeSearch": "Fermer la recherche",
   "countOfFiltersApplied_one": "{{count}} filtre(s) appliqué(s)",
   "countOfFiltersApplied_other": "{{count}} filtre(s) appliqué(s)",
