@@ -2,7 +2,12 @@ import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
-import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
+import {
+  cohortUrl,
+  getAllPatientLists,
+  getPatientListIdsForPatient,
+  getPatientListMembers,
+} from './patient-list.resource';
 import { type PatientListManagementConfig } from '../config-schema';
 import {
   type CohortResponse,

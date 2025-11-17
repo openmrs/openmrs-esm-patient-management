@@ -58,7 +58,7 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
   return response.data;
 }
 
-export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
+export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t?: TFunction) {
   const {
     error: { fieldErrors, globalErrors, message, code },
   } = errorObject ?? {};
@@ -75,7 +75,7 @@ export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
       .join('\n');
   }
 
-  return message ?? code ?? this.translateService.instant('unknownError');
+  return message ?? code ?? t('unknownError', 'An unknown error occurred');
 }
 
 async function deleteData(url: string, data = {}, ac = new AbortController()) {
