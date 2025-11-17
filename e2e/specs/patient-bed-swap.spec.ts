@@ -13,6 +13,7 @@ import {
   getProvider,
   retireBedType,
   startVisit,
+  waitForAdmissionToBeProcessed,
 } from '../commands';
 import type { Bed, BedType, Patient, Provider } from '../commands/types';
 import { test } from '../core';
@@ -88,62 +89,8 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     await wardPage.waitForPatientInWardView(fullName);
   });
 
-  // Poll the admission API to ensure emrapi has processed the admission and made it available.
-  // The UI mutate() triggers async revalidation, but emrapi needs time to process the encounter
-  // into an InpatientAdmission. The workspace siderail buttons require complete wardPatient data
-  // (including visit) to render properly.
   await test.step('And I wait for the admission to be available in the API', async () => {
-    const maxAttempts = 30;
-    const delayMs = 2000;
-    let admissionFound = false;
-    let lastResponse: any = null;
-
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const response = await api.get(
-        `emrapi/inpatient/admission?currentInpatientLocation=${process.env.E2E_WARD_LOCATION_UUID}`,
-      );
-
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      if (response.ok()) {
-        const data = await response.json();
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        const results = data.results || [];
-        lastResponse = { results, totalResults: results.length };
-
-        // Check that the admission exists for this patient with visit data
-        // The admission may have patient at top level or nested in visit
-        admissionFound = results.some((admission: any) => {
-          const patientUuid = admission.patient?.uuid || admission.visit?.patient?.uuid;
-          return patientUuid === wardPatient.uuid && admission.visit?.uuid;
-        });
-
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (admissionFound) {
-          break;
-        }
-      } else {
-        lastResponse = { status: response.status(), statusText: response.statusText() };
-      }
-
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      if (attempt < maxAttempts - 1) {
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(delayMs);
-      }
-    }
-
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (!admissionFound) {
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      const debugInfo = lastResponse
-        ? ` Last API response: ${JSON.stringify(lastResponse)}`
-        : ' No successful API responses received.';
-      throw new Error(
-        `Admission for patient ${wardPatient.uuid} not found in emrapi API after ${maxAttempts} attempts (${maxAttempts * delayMs}ms).${debugInfo} ` +
-          `This may indicate: (1) emrapi configuration issue, (2) encounter type mismatch, or (3) backend processing delay.`,
-      );
-    }
+    await waitForAdmissionToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   });
 
   await test.step('And I click on the patient card to open the ward patient workspace', async () => {
@@ -151,7 +98,7 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
   });
 
   await test.step('Then I see the "Transfers" button in the siderail', async () => {
-    await expect(wardPage.transferButton()).toBeVisible();
+    await expect(wardPage.transferButton()).toBeVisible({ timeout: 10000 });
   });
 
   await test.step('And I click the "Transfers" button to open the transfer workspace', async () => {
