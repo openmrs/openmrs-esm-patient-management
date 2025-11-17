@@ -1,7 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
+import { parseDate, toCalendar, createCalendar, getLocalTimeZone } from '@internationalized/date';
 import { monthDays } from '../../helpers';
 import { useAppointmentsStore } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
@@ -21,8 +22,10 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
+  const calendar = createCalendar(getDefaultCalendar(getLocale()));
+  const date = toCalendar(parseDate(selectedDate), calendar);
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-  const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
+  const monthViewDate = dateToDisplay === '' ? date : toCalendar(parseDate(dateToDisplay), calendar);
   const daysInWeeks = daysInWeek.map((day) => t(day));
 
   const handleClick = (date: Date) => {
@@ -36,7 +39,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
       <>
         <div className={styles.container}></div>
         <span className={styles.headerContainer}>
-          {formatDate(new Date(monthViewDate), { day: false, time: false, noToday: true })}
+          {formatDate(monthViewDate.toDate(getLocalTimeZone()), { day: false, time: false, noToday: true })}
         </span>
         <div className={styles.workLoadCard}>
           {daysInWeeks?.map((day, i) => (
@@ -45,23 +48,18 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
-            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
+            {monthDays(monthViewDate).map((dateTime, i) => (
               <div
-                onClick={() => handleClick(dayjs(dateTime).toDate())}
+                onClick={() => handleClick(dateTime.toDate(getLocalTimeZone()))}
                 key={i}
                 className={`${styles.monthlyWorkloadCard} ${
-                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
-                    ? styles.selectedDate
-                    : ''
+                  dateTime.toString() === monthViewDate.toString() ? styles.selectedDate : ''
                 }`}>
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}
-                  isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
-                  count={
-                    calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
-                      ?.count ?? 0
-                  }
+                  isActive={toCalendar(parseDate(dateToDisplay), calendar).toString() === dateTime.toString()}
+                  count={calendarWorkload.find((calendar) => calendar.date === dateTime.toString())?.count ?? 0}
                 />
               </div>
             ))}

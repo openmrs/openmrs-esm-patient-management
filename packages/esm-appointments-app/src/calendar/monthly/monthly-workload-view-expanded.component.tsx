@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Popover, PopoverContent } from '@carbon/react';
 import styles from './monthly-view-workload.scss';
 import MonthlyWorkloadView, { type MonthlyWorkloadViewProps } from './monthly-workload-view.component';
@@ -10,7 +10,7 @@ interface MonthlyWorkloadViewExpandedProps extends MonthlyWorkloadViewProps {
 
 const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({ count, events, dateTime }) => {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
 
   const handleClickOutside = (event) => {

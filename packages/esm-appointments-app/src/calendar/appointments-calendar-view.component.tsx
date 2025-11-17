@@ -1,26 +1,29 @@
 import React, { useEffect } from 'react';
-import dayjs from 'dayjs';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { omrsDateFormat } from '../constants';
+import { parseDate, toCalendar, createCalendar } from '@internationalized/date';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import { useAppointmentsStore, setSelectedDate } from '../store';
+import { getDefaultCalendar, getLocale } from '@openmrs/esm-framework';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
+  const localCalendarName = getDefaultCalendar(getLocale());
   const { selectedDate } = useAppointmentsStore();
-  const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
+  const calendarObject = toCalendar(parseDate(selectedDate.split('T')[0]), createCalendar(localCalendarName));
+  const { calendarEvents } = useAppointmentsCalendar(calendarObject.toString(), 'monthly');
 
   let params = useParams();
 
   useEffect(() => {
     if (params.date) {
-      setSelectedDate(dayjs(params.date).startOf('day').format(omrsDateFormat));
+      const date = toCalendar(parseDate(params.date), createCalendar(localCalendarName));
+      setSelectedDate(date.toString());
     }
-  }, [params.date]);
+  }, [localCalendarName, params.date]);
 
   return (
     <div data-testid="appointments-calendar">
