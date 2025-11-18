@@ -7,7 +7,7 @@ import {
   PatientAppointmentContextTypes,
 } from '../hooks/patient-appointment-context';
 import PatientAppointmentsBase from './patient-appointments-base.component';
-import PatientAppointmentsHeader from './patient-appointments-header';
+import PatientAppointmentsHeader from './patient-appointments-header.component';
 import styles from './patient-appointments-overview.scss';
 
 /**

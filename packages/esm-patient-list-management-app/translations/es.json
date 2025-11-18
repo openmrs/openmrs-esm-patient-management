@@ -58,6 +58,7 @@
   "noMatchingPatients": "No hay pacientes coincidentes para mostrar",
   "noOfPatients": "N.º de pacientes",
   "noPatientsInList": "No hay pacientes en esta lista",
+  "offlinePatients": "Offline patients",
   "openPatientList": "Agregar a la lista",
   "patientAddedToList": "Patient added to list",
   "patientAlreadyInList": "This patient is already in the list",
@@ -88,6 +89,7 @@
   "systemDefined": "definida por el sistema",
   "systemLists": "Listas del sistema",
   "trySearchingForADifferentList": "Intente buscar una lista diferente",
+  "unknownError": "An unknown error occurred",
   "unstarList": "Desmarcar lista como favorita",
   "updated": "Actualizada",
   "userDefined": "definida por el usuario"

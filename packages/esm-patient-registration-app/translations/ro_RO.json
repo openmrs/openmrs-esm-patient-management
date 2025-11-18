@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "Sterge",
   "demographicsSection": "Informatii de baza",
   "discard": "Renunta",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "Data nasterii cunoscuta?",
   "editIdentifierTooltip": "Editeaza",
   "editPatientDetails": "Editeaza detalii pacient",

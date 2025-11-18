@@ -31,7 +31,7 @@ import {
 } from '@openmrs/esm-framework';
 import type { PatientListManagementConfig } from '../config-schema';
 import type { PatientList } from '../api/types';
-import { starPatientList } from '../api/api-remote';
+import { starPatientList } from '../api/patient-list.resource';
 import { CustomPagination } from './custom-pagination.component';
 import { ErrorState } from '../error-state/error-state.component';
 import EmptyState from '../empty-state/empty-state.component';

@@ -58,6 +58,7 @@
   "noMatchingPatients": "Không có bệnh nhân phù hợp để hiển thị",
   "noOfPatients": "Số bệnh nhân",
   "noPatientsInList": "Không có bệnh nhân nào trong danh sách này",
+  "offlinePatients": "Offline patients",
   "openPatientList": "Thêm vào danh sách",
   "patientAddedToList": "Patient added to list",
   "patientAlreadyInList": "This patient is already in the list",
@@ -88,6 +89,7 @@
   "systemDefined": "hệ thống được xác định",
   "systemLists": "Danh sách hệ thống",
   "trySearchingForADifferentList": "Thử tìm kiếm một danh sách khác",
+  "unknownError": "An unknown error occurred",
   "unstarList": "Bỏ dấu sao danh sách",
   "updated": "Đã cập nhật",
   "userDefined": "Người dùng được xác định"

@@ -58,6 +58,7 @@
   "noMatchingPatients": "Tidak ada pasien yang cocok untuk ditampilkan",
   "noOfPatients": "Jumlah pasien",
   "noPatientsInList": "Tidak ada pasien dalam daftar ini",
+  "offlinePatients": "Offline patients",
   "openPatientList": "Tambahkan ke daftar",
   "patientAddedToList": "Patient added to list",
   "patientAlreadyInList": "This patient is already in the list",
@@ -88,6 +89,7 @@
   "systemDefined": "didefinisikan sistem",
   "systemLists": "Daftar sistem",
   "trySearchingForADifferentList": "Coba cari daftar yang berbeda",
+  "unknownError": "An unknown error occurred",
   "unstarList": "Hapus tanda daftar",
   "updated": "Diperbarui",
   "userDefined": "didefinisikan pengguna"

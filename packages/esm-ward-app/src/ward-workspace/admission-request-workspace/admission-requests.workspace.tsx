@@ -7,6 +7,7 @@ import {
   AdmissionRequestsWorkspaceContextProvider,
   type AdmissionRequestsWorkspaceContextProps,
 } from './admission-requests-context';
+import AdmissionRequestsEmptyState from './admission-requests-empty-state.component';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import styles from './admission-requests-workspace.scss';
 
@@ -32,7 +33,7 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceContextProp
           />
         </div>
       )}
-      {inpatientRequests?.length == 0 && <div>{t('noPendingPatientRequests', 'No pending patient requests')}</div>}
+      {inpatientRequests?.length === 0 && !isLoading && <AdmissionRequestsEmptyState />}
       <AdmissionRequestsWorkspaceContextProvider
         value={{ wardPendingPatients } as unknown as AdmissionRequestsWorkspaceContextProps}>
         <div className={styles.content}>{wardPendingPatients}</div>

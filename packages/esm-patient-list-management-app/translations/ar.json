@@ -58,6 +58,7 @@
   "noMatchingPatients": "No matching patients to display",
   "noOfPatients": "عدد المرضى",
   "noPatientsInList": "There are no patients in this list",
+  "offlinePatients": "Offline patients",
   "openPatientList": "أضف إلى القائمة",
   "patientAddedToList": "Patient added to list",
   "patientAlreadyInList": "This patient is already in the list",
@@ -88,6 +89,7 @@
   "systemDefined": "معرف من النظام",
   "systemLists": "قوائم النظام",
   "trySearchingForADifferentList": "Try searching for a different list",
+  "unknownError": "An unknown error occurred",
   "unstarList": "Unstar list",
   "updated": "Updated",
   "userDefined": "معرف من المستخدم"

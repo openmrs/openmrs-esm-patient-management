@@ -58,6 +58,7 @@
   "noMatchingPatients": "Nu exista pacienti corespunzatori de afisat",
   "noOfPatients": "Nr. pacienti",
   "noPatientsInList": "Nu exista pacienti in aceasta lista",
+  "offlinePatients": "Offline patients",
   "openPatientList": "Adauga in lista",
   "patientAddedToList": "Pacient adăugat în listă",
   "patientAlreadyInList": "Acest pacient este deja în listă",
@@ -88,6 +89,7 @@
   "systemDefined": "definit de sistem",
   "systemLists": "Liste sistem",
   "trySearchingForADifferentList": "Incearca sa cauti alta lista",
+  "unknownError": "An unknown error occurred",
   "unstarList": "Elimina din favorite",
   "updated": "Actualizat",
   "userDefined": "definit de utilizator"

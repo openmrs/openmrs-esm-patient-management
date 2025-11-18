@@ -1,7 +1,6 @@
-import type React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { showModal, navigate } from '@openmrs/esm-framework';
+import { type FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { showModal, navigate } from '@openmrs/esm-framework';
 
 function getUrlWithoutPrefix(url: string) {
   return url.split(window['getOpenmrsSpaBase']())?.[1];
@@ -12,7 +11,7 @@ interface BeforeSavePromptProps {
   redirect?: string;
 }
 
-const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) => {
+const BeforeSavePrompt: FC<BeforeSavePromptProps> = ({ when, redirect }) => {
   const { t } = useTranslation();
   const ref = useRef<boolean>(false);
   const [localTarget, setTarget] = useState<string | undefined>();
