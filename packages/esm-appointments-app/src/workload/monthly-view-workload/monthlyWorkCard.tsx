@@ -26,7 +26,7 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, co
   const layout = useLayoutType();
   const isToday = isSameDay(date, today(getLocalTimeZone()));
   const dateSelected = toCalendar(
-    parseDate(selectedDate.format('YYYY-MM-DD')),
+    parseDate(dayjs(selectedDate).format('YYYY-MM-DD')),
     createCalendar(getDefaultCalendar(getLocale())),
   );
 

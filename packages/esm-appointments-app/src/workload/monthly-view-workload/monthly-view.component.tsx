@@ -1,9 +1,8 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@openmrs/esm-framework';
 import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
-import { parseDate, toCalendar, createCalendar, getLocalTimeZone } from '@internationalized/date';
+import { parseDate, toCalendar, createCalendar, getLocalTimeZone, toCalendarDate } from '@internationalized/date';
 import { monthDays } from '../../helpers';
 import { useAppointmentsStore } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
@@ -24,9 +23,10 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
   const calendar = createCalendar(getDefaultCalendar(getLocale()));
-  const date = toCalendar(parseDate(selectedDate), calendar);
+  const date = toCalendar(parseDate(selectedDate.split('T')[0]), calendar);
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-  const monthViewDate = dateToDisplay === '' ? date : toCalendar(parseDate(dateToDisplay), calendar);
+  const monthViewDate =
+    dateToDisplay === '' ? toCalendarDate(date) : toCalendar(parseDate(dateToDisplay.split('T')[0]), calendar);
   const daysInWeeks = daysInWeek.map((day) => t(day));
 
   const handleClick = (date: Date) => {
@@ -59,7 +59,9 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}
-                  isActive={toCalendar(parseDate(dateToDisplay), calendar).toString() === dateTime.toString()}
+                  isActive={
+                    toCalendar(parseDate(dateToDisplay.split('T')[0]), calendar).toString() === dateTime.toString()
+                  }
                   count={calendarWorkload.find((calendar) => calendar.date === dateTime.toString())?.count ?? 0}
                 />
               </div>

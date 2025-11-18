@@ -1,5 +1,5 @@
 import { CalendarDate, startOfMonth, endOfMonth, getDayOfWeek, isSameMonth } from '@internationalized/date';
-import { getLocale } from '@openmrs/esm-framework';
+import { getLocale } from '@openmrs/esm-utils';
 import { type AppointmentSummary, type Appointment } from '../types';
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
