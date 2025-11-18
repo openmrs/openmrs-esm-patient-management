@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Controller, useController, useForm } from 'react-hook-form';
+import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -659,7 +659,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!watch('isAllDayAppointment') && <TimeAndDuration control={control} errors={errors} t={t} />}
+                {!watch('isAllDayAppointment') && <TimeAndDuration t={t} control={control} errors={errors} />}
 
                 <ResponsiveWrapper>
                   <Controller
@@ -775,7 +775,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                   />
                 </ResponsiveWrapper>
 
-                {!watch('isAllDayAppointment') && <TimeAndDuration control={control} t={t} errors={errors} />}
+                {!watch('isAllDayAppointment') && <TimeAndDuration t={t} control={control} errors={errors} />}
               </div>
             )}
           </div>
@@ -911,7 +911,19 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   );
 };
 
-function TimeAndDuration({ t, control, errors }) {
+/**
+ * TimeAndDuration component for appointment form
+ * Uses Record<string, any> for control/errors types since AppointmentFormData
+ * is defined inside the parent component and cannot be referenced here.
+ * Type safety is maintained at the call site.
+ */
+interface TimeAndDurationProps {
+  t: ReturnType<typeof useTranslation>['t'];
+  control: Control<Record<string, any>>;
+  errors: FieldErrors<Record<string, any>>;
+}
+
+function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
   return (
     <>
       <ResponsiveWrapper>
