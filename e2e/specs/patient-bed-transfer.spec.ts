@@ -129,3 +129,10 @@ test('Admit a transferred patient to a new bed', async ({ page, api }) => {
     ).toBeVisible();
   });
 });
+
+test.afterAll(async ({ api }) => {
+  await dischargePatientFromBed(api, transferBed.id, wardPatient.uuid);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+});
