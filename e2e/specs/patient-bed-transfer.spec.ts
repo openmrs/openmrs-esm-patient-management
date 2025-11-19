@@ -4,11 +4,15 @@ import { test } from '../core';
 import {
   changeLocation,
   changeToWardLocation,
+  deletePatient,
+  dischargePatientFromBed,
+  endVisit,
   generateBedType,
   generateRandomBed,
   generateRandomPatient,
   generateWardAdmissionRequest,
   getProvider,
+  retireBedType,
   startVisit,
 } from '../commands';
 import { WardPage } from '../pages';
@@ -71,7 +75,6 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 
   await test.step('And I click the admitted patient card', async () => {
     await wardPage.clickPatientCard(fullName);
-    await expect(wardPage.transferButton()).toBeVisible({ timeout: 10000 });
   });
 
   await test.step('And I click the transfer button', async () => {
