@@ -86,7 +86,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
     if (config.defaultToCurrentLocation && sessionLocation?.uuid) {
       return sessionLocation.uuid;
     }
-    return allLocationsItem.id;
+    return 'all';
   });
 
   const locationOptions = useMemo(() => {
