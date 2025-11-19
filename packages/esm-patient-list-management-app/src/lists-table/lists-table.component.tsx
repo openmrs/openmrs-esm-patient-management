@@ -187,7 +187,6 @@ const ListsTable: React.FC<PatientListTableProps> = ({
               onChange={({ selectedItem }) => setSelectedLocation(selectedItem.id)}
               titleText={t('filterByLocation', 'Filter by location')}
               type="inline"
-              className={styles.locationFilter}
             />
           </Layer>
           <Layer>
