@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { filterByServiceType } from '../utils';
+import { filterByProvider, filterByServiceType } from '../utils';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 
 interface AppointmentsListProps {
   appointmentServiceTypes?: Array<string>;
+  appointmentProviders?: Array<string>;
   date: string;
   excludeCancelledAppointments?: boolean;
   status?: string;
@@ -13,6 +14,7 @@ interface AppointmentsListProps {
 
 const AppointmentsList: React.FC<AppointmentsListProps> = ({
   appointmentServiceTypes,
+  appointmentProviders,
   date,
   excludeCancelledAppointments = false,
   status,
@@ -27,11 +29,24 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
     }),
   );
 
+  const appointmentsFilteredByProvider = filterByProvider(appointmentList, appointmentProviders).map((appointment) => ({
+    id: appointment.uuid,
+    ...appointment,
+  }));
+
   const activeAppointments = useMemo(() => {
-    return excludeCancelledAppointments
-      ? appointmentsFilteredByServiceType.filter((appointment) => appointment.status !== 'Cancelled')
-      : appointmentsFilteredByServiceType;
-  }, [excludeCancelledAppointments, appointmentsFilteredByServiceType]);
+    const byProvider = appointmentsFilteredByProvider;
+
+    const byServiceType = appointmentsFilteredByServiceType;
+
+    const combined = byProvider.filter((appt) => byServiceType.some((s) => s.uuid === appt.uuid));
+
+    const finalList = excludeCancelledAppointments
+      ? combined.filter((appointment) => appointment.status !== 'Cancelled')
+      : combined;
+
+    return finalList;
+  }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType, excludeCancelledAppointments]);
 
   return (
     <AppointmentsTable
