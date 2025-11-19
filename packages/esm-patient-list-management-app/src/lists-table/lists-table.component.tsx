@@ -76,7 +76,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   const pageSize = config.patientListsToShow ?? 10;
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const [searchTerm, setSearchTerm] = useState('');
-  const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
+  const responsiveSize = layout === 'tablet' ? 'lg' : 'md';
 
   const { toggleStarredList, starredLists } = useStarredLists();
 
@@ -193,7 +193,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
             <Search
               className={styles.searchbox}
               id={`${id}-search`}
-              labelText=""
+              labelText={t('searchThisList', 'Search this list')}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               placeholder={t('searchThisList', 'Search this list')}
               size={responsiveSize}
@@ -205,8 +205,6 @@ const ListsTable: React.FC<PatientListTableProps> = ({
       <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()} className={styles.tableContainer}>
-            {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
-
             <Table
               {...getTableProps()}
               className={styles.table}
