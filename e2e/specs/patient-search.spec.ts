@@ -1,9 +1,10 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage } from '../pages';
+import { getPatientIdentifierStr } from '../commands';
 
 test('Search patient by patient identifier', async ({ page, patient }) => {
-  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
+  const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
   const homePage = new HomePage(page);
@@ -35,7 +36,7 @@ test('Search patient by patient identifier', async ({ page, patient }) => {
 });
 
 test('Search patient by partial patient identifier', async ({ page, patient }) => {
-  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
+  const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
   
@@ -70,7 +71,7 @@ test('Search patient by partial patient identifier', async ({ page, patient }) =
 });
 
 test('Search patient by full name', async ({ page, patient }) => {
-  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
+  const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
   const homePage = new HomePage(page);
@@ -150,7 +151,7 @@ test('Search patient by last name only', async ({ page, patient }) => {
 });
 
 test('Search results show correct patient information', async ({ page, patient }) => {
-  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
+  const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
   const gender = patient.person.gender;

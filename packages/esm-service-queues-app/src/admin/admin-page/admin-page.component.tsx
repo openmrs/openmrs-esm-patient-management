@@ -13,7 +13,7 @@ import {
   Layer,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { launchWorkspace, useLayoutType, ErrorState } from '@openmrs/esm-framework';
+import { launchWorkspace2, useLayoutType, ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
 import styles from './admin-page.scss';
@@ -85,11 +85,11 @@ const AdminPage = () => {
   }, [queueRooms]);
 
   const handleAddQueue = () => {
-    launchWorkspace('service-queues-service-form');
+    launchWorkspace2('service-queues-service-form');
   };
 
   const handleAddQueueRoom = () => {
-    launchWorkspace('service-queues-room-workspace');
+    launchWorkspace2('service-queues-room-workspace');
   };
 
   if (isLoadingQueues || isLoadingQueueRooms) {
