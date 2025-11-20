@@ -7,6 +7,7 @@ import type {
   Patient,
   Person,
   Visit,
+  Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
@@ -50,7 +51,7 @@ export type WardPatient = {
   inpatientRequest: InpatientRequest;
 };
 
-export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
+export interface WardPatientWorkspaceProps {
   wardPatient: WardPatient;
 
   /**
@@ -59,6 +60,11 @@ export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
    */
   relatedTransferPatients?: WardPatient[];
 }
+
+/**
+ * props type of workspaces in the 'ward-patient` workspace group.
+ */
+export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<{}, {}, { wardPatient: WardPatient }>;
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -271,5 +277,3 @@ export interface MaternalWardViewContext {
   [key: number]: unknown;
   [key: symbol]: unknown;
 }
-
-export type PatientWorkspaceAdditionalProps = Omit<WardPatientWorkspaceProps, keyof DefaultWorkspaceProps>;

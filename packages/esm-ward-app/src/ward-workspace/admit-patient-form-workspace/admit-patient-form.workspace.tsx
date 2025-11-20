@@ -4,7 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import {
+  closeWorkspaceGroup2,
+  showSnackbar,
+  useAppContext,
+  Workspace2,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
@@ -19,11 +25,9 @@ import styles from './admit-patient-form.scss';
  * the bed management module is installed. It asks to (optionally) select
  * a bed to assign to patient
  */
-const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
-  wardPatient,
+const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
+  workspaceProps: { wardPatient },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
 }) => {
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
@@ -58,10 +62,6 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   } = useForm<FormValues>({
     resolver: zodResolver(zodSchema),
   });
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = (values: FormValues) => {
     setShowErrorNotifications(false);
@@ -115,6 +115,8 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
                 }),
               });
             }
+            closeWorkspace({ discardUnsavedChanges: true });
+            closeWorkspaceGroup2();
           }
         },
         () => {
@@ -131,7 +133,6 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
       .finally(async () => {
         await wardPatientGroupDetails?.mutate?.();
         setIsSubmitting(false);
-        closeWorkspaceWithSavedChanges();
       });
   };
 
@@ -143,66 +144,68 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   if (!wardPatientGroupDetails) return <></>;
 
   return (
-    <div className={styles.flexWrapper}>
-      <WardPatientWorkspaceBanner {...{ wardPatient }} />
-      <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-        <div className={styles.formContent}>
-          <Row>
-            <Column>
-              <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
-              <div className={styles.bedSelectionDropdown}>
-                <Controller
-                  control={control}
-                  name="bedId"
-                  render={({ field: { onChange, value }, fieldState: { error } }) => {
-                    return (
-                      <BedSelector
-                        beds={beds}
-                        isLoadingBeds={isLoading}
-                        currentPatient={patient}
-                        selectedBedId={value}
-                        error={error}
-                        control={control}
-                        onChange={onChange}
-                      />
-                    );
-                  }}
-                />
-              </div>
-            </Column>
-          </Row>
-          <div className={styles.errorNotifications}>
-            {showErrorNotifications &&
-              Object.entries(errors).map(([key, value]) => {
-                return (
-                  <Row key={key}>
-                    <Column>
-                      <InlineNotification kind="error" subtitle={value.message} lowContrast />
-                    </Column>
-                  </Row>
-                );
-              })}
+    <Workspace2 title={t('admitPatient', 'Admit patient')} hasUnsavedChanges={isDirty}>
+      <div className={styles.flexWrapper}>
+        <WardPatientWorkspaceBanner {...{ wardPatient }} />
+        <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+          <div className={styles.formContent}>
+            <Row>
+              <Column>
+                <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
+                <div className={styles.bedSelectionDropdown}>
+                  <Controller
+                    control={control}
+                    name="bedId"
+                    render={({ field: { onChange, value }, fieldState: { error } }) => {
+                      return (
+                        <BedSelector
+                          beds={beds}
+                          isLoadingBeds={isLoading}
+                          currentPatient={patient}
+                          selectedBedId={value}
+                          error={error}
+                          control={control}
+                          onChange={onChange}
+                        />
+                      );
+                    }}
+                  />
+                </div>
+              </Column>
+            </Row>
+            <div className={styles.errorNotifications}>
+              {showErrorNotifications &&
+                Object.entries(errors).map(([key, value]) => {
+                  return (
+                    <Row key={key}>
+                      <Column>
+                        <InlineNotification kind="error" subtitle={value.message} lowContrast />
+                      </Column>
+                    </Row>
+                  );
+                })}
+            </div>
           </div>
-        </div>
-        <ButtonSet className={styles.buttonSet}>
-          <Button size="xl" kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button
-            type="submit"
-            size="xl"
-            disabled={
-              isSubmitting ||
-              isLoadingEmrConfiguration ||
-              errorFetchingEmrConfiguration ||
-              isLoading ||
-              isLoadingBedsAssignedToPatient
-            }>
-            {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
-          </Button>
-        </ButtonSet>
-      </Form>
-    </div>
+          <ButtonSet className={styles.buttonSet}>
+            <Button size="xl" kind="secondary" onClick={() => closeWorkspace()}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button
+              type="submit"
+              size="xl"
+              disabled={
+                isSubmitting ||
+                isLoadingEmrConfiguration ||
+                errorFetchingEmrConfiguration ||
+                isLoading ||
+                isLoadingBedsAssignedToPatient
+              }>
+              {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
+            </Button>
+          </ButtonSet>
+        </Form>
+      </div>
+    </Workspace2>
   );
 };
 

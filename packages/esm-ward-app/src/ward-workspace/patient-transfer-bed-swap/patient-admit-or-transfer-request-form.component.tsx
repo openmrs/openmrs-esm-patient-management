@@ -11,18 +11,31 @@ import {
   TextArea,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useAppContext, Workspace2 } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import LocationSelector from '../../location-selector/location-selector.component';
-import type { ObsPayload, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import type { ObsPayload, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useCreateEncounter } from '../../ward.resource';
 import styles from './patient-transfer-swap.scss';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
+
+export interface PatientAdmitOrTransferFormProps {
+  wardPatient: WardPatient;
+
+  /**
+   * Related patients that are in the same bed as wardPatient. On transfer or bed swap
+   * these related patients have the option to be transferred / swapped together
+   */
+  relatedTransferPatients?: WardPatient[];
+
+  onSuccess(): void;
+  onCancel(): void;
+}
 
 /**
  * Form to fill out for:
@@ -31,11 +44,11 @@ import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-pat
  * - an un-admitted patient, to create a request to admit
  */
 export default function PatientAdmitOrTransferForm({
-  closeWorkspaceWithSavedChanges,
   wardPatient,
-  promptBeforeClosing,
   relatedTransferPatients = [],
-}: WardPatientWorkspaceProps) {
+  onSuccess,
+  onCancel,
+}: PatientAdmitOrTransferFormProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
@@ -90,11 +103,6 @@ export default function PatientAdmitOrTransferForm({
     }
   }, [dispositionsWithTypeTransfer, setValue]);
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-    return () => promptBeforeClosing(null);
-  }, [isDirty, promptBeforeClosing]);
-
   const onSubmit = useCallback(
     (values: FormValues) => {
       setIsSubmitting(true);
@@ -144,6 +152,7 @@ export default function PatientAdmitOrTransferForm({
             title: t('patientTransferRequestCreated', 'Patient transfer request created'),
             kind: 'success',
           });
+          onSuccess();
         })
         .catch((err: Error) => {
           showSnackbar({
@@ -154,12 +163,11 @@ export default function PatientAdmitOrTransferForm({
         })
         .finally(() => {
           setIsSubmitting(false);
-          closeWorkspaceWithSavedChanges();
           wardPatientGroupDetails.mutate();
         });
     },
     [
-      closeWorkspaceWithSavedChanges,
+      onSuccess,
       createEncounter,
       dispositionsWithTypeTransfer,
       emrConfiguration,
@@ -303,7 +311,7 @@ export default function PatientAdmitOrTransferForm({
         )}
       </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button size="xl" kind="secondary" onClick={closeWorkspaceWithSavedChanges}>
+        <Button size="xl" kind="secondary" onClick={onCancel}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button
