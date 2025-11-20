@@ -25,6 +25,7 @@ import { type SavePatientForm, SavePatientTransactionManager } from './form-mana
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
+import PatientVerification from '../patient-verification/patient-verification.component';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -243,6 +244,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             </div>
             <div className={styles.infoGrid}>
               <PatientRegistrationContextProvider value={createContextValue(props)}>
+                <PatientVerification props={props} setInitialFormValues={setInitialFormValues} />
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}

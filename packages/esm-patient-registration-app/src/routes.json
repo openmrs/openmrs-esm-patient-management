@@ -56,6 +56,14 @@
     {
       "name": "delete-identifier-confirmation-modal",
       "component": "deleteIdentifierConfirmationModal"
+    },
+    {
+      "component": "emptyClientRegistryModal",
+      "name": "empty-client-registry-modal"
+    },
+    {
+      "component": "confirmClientRegistryModal",
+      "name": "confirm-client-registry-modal"
     }
   ]
 }

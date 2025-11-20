@@ -1,0 +1,29 @@
+.patientInfoRow {
+  display: grid;
+  grid-template-columns: 0.25fr 0.75fr;
+  margin: 0.25rem;
+}
+
+.patientInfoLabel {
+  min-width: 5rem;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.patientDetailsContainer {
+  display: flex;
+  margin: 1rem;
+}
+
+.patientPhoto {
+  display: flex;
+  align-items: center;
+}
+
+.patientInfoContainer {
+  width: 100%;
+  margin-left: 0.625rem;
+}
