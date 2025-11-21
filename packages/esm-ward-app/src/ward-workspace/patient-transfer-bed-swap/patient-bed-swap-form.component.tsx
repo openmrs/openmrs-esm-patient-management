@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
@@ -7,19 +7,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { assignPatientToBed, removePatientFromBed, useCreateEncounter } from '../../ward.resource';
-import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import type { WardViewContext } from '../../types';
 import BedSelector from '../bed-selector.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import styles from './patient-transfer-swap.scss';
+import { type PatientAdmitOrTransferFormProps } from './patient-admit-or-transfer-request-form.component';
 
 export default function PatientBedSwapForm({
-  promptBeforeClosing,
-  closeWorkspaceWithSavedChanges,
   wardPatient,
   relatedTransferPatients = [],
-}: WardPatientWorkspaceProps) {
-  const { patient, visit } = wardPatient;
+  onCancel,
+  onSuccess
+}: PatientAdmitOrTransferFormProps) {
+  const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -46,11 +47,6 @@ export default function PatientBedSwapForm({
     control,
     handleSubmit,
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema) });
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-    return () => promptBeforeClosing(null);
-  }, [isDirty, promptBeforeClosing]);
 
   const beds = useMemo(() => wardPatientGroupDetails?.bedLayouts ?? [], [wardPatientGroupDetails]);
 
@@ -112,6 +108,7 @@ export default function PatientBedSwapForm({
                 }),
               });
             }
+            onSuccess();
           }
         })
         .catch((error: Error) => {
@@ -124,7 +121,6 @@ export default function PatientBedSwapForm({
         .finally(() => {
           setIsSubmitting(false);
           wardPatientGroupDetails.mutate();
-          closeWorkspaceWithSavedChanges();
         });
     },
     [
@@ -134,7 +130,7 @@ export default function PatientBedSwapForm({
       emrConfiguration,
       t,
       wardPatientGroupDetails,
-      closeWorkspaceWithSavedChanges,
+      onSuccess,
       selectedRelatedPatient,
       relatedTransferPatients,
       wardPatient,
@@ -222,7 +218,7 @@ export default function PatientBedSwapForm({
         )}
       </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button size="xl" kind="secondary" onClick={closeWorkspaceWithSavedChanges}>
+        <Button size="xl" kind="secondary" onClick={onCancel}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button
