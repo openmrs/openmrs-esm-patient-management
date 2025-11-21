@@ -23,7 +23,7 @@ import { SectionWrapper } from './section/section-wrapper.component';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
-import BeforeSavePrompt from './before-save-prompt';
+import BeforeSavePrompt from './before-save-prompt.component';
 import styles from './patient-registration.scss';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;

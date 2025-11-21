@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "Hapus",
   "demographicsSection": "Informasi Dasar",
   "discard": "Buang",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "Tanggal Lahir Diketahui?",
   "editIdentifierTooltip": "Edit",
   "editPatientDetails": "Edit detail pasien",

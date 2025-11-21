@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import classNames from 'classnames';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { assignPatientToBed, removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { assignPatientToBed, useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import BedSelector from '../bed-selector.component';
-import styles from './patient-transfer-swap.scss';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
+import styles from './patient-transfer-swap.scss';
 
 export default function PatientBedSwapForm({
   promptBeforeClosing,
@@ -45,7 +45,6 @@ export default function PatientBedSwapForm({
     formState: { errors, isDirty },
     control,
     handleSubmit,
-    getValues,
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema) });
 
   useEffect(() => {
@@ -60,6 +59,7 @@ export default function PatientBedSwapForm({
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
       setIsSubmitting(true);
       setShowErrorNotifications(false);
+
       const wardPatientsToSwap = [
         wardPatient,
         ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
@@ -145,7 +145,10 @@ export default function PatientBedSwapForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return null;
+  }
+
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
@@ -180,7 +183,7 @@ export default function PatientBedSwapForm({
                         <WardPatientIdentifier id="patient-identifier" patient={relatedPatient} />
                       </div>
                     }
-                    onChange={(_, { checked, id }) => {
+                    onChange={(_event, { checked, id }) => {
                       const currentValue = selectedRelatedPatient;
                       setCheckedRelatedPatient(
                         checked ? [...currentValue, id] : currentValue.filter((item) => item !== id),
