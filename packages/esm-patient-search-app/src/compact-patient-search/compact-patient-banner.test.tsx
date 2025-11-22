@@ -70,7 +70,7 @@ describe('CompactPatientBanner', () => {
     //   screen.getByRole('link', { name: new RegExp(`Smith, John Doe Male · ${age} yrs · OpenMRS ID 1000NLY`, 'i') }),
     // ).toBeInTheDocument();
     // expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${patients[0].uuid}/chart/`);
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
   });
 
@@ -98,7 +98,7 @@ describe('CompactPatientBanner', () => {
       </PatientSearchContext.Provider>,
     );
 
-    expect(screen.getAllByRole('img')).toHaveLength(2);
+    expect(screen.getAllByText('Patient Photo')).toHaveLength(2);
   });
 
   it('renders empty state when patients array is empty', () => {
@@ -108,6 +108,6 @@ describe('CompactPatientBanner', () => {
       </PatientSearchContext.Provider>,
     );
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByText('Patient Photo')).not.toBeInTheDocument();
   });
 });
