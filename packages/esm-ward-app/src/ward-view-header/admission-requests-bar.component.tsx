@@ -44,6 +44,7 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
         })}
       </span>
       <Button
+        className={styles.manageButton}
         onClick={() => {
           launchWorkspaceGroup('ward-patient-admission-requests', {
             state: { wardPendingPatients },

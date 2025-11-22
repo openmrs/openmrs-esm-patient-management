@@ -19,6 +19,7 @@ export interface PatientList {
   display: string;
   description: string;
   type: string;
+  location: { uuid: string; display: string } | null;
   size: number;
   options?: Array<PatientListOption>;
 }

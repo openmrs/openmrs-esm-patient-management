@@ -30,7 +30,7 @@ const PatientAppointmentsHeader: React.FC<PatientAppointmentsHeaderProps> = ({ p
       </div>
       <div className={styles.divider}></div>
       <div className={styles.patientBanner}>
-        <div className={styles.patientAvatar} role="img">
+        <div className={styles.patientAvatar}>
           <PatientPhoto patientUuid={patient.id} patientName={patientName} />
         </div>
         <PatientBannerPatientInfo patient={patient}></PatientBannerPatientInfo>

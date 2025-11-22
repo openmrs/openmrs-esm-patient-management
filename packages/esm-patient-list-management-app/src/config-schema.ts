@@ -17,10 +17,16 @@ export const configSchema = {
     _description: 'The default number of lists to show in the Lists dashboard table',
     _validators: [validator((v: unknown) => typeof v === 'number' && v > 0, 'Must be greater than zero')],
   },
+  defaultToCurrentLocation: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: "If true, the patient list will default to filtering by the user's current session location.",
+  },
 };
 
 export interface PatientListManagementConfig {
   myListCohortTypeUUID: string;
   systemListCohortTypeUUID: string;
   patientListsToShow: number;
+  defaultToCurrentLocation: boolean;
 }

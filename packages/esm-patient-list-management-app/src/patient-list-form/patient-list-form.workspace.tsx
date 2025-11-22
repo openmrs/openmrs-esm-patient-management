@@ -17,7 +17,7 @@ import {
   editPatientList,
   extractErrorMessagesFromResponse,
   type ErrorObject,
-} from '../api/api-remote';
+} from '../api/patient-list.resource';
 import { useCohortTypes } from '../api/hooks';
 import styles from './patient-list-form.scss';
 
@@ -105,7 +105,7 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
         OpenmrsFetchError && error instanceof OpenmrsFetchError
           ? typeof error.responseBody === 'string'
             ? error.responseBody
-            : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+            : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
           : (error as any)?.message;
 
       showSnackbar({

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
 import { type ConfigObject, isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import styles from './patient-banner-queue-entry-status.scss';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import styles from './patient-banner-queue-entry-status.scss';
 
 interface PatientBannerQueueEntryStatusProps {
   patientUuid: string;
@@ -25,7 +25,6 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
 
   return (
     <div className={styles.queueEntryStatusContainer}>
-      <span className={styles.separator}>&middot;</span>
       <span>{queueEntry.queue.name}</span>
       <QueuePriority
         priority={queueEntry.priority}

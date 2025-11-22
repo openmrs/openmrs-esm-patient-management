@@ -125,7 +125,7 @@ describe('PatientSearch', () => {
     //   `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
     // );
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
   });
 });
 

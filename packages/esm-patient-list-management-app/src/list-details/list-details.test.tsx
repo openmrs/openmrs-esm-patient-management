@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
 import { showModal } from '@openmrs/esm-framework';
 import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
-import { deletePatientList } from '../api/api-remote';
+import { deletePatientList } from '../api/patient-list.resource';
 import { getByTextWithMarkup } from 'tools';
 import ListDetails from './list-details.component';
 
@@ -20,7 +20,7 @@ jest.mock('../api/hooks', () => ({
   useCohortTypes: jest.fn(),
 }));
 
-jest.mock('../api/api-remote');
+jest.mock('../api/patient-list.resource');
 
 const mockPatientListDetails = {
   name: 'Test Patient List',

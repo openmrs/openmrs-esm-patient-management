@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { InlineNotification, Search, SkeletonText } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, isDesktop, launchWorkspace, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, showToast, useLayoutType } from '@openmrs/esm-framework';
 import type { Concept, Queue, QueueEntry } from '../types';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useColumns } from '../queue-table/cells/columns.resource';
@@ -11,6 +10,7 @@ import PatientQueueHeader from '../patient-queue-header/patient-queue-header.com
 import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
+import AddPatientToQueueButton from '../queue-table/components/add-patient-to-queue-button.component';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
@@ -47,24 +47,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
         showFilters={false}
         actions={
           <div className={styles.headerButtons}>
-            <ExtensionSlot
-              name="patient-search-button-slot"
-              state={{
-                buttonText: t('addPatientToQueue', 'Add patient to queue'),
-                buttonProps: {
-                  kind: 'secondary',
-                  renderIcon: (props) => <Add size={16} {...props} />,
-                  size: isDesktop(layout) ? 'sm' : 'lg',
-                },
-                selectPatientAction: (selectedPatientUuid) => {
-                  launchWorkspace('create-queue-entry-workspace', {
-                    selectedPatientUuid,
-                    currentServiceQueueUuid: selectedQueue.uuid,
-                  });
-                },
-                workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
-              }}
-            />
+            <AddPatientToQueueButton />
             <div className={styles.filterSearch}>
               <Search
                 labelText=""
