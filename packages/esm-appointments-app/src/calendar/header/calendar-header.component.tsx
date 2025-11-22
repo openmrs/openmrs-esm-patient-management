@@ -1,9 +1,10 @@
 import React from 'react';
-import dayjs from 'dayjs';
+import { parseDate, toCalendar, createCalendar } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import { spaHomePage } from '../../constants';
 import { useAppointmentsStore } from '../../store';
 import styles from './calendar-header.scss';
@@ -13,7 +14,8 @@ const CalendarHeader: React.FC = () => {
   const { selectedDate } = useAppointmentsStore();
 
   const handleClick = () => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });
+    const date = toCalendar(parseDate(selectedDate), createCalendar(getDefaultCalendar(getLocale())));
+    navigate({ to: `${spaHomePage}/appointments/${date.toString()}` });
   };
 
   return (
