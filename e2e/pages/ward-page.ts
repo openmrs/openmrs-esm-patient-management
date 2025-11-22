@@ -61,6 +61,9 @@ export class WardPage {
     await this.page.getByText(/admission request cancelled/i).waitFor({ state: 'visible' });
   }
 
+  async clickAdmitButton() {
+    await this.page.getByRole('button', { name: /Admit/i }).click();
+  }
   async waitForPatientInWardView(patientName: string) {
     await this.page
       .locator(`[class*="wardPatientCard"]:has-text("${patientName}")`)
