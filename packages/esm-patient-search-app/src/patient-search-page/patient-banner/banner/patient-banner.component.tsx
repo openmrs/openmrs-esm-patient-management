@@ -62,7 +62,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         })}
         role="banner">
         <ClickablePatientContainer patient={fhirMappedPatient}>
-          <div className={styles.patientAvatar} role="img">
+          <div className={styles.patientAvatar}>
             <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
           </div>
           <PatientBannerPatientInfo patient={fhirMappedPatient} />
