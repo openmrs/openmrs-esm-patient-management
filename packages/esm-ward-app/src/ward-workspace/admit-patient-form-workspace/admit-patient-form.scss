@@ -40,3 +40,8 @@
 .productiveHeading02 {
   @include type.type-style('heading-compact-02');
 }
+
+// Location validation warning notification
+.locationValidationWarning {
+  margin-bottom: layout.$spacing-05;
+}
