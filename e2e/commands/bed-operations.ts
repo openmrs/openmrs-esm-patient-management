@@ -88,7 +88,7 @@ export const bedLocation = async (api: APIRequestContext) => {
 };
 
 export const retireBedType = async (api: APIRequestContext, uuid: string, retireReason: string) => {
-  const response = await api.put(`bedtype/${uuid}`, {
+  const response = await api.post(`bedtype/${uuid}`, {
     data: {
       retired: 'true',
       retiredReason: retireReason,

@@ -385,12 +385,12 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               {formState.modifyDefaultTransitionDateTime && (
                 <div className={styles.dateTimeFields}>
                   <OpenmrsDatePicker
-                    value={formState.transitionDate}
+                    data-testid="datePickerInput"
+                    id="datePickerInput"
+                    labelText={t('date', 'Date')}
                     maxDate={new Date()}
                     onChange={setTransitionDate}
-                    id="datePickerInput"
-                    data-testid="datePickerInput"
-                    labelText={t('date', 'Date')}
+                    value={formState.transitionDate}
                   />
 
                   <TimePicker

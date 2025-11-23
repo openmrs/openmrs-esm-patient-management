@@ -9,7 +9,7 @@ const moduleName = '@openmrs/esm-service-queues-app';
 const swrRefreshIntervalInMs = 60000;
 
 const options = {
-  featureName: 'service-queues',
+  featureName: 'serviceQueues',
   moduleName,
 };
 
@@ -121,7 +121,6 @@ export const transitionOverflowMenuItem = getAsyncLifecycle(
   },
 );
 
-// t('addNewQueueService', 'Add New Queue Service')
 export const addNewQueueServiceWorkspace = getAsyncLifecycle(
   () => import('./admin/queue-services/queue-service-form.workspace'),
   {
@@ -130,7 +129,6 @@ export const addNewQueueServiceWorkspace = getAsyncLifecycle(
   },
 );
 
-// t('addNewQueueServiceRoom', 'Add new queue service room')
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./admin/queue-rooms/queue-room-form.workspace'),
   {
@@ -172,6 +170,16 @@ export const adminPageCardLink = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const serviceQueuesAdminPage = getAsyncLifecycle(() => import('./admin/admin-page/admin-page.component'), {
+  featureName: 'service-queues-admin-page',
+  moduleName,
+});
+
+export const queueScreen = getAsyncLifecycle(() => import('./queue-screen/queue-screen.component'), {
+  featureName: 'queue-screen',
+  moduleName,
+});
 
 export function startupApp() {
   registerBreadcrumbs([]);
