@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PatientUuid } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps, type PatientUuid } from '@openmrs/esm-framework';
 import { usePatientNotes } from '../notes.resource';
 import InPatientNote, { InPatientNoteSkeleton } from './note.component';
 import styles from './styles.scss';
@@ -10,13 +10,14 @@ import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 interface PatientNotesHistoryProps {
   patientUuid: PatientUuid;
   visitUuid: string;
+  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
 }
 
-const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid }) => {
+const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
 
-  const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
+  const { patientNotes, mutatePatientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
     patientUuid,
     visitUuid,
     emrConfiguration?.inpatientNoteEncounterType?.uuid,
@@ -34,7 +35,12 @@ const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, 
       </div>
       {isLoading ? [1, 2, 3, 4].map((item, index) => <InPatientNoteSkeleton key={index} />) : null}
       {patientNotes.map((patientNote) => (
-        <InPatientNote key={patientNote.id} note={patientNote} />
+        <InPatientNote
+          key={patientNote.encounterUuid}
+          note={patientNote}
+          mutatePatientNotes={mutatePatientNotes}
+          promptBeforeClosing={promptBeforeClosing}
+        />
       ))}
       {errorFetchingPatientNotes && (
         <InlineNotification

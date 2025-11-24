@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
-import { savePatientNote } from '../notes.resource';
+import { createPatientNote } from '../notes.resource';
 import PatientNotesForm from './notes-form.component';
 import { emrConfigurationMock, mockPatient, mockSession } from '__mocks__';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
@@ -17,7 +17,7 @@ const testProps = {
   setOnCloseCallback: jest.fn(),
 };
 
-const mockSavePatientNote = savePatientNote as jest.Mock;
+const mockCreatePatientNote = createPatientNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedCreateErrorHandler = jest.mocked(createErrorHandler);
 const mockedTranslateFrom = jest.mocked(translateFrom);
@@ -25,7 +25,7 @@ const mockedResponsiveWrapper = jest.mocked(ResponsiveWrapper);
 const mockedUseSession = jest.mocked(useSession);
 
 jest.mock('../notes.resource', () => ({
-  savePatientNote: jest.fn(),
+  createPatientNote: jest.fn(),
 }));
 
 jest.mock('../../../hooks/useEmrConfiguration', () => jest.fn());
@@ -65,7 +65,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
     patient: mockPatient.uuid,
   };
 
-  mockSavePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
+  mockCreatePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
 
   renderWardPatientNotesForm();
 
@@ -77,8 +77,8 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   const submitButton = screen.getByRole('button', { name: /Save/i });
   await userEvent.click(submitButton);
 
-  expect(mockSavePatientNote).toHaveBeenCalledTimes(1);
-  expect(mockSavePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
+  expect(mockCreatePatientNote).toHaveBeenCalledTimes(1);
+  expect(mockCreatePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
 });
 
 test('renders an error snackbar if there was a problem recording a visit note', async () => {
@@ -90,7 +90,7 @@ test('renders an error snackbar if there was a problem recording a visit note', 
     },
   };
 
-  mockSavePatientNote.mockRejectedValueOnce(error);
+  mockCreatePatientNote.mockRejectedValueOnce(error);
   renderWardPatientNotesForm();
 
   const note = screen.getByRole('textbox', { name: /Write your notes/i });

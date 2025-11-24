@@ -6,22 +6,28 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button, Column, Form, InlineLoading, InlineNotification, Row, Stack, TextArea } from '@carbon/react';
 import {
   type DefaultWorkspaceProps,
+  isDesktop,
   type PatientUuid,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
+  useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
 import { moduleName } from '../../../constant';
-import { savePatientNote } from '../notes.resource';
+import { createPatientNote } from '../notes.resource';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 import styles from './notes-form.scss';
 import { type EncounterPayload } from '../../../types';
 
 type NotesFormData = z.infer<typeof noteFormSchema>;
 
-interface PatientNotesFormProps extends DefaultWorkspaceProps {
+interface PatientNotesFormProps {
   patientUuid: PatientUuid;
+  encounterUuid?: string;
+  initialNote?: string;
+  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
+  closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
 }
 
 const noteFormSchema = z.object({
@@ -35,13 +41,14 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   promptBeforeClosing,
+  encounterUuid,
+  initialNote = '',
 }) => {
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { t } = useTranslation();
   const session = useSession();
-
+  const isTablet = !isDesktop(useLayoutType());
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rows, setRows] = useState(0);
 
   const {
     control,
@@ -51,7 +58,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
     mode: 'onSubmit',
     resolver: zodResolver(noteFormSchema),
     defaultValues: {
-      wardClinicalNote: '',
+      wardClinicalNote: initialNote,
     },
   });
 
@@ -68,6 +75,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
       setIsSubmitting(true);
 
       const notePayload: EncounterPayload = {
+        uuid: encounterUuid || undefined,
         patient: patientUuid,
         location: locationUuid,
         encounterType: emrConfiguration?.inpatientNoteEncounterType?.uuid,
@@ -89,7 +97,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
 
       const abortController = new AbortController();
 
-      savePatientNote(notePayload, abortController)
+      createPatientNote(notePayload, abortController)
         .then(() => {
           closeWorkspaceWithSavedChanges();
           showSnackbar({
@@ -117,6 +125,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
       locationUuid,
       patientUuid,
       providerUuid,
+      encounterUuid,
       t,
     ],
   );
@@ -139,7 +148,7 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
           />
         </div>
       )}
-      <Stack className={styles.formContainer} gap={2}>
+      <Stack className={styles.formContainer} gap={4}>
         <Row className={styles.row}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('note', 'Note')}</span>
@@ -158,12 +167,9 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
                     onBlur={onBlur}
                     onChange={(event) => {
                       onChange(event);
-                      const textAreaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                      const newRows = Math.ceil(event.target.scrollHeight / textAreaLineHeight);
-                      setRows(newRows);
                     }}
                     placeholder={t('wardClinicalNotePlaceholder', 'Write any notes here')}
-                    rows={rows}
+                    rows={6}
                     value={value}
                   />
                 </ResponsiveWrapper>
@@ -171,14 +177,17 @@ const PatientNotesForm: React.FC<PatientNotesFormProps> = ({
             />
           </Column>
         </Row>
+        <div className={styles.saveButtonContainer}>
+          <Button
+            className={styles.saveButton}
+            disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
+            kind="primary"
+            size={isTablet ? 'lg' : 'sm'}
+            type="submit">
+            {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
+          </Button>
+        </div>
       </Stack>
-      <Button
-        className={styles.saveButton}
-        disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
-        kind="primary"
-        type="submit">
-        {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
-      </Button>
     </Form>
   );
 };

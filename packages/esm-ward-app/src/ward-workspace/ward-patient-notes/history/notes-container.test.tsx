@@ -54,7 +54,7 @@ describe('PatientNotesHistory', () => {
       isLoadingPatientNotes: true,
     });
 
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} />);
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
 
     expect(screen.getAllByTestId('in-patient-note-skeleton')).toHaveLength(4);
   });
@@ -72,7 +72,7 @@ describe('PatientNotesHistory', () => {
       isLoadingPatientNotes: false,
     });
 
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} />);
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
 
     expect(screen.getByText('History')).toBeInTheDocument();
 
