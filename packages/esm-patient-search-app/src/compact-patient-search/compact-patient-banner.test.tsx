@@ -72,7 +72,7 @@ describe('CompactPatientBanner', () => {
       </PatientSearchContext.Provider>,
     );
 
-    expect(screen.getAllByRole('img')).toHaveLength(2);
+    expect(screen.getAllByText('Patient Photo')).toHaveLength(2);
   });
 
   it('renders empty state when patients array is empty', () => {
@@ -82,6 +82,6 @@ describe('CompactPatientBanner', () => {
       </PatientSearchContext.Provider>,
     );
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByText('Patient Photo')).not.toBeInTheDocument();
   });
 });

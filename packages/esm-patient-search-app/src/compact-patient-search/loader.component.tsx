@@ -5,7 +5,7 @@ import styles from './compact-patient-banner.scss';
 export const Loader = () => {
   return (
     <div className={styles.patientSearchResult} data-testid="search-skeleton">
-      <div className={styles.patientAvatar} role="img">
+      <div className={styles.patientAvatar}>
         <SkeletonIcon className={styles.skeletonIcon} />
       </div>
       <div>

@@ -82,7 +82,7 @@ describe('PatientSearch', () => {
     // expect(screen.getByRole('link', { name: new RegExp(`Smith, John Doe Male · ${age} yrs · OpenMRS ID 1000NLY`, 'i') })).toBeInTheDocument();
     // expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${mockSearchResults[0].id}/chart/`);
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
   });
 });
 

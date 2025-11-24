@@ -109,7 +109,7 @@ describe('RecentlySearchedPatients', () => {
     //   `/openmrs/spa/patient/${mockSearchResults[0].id}/chart/`,
     // );
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/i })).toBeInTheDocument();
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
     expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
   });
 

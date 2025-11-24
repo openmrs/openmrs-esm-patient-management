@@ -32,7 +32,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
 
     return (
       <ClickablePatientContainer key={patient.id} patient={patient}>
-        <div className={styles.patientAvatar} role="img">
+        <div className={styles.patientAvatar}>
           <PatientPhoto patientUuid={patient.id} patientName={patientName} />
         </div>
         <PatientBannerPatientInfo patient={patient} />
