@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
@@ -17,11 +17,43 @@ import {
   type PatientListFilter,
   PatientListType,
 } from './types';
+import { useActiveVisits } from '@openmrs/esm-active-visits-app/src/active-visits-widget/active-visits.resource';
 
 interface PatientListResponse {
   results: CohortResponse<OpenmrsCohort>;
   links: Array<{ rel: 'prev' | 'next' }>;
   totalCount: number;
+}
+
+/**
+ * Hook to create a patient list from active visits
+ * This transforms the active visits data into a patient list format
+ */
+export function useActiveVisitsPatientList() {
+  const { activeVisits, isLoading, error, totalResults } = useActiveVisits();
+  const { user } = useSession();
+
+  const activeVisitsPatientList = useMemo(() => {
+    const starredListsString = user?.userProperties?.starredPatientLists ?? '';
+    const starredListsArray = starredListsString.split(',').filter(Boolean);
+    const isStarred = starredListsArray.includes('active-visits-system-list');
+
+    return {
+      id: 'active-visits-system-list',
+      display: 'Active Visits',
+      description: 'Patients currently with active visits at this location',
+      type: PatientListType.SYSTEM,
+      size: totalResults,
+      isStarred,
+      patientUuids: activeVisits?.map((visit) => visit.patientUuid) || [],
+    };
+  }, [activeVisits, totalResults, user?.userProperties?.starredPatientLists]);
+
+  return {
+    activeVisitsPatientList,
+    isLoading,
+    error,
+  };
 }
 
 export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
@@ -78,15 +110,47 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     size: cohort.size,
     location: cohort.location,
   }));
+
   const { user } = useSession();
 
+  // Fetch Active Visits list
+  const {
+    activeVisitsPatientList,
+    isLoading: isLoadingActiveVisits,
+    error: activeVisitsError,
+  } = useActiveVisitsPatientList();
+
+  const starredListsArray = useMemo(() => {
+    const starredString = user?.userProperties?.starredPatientLists ?? '';
+    return starredString.split(',').filter(Boolean);
+  }, [user?.userProperties?.starredPatientLists]);
+
+  const allPatientLists = useMemo(() => {
+    let lists = [...patientListsData];
+
+    if (type === PatientListType.SYSTEM || !type) {
+      lists = [activeVisitsPatientList, ...lists];
+    }
+
+    if (isStarred) {
+      lists = lists.filter(({ id }) => starredListsArray.includes(id));
+
+      if (activeVisitsPatientList.isStarred) {
+        const hasActiveVisits = lists.some((list) => list.id === 'active-visits-system-list');
+        if (!hasActiveVisits) {
+          lists = [activeVisitsPatientList, ...lists];
+        }
+      }
+    }
+
+    return lists;
+  }, [patientListsData, activeVisitsPatientList, type, isStarred, starredListsArray]);
+
   return {
-    patientLists: isStarred
-      ? patientListsData.filter(({ id }) => user?.userProperties?.starredPatientLists?.includes(id))
-      : patientListsData,
-    isLoading,
+    patientLists: allPatientLists,
+    isLoading: isLoading || isLoadingActiveVisits,
     isValidating,
-    error,
+    error: error || activeVisitsError,
     mutate,
   };
 }
@@ -109,24 +173,57 @@ export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: str
       getPatientListIdsForPatient(patientUuid),
     ]);
 
-    const listsWithoutPatient = allLists.filter((list) => !listsIdsOfThisPatient.includes(list.id));
+    const listsWithoutPatient = allLists.filter(
+      (list) => !listsIdsOfThisPatient.includes(list.id) && list.id !== 'active-visits-system-list',
+    );
     return listsWithoutPatient;
   });
 }
 
 export function usePatientListDetails(patientListUuid: string) {
-  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate,cohortType)`;
+  const { user } = useSession();
 
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<OpenmrsCohort>, Error>(
-    patientListUuid ? url : null,
-    openmrsFetch,
-  );
+  const isActiveVisitsList = patientListUuid === 'active-visits-system-list';
+
+  const {
+    activeVisitsPatientList,
+    isLoading: isLoadingActiveVisits,
+    error: activeVisitsError,
+  } = useActiveVisitsPatientList();
+
+  const url = !isActiveVisitsList
+    ? `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate,cohortType)`
+    : null;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<OpenmrsCohort>, Error>(url, openmrsFetch);
+
+  const listDetails = useMemo(() => {
+    if (isActiveVisitsList) {
+      if (!activeVisitsPatientList) return null;
+
+      return {
+        uuid: activeVisitsPatientList.id,
+        name: activeVisitsPatientList.display,
+        description: activeVisitsPatientList.description,
+        display: activeVisitsPatientList.display,
+        size: activeVisitsPatientList.size,
+        cohortType: {
+          uuid: 'system',
+          display: PatientListType.SYSTEM,
+        },
+        attributes: [],
+        startDate: null,
+        endDate: null,
+      };
+    }
+
+    return data?.data;
+  }, [isActiveVisitsList, activeVisitsPatientList, data?.data]);
 
   return {
-    listDetails: data?.data,
-    error,
-    isLoading,
-    mutateListDetails: mutate,
+    listDetails,
+    error: isActiveVisitsList ? activeVisitsError : error,
+    isLoading: isActiveVisitsList ? isLoadingActiveVisits : isLoading,
+    mutateListDetails: isActiveVisitsList ? () => {} : mutate, // No-op for system list
   };
 }
 
@@ -137,16 +234,125 @@ export function usePatientListMembers(
   pageSize: number = 10,
   v: string = 'full',
 ) {
+  const isActiveVisitsList = patientListUuid === 'active-visits-system-list';
+
+  const { activeVisits, isLoading: isLoadingActiveVisits, error: activeVisitsError, totalResults } = useActiveVisits();
+
+  const apiUrl = !isActiveVisitsList
+    ? `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`
+    : null;
+
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
-    `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`,
+    apiUrl,
     openmrsFetch,
   );
 
+  const { listMembers: activeVisitsMembers, filteredCount } = useMemo(() => {
+    if (!isActiveVisitsList || !activeVisits || activeVisits.length === 0) {
+      return { listMembers: [], filteredCount: 0 };
+    }
+
+    const visits = activeVisits as any[];
+
+    let filtered = visits;
+    if (searchQuery) {
+      const lowerSearch = searchQuery.toLowerCase();
+      filtered = visits.filter((visit: any) => {
+        const name = visit.patient?.person?.display || visit.patient?.display || visit.name || visit.patientName || '';
+        const identifier = visit.patient?.identifiers?.[0]?.identifier || visit.identifier || visit.idNumber || '';
+        const gender = visit.patient?.person?.gender || visit.gender || visit.sex || '';
+
+        return (
+          name.toLowerCase().includes(lowerSearch) ||
+          identifier.toLowerCase().includes(lowerSearch) ||
+          gender.toLowerCase().includes(lowerSearch)
+        );
+      });
+    }
+
+    const filteredCount = filtered.length;
+
+    const paginated = filtered.slice(startIndex, startIndex + pageSize);
+
+    const members = paginated.map((visit: any) => {
+      const patientUuid = visit.patient?.uuid || visit.patientUuid || '';
+
+      let patientDisplay = '';
+      if (visit.patient?.display) {
+        patientDisplay = visit.patient.display;
+      } else if (visit.patient?.person?.display) {
+        patientDisplay = visit.patient.person.display;
+      } else if (visit.name) {
+        patientDisplay = visit.name;
+      } else if (visit.patientName) {
+        patientDisplay = visit.patientName;
+      }
+
+      let identifierValue = '';
+      if (visit.patient?.identifiers && visit.patient.identifiers.length > 0) {
+        identifierValue = visit.patient.identifiers[0].identifier;
+      } else if (visit.identifier) {
+        identifierValue = visit.identifier;
+      } else if (visit.idNumber) {
+        identifierValue = visit.idNumber;
+      }
+
+      let ageValue;
+      if (visit.patient?.person?.age !== undefined) {
+        ageValue = visit.patient.person.age;
+      } else if (visit.age !== undefined) {
+        ageValue = typeof visit.age === 'string' ? parseInt(visit.age, 10) : visit.age;
+      }
+
+      const genderValue = visit.patient?.person?.gender || visit.gender || visit.sex || '';
+
+      let attributesArray = visit.patient?.person?.attributes || [];
+      if (
+        visit.telephoneNumber &&
+        !attributesArray.some((attr: any) => attr?.attributeType?.display === 'Telephone Number')
+      ) {
+        attributesArray = [
+          ...attributesArray,
+          {
+            attributeType: { display: 'Telephone Number' },
+            value: visit.telephoneNumber,
+          },
+        ];
+      }
+
+      const visitStartDate =
+        visit.startDatetime || visit.visitStartDatetime || visit.visitStartTime || new Date().toISOString();
+
+      return {
+        uuid: `visit-${visit.visitUuid || visit.uuid || visit.id}`,
+        patient: {
+          uuid: patientUuid,
+          identifiers: [
+            {
+              identifier: identifierValue,
+            },
+          ],
+          person: {
+            display: patientDisplay,
+            age: ageValue,
+            gender: genderValue,
+            attributes: attributesArray,
+          },
+        },
+        startDate: visitStartDate,
+        endDate: null,
+      };
+    });
+
+    return { listMembers: members, filteredCount };
+  }, [isActiveVisitsList, activeVisits, searchQuery, startIndex, pageSize]);
+
   return {
-    listMembers: data?.data?.results ?? [],
-    isLoadingListMembers: isLoading,
-    error: error,
-    mutateListMembers: mutate,
+    listMembers: isActiveVisitsList ? activeVisitsMembers : (data?.data?.results ?? []),
+    isLoadingListMembers: isActiveVisitsList ? isLoadingActiveVisits : isLoading,
+    error: isActiveVisitsList ? activeVisitsError : error,
+    mutateListMembers: isActiveVisitsList ? () => {} : mutate, // No-op for system list
+    totalCount: isActiveVisitsList ? (searchQuery ? filteredCount : totalResults) : data?.data?.totalCount,
   };
 }
 
