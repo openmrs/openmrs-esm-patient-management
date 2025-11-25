@@ -130,6 +130,5 @@
   "unknown": "Unknown",
   "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Patient note saved",
-  "wardClinicalNotePlaceholder": "Write any notes here",
-  "wards": "Wards"
+  "wardClinicalNotePlaceholder": "Write any notes here"
 }
