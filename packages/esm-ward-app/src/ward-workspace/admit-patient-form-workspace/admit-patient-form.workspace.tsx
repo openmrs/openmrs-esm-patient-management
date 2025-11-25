@@ -4,11 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { type Location, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
+import useLocation from '../../hooks/useLocation';
+import { isLocationDescendantOf } from '../../utils/location-utils';
 import BedSelector from '../bed-selector.component';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './admit-patient-form.scss';
@@ -31,15 +33,23 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   const { t } = useTranslation();
   const { location } = useWardLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locationValidationError, setLocationValidationError] = useState<string | null>(null);
   const { admitPatient, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useAdmitPatient();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
 
+  // Fetch the patient's visit location with full details including parentLocation
+  const { data: visitLocationResponse, isLoading: isLoadingVisitLocation } = useLocation(visit?.location?.uuid, 'full');
+  const visitLocation: Location | undefined = visitLocationResponse?.data;
+
   const { data: bedsAssignedToPatient, isLoading: isLoadingBedsAssignedToPatient } = useAssignedBedByPatient(
     patient.uuid,
   );
-  const beds = isLoading ? [] : (wardPatientGroupDetails?.bedLayouts ?? []);
+  const beds = useMemo(
+    () => (isLoading ? [] : (wardPatientGroupDetails?.bedLayouts ?? [])),
+    [isLoading, wardPatientGroupDetails?.bedLayouts],
+  );
 
   const zodSchema = useMemo(
     () =>
@@ -55,9 +65,68 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
     control,
     formState: { errors, isDirty },
     handleSubmit,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(zodSchema),
   });
+
+  const selectedBedId = watch('bedId');
+
+  // Fetch the selected bed's location details with full representation
+  const selectedBed = useMemo(() => beds.find((bed) => bed.bedId === selectedBedId), [beds, selectedBedId]);
+  const { data: selectedBedLocationResponse, isLoading: isLoadingSelectedBedLocation } = useLocation(
+    selectedBed?.location,
+    'full',
+  );
+  const selectedBedLocation: Location | undefined = selectedBedLocationResponse?.data;
+
+  // Validate location hierarchy whenever the selected bed location or visit location changes
+  useEffect(() => {
+    if (!selectedBedId) {
+      // No bed selected, clear validation error
+      setLocationValidationError(null);
+      return;
+    }
+
+    if (isLoadingVisitLocation || isLoadingSelectedBedLocation) {
+      // Still loading location data
+      return;
+    }
+
+    if (!visitLocation) {
+      // Visit location not available
+      setLocationValidationError(
+        t('visitLocationNotAvailable', 'Unable to validate location: Visit location information is not available.'),
+      );
+      return;
+    }
+
+    if (!selectedBedLocation) {
+      // Selected bed location not available
+      setLocationValidationError(
+        t(
+          'bedLocationNotAvailable',
+          'Unable to validate location: Selected bed location information is not available.',
+        ),
+      );
+      return;
+    }
+
+    // Perform location validation
+    const isValid = isLocationDescendantOf(selectedBedLocation, visitLocation);
+
+    if (!isValid) {
+      setLocationValidationError(
+        t(
+          'invalidAdmissionLocation',
+          "The selected location is not a sub-location of the patient's visit location ({{visitLocationName}}). Please select a valid admission location.",
+          { visitLocationName: visitLocation.display || visitLocation.name },
+        ),
+      );
+    } else {
+      setLocationValidationError(null);
+    }
+  }, [selectedBedId, selectedBedLocation, visitLocation, isLoadingVisitLocation, isLoadingSelectedBedLocation, t]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -182,6 +251,19 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
                   </Row>
                 );
               })}
+            {locationValidationError && (
+              <Row>
+                <Column>
+                  <InlineNotification
+                    kind="warning"
+                    subtitle={locationValidationError}
+                    lowContrast
+                    hideCloseButton
+                    className={styles.locationValidationWarning}
+                  />
+                </Column>
+              </Row>
+            )}
           </div>
         </div>
         <ButtonSet className={styles.buttonSet}>
@@ -196,7 +278,10 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
               isLoadingEmrConfiguration ||
               errorFetchingEmrConfiguration ||
               isLoading ||
-              isLoadingBedsAssignedToPatient
+              isLoadingBedsAssignedToPatient ||
+              isLoadingVisitLocation ||
+              isLoadingSelectedBedLocation ||
+              !!locationValidationError
             }>
             {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
           </Button>
