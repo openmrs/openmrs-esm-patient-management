@@ -2,11 +2,21 @@ import React from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { isSameMonth } from '../../helpers';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
+import {
+  parseDate,
+  type CalendarDate,
+  toCalendar,
+  createCalendar,
+  getLocalTimeZone,
+  today,
+  isSameDay,
+} from '@internationalized/date';
+import { isSameCalendarMonth } from '../../helpers';
 import styles from './monthly-workload.scss';
 
 interface MonthlyWorkloadComponentProps {
-  date: Dayjs;
+  date: CalendarDate;
   count: number;
   isActive: boolean;
   selectedDate?: Dayjs;
@@ -14,16 +24,20 @@ interface MonthlyWorkloadComponentProps {
 
 const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, count, isActive, selectedDate }) => {
   const layout = useLayoutType();
-  const isToday = date.isSame(dayjs(), 'day');
+  const isToday = isSameDay(date, today(getLocalTimeZone()));
+  const dateSelected = toCalendar(
+    parseDate(dayjs(selectedDate).format('YYYY-MM-DD')),
+    createCalendar(getDefaultCalendar(getLocale())),
+  );
 
   return (
     <div
       className={classNames(
         styles['monthly-cell'],
         {
-          [styles['monthly-cell-selected']]: isSameMonth(date, dayjs(selectedDate)),
-          [styles['monthly-cell-current']]: isSameMonth(date, dayjs(selectedDate)),
-          [styles['monthly-cell-current']]: isSameMonth(date, selectedDate),
+          [styles['monthly-cell-selected']]: isSameCalendarMonth(date, dateSelected),
+          [styles['monthly-cell-current']]: isSameCalendarMonth(date, dateSelected),
+          [styles['monthly-cell-current']]: isSameCalendarMonth(date, dateSelected),
           [styles['monthly-cell-active']]: isActive,
         },
         {
@@ -32,7 +46,7 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, co
         },
       )}>
       <div>
-        <b className={[styles.calendarDate, isToday ? styles.blue : ''].join(' ')}>{date.format('D')}</b>
+        <b className={[styles.calendarDate, isToday ? styles.blue : ''].join(' ')}>{date.day}</b>
         <div className={styles.currentData}>
           <div tabIndex={0} role="button" className={classNames(styles.tileContainer, {})}></div>
           <div className={styles.serviceArea}>

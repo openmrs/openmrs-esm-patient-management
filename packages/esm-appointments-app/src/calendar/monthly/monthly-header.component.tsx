@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { omrsDateFormat } from '../../constants';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
+import { parseDate, toCalendar, createCalendar } from '@internationalized/date';
 import { useAppointmentsStore, setSelectedDate } from '../../store';
 import DaysOfWeekCard from './days-of-week.component';
 import styles from './monthly-header.scss';
@@ -13,14 +13,15 @@ const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 const MonthlyHeader: React.FC = () => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
+  const date = toCalendar(parseDate(selectedDate.split('T')[0]), createCalendar(getDefaultCalendar(getLocale())));
 
   const handleSelectPrevMonth = useCallback(() => {
-    setSelectedDate(dayjs(selectedDate).subtract(1, 'month').format(omrsDateFormat));
-  }, [selectedDate]);
+    setSelectedDate(date.subtract({ months: 1 }).toString());
+  }, [date]);
 
   const handleSelectNextMonth = useCallback(() => {
-    setSelectedDate(dayjs(selectedDate).add(1, 'month').format(omrsDateFormat));
-  }, [selectedDate]);
+    setSelectedDate(date.subtract({ months: 1 }).toString());
+  }, [date]);
 
   return (
     <>
