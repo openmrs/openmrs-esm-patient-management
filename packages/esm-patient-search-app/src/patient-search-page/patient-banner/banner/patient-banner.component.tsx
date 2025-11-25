@@ -13,6 +13,7 @@ import {
   useLayoutType,
   useVisit,
   navigate,
+  getPatientName,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { usePatientSearchContext, usePatientSearchContext2 } from '../../../patient-search-context';
@@ -38,11 +39,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const context2 = usePatientSearchContext2();
   const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
 
-  const patientName =
-    patient.name?.[0]?.text ??
-    `${patient.name?.[0]?.given?.join(' ') ?? ''} ${patient.name?.[0]?.family ?? ''}`.trim();
+  const patientName = getPatientName(patient);
 
-  const isDeceased = !!(patient.deceasedBoolean || patient.deceasedDateTime);
+  const isDeceased = patient.deceasedBoolean;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
 
