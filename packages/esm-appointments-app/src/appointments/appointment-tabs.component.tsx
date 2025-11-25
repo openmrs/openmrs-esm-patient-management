@@ -9,9 +9,10 @@ import styles from './appointment-tabs.scss';
 
 interface AppointmentTabsProps {
   appointmentServiceTypes: Array<string>;
+  appointmentProviders: Array<string>;
 }
 
-const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTypes }) => {
+const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTypes, appointmentProviders }) => {
   const { t } = useTranslation();
   const { showUnscheduledAppointmentsTab } = useConfig<ConfigObject>();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -30,7 +31,10 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
           </TabList>
           <TabPanels>
             <TabPanel className={styles.tabPanel}>
-              <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
+              <ScheduledAppointments
+                appointmentServiceTypes={appointmentServiceTypes}
+                appointmentProviders={appointmentProviders}
+              />
             </TabPanel>
             <TabPanel className={styles.tabPanel}>
               <UnscheduledAppointments />
@@ -38,7 +42,10 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
           </TabPanels>
         </Tabs>
       ) : (
-        <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
+        <ScheduledAppointments
+          appointmentServiceTypes={appointmentServiceTypes}
+          appointmentProviders={appointmentProviders}
+        />
       )}
     </div>
   );

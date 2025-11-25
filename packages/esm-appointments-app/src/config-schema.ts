@@ -80,6 +80,11 @@ export const configSchema = {
     _description:
       'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
   },
+  showProviderColumn: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Whether to show the provider column and enable provider filtering in the appointments dashboard',
+  },
   appointmentsTableColumns: {
     _type: Type.Array,
     _description:
@@ -110,6 +115,7 @@ export interface ConfigObject {
   includePhoneNumberInExcelSpreadsheet: boolean;
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
+  showProviderColumn: boolean;
 }
 
 export type AppointmentTableColumn = {

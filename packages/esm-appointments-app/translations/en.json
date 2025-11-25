@@ -82,6 +82,7 @@
   "expected": "Expected",
   "failedToLoadMetrics": "Failed to load",
   "filterAppointments": "Filter appointments",
+  "filterAppointmentsByProvider": "Filter appointments by provider",
   "filterAppointmentsByServiceType": "Filter appointments by service type",
   "filterTable": "Filter table",
   "FRI": "FRI",
