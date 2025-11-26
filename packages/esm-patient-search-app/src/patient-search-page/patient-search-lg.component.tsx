@@ -2,7 +2,6 @@ import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
-import type { SearchedPatient } from '../types';
 import { EmptyState, ErrorState, LoadingState, PatientSearchResults } from './patient-search-views.component';
 import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
@@ -11,7 +10,7 @@ interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
-  searchResults: Array<SearchedPatient>;
+  searchResults: fhir.Patient[];
   isLoading: boolean;
   fetchError: Error | null;
 }
