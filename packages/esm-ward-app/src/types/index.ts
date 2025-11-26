@@ -228,6 +228,7 @@ export interface WardMetrics {
 }
 
 export interface EncounterPayload {
+  uuid?: string;
   encounterDatetime?: string;
   encounterType: string;
   patient: string;
