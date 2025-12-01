@@ -42,10 +42,9 @@ test.beforeAll(async ({ api }) => {
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
   provider = await getProvider(api);
-
+  transferBed = await generateRandomBed(api, bedtype);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   fullName = wardPatient.person?.display;
-
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
 });
@@ -98,10 +97,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 test('Admit a transferred patient to a new bed', async ({ page, api }) => {
   await changeLocation(api, process.env.E2E_WARD1_LOCATION_UUID);
 
-  transferBed = await generateRandomBed(api, bedtype);
-
   const wardPage = new WardPage(page);
-
   await test.step('When I visit the patient ward page', async () => {
     await wardPage.goTo();
   });
