@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "activeVisitsListAutoManaged": "The Active Visits list is automatically managed",
   "add": "Add",
   "addPatientToList": "Add patient to list",
   "allLists": "All lists",
@@ -7,6 +8,7 @@
   "backToListsPage": "Back to lists page",
   "cancel": "Cancel",
   "cannotAddPatient": "Cannot add patient",
+  "cannotModifySystemList": "Cannot modify system list",
   "checkFilters": "Check the filters above",
   "chooseCohortType": "Choose cohort type",
   "cohortNameRequired": "Cohort name is required",
@@ -55,6 +57,7 @@
   "newPatientListHeader": "New patient list",
   "newPatientListNameLabel": "List name",
   "nextPage": "Next page",
+  "noActiveVisits": "There are no active visits at this location",
   "noMatchingLists": "No matching lists to display",
   "noMatchingListsFound": "No matching lists found",
   "noMatchingPatients": "No matching patients to display",
@@ -69,6 +72,7 @@
   "patientLists": "Patient lists",
   "patientRemovedFromList": "Patient removed from list",
   "patients": "patients",
+  "patientsWithActiveVisits": "Patients currently with active visits at this location",
   "previousPage": "Previous page",
   "removeFromList": "Remove from list",
   "removePatientFromList": "Remove patient from list",
@@ -94,5 +98,6 @@
   "unknownError": "An unknown error occurred",
   "unstarList": "Unstar list",
   "updated": "Updated",
-  "userDefined": "user-defined"
+  "userDefined": "user-defined",
+  "visitStartTime": "Visit Start Time"
 }
