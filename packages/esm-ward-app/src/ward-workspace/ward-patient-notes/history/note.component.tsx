@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText, Tag, Tile , OverflowMenu , OverflowMenuItem , Stack , TextArea , Button , Layer } from '@carbon/react';
+import { SkeletonText, Tag, Tile, OverflowMenu, OverflowMenuItem, Stack, TextArea, Button, Layer , InlineLoading } from '@carbon/react';
 import { type DefaultWorkspaceProps, isDesktop, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { type PatientNote } from '../types';
 import { editPatientNotes } from '../notes.resource';
@@ -36,11 +36,36 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
   const [editMode, setEditMode] = useState(false);
   const [editedNote, setEditedNote] = useState(note.encounterNote);
   const isTablet = !isDesktop(useLayoutType());
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     promptBeforeClosing(() => editMode);
     return () => promptBeforeClosing(null);
   }, [editMode, promptBeforeClosing]);
+
+  const onSave = async () => {
+    try {
+      setIsSaving(true);
+      await editPatientNotes(note.obsUuid, editedNote);
+      setEditMode(false);
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
+        title: t('visitNoteSaved', 'Patient note saved'),
+      });
+      mutatePatientNotes();
+    } catch (e) {
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        subtitle: e?.responseBody?.error?.translatedMessage ?? e?.responseBody?.error?.message,
+        title: t('errorSavingPatientNote', 'Error saving patient note'),
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className={styles.noteTile}>
@@ -98,21 +123,8 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                   size={isTablet ? 'lg' : 'sm'}>
                   {t('cancel', 'Cancel')}
                 </Button>
-                <Button
-                  onClick={async () => {
-                    await editPatientNotes(note.obsUuid, editedNote);
-                    setEditMode(false);
-                    showSnackbar({
-                      isLowContrast: true,
-                      kind: 'success',
-                      subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
-                      title: t('visitNoteSaved', 'Patient note saved'),
-                    });
-                    mutatePatientNotes();
-                  }}
-                  kind={'primary'}
-                  size={isTablet ? 'lg' : 'sm'}>
-                  {t('save', 'Save')}
+                <Button onClick={onSave} kind={'primary'} size={isTablet ? 'lg' : 'sm'}>
+                  {isSaving ? <InlineLoading description={t('saving', 'Saving...')} /> : t('save', 'Save')}
                 </Button>
               </div>
             </Stack>
