@@ -63,8 +63,9 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
               />
             )}
             <OverflowMenuItem
-              aria-label={t('edit', 'Edit')}
+              aria-label={t('delete', 'Delete')}
               id={'delete-note-' + note.encounterUuid}
+              isDelete
               className={styles.menuItem}
               hasDivider
               itemText={t('delete', 'Delete')}
@@ -99,7 +100,6 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                 </Button>
                 <Button
                   onClick={async () => {
-                    // Call the editPatientNotes function to save the edited note
                     await editPatientNotes(note.obsUuid, editedNote);
                     setEditMode(false);
                     showSnackbar({

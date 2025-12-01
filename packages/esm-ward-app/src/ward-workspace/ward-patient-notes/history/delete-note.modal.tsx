@@ -23,14 +23,14 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
       await deleteEncounter(encounterUuid);
       showSnackbar({
         kind: 'success',
-        title: t('noteDeleteSuccessfully', 'Note deleted successfully'),
+        title: t('noteDeletedSuccessfully', 'Note deleted successfully'),
       });
       close();
-      onDelete();
+      onDelete?.();
     } catch (e) {
       showSnackbar({
         kind: 'error',
-        title: t('errorDeletingNode', 'Error delete note'),
+        title: t('errorDeletingNote', 'Error deleting note'),
         subtitle: e?.responseBody?.error?.translatedMessage ?? e?.responseBody?.error?.message,
       });
     }
@@ -38,7 +38,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
 
   return (
     <>
-      <ModalHeader closeModal={close}>{t('deleteNote', 'Delete Note')}?</ModalHeader>
+      <ModalHeader closeModal={close}>{t('deleteNote', 'Delete note')}?</ModalHeader>
       <ModalBody>
         <p>
           {t('deleteNoteConfirmationText', `Are you sure you want to delete this note? This action can't be undone.`)}
