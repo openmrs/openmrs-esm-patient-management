@@ -1,0 +1,35 @@
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #161616;
+  overflow: hidden;
+}
+
+.previewContainer {
+  width: 100%;
+  max-height: 75vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f4f4f4;
+  padding: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+
+  > div {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background: white;
+  }
+}
+
+@media print {
+  .previewContainer {
+    max-height: none;
+    overflow: visible;
+    background: white;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+}

@@ -150,8 +150,8 @@
   "selectStatus": "Select status",
   "service": "Service",
   "serviceName": "Service name",
-  "serviceType": "Service type",
   "serviceUnavailable": "Appointment time is outside of service hours",
+  "serviceType": "Service type",
   "status": "Status",
   "SUN": "SUN",
   "THUR": "THUR",
@@ -169,5 +169,6 @@
   "updateError": "Error updating upcoming appointment",
   "WED": "WED",
   "week": "Week",
-  "yes": "Yes"
+  "yes": "Yes",
+  "prescription": "Rx Sheet"
 }

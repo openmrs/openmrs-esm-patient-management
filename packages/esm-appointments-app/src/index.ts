@@ -119,3 +119,8 @@ export const batchChangeAppointmentStatusesModal = getAsyncLifecycle(
   () => import('./appointments/common-components/batch-change-appointment-statuses.modal'),
   options,
 );
+
+export const printPrescriptionPreviewModal = getAsyncLifecycle(
+  () => import('./prescription/print-prescription-preview.modal'),
+  options,
+);

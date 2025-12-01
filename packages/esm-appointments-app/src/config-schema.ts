@@ -88,7 +88,7 @@ export const configSchema = {
     _type: Type.Array,
     _description:
       'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
-    _default: ['patientName', 'identifier', 'location', 'serviceType', 'status'],
+    _default: ['patientName', 'identifier', 'location', 'serviceType', 'status', 'prescription', 'provider'],
     _elements: {
       _type: Type.String,
       _validators: [validators.oneOf(appointmentColumnTypes)],
@@ -98,6 +98,66 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description: 'Whether to filter providers by appointment supported enabled',
+  },
+  prescriptionConfig: {
+    logoUrl: {
+      _type: Type.String,
+      _default: '',
+      _description: 'URL of the hospital/clinic logo to display in the prescription header',
+    },
+    watermarkLogoUrl: {
+      _type: Type.String,
+      _default: '',
+      _description:
+        'URL of the icon/logo to display as watermark in the prescription body. Should be an icon without text for best results',
+    },
+    watermarkAlignment: {
+      _type: Type.String,
+      _default: 'center',
+      _description: 'Alignment of the watermark logo: left, center, or right',
+      _validators: [validators.oneOf(['left', 'center', 'right'])],
+    },
+    watermarkOpacity: {
+      _type: Type.Number,
+      _default: 0.04,
+      _description: 'Opacity of the watermark logo (0.0 to 1.0). Recommended: 0.03-0.08 for subtle watermark effect',
+      _validators: [validators.inRange(0, 1)],
+    },
+    showDiagnosisSection: {
+      _type: Type.Boolean,
+      _default: true,
+      _description: 'Show diagnosis section in prescription template',
+    },
+    hospitalSlogan: {
+      _type: Type.String,
+      _default: 'SLOGAN HERE',
+      _description: 'Hospital slogan to display on prescription footer',
+    },
+    landlineNumber: {
+      _type: Type.String,
+      _default: '',
+      _description: 'Hospital landline phone number',
+    },
+    whatsappNumber: {
+      _type: Type.String,
+      _default: '',
+      _description: 'Hospital WhatsApp contact number',
+    },
+    email: {
+      _type: Type.String,
+      _default: '',
+      _description: 'Hospital contact email',
+    },
+    address: {
+      _type: Type.String,
+      _default: '',
+      _description: 'Hospital physical address',
+    },
+    website: {
+      _type: Type.String,
+      _default: '',
+      _description: 'Hospital website URL',
+    },
   },
 };
 
@@ -121,4 +181,17 @@ export interface ConfigObject {
   showUnscheduledAppointmentsTab: boolean;
   showEarlyAppointmentsTab: boolean;
   filterProvidersByAppointmentSupportedEnabled: boolean;
+  prescriptionConfig: {
+    logoUrl: string;
+    watermarkLogoUrl: string;
+    watermarkAlignment: 'left' | 'center' | 'right';
+    watermarkOpacity: number;
+    showDiagnosisSection: boolean;
+    hospitalSlogan: string;
+    landlineNumber: string;
+    whatsappNumber: string;
+    email: string;
+    address: string;
+    website: string;
+  };
 }

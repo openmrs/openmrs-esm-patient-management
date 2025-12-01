@@ -1,0 +1,513 @@
+{
+  "@openmrs/esm-login-app": {
+    "logo": {
+      "src": "/emr/luqman-login-logo.svg",
+      "alt": "Luqman-EMR"
+    },
+    "links": {
+      "src": "/emr/home"
+    },
+    "showPasswordOnSeparateScreen": false
+  },
+  "@openmrs/esm-app-shell": {
+    "Enabled feature flags": [
+      "print-patient-identifier-sticker"
+    ]
+  },
+  "@openmrs/esm-primary-navigation-app": {
+    "externalRefLinks": [],
+    "logo": {
+      "src": "/emr/luqman-primary-logo.svg",
+      "name": "Luqman-EMR"
+    },
+    "extensionSlots": {
+      "homepage-dashboard-slot": {
+        "configure": {
+          "clinical-appointments-dashboard-link": {
+            "Display conditions": {
+              "privileges": [
+                "Manage Appointments"
+              ]
+            }
+          }
+        }
+      },
+      "user-panel-slot": {
+        "remove": [
+          "change-language"
+        ]
+      },
+      "app-menu-slot": {
+        "configure": {
+          "system-administration-app-menu-link": {
+            "Display conditions": {
+              "privileges": [
+                "View Administration Functions"
+              ]
+            }
+          },
+          "forms-app-link": {
+            "Display conditions": {
+              "privileges": [
+                "o3: View Patient Chart Forms Dashboard"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "@openmrs/esm-patient-list-management-app": {
+    "Display conditions": {
+      "privileges": [
+        "o3: View Lists Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-patient-registration-app": {
+    "fieldConfigurations": {
+      "name": {
+        "displayMiddleName": false
+      },
+      "dateOfBirth": {
+        "useEstimatedDateOfBirth": {
+          "enabled": true
+        }
+      },
+      "phone": {
+        "validation": {
+          "required": true,
+          "matches": "^0(3[0-9][0-9])[0-9]{7}$"
+        }
+      },
+      "gender": [
+        {
+          "value": "male",
+          "label": "Male"
+        },
+        {
+          "value": "female",
+          "label": "Female"
+        },
+        {
+          "value": "other",
+          "label": "Other"
+        }
+      ]
+    },
+    "links": {
+      "submitButton": "${openmrsSpaBase}/patient/${patientUuid}/chart/Appointments"
+    },
+    "defaultPatientIdentifierTypes": [
+      "49af6cdc-7968-4abb-bf46-de10d7f4859f"
+    ]
+  },
+  "@openmrs/esm-service-queues-app": {
+    "concepts": {
+      "priorityConceptSetUuid": "78063dec-b6d8-40c1-9483-dd4d3c3ca434",
+      "defaultPriorityConceptUuid": "f4620bfa-3625-4883-bd3f-84c2cce14470",
+      "emergencyPriorityConceptUuid": "04f6f7e0-e3cb-4e13-a133-4479f759574e",
+      "serviceConceptSetUuid": "a8f3f64a-11d5-4a09-b0fb-c8118fa349f3",
+      "statusConceptSetUuid": "d60ffa60-fca6-4c60-aea9-a79469ae65c7",
+      "defaultStatusConceptUuid": "51ae5e4d-b72b-4912-bf31-a17efb690aeb",
+      "defaultTransitionStatus": "ca7494ae-437f-4fd0-8aae-b88b9a2ba47d",
+      "historicalObsConceptUuid": [
+        "161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      ]
+    },
+    "priorityConfigs": [
+      {
+        "conceptUuid": "04f6f7e0-e3cb-4e13-a133-4479f759574e",
+        "tagClassName": "tag",
+        "tagType": "red"
+      },
+      {
+        "conceptUuid": "dc3492ef-24a5-4fd9-b58d-4fd2acf7071f",
+        "tagClassName": "tag",
+        "tagType": "green"
+      },
+      {
+        "conceptUuid": "f4620bfa-3625-4883-bd3f-84c2cce14470",
+        "tagClassName": "tag",
+        "tagType": "gray"
+      }
+    ],
+    "visitQueueNumberAttributeUuid": "aac48226-d143-4274-80e0-264db4e368ee",
+    "queueTables": {
+      "columnDefinitions": [
+        {
+          "id": "serve-patient",
+          "columnType": "extension",
+          "header": "Serve Patient"
+        }
+      ],
+      "tableDefinitions": [
+        {
+          "columns": [
+            "patient-name",
+            "queue-number",
+            "coming-from",
+            "priority",
+            "status",
+            "queue",
+            "wait-time",
+            "serve-patient",
+            "actions"
+          ]
+        }
+      ]
+    },
+    "showQueueTableTab": false,
+    "defaultIdentifierTypes": [
+      "05ee9cf4-7242-4a17-b4d4-00f707265c8a",
+      "f85081e2-b4be-4e48-b3a4-7994b69bb101"
+    ],
+    "defaultFacilityUrl": "",
+    "Translation overrides": {
+      "en": {
+        "change": "Move to the next queue"
+      }
+    }
+  },
+  "@openmrs/esm-form-entry-app": {
+    "customEncounterDatetime": true
+  },
+  "@openmrs/esm-patient-banner-app": {
+    "contactAttributeTypes": [
+      "14d4f066-15f5-102d-96e4-000c29c2a5d7"
+    ],
+    "printPatientSticker": {
+      "header": {
+        "showBarcode": true,
+        "showLogo": true,
+        "logo": "/emr/luqman-primary-logo.svg"
+      }
+    },
+    "extensionSlots": {
+      "patient-actions-slot": {
+        "remove": [
+          "mark-patient-deceased-button"
+        ],
+        "configure": {
+          "start-visit-button": {
+            "Display conditions": {
+              "privileges": [
+                "Add Visits"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "@openmrs/esm-patient-chart-app": {
+    "extensionSlots": {
+      "patient-chart-dashboard-slot": {
+        "configure": {
+          "billing-summary-dashboard-link": {
+            "Display conditions": {
+              "privileges": [
+                "o3: View Patient Chart Bill History"
+              ]
+            }
+          },
+          "patient-appointments-summary-dashboard": {
+            "Display conditions": {
+              "privileges": [
+                "o3: View Patient Chart Appointments"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "restrictByVisitLocationTag": true,
+    "showUpcomingAppointments": true,
+    "showExtraVisitAttributesSlot": true,
+    "showServiceQueueFields": true,
+    "visitAttributeTypes": [],
+    "defaultFacilityUrl": "",
+    "logo": {
+      "src": "/emr/luqman-primary-logo.svg"
+    },
+    "Translation overrides": {
+      "en": {
+        "endActiveVisit": "Check out",
+        "addVisit": "Check in",
+        "startAVisit": "Check in",
+        "endAVisit": "Check out",
+        "Vitals & Biometrics dashboard": "Vitals & Anthropometric",
+        "vitalsAndBiometrics": "Vitals & Anthropometric"
+      }
+    }
+  },
+  "@openmrs/esm-patient-notes-app": {
+    "visitNoteConfig": {
+      "encounterTypeUuid": "d7151f82-c1f3-4152-a605-2f9ea7414a79",
+      "clinicianEncounterRole": "a0b03050-c99b-11e0-9572-0800200c9a66"
+    }
+  },
+  "@openmrs/esm-patient-vitals-app": {
+    "Translation overrides": {
+      "en": {
+        "vitalsAndBiometrics": "Vitals & Anthropometrics",
+        "Vitals & Biometrics": "Vitals & Anthropometrics",
+        "biometricDisplayed": "Anthropometrics displayed",
+        "biometrics": "Anthropometrics"
+      }
+    },
+    "Display conditions": {
+      "privileges": [
+        "o3: View Patient Chart Vitals and Biometrics Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-patient-attachments-app": {
+    "maxFileSize": 5,
+    "Display conditions": {
+      "privileges": [
+        "o3: View Attachments Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-appointments-app": {
+    "concepts": {
+      "visitQueueNumberAttributeUuid": "c61ce16f-272a-41e7-9924-4c555d0932c5"
+    },
+    "includePhoneNumberInExcelSpreadsheet": true,
+    "allowAllDayAppointments": false,
+    "showServiceQueueFields": true,
+    "patientIdentifierType": "Luqman MR",
+    "showUnscheduledAppointmentsTab": false,
+    "appointmentTypes": [
+      "Scheduled",
+      "WalkIn"
+    ],
+    "extensionSlots": {
+      "scheduled-appointments-panels-slot": {
+        "remove": [],
+        "configure": {
+          "expected-appointments-panel": {
+            "showForPastDate": true,
+            "showForFutureDate": true
+          },
+          "completed-appointments-panel": {
+            "showForPastDate": true,
+            "showForFutureDate": false
+          }
+        }
+      }
+    },
+    "checkInButton": {
+      "enabled": true,
+      "showIfActiveVisit": false
+    },
+    "checkOutButton": {
+      "enabled": true,
+      "showIfActiveVisit": true
+    },
+    "appointmentsTableColumns": [
+      "patientName",
+      "identifier",
+      "location",
+      "serviceType",
+      "status",
+      "provider",
+      "dateTime"
+    ],
+    "defaultFacilityUrl": "${openmrsSpaBase}/patient/${patientUuid}/chart"
+  },
+  "@openmrs/esm-billing-app": {
+    "Display conditions": {
+      "privileges": [
+        "o3: View Patient Chart Bill History"
+      ]
+    },
+    "country": "Pakistan",
+    "cashierUuid": "54065383-b4d4-42d2-af4d-d250a1fd2590",
+    "cashPointUuid": "54065383-b4d4-42d2-af4d-d250a1fd2590",
+    "extensionSlots": {
+      "billing-dashboard-group-nav-slot": {
+        "remove": [
+          "payment-modes-link",
+          "payment-points-link",
+          "bill-deposit-dashboard-link"
+        ],
+        "configure": {
+          "chargeable-items-link": {
+            "Display conditions": {
+              "privileges": [
+                "o3: Add Billable Services"
+              ]
+            }
+          },
+          "payment-history-link": {
+            "Display conditions": {
+              "privileges": [
+                "o3: Add Billable Services"
+              ]
+            }
+          },
+          "bill-manager-link": {
+            "Display conditions": {
+              "privileges": [
+                "o3: View Manage Bill Deposits"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "visitAttributeTypes": {
+      "isPatientExempted": "df0362f9-782e-4d92-8bb2-3112e9e9eb3c",
+      "exemptionCategory": "fbc0702d-b4c9-4968-be63-af8ad3ad6239",
+      "paymentMethods": "8553afa0-bdb9-4d3c-8a98-05fa9350aa85"
+    },
+    "concepts": {
+      "emergencyPriorityConceptUuid": "04f6f7e0-e3cb-4e13-a133-4479f759574e",
+      "serviceConceptSetUuid": "a8f3f64a-11d5-4a09-b0fb-c8118fa349f3"
+    },
+    "excludedPaymentMode": [
+      {
+        "uuid": "eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4",
+        "label": "Waiver"
+      }
+    ]
+  },
+  "@openmrs/esm-patient-allergies-app": {
+    "Display conditions": {
+      "privileges": [
+        "o3: View Allergies Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-patient-medications-app": {
+    "Display conditions": {
+      "privileges": [
+        "o3: View Patient Chart Medications Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-patient-conditions-app": {
+    "Display conditions": {
+      "privileges": [
+        "o3: View Patient Chart Conditions Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-patient-orders-app": {
+    "Display conditions": {
+      "privileges": [
+        "o3: View Allergies Dashboard"
+      ]
+    }
+  },
+  "@openmrs/esm-stock-management-app": {
+    "logo": {
+      "src": "/emr/luqman-primary-logo.svg",
+      "name": "Luqman-EMR",
+      "alt": "Luqman-EMR"
+    },
+    "packingUnitsUUID": "bce2b1af-98b1-48a2-98a2-3e4ffb3c79c2",
+    "dispensingUnitsUUID": "162402AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "stockAdjustmentReasonUUID": "3a9021d1-d6c1-4fc2-8e30-ca8e204e44de",
+    "stockTakeReasonUUID": "3a9021d1-d6c1-4fc2-8e30-ca8e204e44de",
+    "stockSourceTypeUUID": "2e1e8049-9cbe-4a2d-b1e5-8a91e5d7d97d",
+    "stockItemCategoryUUID": "6d24eb6e-b42f-4706-ab2d-ae4472161f6a",
+    "extensionSlots": {
+      "stock-page-dashboard-slot": {
+        "configure": {
+          "user-scopes-db-link": {
+            "Display conditions": {
+              "privileges": [
+                "System Developer"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "@openmrs/esm-home-app": {
+    "extensionSlots": {
+      "homepage-widgets-slot": {
+        "configure": {
+          "home-appointments": {
+            "Display conditions": {
+              "privileges": [
+                "o3: View Patient Chart Appointments"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "@openmrs/esm-system-admin-app": {
+    "extensionSlots": {
+      "system-admin-page-card-link-slot": {
+        "configure": {
+          "system-admin-page-link": {
+            "Display conditions": {
+              "privileges": [
+                "System Developer"
+              ]
+            }
+          },
+          "admin-ocl-card-link": {
+            "Display conditions": {
+              "privileges": [
+                "System Developer"
+              ]
+            }
+          },
+          "system-administration-cohort-builder-card-link": {
+            "Display conditions": {
+              "privileges": [
+                "System Developer"
+              ]
+            }
+          },
+          "system-administration-form-builder-card-link": {
+            "Display conditions": {
+              "privileges": [
+                "Manage Forms"
+              ]
+            }
+          },
+          "admin-report-link": {
+            "Display conditions": {
+              "privileges": [
+                "Manage Reports"
+              ]
+            }
+          },
+          "stock-management-admin-card-link": {
+            "Display conditions": {
+              "privileges": [
+                "Task: stockmanagement.stockoperations.mutate"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "core": {
+    "Translation overrides": {
+      "en": {
+        "address1": "Address",
+        "address2": "Landmark",
+        "address4": "Ward",
+        "address5": "Sub-location",
+        "address6": "Location",
+        "city": "City/Sector/Village",
+        "district": "District/Tehsil",
+        "state": "Province"
+      }
+    }
+  },
+  "@openmrs/esm-styleguide": {
+    "Brand color #1": "#005d5d"
+  }
+}

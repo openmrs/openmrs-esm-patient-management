@@ -2299,6 +2299,7 @@ __metadata:
     lodash-es: "npm:^4.17.15"
     openmrs: "npm:next"
     react-hook-form: "npm:^7.54.0"
+    react-to-print: "npm:^2.15.1"
     xlsx: "npm:^0.18.5"
     yup: "npm:^0.32.11"
     zod: "npm:^3.24.1"
@@ -15831,6 +15832,16 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
   checksum: 10/f59f86aca0797e389698fc20a7e88a26748e00e56e011dd6d9f7a4fa1ba7fda32083bc8e5f2af000957d20ad9f4c74dd151cb667b958dcac8f3959d860905fd4
+  languageName: node
+  linkType: hard
+
+"react-to-print@npm:^2.15.1":
+  version: 2.15.1
+  resolution: "react-to-print@npm:2.15.1"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 10/0786fd5dd055b5b50f9a0dba99f0ccb30b9407b8e77748f5fc2557446ed0d0c65759e927cc2cdaa9e34f286838bbb230d3b0ba03d20b9754d0469fc4dac7c529
   languageName: node
   linkType: hard
 

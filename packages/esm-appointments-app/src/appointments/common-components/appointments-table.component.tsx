@@ -31,7 +31,7 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Calendar, Download } from '@carbon/react/icons';
+import { Calendar, Download, Printer } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   EmptyCard,
@@ -80,6 +80,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
+  const handlePrintPrescription = (appointment: Appointment) => {
+    const dispose = showModal('print-prescription-preview-modal', {
+      onClose: () => dispose(),
+      appointment,
+    });
+  };
+
   useEffect(() => {
     setSelectedAppointmentUuids(new Set());
   }, [appointments]);
@@ -110,9 +117,20 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
         location: appointment.location?.name,
         provider: appointment.providers?.[0]?.name ?? '--',
         status: <AppointmentActions appointment={appointment} />,
+        prescription: (
+          <Button
+            kind="ghost"
+            size={responsiveSize}
+            renderIcon={Printer}
+            iconDescription={t('printPrescription', 'Print Prescription')}
+            hasIconOnly
+            onClick={() => handlePrintPrescription(appointment)}
+            tooltipPosition="left"
+          />
+        ),
         appointment,
       })),
-    [results, customPatientChartUrl, patientIdentifierType],
+    [results, customPatientChartUrl, patientIdentifierType, responsiveSize, t],
   );
 
   const appointmentUuidsWithChangeableStatus = useMemo(() => {
