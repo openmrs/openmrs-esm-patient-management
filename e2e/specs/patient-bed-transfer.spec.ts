@@ -77,6 +77,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
   });
 
   await test.step('And I click the transfer button', async () => {
+    await expect(wardPage.transferButton()).toBeVisible({ timeout: 10000 });
     await wardPage.transferButton().click();
   });
 
