@@ -8,7 +8,6 @@ import {
   restBaseUrl,
   fhirBaseUrl,
   useFhirInfinite,
-  useFhirFetchAll,
 } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, User } from './types';
 
@@ -152,7 +151,7 @@ export function useFhirPatients(patientUuids: string[] | null) {
     return `${fhirBaseUrl}/Patient?_id=${patientUuids.join(',')}`;
   }, [shouldFetch, patientUuids]);
 
-  const { data, error, isLoading } = useFhirFetchAll<fhir.Patient>(url);
+  const { data, error, isLoading } = useFhirInfinite<fhir.Patient>(url);
 
   return useMemo(
     () => ({
