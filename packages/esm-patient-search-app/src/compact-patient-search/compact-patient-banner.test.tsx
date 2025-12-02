@@ -52,7 +52,7 @@ describe('CompactPatientBanner', () => {
     //   screen.getByRole('link', { name: new RegExp(`Smith, John Doe Male · ${age} yrs · OpenMRS ID 1000NLY`, 'i') }),
     // ).toBeInTheDocument();
     // expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${patients[0].uuid}/chart/`);
-    expect(screen.getByRole('Patient Photo')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
   });
 
