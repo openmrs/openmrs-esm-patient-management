@@ -11,8 +11,8 @@ import { type Appointment } from '../types';
  * @returns {Array<number>} An array of page sizes.
  */
 export function getPageSizes<T>(data: Array<T>, pageSize: number = 10): Array<number> {
-  if (!data) {
-    return [];
+  if (!data || data.length === 0) {
+    return [pageSize];
   }
   const numberOfPages = Math.ceil(data.length / pageSize);
   return Array.from({ length: numberOfPages }, (_, i) => (i + 1) * pageSize);
@@ -77,4 +77,16 @@ export function filterByServiceType(appointmentList: Array<Appointment>, appoint
   return appointmentServiceTypes?.length > 0
     ? appointmentList.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
     : appointmentList;
+}
+
+export function filterByProvider(
+  appointmentList: Array<Appointment>,
+
+  appointmentProviders: { id: string; label: string } | null,
+) {
+  if (!appointmentProviders.id) return appointmentList;
+
+  return appointmentList.filter(({ providers }) => {
+    return providers?.[0]?.uuid === appointmentProviders?.id;
+  });
 }
