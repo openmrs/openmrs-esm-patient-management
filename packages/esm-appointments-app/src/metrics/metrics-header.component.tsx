@@ -39,6 +39,15 @@ const MetricsHeader: React.FC = () => {
           }>
           {t('appointmentsCalendar', 'Appointments calendar')}
         </Button>
+        <Button
+          kind="tertiary"
+          renderIcon={Hospital}
+          size={responsiveSize}
+          onClick={() => {
+            launchWorkspace('service-availability-form-workspace', {});
+          }}>
+          {t('configureServiceAvailability', 'Configure Service Availability')}
+        </Button>
         <ExtensionSlot
           name="patient-search-button-slot"
           state={{

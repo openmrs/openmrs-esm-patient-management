@@ -61,6 +61,29 @@ export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
 
+export interface WeeklyAvailability {
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  maxAppointmentsLimit: number | null;
+  uuid: string;
+}
+
+export interface WeekDay {
+  id: string;
+  label: string;
+}
+
+export const getWeekDays = (t: (key: string, fallback: string) => string): WeekDay[] => [
+  { id: 'MONDAY', label: t('monday', 'Monday') },
+  { id: 'TUESDAY', label: t('tuesday', 'Tuesday') },
+  { id: 'WEDNESDAY', label: t('wednesday', 'Wednesday') },
+  { id: 'THURSDAY', label: t('thursday', 'Thursday') },
+  { id: 'FRIDAY', label: t('friday', 'Friday') },
+  { id: 'SATURDAY', label: t('saturday', 'Saturday') },
+  { id: 'SUNDAY', label: t('sunday', 'Sunday') },
+];
+
 export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
@@ -78,6 +101,7 @@ export interface AppointmentService {
   color?: string;
   startTimeTimeFormat?: amPm;
   endTimeTimeFormat?: amPm;
+  weeklyAvailability?: Array<WeeklyAvailability>;
 }
 
 export interface ServiceTypes {

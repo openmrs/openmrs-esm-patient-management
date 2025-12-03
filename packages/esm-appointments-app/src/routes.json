@@ -141,6 +141,12 @@
       "component": "appointmentsFormWorkspace",
       "title": "createNewAppointment",
       "type": "form"
+    },
+    {
+      "name": "service-availability-form-workspace",
+      "component": "serviceAvailabilityFormWorkspace",
+      "title": "configureServiceAvailability",
+      "type": "form"
     }
   ]
 }

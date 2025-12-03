@@ -7,23 +7,34 @@ import { useAppointmentsStore } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
+import type { AppointmentService } from '../../types';
 
 interface MonthlyCalendarViewProps {
   calendarWorkload: Array<{ count: number; date: string }>;
   dateToDisplay?: string;
   onDateClick?: (pickedDate: Date) => void;
+  serviceDetails?: AppointmentService;
 }
 
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   calendarWorkload,
   dateToDisplay = '',
   onDateClick,
+  serviceDetails,
 }) => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
   const daysInWeeks = daysInWeek.map((day) => t(day));
+
+  const isDateAvailable = (date: dayjs.Dayjs): boolean => {
+    if (!serviceDetails?.weeklyAvailability || serviceDetails.weeklyAvailability.length === 0) {
+      return true;
+    }
+    const dayOfWeek = date.format('dddd').toUpperCase();
+    return serviceDetails.weeklyAvailability.some((day) => day.dayOfWeek === dayOfWeek);
+  };
 
   const handleClick = (date: Date) => {
     if (onDateClick) {
@@ -45,26 +56,31 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
-            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
-              <div
-                onClick={() => handleClick(dayjs(dateTime).toDate())}
-                key={i}
-                className={`${styles.monthlyWorkloadCard} ${
-                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
-                    ? styles.selectedDate
-                    : ''
-                }`}>
-                <MonthlyWorkloadCard
+            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => {
+              const isAvailable = isDateAvailable(dateTime);
+              return (
+                <div
+                  onClick={() => isAvailable && handleClick(dayjs(dateTime).toDate())}
                   key={i}
-                  date={dateTime}
-                  isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
-                  count={
-                    calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
-                      ?.count ?? 0
-                  }
-                />
-              </div>
-            ))}
+                  className={`${styles.monthlyWorkloadCard} ${
+                    dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
+                      ? styles.selectedDate
+                      : ''
+                  }`}
+                  style={{ cursor: isAvailable ? 'pointer' : 'not-allowed' }}>
+                  <MonthlyWorkloadCard
+                    key={i}
+                    date={dateTime}
+                    isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
+                    isAvailable={isAvailable}
+                    count={
+                      calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
+                        ?.count ?? 0
+                    }
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </>

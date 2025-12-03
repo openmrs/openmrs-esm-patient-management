@@ -1,4 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  refreshAppointmentCalendar,
+  getMaxAppointmentsLimit,
+  evaluateAppointmentCalendarDates,
+} from '../hooks/useAppointmentsCalendar';
 import dayjs from 'dayjs';
 import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +68,10 @@ interface AppointmentsFormProps {
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
 const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
-
+const SERVICE_APPOINTMENT_CAPS: Record<string, number> = {
+  'HIV Consultation': 20,
+  'Drug Refill': 8,
+};
 const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> = ({
   appointment,
   recurringPattern,
@@ -331,9 +340,96 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     }
   })();
 
-  // Same for creating and editing
+  // Check if service appointment limit has been reached
+  const checkServiceAppointmentLimit = async (
+    serviceName: string,
+    appointmentDate: string,
+  ): Promise<{ blocked: boolean; reason?: string }> => {
+    const serviceDetails = services?.find((s) => s.name === serviceName);
+
+    if (!serviceDetails) {
+      return { blocked: false };
+    }
+
+    const dayOfWeek = dayjs(appointmentDate).format('dddd').toUpperCase();
+    const weeklyAvailability = serviceDetails.weeklyAvailability || [];
+    let effectiveMaxLimit = getMaxAppointmentsLimit(serviceDetails);
+
+    if (weeklyAvailability.length > 0) {
+      const dayConfig = weeklyAvailability.find((day) => day.dayOfWeek === dayOfWeek);
+
+      if (!dayConfig) {
+        return {
+          blocked: true,
+          reason: `Service "${serviceName}" is not available on ${dayOfWeek}s. Please select a different day.`,
+        };
+      }
+
+      effectiveMaxLimit = dayConfig.maxAppointmentsLimit;
+    }
+
+    if (effectiveMaxLimit === null) {
+      return { blocked: false };
+    }
+
+    const { startDate, endDate } = evaluateAppointmentCalendarDates(appointmentDate, 'daily');
+    const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+
+    try {
+      const response = await openmrsFetch(url);
+      const data = response?.data || [];
+
+      for (const service of data) {
+        if (service.appointmentService?.name === serviceName) {
+          for (const [date, value] of Object.entries(service.appointmentCountMap || {})) {
+            if (date === appointmentDate) {
+              const count: number =
+                value && typeof value === 'object' && 'allAppointmentsCount' in value
+                  ? (value.allAppointmentsCount as number)
+                  : 0;
+
+              if (count >= effectiveMaxLimit) {
+                return {
+                  blocked: true,
+                  reason: `The maximum number of appointments (${effectiveMaxLimit}) for ${serviceName} on this ${dayOfWeek} has been reached.`,
+                };
+              }
+            }
+          }
+        }
+      }
+      return { blocked: false };
+    } catch (error) {
+      return { blocked: false };
+    }
+  };
+
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
+
+    if (context !== 'editing') {
+      const selectedService = data.selectedService;
+      const appointmentDate = dayjs(data.appointmentDateTime.startDate).format('YYYY-MM-DD');
+      const limitCheck = await checkServiceAppointmentLimit(selectedService, appointmentDate);
+
+      if (limitCheck.blocked) {
+        setIsSubmitting(false);
+        const formattedDate = dayjs(data.appointmentDateTime.startDate).format('DD/MM/YYYY');
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          title: t('appointmentLimitReached', 'Appointment not available'),
+          subtitle:
+            limitCheck.reason ||
+            t(
+              'appointmentLimitReachedMessage',
+              `The service is not available for the selected date. Please select a different date.`,
+            ),
+        });
+        return;
+      }
+    }
+
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
 
@@ -386,6 +482,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
                 ? t('appointmentEdited', 'Appointment edited')
                 : t('appointmentScheduled', 'Appointment scheduled'),
           });
+          const selectedService = data.selectedService;
+          const appointmentDate = dayjs(data.appointmentDateTime.startDate).format('YYYY-MM-DD');
+          refreshAppointmentCalendar(appointmentDate, 'daily', selectedService);
         }
         if (status === 204) {
           setIsSubmitting(false);
