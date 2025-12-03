@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, launchWorkspace2 } from '@openmrs/esm-framework';
 import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
 import { getByTextWithMarkup } from 'tools';
@@ -13,6 +13,7 @@ const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
 const mockDeletePatientList = jest.mocked(deletePatientList);
 const mockUseCohortTypes = jest.mocked(useCohortTypes);
 const mockShowModal = jest.mocked(showModal);
+const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
 jest.mock('../api/hooks', () => ({
   usePatientListDetails: jest.fn(),
@@ -120,6 +121,12 @@ describe('ListDetails', () => {
     await userEvent.click(screen.getByText('Actions'));
     const editBtn = screen.getByText('Edit name or description');
     await userEvent.click(editBtn);
+
+    // Verify workspace v2 API is called
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', {
+      patientListDetails: mockPatientListDetails,
+      onSuccess: expect.any(Function),
+    });
   });
 
   it('deletes patient list and navigates back to the list page', async () => {
@@ -132,5 +139,84 @@ describe('ListDetails', () => {
       'delete-patient-list-modal',
       expect.objectContaining({ listName: expect.any(String), onConfirm: expect.any(Function) }),
     );
+  });
+});
+
+describe('ListDetails - Workspace V2 Integration', () => {
+  const mockMutateListDetails = jest.fn().mockResolvedValue({});
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockUsePatientListDetails.mockReturnValue({
+      listDetails: mockPatientListDetails,
+      error: null,
+      isLoading: false,
+      mutateListDetails: mockMutateListDetails,
+    });
+
+    mockUsePatientListMembers.mockReturnValue({
+      listMembers: mockPatientListMembers,
+      isLoadingListMembers: false,
+      error: null,
+      mutateListMembers: jest.fn().mockResolvedValue({}),
+    });
+
+    mockUseCohortTypes.mockReturnValue({
+      listCohortTypes: mockCohortTypeList,
+      isLoading: false,
+      error: null,
+      mutate: jest.fn().mockReturnValue({}),
+    });
+  });
+
+  it('uses launchWorkspace2 (v2 API) for edit functionality', async () => {
+    render(<ListDetails />);
+
+    await userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText('Edit name or description'));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalled();
+    // Ensure it's the v2 function, not the v1 launchWorkspace
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', expect.any(Object));
+  });
+
+  it('passes patientListDetails to workspace for editing', async () => {
+    render(<ListDetails />);
+
+    await userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText('Edit name or description'));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'patient-list-form-workspace',
+      expect.objectContaining({
+        patientListDetails: mockPatientListDetails,
+      }),
+    );
+  });
+
+  it('passes mutate function as onSuccess callback for data refresh', async () => {
+    render(<ListDetails />);
+
+    await userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText('Edit name or description'));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'patient-list-form-workspace',
+      expect.objectContaining({
+        onSuccess: mockMutateListDetails,
+      }),
+    );
+  });
+
+  it('workspace name follows v2 naming convention with -workspace suffix', async () => {
+    render(<ListDetails />);
+
+    await userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText('Edit name or description'));
+
+    const [workspaceName] = mockLaunchWorkspace2.mock.calls[0];
+    expect(workspaceName).toBe('patient-list-form-workspace');
+    expect(workspaceName).toMatch(/-workspace$/);
   });
 });

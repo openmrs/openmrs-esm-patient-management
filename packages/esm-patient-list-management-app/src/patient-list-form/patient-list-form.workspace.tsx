@@ -1,4 +1,4 @@
-import React, { useCallback, type SyntheticEvent, useEffect, useId, useState } from 'react';
+import React, { useCallback, type SyntheticEvent, useEffect, useId, useMemo, useState } from 'react';
 import { Button, ButtonSet, Dropdown, Layer, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type TFunction } from 'i18next';
@@ -9,7 +9,8 @@ import {
   showSnackbar,
   useLayoutType,
   useSession,
-  type DefaultWorkspaceProps,
+  Workspace2,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import type { NewCohortData, NewCohortDataPayload, OpenmrsCohort } from '../api/types';
 import {
@@ -36,16 +37,19 @@ const createCohortSchema = (t: TFunction) => {
 
 type CohortFormData = z.infer<ReturnType<typeof createCohortSchema>>;
 
-export interface PatientListFormWorkspaceProps extends DefaultWorkspaceProps {
+export interface PatientListFormWorkspaceProps {
+  /** Existing patient list to edit. If not provided, creates a new list. */
   patientListDetails?: OpenmrsCohort;
+  /** Callback triggered after successful create/edit operation */
   onSuccess?: () => void;
 }
 
-const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
-  patientListDetails,
-  onSuccess = () => {},
+const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFormWorkspaceProps>> = ({
+  workspaceProps,
   closeWorkspace,
 }) => {
+  // Extract workspace props with defaults
+  const { patientListDetails, onSuccess = () => {} } = workspaceProps ?? {};
   const id = useId();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveLevel = isTablet ? 1 : 0;
@@ -62,6 +66,26 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
     cohortType: '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  // Track initial form values to detect dirty state
+  const initialValues = useMemo(
+    () => ({
+      name: patientListDetails?.name || '',
+      description: patientListDetails?.description || '',
+      cohortType: patientListDetails?.cohortType?.uuid || '',
+    }),
+    [patientListDetails],
+  );
+
+  // Determine if form has unsaved changes (dirty state)
+  // This is used by Workspace2's hasUnsavedChanges prop for v2 unsaved changes handling
+  const isDirty = useMemo(() => {
+    return (
+      cohortDetails.name !== initialValues.name ||
+      cohortDetails.description !== initialValues.description ||
+      cohortDetails.cohortType !== initialValues.cohortType
+    );
+  }, [cohortDetails, initialValues]);
 
   const validateForm = useCallback(
     (data: CohortFormData) => {
@@ -129,7 +153,8 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
           });
           onSuccess();
           setIsSubmitting(false);
-          closeWorkspace();
+          // Use discardUnsavedChanges: true to close without prompting (changes were saved)
+          closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch(onError);
     } else {
@@ -146,7 +171,8 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
           });
           onSuccess();
           setIsSubmitting(false);
-          closeWorkspace();
+          // Use discardUnsavedChanges: true to close without prompting (changes were saved)
+          closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch(onError);
     }
@@ -159,75 +185,90 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
     }));
   }, []);
 
+  const workspaceTitle = patientListDetails
+    ? t('editPatientListHeader', 'Edit patient list')
+    : t('newPatientListHeader', 'New patient list');
+
+  /**
+   * Handle cancel button click
+   * If there are unsaved changes, the Workspace2 component will prompt the user
+   * via the hasUnsavedChanges prop mechanism
+   */
+  const handleCancel = useCallback(() => {
+    closeWorkspace();
+  }, [closeWorkspace]);
+
   return (
-    <div data-tutorial-target="patient-list-form" className={styles.container}>
-      {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
-      <div className={styles.content}>
-        <h4 className={styles.header}>{t('configureList', 'Configure your patient list using the fields below')}</h4>
-        <div>
-          <Layer level={responsiveLevel}>
-            <TextInput
-              id={`${id}-input`}
-              invalid={!!validationErrors.name}
-              invalidText={validationErrors.name}
-              labelText={t('newPatientListNameLabel', 'List name')}
-              name="name"
-              onChange={handleChange}
-              placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
-              value={cohortDetails?.name}
-            />
-          </Layer>
+    <Workspace2 title={workspaceTitle} hasUnsavedChanges={isDirty}>
+      <div data-tutorial-target="patient-list-form" className={styles.container}>
+        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
+        <div className={styles.content}>
+          <h4 className={styles.header}>{t('configureList', 'Configure your patient list using the fields below')}</h4>
+          <div>
+            <Layer level={responsiveLevel}>
+              <TextInput
+                id={`${id}-input`}
+                invalid={!!validationErrors.name}
+                invalidText={validationErrors.name}
+                labelText={t('newPatientListNameLabel', 'List name')}
+                name="name"
+                onChange={handleChange}
+                placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
+                value={cohortDetails?.name}
+              />
+            </Layer>
+          </div>
+          <div className={styles.input}>
+            <Layer level={responsiveLevel}>
+              <Dropdown
+                id="cohortType"
+                items={listCohortTypes}
+                itemToString={(item) => (item ? item.display : '')}
+                label={t('chooseCohortType', 'Choose cohort type')}
+                onChange={({ selectedItem }) => {
+                  setCohortDetails((prev) => ({
+                    ...prev,
+                    cohortType: selectedItem?.uuid || '',
+                  }));
+                }}
+                selectedItem={listCohortTypes.find((item) => item.uuid === cohortDetails.cohortType) || null}
+                titleText={t('selectCohortType', 'Select cohort type')}
+                type="default"
+              />
+            </Layer>
+          </div>
+          <div className={styles.input}>
+            <Layer level={responsiveLevel}>
+              <TextArea
+                enableCounter
+                id={`${id}-textarea`}
+                labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
+                maxCount={255}
+                name="description"
+                onChange={handleChange}
+                placeholder={t(
+                  'listDescriptionPlaceholder',
+                  'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
+                )}
+                value={cohortDetails?.description}
+              />
+            </Layer>
+          </div>
         </div>
-        <div className={styles.input}>
-          <Layer level={responsiveLevel}>
-            <Dropdown
-              id="cohortType"
-              items={listCohortTypes}
-              itemToString={(item) => (item ? item.display : '')}
-              label={t('chooseCohortType', 'Choose cohort type')}
-              onChange={({ selectedItem }) => {
-                setCohortDetails((prev) => ({
-                  ...prev,
-                  cohortType: selectedItem?.uuid || '',
-                }));
-              }}
-              selectedItem={listCohortTypes.find((item) => item.uuid === cohortDetails.cohortType) || null}
-              titleText={t('selectCohortType', 'Select cohort type')}
-              type="default"
-            />
-          </Layer>
-        </div>
-        <div className={styles.input}>
-          <Layer level={responsiveLevel}>
-            <TextArea
-              enableCounter
-              id={`${id}-textarea`}
-              labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
-              maxCount={255}
-              name="description"
-              onChange={handleChange}
-              placeholder={t(
-                'listDescriptionPlaceholder',
-                'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
-              )}
-              value={cohortDetails?.description}
-            />
-          </Layer>
-        </div>
+        <ButtonSet className={styles.buttonSet}>
+          <Button className={styles.button} onClick={handleCancel} kind="secondary" size="xl">
+            {getCoreTranslation('cancel')}
+          </Button>
+          <Button className={styles.button} onClick={handleSubmit} size="xl" disabled={isSubmitting}>
+            {isSubmitting
+              ? t('submitting', 'Submitting')
+              : patientListDetails
+                ? t('editList', 'Edit list')
+                : t('createList', 'Create list')}
+          </Button>
+        </ButtonSet>
       </div>
-      <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} onClick={closeWorkspace} kind="secondary" size="xl">
-          {getCoreTranslation('cancel')}
-        </Button>
-        <Button className={styles.button} onClick={handleSubmit} size="xl" disabled={isSubmitting}>
-          {isSubmitting
-            ? t('submitting', 'Submitting')
-            : patientListDetails
-              ? t('editList', 'Edit list')
-              : t('createList', 'Create list')}
-        </Button>
-      </ButtonSet>
-    </div>
+    </Workspace2>
   );
 };
 
