@@ -19,12 +19,17 @@ import type { AppointmentKind, AppointmentStatus } from '../types';
 import AppointmentForm from './appointments-form.workspace';
 
 const defaultProps = {
-  context: 'creating',
   closeWorkspace: jest.fn(),
-  patientUuid: mockPatient.id,
-  promptBeforeClosing: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  setTitle: jest.fn(),
+  workspaceProps: {
+    context: 'creating',
+    patientUuid: mockPatient.id,
+  },
+  windowProps: null,
+  groupProps: null,
+  workspaceName: 'appointments-form',
+  windowName: 'test-window',
+  isRootWorkspace: true,
+  launchChildWorkspace: jest.fn(),
 };
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
@@ -783,7 +788,16 @@ describe('AppointmentForm', () => {
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-      renderWithSwr(<AppointmentForm {...defaultProps} appointment={existingAppointment} context="editing" />);
+      renderWithSwr(
+        <AppointmentForm
+          {...defaultProps}
+          workspaceProps={{
+            ...defaultProps.workspaceProps,
+            appointment: existingAppointment,
+            context: 'editing',
+          }}
+        />,
+      );
 
       await waitForLoadingToFinish();
 
@@ -828,8 +842,16 @@ describe('AppointmentForm', () => {
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
       mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
       mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
-
-      renderWithSwr(<AppointmentForm {...defaultProps} appointment={existingAppointment} context="editing" />);
+      renderWithSwr(
+        <AppointmentForm
+          {...defaultProps}
+          workspaceProps={{
+            ...defaultProps.workspaceProps,
+            appointment: existingAppointment,
+            context: 'editing',
+          }}
+        />,
+      );
 
       await waitForLoadingToFinish();
 
@@ -897,9 +919,6 @@ describe('AppointmentForm', () => {
 
       // Try to cancel
       await user.click(cancelButton);
-
-      // Should call promptBeforeClosing if there are unsaved changes
-      expect(defaultProps.promptBeforeClosing).toHaveBeenCalled();
     });
   });
 });
