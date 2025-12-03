@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { type EncounterPayload } from '../../types';
 import { type PatientNote, type RESTPatientNote, type UsePatientNotes } from './types';
 
-export function savePatientNote(payload: EncounterPayload, abortController: AbortController = new AbortController()) {
+export function createPatientNote(payload: EncounterPayload, abortController: AbortController = new AbortController()) {
   return openmrsFetch(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',
@@ -11,6 +11,16 @@ export function savePatientNote(payload: EncounterPayload, abortController: Abor
     method: 'POST',
     body: payload,
     signal: abortController.signal,
+  });
+}
+
+export function editPatientNotes(obsUuid: string, note: string) {
+  return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: { value: note },
   });
 }
 
@@ -40,7 +50,8 @@ export function usePatientNotes(
               const noteObs = encounter.obs.find((obs) => obs.concept.uuid === conceptUuid);
 
               return {
-                id: encounter.uuid,
+                encounterUuid: encounter.uuid,
+                obsUuid: noteObs ? noteObs.uuid : null,
                 diagnoses: encounter.diagnoses.map((d) => d.display).join(', '),
                 encounterDate: encounter.encounterDatetime,
                 encounterNote: noteObs ? noteObs.value : '',
