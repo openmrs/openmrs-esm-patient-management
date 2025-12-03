@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "删除",
   "demographicsSection": "基本信息",
   "discard": "放弃",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "出生日期已知？",
   "editIdentifierTooltip": "编辑",
   "editPatientDetails": "编辑患者详情",

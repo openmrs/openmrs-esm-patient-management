@@ -39,7 +39,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   const { data: bedsAssignedToPatient, isLoading: isLoadingBedsAssignedToPatient } = useAssignedBedByPatient(
     patient.uuid,
   );
-  const beds = isLoading ? [] : wardPatientGroupDetails?.bedLayouts ?? [];
+  const beds = isLoading ? [] : (wardPatientGroupDetails?.bedLayouts ?? []);
 
   const zodSchema = useMemo(
     () =>
@@ -128,14 +128,14 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
           });
         },
       )
-      .finally(() => {
+      .finally(async () => {
+        await wardPatientGroupDetails?.mutate?.();
         setIsSubmitting(false);
-        wardPatientGroupDetails?.mutate?.();
         closeWorkspaceWithSavedChanges();
       });
   };
 
-  const onError = useCallback((values) => {
+  const onError = useCallback(() => {
     setShowErrorNotifications(true);
     setIsSubmitting(false);
   }, []);
