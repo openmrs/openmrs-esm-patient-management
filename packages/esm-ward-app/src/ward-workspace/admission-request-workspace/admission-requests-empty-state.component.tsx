@@ -12,9 +12,10 @@ const AdmissionRequestsEmptyState: React.FC = () => {
   const isDesktop = useLayoutType() !== 'tablet';
 
   const handleAddPatient = () => {
-    launchWorkspace2('ward-app-patient-search-workspace', {
-      workspaceProps: {
-        workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
+    launchWorkspace2(
+      'ward-app-patient-search-workspace',
+      {
+        workspaceTitle: t('addPatientToWard', 'Add patient to ward'),
         onPatientSelected(
           patientUuid: string,
           patient: fhir.Patient,
@@ -26,7 +27,10 @@ const AdmissionRequestsEmptyState: React.FC = () => {
           });
         },
       },
-    });
+      {
+        startVisitWorkspaceName: 'ward-app-start-visit-workspace',
+      },
+    );
   };
 
   return (
