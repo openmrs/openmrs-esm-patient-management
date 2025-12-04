@@ -3,7 +3,14 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineNotification } from '@carbon/react';
 import { Movement } from '@carbon/react/icons';
-import { ArrowRightIcon, isDesktop, launchWorkspaceGroup, useAppContext, useLayoutType } from '@openmrs/esm-framework';
+import {
+  ArrowRightIcon,
+  isDesktop,
+  launchWorkspace2,
+  launchWorkspaceGroup,
+  useAppContext,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { type WardViewContext } from '../types';
 import styles from './admission-requests.scss';
 
@@ -46,11 +53,8 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
       <Button
         className={styles.manageButton}
         onClick={() => {
-          launchWorkspaceGroup('ward-patient-admission-requests', {
-            state: { wardPendingPatients },
-            workspaceToLaunch: {
-              name: 'admission-requests-workspace',
-            },
+          launchWorkspace2('admission-requests-workspace', {
+            wardPendingPatients,
           });
         }}
         renderIcon={ArrowRightIcon}

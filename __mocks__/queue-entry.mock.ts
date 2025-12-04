@@ -150,6 +150,7 @@ export const mockQueueEntryAlice: QueueEntry = {
     },
     visitTypeUuid: 'visit-type-uuid',
     startDatetime: '2022-04-03T07:22:00.000+0000',
+    stopDatetime: null,
   } as Visit,
   sortWeight: 0,
   queueComingFrom: mockQueueTriage,

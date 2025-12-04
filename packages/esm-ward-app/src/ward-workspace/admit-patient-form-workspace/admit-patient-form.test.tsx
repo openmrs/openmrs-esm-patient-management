@@ -7,12 +7,13 @@ import {
   useAppContext,
   useFeatureFlag,
   useSession,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
-import type { WardPatient, WardViewContext } from '../../types';
+import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import useWardLocation from '../../hooks/useWardLocation';
@@ -68,13 +69,6 @@ const mockUseAdmitPatientObj: ReturnType<typeof useAdmitPatient> = {
 };
 jest.mocked(useAdmitPatient).mockReturnValue(mockUseAdmitPatientObj);
 
-const mockWorkspaceProps: DefaultWorkspaceProps = {
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  closeWorkspace: jest.fn(),
-};
-
 const mockWardPatientAliceProps: WardPatient = {
   visit: mockInpatientRequestAlice.visit,
   patient: mockPatientAlice,
@@ -83,12 +77,21 @@ const mockWardPatientAliceProps: WardPatient = {
   inpatientRequest: mockInpatientRequestAlice,
 };
 
+const mockWorkspaceProps: Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}> = {
+  closeWorkspace: jest.fn(),
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {
+    wardPatient: mockWardPatientAliceProps,
+  },
+  windowProps: {},
+  groupProps: {},
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
+};
+
 function renderAdmissionForm() {
-  renderWithSwr(
-    <AdmitPatientFormWorkspace
-      {...{ ...mockWorkspaceProps, wardPatient: mockWardPatientAliceProps, WardPatientHeader: jest.fn() }}
-    />,
-  );
+  renderWithSwr(<AdmitPatientFormWorkspace {...mockWorkspaceProps} />);
 }
 
 describe('Testing AdmitPatientForm', () => {
@@ -168,9 +171,7 @@ describe('Testing AdmitPatientForm', () => {
     renderAdmissionForm();
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
     await user.click(cancelButton);
-    expect(mockWorkspaceProps.closeWorkspace).toHaveBeenCalledWith({
-      ignoreChanges: true,
-    });
+    expect(mockWorkspaceProps.closeWorkspace).toHaveBeenCalledWith();
     screen.getByText('Admit');
     expect(screen.getByText('Select a bed')).toBeInTheDocument();
 
