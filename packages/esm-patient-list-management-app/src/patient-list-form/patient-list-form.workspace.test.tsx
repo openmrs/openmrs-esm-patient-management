@@ -9,26 +9,27 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
-import { createPatientList, editPatientList } from '../api/api-remote';
-import { useCohortTypes } from '../api/hooks';
 import type { OpenmrsCohort, CohortType } from '../api/types';
 import PatientListFormWorkspace from './patient-list-form.workspace';
 import type { PatientListFormWorkspaceProps } from './patient-list-form.workspace';
 
 // Mock dependencies
-jest.mock('../api/api-remote', () => ({
-  createPatientList: jest.fn(),
-  editPatientList: jest.fn(),
-  extractErrorMessagesFromResponse: jest.fn((err) => err?.message || 'Unknown error'),
+const mockCreatePatientList = jest.fn();
+const mockEditPatientList = jest.fn();
+const mockExtractErrorMessagesFromResponse = jest.fn();
+
+jest.mock('../api/patient-list.resource', () => ({
+  createPatientList: (...args: unknown[]) => mockCreatePatientList(...args),
+  editPatientList: (...args: unknown[]) => mockEditPatientList(...args),
+  extractErrorMessagesFromResponse: (...args: unknown[]) => mockExtractErrorMessagesFromResponse(...args),
 }));
+
+const mockUseCohortTypes = jest.fn();
 
 jest.mock('../api/hooks', () => ({
-  useCohortTypes: jest.fn(),
+  useCohortTypes: () => mockUseCohortTypes(),
 }));
 
-const mockCreatePatientList = jest.mocked(createPatientList);
-const mockEditPatientList = jest.mocked(editPatientList);
-const mockUseCohortTypes = jest.mocked(useCohortTypes);
 const mockUseSession = jest.mocked(useSession);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -97,6 +98,7 @@ describe('PatientListFormWorkspace', () => {
     });
     mockCreatePatientList.mockResolvedValue({});
     mockEditPatientList.mockResolvedValue({});
+    mockExtractErrorMessagesFromResponse.mockImplementation((err) => err?.error?.message || 'Unknown error');
   });
 
   describe('Component Rendering', () => {
