@@ -1,7 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { type AppointmentSummary, type Appointment } from '../types';
-import { configSchema } from '../config-schema';
+import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type AppointmentSummary } from '../types';
+import { appointmentsFormWorkspace } from '../constants';
+import { type TFunction } from 'i18next';
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
   const groupedAppointments = appointmentSummary?.map(({ countMap, serviceName }) => ({
@@ -79,4 +80,27 @@ export const getGender = (gender, t) => {
     default:
       return gender;
   }
+};
+
+export const launchCreateAppointmentForm = (t: TFunction<'translation', undefined>) => {
+  launchWorkspace2(
+    'appointments-patient-search-workspace',
+    {
+      initialQuery: '',
+      workspaceTitle: t('createNewAppointment', 'Create new appointment'),
+      onPatientSelected(
+        patientUuid: string,
+        patient: fhir.Patient,
+        launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+      ) {
+        launchChildWorkspace(appointmentsFormWorkspace, {
+          patientUuid: patient.id,
+        });
+      },
+    },
+    {
+      startVisitWorkspaceName: 'appointments-patient-search-start-visit-workspace',
+    },
+  );
 };

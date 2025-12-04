@@ -18,10 +18,39 @@ import { useProviders } from '../hooks/useProviders';
 import type { AppointmentKind, AppointmentStatus } from '../types';
 import AppointmentForm from './appointments-form.workspace';
 
+const existingAppointment = {
+  uuid: 'appointment-uuid',
+  appointmentNumber: 'APT-001',
+  startDateTime: '2024-01-04T09:30:00.000Z',
+  endDateTime: '2024-01-04T10:00:00.000Z',
+  appointmentKind: 'Scheduled' as AppointmentKind.SCHEDULED,
+  status: 'Scheduled' as AppointmentStatus.SCHEDULED,
+  comments: 'Existing appointment note',
+  location: { uuid: 'b1a8b05e-3542-4037-bbd3-998ee9c40574', display: 'Inpatient Ward', name: 'Inpatient Ward' },
+  service: {
+    uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+    name: 'Outpatient',
+    appointmentServiceId: 1,
+    creatorName: 'Test Creator',
+    description: 'Outpatient service',
+    endTime: '17:00',
+    initialAppointmentStatus: 'Scheduled' as AppointmentStatus.SCHEDULED,
+    maxAppointmentsLimit: null,
+    startTime: '08:00',
+  },
+  patient: { uuid: mockPatient.id, name: 'Test Patient', identifier: '12345', identifiers: [] },
+  provider: { uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'Dr. Cook' },
+  providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', response: 'ACCEPTED' }],
+  recurring: false,
+  voided: false,
+  extensions: {},
+  teleconsultationLink: null,
+  dateAppointmentScheduled: '2024-01-04T00:00:00.000Z',
+};
+
 const defaultProps = {
   closeWorkspace: jest.fn(),
   workspaceProps: {
-    context: 'creating',
     patientUuid: mockPatient.id,
   },
   windowProps: null,
@@ -708,7 +737,15 @@ describe('AppointmentForm', () => {
         data: { PATIENT_DOUBLE_BOOKING: true },
       } as FetchResponse);
 
-      renderWithSwr(<AppointmentForm {...defaultProps} />);
+      renderWithSwr(
+        <AppointmentForm
+          {...defaultProps}
+          workspaceProps={{
+            ...defaultProps.workspaceProps,
+            appointment: existingAppointment,
+          }}
+        />,
+      );
 
       await waitForLoadingToFinish();
 
@@ -756,36 +793,6 @@ describe('AppointmentForm', () => {
 
   describe('Edit Mode', () => {
     it('should pre-populate form with existing appointment data', async () => {
-      const existingAppointment = {
-        uuid: 'appointment-uuid',
-        appointmentNumber: 'APT-001',
-        startDateTime: '2024-01-04T09:30:00.000Z',
-        endDateTime: '2024-01-04T10:00:00.000Z',
-        appointmentKind: 'Scheduled' as AppointmentKind.SCHEDULED,
-        status: 'Scheduled' as AppointmentStatus.SCHEDULED,
-        comments: 'Existing appointment note',
-        location: { uuid: 'b1a8b05e-3542-4037-bbd3-998ee9c40574', display: 'Inpatient Ward', name: 'Inpatient Ward' },
-        service: {
-          uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
-          name: 'Outpatient',
-          appointmentServiceId: 1,
-          creatorName: 'Test Creator',
-          description: 'Outpatient service',
-          endTime: '17:00',
-          initialAppointmentStatus: 'Scheduled' as AppointmentStatus.SCHEDULED,
-          maxAppointmentsLimit: null,
-          startTime: '08:00',
-        },
-        patient: { uuid: mockPatient.id, name: 'Test Patient', identifier: '12345', identifiers: [] },
-        provider: { uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'Dr. Cook' },
-        providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', response: 'ACCEPTED' }],
-        recurring: false,
-        voided: false,
-        extensions: {},
-        teleconsultationLink: null,
-        dateAppointmentScheduled: '2024-01-04T00:00:00.000Z',
-      };
-
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
       renderWithSwr(
@@ -794,7 +801,6 @@ describe('AppointmentForm', () => {
           workspaceProps={{
             ...defaultProps.workspaceProps,
             appointment: existingAppointment,
-            context: 'editing',
           }}
         />,
       );
@@ -809,35 +815,6 @@ describe('AppointmentForm', () => {
 
     it('should update appointment successfully', async () => {
       const user = userEvent.setup();
-      const existingAppointment = {
-        uuid: 'appointment-uuid',
-        appointmentNumber: 'APT-001',
-        startDateTime: '2024-01-04T09:30:00.000Z',
-        endDateTime: '2024-01-04T10:00:00.000Z',
-        appointmentKind: 'Scheduled' as AppointmentKind.SCHEDULED,
-        status: 'Scheduled' as AppointmentStatus.SCHEDULED,
-        comments: 'Original note',
-        location: { uuid: 'b1a8b05e-3542-4037-bbd3-998ee9c40574', display: 'Inpatient Ward', name: 'Inpatient Ward' },
-        service: {
-          uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
-          name: 'Outpatient',
-          appointmentServiceId: 1,
-          creatorName: 'Test Creator',
-          description: 'Outpatient service',
-          endTime: '17:00',
-          initialAppointmentStatus: 'Scheduled',
-          maxAppointmentsLimit: null,
-          startTime: '08:00',
-        },
-        patient: { uuid: mockPatient.id, name: 'Test Patient', identifier: '12345', identifiers: [] },
-        provider: { uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'Dr. Cook' },
-        providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', response: 'ACCEPTED' }],
-        recurring: false,
-        voided: false,
-        extensions: {},
-        teleconsultationLink: null,
-        dateAppointmentScheduled: '2024-01-04T00:00:00.000Z',
-      };
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
       mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
@@ -848,7 +825,6 @@ describe('AppointmentForm', () => {
           workspaceProps={{
             ...defaultProps.workspaceProps,
             appointment: existingAppointment,
-            context: 'editing',
           }}
         />,
       );
