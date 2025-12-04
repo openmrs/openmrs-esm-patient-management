@@ -46,11 +46,12 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     ) {
       launchWorkspace2('appointments-form-workspace', {
         context: 'creating',
+        patientUuid: patientUuid,
       });
     } else {
       launchWorkspace2('appointments-form-workspace', {
         context: 'creating',
-        patientUuid,
+        patientUuid: patientUuid,
         workspaceTitle: t('createNewAppointment', 'Create new appointment'),
       });
     }
