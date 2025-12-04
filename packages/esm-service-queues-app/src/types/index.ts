@@ -273,6 +273,7 @@ export interface QueueEntryPayload {
     patient: { uuid: string };
     startedAt: Date;
     sortWeight: number;
+    providerWaitingFor?: { uuid: string };
   };
 }
 
@@ -465,7 +466,7 @@ export interface QueueEntry {
   patient: Patient;
   priority: Concept;
   priorityComment: string | null;
-  providerWaitingFor: Provider;
+  providerWaitingFor?: Provider;
   queue: Queue;
   startedAt: string;
   status: Concept;
@@ -490,5 +491,3 @@ export interface QueueEntrySearchCriteria {
 export interface Concept extends OpenmrsResource {
   setMembers?: Array<Concept>;
 }
-
-export interface Provider extends OpenmrsResource {}
