@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
 import { getGender } from '../../helpers';
+import { usePatientPhone } from '../../helpers/functions';
 import { type Appointment } from '../../types';
 import styles from './appointment-details.scss';
 
@@ -15,6 +16,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
   const [isEnabledQuery, setIsEnabledQuery] = useState(false);
   const { appointmentsCount, isLoading } = usePatientAppointmentHistory(appointment.patient.uuid);
   const { patient } = usePatient(appointment.patient.uuid);
+  const { phoneNumber, isLoading: phoneLoading } = usePatientPhone(patient);
 
   useEffect(() => {
     if (!isLoading) {
@@ -41,6 +43,10 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           <div className={styles.labelContainer}>
             <p className={styles.labelBold}>{t('gender', 'Gender')}: </p>
             <p className={styles.label}>{getGender(appointment.patient.gender, t)}</p>
+          </div>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('phoneNumber', 'Phone number')}: </p>
+            <p className={styles.label}>{phoneLoading ? t('loading', 'Loading...') : phoneNumber || '--'}</p>
           </div>
           {patient && patient?.birthDate ? (
             <div className={styles.labelContainer}>
