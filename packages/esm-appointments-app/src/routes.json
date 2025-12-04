@@ -98,10 +98,6 @@
       "slot": "visit-form-top-slot"
     },
     {
-      "name": "search-patient",
-      "component": "searchPatient"
-    },
-    {
       "name": "home-appointments-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile"

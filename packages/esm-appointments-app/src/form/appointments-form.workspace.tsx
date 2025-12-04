@@ -35,7 +35,6 @@ import {
   useSession,
   Workspace2,
   type Workspace2DefinitionProps,
-  type DefaultWorkspaceProps,
   type FetchResponse,
 } from '@openmrs/esm-framework';
 import { z } from 'zod';
@@ -57,16 +56,18 @@ import styles from './appointments-form.scss';
 interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
-  patientUuid?: string;
-  context: string;
+  patientUuid: string;
 }
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
 const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
 
+/**
+ * Workspace used to create or edit an appointment within the appointments app
+ */
 const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps>> = ({
-  workspaceProps: { appointment, recurringPattern, patientUuid, context },
+  workspaceProps: { appointment, recurringPattern, patientUuid },
   closeWorkspace,
 }) => {
   const { patient } = usePatient(patientUuid);
@@ -326,6 +327,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     }
   })();
 
+  const isEditing = Boolean(appointment);
+
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
@@ -338,7 +341,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      if (context !== 'editing') {
+      if (isEditing) {
         errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
       } else {
         errorMessage = null;
@@ -376,19 +379,17 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             isLowContrast: true,
             kind: 'success',
             subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title:
-              context === 'editing'
-                ? t('appointmentEdited', 'Appointment edited')
-                : t('appointmentScheduled', 'Appointment scheduled'),
+            title: isEditing
+              ? t('appointmentEdited', 'Appointment edited')
+              : t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
         if (status === 204) {
           setIsSubmitting(false);
           showSnackbar({
-            title:
-              context === 'editing'
-                ? t('appointmentEditError', 'Error editing appointment')
-                : t('appointmentFormError', 'Error scheduling appointment'),
+            title: isEditing
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
             kind: 'error',
             isLowContrast: false,
             subtitle: t('noContent', 'No Content'),
@@ -398,10 +399,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       (error) => {
         setIsSubmitting(false);
         showSnackbar({
-          title:
-            context === 'editing'
-              ? t('appointmentEditError', 'Error editing appointment')
-              : t('appointmentFormError', 'Error scheduling appointment'),
+          title: isEditing
+            ? t('appointmentEditError', 'Error editing appointment')
+            : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           isLowContrast: false,
           subtitle: error?.message,
@@ -445,7 +445,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       providers: [{ uuid: provider }],
       patientUuid: patientUuid,
       comments: appointmentNote,
-      uuid: context === 'editing' ? appointment.uuid : undefined,
+      uuid: isEditing ? appointment.uuid : undefined,
       dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
@@ -469,13 +469,18 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     };
   };
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
+  }
+
+  const title = isEditing
+    ? t('editAppointment', 'Edit appointment')
+    : t('createNewAppointment', 'Create new appointment');
 
   return (
-    <Workspace2 title={t('createNewAppointment', 'Create new appointment')} hasUnsavedChanges={isDirty}>
+    <Workspace2 title={title} hasUnsavedChanges={isDirty}>
       <Form onSubmit={handleSubmit(handleSaveAppointment)}>
         {patient && (
           <ExtensionSlot
@@ -528,12 +533,12 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     labelText={t('selectService', 'Select a service')}
                     onBlur={onBlur}
                     onChange={(event) => {
-                      if (context === 'creating') {
+                      if (!isEditing) {
                         setValue(
                           'duration',
                           services?.find((service) => service.name === event.target.value)?.durationMins,
                         );
-                      } else if (context === 'editing') {
+                      } else {
                         const previousServiceDuration = services?.find(
                           (service) => service.name === getValues('selectedService'),
                         )?.durationMins;
@@ -789,7 +794,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </FormGroup>
           )}
 
-          {context !== 'creating' ? (
+          {isEditing ? (
             <FormGroup className={styles.formGroup} legendText={t('appointmentStatus', 'Appointment Status')}>
               <ResponsiveWrapper>
                 <Controller

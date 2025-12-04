@@ -4,17 +4,11 @@ import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import {
-  ExtensionSlot,
-  isDesktop,
-  launchWorkspace2,
-  navigate,
-  useLayoutType,
-  type Workspace2DefinitionProps,
-} from '@openmrs/esm-framework';
-import { appointmentsFormWorkspace, spaHomePage } from '../constants';
+import { isDesktop, navigate, useLayoutType } from '@openmrs/esm-framework';
+import { spaHomePage } from '../constants';
 import { useAppointmentsStore } from '../store';
 import styles from './metrics-header.scss';
+import { launchCreateAppointmentForm } from '../helpers';
 
 dayjs.extend(isToday);
 
@@ -23,16 +17,6 @@ const MetricsHeader: React.FC = () => {
   const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
-
-  const launchCreateAppointmentForm = (patientUuid) => {
-    const props = {
-      patientUuid: patientUuid,
-      context: 'creating',
-      mutate: () => {}, // TODO get this to mutate properly
-    };
-
-    launchWorkspace2('appointments-form-workspace', { ...props });
-  };
 
   return (
     <div className={styles.metricsContainer}>
@@ -50,28 +34,7 @@ const MetricsHeader: React.FC = () => {
           kind="primary"
           renderIcon={(props) => <Hospital size={32} {...props} />}
           size={responsiveSize}
-          onClick={() =>
-            launchWorkspace2(
-              'appointments-patient-search-workspace',
-              {
-                initialQuery: '',
-                workspaceTitle: t('createNewAppointment', 'Create new appointment'),
-                onPatientSelected(
-                  patientUuid: string,
-                  patient: fhir.Patient,
-                  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-                  closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-                ) {
-                  launchChildWorkspace(appointmentsFormWorkspace, {
-                    patientUuid: patient.id,
-                  });
-                },
-              },
-              {
-                startVisitWorkspaceName: 'appointments-patient-search-start-visit-workspace',
-              },
-            )
-          }>
+          onClick={() => launchCreateAppointmentForm(t)}>
           {t('createNewAppointment', 'Create new appointment')}
         </Button>
       </div>
