@@ -45,8 +45,12 @@ export class WardPage {
     await this.page.getByRole('button', { name: 'Patient Note' }).click();
   }
 
-  async clickCancelButton() {
-    await this.cancelButton().click();
+  async clickCancelAdmissionButton(patientName: string) {
+    await this.page
+      .locator(`[class*="admissionRequestCard"]:has-text("${patientName}") button`)
+      .filter({ hasText: 'Cancel' })
+      .first()
+      .click();
   }
 
   async fillWardAdmissionNote(note: string) {

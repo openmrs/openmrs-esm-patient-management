@@ -1,44 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionMenuButton, AddIcon, launchWorkspace } from '@openmrs/esm-framework';
-import { type CreateAdmissionEncounterWorkspaceProps } from './create-admission-encounter.workspace';
+import { ActionMenuButton2, AddIcon, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 function CreateAdmissionRequestActionButton() {
   const { t } = useTranslation();
 
-  // TODO: this is an attempt to save the previous search term for the
-  // "Back to patient search" button, but it doesn't work. See:
-  // https://openmrs.atlassian.net/browse/O3-4300
-  const [searchTerm, setSearchTerm] = useState<string>('');
-
-  // See PatientSearchWorkspaceProps in patient-search-app
-  const workspaceProps = {
-    initialQuery: searchTerm,
-    nonNavigationSelectPatientAction: async (patientUuid) => {
-      launchWorkspace<CreateAdmissionEncounterWorkspaceProps>('create-admission-encounter-workspace', {
-        patientUuid,
-        handleReturnToSearchList: launchSearchWorkspace,
-      });
-    },
-    handleSearchTermUpdated: (value: string) => {
-      setSearchTerm(value);
-    },
-  };
-
-  const launchSearchWorkspace = () => {
-    launchWorkspace('patient-search-workspace', {
-      ...workspaceProps,
-      workspaceTitle: t('addPatientToWard', 'Add patient to ward'),
-    });
-  };
-
   return (
-    <ActionMenuButton
-      getIcon={(props) => <AddIcon {...props} />}
+    <ActionMenuButton2
+      icon={(props) => <AddIcon {...props} />}
       label={t('addPatientToWard', 'Add patient to ward')}
-      iconDescription={t('addPatientToWard', 'Add patient to ward')}
-      handler={launchSearchWorkspace}
-      type={'patient-search-workspace'}
+      workspaceToLaunch={{
+        workspaceName: 'ward-app-patient-search-workspace',
+        workspaceProps: {
+          workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
+          onPatientSelected(
+            patientUuid: string,
+            patient: fhir.Patient,
+            launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+            closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+          ) {
+            launchChildWorkspace('create-admission-encounter-workspace', {
+              selectedPatientUuid: patient.id,
+            });
+          },
+        },
+        windowProps: {
+          startVisitWorkspaceName: 'ward-app-start-visit-workspace',
+        },
+      }}
     />
   );
 }
