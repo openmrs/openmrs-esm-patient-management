@@ -281,7 +281,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   useEffect(() => {
     if (isSuccessful) {
       reset();
-      closeWorkspace({ discardUnsavedChanges: true });
+      closeWorkspace({ discardUnsavedChanges: true, closeWindow: true });
     }
   }, [isSuccessful, reset, closeWorkspace]);
 

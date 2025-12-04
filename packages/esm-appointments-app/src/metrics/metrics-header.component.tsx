@@ -63,7 +63,7 @@ const MetricsHeader: React.FC = () => {
                   closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
                 ) {
                   launchChildWorkspace(appointmentsFormWorkspace, {
-                    selectedPatientUuid: patient.id,
+                    patientUuid: patient.id,
                   });
                 },
               },
