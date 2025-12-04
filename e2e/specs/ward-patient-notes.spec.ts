@@ -6,9 +6,10 @@ import {
   deletePatient,
   endVisit,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
+  waitForAdmissionToBeProcessed,
 } from '../commands';
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
@@ -27,7 +28,7 @@ test.beforeEach(async ({ api, page }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmission(api, provider.uuid, wardPatient?.uuid);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid);
 
   // Poll the admission requests API to verify the admission is queryable before navigating.
   // This prevents race conditions where the UI loads before the backend has indexed the admission.
@@ -63,7 +64,7 @@ test.beforeEach(async ({ api, page }) => {
   }
 });
 
-test('Add a patient note to an inpatient admission', async ({ page }) => {
+test('Add a patient note to an inpatient admission', async ({ page, api }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
 
@@ -97,6 +98,10 @@ test('Add a patient note to an inpatient admission', async ({ page }) => {
 
   await test.step('And I should see the patient in the ward view', async () => {
     await wardPage.waitForPatientInWardView(fullName);
+  });
+
+  await test.step('And I wait for the admission to be available in the API', async () => {
+    await waitForAdmissionToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   });
 
   await test.step('And when I click on the patient card to open the patient workspace', async () => {

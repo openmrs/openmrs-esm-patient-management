@@ -13,7 +13,7 @@ import {
   launchWorkspace,
   showModal,
 } from '@openmrs/esm-framework';
-import { deletePatientList } from '../api/api-remote';
+import { deletePatientList } from '../api/patient-list.resource';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
 import styles from './list-details.scss';
