@@ -155,6 +155,11 @@
       "name": "appointments-patient-search-workspace",
       "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
       "window": "appointments-window"
+    },
+    {
+      "name": "appointments-patient-search-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "appointments-window"
     }
   ]
 }

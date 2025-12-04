@@ -10,9 +10,9 @@ import {
   launchWorkspace2,
   navigate,
   useLayoutType,
-  Workspace2DefinitionProps,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { spaHomePage } from '../constants';
+import { appointmentsFormWorkspace, spaHomePage } from '../constants';
 import { useAppointmentsStore } from '../store';
 import styles from './metrics-header.scss';
 
@@ -46,19 +46,34 @@ const MetricsHeader: React.FC = () => {
           }>
           {t('appointmentsCalendar', 'Appointments calendar')}
         </Button>
-        <ExtensionSlot
-          name="patient-search-button-slot"
-          state={{
-            selectPatientAction: launchCreateAppointmentForm,
-            buttonText: t('createNewAppointment', 'Create new appointment'),
-            overlayHeader: t('createNewAppointment', 'Create new appointment'),
-            buttonProps: {
-              kind: 'primary',
-              renderIcon: (props) => <Hospital size={32} {...props} />,
-              size: responsiveSize,
-            },
-          }}
-        />
+        <Button
+          kind="primary"
+          renderIcon={(props) => <Hospital size={32} {...props} />}
+          size={responsiveSize}
+          onClick={() =>
+            launchWorkspace2(
+              'appointments-patient-search-workspace',
+              {
+                initialQuery: '',
+                workspaceTitle: t('createNewAppointment', 'Create new appointment'),
+                onPatientSelected(
+                  patientUuid: string,
+                  patient: fhir.Patient,
+                  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+                  closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+                ) {
+                  launchChildWorkspace(appointmentsFormWorkspace, {
+                    selectedPatientUuid: patient.id,
+                  });
+                },
+              },
+              {
+                startVisitWorkspaceName: 'appointments-patient-search-start-visit-workspace',
+              },
+            )
+          }>
+          {t('createNewAppointment', 'Create new appointment')}
+        </Button>
       </div>
     </div>
   );
