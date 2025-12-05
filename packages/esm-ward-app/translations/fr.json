@@ -73,6 +73,7 @@
   "note": "Note",
   "notes": "Notes",
   "notesRequiredForCancellingRequest": "Les notes sont obligatoires pour annuler une admission ou un transfert",
+  "orderBasket": "Order basket",
   "Orders": "Prescriptions",
   "other": "Autre",
   "Patient": "Patient",
@@ -122,7 +123,6 @@
   "transfer": "Transfert",
   "transferElsewhere": "Transférer vers une autre unité",
   "transferPatient": "Transférer le patient",
-  "transferRequest": "Demande de transfert",
   "transfers": "Transferts",
   "transferToDispositionLocation": "Transféré vers {{location}}",
   "transferType": "Type de transfert",
@@ -131,5 +131,6 @@
   "unknownError": "Erreur inconnue",
   "visitNoteSaved": "Note enregistrée",
   "wardClinicalNotePlaceholder": "Indiquez les notes ici",
+  "wardPatient": "Ward patient",
   "wards": "Admissions"
 }

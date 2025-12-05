@@ -78,16 +78,19 @@ export const mockSession = {
         {
           uuid: '62431c71-5244-11ea-a771-0242ac160002',
           display: 'Manage Appointment Services',
+          name: 'Manage Appointment Services',
           links: [],
         },
         {
           uuid: '6206682c-5244-11ea-a771-0242ac160002',
           display: 'Manage Appointments',
+          name: 'Manage Appointments',
           links: [],
         },
         {
           uuid: '6280ff58-5244-11ea-a771-0242ac160002',
           display: 'Manage Appointment Specialities',
+          name: 'Manage Appointment Specialities',
           links: [],
         },
       ],
@@ -95,16 +98,19 @@ export const mockSession = {
         {
           uuid: '8d94f852-c2cc-11de-8d13-0010c6dffd0f',
           display: 'System Developer',
+          name: 'System Developer',
           links: [],
         },
         {
           uuid: '62c195c5-5244-11ea-a771-0242ac160002',
           display: 'Bahmni Role',
+          name: 'Bahmni Role',
           links: [],
         },
         {
           uuid: '8d94f280-c2cc-11de-8d13-0010c6dffd0f',
           display: 'Provider',
+          name: 'Provider',
           links: [],
         },
       ],
