@@ -5,6 +5,7 @@ export const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
 export const appointmentLocationTagName = 'Appointment Location';
 
 export const moduleName = '@openmrs/esm-appointments-app';
+export const appointmentsFormWorkspace = 'appointments-form-workspace';
 
 export const datePickerPlaceHolder = 'dd/mm/yyyy';
 export const dateFormat = 'DD/MM/YYYY';

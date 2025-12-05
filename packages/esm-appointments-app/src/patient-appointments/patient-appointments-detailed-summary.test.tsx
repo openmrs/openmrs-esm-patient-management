@@ -3,32 +3,32 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '__mocks__';
-import { mockPatient, patientChartBasePath, renderWithContext, waitForLoadingToFinish, withSwr } from 'tools';
-import { type AppointmentsFetchResponse } from '../types';
 import {
-  PatientAppointmentContextProvider,
-  PatientAppointmentContextTypes,
-} from '../hooks/patient-appointment-context';
-import AppointmentsBase from './patient-appointments-base.component';
+  mockPatient,
+  patientChartBasePath,
+  renderWithContext,
+  renderWithSwr,
+  waitForLoadingToFinish,
+  withSwr,
+} from 'tools';
+import { type AppointmentsFetchResponse } from '../types';
+import AppointmentsDetailedSummary from './patient-appointments-detailed-summary.extension';
 
 const testProps = {
   basePath: patientChartBasePath,
   patientUuid: mockPatient.id,
+  launchAppointmentForm: jest.fn(),
 };
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-describe('AppointmentsOverview', () => {
+describe('AppointmentsDetailedSummary', () => {
   it('renders an empty state if appointments data is unavailable', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({
       data: [],
     } as unknown as FetchResponse<AppointmentsFetchResponse>);
 
-    renderWithContext(
-      withSwr(<AppointmentsBase {...testProps} />),
-      PatientAppointmentContextProvider,
-      PatientAppointmentContextTypes.APPOINTMENTS_APP,
-    );
+    renderWithSwr(<AppointmentsDetailedSummary {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -48,11 +48,7 @@ describe('AppointmentsOverview', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderWithContext(
-      withSwr(<AppointmentsBase {...testProps} />),
-      PatientAppointmentContextProvider,
-      PatientAppointmentContextTypes.APPOINTMENTS_APP,
-    );
+    renderWithSwr(<AppointmentsDetailedSummary {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -71,11 +67,7 @@ describe('AppointmentsOverview', () => {
       ...mockAppointmentsData,
     } as unknown as FetchResponse<AppointmentsFetchResponse>);
 
-    renderWithContext(
-      withSwr(<AppointmentsBase {...testProps} />),
-      PatientAppointmentContextProvider,
-      PatientAppointmentContextTypes.APPOINTMENTS_APP,
-    );
+    renderWithSwr(<AppointmentsDetailedSummary {...testProps} />);
 
     await waitForLoadingToFinish();
 
