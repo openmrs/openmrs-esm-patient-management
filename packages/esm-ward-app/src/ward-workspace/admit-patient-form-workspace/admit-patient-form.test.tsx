@@ -17,12 +17,15 @@ import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '..
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import useWardLocation from '../../hooks/useWardLocation';
+import useLocation from '../../hooks/useLocation';
 
 jest.mock('../../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
 }));
 
 jest.mock('../../hooks/useWardLocation', () => jest.fn());
+
+jest.mock('../../hooks/useLocation', () => jest.fn());
 
 jest.mock('../../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
@@ -47,6 +50,7 @@ jest.mock('../../ward.resource', () => ({
 }));
 
 const mockedUseWardLocation = jest.mocked(useWardLocation);
+const mockedUseLocation = jest.mocked(useLocation);
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseSession = jest.mocked(useSession);
@@ -110,6 +114,19 @@ describe('Testing AdmitPatientForm', () => {
       invalidLocation: false,
       isLoadingLocation: false,
       errorFetchingLocation: null,
+    });
+
+    // Mock useLocation to return proper location hierarchy for validation
+    // @ts-ignore - simplified mock for testing
+    mockedUseLocation.mockReturnValue({
+      // @ts-ignore
+      data: {
+        data: {
+          ...mockLocationInpatientWard,
+          parentLocation: null, // Mock parent location for valid hierarchy
+        },
+      },
+      isLoading: false,
     });
 
     // @ts-ignore - we don't need to mock the entire object

@@ -30,6 +30,11 @@ interface LocationSelectorProps extends RadioButtonGroupProps {
    */
   excludeLocations?: Location[];
 
+  /**
+   * Custom message to display when no locations are found
+   */
+  emptyStateMessage?: string;
+
   field: ControllerRenderProps<
     {
       note?: string;
@@ -44,6 +49,7 @@ export default function LocationSelector({
   paginationSize = 15,
   ancestorLocation,
   excludeLocations: locationsToFilter,
+  emptyStateMessage,
   field,
 }: LocationSelectorProps) {
   const { t } = useTranslation();
@@ -110,7 +116,9 @@ export default function LocationSelector({
                 <RadioButton key={location.id} labelText={location.name} value={location.id} />
               ))
             ) : (
-              <span className={styles.bodyShort01}>{t('noLocationsFound', 'No locations found')}</span>
+              <span className={styles.bodyShort01}>
+                {emptyStateMessage || t('noLocationsFound', 'No locations found')}
+              </span>
             )}
           </RadioButtonGroup>
         </ResponsiveWrapper>
