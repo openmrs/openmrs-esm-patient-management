@@ -9,6 +9,11 @@ interface AppointmentsListProps {
   excludeCancelledAppointments?: boolean;
   status?: string;
   title: string;
+  // Optional props for status dropdown (I passed from Extension state)
+  statusDropdownItems?: Array<{ id: string; name: string; display: string }>;
+  selectedStatusItem?: { id: string; name: string; display: string } | null;
+  onStatusChange?: ({ selectedItem }) => void;
+  responsiveSize?: string;
 }
 
 const AppointmentsList: React.FC<AppointmentsListProps> = ({
@@ -17,6 +22,10 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   excludeCancelledAppointments = false,
   status,
   title,
+  statusDropdownItems,
+  selectedStatusItem,
+  onStatusChange,
+  responsiveSize,
 }) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
 
@@ -39,6 +48,10 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
       hasActiveFilters={appointmentServiceTypes?.length > 0}
       isLoading={isLoading}
       tableHeading={title}
+      statusDropdownItems={statusDropdownItems}
+      selectedStatusItem={selectedStatusItem}
+      onStatusChange={onStatusChange}
+      responsiveSize={responsiveSize}
     />
   );
 };

@@ -79,8 +79,22 @@
 
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+
   align-items: center;
+  gap: layout.$spacing-03;
+  flex-wrap: nowrap;
+}
+
+.filterContainer {
+  white-space: nowrap;
+
+  :global(.cds--label) {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
 }
 
 .menuItem {
