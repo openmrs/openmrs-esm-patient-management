@@ -21,11 +21,6 @@
     border-right: 1px solid colors.$gray-20;
   }
 
-  &-today {
-    background-color: colors.$blue-70;
-    color: colors.$white;
-  }
-
   &-selected {
     background-color: colors.$gray-10;
     color: colors.$white;
@@ -35,14 +30,79 @@
     color: colors.$black;
   }
 
-  &:hover {
-    background-color: colors.$blue-30-hover;
-    color: colors.$white;
-  }
-
   &-active {
     background-color: colors.$magenta-30;
     color: colors.$white;
+  }
+
+  &-today {
+    background-color: colors.$magenta-30;
+    color: colors.$white;
+
+    .calendarDate {
+      color: colors.$white;
+    }
+
+    .serviceArea span {
+      color: colors.$white;
+    }
+  }
+
+  &-unavailable {
+    background-color: colors.$gray-10;
+    color: colors.$gray-40;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: colors.$gray-10;
+      color: colors.$gray-40;
+    }
+
+    .calendarDate {
+      color: colors.$gray-40;
+    }
+
+    .serviceArea span {
+      color: colors.$gray-40;
+    }
+
+    // Today should show pink even if unavailable, but still not clickable
+    &.monthly-cell-today {
+      background-color: colors.$magenta-30;
+      color: colors.$white;
+      cursor: not-allowed;
+
+      .calendarDate {
+        color: colors.$white;
+      }
+
+      .serviceArea span {
+        color: colors.$white;
+      }
+
+      &:hover {
+        background-color: colors.$magenta-30;
+        color: colors.$white;
+      }
+    }
+  }
+
+  // Available days should have white background and hover to pink
+  &:not(.monthly-cell-unavailable):not(.monthly-cell-today):not(.monthly-cell-active) {
+    background-color: colors.$white;
+
+    &:hover {
+      background-color: colors.$magenta-30;
+      color: colors.$white;
+
+      .calendarDate {
+        color: colors.$white;
+      }
+
+      .serviceArea span {
+        color: colors.$white;
+      }
+    }
   }
 }
 
