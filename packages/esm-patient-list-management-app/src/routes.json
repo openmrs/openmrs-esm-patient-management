@@ -53,12 +53,12 @@
   "workspaceWindows2": [
     {
       "name": "patient-list-form-window",
-      "group": "patientListFormWorkspaceGroup"
+      "group": "patient-list-form-workspace-group"
     }
   ],
   "workspaceGroups2": [
     {
-      "name": "patientListFormWorkspaceGroup",
+      "name": "patient-list-form-workspace-group",
       "overlay": false
     }
   ]

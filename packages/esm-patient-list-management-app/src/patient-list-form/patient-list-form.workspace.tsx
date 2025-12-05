@@ -48,7 +48,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
   workspaceProps,
   closeWorkspace,
 }) => {
-  // Extract workspace props with defaults
   const { patientListDetails, onSuccess = () => {} } = workspaceProps ?? {};
   const id = useId();
   const isTablet = useLayoutType() === 'tablet';
@@ -67,7 +66,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  // Track initial form values to detect dirty state
   const initialValues = useMemo(
     () => ({
       name: patientListDetails?.name || '',
@@ -77,8 +75,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
     [patientListDetails],
   );
 
-  // Determine if form has unsaved changes (dirty state)
-  // This is used by Workspace2's hasUnsavedChanges prop for v2 unsaved changes handling
   const isDirty = useMemo(() => {
     return (
       cohortDetails.name !== initialValues.name ||
@@ -153,7 +149,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
           });
           onSuccess();
           setIsSubmitting(false);
-          // Use discardUnsavedChanges: true to close without prompting (changes were saved)
           closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch(onError);
@@ -171,7 +166,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
           });
           onSuccess();
           setIsSubmitting(false);
-          // Use discardUnsavedChanges: true to close without prompting (changes were saved)
           closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch(onError);
@@ -189,11 +183,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
     ? t('editPatientListHeader', 'Edit patient list')
     : t('newPatientListHeader', 'New patient list');
 
-  /**
-   * Handle cancel button click
-   * If there are unsaved changes, the Workspace2 component will prompt the user
-   * via the hasUnsavedChanges prop mechanism
-   */
   const handleCancel = useCallback(() => {
     closeWorkspace();
   }, [closeWorkspace]);

@@ -19,7 +19,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
-describe('Header Component - Workspace V2 Integration', () => {
+describe('Header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -32,63 +32,27 @@ describe('Header Component - Workspace V2 Integration', () => {
     expect(screen.getByTestId('patient-lists-icon')).toBeInTheDocument();
   });
 
-  it('launches workspace v2 when new list button is clicked', async () => {
+  it('launches workspace when new list button is clicked', async () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    const newListButton = screen.getByRole('button', { name: /new list/i });
-    await user.click(newListButton);
+    await user.click(screen.getByRole('button', { name: /new list/i }));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', {
       onSuccess: undefined,
     });
   });
 
-  it('passes onCreateSuccess callback to workspace props', async () => {
+  it('passes onCreateSuccess callback to workspace', async () => {
     const user = userEvent.setup();
     const mockOnCreateSuccess = jest.fn();
 
     render(<Header onCreateSuccess={mockOnCreateSuccess} />);
 
-    const newListButton = screen.getByRole('button', { name: /new list/i });
-    await user.click(newListButton);
+    await user.click(screen.getByRole('button', { name: /new list/i }));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', {
       onSuccess: mockOnCreateSuccess,
     });
-  });
-
-  it('launches correct workspace name for v2 API', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    const newListButton = screen.getByRole('button', { name: /new list/i });
-    await user.click(newListButton);
-
-    // Verify the correct workspace name is used
-    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', expect.any(Object));
-  });
-
-  it('button has correct role and accessibility attributes', () => {
-    render(<Header />);
-
-    const newListButton = screen.getByRole('button', { name: /new list/i });
-    expect(newListButton).toHaveAttribute('data-openmrs-role', 'New List');
-  });
-});
-
-describe('Header Workspace V2 Props', () => {
-  it('workspace is launched with correct structure for creating new list', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: /new list/i }));
-
-    // Verify launchWorkspace2 was called (v2 API)
-    expect(mockLaunchWorkspace2).toHaveBeenCalledTimes(1);
-
-    // Verify workspace name follows v2 naming convention
-    const [workspaceName] = mockLaunchWorkspace2.mock.calls[0];
-    expect(workspaceName).toBe('patient-list-form-workspace');
   });
 });

@@ -14,8 +14,9 @@ export class PatientListsPage {
 
   async addNewPatientList(listName: string, description: string) {
     await this.page.getByRole('button', { name: 'New List' }).click();
-    // Workspace v2 uses a different DOM structure - target form elements directly
-    await this.page.getByLabel(/list name/i).fill(listName);
+    const listNameInput = this.page.getByLabel(/list name/i);
+    await listNameInput.waitFor({ state: 'visible' });
+    await listNameInput.fill(listName);
     await this.page.getByLabel(/describe the purpose of this list/i).fill(description);
     await this.page.getByRole('button', { name: 'Create list' }).click();
   }
@@ -23,8 +24,9 @@ export class PatientListsPage {
   async editPatientList(listName: string, description: string) {
     await this.page.getByRole('button', { name: 'Actions' }).click();
     await this.page.getByRole('menuitem', { name: 'Edit name or description' }).click();
-    // Workspace v2 uses a different DOM structure - target form elements directly
-    await this.page.getByLabel(/list name/i).fill(listName);
+    const listNameInput = this.page.getByLabel(/list name/i);
+    await listNameInput.waitFor({ state: 'visible' });
+    await listNameInput.fill(listName);
     await this.page.getByLabel(/describe the purpose of this list/i).fill(description);
     await this.page.getByRole('button', { name: 'Edit list' }).click();
   }
