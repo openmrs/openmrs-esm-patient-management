@@ -12,6 +12,11 @@ import { type Appointment } from '../types';
 
 interface PatientAppointmentsDetailProps {
   patientUuid: string;
+
+  /**
+   * callback to launch the appropriate appointments form workspace, depending
+   * on which app is using this extension
+   */
   launchAppointmentForm(patientUuid: string, appointment?: Appointment): void;
 }
 
@@ -21,6 +26,12 @@ enum AppointmentTypes {
   PAST = 2,
 }
 
+/**
+ * This extension displays a detailed summary of appointments for a single patient.
+ * Note that this extension can be used both in the patient chart and in the appointments app.
+ * Accordingly, the `launchAppointmentForm` callback is passed in to allow the app to define
+ * how the appointments form workspace is launched.
+ */
 const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProps> = ({
   patientUuid,
   launchAppointmentForm,

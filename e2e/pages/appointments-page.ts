@@ -13,14 +13,7 @@ export class PatientChartAppointmentsPage {
 export class AppointmentsPage {
   constructor(readonly page: Page) {}
 
-  readonly appointmentsTable = () => this.page.getByTestId('table');
-  readonly floatingSearchResultsContainer = () => this.page.locator('[data-testid="floatingSearchResultsContainer"]');
-
   async goto() {
     await this.page.goto(`${process.env.E2E_BASE_URL}/spa/home/appointments`);
-  }
-
-  async clickOnPatientResult(name: string) {
-    await this.floatingSearchResultsContainer().locator(`text=${name}`).click();
   }
 }
