@@ -14,19 +14,21 @@ export class PatientListsPage {
 
   async addNewPatientList(listName: string, description: string) {
     await this.page.getByRole('button', { name: 'New List' }).click();
-    const panel = this.page.getByRole('complementary').last();
-    await panel.getByRole('textbox', { name: 'List name' }).fill(listName);
-    await panel.getByRole('textbox', { name: 'Describe the purpose of this list in a few words' }).fill(description);
-    await panel.getByRole('button', { name: 'Create list' }).click();
+    const listNameInput = this.page.getByLabel(/list name/i);
+    await listNameInput.waitFor({ state: 'visible' });
+    await listNameInput.fill(listName);
+    await this.page.getByLabel(/describe the purpose of this list/i).fill(description);
+    await this.page.getByRole('button', { name: 'Create list' }).click();
   }
 
   async editPatientList(listName: string, description: string) {
     await this.page.getByRole('button', { name: 'Actions' }).click();
     await this.page.getByRole('menuitem', { name: 'Edit name or description' }).click();
-    const panel = this.page.getByRole('complementary').last();
-    await panel.getByRole('textbox', { name: 'List name' }).fill(listName);
-    await panel.getByRole('textbox', { name: 'Describe the purpose of this list in a few words' }).fill(description);
-    await panel.getByRole('button', { name: 'Edit list' }).click();
+    const listNameInput = this.page.getByLabel(/list name/i);
+    await listNameInput.waitFor({ state: 'visible' });
+    await listNameInput.fill(listName);
+    await this.page.getByLabel(/describe the purpose of this list/i).fill(description);
+    await this.page.getByRole('button', { name: 'Edit list' }).click();
   }
 
   async searchPatientList(listName: string) {

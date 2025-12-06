@@ -41,8 +41,11 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByRole('button', { name: 'Add', exact: true }).click();
   });
 
-  await test.step('And I select “Outpatient Department” service', async () => {
-    await page.selectOption('select#service', { label: 'Outpatient Department' });
+  await test.step('And I select "Outpatient Department" service', async () => {
+    // Wait for the service select to be visible before interacting
+    const serviceSelect = page.locator('select#service');
+    await serviceSelect.waitFor({ state: 'visible' });
+    await serviceSelect.selectOption({ label: 'Outpatient Department' });
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -92,8 +95,11 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByRole('menuitem', { name: 'Edit' }).click();
   });
 
-  await test.step('When I change to “Inpatient ward” location', async () => {
-    await page.selectOption('select#service', { label: 'General Medicine service' });
+  await test.step('When I change to "Inpatient ward" location', async () => {
+    // Wait for the service select to be visible before interacting
+    const serviceSelect = page.locator('select#service');
+    await serviceSelect.waitFor({ state: 'visible' });
+    await serviceSelect.selectOption({ label: 'General Medicine service' });
   });
 
   await test.step('And I change to "General Medicine" Service', async () => {
