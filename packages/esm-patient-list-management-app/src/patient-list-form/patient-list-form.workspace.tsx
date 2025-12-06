@@ -66,22 +66,18 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  const initialValues = useMemo(
-    () => ({
+  const { initialValues, isDirty } = useMemo(() => {
+    const initial = {
       name: patientListDetails?.name || '',
       description: patientListDetails?.description || '',
       cohortType: patientListDetails?.cohortType?.uuid || '',
-    }),
-    [patientListDetails],
-  );
-
-  const isDirty = useMemo(() => {
-    return (
-      cohortDetails.name !== initialValues.name ||
-      cohortDetails.description !== initialValues.description ||
-      cohortDetails.cohortType !== initialValues.cohortType
-    );
-  }, [cohortDetails, initialValues]);
+    };
+    const dirty =
+      cohortDetails.name !== initial.name ||
+      cohortDetails.description !== initial.description ||
+      cohortDetails.cohortType !== initial.cohortType;
+    return { initialValues: initial, isDirty: dirty };
+  }, [cohortDetails, patientListDetails]);
 
   const validateForm = useCallback(
     (data: CohortFormData) => {

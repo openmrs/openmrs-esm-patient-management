@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import {
   getCoreTranslation,
   showSnackbar,
@@ -75,8 +75,6 @@ function createMockWorkspace2Props(
 
 describe('PatientListFormWorkspace', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     mockUseSession.mockReturnValue(mockSession.data);
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseCohortTypes.mockReturnValue({
@@ -132,23 +130,19 @@ describe('PatientListFormWorkspace', () => {
     await user.type(screen.getByLabelText(/describe the purpose of this list/i), 'A description for testing');
     await user.click(screen.getByRole('button', { name: /create list/i }));
 
-    await waitFor(() => {
-      expect(mockCreatePatientList).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: 'My New Patient List',
-          description: 'A description for testing',
-        }),
-      );
-    });
+    expect(mockCreatePatientList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'My New Patient List',
+        description: 'A description for testing',
+      }),
+    );
 
-    await waitFor(() => {
-      expect(mockShowSnackbar).toHaveBeenCalledWith(
-        expect.objectContaining({
-          kind: 'success',
-          title: 'Created',
-        }),
-      );
-    });
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+        title: 'Created',
+      }),
+    );
 
     expect(mockOnSuccess).toHaveBeenCalled();
     expect(mockCloseWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
@@ -168,23 +162,19 @@ describe('PatientListFormWorkspace', () => {
     await user.type(nameInput, 'Updated List Name');
     await user.click(screen.getByRole('button', { name: /edit list/i }));
 
-    await waitFor(() => {
-      expect(mockEditPatientList).toHaveBeenCalledWith(
-        'test-list-uuid',
-        expect.objectContaining({
-          name: 'Updated List Name',
-        }),
-      );
-    });
+    expect(mockEditPatientList).toHaveBeenCalledWith(
+      'test-list-uuid',
+      expect.objectContaining({
+        name: 'Updated List Name',
+      }),
+    );
 
-    await waitFor(() => {
-      expect(mockShowSnackbar).toHaveBeenCalledWith(
-        expect.objectContaining({
-          kind: 'success',
-          title: 'Updated',
-        }),
-      );
-    });
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+        title: 'Updated',
+      }),
+    );
 
     expect(mockOnSuccess).toHaveBeenCalled();
     expect(mockCloseWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
@@ -212,13 +202,11 @@ describe('PatientListFormWorkspace', () => {
     await user.type(screen.getByLabelText(/list name/i), 'Test List');
     await user.click(screen.getByRole('button', { name: /create list/i }));
 
-    await waitFor(() => {
-      expect(mockShowSnackbar).toHaveBeenCalledWith(
-        expect.objectContaining({
-          kind: 'error',
-          title: expect.stringMatching(/error creating list/i),
-        }),
-      );
-    });
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: expect.stringMatching(/error creating list/i),
+      }),
+    );
   });
 });
