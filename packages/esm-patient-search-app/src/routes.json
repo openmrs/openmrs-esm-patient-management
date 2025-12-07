@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "pages": [
     {
@@ -26,6 +26,12 @@
       "name": "patient-search-bar",
       "component": "patientSearchBar",
       "slot": "patient-search-bar-slot",
+      "offline": true
+    },
+    {
+      "name": "patient-search-start-visit-button",
+      "component": "patientSearchStartVisitButton2",
+      "slot": "start-visit-button-slot2",
       "offline": true
     }
   ],

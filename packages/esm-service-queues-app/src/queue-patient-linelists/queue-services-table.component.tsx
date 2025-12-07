@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import QueuePatientBaseTable from './queue-linelist-base-table.component';
 import { useServiceQueueEntries } from '../service-queues.resource';
+import QueuePatientBaseTable from './queue-linelist-base-table.component';
 
 const ServicesTable: React.FC = () => {
   const { t } = useTranslation();
