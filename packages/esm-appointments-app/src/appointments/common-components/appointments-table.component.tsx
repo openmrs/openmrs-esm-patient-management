@@ -228,7 +228,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
-                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />

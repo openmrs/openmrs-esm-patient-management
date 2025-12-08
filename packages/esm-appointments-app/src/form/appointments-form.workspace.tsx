@@ -57,12 +57,13 @@ export interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
   patientUuid?: string;
-  context: string;
+  context: 'creating' | 'editing';
 }
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
-const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
+const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
 
 const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps>> = ({
   workspaceProps: { appointment, recurringPattern, patientUuid, context },
@@ -289,7 +290,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     setValue('appointmentDateTime', { ...appointmentDate, startDate: date });
   };
 
-  const handleSelectChange = (e) => {
+  const handleSelectChange = (e: { selectedItems: Array<{ id: number; label: string }> }) => {
     setValue(
       'selectedDaysOfWeekText',
       (() => {
@@ -306,8 +307,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     );
     setValue(
       'recurringPatternDaysOfWeek',
-      e.selectedItems.map((s) => {
-        return s.id;
+      e.selectedItems.map((s: { id: number }) => {
+        return String(s.id);
       }),
     );
   };
@@ -444,7 +445,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       providers: [{ uuid: provider }],
       patientUuid: patientUuid,
       comments: appointmentNote,
-      uuid: context === 'editing' ? appointment.uuid : undefined,
+      uuid: context === 'editing' ? appointment?.uuid : undefined,
       dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
@@ -479,7 +480,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         context === 'editing'
           ? t('editAppointment', 'Edit appointment')
           : t('createNewAppointment', 'Create new appointment')
-      }>
+      }
+      hasUnsavedChanges={isDirty}>
       <Form onSubmit={handleSubmit(handleSaveAppointment)}>
         {patient && (
           <ExtensionSlot
@@ -531,7 +533,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     invalidText={errors?.selectedService?.message}
                     labelText={t('selectService', 'Select a service')}
                     onBlur={onBlur}
-                    onChange={(event) => {
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
                       if (context === 'creating') {
                         setValue(
                           'duration',
@@ -675,7 +677,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                           invalidText={t('invalidNumber', 'Number is not valid')}
                           value={value}
                           onBlur={onBlur}
-                          onChange={(e) => {
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             onChange(Number(e.target.value));
                           }}
                         />
@@ -691,7 +693,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                         <RadioButtonGroup
                           legendText={t('period', 'Period')}
                           name="radio-button-group"
-                          onChange={(type) => onChange(type)}
+                          onChange={(type: string) => onChange(type)}
                           valueSelected={value}>
                           <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
                           <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
@@ -714,15 +716,15 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                               getValues('recurringPatternDaysOfWeek').includes(i.id),
                             )}
                             items={weekDays}
-                            itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
+                            itemToString={(item: any) => (item ? t(item.labelCode, item.label) : '')}
                             label={getValues('selectedDaysOfWeekText')}
-                            onChange={(e) => {
+                            onChange={(e: any) => {
                               onChange(e);
                               handleSelectChange(e);
                             }}
                             selectionFeedback="top-after-reopen"
-                            sortItems={(items) => {
-                              return items.sort((a, b) => a.order > b.order);
+                            sortItems={(items: any[]) => {
+                              return items.sort((a: any, b: any) => a.order - b.order);
                             }}
                           />
                         )}
@@ -941,7 +943,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               invalid={!!errors?.startTime}
               invalidText={errors?.startTime?.message}
               labelText={t('time', 'Time')}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 onChange(event.target.value);
               }}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
@@ -952,7 +954,9 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
                 render={({ field: { value, onChange } }) => (
                   <TimePickerSelect
                     id="time-picker-select-1"
-                    onChange={(event) => onChange(event.target.value as 'AM' | 'PM')}
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+                      onChange(event.target.value as 'AM' | 'PM')
+                    }
                     value={value}
                     aria-label={t('time', 'Time')}>
                     <SelectItem value="AM" text="AM" />
