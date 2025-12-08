@@ -47,7 +47,7 @@ test('Cancel an admission request', async ({ page }) => {
   });
 
   await test.step('And when I click the "Cancel" button to cancel the request', async () => {
-    await wardPage.clickCancelButton();
+    await wardPage.clickCancelAdmissionButton(fullName);
   });
 
   await test.step('Then I should see the "Cancel admission request" form launched in the workspace', async () => {
