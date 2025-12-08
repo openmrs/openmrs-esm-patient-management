@@ -33,7 +33,7 @@ import {
   parseDate,
   useConfig,
   useLayoutType,
-  launchWorkspace,
+  launchWorkspace2,
   usePagination,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '../../empty-state/empty-state.component';
@@ -45,6 +45,7 @@ import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
+import { launchCreateAppointmentForm } from '../../helpers';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -128,8 +129,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
         }
-        // TODO @brandones: Make this a workspace, not an extension
-        launchForm={() => launchWorkspace('search-patient')}
+        launchForm={() => launchCreateAppointmentForm(t)}
       />
     );
   }
@@ -223,11 +223,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                   itemText={t('editAppointment', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace('appointments-form-workspace', {
+                                    launchWorkspace2('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
-                                      context: 'editing',
-                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />
