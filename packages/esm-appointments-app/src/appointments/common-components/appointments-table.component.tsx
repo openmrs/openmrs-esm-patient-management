@@ -25,7 +25,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Download } from '@carbon/icons-react';
+import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   formatDate,
