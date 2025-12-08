@@ -788,9 +788,10 @@ describe('AppointmentForm', () => {
       const user = userEvent.setup();
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+      // Backend should exclude the current appointment from conflict check when UUID is sent
       mockCheckAppointmentConflict.mockResolvedValue({
-        status: 200,
-        data: { PATIENT_DOUBLE_BOOKING: true },
+        status: 204,
+        data: {},
       } as FetchResponse);
       mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
@@ -818,6 +819,12 @@ describe('AppointmentForm', () => {
       await user.click(saveButton);
 
       expect(mockCheckAppointmentConflict).toHaveBeenCalledTimes(1);
+      // Verify UUID is sent to backend so it can exclude current appointment from conflict check
+      expect(mockCheckAppointmentConflict).toHaveBeenCalledWith(
+        expect.objectContaining({
+          uuid: existingAppointment.uuid,
+        }),
+      );
       // Should NOT show double-booking error when editing (same appointment)
       expect(mockShowSnackbar).not.toHaveBeenCalledWith(
         expect.objectContaining({

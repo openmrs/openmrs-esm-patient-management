@@ -336,17 +336,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
 
-    // check if Duplicate Response Occurs
+    // Check if a duplicate response occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      if (!isEditing) {
-        errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
-      } else {
-        errorMessage = null;
-      }
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
 
     if (response.status === 200 && errorMessage) {
