@@ -1,19 +1,13 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
+import type { PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
-interface RecentPatientSearchProps {
-  data: fhir.Patient[];
-  fetchError: any;
-  hasMore?: boolean;
-  isLoading: boolean;
-  isValidating?: boolean;
-  setPage?: (page: number | ((prevPage: number) => number)) => void;
-}
+interface RecentPatientSearchProps extends PatientSearchResponse {}
 
 const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
   ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
