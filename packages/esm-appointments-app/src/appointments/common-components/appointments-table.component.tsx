@@ -30,11 +30,10 @@ import {
   formatDate,
   formatDatetime,
   isDesktop,
-  launchWorkspace,
-  launchWorkspace2,
   parseDate,
   useConfig,
   useLayoutType,
+  launchWorkspace,
   usePagination,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '../../empty-state/empty-state.component';
@@ -224,10 +223,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                   itemText={t('editAppointment', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace2('appointments-form-workspace', {
+                                    launchWorkspace('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
+                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />

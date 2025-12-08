@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExtensionSlot, launchWorkspace2 } from '@openmrs/esm-framework';
+import { ExtensionSlot, launchWorkspace } from '@openmrs/esm-framework';
 import styles from './patient-search.scss';
 
 const PatientSearch: React.FC = () => {
@@ -10,7 +10,7 @@ const PatientSearch: React.FC = () => {
       mutate: () => {}, // TODO get this to mutate properly
     };
 
-    launchWorkspace2('appointments-form-workspace', { ...props });
+    launchWorkspace('appointments-form-workspace', { ...props });
   };
 
   return (

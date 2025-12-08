@@ -2,14 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, screen } from '@testing-library/react';
 import {
+  type FetchResponse,
   getDefaultsFromConfigSchema,
   openmrsFetch,
   showSnackbar,
   useConfig,
   useLocations,
   useSession,
-  type FetchResponse,
-  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockUseAppointmentServiceData, mockSession, mockLocations, mockProviders } from '__mocks__';
@@ -17,33 +16,15 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment, checkAppointmentConflict } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
 import type { AppointmentKind, AppointmentStatus } from '../types';
-import AppointmentForm, { type AppointmentsFormProps } from './appointments-form.workspace';
+import AppointmentForm from './appointments-form.workspace';
 
-const renderAppointmentsForm = (props: Partial<Workspace2DefinitionProps<AppointmentsFormProps>> = {}) => {
-  const closeWorkspace = props.closeWorkspace || jest.fn();
-  const workspaceProps: AppointmentsFormProps = {
-    context: props.workspaceProps?.context || 'creating',
-    patientUuid: props.workspaceProps?.patientUuid || mockPatient.id,
-    appointment: props.workspaceProps?.appointment,
-    recurringPattern: props.workspaceProps?.recurringPattern,
-
-    ...props.workspaceProps,
-  };
-
-  const defaultProps: Workspace2DefinitionProps<AppointmentsFormProps> = {
-    closeWorkspace,
-    workspaceProps,
-    groupProps: props.groupProps || { collapsed: false, name: 'appointmentsFormWorkspaceGroup', overlay: false },
-    windowProps: props.windowProps || { group: 'appointmentsFormWorkspaceGroup', name: 'appointments-form-window' },
-    workspaceName: props.workspaceName || 'appointments-form-workspace',
-    launchChildWorkspace: jest.fn(),
-    windowName: 'appointments-form-window',
-
-    isRootWorkspace: false,
-    ...props,
-  };
-
-  return renderWithSwr(<AppointmentForm {...defaultProps} />);
+const defaultProps = {
+  context: 'creating',
+  closeWorkspace: jest.fn(),
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  setTitle: jest.fn(),
 };
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
@@ -76,7 +57,7 @@ jest.mock('../workload/workload.resource', () => ({
 }));
 
 describe('AppointmentForm', () => {
-  const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/;
+  const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3}Z|\+00:00)$/;
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
@@ -100,7 +81,7 @@ describe('AppointmentForm', () => {
   it('renders the appointments form', async () => {
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -123,18 +104,17 @@ describe('AppointmentForm', () => {
 
   it('closes the workspace when the cancel button is clicked', async () => {
     const user = userEvent.setup();
-    const mockCloseWorkspace = jest.fn();
 
     mockOpenmrsFetch.mockResolvedValueOnce(mockUseAppointmentServiceData as unknown as FetchResponse);
 
-    renderAppointmentsForm({ closeWorkspace: mockCloseWorkspace });
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
     await user.click(cancelButton);
 
-    expect(mockCloseWorkspace).toHaveBeenCalledTimes(1);
+    expect(defaultProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('renders a success snackbar upon successfully scheduling an appointment', async () => {
@@ -144,7 +124,7 @@ describe('AppointmentForm', () => {
     mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -222,7 +202,7 @@ describe('AppointmentForm', () => {
     mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockRejectedValue(error);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -294,7 +274,7 @@ describe('AppointmentForm', () => {
     });
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -312,7 +292,7 @@ describe('AppointmentForm', () => {
 
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -333,7 +313,7 @@ describe('AppointmentForm', () => {
     const user = userEvent.setup();
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -374,7 +354,7 @@ describe('AppointmentForm', () => {
     mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -415,7 +395,7 @@ describe('AppointmentForm', () => {
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -445,7 +425,7 @@ describe('AppointmentForm', () => {
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -477,7 +457,7 @@ describe('AppointmentForm', () => {
     mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
     mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -532,7 +512,7 @@ describe('AppointmentForm', () => {
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -568,7 +548,7 @@ describe('AppointmentForm', () => {
       mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
       mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-      renderAppointmentsForm();
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -636,7 +616,7 @@ describe('AppointmentForm', () => {
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-      renderAppointmentsForm();
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -669,7 +649,7 @@ describe('AppointmentForm', () => {
         data: { SERVICE_UNAVAILABLE: true },
       } as FetchResponse);
 
-      renderAppointmentsForm();
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -723,7 +703,7 @@ describe('AppointmentForm', () => {
         data: { PATIENT_DOUBLE_BOOKING: true },
       } as FetchResponse);
 
-      renderAppointmentsForm();
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -803,13 +783,13 @@ describe('AppointmentForm', () => {
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-      renderAppointmentsForm({ workspaceProps: { appointment: existingAppointment, context: 'editing' } });
+      renderWithSwr(<AppointmentForm {...defaultProps} appointment={existingAppointment} context="editing" />);
 
       await waitForLoadingToFinish();
 
       // Check that form fields are pre-populated
       expect(screen.getByDisplayValue('Existing appointment note')).toBeInTheDocument();
-      expect(screen.getByText('Outpatient')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Outpatient')).toBeInTheDocument();
       expect(screen.getByRole('combobox', { name: /select the type of appointment/i })).toHaveValue('Scheduled');
     });
 
@@ -849,7 +829,7 @@ describe('AppointmentForm', () => {
       mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
       mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-      renderAppointmentsForm({ workspaceProps: { appointment: existingAppointment, context: 'editing' } });
+      renderWithSwr(<AppointmentForm {...defaultProps} appointment={existingAppointment} context="editing" />);
 
       await waitForLoadingToFinish();
 
@@ -886,7 +866,7 @@ describe('AppointmentForm', () => {
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-      renderAppointmentsForm();
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -902,11 +882,10 @@ describe('AppointmentForm', () => {
 
     it('should warn before closing with unsaved changes', async () => {
       const user = userEvent.setup();
-      const mockCloseWorkspace = jest.fn();
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
-      renderAppointmentsForm({ closeWorkspace: mockCloseWorkspace });
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -919,8 +898,8 @@ describe('AppointmentForm', () => {
       // Try to cancel
       await user.click(cancelButton);
 
-      // Should call closeWorkspace with discardUnsavedChanges
-      expect(mockCloseWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: false });
+      // Should call promptBeforeClosing if there are unsaved changes
+      expect(defaultProps.promptBeforeClosing).toHaveBeenCalled();
     });
   });
 });
