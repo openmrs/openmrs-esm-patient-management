@@ -129,11 +129,20 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   await test.step('Then I should see a success message', async () => {
     await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
-
-  await test.step('When I open the tab containing the edited appointment', async () => {
-    await page.getByRole('tab', { name: /upcoming/i }).click();
+  await test.step('Then I should filter and not see the patient under Upcoming', async () => {
+    await page.getByRole('tab', { name: /Upcoming/i }).click();
+    await expect(page.getByText('A sample note for testing out the edit flow for scheduled appointments')).toBeHidden();
   });
-
+  await test.step('Then I should filter and not see the patient under Past', async () => {
+    await page.getByRole('tab', { name: /Past/i }).click();
+    await expect(page.getByText('A sample note for testing out the edit flow for scheduled appointments')).toBeHidden();
+  });
+  await test.step('Then I should filter see the patient under Today', async () => {
+    await page.getByRole('tab', { name: /Today/i }).click();
+    await expect(
+      page.getByText('A sample note for testing out the edit flow for scheduled appointments'),
+    ).toBeVisible();
+  });
   await test.step('Then I click the options kebab menu in the appointment', async () => {
     const optionsButton = page.getByRole('button', { name: 'Options' });
     await expect(optionsButton).toBeVisible();
