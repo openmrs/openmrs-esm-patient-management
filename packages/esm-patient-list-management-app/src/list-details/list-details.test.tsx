@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, launchWorkspace2 } from '@openmrs/esm-framework';
 import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/patient-list.resource';
 import { getByTextWithMarkup } from 'tools';
@@ -13,6 +13,7 @@ const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
 const mockDeletePatientList = jest.mocked(deletePatientList);
 const mockUseCohortTypes = jest.mocked(useCohortTypes);
 const mockShowModal = jest.mocked(showModal);
+const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
 jest.mock('../api/hooks', () => ({
   usePatientListDetails: jest.fn(),
@@ -63,6 +64,8 @@ const mockCohortTypeList = [
 
 describe('ListDetails', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+
     mockUsePatientListDetails.mockReturnValue({
       listDetails: mockPatientListDetails,
       error: null,
@@ -114,15 +117,19 @@ describe('ListDetails', () => {
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
-  it('opens overlay with a form when the "Edit name or description" button is clicked', async () => {
+  it('opens workspace to edit patient list', async () => {
     render(<ListDetails />);
 
     await userEvent.click(screen.getByText('Actions'));
-    const editBtn = screen.getByText('Edit name or description');
-    await userEvent.click(editBtn);
+    await userEvent.click(screen.getByText('Edit name or description'));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', {
+      patientListDetails: mockPatientListDetails,
+      onSuccess: expect.any(Function),
+    });
   });
 
-  it('deletes patient list and navigates back to the list page', async () => {
+  it('opens delete confirmation modal', async () => {
     render(<ListDetails />);
 
     await userEvent.click(screen.getByText('Actions'));
