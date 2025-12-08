@@ -10,13 +10,13 @@ import styles from './patient-search.scss';
 interface RecentPatientSearchProps extends PatientSearchResponse {}
 
 const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
+  ({ data: searchResults, fetchError, isLoading, isValidating = false, hasMore = false, setPage }, ref) => {
     const { t } = useTranslation();
-    const observer = useRef(null);
+    const observer = useRef<IntersectionObserver | null>(null);
 
     const loadingIconRef = useCallback(
       (node: HTMLDivElement | null) => {
-        if (isValidating) {
+        if (!setPage || isValidating) {
           return;
         }
         if (observer.current) {
@@ -47,7 +47,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
       };
     }, []);
 
-    if (!searchResults && isLoading) {
+    if (isLoading) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
