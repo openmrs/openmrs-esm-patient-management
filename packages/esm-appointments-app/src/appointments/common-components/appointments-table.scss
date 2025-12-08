@@ -88,12 +88,41 @@
 
 .filterContainer {
   white-space: nowrap;
+  flex-shrink: 0;
 
   :global(.cds--label) {
     white-space: nowrap;
     overflow: visible;
+  }
+
+  :global(.cds--dropdown) {
+    width: auto;
+  }
+
+  :global(.cds--list-box) {
+    width: auto;
+  }
+
+  :global(.cds--list-box__field) {
+    width: auto;
+    min-width: 150px;
+  }
+  :global(.cds--list-box__menu) {
+    min-width: 150px !important;
+  }
+  :global(.cds--list-box__menu-item) {
+    width: 100%;
+    overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+  }
+
+  :global(.cds--list-box__menu-item__option) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
   }
 }
 

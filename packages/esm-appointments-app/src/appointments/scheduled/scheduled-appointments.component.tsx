@@ -44,24 +44,26 @@ const ScheduledAppointments: React.FC<{ appointmentServiceTypes?: Array<string> 
   }, [selectedDate]);
 
   useEffect(() => {
-    if (allowedExtensions && (currentTab === null || !allowedExtensions[currentTab])) {
-      for (const ext of Object.keys(allowedExtensions)) {
-        if (allowedExtensions[ext]) {
-          setCurrentTab(ext);
-          break;
-        }
-      }
+    if (allowedExtensions && (currentTab === null || (currentTab !== 'all' && !allowedExtensions[currentTab]))) {
+      setCurrentTab('all');
     }
   }, [allowedExtensions, currentTab]);
 
   const panelsToShow = scheduledAppointmentPanels.filter(shouldShowPanel);
 
   // Build dropdown items
-  const statusDropdownItems = panelsToShow.map((panel) => ({
-    id: panel.name,
-    name: panel.name,
-    display: t(panel.config.title),
-  }));
+  const statusDropdownItems = [
+    {
+      id: 'all',
+      name: 'all',
+      display: t('all', 'All'),
+    },
+    ...panelsToShow.map((panel) => ({
+      id: panel.name,
+      name: panel.name,
+      display: t(panel.config.title),
+    })),
+  ];
 
   const selectedStatusItem =
     statusDropdownItems.find((item) => item.name === currentTab) || (statusDropdownItems[0] ?? null);
@@ -71,6 +73,8 @@ const ScheduledAppointments: React.FC<{ appointmentServiceTypes?: Array<string> 
       setCurrentTab(selectedItem.name);
     }
   }, []);
+
+  const firstPanelToShow = panelsToShow[0];
 
   return (
     <div className={styles.container}>
@@ -88,6 +92,7 @@ const ScheduledAppointments: React.FC<{ appointmentServiceTypes?: Array<string> 
             selectedStatusItem={selectedStatusItem}
             onStatusChange={handleStatusChange}
             responsiveSize={responsiveSize}
+            firstPanelToShow={firstPanelToShow}
           />
         )}
       </ExtensionSlot>
@@ -122,6 +127,7 @@ function ExtensionWrapper({
   selectedStatusItem,
   onStatusChange,
   responsiveSize,
+  firstPanelToShow,
 }: {
   extension: ConnectedExtension;
   currentTab: string | null;
@@ -134,7 +140,9 @@ function ExtensionWrapper({
   selectedStatusItem: { id: string; name: string; display: string } | null;
   onStatusChange: ({ selectedItem }: { selectedItem: any }) => void;
   responsiveSize: string;
+  firstPanelToShow: ConnectedExtension | undefined;
 }) {
+  const { t } = useTranslation();
   const currentConfig = useRef(extension.config);
   const currentDateType = useRef(dateType);
 
@@ -152,17 +160,21 @@ function ExtensionWrapper({
     shouldShow ? showExtensionTab(extension.name) : hideExtensionTab(extension.name);
   }, [extension, dateType, showExtensionTab, hideExtensionTab]);
 
+  // When "all" is selected, show only the first extension with null status to get all appointments
+  const isAllSelected = currentTab === 'all';
+  const shouldShowExtension = isAllSelected ? firstPanelToShow?.name === extension.name : currentTab === extension.name;
+
   return (
     <div
       key={extension.name}
-      style={{ display: currentTab === extension.name ? 'block' : 'none' }}
+      style={{ display: shouldShowExtension ? 'block' : 'none' }}
       className={styles.extensionWrapper}>
       <Extension
         state={{
           date,
           appointmentServiceTypes,
-          status: extension.config?.status,
-          title: extension.config?.title,
+          status: isAllSelected ? null : extension.config?.status,
+          title: isAllSelected ? t('allAppointments', 'All Appointments') : extension.config?.title || extension.name,
           statusDropdownItems,
           selectedStatusItem,
           onStatusChange,

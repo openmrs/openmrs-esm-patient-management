@@ -7,7 +7,7 @@ interface AppointmentsListProps {
   appointmentServiceTypes?: Array<string>;
   date: string;
   excludeCancelledAppointments?: boolean;
-  status?: string;
+  status?: string | null;
   title: string;
   // Optional props for status dropdown (I passed from Extension state)
   statusDropdownItems?: Array<{ id: string; name: string; display: string }>;

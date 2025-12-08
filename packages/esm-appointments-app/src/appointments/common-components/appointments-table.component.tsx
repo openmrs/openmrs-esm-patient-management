@@ -25,7 +25,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Download } from '@carbon/icons-react';
+import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   formatDate,
@@ -209,7 +209,7 @@ const AppointmentsTable = memo(function AppointmentsTable({
                                 <OverflowMenuItem
                                   itemText={t('editAppointment', 'Edit appointment')}
                                   onClick={() =>
-                                    launchWorkspace('appointments-form-workspace', {
+                                    launchWorkspace2('appointments-form-workspace', {
                                       appointment: row.cells._appointment,
                                       patientUuid: row.cells._appointment.patient.uuid,
                                       context: 'editing',
