@@ -1,1 +1,6 @@
-{}
+{
+  "contactAdministrator": "Por favor, intente usar los links del menú de navegación situado a la izquierda. Si el problema persiste, contacte con su administrador del sistema.",
+  "dashboardNotFound": "El panel que está buscando no existe.",
+  "dashboardNotFoundDescription": "No se pudo encontrar la página solicitada. Es posible que se haya movido, eliminado o que el panel configurado no exista.",
+  "pageNotFound": "Página no encontrada"
+}

@@ -1,6 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createDashboardLink } from './createDashboardLink.component';
+import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
 import { setupOffline } from './offline';
 
@@ -33,6 +33,7 @@ export const addPatientToPatientListMenuItem = getAsyncLifecycle(
   },
 );
 
+// t('patientLists', 'Patient lists')
 export const patientListDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const listDetailsTable = getAsyncLifecycle(() => import('./list-details-table/list-details-table.component'), {

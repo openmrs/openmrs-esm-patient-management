@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "extensions": [
     {
@@ -135,12 +135,23 @@
       "component": "cancelAppointmentModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",
-      "title": "createNewAppointment",
-      "type": "form"
+      "window": "appointments-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "appointments-form-window",
+      "group": "appointmentsFormWorkspaceGroup"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "appointmentsFormWorkspaceGroup",
+      "overlay": false
     }
   ]
 }

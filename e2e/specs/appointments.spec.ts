@@ -5,8 +5,27 @@ import { startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage } from '../pages';
 
-let visit: Visit;
+/**
+ * Returns a business day (Mon-Fri) for scheduling appointments.
+ * If the target date falls on a weekend, advances to the next Monday.
+ * Note: Does not account for public holidays.
+ *
+ * @param daysFromToday - Number of days to add from today (0 = today)
+ * @param hour - Hour to set (24-hour format)
+ * @returns A dayjs object set to a business day with the specified hour
+ */
+const getBusinessDay = (daysFromToday: number, hour: number): dayjs.Dayjs => {
+  let targetDate = dayjs().add(daysFromToday, 'day');
 
+  // If the target date falls on a weekend, move to next Monday
+  while (targetDate.day() === 0 || targetDate.day() === 6) {
+    targetDate = targetDate.add(1, 'day');
+  }
+
+  return targetDate.hour(hour).minute(0).second(0).millisecond(0);
+};
+
+let visit: Visit;
 test.beforeEach(async ({ api, patient }) => {
   visit = await startVisit(api, patient.uuid);
 });
@@ -30,15 +49,15 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByLabel('Select an appointment type').selectOption('Scheduled');
   });
 
-  await test.step('And I set date for tomorrow', async () => {
-    const tomorrow = dayjs().add(1, 'day').hour(10).minute(0).second(0);
+  await test.step('And I set the appointment date to the next business day', async () => {
+    const nextBusinessDay = getBusinessDay(1, 10);
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
     const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
     const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
-    await dateDayInput.fill(tomorrow.format('DD'));
-    await dateMonthInput.fill(tomorrow.format('MM'));
-    await dateYearInput.fill(tomorrow.format('YYYY'));
+    await dateDayInput.fill(nextBusinessDay.format('DD'));
+    await dateMonthInput.fill(nextBusinessDay.format('MM'));
+    await dateYearInput.fill(nextBusinessDay.format('YYYY'));
   });
 
   await test.step('And I set time to 10:00 AM', async () => {
@@ -62,7 +81,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/appointment scheduled/i)).toBeVisible();
+    await expect(page.getByText('Appointment scheduled', { exact: true })).toBeVisible();
   });
 
   await test.step('When I click the overflow menu on the table row with the newly created appointment', async () => {
@@ -77,40 +96,20 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.selectOption('select#service', { label: 'General Medicine service' });
   });
 
-  await test.step('And I change to “General Medicine” Service', async () => {
+  await test.step('And I change to "General Medicine" Service', async () => {
     await page.getByLabel('Select a service').selectOption('General Medicine service');
   });
 
-  await test.step('And I change the date to Today', async () => {
-    const today = dayjs().hour(14).minute(0).second(0);
-    const dateInput = page.getByTestId('datePickerInput');
-    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
-    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
-    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
-    await dateDayInput.fill(today.format('DD'));
-    await dateMonthInput.fill(today.format('MM'));
-    await dateYearInput.fill(today.format('YYYY'));
-  });
-
-  await test.step('And I set time to 2:00 PM', async () => {
+  await test.step('And I change the time to 2:00 PM', async () => {
     await page.locator('#time-picker').clear();
     await page.locator('#time-picker').fill('02:00');
     await page.locator('#time-picker-select-1').selectOption('PM');
   });
 
-  await test.step('And I set the “Duration” of the appointment”', async () => {
+  await test.step('And I set the "Duration" of the appointment"', async () => {
     await page.getByLabel('Duration (minutes)').fill('80');
   });
 
-  await test.step('I set the Date appointment issued', async () => {
-    const appointmentIssuedDateInput = page.getByTestId('dateAppointmentScheduledPickerInput');
-    const appointmentIssuedDateDayInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /day/i });
-    const appointmentIssuedDateMonthInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /month/i });
-    const appointmentIssuedDateYearInput = appointmentIssuedDateInput.getByRole('spinbutton', { name: /year/i });
-    await appointmentIssuedDateDayInput.fill('20');
-    await appointmentIssuedDateMonthInput.fill('08');
-    await appointmentIssuedDateYearInput.fill('2024');
-  });
   await test.step('And I change the note', async () => {
     await page
       .getByPlaceholder('Write any additional points here')
@@ -122,7 +121,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/appointment edited/i)).toBeVisible();
+    await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
   await test.step('Then I should filter and not see the patient under Upcoming', async () => {
     await page.getByRole('tab', { name: /Upcoming/i }).click();
@@ -139,7 +138,9 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     ).toBeVisible();
   });
   await test.step('Then I click the options kebab menu in the appointment', async () => {
-    await page.getByRole('button', { name: 'Options' }).click();
+    const optionsButton = page.getByRole('button', { name: 'Options' });
+    await expect(optionsButton).toBeVisible();
+    await optionsButton.click();
   });
 
   await test.step('And I choose the "Cancel" option', async () => {
@@ -151,7 +152,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see a success message', async () => {
-    await expect(page.getByText(/appointment cancelled successfully/i)).toBeVisible();
+    await expect(page.getByText('Appointment cancelled successfully', { exact: true })).toBeVisible();
   });
 });
 

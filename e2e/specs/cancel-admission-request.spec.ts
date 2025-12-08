@@ -5,7 +5,7 @@ import {
   deletePatient,
   endVisit,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
 } from '../commands';
@@ -27,7 +27,7 @@ test.beforeEach(async ({ api, page }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Cancel an admission request', async ({ page }) => {
@@ -47,7 +47,7 @@ test('Cancel an admission request', async ({ page }) => {
   });
 
   await test.step('And when I click the "Cancel" button to cancel the request', async () => {
-    await wardPage.clickCancelButton();
+    await wardPage.clickCancelAdmissionButton(fullName);
   });
 
   await test.step('Then I should see the "Cancel admission request" form launched in the workspace', async () => {
