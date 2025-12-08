@@ -36,9 +36,7 @@ const mockAppointments = [
       endTime: '',
       maxAppointmentsLimit: null,
       durationMins: null,
-      location: {
-        uuid: '8d6c993e-c2cc-11de-8d13-0010c6dffd0f',
-      },
+      location: { uuid: '8d6c993e-c2cc-11de-8d13-0010c6dffd0f' },
       uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
       initialAppointmentStatus: 'Scheduled',
       creatorName: null,
@@ -65,10 +63,7 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockExportAppointmentsToSpreadsheet = jest.mocked(exportAppointmentsToSpreadsheet);
 
 jest.mock('../../helpers/excel', () => {
-  return {
-    ...jest.requireActual('../../helpers/excel'),
-    exportAppointmentsToSpreadsheet: jest.fn(),
-  };
+  return { ...jest.requireActual('../../helpers/excel'), exportAppointmentsToSpreadsheet: jest.fn() };
 });
 
 describe('AppointmentsTable', () => {
@@ -136,6 +131,7 @@ describe('AppointmentsTable', () => {
         }),
       ]),
       expect.stringContaining('scheduled_appointments'),
+      expect.objectContaining({ includePhoneNumberInExcelSpreadsheet: expect.any(Boolean) }),
     );
   });
 });
