@@ -784,7 +784,7 @@ describe('AppointmentForm', () => {
       expect(mockSaveAppointment).not.toHaveBeenCalled();
     });
 
-    it('should allow patient double-booking when editing same appointment', async () => {
+    it('should not show double-booking error when editing same appointment', async () => {
       const user = userEvent.setup();
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
