@@ -67,9 +67,10 @@
     "workspaces": [
     {
        "name": "bed-form-workspace",
-       "title": "Add or edit bed",
+       "title": "Bed Management",
        "component": "bedFormWorkspace",
-       "type": "workspace"
+       "type": "bed-form",
+       "width": "narrow"
     }
   ]
 }

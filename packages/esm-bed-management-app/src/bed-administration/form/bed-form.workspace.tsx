@@ -18,27 +18,14 @@ import {
 } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  type DefaultWorkspaceProps,
-  getCoreTranslation,
-  ResponsiveWrapper,
-  showSnackbar,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
-import { type BedPostPayload, type InitialData } from '../../types';
+import { getCoreTranslation, ResponsiveWrapper, showSnackbar, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { type BedFormWorkspaceProps, type BedPostPayload } from '../../types';
 import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
 import { editBed, saveBed, useBedType, useBedTagMappings } from './bed-form.resource';
 import styles from './bed-form.workspace.scss';
 
 const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
 type OccupancyStatus = (typeof OCCUPANCY_STATUSES)[number];
-
-type BedFormWorkspaceProps = DefaultWorkspaceProps & {
-  bed?: InitialData;
-  mutateBeds: () => void;
-  defaultLocation?: { display: string; uuid: string };
-};
 
 const BedFormWorkspace: React.FC<BedFormWorkspaceProps> = ({
   closeWorkspace,

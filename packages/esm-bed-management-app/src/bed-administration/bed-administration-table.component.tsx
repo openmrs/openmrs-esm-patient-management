@@ -25,19 +25,16 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { type Bed } from '../types';
+import { type Bed, type BedFormWorkspaceProps, type WorkspaceMode } from '../types';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import styles from './bed-administration-table.scss';
 
-type WorkspaceMode = 'add' | 'edit';
-
-interface BedWorkspaceConfig {
-  workspaceTitle: string;
-  bed?: Bed;
-  mutateBeds: () => void;
-}
+type BedWorkspaceConfig = Omit<
+  BedFormWorkspaceProps,
+  'closeWorkspace' | 'closeWorkspaceWithSavedChanges' | 'promptBeforeClosing' | 'setTitle'
+>;
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
