@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
 import { PatientAppointmentContextTypes, usePatientAppointmentContext } from '../hooks/patient-appointment-context';
@@ -44,14 +44,14 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     if (
       (patientAppointmentContext as PatientAppointmentContextTypes) === PatientAppointmentContextTypes.PATIENT_CHART
     ) {
-      launchWorkspace2('appointments-form-workspace', {
+      launchWorkspace('appointments-form-workspace', {
         context: 'creating',
-        patientUuid,
       });
     } else {
-      launchWorkspace2('appointments-form-workspace', {
+      launchWorkspace('appointments-form-workspace', {
         context: 'creating',
         patientUuid,
+        workspaceTitle: t('createNewAppointment', 'Create new appointment'),
       });
     }
   };

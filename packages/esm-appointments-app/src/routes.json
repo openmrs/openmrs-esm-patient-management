@@ -135,23 +135,12 @@
       "component": "cancelAppointmentModal"
     }
   ],
-  "workspaces2": [
+  "workspaces": [
     {
       "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",
-      "window": "appointments-form-window"
-    }
-  ],
-  "workspaceWindows2": [
-    {
-      "name": "appointments-form-window",
-      "group": "appointmentsFormWorkspaceGroup"
-    }
-  ],
-  "workspaceGroups2": [
-    {
-      "name": "appointmentsFormWorkspaceGroup",
-      "overlay": false
+      "title": "createNewAppointment",
+      "type": "form"
     }
   ]
 }
