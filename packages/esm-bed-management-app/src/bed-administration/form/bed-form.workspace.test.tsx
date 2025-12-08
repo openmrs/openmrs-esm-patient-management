@@ -150,7 +150,7 @@ describe('BedFormWorkspace', () => {
     renderWithSwr(<BedFormWorkspace {...mockWorkspaceProps} mutateBeds={mockMutateBeds} />);
 
     const bedNumberInput = screen.getByLabelText(/bed number/i);
-    await user.type(bedNumberInput, 'TEST-BED');
+    await user.type(bedNumberInput, 'BED-01');
 
     expect(mockWorkspaceProps.promptBeforeClosing).toHaveBeenCalled();
   });
@@ -161,9 +161,9 @@ describe('BedFormWorkspace', () => {
 
     renderWithSwr(<BedFormWorkspace {...mockWorkspaceProps} mutateBeds={mockMutateBeds} />);
 
-    // Fill out the form
+    // Fill out the form with a valid bed number (max 10 chars)
     const bedNumberInput = screen.getByLabelText(/bed number/i);
-    await user.type(bedNumberInput, 'NEW-BED-001');
+    await user.type(bedNumberInput, 'BED-001');
 
     // Select bed type
     const bedTypeSelect = screen.getByLabelText(/bed type/i);
@@ -184,10 +184,10 @@ describe('BedFormWorkspace', () => {
 
     renderWithSwr(<BedFormWorkspace {...mockWorkspaceProps} bed={mockBedData} mutateBeds={mockMutateBeds} />);
 
-    // Modify the bed number
+    // Modify the bed number with a valid value (max 10 chars)
     const bedNumberInput = screen.getByLabelText(/bed number/i);
     await user.clear(bedNumberInput);
-    await user.type(bedNumberInput, 'UPDATED-BED');
+    await user.type(bedNumberInput, 'UPD-001');
 
     // Submit the form
     const saveButton = screen.getByRole('button', { name: /save/i });
@@ -204,9 +204,9 @@ describe('BedFormWorkspace', () => {
 
     renderWithSwr(<BedFormWorkspace {...mockWorkspaceProps} mutateBeds={mockMutateBeds} />);
 
-    // Fill out required fields
+    // Fill out required fields with valid bed number (max 10 chars)
     const bedNumberInput = screen.getByLabelText(/bed number/i);
-    await user.type(bedNumberInput, 'NEW-BED-001');
+    await user.type(bedNumberInput, 'BED-001');
 
     const bedTypeSelect = screen.getByLabelText(/bed type/i);
     await user.selectOptions(bedTypeSelect, 'Standard');
