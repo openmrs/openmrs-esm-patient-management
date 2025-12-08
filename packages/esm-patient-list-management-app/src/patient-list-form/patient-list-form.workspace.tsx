@@ -1,6 +1,7 @@
 import React, { useCallback, type SyntheticEvent, useEffect, useId, useState } from 'react';
 import { Button, ButtonSet, Dropdown, Layer, TextArea, TextInput } from '@carbon/react';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { type TFunction } from 'i18next';
 import { z } from 'zod';
 import {
   getCoreTranslation,
@@ -16,7 +17,7 @@ import {
   editPatientList,
   extractErrorMessagesFromResponse,
   type ErrorObject,
-} from '../api/api-remote';
+} from '../api/patient-list.resource';
 import { useCohortTypes } from '../api/hooks';
 import styles from './patient-list-form.scss';
 
@@ -104,7 +105,7 @@ const PatientListFormWorkspace: React.FC<PatientListFormWorkspaceProps> = ({
         OpenmrsFetchError && error instanceof OpenmrsFetchError
           ? typeof error.responseBody === 'string'
             ? error.responseBody
-            : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+            : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
           : (error as any)?.message;
 
       showSnackbar({

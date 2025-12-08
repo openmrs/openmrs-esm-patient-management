@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "Excluir",
   "demographicsSection": "Informações básicas",
   "discard": "Descartar",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "Data de nascimento conhecida?",
   "editIdentifierTooltip": "Editar",
   "editPatientDetails": "Editar detalhes do paciente",

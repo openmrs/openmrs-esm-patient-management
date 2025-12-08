@@ -5,7 +5,7 @@ import {
   deletePatient,
   endVisit,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
 } from '../commands';
@@ -27,7 +27,7 @@ test.beforeEach(async ({ api }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
 });
 
 test('Admit a patient to a ward from the admission requests list', async ({ page }) => {
@@ -55,7 +55,7 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
-    await page.getByRole('button', { name: 'Admit' }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I should see a success message confirming the admission success', async () => {
