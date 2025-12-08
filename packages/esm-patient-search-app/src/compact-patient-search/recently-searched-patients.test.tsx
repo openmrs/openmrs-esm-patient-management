@@ -17,7 +17,7 @@ const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 describe('RecentlySearchedPatients', () => {
   const birthdate = '1990-01-01T00:00:00.000+0000';
   const age = dayjs().diff(birthdate, 'years');
-  
+
   // Mock FHIR Patient
   const mockSearchResults: Array<fhir.Patient> = [
     {
@@ -113,6 +113,17 @@ describe('RecentlySearchedPatients', () => {
     expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
   });
 
+  it('renders a loading spinner when revalidating recently searched patients', () => {
+    renderRecentlySearchedPatients({
+      currentPage: 0,
+      data: mockSearchResults,
+      hasMore: false,
+      totalResults: 1,
+      isValidating: true,
+    });
+
+    expect(screen.getByTitle(/loading/i)).toBeInTheDocument();
+  });
 });
 
 function renderRecentlySearchedPatients(props = {}) {

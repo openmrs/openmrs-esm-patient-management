@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layer, Tile } from '@carbon/react';
+import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
 import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
@@ -10,11 +10,48 @@ interface RecentPatientSearchProps {
   data: fhir.Patient[];
   fetchError: any;
   isLoading: boolean;
+  isValidating?: boolean;
+  hasMore?: boolean;
+  setPage?: (page: number | ((prevPage: number) => number)) => void;
 }
 
 const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
-  ({ data: searchResults, fetchError, isLoading }, ref) => {
+  ({ data: searchResults, fetchError, isLoading, isValidating = false, hasMore = false, setPage }, ref) => {
     const { t } = useTranslation();
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    const loadingIconRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        if (isValidating) {
+          return;
+        }
+        if (observer.current) {
+          observer.current.disconnect();
+        }
+        observer.current = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting && hasMore && setPage) {
+              setPage((page) => page + 1);
+            }
+          },
+          {
+            threshold: 0.75,
+          },
+        );
+        if (node) {
+          observer.current.observe(node);
+        }
+      },
+      [isValidating, hasMore, setPage],
+    );
+
+    useEffect(() => {
+      return () => {
+        if (observer.current) {
+          observer.current.disconnect();
+        }
+      };
+    }, []);
 
     if (!searchResults?.length && isLoading) {
       return (
@@ -57,8 +94,18 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
                   count: searchResults.length,
                 })}
               </span>
+              {isValidating && (
+                <span className={styles.validationIcon}>
+                  <InlineLoading className={styles.spinner} />
+                </span>
+              )}
             </div>
             <CompactPatientBanner patients={searchResults} ref={ref} />
+            {hasMore && (
+              <div className={styles.loadingIcon} ref={loadingIconRef}>
+                <Loading withOverlay={false} small />
+              </div>
+            )}
           </div>
         </div>
       );
