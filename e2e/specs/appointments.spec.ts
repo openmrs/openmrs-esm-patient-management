@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { startVisit, endVisit } from '../commands';
+import { startVisit, endVisit, getPatientIdentifierStr } from '../commands';
 import { test } from '../core';
-import { AppointmentsPage } from '../pages';
+import { AppointmentsPage, PatientChartAppointmentsPage } from '../pages';
 
 /**
  * Returns a business day (Mon-Fri) for scheduling appointments.
@@ -26,14 +26,12 @@ const getBusinessDay = (daysFromToday: number, hour: number): dayjs.Dayjs => {
 };
 
 let visit: Visit;
-test.beforeEach(async ({ api, patient }) => {
+
+test('Add, edit and cancel an appointment from patient chart', async ({ api, page, patient }) => {
   visit = await startVisit(api, patient.uuid);
-});
+  const appointmentsPage = new PatientChartAppointmentsPage(page);
 
-test('Add, edit and cancel an appointment', async ({ page, patient }) => {
-  const appointmentsPage = new AppointmentsPage(page);
-
-  await test.step('When I go to the Appointments page in the patient chart', async () => {
+  await test.step('Given I navigate to the Appointments page in the patient chart', async () => {
     await appointmentsPage.goto(patient.uuid);
   });
 
@@ -41,7 +39,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByRole('button', { name: 'Add', exact: true }).click();
   });
 
-  await test.step('And I select "Outpatient Department" service', async () => {
+  await test.step('And I select "Outpatient Department" as the service', async () => {
     // Wait for the service select to be visible before interacting
     const serviceSelect = page.locator('select#service');
     await serviceSelect.waitFor({ state: 'visible' });
@@ -63,7 +61,7 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await dateYearInput.fill(nextBusinessDay.format('YYYY'));
   });
 
-  await test.step('And I set time to 10:00 AM', async () => {
+  await test.step('And I set the appointment time to 10:00 AM', async () => {
     await page.locator('#time-picker').clear();
     await page.locator('#time-picker').fill('10:00');
     await page.locator('#time-picker-select-1').selectOption('AM');
@@ -73,86 +71,204 @@ test('Add, edit and cancel an appointment', async ({ page, patient }) => {
     await page.getByLabel('Duration (minutes)').fill('60');
   });
 
-  await test.step('And I add a note', async () => {
+  await test.step('And I enter an appointment note', async () => {
     await page
       .getByPlaceholder(/write any additional points here/i)
       .fill('A sample note for testing out the appointment scheduling flow');
   });
 
-  await test.step('And I click Save button', async () => {
+  await test.step('And I click the "Save and close" button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success message', async () => {
+  await test.step('Then I should see a success message confirming the appointment was scheduled', async () => {
     await expect(page.getByText('Appointment scheduled', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I click the overflow menu on the table row with the newly created appointment', async () => {
+  await test.step('When I click the options menu on the newly created appointment row', async () => {
     await page.getByRole('button', { name: 'Options' }).click();
   });
 
-  await test.step('And I choose the "Edit" option from the popup menu', async () => {
+  await test.step('And I select the "Edit" option from the menu', async () => {
     await page.getByRole('menuitem', { name: 'Edit' }).click();
   });
 
-  await test.step('When I change to "Inpatient ward" location', async () => {
+  await test.step('And I change the service to "General Medicine"', async () => {
     // Wait for the service select to be visible before interacting
     const serviceSelect = page.locator('select#service');
     await serviceSelect.waitFor({ state: 'visible' });
     await serviceSelect.selectOption({ label: 'General Medicine service' });
   });
 
-  await test.step('And I change to "General Medicine" Service', async () => {
-    await page.getByLabel('Select a service').selectOption('General Medicine service');
-  });
-
-  await test.step('And I change the time to 2:00 PM', async () => {
+  await test.step('And I change the appointment time to 2:00 PM', async () => {
     await page.locator('#time-picker').clear();
     await page.locator('#time-picker').fill('02:00');
     await page.locator('#time-picker-select-1').selectOption('PM');
   });
 
-  await test.step('And I set the "Duration" of the appointment"', async () => {
+  await test.step('And I change the duration to 80 minutes', async () => {
     await page.getByLabel('Duration (minutes)').fill('80');
   });
 
-  await test.step('And I change the note', async () => {
+  await test.step('And I update the appointment note', async () => {
     await page
       .getByPlaceholder('Write any additional points here')
       .fill('A sample note for testing out the edit flow for scheduled appointments');
   });
 
-  await test.step('And I click Save button', async () => {
+  await test.step('And I click the "Save and close" button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
-  await test.step('Then I should see a success message', async () => {
+  await test.step('Then I should see a success message confirming the appointment was edited', async () => {
     await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I open the tab containing the edited appointment', async () => {
+  await test.step('When I navigate to the "Upcoming" appointments tab', async () => {
     await page.getByRole('tab', { name: /upcoming/i }).click();
   });
 
-  await test.step('Then I click the options kebab menu in the appointment', async () => {
+  await test.step('And I click the options menu on the edited appointment', async () => {
     const optionsButton = page.getByRole('button', { name: 'Options' });
     await expect(optionsButton).toBeVisible();
     await optionsButton.click();
   });
 
-  await test.step('And I choose the "Cancel" option', async () => {
+  await test.step('And I select the "Cancel" option from the menu', async () => {
     await page.getByRole('menuitem', { name: 'Cancel' }).click();
   });
 
-  await test.step('When I click the "Cancel appointment" button to confirm', async () => {
+  await test.step('And I confirm the cancellation by clicking the "Cancel appointment" button', async () => {
     await page.getByRole('button', { name: 'danger Cancel appointment' }).click();
   });
 
-  await test.step('Then I should see a success message', async () => {
+  await test.step('Then I should see a success message confirming the appointment was cancelled', async () => {
     await expect(page.getByText('Appointment cancelled successfully', { exact: true })).toBeVisible();
   });
 });
 
+test('Add and edit an appointment from appointments dashboard', async ({ page, patient }) => {
+  const appointmentsPage = new AppointmentsPage(page);
+
+  // Extract details from the created patient
+  const openmrsIdentifier = getPatientIdentifierStr(patient);
+  const firstName = patient.person.display.split(' ')[0];
+  const lastName = patient.person.display.split(' ')[1];
+
+  await test.step('Given I navigate to the Appointments dashboard', async () => {
+    await appointmentsPage.goto();
+  });
+
+  await test.step('When I click the "Create new appointment" button', async () => {
+    await page.getByRole('button', { name: 'Create new appointment', exact: true }).click();
+  });
+
+  await test.step('And I enter the patient identifier in the search field', async () => {
+    await page.getByTestId('patientSearchBar').fill(openmrsIdentifier);
+  });
+
+  await test.step('Then I should see the patient matching the entered identifier in the search results', async () => {
+    await expect(page.getByText(/1 search result/)).toBeVisible();
+    await expect(page.getByText(new RegExp(firstName))).toBeVisible();
+    await expect(page.getByText(new RegExp(lastName))).toBeVisible();
+    await expect(page.getByText(new RegExp(openmrsIdentifier))).toBeVisible();
+  });
+
+  await test.step('When I click on the patient record from the search results', async () => {
+    await page.getByText(new RegExp(firstName)).click();
+  });
+
+  await test.step('And I select “Outpatient Department” service', async () => {
+    await page.selectOption('select#service', { label: 'Outpatient Department' });
+  });
+
+  await test.step('And I make appointment as “Scheduled”', async () => {
+    await page.getByLabel('Select an appointment type').selectOption('Scheduled');
+  });
+
+  const now = dayjs();
+  await test.step('And I set the appointment date to today', async () => {
+    const dateInput = page.getByTestId('datePickerInput');
+    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
+    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
+    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
+    await dateDayInput.fill(now.format('DD'));
+    await dateMonthInput.fill(now.format('MM'));
+    await dateYearInput.fill(now.format('YYYY'));
+  });
+
+  await test.step('And I set the appointment time to the current time', async () => {
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill(now.format('hh:mm'));
+    await page.locator('#time-picker-select-1').selectOption(now.format('A'));
+  });
+
+  await test.step('And I set the “Duration” to 60', async () => {
+    await page.getByLabel('Duration (minutes)').fill('60');
+  });
+
+  await test.step('And I enter an appointment note', async () => {
+    await page
+      .getByPlaceholder(/write any additional points here/i)
+      .fill('A sample note for testing out the appointment scheduling flow');
+  });
+
+  await test.step('And I click the "Save and close" button', async () => {
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a success message confirming the appointment was scheduled', async () => {
+    await expect(page.getByText('Appointment scheduled', { exact: true })).toBeVisible();
+  });
+
+  await test.step('And the newly created appointment should appear in the appointments table', async () => {
+    const appointmentRow = page.locator('table tr').filter({ hasText: openmrsIdentifier });
+    await expect(appointmentRow).toBeVisible();
+  });
+
+  await test.step('When I click the options menu on the newly created appointment row', async () => {
+    const appointmentRow = page.locator('table tr').filter({ hasText: openmrsIdentifier });
+    await appointmentRow.getByRole('button', { name: 'Options' }).click();
+  });
+
+  await test.step('And I select the "Edit" option from the menu', async () => {
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+  });
+
+  await test.step('And I change the service to "General Medicine"', async () => {
+    const serviceSelect = page.locator('select#service');
+    await serviceSelect.waitFor({ state: 'visible' });
+    await serviceSelect.selectOption({ label: 'General Medicine service' });
+  });
+
+  await test.step('And I change the appointment time to 2:00 PM', async () => {
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill('02:00');
+    await page.locator('#time-picker-select-1').selectOption('PM');
+  });
+
+  await test.step('And I change the duration to 80 minutes', async () => {
+    await page.getByLabel('Duration (minutes)').fill('80');
+  });
+
+  await test.step('And I update the appointment note', async () => {
+    await page
+      .getByPlaceholder('Write any additional points here')
+      .fill('A sample note for testing out the edit flow for scheduled appointments');
+  });
+
+  await test.step('And I click the "Save and close" button', async () => {
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a success message confirming the appointment was edited', async () => {
+    await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
+  });
+});
+
 test.afterEach(async ({ api }) => {
-  await endVisit(api, visit.uuid);
+  if (visit) {
+    await endVisit(api, visit.uuid);
+    visit = undefined;
+  }
 });
