@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  Dropdown,
 } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
 import {
@@ -46,6 +47,8 @@ import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
+import { setAppointmentProvider, useAppointmentsStore } from '../../store';
+import { useProviders } from '../../hooks/useProviders';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -74,11 +77,40 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { visits } = useTodaysVisits();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+  const { appointmentProvider } = useAppointmentsStore();
 
   const headerData = appointmentsTableColumns.map((columnKey) => ({
     header: t(columnKey, columnKey),
     key: columnKey,
   }));
+
+  function StatusDropdownFilter() {
+    const { t } = useTranslation();
+    const layout = useLayoutType();
+    const { providers } = useProviders();
+    const providerOptions = useMemo(
+      () => providers?.map((item) => ({ id: item.uuid, label: item.display })) ?? [],
+      [providers],
+    );
+    const handleChangeProviderFilter = useCallback(({ selectedItem }) => {
+      setAppointmentProvider(selectedItem);
+    }, []);
+
+    return (
+      <div className={styles.filterContainer}>
+        <Dropdown
+          id="statusFilter"
+          items={[{ label: `${t('any', 'Any')}` }, ...(providerOptions ?? [])]}
+          itemToString={(item) => (item ? item.label : '')}
+          label={appointmentProvider.label ?? t('all', 'All')}
+          onChange={handleChangeProviderFilter}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          titleText={t('filterAppointmentsByProvider', 'Filter appointments by provider:')}
+          type="inline"
+        />
+      </div>
+    );
+  }
 
   const rowData = results?.map((appointment) => ({
     id: appointment.uuid,
@@ -105,22 +137,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     return <DataTableSkeleton role="progressbar" row={5} />;
   }
 
-  if (hasActiveFilters && !appointments?.length) {
-    return (
-      <div className={styles.filterEmptyState}>
-        <Layer level={0}>
-          <Tile className={styles.filterEmptyStateTile}>
-            <p className={styles.filterEmptyStateContent}>
-              {t('noMatchingAppointments', 'No matching appointments found')}
-            </p>
-            <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-          </Tile>
-        </Layer>
-      </div>
-    );
-  }
-
-  if (!appointments?.length) {
+  if (!appointments?.length && !hasActiveFilters) {
     return (
       <EmptyState
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
@@ -143,8 +160,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
         </div>
       </Tile>
       <div className={styles.toolbar}>
+        {appointmentsTableColumns.includes('provider') && <StatusDropdownFilter />}
+
         <Search
-          className={styles.searchbar}
+          className={styles.search}
           labelText={t('filterAppointments', 'Filter appointments')}
           placeholder={t('filterTable', 'Filter table')}
           onChange={(event) => setSearchString(event.target.value)}
@@ -198,8 +217,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBody>
                   {rows.map((row) => {
                     const matchingAppointment = appointments.find((appointment) => appointment.uuid === row.id);
-                    const patientUuid = matchingAppointment.patient?.uuid;
-                    const visitDate = dayjs(matchingAppointment.startDateTime);
+                    const patientUuid = matchingAppointment?.patient?.uuid;
+                    const visitDate = dayjs(matchingAppointment?.startDateTime);
                     const isFutureAppointment = visitDate.isAfter(dayjs());
                     const isTodayAppointment = visitDate.isToday();
                     const hasActiveVisitToday = visits?.some(
