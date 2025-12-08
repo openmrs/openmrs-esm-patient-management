@@ -3,7 +3,6 @@ import useSWR from 'swr';
 import {
   openmrsFetch,
   useSession,
-  useConfig,
   type FetchResponse,
   restBaseUrl,
   fhirBaseUrl,
@@ -151,14 +150,25 @@ export function useFhirPatients(patientUuids: string[] | null) {
     return `${fhirBaseUrl}/Patient?_id=${patientUuids.join(',')}`;
   }, [shouldFetch, patientUuids]);
 
-  const { data, error, isLoading } = useFhirInfinite<fhir.Patient>(url);
+  const { data, error, isLoading, isValidating, hasMore, loadMore } = useFhirInfinite<fhir.Patient>(url);
+
+  const totalResults = patientUuids?.length ?? 0;
+
+  const handleSetPage = useCallback(async () => {
+    loadMore();
+    return [];
+  }, [loadMore]);
 
   return useMemo(
     () => ({
       data: data ?? [],
       isLoading,
       fetchError: error,
+      isValidating: isValidating ?? false,
+      hasMore: hasMore ?? false,
+      setPage: handleSetPage,
+      totalResults,
     }),
-    [data, isLoading, error],
+    [data, isLoading, error, isValidating, hasMore, handleSetPage, totalResults],
   );
 }
