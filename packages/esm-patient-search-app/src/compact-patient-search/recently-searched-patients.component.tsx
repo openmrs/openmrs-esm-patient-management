@@ -16,9 +16,9 @@ interface RecentPatientSearchProps {
 }
 
 const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
-  ({ data: searchResults, fetchError, isLoading, isValidating = false, hasMore = false, setPage }, ref) => {
+  ({ data: searchResults, fetchError, isLoading, isValidating, hasMore, setPage }, ref) => {
     const { t } = useTranslation();
-    const observer = useRef<IntersectionObserver | null>(null);
+    const observer = useRef(null);
 
     const loadingIconRef = useCallback(
       (node: HTMLDivElement | null) => {
