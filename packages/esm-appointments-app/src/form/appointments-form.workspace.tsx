@@ -60,8 +60,9 @@ interface AppointmentsFormProps {
 }
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
-const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
+const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
 
 /**
  * Workspace used to create or edit an appointment within the appointments app
@@ -263,7 +264,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
 
-  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
+  // Retrieve ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
     field: { ref: startDateRef },
   } = useController({ name: 'appointmentDateTime.startDate', control });
@@ -341,7 +342,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      if (isEditing) {
+      if (!isEditing) {
         errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
       } else {
         errorMessage = null;
@@ -532,7 +533,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     invalidText={errors?.selectedService?.message}
                     labelText={t('selectService', 'Select a service')}
                     onBlur={onBlur}
-                    onChange={(event) => {
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
                       if (!isEditing) {
                         setValue(
                           'duration',
@@ -939,7 +940,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               invalid={!!errors?.startTime}
               invalidText={errors?.startTime?.message}
               labelText={t('time', 'Time')}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 onChange(event.target.value);
               }}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
@@ -950,7 +951,9 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
                 render={({ field: { value, onChange } }) => (
                   <TimePickerSelect
                     id="time-picker-select-1"
-                    onChange={(event) => onChange(event.target.value as 'AM' | 'PM')}
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+                      onChange(event.target.value as 'AM' | 'PM')
+                    }
                     value={value}
                     aria-label={t('time', 'Time')}>
                     <SelectItem value="AM" text="AM" />

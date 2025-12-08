@@ -728,7 +728,7 @@ describe('AppointmentForm', () => {
       expect(mockSaveAppointment).not.toHaveBeenCalled();
     });
 
-    it('should detect patient double-booking conflicts', async () => {
+    it('should detect patient double-booking conflicts when creating new appointment', async () => {
       const user = userEvent.setup();
 
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
@@ -737,15 +737,8 @@ describe('AppointmentForm', () => {
         data: { PATIENT_DOUBLE_BOOKING: true },
       } as FetchResponse);
 
-      renderWithSwr(
-        <AppointmentForm
-          {...defaultProps}
-          workspaceProps={{
-            ...defaultProps.workspaceProps,
-            appointment: existingAppointment,
-          }}
-        />,
-      );
+      // Render WITHOUT existing appointment (creating mode)
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
@@ -782,12 +775,57 @@ describe('AppointmentForm', () => {
       await user.click(saveButton);
 
       expect(mockCheckAppointmentConflict).toHaveBeenCalledTimes(1);
+      // Should show double-booking error when creating new appointment
       expect(mockShowSnackbar).toHaveBeenCalledWith({
         isLowContrast: true,
         kind: 'error',
         title: 'Patient already booked for an appointment at this time',
       });
       expect(mockSaveAppointment).not.toHaveBeenCalled();
+    });
+
+    it('should allow patient double-booking when editing same appointment', async () => {
+      const user = userEvent.setup();
+
+      mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+      mockCheckAppointmentConflict.mockResolvedValue({
+        status: 200,
+        data: { PATIENT_DOUBLE_BOOKING: true },
+      } as FetchResponse);
+      mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
+
+      // Render WITH existing appointment (editing mode)
+      renderWithSwr(
+        <AppointmentForm
+          {...defaultProps}
+          workspaceProps={{
+            ...defaultProps.workspaceProps,
+            appointment: existingAppointment,
+          }}
+        />,
+      );
+
+      await waitForLoadingToFinish();
+
+      const appointmentNoteTextarea = screen.getByRole('textbox', { name: /write an additional note/i });
+      const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+      // Make a small change
+      await user.clear(appointmentNoteTextarea);
+      await user.type(appointmentNoteTextarea, 'Updated note');
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await user.click(saveButton);
+
+      expect(mockCheckAppointmentConflict).toHaveBeenCalledTimes(1);
+      // Should NOT show double-booking error when editing (same appointment)
+      expect(mockShowSnackbar).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Patient already booked for an appointment at this time',
+        }),
+      );
+      // Should proceed with save
+      expect(mockSaveAppointment).toHaveBeenCalled();
     });
   });
 

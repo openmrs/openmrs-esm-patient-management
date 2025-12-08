@@ -3,21 +3,22 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { type Appointment } from '../types';
 import { usePatientAppointments } from './patient-appointments.resource';
 import PatientAppointmentsTable from './patient-appointments-table.component';
 import styles from './patient-appointments-detailed-summary.scss';
-import { type Appointment } from '../types';
 
 interface PatientAppointmentsDetailProps {
   patientUuid: string;
 
   /**
-   * callback to launch the appropriate appointments form workspace, depending
-   * on which app is using this extension
+   * Optional callback to launch the appropriate appointments form workspace, depending
+   * on which app is using this extension. If not provided, uses the default implementation
+   * for patient chart context.
    */
-  launchAppointmentForm(patientUuid: string, appointment?: Appointment): void;
+  launchAppointmentForm?(patientUuid: string, appointment?: Appointment): void;
 }
 
 enum AppointmentTypes {
@@ -40,6 +41,13 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
   const headerTitle = t('appointments', 'Appointments');
   const isTablet = useLayoutType() === 'tablet';
   const [switchedView, setSwitchedView] = useState(false);
+
+  // Default implementation for patient chart context
+  const defaultLaunchAppointmentForm = (patientUuid: string, appointment?: Appointment) => {
+    launchWorkspace2('appointments-form-workspace', { patientUuid, appointment });
+  };
+
+  const handleLaunchAppointmentForm = launchAppointmentForm || defaultLaunchAppointmentForm;
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const startDate = useMemo(() => dayjs().subtract(6, 'month').toISOString(), []);
@@ -87,7 +95,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add Appointments"
-              onClick={() => launchAppointmentForm(patientUuid)}>
+              onClick={() => handleLaunchAppointmentForm(patientUuid)}>
               {t('add', 'Add')}
             </Button>
           </div>
