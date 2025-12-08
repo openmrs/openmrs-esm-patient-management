@@ -9,9 +9,9 @@ import styles from './patient-search.scss';
 interface RecentPatientSearchProps {
   data: fhir.Patient[];
   fetchError: any;
-  hasMore: boolean;
+  hasMore?: boolean;
   isLoading: boolean;
-  isValidating: boolean;
+  isValidating?: boolean;
   setPage?: (page: number | ((prevPage: number) => number)) => void;
 }
 
