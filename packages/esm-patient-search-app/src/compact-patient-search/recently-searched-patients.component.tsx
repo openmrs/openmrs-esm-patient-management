@@ -9,14 +9,14 @@ import styles from './patient-search.scss';
 interface RecentPatientSearchProps {
   data: fhir.Patient[];
   fetchError: any;
+  hasMore: boolean;
   isLoading: boolean;
-  isValidating?: boolean;
-  hasMore?: boolean;
+  isValidating: boolean;
   setPage?: (page: number | ((prevPage: number) => number)) => void;
 }
 
 const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
-  ({ data: searchResults, fetchError, isLoading, isValidating, hasMore, setPage }, ref) => {
+  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
 
@@ -30,7 +30,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
         }
         observer.current = new IntersectionObserver(
           (entries) => {
-            if (entries[0].isIntersecting && hasMore && setPage) {
+            if (entries[0].isIntersecting && hasMore) {
               setPage((page) => page + 1);
             }
           },
@@ -53,7 +53,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientS
       };
     }, []);
 
-    if (!searchResults?.length && isLoading) {
+    if (!searchResults && isLoading) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
