@@ -64,12 +64,25 @@
       "component": "newBedTypeModal"
     }
   ],
-    "workspaces": [
+  "workspaceGroups2": [
     {
-       "name": "bed-form-workspace",
-       "title": "Add or edit bed",
-       "component": "bedFormWorkspace",
-       "type": "workspace"
+      "name": "bed-management-group",
+      "persistence": "closable"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "bed-management-window",
+      "group": "bed-management-group",
+      "canMaximize": true,
+      "width": "narrow"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "bed-form-workspace",
+      "component": "bedFormWorkspace",
+      "window": "bed-management-window"
     }
   ]
 }
