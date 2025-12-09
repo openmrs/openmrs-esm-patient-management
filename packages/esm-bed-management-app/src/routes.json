@@ -64,7 +64,7 @@
       "component": "newBedTypeModal"
     }
   ],
-    "workspaces": [
+    "workspaces2": [
     {
        "name": "bed-form-workspace",
        "title": "Bed Management",
