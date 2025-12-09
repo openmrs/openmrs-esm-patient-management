@@ -77,7 +77,6 @@ const mockBedTags = [
 
 describe('BedFormWorkspace', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
 
     mockUseSession.mockReturnValue({
       authenticated: true,
