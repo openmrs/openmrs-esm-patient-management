@@ -32,3 +32,20 @@
   height: 3.5rem;
   width: 3.5rem;
 }
+
+.patientInfoWithButton {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.addToListButtonContainer {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.addToListButton {
+  font-size: 0.75rem;
+  min-height: 2rem;
+  max-width: fit-content;
+}
