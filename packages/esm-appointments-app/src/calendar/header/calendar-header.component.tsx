@@ -1,19 +1,23 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
+import { parseDate, toCalendar, createCalendar, type Calendar } from '@internationalized/date';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import { useAppointmentsStore } from '../../store';
 import styles from './calendar-header.scss';
 
-const CalendarHeader: React.FC = () => {
+interface CalendarHeaderProps {
+  calendar: Calendar;
+}
+const CalendarHeader: React.FC<CalendarHeaderProps> = ({ calendar }) => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
 
   const handleClick = () => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });
+    const date = toCalendar(parseDate(selectedDate), calendar);
+    navigate({ to: `${spaHomePage}/appointments/${encodeURI(date.toString())}` });
   };
 
   return (
