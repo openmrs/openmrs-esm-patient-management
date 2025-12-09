@@ -17,7 +17,7 @@ import {
   Tag,
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
-import { launchWorkspace, navigate, usePagination } from '@openmrs/esm-framework';
+import { launchWorkspace2, navigate, usePagination } from '@openmrs/esm-framework';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
 import { type Bed, type WorkspaceMode } from '../types';
 import Header from '../header/header.component';
@@ -85,8 +85,7 @@ const WardWithBeds: React.FC = () => {
   }, [paginatedData]);
 
   const handleLaunchBedFormWorkspace = (mode: WorkspaceMode, bed?: Bed) => {
-    launchWorkspace('bed-form-workspace', {
-      workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
+    launchWorkspace2('bed-form-workspace', {
       mutateBeds: mutate,
       defaultLocation: { display: name, uuid: location },
       ...(mode === 'edit' && bed ? { bed } : {}),

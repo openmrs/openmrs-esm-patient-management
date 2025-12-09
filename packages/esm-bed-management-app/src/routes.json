@@ -64,13 +64,25 @@
       "component": "newBedTypeModal"
     }
   ],
-    "workspaces2": [
+  "workspaceGroups2": [
     {
-       "name": "bed-form-workspace",
-       "title": "Bed Management",
-       "component": "bedFormWorkspace",
-       "type": "bed-form",
-       "width": "narrow"
+      "name": "bed-management-group",
+      "persistence": "closable"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "bed-management-window",
+      "group": "bed-management-group",
+      "canMaximize": true,
+      "width": "narrow"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "bed-form-workspace",
+      "component": "bedFormWorkspace",
+      "window": "bed-management-window"
     }
   ]
 }

@@ -203,13 +203,6 @@ export interface BedDetails extends Bed {
 
 export type WorkspaceMode = 'add' | 'edit';
 
-export interface BedManagementWorkspaceProps {
-  closeWorkspace: (options?: CloseWorkspaceOptions) => void;
-  closeWorkspaceWithSavedChanges: (options?: CloseWorkspaceOptions) => void;
-  promptBeforeClosing: (testFn: () => boolean) => void;
-  setTitle: (title: string, titleNode?: React.ReactNode) => void;
-}
-
 export interface CloseWorkspaceOptions {
   ignoreChanges?: boolean;
   onWorkspaceClose?: () => void;
@@ -234,9 +227,8 @@ export interface BedWorkspaceData {
   }>;
 }
 
-export interface BedFormWorkspaceProps extends BedManagementWorkspaceProps {
+export interface BedFormWorkspaceConfig {
   bed?: BedWorkspaceData;
   mutateBeds: () => void;
   defaultLocation?: { display: string; uuid: string };
-  workspaceTitle?: string;
 }

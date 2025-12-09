@@ -21,20 +21,15 @@ import { Add, Edit } from '@carbon/react/icons';
 import {
   ErrorState,
   isDesktop as desktopLayout,
-  launchWorkspace,
+  launchWorkspace2,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { type Bed, type BedFormWorkspaceProps, type WorkspaceMode } from '../types';
+import { type Bed, type BedFormWorkspaceConfig, type WorkspaceMode } from '../types';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import styles from './bed-administration-table.scss';
-
-type BedWorkspaceConfig = Omit<
-  BedFormWorkspaceProps,
-  'closeWorkspace' | 'closeWorkspaceWithSavedChanges' | 'promptBeforeClosing' | 'setTitle'
->;
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -73,8 +68,7 @@ const BedAdministrationTable: React.FC = () => {
 
   const handleLaunchBedWorkspace = useCallback(
     (mode: WorkspaceMode, bed?: Bed) => {
-      const config: BedWorkspaceConfig = {
-        workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
+      const config: BedFormWorkspaceConfig = {
         mutateBeds: mutateBedsGroupedByLocation,
       };
 
@@ -82,9 +76,9 @@ const BedAdministrationTable: React.FC = () => {
         config.bed = bed;
       }
 
-      launchWorkspace('bed-form-workspace', config);
+      launchWorkspace2('bed-form-workspace', config);
     },
-    [t, mutateBedsGroupedByLocation],
+    [mutateBedsGroupedByLocation],
   );
 
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
