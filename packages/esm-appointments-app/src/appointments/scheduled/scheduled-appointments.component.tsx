@@ -150,7 +150,7 @@ function ExtensionWrapper({
     const configChanged = !shallowEqual(currentConfig.current, extension.config);
     const dateTypeChanged = currentDateType.current !== dateType;
 
-    // Always evaluate once to populate allowedExtensions so the dropdown is rendered on first load.
+    // Always to evaluate once to populate allowedExtensions so the dropdown is rendered on first load.
     if (configChanged || dateTypeChanged || !currentConfig.current) {
       currentConfig.current = extension.config;
       currentDateType.current = dateType;
@@ -160,7 +160,6 @@ function ExtensionWrapper({
     shouldShow ? showExtensionTab(extension.name) : hideExtensionTab(extension.name);
   }, [extension, dateType, showExtensionTab, hideExtensionTab]);
 
-  // When "all" is selected, show only the first extension with null status to get all appointments
   const isAllSelected = currentTab === 'all';
   const shouldShowExtension = isAllSelected ? firstPanelToShow?.name === extension.name : currentTab === extension.name;
 
@@ -174,7 +173,7 @@ function ExtensionWrapper({
           date,
           appointmentServiceTypes,
           status: isAllSelected ? null : extension.config?.status,
-          title: isAllSelected ? t('allAppointments', 'All Appointments') : extension.config?.title || extension.name,
+          title: isAllSelected ? t('allAppointments', 'All') : extension.config?.title || extension.name,
           statusDropdownItems,
           selectedStatusItem,
           onStatusChange,
