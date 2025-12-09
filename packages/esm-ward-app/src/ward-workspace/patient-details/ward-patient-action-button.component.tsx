@@ -1,16 +1,16 @@
 import React from 'react';
-import { ActionMenuButton2, UserAvatarIcon } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { ActionMenuButton2, UserAvatarIcon } from '@openmrs/esm-framework';
 
-export default function AdmissionRequestsActionButton() {
+export default function WardPatientActionButton() {
   const { t } = useTranslation();
 
   return (
     <ActionMenuButton2
       icon={(props) => <UserAvatarIcon {...props} />}
-      label={t('pendingAdmissions', 'Pending admissions')}
+      label={t('Patient', 'patient')}
       workspaceToLaunch={{
-        workspaceName: 'admission-requests-workspace',
+        workspaceName: 'ward-patient-workspace',
       }}
     />
   );

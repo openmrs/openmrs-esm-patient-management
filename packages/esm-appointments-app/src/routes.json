@@ -98,10 +98,6 @@
       "slot": "visit-form-top-slot"
     },
     {
-      "name": "search-patient",
-      "component": "searchPatient"
-    },
-    {
       "name": "home-appointments-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile"
@@ -135,7 +131,17 @@
       "component": "cancelAppointmentModal"
     }
   ],
-  "workspaces": [
+  "workspaceGroups2": [{
+      "name": "appointments-group"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "appointments-window",
+      "group": "appointments-group"
+    }
+  ],
+  "workspaces2": [
     {
       "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",

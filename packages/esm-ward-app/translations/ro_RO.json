@@ -73,6 +73,7 @@
   "note": "Notă",
   "notes": "Note",
   "notesRequiredForCancellingRequest": "Este necesară o notă pentru anularea cererii de internare sau transfer",
+  "orderBasket": "Order basket",
   "Orders": "Comenzi",
   "other": "Altul",
   "Patient": "patient",
@@ -122,7 +123,6 @@
   "transfer": "Transfer",
   "transferElsewhere": "Transfer în altă parte",
   "transferPatient": "Transfer pacient",
-  "transferRequest": "Cerere de transfer",
   "transfers": "Transferuri",
   "transferToDispositionLocation": "Transfer către {{location}}",
   "transferType": "Tip de transfer",
@@ -131,5 +131,6 @@
   "unknownError": "An unknown error occurred",
   "visitNoteSaved": "Nota pacientului a fost salvată",
   "wardClinicalNotePlaceholder": "Scrie orice notițe aici",
+  "wardPatient": "Ward patient",
   "wards": "Salonae"
 }

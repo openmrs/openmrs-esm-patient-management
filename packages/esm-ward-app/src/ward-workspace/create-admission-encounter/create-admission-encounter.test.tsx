@@ -231,11 +231,16 @@ describe('CreateAdmissionEncounterWorkspace', () => {
 function renderCreateAdmissionEncounterWorkspace(patentUuid: string) {
   renderWithSwr(
     <CreateAdmissionEncounterWorkspace
-      patientUuid={patentUuid}
       closeWorkspace={jest.fn()}
-      promptBeforeClosing={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      setTitle={jest.fn()}
+      launchChildWorkspace={jest.fn()}
+      workspaceProps={{
+        selectedPatientUuid: patentUuid,
+      }}
+      windowProps={{
+        startVisitWorkspaceName: '',
+      }}
+      groupProps={undefined}
+      workspaceName={''}
     />,
   );
 }

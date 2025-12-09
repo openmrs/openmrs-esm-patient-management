@@ -70,7 +70,7 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('And I admit the patient', async () => {
-    await page.getByRole('button', { name: /Admit/i }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I see an admission success message', async () => {

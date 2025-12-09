@@ -160,6 +160,7 @@ export const checkAppointmentConflict = async (appointmentPayload: AppointmentPa
       providers: [],
       locationUuid: appointmentPayload.locationUuid,
       appointmentKind: appointmentPayload.appointmentKind,
+      ...(appointmentPayload.uuid && { uuid: appointmentPayload.uuid }),
     },
     headers: { 'Content-Type': 'application/json' },
   });

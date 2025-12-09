@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react';
-import { getPatientName, launchWorkspaceGroup } from '@openmrs/esm-framework';
+import { getPatientName, launchWorkspace2 } from '@openmrs/esm-framework';
 import { type WardPatient } from '../types';
 import styles from './ward-patient-card.scss';
 
@@ -23,16 +23,8 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient, relatedTransf
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
-          launchWorkspaceGroup('ward-patient', {
-            state: {
-              wardPatient,
-              patient,
-              patientUuid: patient.uuid,
-              relatedTransferPatients,
-            },
-            workspaceToLaunch: {
-              name: 'ward-patient-workspace',
-            },
+          launchWorkspace2('ward-patient-workspace', {}, {}, {
+            wardPatient
           });
         }}>
         {getPatientName(patient.person)}
