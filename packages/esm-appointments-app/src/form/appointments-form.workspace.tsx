@@ -68,10 +68,6 @@ interface AppointmentsFormProps {
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
 const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
-const SERVICE_APPOINTMENT_CAPS: Record<string, number> = {
-  'HIV Consultation': 20,
-  'Drug Refill': 8,
-};
 const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> = ({
   appointment,
   recurringPattern,
@@ -340,7 +336,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     }
   })();
 
-  // Check if service appointment limit has been reached
   const checkServiceAppointmentLimit = async (
     serviceName: string,
     appointmentDate: string,

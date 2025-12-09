@@ -66,7 +66,6 @@
       color: colors.$gray-40;
     }
 
-    // Today should show pink even if unavailable, but still not clickable
     &.monthly-cell-today {
       background-color: colors.$magenta-30;
       color: colors.$white;
@@ -87,7 +86,6 @@
     }
   }
 
-  // Available days should have white background and hover to pink
   &:not(.monthly-cell-unavailable):not(.monthly-cell-today):not(.monthly-cell-active) {
     background-color: colors.$white;
 
@@ -233,6 +231,10 @@
 
 .calendarDate {
   @include type.type-style('heading-compact-01');
+}
+
+.unavailableContent {
+  opacity: 0.3;
 }
 
 .wrapper {

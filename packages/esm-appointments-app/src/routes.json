@@ -141,12 +141,24 @@
       "component": "appointmentsFormWorkspace",
       "title": "createNewAppointment",
       "type": "form"
-    },
+    }
+  ],
+  "workspaces2": [
     {
       "name": "service-availability-form-workspace",
       "component": "serviceAvailabilityFormWorkspace",
-      "title": "configureServiceAvailability",
-      "type": "form"
+      "window": "service-availability-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "service-availability-form-window",
+      "group": "appointments"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "appointments"
     }
   ]
 }

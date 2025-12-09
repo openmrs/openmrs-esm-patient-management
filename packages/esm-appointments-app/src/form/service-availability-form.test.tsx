@@ -22,7 +22,6 @@ const defaultProps = {
 
 describe('AppointmentServiceForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
   });
@@ -30,10 +29,7 @@ describe('AppointmentServiceForm', () => {
   it('renders the service availability form with all fields', async () => {
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/select a service/i)).toBeInTheDocument();
-    });
-
+    expect(await screen.findByLabelText(/select a service/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/max appointments limit/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
@@ -43,11 +39,7 @@ describe('AppointmentServiceForm', () => {
   it('loads and displays available services in the dropdown', async () => {
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/select a service/i)).toBeInTheDocument();
-    });
-
-    const serviceSelect = screen.getByLabelText(/select a service/i);
+    const serviceSelect = await screen.findByLabelText(/select a service/i);
     expect(serviceSelect).toBeInTheDocument();
 
     expect(screen.getByRole('option', { name: /select service/i })).toBeInTheDocument();
@@ -57,18 +49,12 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
-
-    const weeklyToggle = screen.getByLabelText(/enable weekly availability/i);
+    const weeklyToggle = await screen.findByLabelText(/enable weekly availability/i);
     expect(weeklyToggle).toBeInTheDocument();
 
     await user.click(weeklyToggle);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/monday/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByLabelText(/monday/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/tuesday/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/wednesday/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/thursday/i)).toBeInTheDocument();
@@ -81,19 +67,13 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
-
-    const weeklyToggle = screen.getByLabelText(/enable weekly availability/i);
+    const weeklyToggle = await screen.findByLabelText(/enable weekly availability/i);
     await user.click(weeklyToggle);
 
     const mondayCheckbox = screen.getByLabelText(/monday/i);
     await user.click(mondayCheckbox);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/start time/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByLabelText(/start time/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/end time/i)).toBeInTheDocument();
     const maxAppointmentsInputs = screen.getAllByLabelText(/max appointments/i);
     expect(maxAppointmentsInputs.length).toBeGreaterThan(0);
@@ -103,19 +83,13 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
-
-    const weeklyToggle = screen.getByLabelText(/enable weekly availability/i);
+    const weeklyToggle = await screen.findByLabelText(/enable weekly availability/i);
     await user.click(weeklyToggle);
 
     const mondayCheckbox = screen.getByLabelText(/monday/i);
     await user.click(mondayCheckbox);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/start time/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByLabelText(/start time/i)).toBeInTheDocument();
 
     await user.click(mondayCheckbox);
 
@@ -128,11 +102,7 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
-
-    const weeklyToggle = screen.getByLabelText(/enable weekly availability/i);
+    const weeklyToggle = await screen.findByLabelText(/enable weekly availability/i);
     await user.click(weeklyToggle);
 
     const mondayCheckbox = screen.getByLabelText(/monday/i);
@@ -155,9 +125,7 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const discardButton = screen.getByRole('button', { name: /discard/i });
     await user.click(discardButton);
@@ -175,9 +143,7 @@ describe('AppointmentServiceForm', () => {
 
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const serviceSelect = screen.getByLabelText(/select a service/i);
     await user.selectOptions(serviceSelect, ['Outpatient']);
@@ -204,9 +170,7 @@ describe('AppointmentServiceForm', () => {
 
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const serviceSelect = screen.getByLabelText(/select a service/i);
     await user.selectOptions(serviceSelect, ['Outpatient']);
@@ -243,9 +207,7 @@ describe('AppointmentServiceForm', () => {
 
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const serviceSelect = screen.getByLabelText(/select a service/i);
     await user.selectOptions(serviceSelect, ['Outpatient']);
@@ -265,9 +227,7 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const submitButton = screen.getByRole('button', { name: /save and close/i });
     await user.click(submitButton);
@@ -285,9 +245,7 @@ describe('AppointmentServiceForm', () => {
 
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const serviceSelect = screen.getByLabelText(/select a service/i);
     await user.selectOptions(serviceSelect, ['Outpatient']);
@@ -305,11 +263,7 @@ describe('AppointmentServiceForm', () => {
     const user = userEvent.setup();
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
-
-    const weeklyToggle = screen.getByLabelText(/enable weekly availability/i);
+    const weeklyToggle = await screen.findByLabelText(/enable weekly availability/i);
     await user.click(weeklyToggle);
 
     const mondayCheckbox = screen.getByLabelText(/monday/i);
@@ -340,9 +294,7 @@ describe('AppointmentServiceForm', () => {
 
     renderWithSwr(<AppointmentServiceForm {...defaultProps} />);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/enable weekly availability/i)).toBeInTheDocument();
-    });
+    await screen.findByLabelText(/enable weekly availability/i);
 
     const serviceSelect = screen.getByLabelText(/select a service/i);
     await user.selectOptions(serviceSelect, ['Outpatient']);

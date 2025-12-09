@@ -4,7 +4,14 @@ import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { ExtensionSlot, isDesktop, launchWorkspace, navigate, useLayoutType } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  isDesktop,
+  launchWorkspace,
+  launchWorkspace2,
+  navigate,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { spaHomePage } from '../constants';
 import { useAppointmentsStore } from '../store';
 import styles from './metrics-header.scss';
@@ -44,7 +51,7 @@ const MetricsHeader: React.FC = () => {
           renderIcon={Hospital}
           size={responsiveSize}
           onClick={() => {
-            launchWorkspace('service-availability-form-workspace', {});
+            launchWorkspace2('service-availability-form-workspace');
           }}>
           {t('configureServiceAvailability', 'Configure Service Availability')}
         </Button>

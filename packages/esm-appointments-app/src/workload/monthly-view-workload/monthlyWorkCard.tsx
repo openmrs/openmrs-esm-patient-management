@@ -40,7 +40,7 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({
           [styles.largeDesktop]: layout !== 'small-desktop',
         },
       )}>
-      <div style={{ opacity: isAvailable || isToday ? 1 : 0.3 }}>
+      <div className={!isAvailable && !isToday ? styles.unavailableContent : ''}>
         <b className={[styles.calendarDate, isToday && isAvailable ? styles.blue : ''].join(' ')}>{date.format('D')}</b>
         <div className={styles.currentData}>
           <div tabIndex={0} role="button" className={classNames(styles.tileContainer, {})}></div>
