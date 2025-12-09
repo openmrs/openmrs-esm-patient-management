@@ -1,10 +1,18 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
+import {
+  parseDate,
+  type CalendarDate,
+  toCalendar,
+  createCalendar,
+  toCalendarDate,
+  type Calendar,
+} from '@internationalized/date';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import { spaHomePage } from '../../constants';
-import { isSameMonth } from '../../helpers';
+import { isSameCalendarMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
@@ -12,18 +20,27 @@ import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
-  dateTime: Dayjs;
+  dateTime: CalendarDate;
   showAllServices?: boolean;
+  calendar: Calendar;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
+  dateTime,
+  calendar,
+  events,
+  showAllServices = false,
+}) => {
   const layout = useLayoutType();
   const { selectedDate } = useAppointmentsStore();
+  const date = toCalendar(parseDate(selectedDate.split('T')[0]), calendar);
 
   const currentData = useMemo(
     () =>
       events?.find(
-        (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),
+        (event) =>
+          toCalendar(parseDate(event.appointmentDate), createCalendar(getDefaultCalendar(getLocale()))).toString() ===
+          dateTime.toString(),
       ),
     [dateTime, events],
   );
@@ -45,14 +62,14 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   }, [currentData?.services, layout, showAllServices]);
 
   const navigateToAppointmentsByDate = (serviceUuid: string) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
+    navigate({ to: `${spaHomePage}/appointments/${dateTime.toString()}/${serviceUuid}` });
   };
 
   return (
     <div
       onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
-        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        styles[isSameCalendarMonth(dateTime, toCalendarDate(date)) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
           ? {}
           : {
@@ -60,7 +77,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               [styles.largeDesktop]: layout !== 'small-desktop',
             },
       )}>
-      {isSameMonth(dateTime, dayjs(selectedDate)) && (
+      {isSameCalendarMonth(dateTime, toCalendarDate(date)) && (
         <div>
           <span className={classNames(styles.totals)}>
             {currentData?.services ? (
@@ -71,7 +88,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
             ) : (
               <div />
             )}
-            <b className={styles.calendarDate}>{dateTime.format('D')}</b>
+            <b className={styles.calendarDate}>{dateTime.day}</b>
           </span>
           {currentData?.services && (
             <div className={styles.currentData}>
@@ -94,6 +111,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
                   events={events}
                   dateTime={dateTime}
+                  calendar={calendar}
                 />
               ) : (
                 ''
