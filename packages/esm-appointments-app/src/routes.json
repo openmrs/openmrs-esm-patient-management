@@ -145,17 +145,14 @@
     {
       "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",
-      "window": "appointments-window"
+      "title": "createNewAppointment",
+      "type": "form"
     },
     {
-      "name": "appointments-patient-search-workspace",
-      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
-      "window": "appointments-window"
-    },
-    {
-      "name": "appointments-patient-search-start-visit-workspace",
-      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
-      "window": "appointments-window"
+      "name": "service-availability-form-workspace",
+      "component": "serviceAvailabilityFormWorkspace",
+      "title": "configureServiceAvailability",
+      "type": "form"
     }
   ]
 }

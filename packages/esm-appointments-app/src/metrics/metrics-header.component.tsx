@@ -31,12 +31,27 @@ const MetricsHeader: React.FC = () => {
           {t('appointmentsCalendar', 'Appointments calendar')}
         </Button>
         <Button
-          kind="primary"
-          renderIcon={(props) => <Hospital size={32} {...props} />}
+          kind="tertiary"
+          renderIcon={Hospital}
           size={responsiveSize}
-          onClick={() => launchCreateAppointmentForm(t)}>
-          {t('createNewAppointment', 'Create new appointment')}
+          onClick={() => {
+            launchWorkspace('service-availability-form-workspace', {});
+          }}>
+          {t('configureServiceAvailability', 'Configure Service Availability')}
         </Button>
+        <ExtensionSlot
+          name="patient-search-button-slot"
+          state={{
+            selectPatientAction: launchCreateAppointmentForm,
+            buttonText: t('createNewAppointment', 'Create new appointment'),
+            overlayHeader: t('createNewAppointment', 'Create new appointment'),
+            buttonProps: {
+              kind: 'primary',
+              renderIcon: (props) => <Hospital size={32} {...props} />,
+              size: responsiveSize,
+            },
+          }}
+        />
       </div>
     </div>
   );

@@ -9,10 +9,17 @@ interface MonthlyWorkloadComponentProps {
   date: Dayjs;
   count: number;
   isActive: boolean;
+  isAvailable?: boolean;
   selectedDate?: Dayjs;
 }
 
-const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, count, isActive, selectedDate }) => {
+const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({
+  date,
+  count,
+  isActive,
+  isAvailable = true,
+  selectedDate,
+}) => {
   const layout = useLayoutType();
   const isToday = date.isSame(dayjs(), 'day');
 
@@ -25,14 +32,16 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, co
           [styles['monthly-cell-current']]: isSameMonth(date, dayjs(selectedDate)),
           [styles['monthly-cell-current']]: isSameMonth(date, selectedDate),
           [styles['monthly-cell-active']]: isActive,
+          [styles['monthly-cell-today']]: isToday,
+          [styles['monthly-cell-unavailable']]: !isAvailable,
         },
         {
           [styles.smallDesktop]: layout === 'small-desktop',
           [styles.largeDesktop]: layout !== 'small-desktop',
         },
       )}>
-      <div>
-        <b className={[styles.calendarDate, isToday ? styles.blue : ''].join(' ')}>{date.format('D')}</b>
+      <div style={{ opacity: isAvailable || isToday ? 1 : 0.3 }}>
+        <b className={[styles.calendarDate, isToday && isAvailable ? styles.blue : ''].join(' ')}>{date.format('D')}</b>
         <div className={styles.currentData}>
           <div tabIndex={0} role="button" className={classNames(styles.tileContainer, {})}></div>
           <div className={styles.serviceArea}>
