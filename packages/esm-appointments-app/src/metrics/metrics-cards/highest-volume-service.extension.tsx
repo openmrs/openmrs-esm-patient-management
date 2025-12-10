@@ -19,7 +19,7 @@ export default function HighestVolumeServiceExtension() {
   return (
     <MetricsCard
       headerLabel={t('highestServiceVolume', 'Highest volume service: {{time}}', { time: formattedStartDate })}
-      label={highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')}
+      label={highestServiceLoad ? t(highestServiceLoad.serviceName) : t('serviceName', 'Service name')}
       value={highestServiceLoad?.count ?? '--'}
     />
   );

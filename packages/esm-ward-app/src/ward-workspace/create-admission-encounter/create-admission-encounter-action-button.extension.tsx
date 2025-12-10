@@ -12,7 +12,7 @@ function CreateAdmissionRequestActionButton() {
       workspaceToLaunch={{
         workspaceName: 'ward-app-patient-search-workspace',
         workspaceProps: {
-          workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
+          workspaceTitle: t('addPatientToWard', 'Add patient to ward'),
           onPatientSelected(
             patientUuid: string,
             patient: fhir.Patient,

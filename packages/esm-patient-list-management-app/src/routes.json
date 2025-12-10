@@ -43,12 +43,23 @@
       "component": "deletePatientListModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "patient-list-form-workspace",
       "component": "patientListFormWorkspace",
-      "title": "patientListFormHeader",
-      "type": "patient-lists"
+      "window": "patient-list-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-list-form-window",
+      "group": "patient-list-form-workspace-group"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "patient-list-form-workspace-group",
+      "overlay": false
     }
   ]
 }
