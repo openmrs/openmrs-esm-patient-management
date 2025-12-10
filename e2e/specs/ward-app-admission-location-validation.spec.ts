@@ -5,7 +5,7 @@ import {
   deletePatient,
   endVisit,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
 } from '../commands';
@@ -34,7 +34,7 @@ test.describe('Ward Admission Location Validation', () => {
     // Create patient with valid visit at ward location
     wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
     visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-    await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+    await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
 
     // Create patient with visit at a different location for invalid location test
     invalidLocationPatient = await generateRandomPatient(api, process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID);
@@ -43,7 +43,7 @@ test.describe('Ward Admission Location Validation', () => {
       invalidLocationPatient.uuid,
       process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
     );
-    await generateWardAdmission(api, provider.uuid, invalidLocationPatient.uuid);
+    await generateWardAdmissionRequest(api, provider.uuid, invalidLocationPatient.uuid);
 
     // Create a bed at the invalid location for testing
     invalidBed = await generateRandomBed(api, bedtype);
