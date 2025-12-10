@@ -25,6 +25,7 @@ const patientLists: Array<PatientList> = [
       "Children's Obstructive Lung Disease, Bronchiectasis and Antibiotic Tolerance Study (investigates novel antibiotic treatment for persistent childhood lung infections)",
     type: 'My List',
     size: 200,
+    location: mockSession.data.sessionLocation,
   },
   {
     id: 'f1b2ca00-6742-490d-9062-5025644c7632',
@@ -33,6 +34,7 @@ const patientLists: Array<PatientList> = [
       'Genomic Evaluation of Neonatal Early Sepsis in Infants - Stratified for Risk Factors (examines genetic factors influencing sepsis risk in newborns).',
     type: 'My List',
     size: 300,
+    location: { uuid: 'loc-2', display: 'Location 2' },
   },
   {
     id: '9c5e8677-6747-4315-84c7-a20f30d795e2',
@@ -41,6 +43,7 @@ const patientLists: Array<PatientList> = [
       'Vascular Imaging and Genomics of Onset and Recovery in Stroke (analyzes cardiovascular and genetic markers predictive of stroke outcomes)',
     type: 'My List',
     size: 500,
+    location: mockSession.data.sessionLocation,
   },
   {
     id: 'be10d553-b183-4647-9be6-160d1246de8a',
@@ -49,6 +52,7 @@ const patientLists: Array<PatientList> = [
       'Equitable Quality in Cancer Treatment for Underserved Young Adults (assesses healthcare disparities in cancer treatment for young adults from disadvantaged backgrounds)',
     type: 'My List',
     size: 100,
+    location: null,
   },
   {
     id: '72a84c22-2425-4501-95b7-820b793602f3',
@@ -57,6 +61,7 @@ const patientLists: Array<PatientList> = [
       'Mental Illness and Neuroimaging Study for Personalized Assessment and Care Evaluation (develops personalized treatment plans for mental illness based on brain imaging and individual factors)',
     type: 'My List',
     size: 250,
+    location: { uuid: 'loc-2', display: 'Location 2' },
   },
   {
     id: '06ca3df6-92d6-4401-8f06-4f094b004425',
@@ -65,6 +70,7 @@ const patientLists: Array<PatientList> = [
       'Mediterranean Diet, Exercise, and Nutrition for Diabetes (evaluates the combined effects of dietary and lifestyle changes on diabetes management).',
     type: 'My List',
     size: 150,
+    location: { uuid: 'loc-3', display: 'Location 3' },
   },
 ];
 
@@ -185,5 +191,75 @@ describe('ListsTable', () => {
 
     await user.click(starListButton);
     await screen.findByRole('button', { name: /^unstar list$/i });
+  });
+
+  it('filters patient lists by location', async () => {
+    const user = userEvent.setup();
+    render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
+
+    const locationFilter = screen.getByRole('combobox', { name: /filter by location/i });
+
+    // Initial state: All locations
+    expect(locationFilter).toHaveTextContent('All Locations');
+    expect(screen.getByText('COBALT Cohort')).toBeInTheDocument();
+    expect(screen.getByText('GENESIS Cohort')).toBeInTheDocument();
+    expect(screen.getByText('VIGOR Cohort')).toBeInTheDocument();
+    expect(screen.getByText('EQUITY Cohort')).toBeInTheDocument();
+    expect(screen.getByText('MINDSCAPE Cohort')).toBeInTheDocument();
+    expect(screen.getByText('MEND Cohort')).toBeInTheDocument();
+
+    await user.click(locationFilter);
+    await user.click(screen.getByRole('option', { name: mockSession.data.sessionLocation.display }));
+
+    expect(locationFilter).toHaveTextContent('Inpatient Ward');
+    expect(screen.getByText('COBALT Cohort')).toBeInTheDocument();
+    expect(screen.getByText('VIGOR Cohort')).toBeInTheDocument();
+    expect(screen.queryByText('GENESIS Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('EQUITY Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('MINDSCAPE Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('MEND Cohort')).not.toBeInTheDocument();
+
+    await user.click(locationFilter);
+    await user.click(screen.getByRole('option', { name: 'Location 2' }));
+
+    expect(locationFilter).toHaveTextContent('Location 2');
+    expect(screen.getByText('GENESIS Cohort')).toBeInTheDocument();
+    expect(screen.getByText('MINDSCAPE Cohort')).toBeInTheDocument();
+    expect(screen.queryByText('COBALT Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('VIGOR Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('EQUITY Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('MEND Cohort')).not.toBeInTheDocument();
+
+    // Filter back to All Locations
+    await user.click(locationFilter);
+    await user.click(screen.getByRole('option', { name: 'All Locations' }));
+
+    expect(locationFilter).toHaveTextContent('All Locations');
+    expect(screen.getByText('COBALT Cohort')).toBeInTheDocument();
+    expect(screen.getByText('GENESIS Cohort')).toBeInTheDocument();
+    expect(screen.getByText('VIGOR Cohort')).toBeInTheDocument();
+    expect(screen.getByText('EQUITY Cohort')).toBeInTheDocument();
+    expect(screen.getByText('MINDSCAPE Cohort')).toBeInTheDocument();
+    expect(screen.getByText('MEND Cohort')).toBeInTheDocument();
+  });
+
+  it('defaults to the current session location if configured', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      patientListsToShow: 10,
+      defaultToCurrentLocation: true,
+    });
+
+    render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
+
+    const locationFilter = screen.getByRole('combobox', { name: /filter by location/i });
+    expect(locationFilter).toHaveTextContent('Inpatient Ward');
+
+    expect(screen.getByText('COBALT Cohort')).toBeInTheDocument();
+    expect(screen.getByText('VIGOR Cohort')).toBeInTheDocument();
+    expect(screen.queryByText('GENESIS Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('EQUITY Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('MINDSCAPE Cohort')).not.toBeInTheDocument();
+    expect(screen.queryByText('MEND Cohort')).not.toBeInTheDocument();
   });
 });

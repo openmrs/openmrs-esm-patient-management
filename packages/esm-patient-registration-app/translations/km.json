@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "លុប",
   "demographicsSection": "ព័ត៌មានផ្ទាល់ខ្លួនអ្នកជំងឺ",
   "discard": "បោះបង់",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "ស្គាល់ថ្ងៃខែឆ្នាំកំណើត?",
   "editIdentifierTooltip": "កែសម្រួល",
   "editPatientDetails": "កែសម្រួលព័ត៌មានលម្អិតអ្នកជំងឺ",

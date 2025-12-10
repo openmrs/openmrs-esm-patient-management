@@ -1,25 +1,29 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { useAppContext } from '@openmrs/esm-framework';
+import { useAppContext, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { mockWardViewContext } from '../../../mock';
-import { type AdmissionRequestsWorkspaceContextProps } from './admission-requests-context';
 import { type WardViewContext } from '../../types';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import DefaultWardPendingPatients from '../../ward-view/default-ward/default-ward-pending-patients.component';
-import AdmissionRequestsWorkspace from './admission-requests.workspace';
+import AdmissionRequestsWorkspace, { type AdmissionRequestsWorkspaceProps } from './admission-requests.workspace';
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
 jest.mock('../../hooks/useEmrConfiguration', () => jest.fn());
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
-const workspaceProps: AdmissionRequestsWorkspaceContextProps = {
+const workspaceProps: Workspace2DefinitionProps<AdmissionRequestsWorkspaceProps> = {
   closeWorkspace: jest.fn(),
-  promptBeforeClosing: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  setTitle: jest.fn(),
-  wardPendingPatients: <DefaultWardPendingPatients />,
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {
+    wardPendingPatients: <DefaultWardPendingPatients />,
+  },
+  windowProps: undefined,
+  groupProps: undefined,
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 describe('Admission Requests Workspace', () => {

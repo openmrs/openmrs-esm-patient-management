@@ -1,4 +1,4 @@
-import { useAppContext, useVisit } from '@openmrs/esm-framework';
+import { closeWorkspaceGroup2, useAppContext, useVisit } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -20,6 +20,11 @@ import useWardLocation from '../../hooks/useWardLocation';
 import { type WardViewContext } from '../../types';
 import { useAdmitPatient } from '../../ward.resource';
 import CreateAdmissionEncounterWorkspace from './create-admission-encounter.workspace';
+
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  closeWorkspaceGroup2: jest.fn(),
+}));
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
@@ -231,11 +236,16 @@ describe('CreateAdmissionEncounterWorkspace', () => {
 function renderCreateAdmissionEncounterWorkspace(patentUuid: string) {
   renderWithSwr(
     <CreateAdmissionEncounterWorkspace
-      patientUuid={patentUuid}
       closeWorkspace={jest.fn()}
-      promptBeforeClosing={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      setTitle={jest.fn()}
+      launchChildWorkspace={jest.fn()}
+      workspaceProps={{
+        selectedPatientUuid: patentUuid,
+      }}
+      windowProps={{
+        startVisitWorkspaceName: '',
+      }}
+      groupProps={undefined}
+      workspaceName={''}
     />,
   );
 }

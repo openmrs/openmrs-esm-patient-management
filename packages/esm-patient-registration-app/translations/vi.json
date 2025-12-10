@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "Xóa",
   "demographicsSection": "Thông tin cơ bản",
   "discard": "Hủy bỏ",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "Date of Birth Known?",
   "editIdentifierTooltip": "Chỉnh sửa",
   "editPatientDetails": "Chỉnh sửa thông tin bệnh nhân",

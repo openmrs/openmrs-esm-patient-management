@@ -40,6 +40,7 @@
   "deleteRelationshipTooltipText": "წაშლა",
   "demographicsSection": "საბაზისო ინფორმაცია",
   "discard": "მოცილება",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "dobToggleLabelText": "დაბადების თარიღი ცნობილია?",
   "editIdentifierTooltip": "ჩასწორება",
   "editPatientDetails": "პაციენტის დეტალების ჩასწორება",

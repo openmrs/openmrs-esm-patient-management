@@ -6,7 +6,8 @@
 .queueEntryStatusContainer {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-02;
+  column-gap: layout.$spacing-02;
+  margin: 0 layout.$spacing-02;
 }
 
 .navDivider {

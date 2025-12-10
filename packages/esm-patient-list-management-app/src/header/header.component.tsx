@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Add } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { PageHeader, PageHeaderContent, PatientListsPictogram, launchWorkspace } from '@openmrs/esm-framework';
+import { PageHeader, PageHeaderContent, PatientListsPictogram, launchWorkspace2 } from '@openmrs/esm-framework';
 import styles from './header.scss';
 
 interface HeaderProps {
@@ -12,8 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onCreateSuccess }) => {
   const { t } = useTranslation();
   const openCreateListWorkspace = () =>
-    launchWorkspace('patient-list-form-workspace', {
-      workspaceTitle: t('newPatientListHeader', 'New patient list'),
+    launchWorkspace2('patient-list-form-workspace', {
       onSuccess: onCreateSuccess,
     });
 
