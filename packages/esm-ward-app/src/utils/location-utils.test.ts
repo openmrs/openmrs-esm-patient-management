@@ -72,31 +72,14 @@ describe('Location Utilities', () => {
       expect(isLocationDescendantOf(clinicRoom, wardA)).toBe(false);
     });
 
-    it('should return false when admission location is null', () => {
-      const visitLocation = createMockLocation('loc-1', 'Main Hospital', 'Main Hospital');
-      expect(isLocationDescendantOf(null, visitLocation)).toBe(false);
-    });
+    it('should return false when either location is null or undefined', () => {
+      const location = createMockLocation('loc-1', 'Main Hospital', 'Main Hospital');
 
-    it('should return false when visit location is null', () => {
-      const admissionLocation = createMockLocation('loc-1', 'Ward A', 'Ward A');
-      expect(isLocationDescendantOf(admissionLocation, null)).toBe(false);
-    });
-
-    it('should return false when both locations are null', () => {
+      expect(isLocationDescendantOf(null, location)).toBe(false);
+      expect(isLocationDescendantOf(location, null)).toBe(false);
       expect(isLocationDescendantOf(null, null)).toBe(false);
-    });
-
-    it('should return false when admission location is undefined', () => {
-      const visitLocation = createMockLocation('loc-1', 'Main Hospital', 'Main Hospital');
-      expect(isLocationDescendantOf(undefined, visitLocation)).toBe(false);
-    });
-
-    it('should return false when visit location is undefined', () => {
-      const admissionLocation = createMockLocation('loc-1', 'Ward A', 'Ward A');
-      expect(isLocationDescendantOf(admissionLocation, undefined)).toBe(false);
-    });
-
-    it('should return false when both locations are undefined', () => {
+      expect(isLocationDescendantOf(undefined, location)).toBe(false);
+      expect(isLocationDescendantOf(location, undefined)).toBe(false);
       expect(isLocationDescendantOf(undefined, undefined)).toBe(false);
     });
 
@@ -165,10 +148,9 @@ describe('Location Utilities', () => {
       const path = getLocationHierarchyPath(location);
 
       expect(path).toEqual(['Main Hospital']);
-      expect(path.length).toBe(1);
     });
 
-    it('should return complete path for nested location hierarchy', () => {
+    it('should return complete path for nested location hierarchy ordered from child to root', () => {
       const mainHospital = createMockLocation('loc-1', 'Main Hospital', 'Main Hospital');
       const wardA = createMockLocation('loc-2', 'Ward A', 'Ward A', mainHospital);
       const room101 = createMockLocation('loc-3', 'Room 101', 'Room 101', wardA);
@@ -176,33 +158,11 @@ describe('Location Utilities', () => {
       const path = getLocationHierarchyPath(room101);
 
       expect(path).toEqual(['Room 101', 'Ward A', 'Main Hospital']);
-      expect(path.length).toBe(3);
     });
 
-    it('should return path ordered from child to root', () => {
-      const root = createMockLocation('loc-1', 'Root', 'Root');
-      const parent = createMockLocation('loc-2', 'Parent', 'Parent', root);
-      const child = createMockLocation('loc-3', 'Child', 'Child', parent);
-
-      const path = getLocationHierarchyPath(child);
-
-      expect(path[0]).toBe('Child');
-      expect(path[1]).toBe('Parent');
-      expect(path[2]).toBe('Root');
-    });
-
-    it('should return empty array when location is null', () => {
-      const path = getLocationHierarchyPath(null);
-
-      expect(path).toEqual([]);
-      expect(path.length).toBe(0);
-    });
-
-    it('should return empty array when location is undefined', () => {
-      const path = getLocationHierarchyPath(undefined);
-
-      expect(path).toEqual([]);
-      expect(path.length).toBe(0);
+    it('should return empty array when location is null or undefined', () => {
+      expect(getLocationHierarchyPath(null)).toEqual([]);
+      expect(getLocationHierarchyPath(undefined)).toEqual([]);
     });
 
     it('should use display name over name property', () => {
@@ -213,53 +173,36 @@ describe('Location Utilities', () => {
       expect(path).not.toContain('hospital');
     });
 
-    it('should fallback to name when display is empty string', () => {
-      const location = {
+    it('should fallback to name when display is empty or null', () => {
+      const locationEmptyDisplay = {
         uuid: 'loc-1',
         name: 'Hospital Name',
         display: '',
       } as Location;
-
-      const path = getLocationHierarchyPath(location);
-
-      expect(path).toContain('Hospital Name');
-      expect(path).toEqual(['Hospital Name']);
-    });
-
-    it('should fallback to name when display is not available', () => {
-      const location = {
-        uuid: 'loc-1',
+      const locationNullDisplay = {
+        uuid: 'loc-2',
         name: 'Hospital Name',
         display: null,
       } as Location;
 
-      const path = getLocationHierarchyPath(location);
-
-      expect(path).toContain('Hospital Name');
+      expect(getLocationHierarchyPath(locationEmptyDisplay)).toEqual(['Hospital Name']);
+      expect(getLocationHierarchyPath(locationNullDisplay)).toEqual(['Hospital Name']);
     });
 
-    it('should fallback to uuid when both display and name are empty', () => {
-      const location = {
+    it('should fallback to uuid when both display and name are empty or null', () => {
+      const locationEmpty = {
         uuid: 'loc-1',
         name: '',
         display: '',
       } as Location;
-
-      const path = getLocationHierarchyPath(location);
-
-      expect(path).toEqual(['loc-1']);
-    });
-
-    it('should fallback to uuid when both display and name are null', () => {
-      const location = {
+      const locationNull = {
         uuid: 'loc-123',
         name: null,
         display: null,
       } as Location;
 
-      const path = getLocationHierarchyPath(location);
-
-      expect(path).toEqual(['loc-123']);
+      expect(getLocationHierarchyPath(locationEmpty)).toEqual(['loc-1']);
+      expect(getLocationHierarchyPath(locationNull)).toEqual(['loc-123']);
     });
 
     it('should handle circular references without infinite loop', () => {
@@ -307,37 +250,12 @@ describe('Location Utilities', () => {
       expect(path[10]).toBe('Root');
     });
 
-    it('should handle location with parentLocation set to null', () => {
-      const location = {
-        uuid: 'loc-1',
-        name: 'Root Location',
-        display: 'Root Location',
-        parentLocation: null,
-      } as Location;
-
-      const path = getLocationHierarchyPath(location);
-
-      expect(path).toEqual(['Root Location']);
-    });
-
-    it('should handle location with parentLocation set to undefined', () => {
-      const location = {
-        uuid: 'loc-1',
-        name: 'Root Location',
-        display: 'Root Location',
-        parentLocation: undefined,
-      } as Location;
-
-      const path = getLocationHierarchyPath(location);
-
-      expect(path).toEqual(['Root Location']);
-    });
-
     it('should handle mixed hierarchy with some locations having display and others only name', () => {
       const root = {
         uuid: 'loc-1',
         name: 'Root',
         display: '',
+        parentLocation: null,
       } as Location;
       const parent = createMockLocation('loc-2', 'parent-name', 'Parent Display', root);
       const child = {
