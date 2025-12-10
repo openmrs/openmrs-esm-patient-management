@@ -168,9 +168,7 @@ describe('Testing AdmitPatientForm', () => {
     renderAdmissionForm();
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
     await user.click(cancelButton);
-    expect(mockWorkspaceProps.closeWorkspace).toHaveBeenCalledWith({
-      ignoreChanges: true,
-    });
+    expect(mockWorkspaceProps.closeWorkspace).toHaveBeenCalled();
     screen.getByText('Admit');
     expect(screen.getByText('Select a bed')).toBeInTheDocument();
 

@@ -25,7 +25,6 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
   wardPatient,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
 }) => {
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
@@ -127,10 +126,6 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
       setLocationValidationError(null);
     }
   }, [selectedBedId, selectedBedLocation, visitLocation, isLoadingVisitLocation, isLoadingSelectedBedLocation, t]);
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = (values: FormValues) => {
     setShowErrorNotifications(false);
@@ -267,7 +262,7 @@ const AdmitPatientFormWorkspace: React.FC<WardPatientWorkspaceProps> = ({
           </div>
         </div>
         <ButtonSet className={styles.buttonSet}>
-          <Button size="xl" kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
+          <Button size="xl" kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button
