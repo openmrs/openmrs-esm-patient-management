@@ -673,8 +673,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                           invalidText={t('invalidNumber', 'Number is not valid')}
                           value={value}
                           onBlur={onBlur}
-                          onChange={(e) => {
-                            onChange(Number(e.target.value));
+                          onChange={(e, state) => {
+                            const value = state?.value ?? (e.target as HTMLInputElement).value;
+                            onChange(Number(value));
                           }}
                         />
                       )}
@@ -720,7 +721,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                             }}
                             selectionFeedback="top-after-reopen"
                             sortItems={(items) => {
-                              return items.sort((a, b) => a.order > b.order);
+                              return [...items].sort((a, b) => a.order - b.order);
                             }}
                           />
                         )}
@@ -898,7 +899,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
           </FormGroup>
         </Stack>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
+          <Button
+            className={styles.button}
+            onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
+            kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} type="submit">
@@ -934,7 +938,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               id="time-picker"
               pattern={time12HourFormatRegexPattern}
               invalid={!!errors?.startTime}
-              invalidText={errors?.startTime?.message}
+              invalidText={errors?.startTime?.message ? String(errors.startTime.message) : undefined}
               labelText={t('time', 'Time')}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 onChange(event.target.value);
@@ -972,12 +976,13 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               hideSteppers
               id="duration"
               invalid={!!errors?.duration}
-              invalidText={errors?.duration?.message}
+              invalidText={errors?.duration?.message ? String(errors.duration.message) : undefined}
               label={t('durationInMinutes', 'Duration (minutes)')}
               onBlur={onBlur}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                onChange(event.target.value === '' ? null : Number(event.target.value))
-              }
+              onChange={(event, state) => {
+                const value = state?.value ?? (event.target as HTMLInputElement).value;
+                onChange(value === '' ? null : Number(value));
+              }}
               ref={ref}
               value={value ?? ''}
             />

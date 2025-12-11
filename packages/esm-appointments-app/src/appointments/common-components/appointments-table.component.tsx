@@ -42,10 +42,10 @@ import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
+import { launchCreateAppointmentForm } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
-import { launchCreateAppointmentForm } from '../../helpers';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -102,7 +102,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   }));
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" row={5} />;
+    return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
 
   if (hasActiveFilters && !appointments?.length) {
@@ -197,6 +197,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBody>
                   {rows.map((row) => {
                     const matchingAppointment = appointments.find((appointment) => appointment.uuid === row.id);
+
+                    if (!matchingAppointment) {
+                      return null;
+                    }
+
                     const patientUuid = matchingAppointment.patient?.uuid;
                     const visitDate = dayjs(matchingAppointment.startDateTime);
                     const isFutureAppointment = visitDate.isAfter(dayjs());
@@ -221,7 +226,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                 <OverflowMenuItem
                                   className={styles.menuItem}
                                   itemText={t('editAppointment', 'Edit appointment')}
-                                  size={responsiveSize}
                                   onClick={() =>
                                     launchWorkspace2('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
