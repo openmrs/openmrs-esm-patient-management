@@ -28,7 +28,7 @@
   justify-content: space-between;
   align-items: center;
   padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
-  background-color: colors.$white-0;
+  background-color: colors.$gray-20;
 }
 
 .tabletHeading {
@@ -68,7 +68,8 @@
 
 .searchbar {
   input {
-    background-color: colors.$gray-10;
+    background-color: colors.$white-0;
+    border-bottom:none;
   }
 }
 
@@ -79,8 +80,23 @@
 
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+
+  justify-content: flex-start;
+
   align-items: center;
+  gap: layout.$spacing-03;
+  flex-wrap: nowrap;
+}
+
+.filterContainer {
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  :global(.cds--list-box__field) {
+    width: auto;
+    min-width: 150px;
+  }
 }
 
 .menuItem {
