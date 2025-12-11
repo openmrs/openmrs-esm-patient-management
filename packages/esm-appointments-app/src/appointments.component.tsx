@@ -28,7 +28,7 @@ const Appointments: React.FC = () => {
 
   return (
     <>
-      <AppointmentsHeader title={t('appointments', 'Appointments')} showServiceTypeFilter />
+      <AppointmentsHeader title={t('appointments', 'Appointments')} />
       <AppointmentMetrics appointmentServiceTypes={appointmentServiceTypes} />
       <AppointmentTabs appointmentServiceTypes={appointmentServiceTypes} />
     </>
