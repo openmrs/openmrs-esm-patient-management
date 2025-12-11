@@ -91,3 +91,20 @@
   flex-wrap: wrap;
   gap: layout.$spacing-05;
 }
+
+// Current visit location display section
+.currentLocationDisplay {
+  margin-bottom: layout.$spacing-05;
+
+  // Read-only text input with subtle background
+  :global(.cds--text-input) {
+    background-color: $ui-02;
+    cursor: not-allowed;
+  }
+}
+
+// Location info notification for transfer workspace
+.locationInfoNotification {
+  margin-top: layout.$spacing-03;
+  margin-bottom: layout.$spacing-05;
+}

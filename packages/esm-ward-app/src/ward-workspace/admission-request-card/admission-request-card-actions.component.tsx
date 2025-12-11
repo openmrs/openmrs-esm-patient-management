@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { closeWorkspaceGroup2, launchWorkspace2, useLayoutType, useWorkspace2Context } from '@openmrs/esm-framework';
+import { closeWorkspaceGroup2, launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
 import type { WardPatientCardType, WardPatientWorkspaceProps } from '../../types';
 import AdmitPatientButton from '../admit-patient-button.component';
 import styles from './admission-request-card.scss';
@@ -9,7 +9,6 @@ import styles from './admission-request-card.scss';
 const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
   const { t } = useTranslation();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
-  const { closeWorkspace } = useWorkspace2Context();
 
   const launchPatientTransferForm = () => {
     launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('transfer-elsewhere-workspace', {
@@ -36,8 +35,7 @@ const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
       <AdmitPatientButton
         wardPatient={wardPatient}
         dispositionType={wardPatient.inpatientRequest.dispositionType}
-        onAdmitPatientSuccess={async () => {
-          await closeWorkspace({ discardUnsavedChanges: true });
+        onAdmitPatientSuccess={() => {
           closeWorkspaceGroup2();
         }}
       />

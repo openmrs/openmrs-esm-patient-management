@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { useAppContext, useWorkspace2Context, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { useAppContext, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { mockWardViewContext } from '../../../mock';
 import { type WardViewContext } from '../../types';
@@ -9,7 +9,6 @@ import DefaultWardPendingPatients from '../../ward-view/default-ward/default-war
 import AdmissionRequestsWorkspace, { type AdmissionRequestsWorkspaceProps } from './admission-requests.workspace';
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
-const mockUseWorkspace2Context = jest.mocked(useWorkspace2Context);
 
 jest.mock('../../hooks/useEmrConfiguration', () => jest.fn());
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
@@ -47,16 +46,6 @@ describe('Admission Requests Workspace', () => {
         },
       },
       mutateEmrConfiguration: jest.fn(),
-    });
-    mockUseWorkspace2Context.mockReturnValue({
-      closeWorkspace: jest.fn(),
-      launchChildWorkspace: jest.fn(),
-      workspaceProps: undefined,
-      windowProps: undefined,
-      groupProps: undefined,
-      workspaceName: '',
-      windowName: '',
-      isRootWorkspace: false,
     });
   });
 
