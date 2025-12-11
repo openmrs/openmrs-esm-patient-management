@@ -675,7 +675,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                           onBlur={onBlur}
                           onChange={(e, state) => {
                             const value = state?.value ?? (e.target as HTMLInputElement).value;
-                            onChange(Number(value));
+                            onChange(value === '' ? null : Number(value));
                           }}
                         />
                       )}
