@@ -93,7 +93,7 @@ const UnscheduledAppointments: React.FC = () => {
                 <TableToolbarSearch
                   style={{ backgroundColor: '#f4f4f4' }}
                   tabIndex={0}
-                  onChange={(event) => setSearchString(event.target.value)}
+                  onChange={(_, value) => setSearchString(value ?? '')}
                 />
                 <Button
                   size="lg"

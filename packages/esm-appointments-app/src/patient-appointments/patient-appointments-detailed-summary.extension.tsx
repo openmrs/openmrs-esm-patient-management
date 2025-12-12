@@ -82,6 +82,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
           <div className={styles.contentSwitcherWrapper}>
             <ContentSwitcher
               size={isTablet ? 'md' : 'sm'}
+              selectedIndex={contentSwitcherValue}
               onChange={({ index }) => {
                 setContentSwitcherValue(index);
                 setSwitchedView(true);

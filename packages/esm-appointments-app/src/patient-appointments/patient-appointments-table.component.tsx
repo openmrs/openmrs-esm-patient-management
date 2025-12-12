@@ -46,7 +46,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
     }
   }, [switchedView, goTo, currentPage]);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
+  const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
       { key: 'date', header: t('date', 'Date') },
       { key: 'location', header: t('location', 'Location') },
@@ -87,9 +87,8 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
                       className={classNames(styles.productiveHeading01, styles.text02)}
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                   <TableHeader />
