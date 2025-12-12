@@ -10,10 +10,10 @@ import {
   parseDate,
   showSnackbar,
   CustomOverflowMenu,
-  launchWorkspace,
+  launchWorkspace2,
   showModal,
 } from '@openmrs/esm-framework';
-import { deletePatientList } from '../api/api-remote';
+import { deletePatientList } from '../api/patient-list.resource';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
 import styles from './list-details.scss';
@@ -95,12 +95,11 @@ const ListDetails = () => {
   );
 
   const handleEditPatientList = useCallback(() => {
-    launchWorkspace('patient-list-form-workspace', {
-      workspaceTitle: t('editPatientListHeader', 'Edit patient list'),
+    launchWorkspace2('patient-list-form-workspace', {
       patientListDetails: listDetails,
       onSuccess: mutateListDetails,
     });
-  }, [listDetails, mutateListDetails, t]);
+  }, [listDetails, mutateListDetails]);
 
   const handleDeletePatientList = useCallback(() => {
     const dispose = showModal('delete-patient-list-modal', {

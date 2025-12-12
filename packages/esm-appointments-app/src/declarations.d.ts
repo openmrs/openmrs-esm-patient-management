@@ -1,4 +1,3 @@
-declare module '@carbon/react';
 declare type SideNavProps = {};
 
 declare module '*.scss' {

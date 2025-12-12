@@ -2,7 +2,12 @@ import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
-import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
+import {
+  cohortUrl,
+  getAllPatientLists,
+  getPatientListIdsForPatient,
+  getPatientListMembers,
+} from './patient-list.resource';
 import { type PatientListManagementConfig } from '../config-schema';
 import {
   type CohortResponse,
@@ -52,7 +57,7 @@ export function useActiveVisitsPatientList() {
 }
 
 export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
-  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
+  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType,location:(uuid,display))';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
@@ -103,6 +108,7 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     description: cohort.description,
     type: cohort.cohortType?.display,
     size: cohort.size,
+    location: cohort.location,
   }));
 
   const { user } = useSession();

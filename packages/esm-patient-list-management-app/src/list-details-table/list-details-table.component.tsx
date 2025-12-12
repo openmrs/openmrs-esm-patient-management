@@ -40,7 +40,7 @@ import {
   useDebounce,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { addPatientToList, removePatientFromList } from '../api/api-remote';
+import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
 import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
 import styles from './list-details-table.scss';
 
