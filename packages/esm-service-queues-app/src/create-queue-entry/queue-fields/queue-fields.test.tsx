@@ -23,6 +23,16 @@ jest.mock('../hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(() => ({ queueLocations: [{ id: '1', name: 'Location 1' }] })),
 }));
 
+jest.mock('../../hooks/useProviders', () => ({
+  useProviders: jest.fn(() => ({
+    providers: [
+      { uuid: 'provider-1', display: 'Dr. Smith', person: { display: 'Dr. Smith' } },
+      { uuid: 'provider-2', display: 'Dr. Jones', person: { display: 'Dr. Jones' } },
+    ],
+    isLoading: false,
+  })),
+}));
+
 jest.mock('../../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({
@@ -84,6 +94,7 @@ describe('QueueFields', () => {
       0,
       '1',
       null,
+      undefined,
     );
   });
 });

@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, showModal, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { canProviderWorkOnQueueEntry } from '../../helpers/provider-access';
 import styles from './queue-table-action-cell.scss';
 
 type ActionProps = {
@@ -22,6 +23,8 @@ function useActionPropsByKey() {
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const session = useSession();
+  const currentProviderUuid = session?.currentProvider?.uuid;
 
   // Map action strings to component props
   const actionPropsByKey: Record<QueueEntryAction, ActionProps> = useMemo(() => {
@@ -47,7 +50,10 @@ function useActionPropsByKey() {
           }
         },
         showIf: (queueEntry: QueueEntry) => {
-          return queueEntry.status.uuid === defaultStatusConceptUuid;
+          return (
+            queueEntry.status.uuid === defaultStatusConceptUuid &&
+            canProviderWorkOnQueueEntry(queueEntry, currentProviderUuid)
+          );
         },
       },
       move: {
@@ -72,6 +78,9 @@ function useActionPropsByKey() {
             queueEntry,
             size: 'sm',
           });
+        },
+        showIf: (queueEntry: QueueEntry) => {
+          return canProviderWorkOnQueueEntry(queueEntry, currentProviderUuid);
         },
       },
       edit: {
@@ -131,7 +140,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries, currentProviderUuid]);
   return actionPropsByKey;
 }
 

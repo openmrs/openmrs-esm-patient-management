@@ -42,8 +42,8 @@ interface UpdateQueueEntryParams {
   sortWeight?: number;
   startedAt?: string;
   endedAt?: string;
-  loationWaitingFor?: Location;
-  providerWaitingFor?: Location;
+  locationWaitingFor?: Location;
+  providerWaitingFor?: { uuid: string };
 }
 
 export function updateQueueEntry(

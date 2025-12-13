@@ -10,3 +10,7 @@
   margin-bottom: layout.$spacing-02;
   @include type.type-style('body-01');
 }
+
+.tagWithMarginBotton {
+  margin-bottom: 1rem;
+}
