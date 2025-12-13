@@ -68,25 +68,26 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   );
 
   useEffect(() => {
-    if (!isLoading && !error && !selectedQueueLocationUuid) {
-      if (queueLocations.length === 1) {
-        handleQueueLocationChange({ selectedItem: queueLocations[0] });
-      }
-      if (
-        queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid) &&
-        selectedQueueLocationUuid
-      ) {
-        handleQueueLocationChange({
-          selectedItem: {
-            id: userSession?.sessionLocation?.uuid,
-            name: userSession?.sessionLocation?.display,
-          },
-        });
+    if (!isLoading && !error) {
+      const sessionLocationId = userSession?.sessionLocation?.uuid;
+      const matchingLocation = queueLocations.find((l) => l.id === sessionLocationId);
+      const isSelectionValid =
+        selectedQueueLocationUuid && queueLocations.some((l) => l.id === selectedQueueLocationUuid);
+
+      if (matchingLocation) {
+        if (selectedQueueLocationUuid !== matchingLocation.id) {
+          handleQueueLocationChange({ selectedItem: matchingLocation });
+        }
+      } else if (queueLocations.length === 1) {
+        if (selectedQueueLocationUuid !== queueLocations[0].id) {
+          handleQueueLocationChange({ selectedItem: queueLocations[0] });
+        }
+      } else if (!isSelectionValid && selectedQueueLocationUuid) {
+        handleQueueLocationChange({ selectedItem: { id: 'all' } });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    selectedQueueLocationName,
-    selectedQueueLocationUuid,
     error,
     handleQueueLocationChange,
     isLoading,

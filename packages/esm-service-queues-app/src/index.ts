@@ -150,6 +150,14 @@ export const createQueueEntryWorkspace = getAsyncLifecycle(
   },
 );
 
+export const addPatientToQueueButton = getAsyncLifecycle(
+  () => import('./patient-search-button/add-to-queue-button.extension'),
+  {
+    featureName: 'add-patient-to-queue-button',
+    moduleName,
+  },
+);
+
 export const patientBannerQueueEntryStatus = getAsyncLifecycle(
   () => import('./patient-banner-extension/patient-banner-queue-entry-status.extension'),
   {
