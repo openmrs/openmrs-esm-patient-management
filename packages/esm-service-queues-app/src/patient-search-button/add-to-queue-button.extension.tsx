@@ -6,6 +6,7 @@ import { useServiceQueuesStore } from '../store/store';
 import { postQueueEntry } from '../create-queue-entry/queue-fields/queue-fields.resource';
 import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../hooks/useQueues';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../constants';
 
 interface AddPatientToQueueButtonProps {
@@ -16,13 +17,28 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
   const { t } = useTranslation();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const config = useConfig<ConfigObject>();
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit, mutate: mutateVisit } = useVisit(patientUuid);
   const { queues } = useQueues(selectedQueueLocationUuid);
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const selectedQueue = useMemo(
     () => queues.find((q) => q.service.uuid === selectedServiceUuid),
     [queues, selectedServiceUuid],
   );
+
+  React.useEffect(() => {
+    let intervalId;
+    if (!activeVisit) {
+      intervalId = setInterval(() => {
+        mutateVisit();
+      }, 1000);
+    }
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeVisit, mutateVisit]);
 
   const handleAddToQueue = useCallback(async () => {
     if (!selectedServiceUuid) {
@@ -78,6 +94,8 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
         visitQueueNumberAttributeUuid,
       );
 
+      mutateQueueEntries();
+
       showSnackbar({
         title: t('patientAddedToQueue', 'Patient added to queue'),
         kind: 'success',
@@ -98,7 +116,20 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
         isLowContrast: !isDuplicate,
       });
     }
-  }, [patientUuid, selectedServiceUuid, selectedQueueLocationUuid, config, t, activeVisit, selectedQueue]);
+  }, [
+    patientUuid,
+    selectedServiceUuid,
+    selectedQueueLocationUuid,
+    config,
+    t,
+    activeVisit,
+    selectedQueue,
+    mutateQueueEntries,
+  ]);
+
+  if (!activeVisit) {
+    return null;
+  }
 
   return (
     <Button kind="primary" onClick={handleAddToQueue} style={{ marginRight: '0.5rem' }}>
