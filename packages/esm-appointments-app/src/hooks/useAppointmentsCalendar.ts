@@ -139,7 +139,7 @@ async function fetchExistingService(uuid: string): Promise<any> {
 function buildUpdatePayload(uuid: string, payload: any, existingService: any): any {
   const mergedPayload: any = {
     uuid,
-    name: payload.name,
+    name: payload.name ?? existingService?.name ?? '',
     startTime: payload.startTime || existingService?.startTime || '',
     endTime: payload.endTime || existingService?.endTime || '',
     durationMins: payload.durationMins ?? existingService?.durationMins ?? null,
