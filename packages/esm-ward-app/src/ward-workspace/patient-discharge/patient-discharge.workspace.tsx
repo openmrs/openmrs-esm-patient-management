@@ -2,11 +2,12 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, ButtonSet, Form, InlineNotification, TextArea } from '@carbon/react';
+import { Button, ButtonSet, Form, InlineNotification, InlineLoading, TextArea } from '@carbon/react';
 import {
   closeWorkspaceGroup2,
   ExtensionSlot,
   ResponsiveWrapper,
+  showModal,
   showSnackbar,
   useAppContext,
   Workspace2,
@@ -46,7 +47,7 @@ export default function PatientDischargeWorkspace({
     defaultValues: { dischargeNote: '' },
   });
 
-  const onSubmit = useCallback(
+  const performDischarge = useCallback(
     (data: DischargeData) => {
       setIsSubmitting(true);
 
@@ -100,6 +101,16 @@ export default function PatientDischargeWorkspace({
         });
     },
     [createEncounter, wardPatient, emrConfiguration, t, closeWorkspace, wardPatientGroupDetails],
+  );
+
+  const onSubmit = useCallback(
+    (data: DischargeData) => {
+      const dispose = showModal('PatientDischargeConfirmationModal', {
+        closeModal: () => dispose(),
+        onConfirm: () => performDischarge(data),
+      });
+    },
+    [performDischarge],
   );
 
   const onError = (errors) => console.error(errors);
@@ -159,7 +170,11 @@ export default function PatientDischargeWorkspace({
               type="submit"
               size="xl"
               disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration}>
-              {t('Discharge', 'Discharge')}
+              {isSubmitting ? (
+                <InlineLoading className={styles.spinner} description={t('discharging', 'Discharging') + '...'} />
+              ) : (
+                <span>{t('Discharge', 'Discharge')}</span>
+              )}
             </Button>
           </ButtonSet>
         </Form>

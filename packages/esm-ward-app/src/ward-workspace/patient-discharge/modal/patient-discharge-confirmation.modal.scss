@@ -1,0 +1,19 @@
+@use '@carbon/layout';
+
+.spinner {
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
+}
+
+.modalBody {
+  padding-bottom: layout.$spacing-05;
+}
+
+.sectionTitle {
+  margin-bottom: layout.$spacing-04;
+}

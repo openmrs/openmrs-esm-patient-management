@@ -1,12 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { closeWorkspaceGroup2, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { closeWorkspaceGroup2, showModal, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import PatientDischargeWorkspace from './patient-discharge.workspace';
 import { mockInpatientRequestAlice, mockPatientAlice, mockVisitAlice } from '__mocks__';
 import type { WardPatient, WardPatientWorkspaceDefinition } from '../../types';
 
+const mockShowModal = jest.mocked(showModal);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseCreateEncounter = jest.mocked(useCreateEncounter);
 const mockRemovePatientFromBed = jest.mocked(removePatientFromBed);
@@ -73,6 +74,14 @@ describe('PatientDischargeWorkspace', () => {
     mockUseAppContext.mockReturnValue({
       wardPatientGroupDetails: { mutate: mockWardPatientMutate },
     } as any);
+
+    // Mock showModal to automatically call onConfirm
+    mockShowModal.mockImplementation((modalName, props: any) => {
+      if (props.onConfirm) {
+        props.onConfirm();
+      }
+      return jest.fn();
+    });
   });
 
   it('renders discharge workspace with note field and action buttons', () => {
@@ -93,7 +102,7 @@ describe('PatientDischargeWorkspace', () => {
     expect(testProps.closeWorkspace).toHaveBeenCalled();
   });
 
-  it('submits discharge, removes patient from bed, and shows success snackbar', async () => {
+  it('submits discharge, shows confirm modal, removes patient from bed, and shows success snackbar', async () => {
     const user = userEvent.setup();
 
     mockCreateEncounter.mockResolvedValueOnce({ ok: true } as any);
@@ -107,7 +116,13 @@ describe('PatientDischargeWorkspace', () => {
 
     await user.click(screen.getByRole('button', { name: /discharge/i }));
 
-    // Wait for the first async action to complete
+    // Verify modal was shown
+    expect(mockShowModal).toHaveBeenCalledWith('PatientDischargeConfirmationModal', {
+      closeModal: expect.any(Function),
+      onConfirm: expect.any(Function),
+    });
+
+    // Wait for the discharge process to complete (onConfirm is called automatically by mock)
     await waitFor(() => {
       expect(mockCreateEncounter).toHaveBeenCalledWith(
         mockWardPatient.patient,
@@ -141,6 +156,7 @@ describe('PatientDischargeWorkspace', () => {
     await user.click(screen.getByRole('button', { name: /discharge/i }));
 
     expect(await screen.findByText(/discharge note is required/i)).toBeInTheDocument();
+    expect(mockShowModal).not.toHaveBeenCalled();
     expect(mockCreateEncounter).not.toHaveBeenCalled();
   });
 
@@ -180,7 +196,10 @@ describe('PatientDischargeWorkspace', () => {
 
     await user.click(dischargeButton);
 
-    expect(dischargeButton).toBeDisabled();
+    // Button should show loading state
+    await waitFor(() => {
+      expect(screen.getByText(/discharging/i)).toBeInTheDocument();
+    });
 
     await waitFor(() => {
       expect(testProps.closeWorkspace).toHaveBeenCalled();
@@ -201,6 +220,11 @@ describe('PatientDischargeWorkspace', () => {
     await user.type(noteInput, 'Patient recovered');
 
     await user.click(screen.getByRole('button', { name: /discharge/i }));
+
+    // Wait for loading state to appear, then check if cancel button is disabled
+    await waitFor(() => {
+      expect(screen.getByText(/discharging/i)).toBeInTheDocument();
+    });
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     expect(cancelButton).toBeDisabled();
