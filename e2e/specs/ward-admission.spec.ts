@@ -55,7 +55,7 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
-    await page.getByRole('button', { name: 'Admit' }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I should see a success message confirming the admission success', async () => {

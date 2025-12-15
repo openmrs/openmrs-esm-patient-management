@@ -15,6 +15,7 @@ import {
 import { spaHomePage } from '../constants';
 import { useAppointmentsStore } from '../store';
 import styles from './metrics-header.scss';
+import { launchCreateAppointmentForm } from '../helpers';
 
 dayjs.extend(isToday);
 
@@ -23,16 +24,6 @@ const MetricsHeader: React.FC = () => {
   const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
-
-  const launchCreateAppointmentForm = (patientUuid) => {
-    const props = {
-      patientUuid: patientUuid,
-      context: 'creating',
-      mutate: () => {}, // TODO get this to mutate properly
-    };
-
-    launchWorkspace('appointments-form-workspace', { ...props });
-  };
 
   return (
     <div className={styles.metricsContainer}>

@@ -70,11 +70,11 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('And I admit the patient', async () => {
-    await page.getByRole('button', { name: /Admit/i }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I see an admission success message', async () => {
-    await expect(page.getByText(/Patient admitted/i)).toBeVisible();
+    await expect(page.getByText('Patient admitted successfully', { exact: true })).toBeVisible();
   });
 
   await test.step('Then I see the patient in the ward', async () => {
