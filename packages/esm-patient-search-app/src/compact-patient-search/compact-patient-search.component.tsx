@@ -2,8 +2,7 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { navigate, interpolateString, useConfig, useSession, useDebounce, showSnackbar } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
-import { type SearchedPatient } from '../types';
-import { useRecentlyViewedPatients, useInfinitePatientSearch, useRestPatients } from '../patient-search.resource';
+import { useRecentlyViewedPatients, useInfinitePatientSearch, useFhirPatients } from '../patient-search.resource';
 import { PatientSearchContextProvider } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from './patient-search.component';
@@ -51,7 +50,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     updateRecentlyViewedPatients,
   } = useRecentlyViewedPatients(showRecentlySearchedPatients);
 
-  const recentPatientSearchResponse = useRestPatients(recentlyViewedPatientUuids, !hasSearchTerm);
+  const recentPatientSearchResponse = useFhirPatients(recentlyViewedPatientUuids);
   const { data: recentPatients, fetchError } = recentPatientSearchResponse;
 
   const handleFocusToInput = useCallback(() => {
@@ -85,19 +84,23 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   const handlePatientSelection = useCallback(
-    (evt, index: number, patients: Array<SearchedPatient>) => {
+    (evt, index: number, patients: Array<fhir.Patient>) => {
       evt.preventDefault();
       if (patients) {
-        addViewedPatientAndCloseSearchResults(patients[index].uuid);
-        navigate({
-          to: interpolateString(config.search.patientChartUrl, {
-            patientUuid: patients[index].uuid,
-          }),
-        });
+        const selectedPatient = patients[index];
+        if (selectedPatient?.id) {
+          addViewedPatientAndCloseSearchResults(selectedPatient.id);
+          navigate({
+            to: interpolateString(config.search.patientChartUrl, {
+              patientUuid: selectedPatient.id,
+            }),
+          });
+        }
       }
     },
     [addViewedPatientAndCloseSearchResults, config.search.patientChartUrl],
   );
+
   const focusedResult = useArrowNavigation(
     !recentPatients ? (searchedPatients?.length ?? 0) : (recentPatients?.length ?? 0),
     handlePatientSelection,

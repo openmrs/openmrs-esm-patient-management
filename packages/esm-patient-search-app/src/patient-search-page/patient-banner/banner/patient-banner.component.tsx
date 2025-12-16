@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
@@ -13,11 +13,10 @@ import {
   useLayoutType,
   useVisit,
   navigate,
+  getPatientName,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
-import { type SearchedPatient } from '../../../types';
 import { usePatientSearchContext, usePatientSearchContext2 } from '../../../patient-search-context';
-import { mapToFhirPatient } from '../../../utils/fhir-mapper';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -26,7 +25,7 @@ interface ClickablePatientContainerProps {
 }
 
 interface PatientBannerProps {
-  patient: SearchedPatient;
+  patient: fhir.Patient;
   patientUuid: string;
   hideActionsOverflow?: boolean;
 }
@@ -37,21 +36,18 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const { activeVisit } = useVisit(patientUuid);
   const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
     usePatientSearchContext() ?? {};
-  // if context2 is present, we use the new workspace v2 APIs,
-  // else, default to the old ones
   const context2 = usePatientSearchContext2();
   const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
 
-  const patientName = patient.person.personName.display;
-  const isDeceased = !!patient.person.deathDate;
+  const patientName = getPatientName(patient);
+
+  const isDeceased = patient.deceasedBoolean;
 
   const [showContactDetails, setShowContactDetails] = useState(false);
 
   const handleToggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
-
-  const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
 
   return (
     <>
@@ -61,12 +57,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           [styles.activePatientContainer]: !isDeceased,
         })}
         role="banner">
-        <ClickablePatientContainer patient={fhirMappedPatient}>
+        <ClickablePatientContainer patient={patient}>
           <div className={styles.patientAvatar}>
             <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
           </div>
-          <PatientBannerPatientInfo patient={fhirMappedPatient} />
+          <PatientBannerPatientInfo patient={patient} />
         </ClickablePatientContainer>
+
         <div className={styles.actionButtons}>
           <PatientBannerToggleContactDetailsButton
             className={styles.toggleContactDetailsButton}
@@ -81,7 +78,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                   selectPatientAction: onPatientSelected ?? nonNavigationSelectPatientAction,
                   launchPatientChart: true,
                 }}
-                patient={fhirMappedPatient}
+                patient={patient}
                 patientUuid={patientUuid}
               />
             ) : null}
@@ -108,17 +105,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               ))}
           </div>
         </div>
-        <div>
-          {showContactDetails && (
-            <div
-              className={classNames(styles.contactDetails, {
-                [styles.deceasedContactDetails]: isDeceased,
-                [styles.tabletContactDetails]: isTablet,
-              })}>
-              <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
-            </div>
-          )}
-        </div>
+
+        {showContactDetails && (
+          <div
+            className={classNames(styles.contactDetails, {
+              [styles.deceasedContactDetails]: isDeceased,
+              [styles.tabletContactDetails]: isTablet,
+            })}>
+            <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
+          </div>
+        )}
       </div>
     </>
   );
@@ -132,7 +128,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
   const patientUuid = patient.id;
 
   const handleClick = useCallback(() => {
-    nonNavigationSelectPatientAction(patientUuid, patient);
+    nonNavigationSelectPatientAction?.(patientUuid, patient);
     patientClickSideEffect?.(patientUuid, patient);
   }, [nonNavigationSelectPatientAction, patientClickSideEffect, patientUuid, patient]);
 
@@ -171,38 +167,37 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
         {children}
       </button>
     );
-  } else {
-    return (
-      <ConfigurableLink
-        className={styles.patientBanner}
-        onBeforeNavigate={handleBeforeNavigate}
-        to={config.search.patientChartUrl}
-        templateParams={{ patientUuid: patientUuid }}>
-        {children}
-      </ConfigurableLink>
-    );
   }
-};
 
-export const PatientBannerSkeleton = () => {
   return (
-    <div className={styles.container} role="banner">
-      <div className={styles.patientBanner}>
-        <SkeletonIcon className={styles.patientAvatar} />
-        <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
-          <div className={styles.flexRow}>
-            <SkeletonText />
-          </div>
-          <div className={styles.identifiers}>
-            <SkeletonText />
-          </div>
-        </div>
-      </div>
-      <div className={styles.emptyStateActionButtonsContainer}>
-        <SkeletonText />
-      </div>
-    </div>
+    <ConfigurableLink
+      className={styles.patientBanner}
+      onBeforeNavigate={handleBeforeNavigate}
+      to={config.search.patientChartUrl}
+      templateParams={{ patientUuid }}>
+      {children}
+    </ConfigurableLink>
   );
 };
 
+export const PatientBannerSkeleton = () => (
+  <div className={styles.container} role="banner">
+    <div className={styles.patientBanner}>
+      <SkeletonIcon className={styles.patientAvatar} />
+      <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
+        <div className={styles.flexRow}>
+          <SkeletonText />
+        </div>
+        <div className={styles.identifiers}>
+          <SkeletonText />
+        </div>
+      </div>
+    </div>
+    <div className={styles.emptyStateActionButtonsContainer}>
+      <SkeletonText />
+    </div>
+  </div>
+);
+
 export default PatientBanner;
+

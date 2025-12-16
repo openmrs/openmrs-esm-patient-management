@@ -2,20 +2,14 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext } from '../patient-search-context';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
 const defaultProps = {
-  currentPage: 0,
   data: [],
   fetchError: null,
-  hasMore: false,
   isLoading: false,
-  isValidating: false,
-  setPage: jest.fn(),
-  totalResults: 0,
 };
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
@@ -23,47 +17,40 @@ const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
 describe('RecentlySearchedPatients', () => {
   const birthdate = '1990-01-01T00:00:00.000+0000';
   const age = dayjs().diff(birthdate, 'years');
-  const mockSearchResults: Array<SearchedPatient> = [
+
+  // Mock FHIR Patient
+  const mockSearchResults: Array<fhir.Patient> = [
     {
-      attributes: [],
-      identifiers: [
+      resourceType: 'Patient',
+      id: 'test-patient-uuid',
+      identifier: [
         {
-          display: 'OpenMRS ID = 1000NLY',
-          uuid: '19e98c23-d26f-4668-8810-00da0e10e326',
-          identifier: '1000NLY',
-          identifierType: {
-            uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-            display: 'OpenMRS ID',
-            links: [
+          id: '19e98c23-d26f-4668-8810-00da0e10e326',
+          use: 'official',
+          type: {
+            text: 'OpenMRS ID',
+            coding: [
               {
-                rel: 'self',
-                uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/patientidentifiertype/05a29f94-c0ed-11e2-94be-8c13b969e334`,
-                resourceAlias: 'patientidentifiertype',
+                code: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+                display: 'OpenMRS ID',
               },
             ],
           },
-          location: {
-            uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
-            display: 'Outpatient Clinic',
-          },
-          preferred: true,
+          value: '1000NLY',
         },
       ],
-      person: {
-        age,
-        addresses: [],
-        birthdate,
-        dead: false,
-        deathDate: null,
-        gender: 'M',
-        personName: {
-          display: 'Smith, John Doe',
-          givenName: 'John',
-          middleName: 'Doe',
-          familyName: 'Smith',
+      name: [
+        {
+          given: ['John', 'Doe'],
+          family: 'Smith',
+          text: 'Smith, John Doe',
         },
-      },
-      uuid: 'test-patient-uuid',
+      ],
+      gender: 'male',
+      birthDate: birthdate,
+      deceasedBoolean: false,
+      address: [],
+      telecom: [],
     },
   ];
 
@@ -110,10 +97,7 @@ describe('RecentlySearchedPatients', () => {
 
   it('renders a list of recently searched patients', () => {
     renderRecentlySearchedPatients({
-      currentPage: 0,
       data: mockSearchResults,
-      hasMore: false,
-      totalResults: 1,
     });
 
     // TODO: Restore these tests once we improve the patient banner test stubs
@@ -122,7 +106,7 @@ describe('RecentlySearchedPatients', () => {
     // ).toBeInTheDocument();
     // expect(screen.getByRole('link')).toHaveAttribute(
     //   'href',
-    //   `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
+    //   `/openmrs/spa/patient/${mockSearchResults[0].id}/chart/`,
     // );
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/i })).toBeInTheDocument();
     expect(screen.getByText('Patient Photo')).toBeInTheDocument();

@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useMemo } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import classNames from 'classnames';
 import {
   ConfigurableLink,
@@ -8,10 +8,8 @@ import {
   PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
-import type { SearchedPatient } from '../types';
 import { type PatientSearchConfig } from '../config-schema';
 import { usePatientSearchContext } from '../patient-search-context';
-import { mapToFhirPatient } from '../utils/fhir-mapper';
 import styles from './compact-patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -20,15 +18,16 @@ interface ClickablePatientContainerProps {
 }
 
 interface CompactPatientBannerProps {
-  patients: Array<SearchedPatient>;
+  patients: fhir.Patient[];
 }
 
 const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
-  const fhirMappedPatients: Array<fhir.Patient> = useMemo(() => {
-    return patients.map(mapToFhirPatient);
-  }, [patients]);
-
   const renderPatient = useCallback((patient: fhir.Patient) => {
+    
+    if (!patient || !patient.id) {
+      return null;
+    }
+    
     const patientName = getPatientName(patient);
 
     return (
@@ -41,7 +40,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
     );
   }, []);
 
-  return <div ref={ref}>{fhirMappedPatients.map(renderPatient)}</div>;
+  return <div ref={ref}>{patients.map(renderPatient)}</div>;
 });
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
