@@ -2,6 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import {
+  closeWorkspaceGroup2,
   type DefaultWorkspaceProps,
   showSnackbar,
   useAppContext,
@@ -17,12 +18,20 @@ import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '..
 import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import useWardLocation from '../../hooks/useWardLocation';
+import useLocation from '../../hooks/useLocation';
+
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  closeWorkspaceGroup2: jest.fn(),
+}));
 
 jest.mock('../../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
 }));
 
 jest.mock('../../hooks/useWardLocation', () => jest.fn());
+
+jest.mock('../../hooks/useLocation', () => jest.fn());
 
 jest.mock('../../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
@@ -47,6 +56,7 @@ jest.mock('../../ward.resource', () => ({
 }));
 
 const mockedUseWardLocation = jest.mocked(useWardLocation);
+const mockedUseLocation = jest.mocked(useLocation);
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 const mockedUseSession = jest.mocked(useSession);
@@ -112,6 +122,19 @@ describe('Testing AdmitPatientForm', () => {
       errorFetchingLocation: null,
     });
 
+    // Mock useLocation to return proper location hierarchy for validation
+    // @ts-ignore - simplified mock for testing
+    mockedUseLocation.mockReturnValue({
+      // @ts-ignore
+      data: {
+        data: {
+          ...mockLocationInpatientWard,
+          parentLocation: null, // Mock parent location for valid hierarchy
+        },
+      },
+      isLoading: false,
+    });
+
     // @ts-ignore - we don't need to mock the entire object
     mockedUseAssignedBedByPatient.mockReturnValue({
       data: {
@@ -154,7 +177,7 @@ describe('Testing AdmitPatientForm', () => {
     renderAdmissionForm();
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
     await user.click(cancelButton);
-    expect(mockWorkspaceProps.closeWorkspace).toHaveBeenCalledWith();
+    expect(mockWorkspaceProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
     screen.getByText('Admit');
     expect(screen.getByText('Select a bed')).toBeInTheDocument();
 

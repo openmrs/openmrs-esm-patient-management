@@ -23,9 +23,14 @@ const WardPatientCard: React.FC<Props> = ({ children, wardPatient, relatedTransf
       <button
         className={styles.wardPatientCardButton}
         onClick={() => {
-          launchWorkspace2('ward-patient-workspace', {}, {}, {
-            wardPatient
-          });
+          launchWorkspace2(
+            'ward-patient-workspace',
+            {},
+            {},
+            {
+              wardPatient,
+            },
+          );
         }}>
         {getPatientName(patient.person)}
       </button>

@@ -4,11 +4,13 @@ import {
   Checkbox,
   CheckboxGroup,
   Form,
+  FormLabel,
   InlineNotification,
   RadioButton,
   RadioButtonGroup,
   Stack,
   TextArea,
+  TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResponsiveWrapper, showSnackbar, useAppContext, Workspace2 } from '@openmrs/esm-framework';
@@ -251,6 +253,26 @@ export default function PatientAdmitOrTransferForm({
             </CheckboxGroup>
           </div>
         )}
+        <div className={`${styles.field} ${styles.currentLocationDisplay}`}>
+          <FormLabel>{t('currentVisitLocation', 'Current Visit Location')}</FormLabel>
+          <TextInput
+            id="current-visit-location"
+            labelText=""
+            value={visit?.location?.display || visit?.location?.name || t('noActiveVisit', 'No active visit')}
+            readOnly
+            disabled
+          />
+        </div>
+        <InlineNotification
+          kind="info"
+          lowContrast
+          hideCloseButton
+          className={styles.locationInfoNotification}
+          title={t(
+            'transferLocationFilterInfo',
+            "Only sub-locations of the patient's visit location that are tagged as 'Admission Location' are shown below.",
+          )}
+        />
         <div className={styles.field}>
           <h2 className={styles.productiveHeading02}>{t('selectALocation', 'Select a location')}</h2>
           <Controller
@@ -264,6 +286,11 @@ export default function PatientAdmitOrTransferForm({
                 invalidText={error?.message}
                 ancestorLocation={visit?.location}
                 excludeLocations={currentAdmission ? [currentAdmission.currentInpatientLocation] : []}
+                emptyStateMessage={t(
+                  'noAdmissionLocationsFound',
+                  "No admission locations found under {{visitLocationName}}. Only sub-locations tagged as 'Admission Location' can be selected for transfer.",
+                  { visitLocationName: visit?.location?.display || visit?.location?.name || 'the visit location' },
+                )}
               />
             )}
           />

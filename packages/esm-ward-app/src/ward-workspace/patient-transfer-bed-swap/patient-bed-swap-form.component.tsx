@@ -18,7 +18,7 @@ export default function PatientBedSwapForm({
   wardPatient,
   relatedTransferPatients = [],
   onCancel,
-  onSuccess
+  onSuccess,
 }: PatientAdmitOrTransferFormProps) {
   const { patient } = wardPatient;
   const { t } = useTranslation();
