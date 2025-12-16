@@ -277,3 +277,18 @@ export interface MaternalWardViewContext {
   [key: number]: unknown;
   [key: symbol]: unknown;
 }
+
+// Carbon Tag color types
+export type CarbonTagType =
+  | 'red'
+  | 'magenta'
+  | 'purple'
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'green'
+  | 'gray'
+  | 'cool-gray'
+  | 'warm-gray'
+  | 'high-contrast'
+  | 'outline';
