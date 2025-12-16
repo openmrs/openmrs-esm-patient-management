@@ -6,8 +6,10 @@ import { useServiceQueuesStore } from '../store/store';
 import { postQueueEntry } from '../create-queue-entry/queue-fields/queue-fields.resource';
 import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../hooks/useQueues';
-import { useMutateQueueEntries } from '../hooks/useQueueEntries';
+import { useMutateQueueEntries, useQueueEntries } from '../hooks/useQueueEntries';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../constants';
+import { updateQueueEntry } from '../modals/queue-entry-actions.resource';
+import styles from './add-to-queue-button.scss';
 
 interface AddPatientToQueueButtonProps {
   patientUuid: string;
@@ -15,16 +17,28 @@ interface AddPatientToQueueButtonProps {
 
 const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const [optimisticStatus, setOptimisticStatus] = React.useState<'queued' | 'not_queued' | null>(null);
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const config = useConfig<ConfigObject>();
   const { activeVisit, mutate: mutateVisit } = useVisit(patientUuid);
   const { queues } = useQueues(selectedQueueLocationUuid);
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const { queueEntries, mutate: mutateQueueEntriesList } = useQueueEntries({
+    patient: patientUuid,
+    isEnded: false,
+  });
 
   const selectedQueue = useMemo(
     () => queues.find((q) => q.service.uuid === selectedServiceUuid),
     [queues, selectedServiceUuid],
   );
+
+  const existingQueueEntry = useMemo(
+    () => queueEntries.find((entry) => entry.queue?.uuid === selectedQueue?.uuid),
+    [queueEntries, selectedQueue],
+  );
+
+  const isPatientInQueue = optimisticStatus !== null ? optimisticStatus === 'queued' : !!existingQueueEntry;
 
   React.useEffect(() => {
     let intervalId;
@@ -82,6 +96,8 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       allowedStatuses?.[0]?.uuid ||
       defaultStatusConceptUuid;
 
+    setOptimisticStatus('queued');
+
     try {
       await postQueueEntry(
         activeVisit.uuid,
@@ -94,7 +110,10 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
         visitQueueNumberAttributeUuid,
       );
 
-      mutateQueueEntries();
+      await mutateQueueEntries();
+      await mutateQueueEntriesList();
+
+      setOptimisticStatus(null);
 
       showSnackbar({
         title: t('patientAddedToQueue', 'Patient added to queue'),
@@ -102,6 +121,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
         isLowContrast: true,
       });
     } catch (error) {
+      setOptimisticStatus(null);
       const errorMessage = error?.responseBody?.error?.message || error?.message || '';
       const isDuplicate = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
 
@@ -125,15 +145,57 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
     activeVisit,
     selectedQueue,
     mutateQueueEntries,
+    mutateQueueEntriesList,
   ]);
+
+  const handleRemoveFromQueue = useCallback(async () => {
+    if (!existingQueueEntry) return;
+
+    setOptimisticStatus('not_queued');
+
+    try {
+      await updateQueueEntry(existingQueueEntry.uuid, {
+        endedAt: new Date().toISOString(),
+      });
+
+      await mutateQueueEntries();
+      await mutateQueueEntriesList();
+
+      setOptimisticStatus(null);
+
+      showSnackbar({
+        title: t('patientRemovedFromQueue', 'Patient removed from queue'),
+        kind: 'success',
+        isLowContrast: true,
+      });
+    } catch (error) {
+      setOptimisticStatus(null);
+      showSnackbar({
+        title: t('errorRemovingPatient', 'Error removing patient from queue'),
+        kind: 'error',
+        subtitle: error?.message,
+      });
+    }
+  }, [existingQueueEntry, mutateQueueEntries, mutateQueueEntriesList, t]);
+
+  const handleButtonClick = useCallback(() => {
+    if (isPatientInQueue) {
+      handleRemoveFromQueue();
+    } else {
+      handleAddToQueue();
+    }
+  }, [isPatientInQueue, handleAddToQueue, handleRemoveFromQueue]);
 
   if (!activeVisit) {
     return null;
   }
 
   return (
-    <Button kind="primary" onClick={handleAddToQueue} style={{ marginRight: '0.5rem' }}>
-      {t('addToQueue', 'Add to queue')}
+    <Button
+      kind={isPatientInQueue ? 'ghost' : 'primary'}
+      className={isPatientInQueue ? styles.removeButton : ''}
+      onClick={handleButtonClick}>
+      {isPatientInQueue ? t('removeFromQueue', 'Remove from queue') : t('addToQueue', 'Add to queue')}
     </Button>
   );
 };
