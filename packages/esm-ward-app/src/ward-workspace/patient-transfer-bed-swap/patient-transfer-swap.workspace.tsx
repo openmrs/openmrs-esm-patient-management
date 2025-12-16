@@ -50,7 +50,10 @@ export default function PatientTransferAndSwapWorkspace({
           <div className={styles.contentSwitcherWrapper}>
             <h2 className={styles.productiveHeading02}>{t('typeOfTransfer', 'Type of transfer')}</h2>
             <div className={styles.contentSwitcher}>
-              <ContentSwitcher onChange={({ name }) => setSelectedSection(name)}>
+              <ContentSwitcher
+                size="md"
+                selectedIndex={selectedSection === TransferSection.TRANSFER ? 0 : 1}
+                onChange={({ name }) => setSelectedSection(name as TransferSectionValues)}>
                 <Switch name={TransferSection.TRANSFER} text={t('transfer', 'Transfer')} />
                 <Switch name={TransferSection.BED_SWAP} text={t('bedSwap', 'Bed swap')} />
               </ContentSwitcher>

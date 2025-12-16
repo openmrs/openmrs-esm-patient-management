@@ -5,14 +5,14 @@ import { useActiveTickets } from './useActiveTickets';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
-interface QueueScreenProps {}
+type QueueScreenProps = Record<string, never>;
 
 const QueueScreen: React.FC<QueueScreenProps> = () => {
   const { t } = useTranslation();
   const { activeTickets, isLoading, error } = useActiveTickets();
 
   if (isLoading) {
-    return <DataTableSkeleton row={5} className={styles.queueScreen} role="progressbar" />;
+    return <DataTableSkeleton rowCount={5} className={styles.queueScreen} data-testid="queue-screen-skeleton" />;
   }
 
   if (error) {

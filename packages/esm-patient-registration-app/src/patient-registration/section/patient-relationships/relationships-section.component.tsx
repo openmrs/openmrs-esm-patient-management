@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
-import {
-  Button,
-  Layer,
-  Select,
-  SelectItem,
-  InlineNotification,
-  NotificationActionButton,
-  SkeletonText,
-} from '@carbon/react';
+import { ActionableNotification, Button, Layer, Select, SelectItem, SkeletonText } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -147,14 +139,11 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
       </div>
     </div>
   ) : (
-    <InlineNotification
+    <ActionableNotification
       kind="info"
       title={t('relationshipRemovedText', 'Relationship removed')}
-      actions={
-        <NotificationActionButton onClick={restoreRelationship}>
-          {t('restoreRelationshipActionButton', 'Undo')}
-        </NotificationActionButton>
-      }
+      actionButtonLabel={t('restoreRelationshipActionButton', 'Undo')}
+      onActionButtonClick={restoreRelationship}
     />
   );
 };
@@ -178,11 +167,13 @@ export const RelationshipsSection = () => {
           uuid: type.uuid,
           direction: 'bIsToA',
         };
-        aIsToB.display === bIsToA.display
-          ? tmp.push(aIsToB)
-          : bIsToA.display === 'Patient'
-            ? tmp.push(aIsToB, { display: `Patient (${aIsToB.display})`, uuid: type.uuid, direction: 'bIsToA' })
-            : tmp.push(aIsToB, bIsToA);
+        if (aIsToB.display === bIsToA.display) {
+          tmp.push(aIsToB);
+        } else if (bIsToA.display === 'Patient') {
+          tmp.push(aIsToB, { display: `Patient (${aIsToB.display})`, uuid: type.uuid, direction: 'bIsToA' });
+        } else {
+          tmp.push(aIsToB, bIsToA);
+        }
       });
       setDisplayRelationshipTypes(tmp);
     }
@@ -191,7 +182,7 @@ export const RelationshipsSection = () => {
   if (!relationshipTypes) {
     return (
       <section aria-label="Loading relationships section">
-        <SkeletonText role="progressbar" />
+        <SkeletonText />
       </section>
     );
   }

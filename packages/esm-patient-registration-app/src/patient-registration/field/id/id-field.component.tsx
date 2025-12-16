@@ -113,7 +113,7 @@ export const Identifiers: React.FC = () => {
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
         </div>
-        <SkeletonText role="progressbar" />
+        <SkeletonText />
       </div>
     );
   }

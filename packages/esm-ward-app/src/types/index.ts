@@ -64,7 +64,11 @@ export interface WardPatientWorkspaceProps {
 /**
  * props type of workspaces in the 'ward-patient` workspace group.
  */
-export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<{}, {}, { wardPatient: WardPatient }>;
+export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<
+  Record<string, never>,
+  Record<string, never>,
+  { wardPatient: WardPatient }
+>;
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -277,3 +281,18 @@ export interface MaternalWardViewContext {
   [key: number]: unknown;
   [key: symbol]: unknown;
 }
+
+// Carbon Tag color types
+export type CarbonTagType =
+  | 'red'
+  | 'magenta'
+  | 'purple'
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'green'
+  | 'gray'
+  | 'cool-gray'
+  | 'warm-gray'
+  | 'high-contrast'
+  | 'outline';

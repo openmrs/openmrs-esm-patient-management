@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, ButtonSet, Column, Form, InlineNotification, Row } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -25,10 +25,9 @@ import styles from './admit-patient-form.scss';
  * the bed management module is installed. It asks to (optionally) select
  * a bed to assign to patient
  */
-const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
-  workspaceProps: { wardPatient },
-  closeWorkspace,
-}) => {
+const AdmitPatientFormWorkspace: React.FC<
+  Workspace2DefinitionProps<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>
+> = ({ workspaceProps: { wardPatient }, closeWorkspace }) => {
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
 
@@ -147,7 +146,7 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
     <Workspace2 title={t('admitPatient', 'Admit patient')} hasUnsavedChanges={isDirty}>
       <div className={styles.flexWrapper}>
         <WardPatientWorkspaceBanner {...{ wardPatient }} />
-        <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
           <div className={styles.formContent}>
             <Row>
               <Column>

@@ -16,7 +16,7 @@ interface ExportedAppointmentsFormGroupProps {
  * Workspace used to create or edit an appointment in the patient chart (or app with compatible workspaceGroup)
  */
 const ExportedAppointmentsForm: React.FC<
-  Workspace2DefinitionProps<ExportedAppointmentsFormProps, {}, ExportedAppointmentsFormGroupProps>
+  Workspace2DefinitionProps<ExportedAppointmentsFormProps, Record<string, never>, ExportedAppointmentsFormGroupProps>
 > = ({ workspaceProps: { appointment, recurringPattern }, groupProps: { patientUuid }, ...rest }) => {
   return <AppointmentsForm workspaceProps={{ appointment, recurringPattern, patientUuid }} groupProps={{}} {...rest} />;
 };

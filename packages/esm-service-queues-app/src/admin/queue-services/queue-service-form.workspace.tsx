@@ -46,7 +46,9 @@ const createQueueServiceSchema = (t: TFunction) =>
 
 type QueueServiceFormData = z.infer<ReturnType<typeof createQueueServiceSchema>>;
 
-const QueueServiceForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) => {
+const QueueServiceForm: React.FC<
+  Workspace2DefinitionProps<Record<string, never>, Record<string, never>, Record<string, never>>
+> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const { queueConcepts } = useServiceConcepts();
   const { queueLocations } = useQueueLocations();
@@ -162,7 +164,7 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace 
           </Column>
         </Stack>
         <ButtonSet className={styles.buttonSet}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">

@@ -23,7 +23,7 @@ export interface PatientSearchWorkspaceWindowProps {
  * This v2 workspace allows other apps to include patient search functionality.
  */
 const PatientSearchWorkspace2: React.FC<
-  Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, {}>
+  Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, Record<string, never>>
 > = ({
   workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle },
   windowProps: { startVisitWorkspaceName },

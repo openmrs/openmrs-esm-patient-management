@@ -5,6 +5,7 @@ import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useObs } from '../../hooks/useObs';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
+import { type CarbonTagType } from '../../types';
 import WardPatientSkeletonText from './ward-patient-skeleton-text.component';
 import WardPatientResponsiveTooltip from './ward-patient-responsive-tooltip.component';
 import styles from '../ward-patient-card.scss';
@@ -61,7 +62,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ id, p
         if (color) {
           return (
             <WardPatientResponsiveTooltip tooltipContent={getObsEncounterString(o, t)}>
-              <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
+              <Tag type={color as CarbonTagType} key={`ward-coded-obs-tag-${o.uuid}`}>
                 {display}
               </Tag>
             </WardPatientResponsiveTooltip>
@@ -84,7 +85,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ id, p
             {coloredOpsTags}
             {summaryTagTooltipText.length > 0 ? (
               <WardPatientResponsiveTooltip tooltipContent={summaryTagTooltipText}>
-                <Tag type={summaryLabelColor}>
+                <Tag type={summaryLabelColor as CarbonTagType}>
                   {t('countItems', '{{count}} {{item}}', {
                     count: summaryTagTooltipText.length,
                     item: summaryLabelToDisplay,

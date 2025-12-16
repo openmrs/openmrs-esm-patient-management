@@ -55,7 +55,9 @@ const createQueueRoomSchema = (t: TFunction) =>
 
 type QueueRoomFormData = z.infer<ReturnType<typeof createQueueRoomSchema>>;
 
-const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) => {
+const QueueRoomForm: React.FC<
+  Workspace2DefinitionProps<Record<string, never>, Record<string, never>, Record<string, never>>
+> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const {
@@ -174,7 +176,7 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
           </Column>
         </Stack>
         <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {getCoreTranslation('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">

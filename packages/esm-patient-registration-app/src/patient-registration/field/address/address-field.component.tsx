@@ -74,7 +74,7 @@ export const AddressComponent: React.FC = () => {
   if (addressTemplate && !Object.keys(addressTemplate)?.length) {
     return (
       <AddressComponentContainer>
-        <SkeletonText role="progressbar" />
+        <SkeletonText />
       </AddressComponentContainer>
     );
   }

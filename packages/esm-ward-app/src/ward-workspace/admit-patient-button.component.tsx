@@ -40,7 +40,10 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   const [isAdmitting, setIsAdmitting] = useState(false);
 
   const launchPatientAdmissionForm = () =>
-    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('admit-patient-form-workspace', { wardPatient });
+    launchWorkspace2<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>(
+      'admit-patient-form-workspace',
+      { wardPatient },
+    );
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 

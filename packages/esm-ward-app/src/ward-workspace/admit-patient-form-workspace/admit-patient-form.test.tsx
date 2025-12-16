@@ -73,7 +73,11 @@ const mockWardPatientAliceProps: WardPatient = {
   inpatientRequest: mockInpatientRequestAlice,
 };
 
-const mockWorkspaceProps: Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}> = {
+const mockWorkspaceProps: Workspace2DefinitionProps<
+  WardPatientWorkspaceProps,
+  Record<string, never>,
+  Record<string, never>
+> = {
   closeWorkspace: jest.fn(),
   launchChildWorkspace: jest.fn(),
   workspaceProps: {
