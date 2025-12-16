@@ -55,9 +55,7 @@ const createQueueRoomSchema = (t: TFunction) =>
 
 type QueueRoomFormData = z.infer<ReturnType<typeof createQueueRoomSchema>>;
 
-const QueueRoomForm: React.FC<
-  Workspace2DefinitionProps<Record<string, never>, Record<string, never>, Record<string, never>>
-> = ({ closeWorkspace }) => {
+const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const {

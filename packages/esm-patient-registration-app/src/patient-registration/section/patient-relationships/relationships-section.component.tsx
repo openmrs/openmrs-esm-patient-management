@@ -182,7 +182,10 @@ export const RelationshipsSection = () => {
   if (!relationshipTypes) {
     return (
       <section aria-label="Loading relationships section">
-        <SkeletonText />
+        <SkeletonText
+          // @ts-expect-error
+          role="progressbar"
+        />
       </section>
     );
   }

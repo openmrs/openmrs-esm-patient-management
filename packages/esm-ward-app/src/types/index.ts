@@ -64,11 +64,7 @@ export interface WardPatientWorkspaceProps {
 /**
  * props type of workspaces in the 'ward-patient` workspace group.
  */
-export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<
-  Record<string, never>,
-  Record<string, never>,
-  { wardPatient: WardPatient }
->;
+export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<{}, {}, { wardPatient: WardPatient }>;
 
 // server-side types defined in openmrs-module-bedmanagement:
 

@@ -81,8 +81,7 @@ describe('Identifiers', () => {
       mockResourcesContextValue,
     );
 
-    expect(screen.getByText('Identifiers')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('should render identifier inputs when identifier types are loaded', () => {

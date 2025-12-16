@@ -25,9 +25,10 @@ import styles from './admit-patient-form.scss';
  * the bed management module is installed. It asks to (optionally) select
  * a bed to assign to patient
  */
-const AdmitPatientFormWorkspace: React.FC<
-  Workspace2DefinitionProps<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>
-> = ({ workspaceProps: { wardPatient }, closeWorkspace }) => {
+const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
+  workspaceProps: { wardPatient },
+  closeWorkspace,
+}) => {
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
   const dispositionType = inpatientRequest?.dispositionType ?? 'ADMIT';
 

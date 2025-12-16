@@ -17,7 +17,7 @@ const workspaceProps = {
   closeWorkspace: jest.fn(),
   setTitle: jest.fn(),
   launchChildWorkspace: jest.fn(),
-} as Partial<Workspace2DefinitionProps<Record<string, never>, Record<string, never>, Record<string, never>>>;
+};
 
 jest.mock('./queue-room.resource', () => ({
   saveQueueRoom: jest.fn().mockResolvedValue({ status: 201 }),

@@ -6,7 +6,7 @@ import AdvancedPatientSearchComponent from './advanced-patient-search.component'
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-page.scss';
 
-type PatientSearchPageComponentProps = Record<string, never>;
+interface PatientSearchPageComponentProps {}
 
 const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = () => {
   const [searchParams] = useSearchParams();

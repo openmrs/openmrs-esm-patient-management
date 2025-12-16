@@ -2,7 +2,6 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import {
-  type DefaultWorkspaceProps,
   showSnackbar,
   useAppContext,
   useFeatureFlag,
@@ -73,11 +72,7 @@ const mockWardPatientAliceProps: WardPatient = {
   inpatientRequest: mockInpatientRequestAlice,
 };
 
-const mockWorkspaceProps: Workspace2DefinitionProps<
-  WardPatientWorkspaceProps,
-  Record<string, never>,
-  Record<string, never>
-> = {
+const mockWorkspaceProps: Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}> = {
   closeWorkspace: jest.fn(),
   launchChildWorkspace: jest.fn(),
   workspaceProps: {

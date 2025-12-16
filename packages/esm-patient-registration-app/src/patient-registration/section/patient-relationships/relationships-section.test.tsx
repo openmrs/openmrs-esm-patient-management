@@ -57,6 +57,7 @@ describe('RelationshipsSection', () => {
     );
 
     expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByText(/add relationship/i)).not.toBeInTheDocument();
   });
 

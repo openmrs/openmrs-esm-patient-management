@@ -12,21 +12,15 @@ const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
   const { closeWorkspace } = useWorkspace2Context();
 
   const launchPatientTransferForm = () => {
-    launchWorkspace2<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>(
-      'transfer-elsewhere-workspace',
-      {
-        wardPatient,
-      },
-    );
+    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('transfer-elsewhere-workspace', {
+      wardPatient,
+    });
   };
 
   const launchCancelAdmissionForm = () => {
-    launchWorkspace2<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>(
-      'cancel-admission-request-workspace',
-      {
-        wardPatient,
-      },
-    );
+    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('cancel-admission-request-workspace', {
+      wardPatient,
+    });
   };
 
   const isTransfer = wardPatient.inpatientRequest.dispositionType == 'TRANSFER';

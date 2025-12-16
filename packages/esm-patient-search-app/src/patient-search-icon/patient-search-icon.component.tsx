@@ -17,7 +17,7 @@ import CompactPatientSearchComponent from '../compact-patient-search/compact-pat
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-icon.scss';
 
-type PatientSearchLaunchProps = Record<string, never>;
+interface PatientSearchLaunchProps {}
 
 const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const { t } = useTranslation();

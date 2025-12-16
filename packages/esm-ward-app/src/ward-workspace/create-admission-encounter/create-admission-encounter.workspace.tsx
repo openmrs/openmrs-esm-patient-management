@@ -33,7 +33,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<
     {
       startVisitWorkspaceName: string;
     },
-    Record<string, never>
+    {}
   >
 > = ({ closeWorkspace, workspaceProps: { selectedPatientUuid } }) => {
   const { location } = useWardLocation();

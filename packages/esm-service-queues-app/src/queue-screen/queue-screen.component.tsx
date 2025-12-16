@@ -5,7 +5,7 @@ import { useActiveTickets } from './useActiveTickets';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
-type QueueScreenProps = Record<string, never>;
+interface QueueScreenProps {}
 
 const QueueScreen: React.FC<QueueScreenProps> = () => {
   const { t } = useTranslation();

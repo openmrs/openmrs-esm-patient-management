@@ -10,7 +10,7 @@ const defaultProps = {
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
   launchChildWorkspace: jest.fn(),
-} as Partial<Workspace2DefinitionProps<Record<string, never>, Record<string, never>, Record<string, never>>>;
+};
 
 const mockSaveQueue = jest.mocked(saveQueue);
 const mockShowSnackbar = jest.mocked(showSnackbar);

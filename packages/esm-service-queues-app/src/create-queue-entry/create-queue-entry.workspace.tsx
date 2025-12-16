@@ -34,7 +34,7 @@ const CreateQueueEntryWorkspace: React.FC<
     {
       startVisitWorkspaceName: string;
     },
-    Record<string, never>
+    {}
   >
 > = ({
   closeWorkspace,

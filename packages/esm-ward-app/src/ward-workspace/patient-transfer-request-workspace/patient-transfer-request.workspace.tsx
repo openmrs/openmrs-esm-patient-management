@@ -10,9 +10,10 @@ import styles from './patient-transfer-request.scss';
  * This workspace is launched when the "Transfer elsewhere" / "Admit elsewhere"
  * button on a pending request patient card is clicked on
  */
-const PatientTransferRequestWorkspace: React.FC<
-  Workspace2DefinitionProps<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>
-> = ({ workspaceProps: { wardPatient }, closeWorkspace }) => {
+const PatientTransferRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
+  workspaceProps: { wardPatient },
+  closeWorkspace,
+}) => {
   const { t } = useTranslation();
   const isTransfer = wardPatient.inpatientRequest.dispositionType == 'TRANSFER';
 

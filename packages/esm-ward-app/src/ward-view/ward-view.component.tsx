@@ -7,7 +7,7 @@ import useWardLocation from '../hooks/useWardLocation';
 import { useWardConfig } from './ward-view.resource';
 import styles from './ward-view.scss';
 
-const WardView: React.FC<Record<string, never>> = () => {
+const WardView: React.FC<{}> = () => {
   const response = useWardLocation();
   const { isLoadingLocation, invalidLocation, location } = response;
   const { t } = useTranslation();

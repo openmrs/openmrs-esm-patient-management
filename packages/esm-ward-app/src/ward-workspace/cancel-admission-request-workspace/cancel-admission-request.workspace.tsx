@@ -7,9 +7,10 @@ import { type Workspace2DefinitionProps } from '@openmrs/esm-framework/src';
  * This is the workspace that is rendered when clicking on the 'Cancel' button on a AdmissionRequestCard
  * for a patient with a pending admission / transfer request to the current location
  */
-const CancelAdmissionRequestWorkspace: React.FC<
-  Workspace2DefinitionProps<WardPatientWorkspaceProps, Record<string, never>, Record<string, never>>
-> = ({ closeWorkspace, workspaceProps: { wardPatient } }) => {
+const CancelAdmissionRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
+  closeWorkspace,
+  workspaceProps: { wardPatient },
+}) => {
   return <CancelAdmissionRequest closeWorkspace={closeWorkspace} wardPatient={wardPatient} />;
 };
 
