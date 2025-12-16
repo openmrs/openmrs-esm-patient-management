@@ -1,6 +1,5 @@
 import type {
   Concept,
-  DefaultWorkspaceProps,
   Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
@@ -230,7 +229,7 @@ export interface EncounterRole extends OpenmrsResourceStrict {
 export interface WardMetrics {
   patients: string;
   freeBeds: string;
-  capacity: string;
+  totalBeds: string;
 }
 
 export interface EncounterPayload {
