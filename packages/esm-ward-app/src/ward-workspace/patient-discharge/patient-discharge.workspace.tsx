@@ -128,7 +128,7 @@ export default function PatientDischargeWorkspace({
         <Form className={styles.workspaceForm} onSubmit={handleSubmit(onSubmit, onError)}>
           <div>
             {errorFetchingEmrConfiguration && (
-              <div className={styles.formError}>
+              <div>
                 <InlineNotification
                   kind="error"
                   title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
@@ -145,7 +145,7 @@ export default function PatientDischargeWorkspace({
 
           <ExtensionSlot name="ward-patient-discharge-slot" />
 
-          <div className={styles.field}>
+          <div>
             <h2 className={styles.columnLabel}>{t('note', 'Note')}</h2>
             <Controller
               name="dischargeNote"
@@ -171,7 +171,7 @@ export default function PatientDischargeWorkspace({
               size="xl"
               disabled={isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration}>
               {isSubmitting ? (
-                <InlineLoading className={styles.spinner} description={t('discharging', 'Discharging') + '...'} />
+                <InlineLoading description={t('discharging', 'Discharging') + '...'} />
               ) : (
                 <span>{t('Discharge', 'Discharge')}</span>
               )}

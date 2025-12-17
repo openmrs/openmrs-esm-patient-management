@@ -12,10 +12,6 @@ describe('PatientDischargeConfirmationModal', () => {
     onConfirm: mockOnConfirm,
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders the modal with correct title and message', () => {
     render(<PatientDischargeConfirmationModal {...defaultProps} />);
 

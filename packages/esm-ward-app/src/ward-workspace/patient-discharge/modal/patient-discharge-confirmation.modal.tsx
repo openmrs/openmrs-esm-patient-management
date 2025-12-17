@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { getCoreTranslation } from '@openmrs/esm-framework';
 import styles from './patient-discharge-confirmation.modal.scss';
 
 interface PatientDischargeConfirmationModalProps {

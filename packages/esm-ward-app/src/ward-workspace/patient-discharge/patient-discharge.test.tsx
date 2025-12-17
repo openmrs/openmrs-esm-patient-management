@@ -59,8 +59,6 @@ describe('PatientDischargeWorkspace', () => {
   const mockWardPatientMutate = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-
     mockUseCreateEncounter.mockReturnValue({
       createEncounter: mockCreateEncounter,
       emrConfiguration: {
