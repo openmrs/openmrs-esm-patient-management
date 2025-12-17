@@ -13,12 +13,9 @@ export interface RESTPatientNote extends OpenmrsResource {
 
 export interface PatientNote {
   id: string;
-  diagnoses: string;
-  encounterDate: string;
   encounterNote: string;
   encounterNoteRecordedAt: string;
   encounterProvider: string;
-  encounterProviderRole: string;
 }
 
 export interface UsePatientNotes {
