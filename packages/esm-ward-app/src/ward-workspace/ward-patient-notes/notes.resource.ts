@@ -26,11 +26,23 @@ export function usePatientNotes(
     'encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display))),' +
     'diagnoses';
-  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterType}&visit=${visitUuid}&v=${customRepresentation}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useOpenmrsFetchAll<RESTPatientNote>(
-    patientUuid && encounterType ? encountersApiUrl : null,
-  );
+  // Build URL dynamically, only include visit parameter if visitUuid is provided
+  // This fixes the issue where visit=undefined causes empty results
+  const encountersApiUrl = useMemo(() => {
+    if (!patientUuid || !encounterType) return null;
+
+    const params = new URLSearchParams();
+    params.append('patient', patientUuid);
+    params.append('encounterType', encounterType);
+    if (visitUuid) {
+      params.append('visit', visitUuid);
+    }
+    params.append('v', customRepresentation);
+    return `${restBaseUrl}/encounter?${params.toString()}`;
+  }, [patientUuid, encounterType, visitUuid, customRepresentation]);
+
+  const { data, error, isLoading, isValidating, mutate } = useOpenmrsFetchAll<RESTPatientNote>(encountersApiUrl);
 
   const patientNotes: Array<PatientNote> | null = useMemo(
     () =>
