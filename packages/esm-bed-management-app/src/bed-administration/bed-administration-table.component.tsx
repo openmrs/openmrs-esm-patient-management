@@ -5,6 +5,7 @@ import {
   DataTable,
   DataTableSkeleton,
   Dropdown,
+  IconButton,
   InlineLoading,
   Pagination,
   Table,
@@ -17,11 +18,12 @@ import {
   Tag,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import {
   ErrorState,
   isDesktop as desktopLayout,
   launchWorkspace2,
+  showModal,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -81,6 +83,17 @@ const BedAdministrationTable: React.FC = () => {
     [mutateBedsGroupedByLocation],
   );
 
+  const openDeleteBedTypeModal = useCallback(
+    (uuid: string) => {
+      const dispose = showModal('delete-bed-confirmation-modal', {
+        uuid,
+        closeModal: () => dispose(),
+        mutateBeds: mutateBedsGroupedByLocation,
+      });
+    },
+    [mutateBedsGroupedByLocation],
+  );
+
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
 
@@ -123,18 +136,36 @@ const BedAdministrationTable: React.FC = () => {
       occupancyStatus: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
-        <Button
-          renderIcon={Edit}
-          onClick={() => handleLaunchBedWorkspace('edit', bed)}
-          kind={'ghost'}
-          iconDescription={t('editBed', 'Edit bed')}
-          hasIconOnly
-          size={responsiveSize}
-          tooltipPosition="right"
-        />
+        <>
+          <IconButton
+            align="top-start"
+            enterDelayMs={300}
+            kind="ghost"
+            tooltipPosition="right"
+            label={t('editBed', 'Edit bed')}
+            onClick={(e) => {
+              e.preventDefault();
+              handleLaunchBedWorkspace('edit', bed);
+            }}
+            size={responsiveSize}>
+            <Edit />
+          </IconButton>
+          <IconButton
+            align="top-start"
+            enterDelayMs={300}
+            kind="ghost"
+            label={t('deleteBedType', 'Delete bed')}
+            onClick={(e) => {
+              e.preventDefault();
+              openDeleteBedTypeModal(bed.uuid);
+            }}
+            size={responsiveSize}>
+            <TrashCan />
+          </IconButton>
+        </>
       ),
     }));
-  }, [handleLaunchBedWorkspace, responsiveSize, paginatedData, t]);
+  }, [handleLaunchBedWorkspace, openDeleteBedTypeModal, responsiveSize, paginatedData, t]);
 
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
