@@ -12,7 +12,6 @@ jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext)
 describe('Ward Metrics', () => {
   it('Should display metrics of in the ward ', () => {
     const mockWardPatientGroupDetails = mockWardViewContext.wardPatientGroupDetails;
-    const bedMetrics = getWardMetrics(mockWardPatientGroupDetails);
     renderWithSwr(<DefaultWardMetrics />);
     expect(screen.getByText('Patients')).toBeInTheDocument();
     expect(screen.getByText('Free beds')).toBeInTheDocument();
