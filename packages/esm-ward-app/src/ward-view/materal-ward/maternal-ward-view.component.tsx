@@ -9,7 +9,6 @@ import MaternalWardPendingPatients from './maternal-ward-pending-patients.compon
 import MaternalWardUnassignedPatients from './maternal-ward-unassigned-patients.component';
 import Ward from '../ward.component';
 import WardViewHeader from '../../ward-view-header/ward-view-header.component';
-import DefaultWardMetrics from '../default-ward/default-ward-metrics.component';
 import MaternalWardMetrics from './maternal-ward-metrics.component';
 
 const MaternalWardView = () => {

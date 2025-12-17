@@ -50,9 +50,9 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
 export function getWardMetrics(wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   // pull all the patients out of the three constructs they are stored in: unadmitted but in a bed, admitted and in a bed, and admitted but not in a bed
   const allPatients = [
-    ...wardPatientGroup.wardUnadmittedPatientsWithBed.values(),
-    ...[...wardPatientGroup.wardAdmittedPatientsWithBed.values()].map((admission) => admission.patient),
-    ...wardPatientGroup.wardUnassignedPatientsList.map((admission) => admission.patient),
+    ...wardPatientGroup.wardUnadmittedPatientsWithBed?.values(),
+    ...[...wardPatientGroup.wardAdmittedPatientsWithBed?.values()].map((admission) => admission.patient),
+    ...wardPatientGroup.wardUnassignedPatientsList?.map((admission) => admission.patient),
   ];
 
   const patientCount = allPatients?.length ?? 0;
@@ -121,9 +121,6 @@ export function createAndGetWardPatientGrouping(
         !wardUnadmittedPatientsWithBed.has(inpatientAdmission.patient.uuid)
       );
     }) ?? [];
-
-  //excluding inpatientRequests
-  const totalPatientsCount = allWardPatientUuids.size;
 
   for (const inpatientRequest of inpatientRequests ?? []) {
     // TODO: inpatientRequest is undefined sometimes, why?
