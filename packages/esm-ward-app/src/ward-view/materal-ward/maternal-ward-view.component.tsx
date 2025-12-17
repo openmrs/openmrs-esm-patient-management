@@ -9,6 +9,8 @@ import MaternalWardPendingPatients from './maternal-ward-pending-patients.compon
 import MaternalWardUnassignedPatients from './maternal-ward-unassigned-patients.component';
 import Ward from '../ward.component';
 import WardViewHeader from '../../ward-view-header/ward-view-header.component';
+import DefaultWardMetrics from '../default-ward/default-ward-metrics.component';
+import MaternalWardMetrics from './maternal-ward-metrics.component';
 
 const MaternalWardView = () => {
   const wardPatientGroupDetails = useWardPatientGrouping();
@@ -24,12 +26,13 @@ const MaternalWardView = () => {
   });
 
   const wardBeds = <MaternalWardBeds {...motherChildRelationships} />;
+  const wardMetrics = <MaternalWardMetrics />;
   const wardUnassignedPatients = <MaternalWardUnassignedPatients />;
   const wardPendingPatients = <MaternalWardPendingPatients />;
 
   return (
     <>
-      <WardViewHeader {...{ wardPendingPatients }} />
+      <WardViewHeader {...{ wardPendingPatients, wardMetrics }} />
       <Ward {...{ wardBeds, wardUnassignedPatients }} />
     </>
   );
