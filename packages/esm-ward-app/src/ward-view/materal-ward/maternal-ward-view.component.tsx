@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDefineAppContext } from '@openmrs/esm-framework';
 import { useWardPatientGrouping } from '../../hooks/useWardPatientGrouping';
-import { type MaternalWardViewContext, type WardViewContext } from '../../types';
+import { type MaternalWardViewContext, WardMetricType, type WardViewContext } from '../../types';
 import { useMotherChildrenRelationshipsByPatient } from './maternal-ward-view.resource';
 import MaternalWardBeds from './maternal-ward-beds.component';
 import MaternalWardPatientCardHeader from './maternal-ward-patient-card-header.component';
@@ -9,7 +9,7 @@ import MaternalWardPendingPatients from './maternal-ward-pending-patients.compon
 import MaternalWardUnassignedPatients from './maternal-ward-unassigned-patients.component';
 import Ward from '../ward.component';
 import WardViewHeader from '../../ward-view-header/ward-view-header.component';
-import MaternalWardMetrics from './maternal-ward-metrics.component';
+import WardMetrics from '../ward-metrics.component';
 
 const MaternalWardView = () => {
   const wardPatientGroupDetails = useWardPatientGrouping();
@@ -25,7 +25,18 @@ const MaternalWardView = () => {
   });
 
   const wardBeds = <MaternalWardBeds {...motherChildRelationships} />;
-  const wardMetrics = <MaternalWardMetrics />;
+  const wardMetrics = (
+    <WardMetrics
+      metrics={[
+        WardMetricType.PATIENTS,
+        WardMetricType.FEMALE_OF_REPRODUCTIVE_AGE,
+        WardMetricType.NEWBORNS,
+        WardMetricType.FREE_BEDS,
+        WardMetricType.TOTAL_BEDS,
+        WardMetricType.PENDING_OUT,
+      ]}
+    />
+  );
   const wardUnassignedPatients = <MaternalWardUnassignedPatients />;
   const wardPendingPatients = <MaternalWardPendingPatients />;
 
