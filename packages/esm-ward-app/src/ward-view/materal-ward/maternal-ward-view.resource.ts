@@ -15,19 +15,16 @@ export function useMotherChildrenRelationshipsByPatient(
 
   const getChildrenRequestParams: MothersAndChildrenSearchCriteria = {
     mothers: allWardPatientUuids,
-    // include children even if they don't have an active visit or weren't born during
-    // the mother's active visit so infants are visible in the maternal ward view
-    requireMotherHasActiveVisit: false,
-    requireChildHasActiveVisit: false,
-    requireChildBornDuringMothersActiveVisit: false,
+    requireMotherHasActiveVisit: true,
+    requireChildHasActiveVisit: true,
+    requireChildBornDuringMothersActiveVisit: true,
   };
 
   const getMotherRequestParams: MothersAndChildrenSearchCriteria = {
     children: allWardPatientUuids,
-    // include mothers even if criteria about active visits or birth timing don't hold
-    requireMotherHasActiveVisit: false,
-    requireChildHasActiveVisit: false,
-    requireChildBornDuringMothersActiveVisit: false,
+    requireMotherHasActiveVisit: true,
+    requireChildHasActiveVisit: true,
+    requireChildBornDuringMothersActiveVisit: true,
   };
 
   const {

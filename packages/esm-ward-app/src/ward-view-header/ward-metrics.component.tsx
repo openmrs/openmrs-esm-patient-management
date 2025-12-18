@@ -10,7 +10,13 @@ import {
 import WardMetric from './ward-metric.component';
 import styles from './ward-metrics.scss';
 
-const wardMetrics = [{ name: 'patients' }, { name: 'freeBeds' }, { name: 'totalBeds' }];
+const wardMetrics = [
+  { name: 'patients' },
+  { name: 'freeBeds' },
+  { name: 'totalBeds' },
+  { name: 'mothers' },
+  { name: 'infants' },
+];
 
 const WardMetrics = () => {
   const { t } = useTranslation();

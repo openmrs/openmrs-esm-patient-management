@@ -132,5 +132,9 @@
   "visitNoteSaved": "Patient note saved",
   "wardClinicalNotePlaceholder": "Write any notes here",
   "wardPatient": "Ward patient",
-  "wards": "Wards"
+  "wards": "Wards",
+  "mothers": "Mothers",
+  "mothersMetricValue": "{{ metricValue }}",
+  "infants": "Infants",
+  "infantsMetricValue": "{{ metricValue }}"
 }

@@ -11,6 +11,8 @@ const wardMetrics = [
   { name: 'patients', key: 'patients', defaultTranslation: 'Patients' },
   { name: 'freeBeds', key: 'freeBeds', defaultTranslation: 'Free beds' },
   { name: 'totalBeds', key: 'totalBeds', defaultTranslation: 'Total beds' },
+  { name: 'mothers', key: 'mothers', defaultTranslation: 'Mothers' },
+  { name: 'infants', key: 'infants', defaultTranslation: 'Infants' },
 ];
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);

@@ -230,6 +230,8 @@ export interface WardMetrics {
   patients: string;
   freeBeds: string;
   totalBeds: string;
+  mothers: string;
+  infants: string;
 }
 
 export interface EncounterPayload {

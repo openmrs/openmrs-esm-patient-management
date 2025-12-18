@@ -50,10 +50,49 @@ export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPa
   const patients = wardPatientGroup?.totalPatientsCount ?? 0;
   const totalBeds = bedLayouts?.length ?? 0;
   const occupiedBeds = bedLayouts?.filter((bed) => bed.patients?.length > 0).length ?? 0;
+
+  // Calculate mothers: adult female patients (assuming every adult in maternal ward is a mother)
+  let mothers = 0;
+  let infants = 0;
+
+  // Get all patients from admitted patients and unassigned patients
+  const allPatients = new Set<Patient>();
+
+  // Add patients from beds
+  bedLayouts?.forEach((bed) => {
+    bed.patients?.forEach((patient) => allPatients.add(patient));
+  });
+
+  // Add unassigned patients
+  wardPatientGroup?.wardUnassignedPatientsList?.forEach((admission) => {
+    allPatients.add(admission.patient);
+  });
+
+  // Count mothers and infants
+  allPatients.forEach((patient) => {
+    if (patient.person?.birthdate) {
+      const birthDate = new Date(patient.person.birthdate);
+      const today = new Date();
+      const ageInYears = (today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+
+      // Infants: patients under 1 year old
+      if (ageInYears < 1) {
+        infants++;
+      }
+
+      // Mothers: adult females (18+ years old, assuming child-bearing age)
+      if (patient.person?.gender === 'F' && ageInYears >= 18) {
+        mothers++;
+      }
+    }
+  });
+
   return {
     patients: patients.toString(),
     freeBeds: (totalBeds - occupiedBeds).toString(),
     totalBeds: totalBeds.toString(),
+    mothers: mothers.toString(),
+    infants: infants.toString(),
   };
 }
 
@@ -142,6 +181,10 @@ export function getWardMetricNameTranslation(name: string, t: TFunction) {
       return t('totalBeds', 'Total beds');
     case 'pendingOut':
       return t('pendingOut', 'Pending out');
+    case 'mothers':
+      return t('mothers', 'Mothers');
+    case 'infants':
+      return t('infants', 'Infants');
   }
 }
 
@@ -155,6 +198,10 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
       return t('totalBedsMetricValue', '{{ metricValue }}', { metricValue: value });
     case 'pendingOut':
       return t('pendingOutMetricValue', '{{ metricValue }}', { metricValue: value });
+    case 'mothers':
+      return t('mothersMetricValue', '{{ metricValue }}', { metricValue: value });
+    case 'infants':
+      return t('infantsMetricValue', '{{ metricValue }}', { metricValue: value });
   }
 }
 
