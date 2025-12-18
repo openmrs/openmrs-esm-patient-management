@@ -1,6 +1,9 @@
-import { createGlobalStore, isOmrsDateStrict, useStore } from '@openmrs/esm-framework';
+import { createGlobalStore, getDefaultCalendar, getLocale, isOmrsDateStrict, useStore } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
+import { type CalendarDate, createCalendar, toCalendarDate, parseAbsoluteToLocal } from '@internationalized/date';
 import { omrsDateFormat } from './constants';
+
+export const calendar = createCalendar(getDefaultCalendar(getLocale()));
 
 export const appointmentsStore = createGlobalStore('appointments-app', {
   appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
@@ -23,6 +26,13 @@ export function setSelectedDate(date: string) {
     );
   }
   appointmentsStore.setState({ selectedDate: date });
+}
+
+export function getSelectedCalendarDate(): CalendarDate {
+  const { selectedDate } = appointmentsStore.getState();
+  const localZoned = parseAbsoluteToLocal(selectedDate);
+
+  return toCalendarDate(localZoned);
 }
 
 /* Set up localStorage serialization */

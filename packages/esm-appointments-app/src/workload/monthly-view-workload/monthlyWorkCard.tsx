@@ -1,34 +1,21 @@
 import React from 'react';
 import classNames from 'classnames';
-import dayjs, { type Dayjs } from 'dayjs';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
-import {
-  parseDate,
-  type CalendarDate,
-  toCalendar,
-  createCalendar,
-  getLocalTimeZone,
-  today,
-  isSameDay,
-} from '@internationalized/date';
+import { type CalendarDate, getLocalTimeZone, today, isSameDay } from '@internationalized/date';
 import { isSameCalendarMonth } from '../../helpers';
 import styles from './monthly-workload.scss';
+import { getSelectedCalendarDate } from '../../store';
 
 interface MonthlyWorkloadComponentProps {
   date: CalendarDate;
   count: number;
   isActive: boolean;
-  selectedDate?: Dayjs;
 }
 
-const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, count, isActive, selectedDate }) => {
+const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, count, isActive }) => {
   const layout = useLayoutType();
   const isToday = isSameDay(date, today(getLocalTimeZone()));
-  const dateSelected = toCalendar(
-    parseDate(dayjs(selectedDate).format('YYYY-MM-DD')),
-    createCalendar(getDefaultCalendar(getLocale())),
-  );
+  const dateSelected = getSelectedCalendarDate();
 
   return (
     <div

@@ -1,36 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@openmrs/esm-framework';
-import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
-import {
-  parseDate,
-  toCalendar,
-  createCalendar,
-  getLocalTimeZone,
-  toCalendarDate,
-  today,
-} from '@internationalized/date';
+import { getLocale } from '@openmrs/esm-utils';
+import { getLocalTimeZone, toCalendarDate, today, type CalendarDate } from '@internationalized/date';
 import { monthDays } from '../../helpers';
-import { useAppointmentsStore } from '../../store';
+import { getSelectedCalendarDate } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
 
 interface MonthlyCalendarViewProps {
   calendarWorkload: Array<{ count: number; date: string }>;
-  dateToDisplay?: string;
+  dateToDisplay?: CalendarDate;
   onDateClick?: (pickedDate: Date) => void;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
-  calendarWorkload,
-  dateToDisplay = '',
-  onDateClick,
-}) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ calendarWorkload, dateToDisplay, onDateClick }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
-  const calendar = createCalendar(getDefaultCalendar(getLocale()));
-  const date = toCalendar(parseDate(selectedDate.split('T')[0]), calendar);
+  const date = getSelectedCalendarDate();
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const todayDate = toCalendarDate(today(getLocalTimeZone()));
   const todayShort = new Intl.DateTimeFormat(getLocale(), { weekday: 'short' })
@@ -42,9 +29,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
     isToday: day === todayShort,
   }));
 
-  const monthViewDate =
-    dateToDisplay === '' ? toCalendarDate(date) : toCalendar(parseDate(dateToDisplay.split('T')[0]), calendar);
-  // const daysInWeeks = daysInWeek.map((day) => t(day));
+  const monthViewDate: CalendarDate = dateToDisplay ?? date;
 
   const handleClick = (date: Date) => {
     if (onDateClick) {
@@ -76,9 +61,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}
-                  isActive={
-                    toCalendar(parseDate(dateToDisplay.split('T')[0]), calendar).toString() === dateTime.toString()
-                  }
+                  isActive={dateToDisplay.toString() === dateTime.toString()}
                   count={calendarWorkload.find((calendar) => calendar.date === dateTime.toString())?.count ?? 0}
                 />
               </div>

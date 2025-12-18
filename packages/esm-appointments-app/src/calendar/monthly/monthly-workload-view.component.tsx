@@ -1,20 +1,12 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { User } from '@carbon/react/icons';
-import {
-  parseDate,
-  type CalendarDate,
-  toCalendar,
-  createCalendar,
-  toCalendarDate,
-  type Calendar,
-} from '@internationalized/date';
+import { parseDate, type CalendarDate, toCalendar, type Calendar } from '@internationalized/date';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import { spaHomePage } from '../../constants';
 import { isSameCalendarMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { useAppointmentsStore } from '../../store';
+import { getSelectedCalendarDate, useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
 import styles from './monthly-view-workload.scss';
 
@@ -33,16 +25,14 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
 }) => {
   const layout = useLayoutType();
   const { selectedDate } = useAppointmentsStore();
-  const date = toCalendar(parseDate(selectedDate.split('T')[0]), calendar);
+  const date = getSelectedCalendarDate();
 
   const currentData = useMemo(
     () =>
       events?.find(
-        (event) =>
-          toCalendar(parseDate(event.appointmentDate), createCalendar(getDefaultCalendar(getLocale()))).toString() ===
-          dateTime.toString(),
+        (event) => toCalendar(parseDate(event.appointmentDate), calendar).toString() === dateTime.toString(),
       ),
-    [dateTime, events],
+    [calendar, dateTime, events],
   );
 
   const visibleServices = useMemo(() => {
@@ -69,7 +59,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
     <div
       onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
-        styles[isSameCalendarMonth(dateTime, toCalendarDate(date)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        styles[isSameCalendarMonth(dateTime, date) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
           ? {}
           : {
@@ -77,7 +67,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
               [styles.largeDesktop]: layout !== 'small-desktop',
             },
       )}>
-      {isSameCalendarMonth(dateTime, toCalendarDate(date)) && (
+      {isSameCalendarMonth(dateTime, date) && (
         <div>
           <span className={classNames(styles.totals)}>
             {currentData?.services ? (

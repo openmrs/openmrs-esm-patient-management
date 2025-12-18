@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppointmentService } from '../form/appointments-form.resource';
+import { parseDate } from '@internationalized/date';
 import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
 import MonthlyCalendarView from './monthly-view-workload/monthly-view.component';
 import styles from './workload.scss';
@@ -30,7 +31,7 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
     <div className={styles.workLoadContainer}>
       <MonthlyCalendarView
         calendarWorkload={monthlyCalendarWorkload}
-        dateToDisplay={appointmentDate.toISOString()}
+        dateToDisplay={parseDate(appointmentDate.toISOString())}
         onDateClick={handleDateClick}
       />
     </div>

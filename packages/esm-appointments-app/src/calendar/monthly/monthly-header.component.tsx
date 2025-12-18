@@ -2,9 +2,9 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
-import { parseDate, toCalendar, createCalendar, getLocalTimeZone } from '@internationalized/date';
-import { useAppointmentsStore, setSelectedDate } from '../../store';
+import { getLocale } from '@openmrs/esm-utils';
+import { getLocalTimeZone } from '@internationalized/date';
+import { useAppointmentsStore, setSelectedDate, getSelectedCalendarDate } from '../../store';
 import DaysOfWeekCard from './days-of-week.component';
 import styles from './monthly-header.scss';
 
@@ -13,7 +13,7 @@ const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 const MonthlyHeader: React.FC = () => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
-  const date = toCalendar(parseDate(selectedDate.split('T')[0]), createCalendar(getDefaultCalendar(getLocale())));
+  const date = getSelectedCalendarDate();
 
   const todayShort = new Intl.DateTimeFormat(getLocale(), { weekday: 'short' })
     .format(date.toDate(getLocalTimeZone()))
@@ -25,11 +25,11 @@ const MonthlyHeader: React.FC = () => {
   }));
 
   const handleSelectPrevMonth = useCallback(() => {
-    setSelectedDate(date.subtract({ months: 1 }).toString());
+    setSelectedDate(date.subtract({ months: 1 }).toDate(getLocalTimeZone()).toISOString());
   }, [date]);
 
   const handleSelectNextMonth = useCallback(() => {
-    setSelectedDate(date.subtract({ months: 1 }).toString());
+    setSelectedDate(date.add({ months: 1 }).toDate(getLocalTimeZone()).toISOString());
   }, [date]);
 
   return (
