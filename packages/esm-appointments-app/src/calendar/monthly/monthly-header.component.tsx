@@ -12,7 +12,6 @@ const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 
 const MonthlyHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
   const date = getSelectedCalendarDate();
 
   const todayShort = new Intl.DateTimeFormat(getLocale(), { weekday: 'short' })
@@ -42,7 +41,7 @@ const MonthlyHeader: React.FC = () => {
           size="sm">
           {t('prev', 'Prev')}
         </Button>
-        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
+        <span>{formatDate(new Date(date.toDate(getLocalTimeZone())), { day: false, time: false, noToday: true })}</span>
         <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={handleSelectNextMonth} size="sm">
           {t('next', 'Next')}
         </Button>

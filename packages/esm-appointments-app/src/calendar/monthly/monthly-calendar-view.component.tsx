@@ -1,7 +1,7 @@
 import React from 'react';
-import { parseDate, toCalendar, type Calendar } from '@internationalized/date';
+import { type Calendar } from '@internationalized/date';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { useAppointmentsStore } from '../../store';
+import { getSelectedCalendarDate } from '../../store';
 import { monthDays } from '../../helpers';
 import MonthlyViewWorkload from './monthly-workload-view.component';
 import MonthlyHeader from './monthly-header.component';
@@ -13,8 +13,7 @@ interface MonthlyCalendarViewProps {
 }
 
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendar }) => {
-  const { selectedDate } = useAppointmentsStore();
-  const date = toCalendar(parseDate(selectedDate.split('T')[0]), calendar);
+  const date = getSelectedCalendarDate();
 
   return (
     <div className={styles.calendarViewContainer}>
