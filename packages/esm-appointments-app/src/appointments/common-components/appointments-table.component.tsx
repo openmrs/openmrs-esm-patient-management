@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -7,6 +7,7 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  Dropdown,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
@@ -55,84 +56,65 @@ interface AppointmentsTableProps {
   isLoading: boolean;
   tableHeading: string;
   hasActiveFilters?: boolean;
+  statusDropdownItems?: Array<{ id: string; name: string; display: string }>;
+  selectedStatusItem?: { id: string; name: string; display: string } | null;
+  onStatusChange?: ({ selectedItem }: { selectedItem: any }) => void;
+  responsiveSize?: string;
 }
-
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
+const AppointmentsTable = memo(function AppointmentsTable({
   appointments,
   isLoading,
   tableHeading,
   hasActiveFilters,
-}) => {
+  statusDropdownItems = [],
+  selectedStatusItem,
+  onStatusChange,
+  responsiveSize: providedResponsiveSize,
+}: AppointmentsTableProps) {
   const { t } = useTranslation();
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(10);
   const [searchString, setSearchString] = useState('');
   const config = useConfig<ConfigObject>();
   const { appointmentsTableColumns } = config;
+  const layout = useLayoutType();
+  const responsiveSize = providedResponsiveSize || (isDesktop(layout) ? 'sm' : 'lg');
+
   const searchResults = useAppointmentSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
-  const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
   const { visits } = useTodaysVisits();
-  const layout = useLayoutType();
-  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+  const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
 
-  const headerData = appointmentsTableColumns.map((columnKey) => ({
-    header: t(columnKey, columnKey),
-    key: columnKey,
+  const headerData = appointmentsTableColumns.map((col) => ({
+    key: col,
+    header: t(col, col),
   }));
 
-  const rowData = results?.map((appointment) => ({
-    id: appointment.uuid,
-    patientName: (
-      <ConfigurableLink
-        className={styles.link}
-        to={customPatientChartUrl}
-        templateParams={{ patientUuid: appointment.patient.uuid }}>
-        {appointment.patient.name}
-      </ConfigurableLink>
-    ),
-    nextAppointmentDate: '--',
-    identifier: patientIdentifierType
-      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
-      : appointment.patient.identifier,
-    dateTime: formatDatetime(new Date(appointment.startDateTime)),
-    serviceType: appointment.service.name,
-    location: appointment.location?.name,
-    provider: appointment.providers?.[0]?.name ?? '--',
-    status: <AppointmentActions appointment={appointment} />,
-  }));
+  const rowData = results.map((appointment) => {
+    const patientUuid = appointment.patient.uuid;
+    const visitDate = dayjs(appointment.startDateTime);
+    const isFuture = visitDate.isAfter(dayjs());
+    const isToday = visitDate.isToday();
+    const hasActiveVisit = visits?.some((v) => v.patient.uuid === patientUuid && v.startDatetime);
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" rowCount={5} />;
-  }
-
-  if (hasActiveFilters && !appointments?.length) {
-    return (
-      <div className={styles.filterEmptyState}>
-        <Layer level={0}>
-          <Tile className={styles.filterEmptyStateTile}>
-            <p className={styles.filterEmptyStateContent}>
-              {t('noMatchingAppointments', 'No matching appointments found')}
-            </p>
-            <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-          </Tile>
-        </Layer>
-      </div>
-    );
-  }
-
-  if (!appointments?.length) {
-    return (
-      <EmptyState
-        headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
-        displayText={
-          tableHeading === t('todays', "Today's")
-            ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
-            : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
-        }
-        launchForm={() => launchCreateAppointmentForm(t)}
-      />
-    );
-  }
+    return {
+      id: appointment.uuid,
+      patientName: (
+        <ConfigurableLink className={styles.link} to={customPatientChartUrl} templateParams={{ patientUuid }}>
+          {appointment.patient.name}
+        </ConfigurableLink>
+      ),
+      identifier: patientIdentifierType
+        ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
+        : appointment.patient.identifier,
+      dateTime: formatDatetime(parseDate(appointment.startDateTime)),
+      serviceType: appointment.service.name,
+      location: appointment.location?.name ?? '--',
+      provider: appointment.providers?.[0]?.name ?? '--',
+      status: <AppointmentActions appointment={appointment} />,
+      _appointment: appointment,
+      _canEdit: isFuture || (isToday && !hasActiveVisit),
+    };
+  });
 
   return (
     <Layer className={styles.container}>
@@ -143,144 +125,130 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       </Tile>
       <div className={styles.toolbar}>
         <Search
+          size={responsiveSize}
+          placeholder={t('searchPatient', 'Search patient')}
+          labelText=""
+          onChange={(e) => setSearchString(e.target.value)}
           className={styles.searchbar}
-          labelText={t('filterAppointments', 'Filter appointments')}
-          placeholder={t('filterTable', 'Filter table')}
-          onChange={(event) => setSearchString(event.target.value)}
-          size={responsiveSize}
         />
+
+        {statusDropdownItems.length > 0 && onStatusChange && (
+          <div className={styles.filterContainer}>
+            <Dropdown
+              id="statusFilter"
+              items={statusDropdownItems}
+              itemToString={(item) => item?.display ?? ''}
+              label={selectedStatusItem?.display || statusDropdownItems[0]?.display || t('all', 'All')}
+              selectedItem={selectedStatusItem || statusDropdownItems[0]}
+              onChange={onStatusChange}
+              type="inline"
+              size={responsiveSize}
+              titleText={t('filterByStatus', 'Filter by status')}
+            />
+          </div>
+        )}
+
         <Button
-          size={responsiveSize}
           kind="tertiary"
           renderIcon={Download}
+          size={responsiveSize}
           onClick={() => {
             const date = appointments[0]?.startDateTime
-              ? formatDate(parseDate(appointments[0]?.startDateTime), {
-                  time: false,
-                  noToday: true,
-                })
-              : null;
+              ? formatDate(parseDate(appointments[0].startDateTime), { time: false, noToday: true })
+              : '';
             exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
           }}>
           {t('download', 'Download')}
         </Button>
       </div>
-      <DataTable
-        aria-label={t('appointmentsTable', 'Appointments table')}
-        data-floating-menu-container
-        rows={rowData}
-        headers={headerData}
-        isSortable
-        size={responsiveSize}
-        useZebraStyles>
-        {({
-          rows,
-          headers,
-          getExpandHeaderProps,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getTableContainerProps,
-        }) => (
-          <>
-            <TableContainer {...getTableContainerProps()}>
+
+      {isLoading ? (
+        <DataTableSkeleton row={5} />
+      ) : (
+        <DataTable
+          key={selectedStatusItem?.id || 'all'}
+          rows={rowData}
+          headers={headerData}
+          isSortable
+          size={responsiveSize}
+          useZebraStyles>
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
-                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                    <TableExpandHeader />
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
-                    <TableHeader aria-label={t('actions', 'Actions')} />
+                    <TableHeader>{t('actions', 'Actions')}</TableHeader>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => {
-                    const matchingAppointment = appointments.find((appointment) => appointment.uuid === row.id);
-
-                    if (!matchingAppointment) {
-                      return null;
-                    }
-
-                    const patientUuid = matchingAppointment.patient?.uuid;
-                    const visitDate = dayjs(matchingAppointment.startDateTime);
-                    const isFutureAppointment = visitDate.isAfter(dayjs());
-                    const isTodayAppointment = visitDate.isToday();
-                    const hasActiveVisitToday = visits?.some(
-                      (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime,
-                    );
-
-                    return (
+                  {rows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={headers.length + 2}>
+                        <EmptyState
+                          headerTitle={t('noAppointments', 'No appointments')}
+                          displayText={t('appointmentsToDisplay', 'appointments to display')}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    rows.map((row) => (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
-                            {isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday) ? (
-                              <OverflowMenu
-                                align="left"
-                                aria-label={t('actions', 'Actions')}
-                                flipped
-                                size={responsiveSize}>
+                            {row.cells._canEdit && (
+                              <OverflowMenu flipped>
                                 <OverflowMenuItem
-                                  className={styles.menuItem}
                                   itemText={t('editAppointment', 'Edit appointment')}
                                   onClick={() =>
                                     launchWorkspace2('appointments-form-workspace', {
-                                      patientUuid: matchingAppointment.patient.uuid,
-                                      appointment: matchingAppointment,
+                                      appointment: row.cells._appointment,
+                                      patientUuid: row.cells._appointment.patient.uuid,
+                                      context: 'editing',
                                     })
                                   }
                                 />
                               </OverflowMenu>
-                            ) : null}
+                            )}
                           </TableCell>
                         </TableExpandRow>
-                        {row.isExpanded ? (
-                          <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
-                            <AppointmentDetails appointment={matchingAppointment} />
+                        {row.isExpanded && (
+                          <TableExpandedRow colSpan={headers.length + 2} className={styles.expandedRow}>
+                            <AppointmentDetails appointment={row.cells._appointment} />
                           </TableExpandedRow>
-                        ) : (
-                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                         )}
                       </React.Fragment>
-                    );
-                  })}
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
-            {rows.length === 0 ? (
-              <div className={styles.tileContainer}>
-                <Layer>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                  </Tile>
-                </Layer>
-              </div>
-            ) : null}
-          </>
-        )}
-      </DataTable>
-      <Pagination
-        backwardText={t('previousPage', 'Previous page')}
-        forwardText={t('nextPage', 'Next page')}
-        itemsPerPageText={t('itemsPerPage', 'Items per page') + ':'}
-        page={currentPage}
-        pageNumberText={t('pageNumber', 'Page number')}
-        pageSize={pageSize}
-        pageSizes={getPageSizes(appointments, pageSize) ?? []}
-        onChange={({ page, pageSize }) => {
-          goTo(page);
-          setPageSize(pageSize);
-        }}
-        totalItems={appointments.length ?? 0}
-      />
+          )}
+        </DataTable>
+      )}
+
+      {!isLoading && appointments.length > 0 && (
+        <Pagination
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={getPageSizes(appointments, pageSize) ?? [10, 25, 50]}
+          totalItems={searchResults.length}
+          onChange={({ page, pageSize }) => {
+            goTo(page);
+            setPageSize(pageSize);
+          }}
+        />
+      )}
     </Layer>
   );
-};
+});
 
 export default AppointmentsTable;

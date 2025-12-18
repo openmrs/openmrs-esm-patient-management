@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch } from '@carbon/react';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import {
   ExtensionSlot,
   Extension,
   useConnectedExtensions,
   type ConnectedExtension,
-  type ConfigObject,
   useLayoutType,
   isDesktop,
 } from '@openmrs/esm-framework';
@@ -17,28 +15,21 @@ import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
 
-interface ScheduledAppointmentsProps {
-  appointmentServiceTypes?: Array<string>;
-}
-
 type DateType = 'pastDate' | 'today' | 'futureDate';
-
 const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceTypes }) => {
+const ScheduledAppointments: React.FC<{ appointmentServiceTypes?: Array<string> }> = ({ appointmentServiceTypes }) => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
-  // added to prevent auto-removal of translations for dynamic keys
-  // t('checkedIn', 'Checked in');
-  // t('expected', 'Expected');
-
-  const [currentTab, setCurrentTab] = useState(null);
+  const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [dateType, setDateType] = useState<DateType>('today');
+
   const scheduledAppointmentPanels = useConnectedExtensions(scheduledAppointmentsPanelsSlot);
   const { allowedExtensions, showExtension, hideExtension } = useAllowedExtensions();
+
   const shouldShowPanel = useCallback(
     (panel: Omit<ConnectedExtension, 'config'>) => allowedExtensions[panel.name] ?? false,
     [allowedExtensions],
@@ -47,78 +38,71 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
   useEffect(() => {
     const dayjsDate = dayjs(selectedDate);
     const now = dayjs();
-    if (dayjsDate.isBefore(now, 'date')) {
-      setDateType('pastDate');
-    } else if (dayjsDate.isAfter(now, 'date')) {
-      setDateType('futureDate');
-    } else {
-      setDateType('today');
-    }
+    if (dayjsDate.isBefore(now, 'date')) setDateType('pastDate');
+    else if (dayjsDate.isAfter(now, 'date')) setDateType('futureDate');
+    else setDateType('today');
   }, [selectedDate]);
 
   useEffect(() => {
-    // This is intended to cover two things:
-    //  1. If no current tab is set, set it to the first allowed tab
-    //  2. If a current tab is set, but the tab is no longer allowed in this context, set it to the
-    //     first allowed tab
-    if (allowedExtensions && (currentTab === null || !allowedExtensions[currentTab])) {
-      for (const extension of Object.getOwnPropertyNames(allowedExtensions)) {
-        if (allowedExtensions[extension]) {
-          setCurrentTab(extension);
-          break;
-        }
-      }
+    if (allowedExtensions && (currentTab === null || (currentTab !== 'all' && !allowedExtensions[currentTab]))) {
+      setCurrentTab('all');
     }
   }, [allowedExtensions, currentTab]);
 
   const panelsToShow = scheduledAppointmentPanels.filter(shouldShowPanel);
 
-  return (
-    <>
-      <ContentSwitcher
-        className={styles.switcher}
-        size={responsiveSize}
-        onChange={({ name }) => setCurrentTab(name)}
-        selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
-        selectionMode="manual">
-        {panelsToShow.map((panel) => (
-          <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
-        ))}
-      </ContentSwitcher>
+  const statusDropdownItems = [
+    {
+      id: 'all',
+      name: 'all',
+      display: t('all', 'All'),
+    },
+    ...panelsToShow.map((panel) => ({
+      id: panel.name,
+      name: panel.name,
+      display: t(panel.config.title),
+    })),
+  ];
 
+  const selectedStatusItem =
+    statusDropdownItems.find((item) => item.name === currentTab) || (statusDropdownItems[0] ?? null);
+
+  const handleStatusChange = useCallback(({ selectedItem }: { selectedItem: any }) => {
+    if (selectedItem?.name) {
+      setCurrentTab(selectedItem.name);
+    }
+  }, []);
+
+  const firstPanelToShow = panelsToShow[0];
+
+  return (
+    <div className={styles.container}>
       <ExtensionSlot name={scheduledAppointmentsPanelsSlot}>
-        {(extension) => {
-          return (
-            <ExtensionWrapper
-              appointmentServiceTypes={appointmentServiceTypes}
-              currentTab={currentTab}
-              date={selectedDate}
-              dateType={dateType}
-              extension={extension}
-              hideExtensionTab={hideExtension}
-              showExtensionTab={showExtension}
-            />
-          );
-        }}
+        {(extension) => (
+          <ExtensionWrapper
+            extension={extension}
+            currentTab={currentTab}
+            appointmentServiceTypes={appointmentServiceTypes}
+            date={selectedDate}
+            dateType={dateType}
+            showExtensionTab={showExtension}
+            hideExtensionTab={hideExtension}
+            statusDropdownItems={statusDropdownItems}
+            selectedStatusItem={selectedStatusItem}
+            onStatusChange={handleStatusChange}
+            responsiveSize={responsiveSize}
+            firstPanelToShow={firstPanelToShow}
+          />
+        )}
       </ExtensionSlot>
-    </>
+    </div>
   );
 };
 
 function useAllowedExtensions() {
   const [allowedExtensions, dispatch] = useReducer(
     (state: Record<string, boolean>, action: { type: 'show_extension' | 'hide_extension'; extension: string }) => {
-      let addedState = {} as Record<string, boolean>;
-      switch (action.type) {
-        case 'show_extension':
-          addedState[action.extension] = true;
-          break;
-        case 'hide_extension':
-          addedState[action.extension] = false;
-          break;
-      }
-
-      return { ...state, ...addedState };
+      return { ...state, [action.extension]: action.type === 'show_extension' };
     },
     {},
   );
@@ -138,55 +122,68 @@ function ExtensionWrapper({
   dateType,
   showExtensionTab,
   hideExtensionTab,
+  statusDropdownItems,
+  selectedStatusItem,
+  onStatusChange,
+  responsiveSize,
+  firstPanelToShow,
 }: {
   extension: ConnectedExtension;
-  currentTab: string;
+  currentTab: string | null;
   appointmentServiceTypes: Array<string>;
   date: string;
   dateType: DateType;
-  showExtensionTab: (extension: string) => void;
-  hideExtensionTab: (extension: string) => void;
+  showExtensionTab: (ext: string) => void;
+  hideExtensionTab: (ext: string) => void;
+  statusDropdownItems: Array<{ id: string; name: string; display: string }>;
+  selectedStatusItem: { id: string; name: string; display: string } | null;
+  onStatusChange: ({ selectedItem }: { selectedItem: any }) => void;
+  responsiveSize: string;
+  firstPanelToShow: ConnectedExtension | undefined;
 }) {
-  const currentConfig = useRef(null);
+  const { t } = useTranslation();
+  const currentConfig = useRef(extension.config);
   const currentDateType = useRef(dateType);
 
-  // This use effect hook controls whether the tab for this extension should render
   useEffect(() => {
-    if (
-      currentConfig.current === null ||
-      (currentConfig.current !== null && !shallowEqual(currentConfig.current, extension.config)) ||
-      currentDateType.current !== dateType
-    ) {
+    const configChanged = !shallowEqual(currentConfig.current, extension.config);
+    const dateTypeChanged = currentDateType.current !== dateType;
+
+    if (configChanged || dateTypeChanged || !currentConfig.current) {
       currentConfig.current = extension.config;
       currentDateType.current = dateType;
-      void (shouldDisplayExtensionTab(extension?.config, dateType)
-        ? showExtensionTab(extension.name)
-        : hideExtensionTab(extension.name));
     }
+
+    const shouldShow = shouldDisplayExtensionTab(extension.config, dateType);
+    shouldShow ? showExtensionTab(extension.name) : hideExtensionTab(extension.name);
   }, [extension, dateType, showExtensionTab, hideExtensionTab]);
+
+  const isAllSelected = currentTab === 'all';
+  const shouldShowExtension = isAllSelected ? firstPanelToShow?.name === extension.name : currentTab === extension.name;
 
   return (
     <div
       key={extension.name}
-      className={styles.container}
-      style={{ display: currentTab === extension.name ? 'block' : 'none' }}>
+      style={{ display: shouldShowExtension ? 'block' : 'none' }}
+      className={styles.extensionWrapper}>
       <Extension
         state={{
           date,
           appointmentServiceTypes,
-          status: extension.config?.status,
-          title: extension.config?.title,
+          status: isAllSelected ? null : extension.config?.status,
+          title: isAllSelected ? t('allAppointments', 'All') : extension.config?.title || extension.name,
+          statusDropdownItems,
+          selectedStatusItem,
+          onStatusChange,
+          responsiveSize,
         }}
       />
     </div>
   );
 }
 
-function shouldDisplayExtensionTab(config: ConfigObject | undefined, dateType: DateType): boolean {
-  if (!config) {
-    return false;
-  }
-
+function shouldDisplayExtensionTab(config: any, dateType: DateType): boolean {
+  if (!config) return false;
   switch (dateType) {
     case 'futureDate':
       return config.showForFutureDate ?? false;
@@ -194,22 +191,18 @@ function shouldDisplayExtensionTab(config: ConfigObject | undefined, dateType: D
       return config.showForPastDate ?? false;
     case 'today':
       return config.showForToday ?? false;
+    default:
+      return false;
   }
 }
 
-function shallowEqual(objA: object, objB: object) {
-  if (Object.is(objA, objB)) {
-    return true;
-  }
-
-  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
-    return false;
-  }
-
-  const objAKeys = Object.getOwnPropertyNames(objA);
-  const objBKeys = Object.getOwnPropertyNames(objB);
-
-  return objAKeys.length === objBKeys.length && objAKeys.every((key) => objA[key] === objB[key]);
+function shallowEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((key) => Object.prototype.hasOwnProperty.call(b, key) && a[key] === b[key]);
 }
 
 export default ScheduledAppointments;
