@@ -51,6 +51,8 @@
   "freeBedsMetricValue": "{{ metricValue }}",
   "hours_one": "{{count}} hour",
   "hours_other": "{{count}} hours",
+  "infants": "Infants",
+  "infantsMetricValue": "{{ metricValue }}",
   "inpatientNotesWorkspaceTitle": "In-patient notes",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
@@ -60,6 +62,8 @@
   "minutes_one": "{{count}} minutes",
   "minutes_other": "{{count}} minutes",
   "motherChildBedShare": "Mother / Child",
+  "mothers": "Mothers",
+  "mothersMetricValue": "{{ metricValue }}",
   "nextPage": "Next page",
   "noActiveVisit": "No active visit",
   "noAdmission": "No admission found",
@@ -132,9 +136,5 @@
   "visitNoteSaved": "Patient note saved",
   "wardClinicalNotePlaceholder": "Write any notes here",
   "wardPatient": "Ward patient",
-  "wards": "Wards",
-  "mothers": "Mothers",
-  "mothersMetricValue": "{{ metricValue }}",
-  "infants": "Infants",
-  "infantsMetricValue": "{{ metricValue }}"
+  "wards": "Wards"
 }
