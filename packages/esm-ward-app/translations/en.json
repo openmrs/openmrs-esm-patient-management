@@ -17,8 +17,6 @@
   "bedSwap": "Bed swap",
   "cancel": "Cancel",
   "cancelAdmissionRequest": "Cancel admission request",
-  "capacity": "Capacity",
-  "capacityMetricValue": "{{ metricValue }} %",
   "chooseAnOption": "Choose an option",
   "clinicalForms": "Clinical forms",
   "clinicalNoteLabel": "Write your notes",
