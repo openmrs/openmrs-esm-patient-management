@@ -1,4 +1,5 @@
-import { createGlobalStore, getDefaultCalendar, getLocale, isOmrsDateStrict, useStore } from '@openmrs/esm-framework';
+import { createGlobalStore, isOmrsDateStrict, useStore } from '@openmrs/esm-framework';
+import { getLocale, getDefaultCalendar } from '@openmrs/esm-utils';
 import dayjs from 'dayjs';
 import { type CalendarDate, createCalendar, toCalendarDate, parseAbsoluteToLocal } from '@internationalized/date';
 import { omrsDateFormat } from './constants';
