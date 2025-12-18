@@ -9,7 +9,6 @@ interface AppointmentsListProps {
   excludeCancelledAppointments?: boolean;
   status?: string | null;
   title: string;
-  // Optional props for status dropdown (I passed from Extension state)
   statusDropdownItems?: Array<{ id: string; name: string; display: string }>;
   selectedStatusItem?: { id: string; name: string; display: string } | null;
   onStatusChange?: ({ selectedItem }) => void;

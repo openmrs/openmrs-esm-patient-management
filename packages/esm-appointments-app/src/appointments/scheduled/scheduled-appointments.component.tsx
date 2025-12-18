@@ -51,7 +51,6 @@ const ScheduledAppointments: React.FC<{ appointmentServiceTypes?: Array<string> 
 
   const panelsToShow = scheduledAppointmentPanels.filter(shouldShowPanel);
 
-  // Build dropdown items
   const statusDropdownItems = [
     {
       id: 'all',
@@ -150,7 +149,6 @@ function ExtensionWrapper({
     const configChanged = !shallowEqual(currentConfig.current, extension.config);
     const dateTypeChanged = currentDateType.current !== dateType;
 
-    // Always evaluate once to populate allowedExtensions so the dropdown is rendered on first load.
     if (configChanged || dateTypeChanged || !currentConfig.current) {
       currentConfig.current = extension.config;
       currentDateType.current = dateType;
@@ -160,7 +158,6 @@ function ExtensionWrapper({
     shouldShow ? showExtensionTab(extension.name) : hideExtensionTab(extension.name);
   }, [extension, dateType, showExtensionTab, hideExtensionTab]);
 
-  // When "all" is selected, show only the first extension with null status to get all appointments
   const isAllSelected = currentTab === 'all';
   const shouldShowExtension = isAllSelected ? firstPanelToShow?.name === extension.name : currentTab === extension.name;
 

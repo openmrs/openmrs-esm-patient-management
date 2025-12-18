@@ -111,7 +111,7 @@ const AppointmentsTable = memo(function AppointmentsTable({
       location: appointment.location?.name ?? '--',
       provider: appointment.providers?.[0]?.name ?? '--',
       status: <AppointmentActions appointment={appointment} />,
-      _appointment: appointment, // for expansion
+      _appointment: appointment,
       _canEdit: isFuture || (isToday && !hasActiveVisit),
     };
   });

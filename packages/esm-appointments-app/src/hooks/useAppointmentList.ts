@@ -16,7 +16,7 @@ export const useAppointmentList = (appointmentStatus: string | null, date?: stri
       startDate: startDate,
       endDate: endDate,
     };
-    // .Only include status in request body if it's not null/undefined
+
     if (status) {
       body.status = status;
     }
