@@ -31,7 +31,7 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
     <div className={styles.workLoadContainer}>
       <MonthlyCalendarView
         calendarWorkload={monthlyCalendarWorkload}
-        dateToDisplay={parseDate(appointmentDate.toISOString())}
+        dateToDisplay={parseDate(appointmentDate.toISOString().split('T')[0])}
         onDateClick={handleDateClick}
       />
     </div>
