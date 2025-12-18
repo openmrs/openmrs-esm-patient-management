@@ -15,7 +15,7 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
   const { visits, isLoading } = usePastVisits(patientUuid);
 
   if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
+    return <StructuredListSkeleton />;
   }
 
   if (visits) {

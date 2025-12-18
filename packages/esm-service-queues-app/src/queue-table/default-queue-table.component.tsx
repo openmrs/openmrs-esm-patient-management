@@ -103,7 +103,14 @@ function QueueTableSection() {
           <StatusDropdownFilter />
           <TableToolbarSearch
             className={styles.search}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              if (typeof e === 'string') {
+                setSearchTerm(e);
+              } else if (e && 'target' in e) {
+                const target = e.target as HTMLInputElement;
+                setSearchTerm(target.value);
+              }
+            }}
             placeholder={t('searchThisList', 'Search this list')}
             size={isDesktop(layout) ? 'sm' : 'lg'}
             persistent

@@ -47,21 +47,13 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
 }
 
 export function getWardMetrics(bedLayouts: BedLayout[], wardPatientGroup: WardPatientGroupDetails): WardMetrics {
-  const bedMetrics = {
-    patients: '--',
-    freeBeds: '--',
-    capacity: '--',
-  };
-  if (bedLayouts == null || bedLayouts.length == 0) return bedMetrics;
-  const total = bedLayouts.length;
-  const occupiedBeds = bedLayouts.filter((bed) => bed.patients.length > 0);
-  const patients = occupiedBeds.length;
-  const freeBeds = total - patients;
-  const capacity = total != 0 ? Math.trunc((wardPatientGroup.totalPatientsCount / total) * 100) : 0;
+  const patients = wardPatientGroup?.totalPatientsCount ?? 0;
+  const totalBeds = bedLayouts?.length ?? 0;
+  const occupiedBeds = bedLayouts?.filter((bed) => bed.patients?.length > 0).length ?? 0;
   return {
-    patients: wardPatientGroup?.totalPatientsCount.toString() ?? '--',
-    freeBeds: freeBeds.toString(),
-    capacity: capacity.toString(),
+    patients: patients.toString(),
+    freeBeds: (totalBeds - occupiedBeds).toString(),
+    totalBeds: totalBeds.toString(),
   };
 }
 
@@ -146,8 +138,8 @@ export function getWardMetricNameTranslation(name: string, t: TFunction) {
       return t('patients', 'Patients');
     case 'freeBeds':
       return t('freeBeds', 'Free beds');
-    case 'capacity':
-      return t('capacity', 'Capacity');
+    case 'totalBeds':
+      return t('totalBeds', 'Total beds');
     case 'pendingOut':
       return t('pendingOut', 'Pending out');
   }
@@ -159,8 +151,8 @@ export function getWardMetricValueTranslation(name: string, t: TFunction, value:
       return t('patientsMetricValue', '{{ metricValue }}', { metricValue: value });
     case 'freeBeds':
       return t('freeBedsMetricValue', '{{ metricValue }}', { metricValue: value });
-    case 'capacity':
-      return t('capacityMetricValue', '{{ metricValue }} %', { metricValue: value });
+    case 'totalBeds':
+      return t('totalBedsMetricValue', '{{ metricValue }}', { metricValue: value });
     case 'pendingOut':
       return t('pendingOutMetricValue', '{{ metricValue }}', { metricValue: value });
   }

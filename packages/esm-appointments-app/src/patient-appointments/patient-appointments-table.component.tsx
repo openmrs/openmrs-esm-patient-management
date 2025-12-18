@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-const utc = require('dayjs/plugin/utc');
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import {

@@ -1,6 +1,5 @@
 import type {
   Concept,
-  DefaultWorkspaceProps,
   Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
@@ -230,7 +229,7 @@ export interface EncounterRole extends OpenmrsResourceStrict {
 export interface WardMetrics {
   patients: string;
   freeBeds: string;
-  capacity: string;
+  totalBeds: string;
 }
 
 export interface EncounterPayload {
@@ -277,3 +276,18 @@ export interface MaternalWardViewContext {
   [key: number]: unknown;
   [key: symbol]: unknown;
 }
+
+// Carbon Tag color types
+export type CarbonTagType =
+  | 'red'
+  | 'magenta'
+  | 'purple'
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'green'
+  | 'gray'
+  | 'cool-gray'
+  | 'warm-gray'
+  | 'high-contrast'
+  | 'outline';
