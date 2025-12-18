@@ -397,8 +397,8 @@ describe('Registering a new patient', () => {
     expect(mockSavePatient).toHaveBeenCalledTimes(1);
     expect(mockSaveEncounter).toHaveBeenCalledTimes(1);
 
-    (expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ subtitle: 'an error message' })),
-      mockSaveEncounter.mockResolvedValue({} as FetchResponse));
+    expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ subtitle: 'an error message' }));
+    mockSaveEncounter.mockResolvedValue({} as FetchResponse);
 
     await user.click(registerPatientButton);
     expect(mockSavePatient).toHaveBeenCalledTimes(2);

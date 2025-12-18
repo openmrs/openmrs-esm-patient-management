@@ -297,7 +297,12 @@ export default function PatientAdmitOrTransferForm({
             control={control}
             render={({ field, fieldState: { error } }) => (
               <ResponsiveWrapper>
-                <TextArea {...field} invalid={!!error?.message} invalidText={error?.message} />
+                <TextArea
+                  {...field}
+                  labelText={t('notes', 'Notes')}
+                  invalid={!!error?.message}
+                  invalidText={error?.message}
+                />
               </ResponsiveWrapper>
             )}
           />

@@ -141,36 +141,42 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
 
   return (
     <div className={styles.wrapper}>
-      <Tabs className={tabsClasses}>
-        <TabList className={styles.verticalTabList} aria-label="Past visits tabs">
-          <Tab className={tabClasses(0)} id="vitals-tab" onClick={() => setSelectedTabIndex(0)}>
-            {t('vitals', 'Vitals')}
-          </Tab>
-          <Tab className={tabClasses(1)} id="notes-tab" onClick={() => setSelectedTabIndex(1)}>
-            {t('notes', 'Notes')}
-          </Tab>
-          <Tab className={tabClasses(2)} id="medications-tab" onClick={() => setSelectedTabIndex(2)}>
-            {t('medications', 'Medications')}
-          </Tab>
-          <Tab className={tabClasses(3)} id="encounters-tab" onClick={() => setSelectedTabIndex(3)}>
-            {t('encounters', 'Encounters')}
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <Vitals vitals={useVitalsFromObs(vitalsToRetrieve)} patientUuid={patientUuid} visitType={visitTypes.PAST} />
-          </TabPanel>
-          <TabPanel>
-            <Notes notes={notes} diagnoses={diagnoses} />
-          </TabPanel>
-          <TabPanel>
-            <Medications medications={medications} />
-          </TabPanel>
-          <TabPanel>
-            <EncounterList encounters={encountersToDisplay} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <div className={tabsClasses}>
+        <Tabs>
+          <TabList className={styles.verticalTabList} aria-label="Past visits tabs">
+            <Tab className={tabClasses(0)} id="vitals-tab" onClick={() => setSelectedTabIndex(0)}>
+              {t('vitals', 'Vitals')}
+            </Tab>
+            <Tab className={tabClasses(1)} id="notes-tab" onClick={() => setSelectedTabIndex(1)}>
+              {t('notes', 'Notes')}
+            </Tab>
+            <Tab className={tabClasses(2)} id="medications-tab" onClick={() => setSelectedTabIndex(2)}>
+              {t('medications', 'Medications')}
+            </Tab>
+            <Tab className={tabClasses(3)} id="encounters-tab" onClick={() => setSelectedTabIndex(3)}>
+              {t('encounters', 'Encounters')}
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Vitals
+                vitals={useVitalsFromObs(vitalsToRetrieve)}
+                patientUuid={patientUuid}
+                visitType={visitTypes.PAST}
+              />
+            </TabPanel>
+            <TabPanel>
+              <Notes notes={notes} diagnoses={diagnoses} />
+            </TabPanel>
+            <TabPanel>
+              <Medications medications={medications} />
+            </TabPanel>
+            <TabPanel>
+              <EncounterList encounters={encountersToDisplay} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </div>
     </div>
   );
 };

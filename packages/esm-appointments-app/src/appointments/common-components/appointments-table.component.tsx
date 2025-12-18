@@ -43,10 +43,10 @@ import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
+import { launchCreateAppointmentForm } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
-import { launchCreateAppointmentForm } from '../../helpers';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);

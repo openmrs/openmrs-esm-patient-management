@@ -12,7 +12,7 @@ const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ pat
   const { t } = useTranslation();
   const handleClick = React.useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-    onTransition && onTransition();
+    onTransition?.();
   }, [onTransition, patientUuid]);
 
   return (

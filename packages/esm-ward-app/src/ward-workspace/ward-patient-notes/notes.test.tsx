@@ -1,12 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { createErrorHandler, ResponsiveWrapper, showSnackbar, translateFrom, useSession } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { savePatientNote, usePatientNotes } from './notes.resource';
 import WardPatientNotesWorkspace from './notes.workspace';
-import { emrConfigurationMock, mockInpatientRequestAlice, mockPatient, mockPatientAlice, mockSession } from '__mocks__';
+import { emrConfigurationMock, mockInpatientRequestAlice, mockPatientAlice } from '__mocks__';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { type WardPatient, type WardPatientWorkspaceDefinition } from '../../types';
+import { configSchema, type WardConfigObject } from '../../config-schema';
 
 const mockWardPatientAlice: WardPatient = {
   visit: mockInpatientRequestAlice.visit,
@@ -41,6 +42,7 @@ jest.mock('../../hooks/useEmrConfiguration', () => jest.fn());
 
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 const mockedUsePatientNotes = jest.mocked(usePatientNotes);
+const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
 
 mockedUseEmrConfiguration.mockReturnValue({
   emrConfiguration: emrConfigurationMock,
@@ -50,6 +52,7 @@ mockedUseEmrConfiguration.mockReturnValue({
 });
 
 describe('<WardPatientNotesWorkspace>', () => {
+  mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema<WardConfigObject>(configSchema));
   mockedUsePatientNotes.mockReturnValue({
     patientNotes: [],
     errorFetchingPatientNotes: undefined,

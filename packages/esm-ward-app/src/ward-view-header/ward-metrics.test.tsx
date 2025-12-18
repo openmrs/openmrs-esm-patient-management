@@ -10,7 +10,7 @@ import WardMetrics from './ward-metrics.component';
 const wardMetrics = [
   { name: 'patients', key: 'patients', defaultTranslation: 'Patients' },
   { name: 'freeBeds', key: 'freeBeds', defaultTranslation: 'Free beds' },
-  { name: 'capacity', key: 'capacity', defaultTranslation: 'Capacity' },
+  { name: 'totalBeds', key: 'totalBeds', defaultTranslation: 'Total beds' },
 ];
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
