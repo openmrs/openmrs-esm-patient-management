@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import styles from './delete-bed-confirmation.scss';
 import { deleteBed } from '../../summary/summary.resource';
 
@@ -11,7 +11,7 @@ interface DeleteBedParams {
   mutateBeds: () => void;
 }
 
-const DeleteBed: React.FC<DeleteBedParams> = ({ closeModal, uuid, mutateBeds }) => {
+const DeleteBed = ({ closeModal, uuid, mutateBeds }: DeleteBedParams) => {
   const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -29,8 +29,8 @@ const DeleteBed: React.FC<DeleteBedParams> = ({ closeModal, uuid, mutateBeds }) 
       });
     } catch (err: any) {
       const message =
-        err?.responseBody?.error?.message ||
-        err?.message ||
+        err?.responseBody?.error?.translatedMessage ||
+        err?.responseBody?.error ||
         t('deleteFailedTryAgain', 'Unable to delete bed. Please try again.');
 
       showSnackbar({
@@ -54,14 +54,14 @@ const DeleteBed: React.FC<DeleteBedParams> = ({ closeModal, uuid, mutateBeds }) 
 
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
-          {getCoreTranslation('cancel')}
+          {t('cancel', 'Cancel')}
         </Button>
 
         <Button kind="danger" onClick={handleDeleteConfirm} disabled={isDeleting}>
           {isDeleting ? (
             <InlineLoading className={styles.spinner} description={t('deleting', 'Deleting') + '...'} />
           ) : (
-            <span>{getCoreTranslation('delete')}</span>
+            <span>{t('delete', 'Delete')}</span>
           )}
         </Button>
       </ModalFooter>

@@ -141,7 +141,6 @@ const BedAdministrationTable: React.FC = () => {
             align="top-start"
             enterDelayMs={300}
             kind="ghost"
-            tooltipPosition="right"
             label={t('editBed', 'Edit bed')}
             onClick={(e) => {
               e.preventDefault();
@@ -151,7 +150,7 @@ const BedAdministrationTable: React.FC = () => {
             <Edit />
           </IconButton>
           <IconButton
-            align="top-start"
+            align="top-right"
             enterDelayMs={300}
             kind="ghost"
             label={t('deleteBedType', 'Delete bed')}
