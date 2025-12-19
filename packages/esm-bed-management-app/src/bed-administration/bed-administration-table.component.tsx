@@ -83,7 +83,7 @@ const BedAdministrationTable: React.FC = () => {
     [mutateBedsGroupedByLocation],
   );
 
-  const openDeleteBedTypeModal = useCallback(
+  const openDeleteBedModal = useCallback(
     (uuid: string) => {
       const dispose = showModal('delete-bed-confirmation-modal', {
         uuid,
@@ -156,7 +156,7 @@ const BedAdministrationTable: React.FC = () => {
             label={t('deleteBedType', 'Delete bed')}
             onClick={(e) => {
               e.preventDefault();
-              openDeleteBedTypeModal(bed.uuid);
+              openDeleteBedModal(bed.uuid);
             }}
             size={responsiveSize}>
             <TrashCan />
@@ -164,7 +164,7 @@ const BedAdministrationTable: React.FC = () => {
         </>
       ),
     }));
-  }, [handleLaunchBedWorkspace, openDeleteBedTypeModal, responsiveSize, paginatedData, t]);
+  }, [handleLaunchBedWorkspace, openDeleteBedModal, responsiveSize, paginatedData, t]);
 
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
