@@ -27,6 +27,7 @@ import {
 import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
+  EmptyCard,
   formatDate,
   formatDatetime,
   isDesktop,
@@ -36,7 +37,6 @@ import {
   launchWorkspace2,
   usePagination,
 } from '@openmrs/esm-framework';
-import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
@@ -122,7 +122,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
 
   if (!appointments?.length) {
     return (
-      <EmptyState
+      <EmptyCard
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
         displayText={
           tableHeading === t('todays', "Today's")
