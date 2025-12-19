@@ -1,5 +1,7 @@
 import { type Patient } from '@openmrs/esm-framework';
 
+// TODO: potentially move these rules into config so they can be customized and defined in a centralized place
+
 export function filterNewborns(patients: Patient[]) {
   return patients.filter((patient) => patient.person.age < 1);
 }
