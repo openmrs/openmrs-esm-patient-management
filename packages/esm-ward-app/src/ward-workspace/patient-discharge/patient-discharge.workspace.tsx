@@ -124,6 +124,7 @@ export default function PatientDischargeWorkspace({
                 <ResponsiveWrapper>
                   <TextArea
                     {...field}
+                    labelText={t('note', 'Note')}
                     invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder={t('dischargeNotePlaceholder', 'Write any notes here (optional)')}
