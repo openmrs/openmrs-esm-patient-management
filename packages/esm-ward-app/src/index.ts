@@ -139,11 +139,6 @@ export const wardPatientWorkspaceBanner = getAsyncLifecycle(
   options,
 );
 
-export const PatientDischargeConfirmationModal = getAsyncLifecycle(
-  () => import('./ward-workspace/patient-discharge/modal/patient-discharge-confirmation.modal'),
-  options,
-);
-
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);

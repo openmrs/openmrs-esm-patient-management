@@ -66,12 +66,7 @@
       "slot": "ward-workspace-patient-banner-slot"
     }
   ],
-  "modals": [
-    {
-      "name": "PatientDischargeConfirmationModal",
-      "component": "PatientDischargeConfirmationModal"
-    }
-  ],
+
   "workspaces2": [
     {
       "name": "admission-requests-workspace",

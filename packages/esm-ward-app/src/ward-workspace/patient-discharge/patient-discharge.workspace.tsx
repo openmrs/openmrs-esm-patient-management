@@ -1,13 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, ButtonSet, Form, InlineNotification, InlineLoading, TextArea } from '@carbon/react';
 import {
   closeWorkspaceGroup2,
   ExtensionSlot,
   ResponsiveWrapper,
-  showModal,
   showSnackbar,
   useAppContext,
   Workspace2,
@@ -18,17 +15,9 @@ import { removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './patient-discharge.scss';
 
-const createNoteSchema = (translate: (key: string, defaultMessage: string) => string) =>
-  z.object({
-    dischargeNote: z
-      .string()
-      .trim()
-      .min(1, {
-        message: translate('dischargeNoteErrorMessage', 'discharge note is required'),
-      }),
-  });
-
-type DischargeData = z.infer<ReturnType<typeof createNoteSchema>>;
+type FormValues = {
+  dischargeData: string;
+};
 
 export default function PatientDischargeWorkspace({
   groupProps: { wardPatient },
@@ -40,77 +29,58 @@ export default function PatientDischargeWorkspace({
     useCreateEncounter();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
-  const noteSchema = useMemo(() => createNoteSchema(t), [t]);
-
-  const { control, handleSubmit } = useForm<DischargeData>({
-    resolver: zodResolver(noteSchema),
-    defaultValues: { dischargeNote: '' },
-  });
-
-  const performDischarge = useCallback(
-    (data: DischargeData) => {
-      setIsSubmitting(true);
-
-      const { dischargeNote } = data;
-
-      const obs: Array<ObsPayload> = [];
-
-      if (dischargeNote) {
-        obs.push({
-          concept: emrConfiguration?.consultFreeTextCommentsConcept?.uuid,
-          value: dischargeNote,
-        });
-      }
-
-      createEncounter(
-        wardPatient?.patient,
-        emrConfiguration.exitFromInpatientEncounterType,
-        wardPatient?.visit?.uuid,
-        obs,
-      )
-        .then((response) => {
-          if (response?.ok) {
-            if (wardPatient?.bed?.id) {
-              return removePatientFromBed(wardPatient.bed.id, wardPatient?.patient?.uuid);
-            }
-            return response;
-          }
-        })
-        .then((response) => {
-          if (!response?.ok) {
-            throw new Error('Discharge failed');
-          }
-          showSnackbar({
-            title: t('patientWasDischarged', 'Patient was discharged'),
-            kind: 'success',
-          });
-
-          closeWorkspace({ discardUnsavedChanges: true });
-          closeWorkspaceGroup2();
-          wardPatientGroupDetails?.mutate?.();
-        })
-        .catch((err: Error) => {
-          showSnackbar({
-            title: t('errorDischargingPatient', 'Error discharging patient'),
-            subtitle: err.message,
-            kind: 'error',
-          });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-        });
-    },
-    [createEncounter, wardPatient, emrConfiguration, t, closeWorkspace, wardPatientGroupDetails],
-  );
+  const { control, handleSubmit } = useForm<FormValues>({ defaultValues: { dischargeData: '' } });
 
   const onSubmit = useCallback(
-    (data: DischargeData) => {
-      const dispose = showModal('PatientDischargeConfirmationModal', {
-        closeModal: () => dispose(),
-        onConfirm: () => performDischarge(data),
-      });
+    async (data: FormValues) => {
+      setIsSubmitting(true);
+
+      try {
+        const note = data.dischargeData;
+        const obs: Array<ObsPayload> = [];
+
+        if (note) {
+          obs.push({
+            concept: emrConfiguration?.consultFreeTextCommentsConcept?.uuid,
+            value: note,
+          });
+        }
+
+        await createEncounter(
+          wardPatient?.patient,
+          emrConfiguration.exitFromInpatientEncounterType,
+          wardPatient?.visit?.uuid,
+          obs,
+        );
+
+        if (wardPatient?.bed?.id) {
+          await removePatientFromBed(wardPatient.bed.id, wardPatient?.patient?.uuid);
+        }
+
+        showSnackbar({
+          title: t('patientWasDischarged', 'Patient was discharged'),
+          kind: 'success',
+        });
+
+        closeWorkspace({ discardUnsavedChanges: true });
+        closeWorkspaceGroup2();
+        wardPatientGroupDetails?.mutate?.();
+      } catch (err) {
+        const message =
+          err?.responseBody?.error?.message ||
+          err?.message ||
+          t('unableToDischargePatient', 'Unable to discharge patient. Please try again.');
+
+        showSnackbar({
+          title: t('errorDischargingPatient', 'Error discharging patient'),
+          subtitle: message,
+          kind: 'error',
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [performDischarge],
+    [createEncounter, wardPatient, emrConfiguration, t, closeWorkspace, wardPatientGroupDetails],
   );
 
   const onError = (errors) => console.error(errors);
@@ -148,7 +118,7 @@ export default function PatientDischargeWorkspace({
           <div>
             <h2 className={styles.columnLabel}>{t('note', 'Note')}</h2>
             <Controller
-              name="dischargeNote"
+              name="dischargeData"
               control={control}
               render={({ field, fieldState: { error } }) => (
                 <ResponsiveWrapper>
@@ -156,7 +126,7 @@ export default function PatientDischargeWorkspace({
                     {...field}
                     invalid={!!error?.message}
                     invalidText={error?.message}
-                    placeholder={t('dischargeNotePlaceholder', 'Write any notes here')}
+                    placeholder={t('dischargeNotePlaceholder', 'Write any notes here (optional)')}
                   />
                 </ResponsiveWrapper>
               )}
@@ -173,7 +143,7 @@ export default function PatientDischargeWorkspace({
               {isSubmitting ? (
                 <InlineLoading description={t('discharging', 'Discharging') + '...'} />
               ) : (
-                <span>{t('Discharge', 'Discharge')}</span>
+                <span>{t('confirmDischarge', 'Confirm Discharge')}</span>
               )}
             </Button>
           </ButtonSet>
