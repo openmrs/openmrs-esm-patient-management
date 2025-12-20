@@ -230,6 +230,17 @@ export interface WardMetrics {
   patients: string;
   freeBeds: string;
   totalBeds: string;
+  femalesOfReproductiveAge?: string; // used in Maternal Ward View
+  newborns?: string; // used in Maternal Ward View
+}
+
+export enum WardMetricType {
+  PATIENTS = 'patients',
+  FREE_BEDS = 'freeBeds',
+  TOTAL_BEDS = 'totalBeds',
+  PENDING_OUT = 'pendingOut',
+  FEMALE_OF_REPRODUCTIVE_AGE = 'femalesOfReproductiveAge',
+  NEWBORNS = 'newborns',
 }
 
 export interface EncounterPayload {
