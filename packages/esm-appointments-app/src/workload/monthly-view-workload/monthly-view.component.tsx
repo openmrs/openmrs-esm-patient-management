@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@openmrs/esm-framework';
-import { getLocale } from '@openmrs/esm-utils';
 import { getLocalTimeZone, toCalendarDate, today, type CalendarDate } from '@internationalized/date';
 import { monthDays } from '../../helpers';
-import { getSelectedCalendarDate } from '../../store';
+import { getSelectedCalendarDate, locale } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
@@ -18,16 +17,27 @@ interface MonthlyCalendarViewProps {
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ calendarWorkload, dateToDisplay, onDateClick }) => {
   const { t } = useTranslation();
   const date = getSelectedCalendarDate();
-  const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const todayDate = toCalendarDate(today(getLocalTimeZone()));
-  const todayShort = new Intl.DateTimeFormat(getLocale(), { weekday: 'short' })
+  const todayShort = new Intl.DateTimeFormat(locale, { weekday: 'short' })
     .format(todayDate.toDate(getLocalTimeZone()))
     .toUpperCase();
 
-  const daysInWeeks = daysInWeek.map((day) => ({
-    label: t(day),
-    isToday: day === todayShort,
-  }));
+  const daysInWeeks = React.useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+
+    const baseDate = new Date(Date.UTC(2021, 7, 1));
+
+    return Array.from({ length: 7 }).map((_, index) => {
+      const date = new Date(baseDate);
+      date.setUTCDate(baseDate.getUTCDate() + index);
+
+      const label = formatter.format(date).toUpperCase();
+      return {
+        label,
+        isToday: label === todayShort,
+      };
+    });
+  }, [todayShort]);
 
   const monthViewDate: CalendarDate = dateToDisplay ?? date;
 

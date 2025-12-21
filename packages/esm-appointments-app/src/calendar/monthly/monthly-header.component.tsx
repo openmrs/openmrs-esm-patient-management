@@ -2,26 +2,35 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { getLocale } from '@openmrs/esm-utils';
 import { getLocalTimeZone } from '@internationalized/date';
-import { useAppointmentsStore, setSelectedDate, getSelectedCalendarDate } from '../../store';
+import { locale, setSelectedDate, getSelectedCalendarDate } from '../../store';
 import DaysOfWeekCard from './days-of-week.component';
 import styles from './monthly-header.scss';
-
-const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 
 const MonthlyHeader: React.FC = () => {
   const { t } = useTranslation();
   const date = getSelectedCalendarDate();
 
-  const todayShort = new Intl.DateTimeFormat(getLocale(), { weekday: 'short' })
+  const todayShort = new Intl.DateTimeFormat(locale, { weekday: 'short' })
     .format(date.toDate(getLocalTimeZone()))
     .toUpperCase();
 
-  const daysInWeeks = DAYS_IN_WEEK.map((day) => ({
-    label: t(day),
-    isToday: day === todayShort,
-  }));
+  const daysInWeeks = React.useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+
+    const baseDate = new Date(Date.UTC(2021, 7, 1));
+
+    return Array.from({ length: 7 }).map((_, index) => {
+      const date = new Date(baseDate);
+      date.setUTCDate(baseDate.getUTCDate() + index);
+
+      const label = formatter.format(date).toUpperCase();
+      return {
+        label,
+        isToday: label === todayShort,
+      };
+    });
+  }, [todayShort]);
 
   const handleSelectPrevMonth = useCallback(() => {
     setSelectedDate(date.subtract({ months: 1 }).toDate(getLocalTimeZone()).toISOString());

@@ -6,6 +6,8 @@ import { omrsDateFormat } from './constants';
 
 export const calendar = createCalendar(getDefaultCalendar(getLocale()));
 
+export const locale = getLocale();
+
 export const appointmentsStore = createGlobalStore('appointments-app', {
   appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
