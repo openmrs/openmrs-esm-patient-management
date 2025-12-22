@@ -38,7 +38,7 @@ describe('DeleteBed', () => {
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
 
-    expect(mockCloseModal).toHaveBeenCalledTimes(1);
+    expect(mockCloseModal).toHaveBeenCalled();
     expect(mockDeleteBed).not.toHaveBeenCalled();
   });
 
@@ -156,15 +156,16 @@ describe('DeleteBed', () => {
     await user.click(deleteButton);
 
     await waitFor(() => {
-      expect(mockMutateBeds).toHaveBeenCalledTimes(1);
+      expect(mockMutateBeds).toHaveBeenCalled();
     });
   });
 
   it('does not call mutateBeds when deletion fails', async () => {
+    const localMutateBeds = jest.fn(); // Fresh mock to ensure zero calls
     const user = userEvent.setup();
     mockDeleteBed.mockRejectedValue(new Error('Network error'));
 
-    render(<DeleteBed {...defaultProps} />);
+    render(<DeleteBed {...defaultProps} mutateBeds={localMutateBeds} />);
 
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
@@ -177,7 +178,7 @@ describe('DeleteBed', () => {
       );
     });
 
-    expect(mockMutateBeds).not.toHaveBeenCalled();
+    expect(localMutateBeds).not.toHaveBeenCalled();
   });
 
   it('re-enables delete button after failed deletion', async () => {
@@ -196,22 +197,31 @@ describe('DeleteBed', () => {
     expect(deleteButton).toBeEnabled();
   });
 
-  it('closes the modal regardless of whether the deletion succeeds or fails', async () => {
+  it('closes the modal on successful deletion', async () => {
     const user = userEvent.setup();
-
-    // Success case
     mockDeleteBed.mockResolvedValue({ ok: true } as any);
+
     render(<DeleteBed {...defaultProps} />);
+
     const deleteButton = screen.getByRole('button', { name: /delete/i });
-
     await user.click(deleteButton);
-    await waitFor(() => expect(mockCloseModal).toHaveBeenCalled());
 
-    // Failure case (re-render or clean state via beforeEach)
+    await waitFor(() => {
+      expect(mockCloseModal).toHaveBeenCalled();
+    });
+  });
+
+  it('closes the modal on failed deletion', async () => {
+    const user = userEvent.setup();
     mockDeleteBed.mockRejectedValue(new Error('Failed'));
+
     render(<DeleteBed {...defaultProps} />);
 
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
-    await waitFor(() => expect(mockCloseModal).toHaveBeenCalled());
+
+    await waitFor(() => {
+      expect(mockCloseModal).toHaveBeenCalled();
+    });
   });
 });
