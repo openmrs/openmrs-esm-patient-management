@@ -72,7 +72,6 @@
   "durationInMinutes": "持续时间（分钟）",
   "edit": "编辑",
   "editAppointment": "编辑预约",
-  "emptyStateText": "没有<1>{{displayText}}</1>可显示",
   "endAppointmentAndVisitConfirmationMessage": "检出患者将预约标记为已完成，并结束该患者的活动就诊。",
   "endAppointmentConfirmation": "您确定要为患者预约检出吗？",
   "endAppointmentConfirmationMessage": "检出患者将标志着预约已完成。",
