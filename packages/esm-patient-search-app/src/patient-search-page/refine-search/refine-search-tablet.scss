@@ -70,7 +70,7 @@
 
 .otherFieldsRow {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: layout.$spacing-05;
 
   &:has(:only-child) {
@@ -78,11 +78,11 @@
   }
 
   &:has(:nth-child(2)):not(:has(:nth-child(3))) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
   }
 
   &:has(:nth-child(3)) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
   }
 }
 
