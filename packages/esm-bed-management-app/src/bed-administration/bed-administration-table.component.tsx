@@ -153,7 +153,7 @@ const BedAdministrationTable: React.FC = () => {
             align="top-right"
             enterDelayMs={300}
             kind="ghost"
-            label={t('deleteBedType', 'Delete bed')}
+            label={t('deleteBed', 'Delete bed')}
             onClick={(e) => {
               e.preventDefault();
               openDeleteBedModal(bed.uuid);
