@@ -72,7 +72,6 @@
   "durationInMinutes": "Durată (minute)",
   "edit": "Editează",
   "editAppointment": "Editează programarea",
-  "emptyStateText": "Nu există <1>{{displayText}}</1> de afișat",
   "endAppointmentAndVisitConfirmationMessage": "La ieșirea pacientului, programarea va fi marcată ca finalizată și vizita activă va fi închisă pentru acest pacient.",
   "endAppointmentConfirmation": "Ești sigur că vrei să marchezi ieșirea pacientului pentru această programare?",
   "endAppointmentConfirmationMessage": "La ieșirea pacientului, programarea va fi marcată ca finalizată.",
