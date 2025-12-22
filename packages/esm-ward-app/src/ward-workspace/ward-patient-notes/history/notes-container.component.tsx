@@ -1,11 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PatientUuid } from '@openmrs/esm-framework';
+import { type PatientUuid, useConfig } from '@openmrs/esm-framework';
 import { usePatientNotes } from '../notes.resource';
 import InPatientNote, { InPatientNoteSkeleton } from './note.component';
 import styles from './styles.scss';
 import { InlineNotification } from '@carbon/react';
 import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
+import { type WardConfigObject } from '../../../config-schema';
 
 interface PatientNotesHistoryProps {
   patientUuid: PatientUuid;
@@ -15,13 +16,12 @@ interface PatientNotesHistoryProps {
 const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
+  const config = useConfig<WardConfigObject>();
 
-  const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
-    patientUuid,
-    visitUuid,
-    emrConfiguration?.inpatientNoteEncounterType?.uuid,
+  const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(patientUuid, visitUuid, [
     emrConfiguration?.consultFreeTextCommentsConcept.uuid,
-  );
+    ...config.additionalInpatientNotesConceptUuids,
+  ]);
 
   const isLoading = isLoadingPatientNotes || isLoadingEmrConfiguration;
 
