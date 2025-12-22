@@ -25,7 +25,7 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
     inpatientRequestResponse?.isLoading;
 
   const wardMetricValues = useMemo(
-    () => (!wardPatientGroupDetails ? null : getWardMetrics(wardPatientGroupDetails)),
+    () => (!wardPatientGroupDetails ? {} : getWardMetrics(wardPatientGroupDetails)),
     [wardPatientGroupDetails],
   );
 
