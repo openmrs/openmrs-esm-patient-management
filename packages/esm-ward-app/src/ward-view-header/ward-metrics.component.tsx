@@ -1,5 +1,5 @@
 import { showNotification, useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WardMetricType, type WardViewContext } from '../types';
 import { getWardMetricNameTranslation, getWardMetrics } from '../ward-view/ward-view.resource';
@@ -23,6 +23,12 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
     admissionLocationResponse?.isLoading ||
     inpatientAdmissionResponse?.isLoading ||
     inpatientRequestResponse?.isLoading;
+
+  const wardMetricValues = useMemo(
+    () => (!wardPatientGroupDetails ? null : getWardMetrics(wardPatientGroupDetails)),
+    [wardPatientGroupDetails],
+  );
+
   if (!wardPatientGroupDetails) return <></>;
 
   if (error) {
@@ -33,7 +39,6 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
     });
   }
 
-  const wardMetricValues = getWardMetrics(wardPatientGroupDetails);
   return (
     <div className={styles.metricsContainer}>
       {metrics.includes(WardMetricType.PATIENTS) && (
