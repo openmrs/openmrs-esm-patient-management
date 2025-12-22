@@ -1,8 +1,9 @@
-import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
 import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type AppointmentSummary, type AppointmentCountMap } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
+import { CalendarDate, startOfMonth, endOfMonth, getDayOfWeek, isSameMonth } from '@internationalized/date';
+import { getLocale } from '@openmrs/esm-utils';
 
 interface FlattenedAppointmentSummary {
   serviceName: string;
@@ -62,30 +63,31 @@ export const formatAMPM = (date: Date): string => {
   return `${hours12}:${minutesStr} ${ampm}`;
 };
 
-export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs) => {
-  return cellDate.isSame(currentDate, 'month');
+export const isSameCalendarMonth = (cellDate: CalendarDate, currentDate: CalendarDate) => {
+  return isSameMonth(cellDate, currentDate);
 };
 
-export const monthDays = (currentDate: Dayjs) => {
-  const monthStart = dayjs(currentDate).startOf('month');
-  const monthEnd = dayjs(currentDate).endOf('month');
-  const monthDays = dayjs(currentDate).daysInMonth();
-  const lastMonth = dayjs(currentDate).subtract(1, 'month');
-  const nextMonth = dayjs(currentDate).add(1, 'month');
-  let days: Dayjs[] = [];
+export const monthDays = (currentDate: CalendarDate) => {
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const monthDays = currentDate.calendar.getDaysInMonth(currentDate);
+  const lastMonth = currentDate.subtract({ months: 1 });
+  const nextMonth = currentDate.add({ months: 1 });
+  let days: CalendarDate[] = [];
 
-  for (let i = lastMonth.daysInMonth() - monthStart.day() + 1; i <= lastMonth.daysInMonth(); i++) {
-    days.push(lastMonth.date(i));
+  const lastMonthDays = lastMonth.calendar.getDaysInMonth(lastMonth);
+  for (let i = lastMonthDays - getDayOfWeek(monthStart, getLocale()) + 1; i <= lastMonthDays; i++) {
+    days.push(new CalendarDate(lastMonth.year, lastMonth.month, i));
   }
 
   for (let i = 1; i <= monthDays; i++) {
-    days.push(currentDate.date(i));
+    days.push(new CalendarDate(currentDate.year, currentDate.month, i));
   }
 
   const dayLen = days.length > 30 ? 7 : 14;
 
-  for (let i = 1; i < dayLen - monthEnd.day(); i++) {
-    days.push(nextMonth.date(i));
+  for (let i = 1; i < dayLen - getDayOfWeek(monthEnd, getLocale()); i++) {
+    days.push(new CalendarDate(nextMonth.year, nextMonth.month, i));
   }
   return days;
 };
