@@ -19,7 +19,7 @@ describe('Ward Metrics', () => {
     expect(screen.queryByText('Infants')).not.toBeInTheDocument();
   });
   it('Should display extra metrics when configured', () => {
-    renderWithSwr(<WardMetrics metrics={[WardMetricType.FEMALE_OF_REPRODUCTIVE_AGE]} />);
+    renderWithSwr(<WardMetrics metrics={[WardMetricType.FEMALES_OF_REPRODUCTIVE_AGE]} />);
     expect(screen.getByText('Mothers')).toBeInTheDocument();
     expect(screen.queryByText('Patients')).not.toBeInTheDocument();
     expect(screen.queryByText('Free beds')).not.toBeInTheDocument();

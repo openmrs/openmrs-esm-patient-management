@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { WardMetricType, type WardViewContext } from '../types';
 import { getWardMetricNameTranslation, getWardMetrics } from '../ward-view/ward-view.resource';
 import WardMetric from './ward-metric.component';
-import styles from '../ward-view/ward-metrics.scss';
+import styles from './ward-metrics.scss';
 
 interface WardMetricsProps {
   metrics?: WardMetricType[];
@@ -39,17 +39,17 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
       {metrics.includes(WardMetricType.PATIENTS) && (
         <WardMetric
           metricName={getWardMetricNameTranslation('patients', t)}
-          metricValue={wardMetricValues['patients']}
+          metricValue={wardMetricValues['patients'] ?? '--'}
           isLoading={false}
           key={'patients'}
         />
       )}
-      {metrics.includes(WardMetricType.FEMALE_OF_REPRODUCTIVE_AGE) &&
+      {metrics.includes(WardMetricType.FEMALES_OF_REPRODUCTIVE_AGE) &&
         wardMetricValues['femalesOfReproductiveAge'] &&
         wardMetricValues['femalesOfReproductiveAge'] !== '0' && (
           <WardMetric
             metricName={getWardMetricNameTranslation('femalesOfReproductiveAge', t)}
-            metricValue={wardMetricValues['femalesOfReproductiveAge']}
+            metricValue={wardMetricValues['femalesOfReproductiveAge'] ?? '--'}
             isLoading={!!isLoading || !!isDataLoading}
             key={'femalesOfReproductiveAge'}
           />
@@ -59,7 +59,7 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
         wardMetricValues['newborns'] !== '0' && (
           <WardMetric
             metricName={getWardMetricNameTranslation('newborns', t)}
-            metricValue={wardMetricValues['newborns']}
+            metricValue={wardMetricValues['newborns'] ?? '--'}
             isLoading={!!isLoading || !!isDataLoading}
             key={'newborns'}
           />
@@ -69,7 +69,7 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
           {metrics.includes(WardMetricType.FREE_BEDS) && (
             <WardMetric
               metricName={getWardMetricNameTranslation('freeBeds', t)}
-              metricValue={wardMetricValues['freeBeds']}
+              metricValue={wardMetricValues['freeBeds'] ?? '--'}
               isLoading={!!isLoading || !!isDataLoading}
               key={'freeBeds'}
             />
@@ -77,7 +77,7 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
           {metrics.includes(WardMetricType.TOTAL_BEDS) && (
             <WardMetric
               metricName={getWardMetricNameTranslation('totalBeds', t)}
-              metricValue={wardMetricValues['totalBeds']}
+              metricValue={wardMetricValues['totalBeds'] ?? '--'}
               isLoading={!!isLoading || !!isDataLoading}
               key={'totalBeds'}
             />
@@ -85,9 +85,9 @@ const WardMetrics: React.FC<WardMetricsProps> = ({
           {metrics.includes(WardMetricType.PENDING_OUT) && (
             <WardMetric
               metricName={getWardMetricNameTranslation('pendingOut', t)}
-              metricValue={wardPatientGroupDetails?.wardPatientPendingCount?.toString()}
+              metricValue={error ? '--' : (wardPatientGroupDetails?.wardPatientPendingCount?.toString() ?? '--')}
               isLoading={!!isDataLoading}
-              key="pending"
+              key={'pendingOut'}
             />
           )}
         </>

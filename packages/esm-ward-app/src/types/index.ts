@@ -239,7 +239,7 @@ export enum WardMetricType {
   FREE_BEDS = 'freeBeds',
   TOTAL_BEDS = 'totalBeds',
   PENDING_OUT = 'pendingOut',
-  FEMALE_OF_REPRODUCTIVE_AGE = 'femalesOfReproductiveAge',
+  FEMALES_OF_REPRODUCTIVE_AGE = 'femalesOfReproductiveAge',
   NEWBORNS = 'newborns',
 }
 

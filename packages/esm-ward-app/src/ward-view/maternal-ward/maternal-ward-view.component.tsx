@@ -29,7 +29,7 @@ const MaternalWardView = () => {
     <WardMetrics
       metrics={[
         WardMetricType.PATIENTS,
-        WardMetricType.FEMALE_OF_REPRODUCTIVE_AGE,
+        WardMetricType.FEMALES_OF_REPRODUCTIVE_AGE,
         WardMetricType.NEWBORNS,
         WardMetricType.FREE_BEDS,
         WardMetricType.TOTAL_BEDS,
