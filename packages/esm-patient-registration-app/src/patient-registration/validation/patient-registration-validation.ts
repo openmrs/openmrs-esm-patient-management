@@ -130,8 +130,8 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
           ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()]+$/u.test(value);
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
           },
         ),
       stateProvince: Yup.string()
@@ -144,8 +144,8 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
           ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()]+$/u.test(value);
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
           },
         ),
       country: Yup.string()
@@ -158,8 +158,8 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
           ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()]+$/u.test(value);
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
           },
         ),
       postalCode: Yup.string()
@@ -188,8 +188,8 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
           ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()]+$/u.test(value);
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
           },
         ),
     }).optional(),
