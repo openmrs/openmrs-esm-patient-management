@@ -42,7 +42,7 @@ const appointment: Appointment = {
   status: 'Scheduled' as AppointmentStatus.SCHEDULED,
   comments: 'Some comments',
   additionalInfo: null,
-  providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
+  providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook', name: 'Dr James Cook' }],
   recurring: false,
   voided: false,
   dateAppointmentScheduled: '',
@@ -92,6 +92,8 @@ test('renders appointment details correctly', async () => {
   expect(screen.getByText(/0899129989932/i)).toBeInTheDocument();
   expect(screen.getByText(/Appointment Notes/i)).toBeInTheDocument();
   expect(screen.getByText(/Some comments/i)).toBeInTheDocument();
+  expect(screen.getByText(/Provider/i)).toBeInTheDocument();
+  expect(screen.getByText(/Dr James Cook/i)).toBeInTheDocument();
   expect(screen.getByText(/Appointment History/i)).toBeInTheDocument();
   expect(screen.getByText(/Completed/i)).toBeInTheDocument();
   expect(screen.getByText('1', { exact: true })).toBeInTheDocument();
