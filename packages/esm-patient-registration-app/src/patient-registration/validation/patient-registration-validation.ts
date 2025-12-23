@@ -124,33 +124,42 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
         .optional()
         .test(
           'valid-city-format',
-          t('invalidCityVillage', 'City/Village should only contain letters, spaces, hyphens, and apostrophes'),
+          t(
+            'invalidCityVillage',
+            'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
             // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
+            return /^[\p{L}\s\-'.()]+$/u.test(value);
           },
         ),
       stateProvince: Yup.string()
         .optional()
         .test(
           'valid-state-format',
-          t('invalidStateProvince', 'State/Province should only contain letters, spaces, hyphens, and apostrophes'),
+          t(
+            'invalidStateProvince',
+            'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
             // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
+            return /^[\p{L}\s\-'.()]+$/u.test(value);
           },
         ),
       country: Yup.string()
         .optional()
         .test(
           'valid-country-format',
-          t('invalidCountry', 'Country should only contain letters, spaces, hyphens, and apostrophes'),
+          t(
+            'invalidCountry',
+            'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
             // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
+            return /^[\p{L}\s\-'.()]+$/u.test(value);
           },
         ),
       postalCode: Yup.string()
@@ -173,11 +182,14 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
         .optional()
         .test(
           'valid-county-format',
-          t('invalidCountyDistrict', 'County/District should only contain letters, spaces, hyphens, and apostrophes'),
+          t(
+            'invalidCountyDistrict',
+            'County/District should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
           (value) => {
             if (!value) return true; // Allow empty values since field is optional
             // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
+            return /^[\p{L}\s\-'.()]+$/u.test(value);
           },
         ),
     }).optional(),

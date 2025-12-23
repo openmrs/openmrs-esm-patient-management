@@ -254,7 +254,7 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'City/Village should only contain letters, spaces, hyphens, and apostrophes',
+        'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
     });
 
@@ -267,7 +267,7 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'City/Village should only contain letters, spaces, hyphens, and apostrophes',
+        'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
     });
 
@@ -315,6 +315,17 @@ describe('Patient registration validation', () => {
       expect(validationError).toBeFalsy();
     });
 
+    it('should allow city/village with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'City (Region)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
+      expect(validationError).toBeFalsy();
+    });
+
     // State/Province validation tests
     it('should reject numeric-only state/province', async () => {
       const invalidFormValues = {
@@ -325,7 +336,7 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'State/Province should only contain letters, spaces, hyphens, and apostrophes',
+        'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
     });
 
@@ -338,7 +349,7 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'State/Province should only contain letters, spaces, hyphens, and apostrophes',
+        'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
     });
 
@@ -375,6 +386,17 @@ describe('Patient registration validation', () => {
       expect(validationError).toBeFalsy();
     });
 
+    it('should allow state/province with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          stateProvince: 'State (Province)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
+      expect(validationError).toBeFalsy();
+    });
+
     // Country validation tests
     it('should reject numeric-only country', async () => {
       const invalidFormValues = {
@@ -384,7 +406,9 @@ describe('Patient registration validation', () => {
         },
       };
       const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain('Country should only contain letters, spaces, hyphens, and apostrophes');
+      expect(validationError.errors).toContain(
+        'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
     });
 
     it('should reject country with special characters', async () => {
@@ -395,7 +419,9 @@ describe('Patient registration validation', () => {
         },
       };
       const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain('Country should only contain letters, spaces, hyphens, and apostrophes');
+      expect(validationError.errors).toContain(
+        'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
     });
 
     it('should allow valid country names', async () => {
@@ -417,6 +443,28 @@ describe('Patient registration validation', () => {
         },
       };
       const validationError = await validateFormValues(validFormValuesWithHyphenatedCountry);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow country with periods', async () => {
+      const validFormValuesWithPeriods = {
+        ...validFormValues,
+        address: {
+          country: 'U.S.A.',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithPeriods);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow country with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          country: 'Cambodia (Kampuchea)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
       expect(validationError).toBeFalsy();
     });
 
@@ -488,7 +536,7 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'County/District should only contain letters, spaces, hyphens, and apostrophes',
+        'County/District should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
     });
 
@@ -501,7 +549,7 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'County/District should only contain letters, spaces, hyphens, and apostrophes',
+        'County/District should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
     });
 
@@ -513,6 +561,28 @@ describe('Patient registration validation', () => {
         },
       };
       const validationError = await validateFormValues(validFormValuesWithCounty);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow county/district with periods and apostrophes', async () => {
+      const validFormValuesWithSpecialChars = {
+        ...validFormValues,
+        address: {
+          countyDistrict: "St. Mary's County",
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithSpecialChars);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow county/district with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          countyDistrict: 'County (District)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
       expect(validationError).toBeFalsy();
     });
 
@@ -529,12 +599,14 @@ describe('Patient registration validation', () => {
       };
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain(
-        'City/Village should only contain letters, spaces, hyphens, and apostrophes',
+        'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
       expect(validationError.errors).toContain(
-        'State/Province should only contain letters, spaces, hyphens, and apostrophes',
+        'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
       );
-      expect(validationError.errors).toContain('Country should only contain letters, spaces, hyphens, and apostrophes');
+      expect(validationError.errors).toContain(
+        'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
       expect(validationError.errors).toContain(
         'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
       );
