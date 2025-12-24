@@ -72,7 +72,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
       const sessionLocationId = userSession?.sessionLocation?.uuid;
       const matchingLocation = queueLocations.find((l) => l.id === sessionLocationId);
       const isSelectionValid =
-        selectedQueueLocationUuid && queueLocations.some((l) => l.id === selectedQueueLocationUuid);
+        selectedQueueLocationUuid && queueLocations.some((location) => location.id === selectedQueueLocationUuid);
 
       if (matchingLocation) {
         if (selectedQueueLocationUuid !== matchingLocation.id) {
