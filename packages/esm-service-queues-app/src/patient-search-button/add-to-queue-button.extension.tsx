@@ -77,7 +77,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       showSnackbar({
         title: t('noActiveVisit', 'No active visit'),
         kind: 'error',
-        subtitle: t('startVisitFirst', 'Please start a visit for this patient first'),
+        subtitle: t('startVisitFirstForThisPatient', 'Please start a visit for this patient first'),
       });
       return;
     }
