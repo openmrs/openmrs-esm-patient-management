@@ -171,7 +171,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
     } catch (error) {
       setOptimisticStatus(null);
       showSnackbar({
-        title: t('errorRemovingPatient', 'Error removing patient from queue'),
+        title: t('errorRemovingPatientFromQueue', 'Error, removing patient from queue'),
         kind: 'error',
         subtitle: error?.message,
       });
