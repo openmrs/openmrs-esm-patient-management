@@ -17,10 +17,9 @@ import {
   TableToolbarSearch,
 } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
-import { ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';
+import { ConfigurableLink, EmptyCard, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { exportUnscheduledAppointmentsToSpreadsheet } from '../../helpers/excel';
-import { EmptyState } from '../../empty-state/empty-state.component';
 import { getPageSizes, useSearchResults } from '../utils';
 import { type ConfigObject } from '../../config-schema';
 
@@ -74,7 +73,7 @@ const UnscheduledAppointments: React.FC = () => {
 
   if (!unscheduledAppointments?.length) {
     return (
-      <EmptyState
+      <EmptyCard
         displayText={t('unscheduledAppointments_lower', 'unscheduled appointments')}
         headerTitle={t('unscheduledAppointments', 'Unscheduled appointments')}
       />

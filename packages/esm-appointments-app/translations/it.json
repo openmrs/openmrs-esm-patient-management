@@ -72,7 +72,6 @@
   "durationInMinutes": "Durata (minuti)",
   "edit": "Modifica",
   "editAppointment": "Modifica appuntamento",
-  "emptyStateText": "Non ci sono <1>{{displayText}}</1> da mostrare",
   "endAppointmentAndVisitConfirmationMessage": "Chiudere l'appuntamento segnerà la visita come completata e chiuderà la cartella clinica del paziente.",
   "endAppointmentConfirmation": "Sei sicuro di voler chiudere l'appuntamento per questo paziente?",
   "endAppointmentConfirmationMessage": "Chiudendo l'appuntamento, verrà segnato come completato.",

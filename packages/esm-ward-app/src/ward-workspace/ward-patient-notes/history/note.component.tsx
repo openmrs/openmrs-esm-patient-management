@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText, Tag, Tile } from '@carbon/react';
+import { SkeletonText, Tile } from '@carbon/react';
 import { type PatientNote } from '../types';
 import styles from './styles.scss';
 
@@ -38,12 +38,6 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note }) => {
           {formattedDate}, {formattedTime}
         </span>
       </div>
-      {note.diagnoses &&
-        note.diagnoses.split(',').map((diagnosis, index) => (
-          <Tag key={index} type="red">
-            {diagnosis.trim()}
-          </Tag>
-        ))}
       <div className={styles.noteBody}>{note.encounterNote}</div>
       <div className={styles.noteProviderName}>{note.encounterProvider}</div>
     </Tile>

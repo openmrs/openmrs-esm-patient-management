@@ -124,7 +124,7 @@ export const defaultWardView = getAsyncLifecycle(() => import('./ward-view/defau
 });
 
 export const maternalWardView = getAsyncLifecycle(
-  () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  () => import('./ward-view/maternal-ward/maternal-ward-view.component'),
   {
     featureName: 'maternal-ward-view',
     moduleName,

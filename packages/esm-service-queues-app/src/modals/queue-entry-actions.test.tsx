@@ -1,14 +1,22 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  getDefaultsFromConfigSchema,
+  openmrsFetch,
+  showSnackbar,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
+import { type ConfigObject, configSchema } from '../config-schema';
 import DeleteQueueEntryModal from './delete-queue-entry.modal';
 import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../hooks/useQueues', () => {
   return {
@@ -18,6 +26,10 @@ jest.mock('../hooks/useQueues', () => {
   };
 });
 
+jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+}));
+
 jest.mock('../hooks/useQueueEntries', () => {
   return {
     useMutateQueueEntries: jest.fn().mockReturnValue({
@@ -26,33 +38,31 @@ jest.mock('../hooks/useQueueEntries', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockReturnValue({
-      showQueueNumber: true,
-      showPriorityComment: true,
-      showTransitionDateTime: true,
-      priorityConfigs: [
-        {
-          conceptUuid: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
-          style: null,
-          color: 'green',
-        },
-        {
-          conceptUuid: 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f',
-          style: null,
-          color: 'orange',
-        },
-      ],
-      concepts: {
-        defaultPriorityConceptUuid: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
-        defaultStatusConceptUuid: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
-        defaultTransitionStatus: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
+beforeEach(() => {
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    showQueueNumber: true,
+    showPriorityComment: true,
+    showTransitionDateTime: true,
+    priorityConfigs: [
+      {
+        conceptUuid: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
+        style: null,
+        color: 'green',
       },
-    }),
-  };
+      {
+        conceptUuid: 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f',
+        style: null,
+        color: 'orange',
+      },
+    ],
+    concepts: {
+      ...getDefaultsFromConfigSchema(configSchema).concepts,
+      defaultPriorityConceptUuid: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
+      defaultStatusConceptUuid: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
+      defaultTransitionStatus: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
+    },
+  } as ConfigObject);
 });
 
 describe('UndoTransitionQueueEntryModal', () => {

@@ -72,7 +72,6 @@
   "durationInMinutes": "Thời lượng (phút)",
   "edit": "Chỉnh sửa",
   "editAppointment": "Edit appointment",
-  "emptyStateText": "Không có 1{{displayText}}1 để hiển thị",
   "endAppointmentAndVisitConfirmationMessage": "Việc kiểm tra bệnh nhân sẽ đánh dấu cuộc hẹn đã hoàn tất và kết thúc chuyến thăm khám đang diễn ra của bệnh nhân này.",
   "endAppointmentConfirmation": "Bạn có chắc chắn muốn cho bệnh nhân ra ngoài cuộc hẹn này không?",
   "endAppointmentConfirmationMessage": "Việc trả phòng cho bệnh nhân sẽ đánh dấu cuộc hẹn đã hoàn tất.",

@@ -2,8 +2,8 @@ import { Type, validator } from '@openmrs/esm-framework';
 
 export interface ActiveVisitsConfigSchema {
   activeVisits: {
-    pageSize: Number;
-    pageSizes: Array<Number>;
+    pageSize: number;
+    pageSizes: Array<number>;
     identifiers: Array<IdentifiersDefinition>;
     obs: Array<string>;
     attributes: Array<AttributeDefinition>;

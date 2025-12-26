@@ -72,7 +72,6 @@
   "durationInMinutes": "Durasi (menit)",
   "edit": "Edit",
   "editAppointment": "Edit janji temu",
-  "emptyStateText": "Tidak ada <1>{{displayText}}</1> untuk ditampilkan",
   "endAppointmentAndVisitConfirmationMessage": "Mencatat keberangkatan pasien akan menandai janji temu sebagai selesai dan menutup kunjungan aktif untuk pasien ini.",
   "endAppointmentConfirmation": "Apakah Anda yakin ingin mencatat keberangkatan pasien untuk janji temu ini?",
   "endAppointmentConfirmationMessage": "Mencatat keberangkatan pasien akan menandai janji temu sebagai selesai.",

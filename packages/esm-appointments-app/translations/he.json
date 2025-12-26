@@ -72,7 +72,6 @@
   "durationInMinutes": "משך (דקות)",
   "edit": "עריכה",
   "editAppointment": "Edit appointment",
-  "emptyStateText": "אין <1>{{displayText}}</1> להצגה",
   "endAppointmentAndVisitConfirmationMessage": "Checking the patient out will mark the appointment as complete, and close out the active visit for this patient.",
   "endAppointmentConfirmation": "Are you sure you want to check the patient out for this appointment?",
   "endAppointmentConfirmationMessage": "Checking the patient out will mark the appointment as complete.",
