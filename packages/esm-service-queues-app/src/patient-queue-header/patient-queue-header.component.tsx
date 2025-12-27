@@ -86,6 +86,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
         handleQueueLocationChange({ selectedItem: { id: 'all' } });
       }
     }
+    // We exclude `selectedQueueLocationUuid` to prevent the effect from re-running when the user manually selects a location, which would incorrectly reset the selection to the default session location.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     error,

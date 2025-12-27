@@ -82,8 +82,10 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       return;
     }
 
-    const { defaultPriorityConceptUuid, defaultStatusConceptUuid } = config.concepts;
-    const { visitQueueNumberAttributeUuid } = config;
+    const {
+      concepts: { defaultPriorityConceptUuid, defaultStatusConceptUuid },
+      visitQueueNumberAttributeUuid,
+    } = config;
     const { allowedPriorities, allowedStatuses, uuid: queueUuid } = selectedQueue;
 
     const priorityUuid =
