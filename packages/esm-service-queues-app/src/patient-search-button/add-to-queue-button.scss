@@ -1,0 +1,6 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.removeButton,
+.removeButton:hover {
+  color: $danger;
+}
