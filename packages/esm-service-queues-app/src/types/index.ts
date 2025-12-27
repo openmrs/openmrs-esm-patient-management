@@ -490,5 +490,3 @@ export interface QueueEntrySearchCriteria {
 export interface Concept extends OpenmrsResource {
   setMembers?: Array<Concept>;
 }
-
-export interface Provider extends OpenmrsResource {}

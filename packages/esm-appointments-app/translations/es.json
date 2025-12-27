@@ -72,7 +72,6 @@
   "durationInMinutes": "Duración (minutos)",
   "edit": "Editar",
   "editAppointment": "Editar cita",
-  "emptyStateText": "No hay <1>{{displayText}}</1> para mostrar",
   "endAppointmentAndVisitConfirmationMessage": "Registrar la salida del paciente marcará la cita como completada y cerrará la consulta activa para este paciente.",
   "endAppointmentConfirmation": "¿Está seguro de que desea registrar la salida del paciente para esta cita?",
   "endAppointmentConfirmationMessage": "Registrar la salida del paciente marcará la cita como completada.",

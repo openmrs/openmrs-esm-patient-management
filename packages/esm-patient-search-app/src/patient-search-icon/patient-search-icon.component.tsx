@@ -104,33 +104,29 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               className={styles.activeSearchIconButton}
               data-testid="closeSearchIcon"
               data-tutorial-target="close-search-icon"
-              enterDelayMs={500}
-              name="CloseSearchIcon"
               onClick={closePatientSearch}>
               <Close size={20} />
             </HeaderGlobalAction>
           </div>
         </>
       ) : (
-        <div>
+        <div
+          onMouseEnter={() => {
+            // Preload the user object on hover. This object may contain a 'patientsVisited'
+            // property with UUIDs of recently viewed patients. This data can be used to display
+            // recently viewed patients if the 'showRecentlySearchedPatients' config property
+            // is enabled.
+            if (userUuid) {
+              void preload(`${restBaseUrl}/user/${userUuid}`, openmrsFetch);
+            }
+          }}>
           {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
           <HeaderGlobalAction
             aria-label={t('searchPatient', 'Search patient')}
             className={styles.searchIconButton}
             data-testid="searchPatientIcon"
             data-tutorial-target="search-patient-icon"
-            enterDelayMs={500}
-            name="SearchPatientIcon"
-            onClick={handleShowSearchInput}
-            onMouseEnter={() => {
-              // Preload the user object on hover. This object may contain a 'patientsVisited'
-              // property with UUIDs of recently viewed patients. This data can be used to display
-              // recently viewed patients if the 'showRecentlySearchedPatients' config property
-              // is enabled.
-              if (userUuid) {
-                void preload(`${restBaseUrl}/user/${userUuid}`, openmrsFetch);
-              }
-            }}>
+            onClick={handleShowSearchInput}>
             <Search size={20} />
           </HeaderGlobalAction>
         </div>

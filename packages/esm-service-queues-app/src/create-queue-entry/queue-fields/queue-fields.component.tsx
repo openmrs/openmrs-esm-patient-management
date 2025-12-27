@@ -371,7 +371,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
             control={control}
             render={({ field }) =>
               isLoadingQueues ? (
-                <RadioButtonGroup>
+                <RadioButtonGroup name="priority">
                   <RadioButtonSkeleton />
                   <RadioButtonSkeleton />
                   <RadioButtonSkeleton />

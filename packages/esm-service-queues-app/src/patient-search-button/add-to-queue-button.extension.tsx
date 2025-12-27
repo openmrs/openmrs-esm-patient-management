@@ -68,7 +68,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       showSnackbar({
         title: t('queueNotFound', 'Queue not found'),
         kind: 'error',
-        subtitle: t('queueNotFoundForService', 'Could not find a queue for the selected service'),
+        subtitle: t('queueNotFoundForSelectedService', 'Could not find a queue for the selected service'),
       });
       return;
     }
@@ -77,7 +77,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       showSnackbar({
         title: t('noActiveVisit', 'No active visit'),
         kind: 'error',
-        subtitle: t('startVisitFirst', 'Please start a visit for this patient first'),
+        subtitle: t('startVisitFirstForThisPatient', 'Please start a visit for this patient first'),
       });
       return;
     }
@@ -173,7 +173,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
     } catch (error) {
       setOptimisticStatus(null);
       showSnackbar({
-        title: t('errorRemovingPatient', 'Error removing patient from queue'),
+        title: t('errorRemovingPatientFromQueue', 'Error, removing patient from queue'),
         kind: 'error',
         subtitle: error?.message,
       });
