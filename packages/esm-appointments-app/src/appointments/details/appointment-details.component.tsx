@@ -59,9 +59,15 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
               ))
             : ''}
         </div>
-        <div>
-          <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>
-          <p className={styles.label}>{appointment.comments}</p>
+        <div className={styles.gridContainer}>
+          <div>
+            <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>
+            <p className={styles.label}>{appointment.comments}</p>
+          </div>
+          <div>
+            <p className={styles.gridTitle}>{t('provider', 'Provider')}</p>
+            <p className={styles.label}>{appointment.providers[0].name}</p>
+          </div>
         </div>
         <div>
           <p className={styles.gridTitle}>{t('appointmentHistory', 'Appointment History')}</p>

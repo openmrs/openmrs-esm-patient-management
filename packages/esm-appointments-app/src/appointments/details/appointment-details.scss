@@ -36,6 +36,13 @@
   margin-top: layout.$spacing-05;
 }
 
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+}
+
 .gridTitle {
   @include type.type-style('label-02');
   margin-bottom: layout.$spacing-04;
