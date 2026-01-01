@@ -21,7 +21,7 @@ const configWithCustomColumns = {
           identifierType: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
           identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
           statusConfigs: [],
-          visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
+          visitQueueNumberAttributeUuid: 'queue-number-visit-attr-type-uuid',
         },
         header: 'EMR ID',
       },
@@ -71,7 +71,7 @@ describe('QueueTable', () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession.data);
     mockUseConfig.mockReturnValue(configDefaults);
-    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   it('renders an empty table with default columns when there are no queue entries', () => {
@@ -189,7 +189,7 @@ describe('QueueTable', () => {
               },
               identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',
               statusConfigs: [],
-              visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
+              visitQueueNumberAttributeUuid: 'queue-number-visit-attr-type-uuid',
             },
           },
         ],
@@ -222,7 +222,7 @@ describe('QueueTable', () => {
   it('uses the visitQueueNumberAttributeUuid defined at the top level', () => {
     mockUseConfig.mockReturnValue({
       ...configDefaults,
-      visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
+      visitQueueNumberAttributeUuid: 'queue-number-visit-attr-type-uuid',
       queueTables: {
         ...configDefaults.queueTables,
         tableDefinitions: [
@@ -239,11 +239,9 @@ describe('QueueTable', () => {
       statusUuid: null,
     });
 
-    const rows = screen.queryAllByRole('row');
-    const aliceRow = rows[2];
+    const aliceRow = screen.getByText('Alice Johnson').closest('tr');
     const cells = within(aliceRow).getAllByRole('cell');
-    // TODO: Figure out why this expectation is failing
-    // expect(cells[1].childNodes[0]).toHaveTextContent('42');
+    expect(cells[1].childNodes[0]).toHaveTextContent('42');
   });
 });
 
