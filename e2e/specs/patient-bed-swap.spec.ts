@@ -76,7 +76,7 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
-    await page.getByRole('button', { name: 'Admit' }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I should see a success message confirming the patient was admitted and assigned to bed', async () => {
@@ -124,7 +124,6 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
 
   await test.step('And the patient should be in the new bed', async () => {
     await wardPage.waitForPatientInWardView(fullName);
-    await expect(page.getByText(fullName, { exact: true })).toBeVisible();
   });
 
   await test.step('And the original bed should be empty', async () => {
