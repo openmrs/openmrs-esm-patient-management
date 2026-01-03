@@ -24,12 +24,11 @@ let wardPatient: Patient;
 test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
-  bed = await generateRandomBed(api, bedType);
+  bed = await generateRandomBed(api, bedType, process.env.E2E_WARD_LOCATION_UUID);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid);
-
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
   // Poll the admission requests API to verify the admission is queryable before navigating.
   // This prevents race conditions where the UI loads before the backend has indexed the admission.
   const maxAttempts = 10;

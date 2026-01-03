@@ -82,7 +82,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 
   await test.step('And I select Inpatient Ward as transfer location', async () => {
     await wardPage.searchLocationInput().fill('Inpatient Ward');
-    await page.getByRole('radio', { name: 'Ward 1' }).click();
+    await page.getByRole('radio', { name: 'Inpatient Ward' }).click();
   });
 
   await test.step('And I click save to complete the ward transfer', async () => {
@@ -95,7 +95,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 });
 
 test('Admit a transferred patient to a new bed', async ({ page, api }) => {
-  await changeLocation(api, process.env.E2E_WARD_LOCATION_UUID);
+  await changeToWardLocation(api);
 
   const wardPage = new WardPage(page);
   await test.step('When I visit the patient ward page', async () => {
