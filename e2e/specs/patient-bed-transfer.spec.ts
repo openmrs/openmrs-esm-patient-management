@@ -37,16 +37,15 @@ async function selectBedByLabel(page: Page, label: string) {
 }
 
 test.beforeAll(async ({ api }) => {
-  await changeToWardLocation(api);
-
+  await changeLocation(api, process.env.E2E_WARD1_LOCATION_UUID);
   bedtype = await generateBedType(api);
-  bed = await generateRandomBed(api, bedtype);
+  bed = await generateRandomBed(api, bedtype, process.env.E2E_WARD1_LOCATION_UUID);
   provider = await getProvider(api);
-  transferBed = await generateRandomBed(api, bedtype);
-  wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
+  transferBed = await generateRandomBed(api, bedtype, process.env.E2E_WARD1_LOCATION_UUID);
+  wardPatient = await generateRandomPatient(api, process.env.E2E_WARD1_LOCATION_UUID);
   fullName = wardPatient.person?.display;
-  visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD1_LOCATION_UUID);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid, process.env.E2E_WARD1_LOCATION_UUID);
 });
 
 test('Transfer a patient from one bed to another', async ({ page }) => {
@@ -63,7 +62,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 
     await selectBedByLabel(page, `${bed.bedNumber} · Empty`);
 
-    await page.getByRole('button', { name: 'Admit' }).click();
+    await page.locator('button[type="submit"]', { hasText: 'Admit' }).click();
   });
 
   await test.step('Then I should see a success admission message', async () => {
@@ -96,7 +95,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 });
 
 test('Admit a transferred patient to a new bed', async ({ page, api }) => {
-  await changeLocation(api, process.env.E2E_WARD1_LOCATION_UUID);
+  await changeLocation(api, process.env.E2E_WARD_LOCATION_UUID);
 
   const wardPage = new WardPage(page);
   await test.step('When I visit the patient ward page', async () => {
