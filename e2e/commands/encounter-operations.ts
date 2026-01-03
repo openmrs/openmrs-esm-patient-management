@@ -6,6 +6,7 @@ export const createEncounter = async (
   api: APIRequestContext,
   patientId: string,
   providerId: string,
+  locationUuid: string,
   note?: string,
 ): Promise<Encounter> => {
   const observations = [];
@@ -30,7 +31,7 @@ export const createEncounter = async (
           provider: providerId,
         },
       ],
-      location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
+      location: locationUuid,
       encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
       obs: observations,
     },
@@ -43,12 +44,13 @@ export const generateWardAdmissionRequest = async (
   api: APIRequestContext,
   providerId: string,
   patientId: string,
+  locationUuid: string,
 ): Promise<Encounter> => {
   const formRes = await api.post('encounter', {
     data: {
       patient: patientId,
       encounterDatetime: dayjs().format(),
-      location: process.env.E2E_WARD_LOCATION_UUID,
+      location: locationUuid,
       encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
       encounterProviders: [
         {
@@ -66,7 +68,7 @@ export const generateWardAdmissionRequest = async (
               formFieldPath: 'rfe-forms-disposition',
             },
             {
-              value: 'ba685651-ed3b-4e63-9b35-78893060758a',
+              value: locationUuid,
               concept: 'b9cd9e47-da43-4a46-8f3c-e30ec9209cc7',
               formFieldNamespace: 'rfe-forms',
               formFieldPath: 'rfe-forms-admitToLocation',
@@ -94,11 +96,12 @@ export const createBedAssignmentEncounter = async (
   providerId: string,
   patientId: string,
   visit: string,
+  locationUuid: string,
 ): Promise<Encounter> => {
   const formRes = await api.post('encounter', {
     data: {
       patient: patientId,
-      location: process.env.E2E_WARD_LOCATION_UUID,
+      location: locationUuid,
       encounterType: 'b2c4d5e6-7f8a-4e9b-8c1d-2e3f8e4a3b8f',
       encounterProviders: [
         {

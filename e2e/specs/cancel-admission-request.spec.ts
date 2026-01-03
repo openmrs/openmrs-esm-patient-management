@@ -23,11 +23,11 @@ let wardPatient: Patient;
 test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
   bedtype = await generateBedType(api);
-  bed = await generateRandomBed(api, bedtype);
+  bed = await generateRandomBed(api, bedtype, process.env.E2E_WARD_LOCATION_UUID);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
 });
 
 test('Cancel an admission request', async ({ page }) => {
