@@ -82,7 +82,7 @@ test('Transfer a patient from one bed to another', async ({ page }) => {
 
   await test.step('And I select Inpatient Ward as transfer location', async () => {
     await wardPage.searchLocationInput().fill('Inpatient Ward');
-    await page.getByRole('radio', { name: 'Inpatient Ward' }).click();
+    await page.getByRole('radio', { name: 'Inpatient Ward' }).check();
   });
 
   await test.step('And I click save to complete the ward transfer', async () => {
