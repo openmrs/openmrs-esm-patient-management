@@ -15,11 +15,7 @@ export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appo
   const isTablet = useLayoutType() === 'tablet';
 
   const handleLaunchEditAppointmentForm = () => {
-    launchWorkspace2('appointments-form-workspace', {
-      appointment,
-      context: 'editing',
-      patientUuid,
-    });
+    launchWorkspace2('appointments-form-workspace', { appointment, patientUuid });
   };
 
   const handleLaunchCancelAppointmentModal = () => {

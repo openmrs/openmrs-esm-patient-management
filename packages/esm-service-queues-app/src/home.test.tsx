@@ -7,6 +7,14 @@ import Home from './home.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
+jest.mock('./hooks/useQueues', () => ({
+  useQueues: jest.fn(() => ({ queues: [] })),
+}));
+
+jest.mock('./create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+}));
+
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',

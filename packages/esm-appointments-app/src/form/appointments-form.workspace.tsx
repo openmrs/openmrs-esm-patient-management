@@ -34,8 +34,8 @@ import {
   usePatient,
   useSession,
   Workspace2,
-  type FetchResponse,
   type Workspace2DefinitionProps,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
@@ -53,11 +53,10 @@ import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
 import styles from './appointments-form.scss';
 
-export interface AppointmentsFormProps {
+interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
-  patientUuid?: string;
-  context: 'creating' | 'editing';
+  patientUuid: string;
 }
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
@@ -65,8 +64,11 @@ const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
 const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
 
+/**
+ * Workspace used to create or edit an appointment within the appointments app
+ */
 const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps>> = ({
-  workspaceProps: { appointment, recurringPattern, patientUuid, context },
+  workspaceProps: { appointment, recurringPattern, patientUuid },
   closeWorkspace,
 }) => {
   const { patient } = usePatient(patientUuid);
@@ -262,7 +264,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
 
-  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
+  // Retrieve ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
     field: { ref: startDateRef },
   } = useController({ name: 'appointmentDateTime.startDate', control });
@@ -281,7 +283,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   useEffect(() => {
     if (isSuccessful) {
       reset();
-      closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
+      closeWorkspace({ discardUnsavedChanges: true, closeWindow: true });
     }
   }, [isSuccessful, reset, closeWorkspace]);
 
@@ -290,7 +292,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     setValue('appointmentDateTime', { ...appointmentDate, startDate: date });
   };
 
-  const handleSelectChange = (e: { selectedItems: Array<{ id: number; label: string }> }) => {
+  const handleSelectChange = (e) => {
     setValue(
       'selectedDaysOfWeekText',
       (() => {
@@ -307,8 +309,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     );
     setValue(
       'recurringPatternDaysOfWeek',
-      e.selectedItems.map((s: { id: number }) => {
-        return String(s.id);
+      e.selectedItems.map((s) => {
+        return s.id;
       }),
     );
   };
@@ -326,23 +328,21 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     }
   })();
 
+  const isEditing = Boolean(appointment);
+
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
 
-    // check if Duplicate Response Occurs
+    // Check if a duplicate response occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      if (context !== 'editing') {
-        errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
-      } else {
-        errorMessage = null;
-      }
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
 
     if (response.status === 200 && errorMessage) {
@@ -376,19 +376,17 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             isLowContrast: true,
             kind: 'success',
             subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title:
-              context === 'editing'
-                ? t('appointmentEdited', 'Appointment edited')
-                : t('appointmentScheduled', 'Appointment scheduled'),
+            title: isEditing
+              ? t('appointmentEdited', 'Appointment edited')
+              : t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
         if (status === 204) {
           setIsSubmitting(false);
           showSnackbar({
-            title:
-              context === 'editing'
-                ? t('appointmentEditError', 'Error editing appointment')
-                : t('appointmentFormError', 'Error scheduling appointment'),
+            title: isEditing
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
             kind: 'error',
             isLowContrast: false,
             subtitle: t('noContent', 'No Content'),
@@ -398,10 +396,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       (error) => {
         setIsSubmitting(false);
         showSnackbar({
-          title:
-            context === 'editing'
-              ? t('appointmentEditError', 'Error editing appointment')
-              : t('appointmentFormError', 'Error scheduling appointment'),
+          title: isEditing
+            ? t('appointmentEditError', 'Error editing appointment')
+            : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           isLowContrast: false,
           subtitle: error?.message,
@@ -445,7 +442,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       providers: [{ uuid: provider }],
       patientUuid: patientUuid,
       comments: appointmentNote,
-      uuid: context === 'editing' ? appointment?.uuid : undefined,
+      uuid: isEditing ? appointment.uuid : undefined,
       dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
@@ -469,19 +466,18 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     };
   };
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
+  }
+
+  const title = isEditing
+    ? t('editAppointment', 'Edit appointment')
+    : t('createNewAppointment', 'Create new appointment');
 
   return (
-    <Workspace2
-      title={
-        context === 'editing'
-          ? t('editAppointment', 'Edit appointment')
-          : t('createNewAppointment', 'Create new appointment')
-      }
-      hasUnsavedChanges={isDirty}>
+    <Workspace2 title={title} hasUnsavedChanges={isDirty}>
       <Form onSubmit={handleSubmit(handleSaveAppointment)}>
         {patient && (
           <ExtensionSlot
@@ -534,12 +530,12 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     labelText={t('selectService', 'Select a service')}
                     onBlur={onBlur}
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-                      if (context === 'creating') {
+                      if (!isEditing) {
                         setValue(
                           'duration',
                           services?.find((service) => service.name === event.target.value)?.durationMins,
                         );
-                      } else if (context === 'editing') {
+                      } else {
                         const previousServiceDuration = services?.find(
                           (service) => service.name === getValues('selectedService'),
                         )?.durationMins;
@@ -677,8 +673,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                           invalidText={t('invalidNumber', 'Number is not valid')}
                           value={value}
                           onBlur={onBlur}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            onChange(Number(e.target.value));
+                          onChange={(e, state) => {
+                            const value = state?.value ?? (e.target as HTMLInputElement).value;
+                            onChange(value === '' ? null : Number(value));
                           }}
                         />
                       )}
@@ -693,7 +690,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                         <RadioButtonGroup
                           legendText={t('period', 'Period')}
                           name="radio-button-group"
-                          onChange={(type: string) => onChange(type)}
+                          onChange={(type) => onChange(type)}
                           valueSelected={value}>
                           <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
                           <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
@@ -716,15 +713,15 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                               getValues('recurringPatternDaysOfWeek').includes(i.id),
                             )}
                             items={weekDays}
-                            itemToString={(item: any) => (item ? t(item.labelCode, item.label) : '')}
+                            itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
                             label={getValues('selectedDaysOfWeekText')}
-                            onChange={(e: any) => {
+                            onChange={(e) => {
                               onChange(e);
                               handleSelectChange(e);
                             }}
                             selectionFeedback="top-after-reopen"
-                            sortItems={(items: any[]) => {
-                              return items.sort((a: any, b: any) => a.order - b.order);
+                            sortItems={(items) => {
+                              return [...items].sort((a, b) => a.order - b.order);
                             }}
                           />
                         )}
@@ -795,7 +792,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </FormGroup>
           )}
 
-          {context !== 'creating' ? (
+          {isEditing ? (
             <FormGroup className={styles.formGroup} legendText={t('appointmentStatus', 'Appointment Status')}>
               <ResponsiveWrapper>
                 <Controller
@@ -904,7 +901,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button
             className={styles.button}
-            onClick={() => closeWorkspace({ discardUnsavedChanges: false })}
+            onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
             kind="secondary">
             {t('discard', 'Discard')}
           </Button>
@@ -941,7 +938,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               id="time-picker"
               pattern={time12HourFormatRegexPattern}
               invalid={!!errors?.startTime}
-              invalidText={errors?.startTime?.message}
+              invalidText={errors?.startTime?.message ? String(errors.startTime.message) : undefined}
               labelText={t('time', 'Time')}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 onChange(event.target.value);
@@ -979,12 +976,13 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               hideSteppers
               id="duration"
               invalid={!!errors?.duration}
-              invalidText={errors?.duration?.message}
+              invalidText={errors?.duration?.message ? String(errors.duration.message) : undefined}
               label={t('durationInMinutes', 'Duration (minutes)')}
               onBlur={onBlur}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                onChange(event.target.value === '' ? null : Number(event.target.value))
-              }
+              onChange={(event, state) => {
+                const value = state?.value ?? (event.target as HTMLInputElement).value;
+                onChange(value === '' ? null : Number(value));
+              }}
               ref={ref}
               value={value ?? ''}
             />

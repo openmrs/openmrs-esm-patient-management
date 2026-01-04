@@ -37,7 +37,7 @@ export function useMotherAndChildren(
     'requireChildBornDuringMothersActiveVisit',
     requireChildBornDuringMothersActiveVisit?.toString() ?? 'false',
   );
-  rep && url.searchParams.append('v', rep);
+  void (rep && url.searchParams.append('v', rep));
   return useOpenmrsFetchAll<MotherAndChild>(fetch ? url : null);
 }
 

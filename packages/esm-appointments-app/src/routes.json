@@ -98,10 +98,6 @@
       "slot": "visit-form-top-slot"
     },
     {
-      "name": "search-patient",
-      "component": "searchPatient"
-    },
-    {
       "name": "home-appointments-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile"
@@ -135,23 +131,31 @@
       "component": "cancelAppointmentModal"
     }
   ],
-  "workspaces2": [
-    {
-      "name": "appointments-form-workspace",
-      "component": "appointmentsFormWorkspace",
-      "window": "appointments-form-window"
+  "workspaceGroups2": [{
+      "name": "appointments-group"
     }
   ],
   "workspaceWindows2": [
     {
-      "name": "appointments-form-window",
-      "group": "appointmentsFormWorkspaceGroup"
+      "name": "appointments-window",
+      "group": "appointments-group"
     }
   ],
-  "workspaceGroups2": [
+  "workspaces2": [
     {
-      "name": "appointmentsFormWorkspaceGroup",
-      "overlay": false
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace",
+      "window": "appointments-window"
+    },
+    {
+      "name": "appointments-patient-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "appointments-window"
+    },
+    {
+      "name": "appointments-patient-search-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "appointments-window"
     }
   ]
 }

@@ -174,7 +174,7 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
           </Column>
         </Stack>
         <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {getCoreTranslation('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
