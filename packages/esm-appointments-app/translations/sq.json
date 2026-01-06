@@ -72,7 +72,6 @@
   "durationInMinutes": "Duration (minutes)",
   "edit": "Ndrysho",
   "editAppointment": "Ndrysho takim",
-  "emptyStateText": "Aty jeni jo <1>{{displayText}}</1> deri display",
   "endAppointmentAndVisitConfirmationMessage": "Checking the pacient out do mark the takim as complete, dhe mbyll out the active vizitë për këtë pacient.",
   "endAppointmentConfirmation": "Jeni ju sure ju want deri check the pacient out për këtë takim?",
   "endAppointmentConfirmationMessage": "Checking the pacient out do mark the takim as complete.",
