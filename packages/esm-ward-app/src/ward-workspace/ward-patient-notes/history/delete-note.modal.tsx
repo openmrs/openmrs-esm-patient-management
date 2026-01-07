@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { deleteEncounter } from '../../../ward.resource';
@@ -16,10 +16,12 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
   onDelete,
 }) => {
   const { t } = useTranslation();
+  const [isDeleting, setIsDeleting] = useState(false);
   const handleCancel = () => close();
 
   const handleDelete = async () => {
     try {
+      setIsDeleting(true);
       await deleteEncounter(encounterUuid);
       showSnackbar({
         kind: 'success',
@@ -33,6 +35,8 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
         title: t('errorDeletingNote', 'Error deleting note'),
         subtitle: e?.responseBody?.error?.translatedMessage ?? e?.responseBody?.error?.message,
       });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -48,7 +52,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
         <Button size="lg" kind="secondary" onClick={handleCancel}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button autoFocus kind="danger" onClick={handleDelete} size="lg">
+        <Button autoFocus kind="danger" disabled={isDeleting} onClick={handleDelete} size="lg">
           {t('delete', 'Delete')}
         </Button>
       </ModalFooter>

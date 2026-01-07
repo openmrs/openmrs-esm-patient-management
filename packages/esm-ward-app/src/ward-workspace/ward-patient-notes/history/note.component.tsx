@@ -14,7 +14,7 @@ import {
 } from '@carbon/react';
 import { isDesktop, showModal, showSnackbar, useEmrConfiguration, useLayoutType } from '@openmrs/esm-framework';
 import { type PatientNote } from '../types';
-import { editPatientNotes } from '../notes.resource';
+import { editPatientNote } from '../notes.resource';
 import styles from './styles.scss';
 
 export const InPatientNoteSkeleton: React.FC = () => {
@@ -66,7 +66,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
   const onSave = async () => {
     try {
       setIsSaving(true);
-      await editPatientNotes(note.obsUuid, editedNote);
+      await editPatientNote(note.obsUuid, editedNote);
       setEditMode(false);
       showSnackbar({
         isLowContrast: true,

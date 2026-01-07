@@ -14,7 +14,7 @@ export function createPatientNote(payload: EncounterPayload, abortController: Ab
   });
 }
 
-export function editPatientNotes(obsUuid: string, note: string) {
+export function editPatientNote(obsUuid: string, note: string) {
   return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
     headers: {
       'Content-Type': 'application/json',

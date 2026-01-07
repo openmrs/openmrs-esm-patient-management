@@ -61,10 +61,6 @@
   height: layout.$spacing-13;
 }
 
-:global(.cds--overflow-menu-option) {
-  z-index: 10000;
-}
-
 .editFields {
   display: flex;
   flex-direction: column;
