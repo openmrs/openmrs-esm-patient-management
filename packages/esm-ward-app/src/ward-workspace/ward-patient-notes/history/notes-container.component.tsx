@@ -1,11 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useConfig, type PatientUuid } from '@openmrs/esm-framework';
+import { useConfig, useEmrConfiguration, type PatientUuid } from '@openmrs/esm-framework';
 import { usePatientNotes } from '../notes.resource';
 import InPatientNote, { InPatientNoteSkeleton } from './note.component';
 import styles from './styles.scss';
 import { InlineNotification } from '@carbon/react';
-import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 import { type WardConfigObject } from '../../../config-schema';
 
 interface PatientNotesHistoryProps {

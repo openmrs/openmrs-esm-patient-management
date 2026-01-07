@@ -39,8 +39,6 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
   const session = useSession();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rows, setRows] = useState(0);
-
   const [hasEditChanges, setHasEditChanges] = useState(false);
 
   const {
@@ -159,12 +157,9 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
                       onBlur={onBlur}
                       onChange={(event) => {
                         onChange(event);
-                        const textAreaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                        const newRows = Math.ceil(event.target.scrollHeight / textAreaLineHeight);
-                        setRows(newRows);
                       }}
                       placeholder={t('wardClinicalNotePlaceholder', 'Write any notes here')}
-                      rows={rows}
+                      rows={6}
                       value={value}
                     />
                   </ResponsiveWrapper>
@@ -172,14 +167,15 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
               />
             </Column>
           </Row>
+
+          <Button
+            className={styles.saveButton}
+            disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
+            kind="primary"
+            type="submit">
+            {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
+          </Button>
         </Stack>
-        <Button
-          className={styles.saveButton}
-          disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
-          kind="primary"
-          type="submit">
-          {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
-        </Button>
       </Form>
 
       <PatientNotesHistory

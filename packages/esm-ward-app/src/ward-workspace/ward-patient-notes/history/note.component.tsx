@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import {
   SkeletonText,
-  Tag,
   Tile,
   OverflowMenu,
   OverflowMenuItem,
@@ -13,7 +12,7 @@ import {
   Layer,
   InlineLoading,
 } from '@carbon/react';
-import { isDesktop, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, showModal, showSnackbar, useEmrConfiguration, useLayoutType } from '@openmrs/esm-framework';
 import { type PatientNote } from '../types';
 import { editPatientNotes } from '../notes.resource';
 import styles from './styles.scss';
@@ -38,6 +37,15 @@ interface InPatientNoteProps {
   promptBeforeClosing(hasUnsavedChanges: boolean): void;
 }
 
+/**
+ * This component shows a note (obs) created with concept as either:
+ * - `consultFreeTextCommentsConcept` from emrapi configuration
+ * - one of the concepts defined in additionalInpatientNotesConceptUuids.
+ *
+ * Note that only notes with concept consultFreeTextCommentsConcept are creatable,
+ * editable and deletable from the ward ap.
+ *
+ */
 const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const formattedDate = note.encounterNoteRecordedAt
@@ -48,6 +56,8 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
   const [editedNote, setEditedNote] = useState(note.encounterNote);
   const isTablet = !isDesktop(useLayoutType());
   const [isSaving, setIsSaving] = useState(false);
+  const { emrConfiguration } = useEmrConfiguration();
+  const isCreatedInWardApp = note.conceptUuid === emrConfiguration?.consultFreeTextCommentsConcept.uuid;
 
   useEffect(() => {
     promptBeforeClosing(editMode);
@@ -84,35 +94,37 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
           <span className={styles.noteDateAndTime}>
             {formattedDate}, {formattedTime}
           </span>
-          <OverflowMenu className={styles.overflowMenu} flipped>
-            {!editMode && (
+          {isCreatedInWardApp && (
+            <OverflowMenu className={styles.overflowMenu} flipped>
+              {!editMode && (
+                <OverflowMenuItem
+                  aria-label={t('edit', 'Edit')}
+                  id={'edit note-' + note.encounterUuid}
+                  className={styles.menuItem}
+                  hasDivider
+                  itemText={t('edit', 'Edit')}
+                  onClick={() => {
+                    setEditMode(true);
+                  }}
+                />
+              )}
               <OverflowMenuItem
-                aria-label={t('edit', 'Edit')}
-                id={'edit note-' + note.encounterUuid}
+                aria-label={t('delete', 'Delete')}
+                id={'delete-note-' + note.encounterUuid}
+                isDelete
                 className={styles.menuItem}
                 hasDivider
-                itemText={t('edit', 'Edit')}
+                itemText={t('delete', 'Delete')}
                 onClick={() => {
-                  setEditMode(true);
+                  const dispose = showModal('delete-note-modal', {
+                    close: () => dispose(),
+                    encounterUuid: note.encounterUuid,
+                    onDelete: () => mutatePatientNotes(),
+                  });
                 }}
               />
-            )}
-            <OverflowMenuItem
-              aria-label={t('delete', 'Delete')}
-              id={'delete-note-' + note.encounterUuid}
-              isDelete
-              className={styles.menuItem}
-              hasDivider
-              itemText={t('delete', 'Delete')}
-              onClick={() => {
-                const dispose = showModal('delete-note-modal', {
-                  close: () => dispose(),
-                  encounterUuid: note.encounterUuid,
-                  onDelete: () => mutatePatientNotes(),
-                });
-              }}
-            />
-          </OverflowMenu>
+            </OverflowMenu>
+          )}
         </div>
         {editMode ? (
           <Layer>

@@ -47,10 +47,11 @@ export function usePatientNotes(patientUuid: string, visitUuid: string, conceptU
                     encounterNote: obs ? obs.value : '',
                     encounterNoteRecordedAt: obs ? obs.obsDatetime : '',
                     encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
+                    conceptUuid: obs.concept.uuid,
                   });
                 }
                 return acc;
-              }, []);
+              }, [] as Array<PatientNote>);
             })
             .sort(
               (a, b) => new Date(b.encounterNoteRecordedAt).getTime() - new Date(a.encounterNoteRecordedAt).getTime(),

@@ -14,11 +14,10 @@ export interface RESTPatientNote extends OpenmrsResource {
 export interface PatientNote {
   encounterUuid: string;
   obsUuid: string;
-  diagnoses: string;
-  encounterDate: string;
   encounterNote: string;
   encounterNoteRecordedAt: string;
   encounterProvider: string;
+  conceptUuid: string;
 }
 
 export interface UsePatientNotes {

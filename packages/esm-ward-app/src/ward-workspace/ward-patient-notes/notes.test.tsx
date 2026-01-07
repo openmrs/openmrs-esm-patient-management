@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { savePatientNote, usePatientNotes } from './notes.resource';
+import { createPatientNote, usePatientNotes } from './notes.resource';
 import WardPatientNotesWorkspace from './notes.workspace';
 import { emrConfigurationMock, mockInpatientRequestAlice, mockPatientAlice } from '__mocks__';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
@@ -30,11 +30,11 @@ const testProps: WardPatientWorkspaceDefinition = {
   isRootWorkspace: false,
 };
 
-const mockSavePatientNote = savePatientNote as jest.Mock;
+const mockCreatePatientNote = createPatientNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 
 jest.mock('./notes.resource', () => ({
-  savePatientNote: jest.fn(),
+  createPatientNote: jest.fn(),
   usePatientNotes: jest.fn(),
 }));
 
@@ -86,7 +86,7 @@ describe('<WardPatientNotesWorkspace>', () => {
       patient: mockPatientAlice.uuid,
     };
 
-    mockSavePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
+    mockCreatePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
 
     renderWardPatientNotesForm();
 
@@ -98,8 +98,8 @@ describe('<WardPatientNotesWorkspace>', () => {
     const submitButton = screen.getByRole('button', { name: /Save/i });
     await userEvent.click(submitButton);
 
-    expect(mockSavePatientNote).toHaveBeenCalledTimes(1);
-    expect(mockSavePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
+    expect(mockCreatePatientNote).toHaveBeenCalledTimes(1);
+    expect(mockCreatePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
   });
 
   test('renders an error snackbar if there was a problem recording a visit note', async () => {
@@ -111,7 +111,7 @@ describe('<WardPatientNotesWorkspace>', () => {
       },
     };
 
-    mockSavePatientNote.mockRejectedValueOnce(error);
+    mockCreatePatientNote.mockRejectedValueOnce(error);
     renderWardPatientNotesForm();
 
     const note = screen.getByRole('textbox', { name: /Write your notes/i });
