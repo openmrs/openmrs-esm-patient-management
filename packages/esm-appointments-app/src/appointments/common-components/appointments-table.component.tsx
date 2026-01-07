@@ -27,21 +27,22 @@ import {
 import { Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
+  EmptyCard,
   formatDate,
   formatDatetime,
   isDesktop,
   parseDate,
   useConfig,
   useLayoutType,
-  launchWorkspace,
+  launchWorkspace2,
   usePagination,
 } from '@openmrs/esm-framework';
-import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
+import { launchCreateAppointmentForm } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
@@ -101,7 +102,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   }));
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" row={5} />;
+    return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
 
   if (hasActiveFilters && !appointments?.length) {
@@ -121,15 +122,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
 
   if (!appointments?.length) {
     return (
-      <EmptyState
+      <EmptyCard
         headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
         displayText={
           tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
         }
-        // TODO @brandones: Make this a workspace, not an extension
-        launchForm={() => launchWorkspace('search-patient')}
+        launchForm={() => launchCreateAppointmentForm(t)}
       />
     );
   }
@@ -197,6 +197,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBody>
                   {rows.map((row) => {
                     const matchingAppointment = appointments.find((appointment) => appointment.uuid === row.id);
+
+                    if (!matchingAppointment) {
+                      return null;
+                    }
+
                     const patientUuid = matchingAppointment.patient?.uuid;
                     const visitDate = dayjs(matchingAppointment.startDateTime);
                     const isFutureAppointment = visitDate.isAfter(dayjs());
@@ -221,13 +226,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                 <OverflowMenuItem
                                   className={styles.menuItem}
                                   itemText={t('editAppointment', 'Edit appointment')}
-                                  size={responsiveSize}
                                   onClick={() =>
-                                    launchWorkspace('appointments-form-workspace', {
+                                    launchWorkspace2('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
-                                      context: 'editing',
-                                      workspaceTitle: t('editAppointment', 'Edit appointment'),
                                     })
                                   }
                                 />

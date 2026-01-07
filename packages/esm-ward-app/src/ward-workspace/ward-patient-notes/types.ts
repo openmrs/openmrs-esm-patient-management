@@ -19,7 +19,6 @@ export interface PatientNote {
   encounterNote: string;
   encounterNoteRecordedAt: string;
   encounterProvider: string;
-  encounterProviderRole: string;
 }
 
 export interface UsePatientNotes {

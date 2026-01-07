@@ -85,7 +85,7 @@ const CreateQueueEntryWorkspace: React.FC<
               renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
               iconDescription={t('backToSearchResults', 'Back to search results')}
               size="sm"
-              onClick={closeWorkspace}>
+              onClick={() => closeWorkspace()}>
               <span>{t('backToSearchResults', 'Back to search results')}</span>
             </Button>
           </div>

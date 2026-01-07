@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText, Tag, Tile, OverflowMenu, OverflowMenuItem, Stack, TextArea, Button, Layer , InlineLoading } from '@carbon/react';
-import { type DefaultWorkspaceProps, isDesktop, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import {
+  SkeletonText,
+  Tag,
+  Tile,
+  OverflowMenu,
+  OverflowMenuItem,
+  Stack,
+  TextArea,
+  Button,
+  Layer,
+  InlineLoading,
+} from '@carbon/react';
+import { isDesktop, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { type PatientNote } from '../types';
 import { editPatientNotes } from '../notes.resource';
 import styles from './styles.scss';
@@ -24,7 +35,7 @@ export const InPatientNoteSkeleton: React.FC = () => {
 interface InPatientNoteProps {
   mutatePatientNotes(): void;
   note: PatientNote;
-  promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
+  promptBeforeClosing(hasUnsavedChanges: boolean): void;
 }
 
 const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes, promptBeforeClosing }) => {
@@ -39,8 +50,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    promptBeforeClosing(() => editMode);
-    return () => promptBeforeClosing(null);
+    promptBeforeClosing(editMode);
   }, [editMode, promptBeforeClosing]);
 
   const onSave = async () => {
@@ -112,6 +122,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                 rows={6}
                 value={editedNote}
                 onChange={(e) => setEditedNote(e.target.value)}
+                labelText={t('editNote', 'Edit note')}
               />
               <div className={styles.editButtons}>
                 <Button
@@ -131,15 +142,6 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
           </Layer>
         ) : (
           <>
-            {note.diagnoses && (
-              <div>
-                {note.diagnoses.split(',').map((diagnosis, index) => (
-                  <Tag key={index} type="red">
-                    {diagnosis.trim()}
-                  </Tag>
-                ))}
-              </div>
-            )}
             <div className={styles.noteBody}>{note.encounterNote}</div>
             <div className={styles.noteProviderName}>{note.encounterProvider}</div>
           </>

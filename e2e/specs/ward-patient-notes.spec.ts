@@ -89,7 +89,7 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
-    await page.getByRole('button', { name: 'Admit' }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I should see a success message confirming the admission success', async () => {
