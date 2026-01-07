@@ -1,26 +1,44 @@
 import React, { useCallback } from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { omrsDateFormat } from '../../constants';
-import { useAppointmentsStore, setSelectedDate } from '../../store';
+import { getLocalTimeZone } from '@internationalized/date';
+import { locale, setSelectedDate, getSelectedCalendarDate } from '../../store';
 import DaysOfWeekCard from './days-of-week.component';
 import styles from './monthly-header.scss';
 
-const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-
 const MonthlyHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
+  const date = getSelectedCalendarDate();
+
+  const todayShort = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+    .format(date.toDate(getLocalTimeZone()))
+    .toUpperCase();
+
+  const daysInWeeks = React.useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+
+    const baseDate = new Date(Date.UTC(2021, 7, 1));
+
+    return Array.from({ length: 7 }).map((_, index) => {
+      const date = new Date(baseDate);
+      date.setUTCDate(baseDate.getUTCDate() + index);
+
+      const label = formatter.format(date).toUpperCase();
+      return {
+        label,
+        isToday: label === todayShort,
+      };
+    });
+  }, [todayShort]);
 
   const handleSelectPrevMonth = useCallback(() => {
-    setSelectedDate(dayjs(selectedDate).subtract(1, 'month').format(omrsDateFormat));
-  }, [selectedDate]);
+    setSelectedDate(date.subtract({ months: 1 }).toDate(getLocalTimeZone()).toISOString());
+  }, [date]);
 
   const handleSelectNextMonth = useCallback(() => {
-    setSelectedDate(dayjs(selectedDate).add(1, 'month').format(omrsDateFormat));
-  }, [selectedDate]);
+    setSelectedDate(date.add({ months: 1 }).toDate(getLocalTimeZone()).toISOString());
+  }, [date]);
 
   return (
     <>
@@ -32,14 +50,14 @@ const MonthlyHeader: React.FC = () => {
           size="sm">
           {t('prev', 'Prev')}
         </Button>
-        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
+        <span>{formatDate(new Date(date.toDate(getLocalTimeZone())), { day: false, time: false, noToday: true })}</span>
         <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={handleSelectNextMonth} size="sm">
           {t('next', 'Next')}
         </Button>
       </div>
       <div className={styles.workLoadCard}>
-        {DAYS_IN_WEEK.map((day) => (
-          <DaysOfWeekCard key={day} dayOfWeek={day} />
+        {daysInWeeks.map(({ label, isToday }) => (
+          <DaysOfWeekCard key={label} dayOfWeek={label} isToday={isToday} />
         ))}
       </div>
     </>
