@@ -18,6 +18,7 @@ export interface PatientNote {
   encounterNoteRecordedAt: string;
   encounterProvider: string;
   conceptUuid: string;
+  encounterTypeUuid: string;
 }
 
 export interface UsePatientNotes {

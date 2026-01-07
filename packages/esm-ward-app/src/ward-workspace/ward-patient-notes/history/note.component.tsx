@@ -42,8 +42,8 @@ interface InPatientNoteProps {
  * - `consultFreeTextCommentsConcept` from emrapi configuration
  * - one of the concepts defined in additionalInpatientNotesConceptUuids.
  *
- * Note that only notes with concept consultFreeTextCommentsConcept are creatable,
- * editable and deletable from the ward ap.
+ * Note that only notes with encounter type emrConfiguration.inpatientNoteEncounterType are creatable,
+ * editable and deletable from the ward app.
  *
  */
 const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes, promptBeforeClosing }) => {
@@ -57,7 +57,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
   const isTablet = !isDesktop(useLayoutType());
   const [isSaving, setIsSaving] = useState(false);
   const { emrConfiguration } = useEmrConfiguration();
-  const isCreatedInWardApp = note.conceptUuid === emrConfiguration?.consultFreeTextCommentsConcept.uuid;
+  const isInpatientNoteEncounter = note.encounterTypeUuid === emrConfiguration?.inpatientNoteEncounterType?.uuid;
 
   useEffect(() => {
     promptBeforeClosing(editMode);
@@ -94,9 +94,9 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
           <span className={styles.noteDateAndTime}>
             {formattedDate}, {formattedTime}
           </span>
-          {isCreatedInWardApp && (
+          {isInpatientNoteEncounter && (
             <OverflowMenu className={styles.overflowMenu} flipped>
-              {!editMode && (
+              {!editMode && note.obsUuid && (
                 <OverflowMenuItem
                   aria-label={t('edit', 'Edit')}
                   id={'edit note-' + note.encounterUuid}
@@ -113,7 +113,6 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                 id={'delete-note-' + note.encounterUuid}
                 isDelete
                 className={styles.menuItem}
-                hasDivider
                 itemText={t('delete', 'Delete')}
                 onClick={() => {
                   const dispose = showModal('delete-note-modal', {

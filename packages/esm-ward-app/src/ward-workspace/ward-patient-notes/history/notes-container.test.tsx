@@ -26,6 +26,7 @@ const mockPatientNotes: PatientNote[] = [
     encounterProvider: 'Dr. John Doe',
     obsUuid: 'obsUuid1',
     conceptUuid: 'concept1',
+    encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
   },
   {
     encounterUuid: 'note-2',
@@ -34,6 +35,7 @@ const mockPatientNotes: PatientNote[] = [
     encounterProvider: 'Dr. Jane Smith',
     obsUuid: 'obsUuid2',
     conceptUuid: 'concept1',
+    encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
   },
 ];
 
