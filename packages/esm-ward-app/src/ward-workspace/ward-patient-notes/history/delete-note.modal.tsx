@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { deleteEncounter } from '../../../ward.resource';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 
 interface DeleteEncounterConfirmationProps {
   encounterUuid: string;
@@ -50,10 +50,10 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
       </ModalBody>
       <ModalFooter>
         <Button size="lg" kind="secondary" onClick={handleCancel}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button autoFocus kind="danger" disabled={isDeleting} onClick={handleDelete} size="lg">
-          {t('delete', 'Delete')}
+          {getCoreTranslation('delete')}
         </Button>
       </ModalFooter>
     </>

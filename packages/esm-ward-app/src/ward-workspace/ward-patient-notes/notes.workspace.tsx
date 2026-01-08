@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button, Column, Form, InlineLoading, InlineNotification, Row, Stack, TextArea } from '@carbon/react';
 import {
   closeWorkspaceGroup2,
+  getCoreTranslation,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
@@ -173,7 +174,11 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
             disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
             kind="primary"
             type="submit">
-            {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving...')} />
+            ) : (
+              <span>{getCoreTranslation('save')}</span>
+            )}
           </Button>
         </Stack>
       </Form>

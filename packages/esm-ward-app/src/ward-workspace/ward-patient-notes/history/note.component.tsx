@@ -12,7 +12,14 @@ import {
   Layer,
   InlineLoading,
 } from '@carbon/react';
-import { isDesktop, showModal, showSnackbar, useEmrConfiguration, useLayoutType } from '@openmrs/esm-framework';
+import {
+  getCoreTranslation,
+  isDesktop,
+  showModal,
+  showSnackbar,
+  useEmrConfiguration,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { type PatientNote } from '../types';
 import { editPatientNote } from '../notes.resource';
 import styles from './styles.scss';
@@ -98,22 +105,22 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
             <OverflowMenu className={styles.overflowMenu} flipped>
               {!editMode && note.obsUuid && (
                 <OverflowMenuItem
-                  aria-label={t('edit', 'Edit')}
+                  aria-label={getCoreTranslation('edit')}
                   id={'edit note-' + note.encounterUuid}
                   className={styles.menuItem}
                   hasDivider
-                  itemText={t('edit', 'Edit')}
+                  itemText={getCoreTranslation('edit')}
                   onClick={() => {
                     setEditMode(true);
                   }}
                 />
               )}
               <OverflowMenuItem
-                aria-label={t('delete', 'Delete')}
+                aria-label={getCoreTranslation('delete')}
                 id={'delete-note-' + note.encounterUuid}
                 isDelete
                 className={styles.menuItem}
-                itemText={t('delete', 'Delete')}
+                itemText={getCoreTranslation('delete')}
                 onClick={() => {
                   const dispose = showModal('delete-note-modal', {
                     close: () => dispose(),
