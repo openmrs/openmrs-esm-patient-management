@@ -66,6 +66,12 @@
       "slot": "ward-workspace-patient-banner-slot"
     }
   ],
+  "modals": [
+    {
+      "name": "delete-note-modal",
+      "component": "deleteNoteModal"
+    }
+  ],
   "workspaces2": [
     {
       "name": "admission-requests-workspace",

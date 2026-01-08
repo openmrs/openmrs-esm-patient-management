@@ -251,6 +251,7 @@ export enum WardMetricType {
 }
 
 export interface EncounterPayload {
+  uuid?: string;
   encounterDatetime?: string;
   encounterType: string;
   patient: string;

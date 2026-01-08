@@ -139,6 +139,11 @@ export const wardPatientWorkspaceBanner = getAsyncLifecycle(
   options,
 );
 
+export const deleteNoteModal = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/history/delete-note.modal'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
