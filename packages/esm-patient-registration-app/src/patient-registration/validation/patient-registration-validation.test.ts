@@ -202,4 +202,414 @@ describe('Patient registration validation', () => {
     const validationError = await validateFormValues(invalidFormValues);
     expect(validationError.errors).toContain('Death date cannot be in future');
   });
+
+  describe('Address validation', () => {
+    it('should allow valid address with all fields filled', async () => {
+      const validFormValuesWithAddress = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'New York',
+          stateProvince: 'New York',
+          country: 'United States',
+          postalCode: '10001',
+          address1: '123 Main Street',
+          address2: 'Apt 4B',
+          countyDistrict: 'Manhattan',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithAddress);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow empty address fields since they are optional', async () => {
+      const validFormValuesWithEmptyAddress = {
+        ...validFormValues,
+        address: {
+          cityVillage: '',
+          stateProvince: '',
+          country: '',
+          postalCode: '',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithEmptyAddress);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow undefined address object', async () => {
+      const validFormValuesWithUndefinedAddress = {
+        ...validFormValues,
+        address: undefined,
+      };
+      const validationError = await validateFormValues(validFormValuesWithUndefinedAddress);
+      expect(validationError).toBeFalsy();
+    });
+
+    // City/Village validation tests
+    it('should reject numeric-only city/village', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          cityVillage: '12345',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should reject city/village with special characters', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'New York#$',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should allow city/village with hyphens', async () => {
+      const validFormValuesWithHyphenatedCity = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'Saint-Denis',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithHyphenatedCity);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow city/village with apostrophes', async () => {
+      const validFormValuesWithApostrophe = {
+        ...validFormValues,
+        address: {
+          cityVillage: "O'Fallon",
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithApostrophe);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow city/village with periods', async () => {
+      const validFormValuesWithPeriod = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'St. Louis',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithPeriod);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow city/village with international characters', async () => {
+      const validFormValuesWithInternationalChars = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'São Paulo',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithInternationalChars);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow city/village with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'City (Region)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
+      expect(validationError).toBeFalsy();
+    });
+
+    // State/Province validation tests
+    it('should reject numeric-only state/province', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          stateProvince: '12345',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should reject state/province with special characters', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          stateProvince: 'California@#',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should allow valid state/province with spaces', async () => {
+      const validFormValuesWithState = {
+        ...validFormValues,
+        address: {
+          stateProvince: 'New York',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithState);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow state/province with hyphens', async () => {
+      const validFormValuesWithHyphenatedState = {
+        ...validFormValues,
+        address: {
+          stateProvince: 'Nouvelle-Aquitaine',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithHyphenatedState);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow state/province with international characters', async () => {
+      const validFormValuesWithInternationalState = {
+        ...validFormValues,
+        address: {
+          stateProvince: 'São Paulo',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithInternationalState);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow state/province with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          stateProvince: 'State (Province)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
+      expect(validationError).toBeFalsy();
+    });
+
+    // Country validation tests
+    it('should reject numeric-only country', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          country: '12345',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should reject country with special characters', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          country: 'USA#$%',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should allow valid country names', async () => {
+      const validFormValuesWithCountry = {
+        ...validFormValues,
+        address: {
+          country: 'United States',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithCountry);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow country with hyphens', async () => {
+      const validFormValuesWithHyphenatedCountry = {
+        ...validFormValues,
+        address: {
+          country: 'Guinea-Bissau',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithHyphenatedCountry);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow country with periods', async () => {
+      const validFormValuesWithPeriods = {
+        ...validFormValues,
+        address: {
+          country: 'U.S.A.',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithPeriods);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow country with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          country: 'Cambodia (Kampuchea)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
+      expect(validationError).toBeFalsy();
+    });
+
+    // Postal Code validation tests
+    it('should allow numeric postal codes', async () => {
+      const validFormValuesWithNumericPostalCode = {
+        ...validFormValues,
+        address: {
+          postalCode: '12345',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithNumericPostalCode);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow alphanumeric postal codes (UK format)', async () => {
+      const validFormValuesWithUKPostalCode = {
+        ...validFormValues,
+        address: {
+          postalCode: 'SW1A 1AA',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithUKPostalCode);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow alphanumeric postal codes (Canadian format)', async () => {
+      const validFormValuesWithCanadianPostalCode = {
+        ...validFormValues,
+        address: {
+          postalCode: 'K1A 0B1',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithCanadianPostalCode);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow postal codes with hyphens (US ZIP+4)', async () => {
+      const validFormValuesWithZipPlus4 = {
+        ...validFormValues,
+        address: {
+          postalCode: '12345-6789',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithZipPlus4);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should reject postal codes with special characters', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          postalCode: '503144ferge#$',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
+      );
+    });
+
+    // County/District validation tests
+    it('should reject numeric-only county/district', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          countyDistrict: '12345',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'County/District should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should reject county/district with special characters', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          countyDistrict: 'District#$',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'County/District should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+    });
+
+    it('should allow valid county/district', async () => {
+      const validFormValuesWithCounty = {
+        ...validFormValues,
+        address: {
+          countyDistrict: 'Los Angeles County',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithCounty);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow county/district with periods and apostrophes', async () => {
+      const validFormValuesWithSpecialChars = {
+        ...validFormValues,
+        address: {
+          countyDistrict: "St. Mary's County",
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithSpecialChars);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should allow county/district with parentheses', async () => {
+      const validFormValuesWithParentheses = {
+        ...validFormValues,
+        address: {
+          countyDistrict: 'County (District)',
+        },
+      };
+      const validationError = await validateFormValues(validFormValuesWithParentheses);
+      expect(validationError).toBeFalsy();
+    });
+
+    // Combined validation tests
+    it('should reject multiple invalid address fields and return all errors', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          cityVillage: '12345',
+          stateProvince: '67890',
+          country: 'USA#$',
+          postalCode: '503144ferge#$',
+        },
+      };
+      const validationError = await validateFormValues(invalidFormValues);
+      expect(validationError.errors).toContain(
+        'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+      expect(validationError.errors).toContain(
+        'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+      expect(validationError.errors).toContain(
+        'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+      );
+      expect(validationError.errors).toContain(
+        'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
+      );
+    });
+  });
 });
