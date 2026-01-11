@@ -2,45 +2,66 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
-import { type DailyAppointmentsCountByService } from '../types';
-
-interface AppointmentCountMapEntry {
-  allAppointmentsCount: number;
-}
-
-interface AppointmentSummaryResponse {
-  appointmentService: {
-    name: string;
-    uuid: string;
-  };
-  appointmentCountMap: Map<string, AppointmentCountMapEntry>;
-}
+import { type DailyAppointmentsCountByService, type Appointment } from '../types';
 
 export const useAppointmentsCalendar = (forDate: string, period: string) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
-  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const searchUrl = `${restBaseUrl}/appointments/search`;
+  const abortController = new AbortController();
 
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummaryResponse> }>(
-    startDate && endDate ? url : null,
-    openmrsFetch,
+  const fetcher = ([url, startDate, endDate]) =>
+    openmrsFetch(url, {
+      method: 'POST',
+      signal: abortController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {
+        startDate,
+        endDate,
+      },
+    });
+
+  const { data, error, isLoading } = useSWR<{ data: Array<Appointment> }, Error>(
+    startDate && endDate ? [searchUrl, startDate, endDate] : null,
+    fetcher,
     { errorRetryCount: 2 },
   );
-  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
-    const serviceName = service.appointmentService.name;
-    const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).map(([key, value]) => {
-      const existingEntry = acc.find((entry) => entry.appointmentDate === key);
-      if (existingEntry) {
-        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
-      } else {
-        acc.push({
-          appointmentDate: key,
-          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
-        });
-      }
-    });
-    return acc;
-  }, []);
+
+  const results: Array<DailyAppointmentsCountByService> = data?.data
+    ? Object.values(
+        data.data.reduce(
+          (acc, appointment) => {
+            const appointmentDate = dayjs(appointment.startDateTime).format('YYYY-MM-DD');
+            const serviceName = appointment.service.name;
+            const serviceUuid = appointment.service.uuid;
+
+            if (!acc[appointmentDate]) {
+              acc[appointmentDate] = {
+                appointmentDate,
+                services: [],
+              };
+            }
+
+            const existingService = acc[appointmentDate].services.find((s) => s.serviceUuid === serviceUuid);
+
+            if (existingService) {
+              existingService.count++;
+            } else {
+              acc[appointmentDate].services.push({
+                serviceName,
+                serviceUuid,
+                count: 1,
+              });
+            }
+
+            return acc;
+          },
+          {} as Record<string, DailyAppointmentsCountByService>,
+        ),
+      )
+    : [];
+
   return { isLoading, calendarEvents: results, error };
 };
 
