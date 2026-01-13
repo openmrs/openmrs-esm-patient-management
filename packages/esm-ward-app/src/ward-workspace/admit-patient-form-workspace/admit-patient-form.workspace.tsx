@@ -141,7 +141,9 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
     setIsSubmitting(false);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return null;
+  }
 
   return (
     <Workspace2 title={t('admitPatient', 'Admit patient')} hasUnsavedChanges={isDirty}>
