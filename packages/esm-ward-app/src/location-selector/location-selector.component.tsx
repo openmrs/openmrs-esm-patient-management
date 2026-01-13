@@ -113,7 +113,15 @@ export default function LocationSelector({
                 <RadioButton key={location.id} labelText={location.name} value={location.id} />
               ))
             ) : (
-              <span className={styles.bodyShort01}>{t('noLocationsFound', 'No locations found')}</span>
+              <span className={styles.bodyShort01}>
+                {ancestorLocation
+                  ? t(
+                      'noSubLocationsFound',
+                      'No admission locations found under {{visitLocation}}. Please contact your administrator.',
+                      { visitLocation: ancestorLocation.display },
+                    )
+                  : t('noLocationsFound', 'No locations found')}
+              </span>
             )}
           </RadioButtonGroup>
         </ResponsiveWrapper>
