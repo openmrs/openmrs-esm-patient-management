@@ -8,7 +8,7 @@ import {
   generateWardAdmissionRequest,
   getProvider,
   startVisit,
-  waitForAdmissionToBeProcessed,
+  waitForAdmissionRequestToBeProcessed,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
@@ -40,7 +40,12 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
   });
 
   await test.step('And I wait for the admission request to be processed', async () => {
-    await waitForAdmissionToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
+    await waitForAdmissionRequestToBeProcessed(
+      api,
+      page,
+      wardPatient.uuid,
+      process.env.E2E_WARD_LOCATION_UUID as string,
+    );
   });
 
   await test.step('And I click the "Manage" button to view admission requests', async () => {
