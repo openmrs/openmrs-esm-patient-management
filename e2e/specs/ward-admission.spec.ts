@@ -57,21 +57,33 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
   });
 
   await test.step('And I click the "Admit patient" button for the patient', async () => {
-    await page.getByRole('button', { name: 'Admit patient' }).first().click();
+    await wardPage.clickAdmitPatientButton(fullName);
   });
 
   await test.step('And I select the bed for admission', async () => {
-    await page.getByText(`${bed.bedNumber} · Empty`).click();
+    const bedLabel = `${bed.bedNumber} · Empty`;
+    // Try radio button first (for fewer beds), fall back to dropdown (for many beds)
+    try {
+      await page.getByRole('radio', { name: bedLabel }).waitFor({ state: 'visible', timeout: 2000 });
+      await page.locator('label.cds--radio-button__label', { hasText: bedLabel }).click();
+    } catch {
+      // Use dropdown if radio not found - Carbon Dropdown renders as a button, not combobox
+      const dropdownButton = page.locator('.cds--dropdown').getByRole('button').first();
+      await dropdownButton.waitFor({ state: 'visible', timeout: 5000 });
+      await dropdownButton.click();
+      await page.getByRole('option', { name: bedLabel }).waitFor({ state: 'visible', timeout: 5000 });
+      await page.getByRole('option', { name: bedLabel }).click();
+    }
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
     await page.getByRole('button', { name: 'Admit', exact: true }).click();
+    // Wait for success notification immediately after clicking to catch it before auto-dismiss
+    await wardPage.expectAdmissionSuccessNotification(fullName, bed.bedNumber);
   });
 
-  await test.step('Then I should see a success message confirming the admission success', async () => {
-    await expect(
-      page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
-    ).toBeVisible();
+  await test.step('Then I should see the patient in the ward view', async () => {
+    await wardPage.waitForPatientInWardView(fullName);
   });
 });
 

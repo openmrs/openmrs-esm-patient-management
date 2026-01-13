@@ -8,7 +8,12 @@ export class WardPage {
   readonly saveButton = () => this.page.getByRole('button', { name: 'Save' });
   readonly clinicalNotesField = () => this.page.getByRole('textbox', { name: /clinical notes/i });
   readonly wardAdmissionNoteField = () => this.page.getByRole('textbox', { name: /write your notes/i });
-  readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
+  readonly cancelAdmissionRequestHeading = () => {
+    // Workspace2 title can be rendered as heading or text, try both
+    return this.page
+      .getByRole('heading', { name: 'Cancel admission request' })
+      .or(this.page.getByText('Cancel admission request', { exact: true }));
+  };
   readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
   readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
 

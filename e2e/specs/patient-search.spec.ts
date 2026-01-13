@@ -68,7 +68,7 @@ test('Search patient by full name', async ({ page, patient }) => {
   });
 
   await test.step('When I click on the app logo', async () => {
-    const logoLink = page.getByRole('link', { name: /openmrs logo/i });
+    const logoLink = page.getByRole('link', { name: 'OpenMRS Logo' });
     await logoLink.click();
   });
 
