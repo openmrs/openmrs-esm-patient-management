@@ -1,4 +1,4 @@
-import React, { type ReactNode, useEffect } from 'react';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification } from '@carbon/react';
 import { useAppContext, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
@@ -18,10 +18,6 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
   const { errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { inpatientRequests, isLoading } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
-
-  useEffect(() => {
-    console.warn('[ward-view-context]', wardPatientGroupDetails);
-  }, [wardPatientGroupDetails]);
 
   return (
     <Workspace2 title={t('admissionRequests', 'Admission requests')}>
