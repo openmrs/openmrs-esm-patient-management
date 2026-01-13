@@ -36,7 +36,6 @@ test('Search patient by patient identifier', async ({ page, patient }) => {
 });
 
 test('Search patient by full name', async ({ page, patient }) => {
-  // extract details from the created patient
   const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
@@ -69,10 +68,7 @@ test('Search patient by full name', async ({ page, patient }) => {
   });
 
   await test.step('When I click on the app logo', async () => {
-    // TODO: Remove once esm-core PR #1542 is fixed
-    // WORKAROUND: Click twice due to workspace bug where first click closes workspace, second navigates
     const logoLink = page.getByRole('link', { name: /openmrs logo/i });
-    await logoLink.click();
     await logoLink.click();
   });
 
