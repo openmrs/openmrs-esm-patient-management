@@ -53,7 +53,9 @@ test('Cancel an admission request', async ({ page }) => {
   });
 
   await test.step('Then I should see the "Cancel admission request" form launched in the workspace', async () => {
-    await expect(wardPage.cancelAdmissionRequestHeading()).toBeVisible();
+    // Wait for workspace to be visible, then check for the heading
+    await page.locator('[class*="workspace"]').waitFor({ state: 'visible', timeout: 10000 });
+    await expect(wardPage.cancelAdmissionRequestHeading()).toBeVisible({ timeout: 10000 });
     await expect(wardPage.clinicalNotesField()).toBeVisible();
   });
 

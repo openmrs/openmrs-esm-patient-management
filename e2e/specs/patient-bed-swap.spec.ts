@@ -27,13 +27,13 @@ async function selectBedByLabel(page: Page, label: string) {
     // Click the Carbon label to avoid overlay interception
     await page.locator('label.cds--radio-button__label', { hasText: label }).click();
   } catch {
-    // Use dropdown if radio not found - Carbon Dropdown renders as a button, not combobox
-    // Look for the dropdown button - it's inside a .cds--dropdown container
-    const dropdownButton = page.locator('.cds--dropdown').getByRole('button').first();
-    await dropdownButton.waitFor({ state: 'visible', timeout: 5000 });
+    // Use dropdown if radio not found - Carbon Dropdown uses .cds--list-box
+    // The button is inside .cds--list-box__field
+    const dropdownButton = page.locator('.cds--list-box__field').getByRole('button').first();
+    await dropdownButton.waitFor({ state: 'visible', timeout: 10000 });
     await dropdownButton.click();
     // Wait for the menu to open and select the option
-    await page.getByRole('option', { name: label }).waitFor({ state: 'visible', timeout: 5000 });
+    await page.getByRole('option', { name: label }).waitFor({ state: 'visible', timeout: 10000 });
     await page.getByRole('option', { name: label }).click();
   }
 }

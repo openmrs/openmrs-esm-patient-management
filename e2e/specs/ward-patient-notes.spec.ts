@@ -41,6 +41,15 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
     await wardPage.goTo();
   });
 
+  await test.step('And I wait for the admission request to be processed', async () => {
+    await waitForAdmissionRequestToBeProcessed(
+      api,
+      page,
+      wardPatient.uuid,
+      process.env.E2E_WARD_LOCATION_UUID as string,
+    );
+  });
+
   await test.step('And I click the "Manage" button to view admission requests', async () => {
     await wardPage.clickManageAdmissionRequests();
   });
@@ -60,11 +69,12 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
       await page.getByRole('radio', { name: bedLabel }).waitFor({ state: 'visible', timeout: 2000 });
       await page.locator('label.cds--radio-button__label', { hasText: bedLabel }).click();
     } catch {
-      // Use dropdown if radio not found - Carbon Dropdown renders as a button, not combobox
-      const dropdownButton = page.locator('.cds--dropdown').getByRole('button').first();
-      await dropdownButton.waitFor({ state: 'visible', timeout: 5000 });
+      // Use dropdown if radio not found - Carbon Dropdown uses .cds--list-box
+      // The button is inside .cds--list-box__field
+      const dropdownButton = page.locator('.cds--list-box__field').getByRole('button').first();
+      await dropdownButton.waitFor({ state: 'visible', timeout: 10000 });
       await dropdownButton.click();
-      await page.getByRole('option', { name: bedLabel }).waitFor({ state: 'visible', timeout: 5000 });
+      await page.getByRole('option', { name: bedLabel }).waitFor({ state: 'visible', timeout: 10000 });
       await page.getByRole('option', { name: bedLabel }).click();
     }
   });
