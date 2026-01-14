@@ -2,12 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PatientNotesHistory from './notes-container.component';
 import { usePatientNotes } from '../notes.resource';
-import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 import { emrConfigurationMock } from '__mocks__';
+import { getDefaultsFromConfigSchema, useConfig, useEmrConfiguration } from '@openmrs/esm-framework';
+import { configSchema, type WardConfigObject } from '../../../config-schema';
+import { type PatientNote } from '../types';
+
+const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
 
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
-
-jest.mock('../../../hooks/useEmrConfiguration', () => jest.fn());
+const mockedUsePatientNotes = jest.mocked(usePatientNotes);
 
 jest.mock('../notes.resource', () => ({
   usePatientNotes: jest.fn(),
@@ -15,30 +18,31 @@ jest.mock('../notes.resource', () => ({
 
 const mockPatientUuid = 'sample-patient-uuid';
 
-const mockPatientNotes = [
+const mockPatientNotes: PatientNote[] = [
   {
-    id: 'note-1',
-    diagnoses: '',
-    encounterDate: '2024-08-01',
+    encounterUuid: 'note-1',
     encounterNote: 'Patient shows improvement with current medication.',
     encounterNoteRecordedAt: '2024-08-01T12:34:56Z',
     encounterProvider: 'Dr. John Doe',
-    encounterProviderRole: 'Endocrinologist',
+    obsUuid: 'obsUuid1',
+    conceptUuid: 'concept1',
+    encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
   },
   {
-    id: 'note-2',
-    diagnoses: '',
-    encounterDate: '2024-08-02',
+    encounterUuid: 'note-2',
     encounterNote: 'Blood pressure is slightly elevated. Consider adjusting medication.',
     encounterNoteRecordedAt: '2024-08-02T14:22:00Z',
     encounterProvider: 'Dr. Jane Smith',
-    encounterProviderRole: 'Cardiologist',
+    obsUuid: 'obsUuid2',
+    conceptUuid: 'concept1',
+    encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
   },
 ];
 
 describe('PatientNotesHistory', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema<WardConfigObject>(configSchema));
   });
 
   test('displays loading skeletons when loading', () => {
@@ -49,12 +53,14 @@ describe('PatientNotesHistory', () => {
       errorFetchingEmrConfiguration: null,
     });
 
-    usePatientNotes.mockReturnValue({
+    mockedUsePatientNotes.mockReturnValue({
       patientNotes: [],
       isLoadingPatientNotes: true,
+      errorFetchingPatientNotes: undefined,
+      mutatePatientNotes: jest.fn(),
     });
 
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} />);
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
 
     expect(screen.getAllByTestId('in-patient-note-skeleton')).toHaveLength(4);
   });
@@ -67,12 +73,14 @@ describe('PatientNotesHistory', () => {
       errorFetchingEmrConfiguration: null,
     });
 
-    usePatientNotes.mockReturnValue({
+    mockedUsePatientNotes.mockReturnValue({
       patientNotes: mockPatientNotes,
       isLoadingPatientNotes: false,
+      errorFetchingPatientNotes: undefined,
+      mutatePatientNotes: jest.fn(),
     });
 
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} />);
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
 
     expect(screen.getByText('History')).toBeInTheDocument();
 

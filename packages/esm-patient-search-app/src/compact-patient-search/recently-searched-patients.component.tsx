@@ -7,9 +7,7 @@ import EmptyDataIllustration from '../ui-components/empty-data-illustration.comp
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
-interface RecentPatientSearchProps extends PatientSearchResponse {}
-
-const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
+const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchResponse>(
   ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);

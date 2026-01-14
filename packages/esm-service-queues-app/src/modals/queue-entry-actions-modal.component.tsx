@@ -13,6 +13,7 @@ import {
   TextArea,
   TimePicker,
   TimePickerSelect,
+  type OnChangeData,
 } from '@carbon/react';
 import { OpenmrsDatePicker, showSnackbar, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import classNames from 'classnames';
@@ -255,10 +256,11 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   <RadioButtonGroup
                     className={styles.radioButtonGroup}
                     id="queue"
+                    name="queue"
                     invalidText="Required"
                     valueSelected={formState.selectedQueue}
                     orientation="vertical"
-                    onChange={(uuid) => setSelectedQueueUuid(uuid)}>
+                    onChange={(uuid) => setSelectedQueueUuid(String(uuid))}>
                     {queues?.map(({ uuid, display, location }) => (
                       <RadioButton
                         key={uuid}
@@ -321,7 +323,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     name="status"
                     valueSelected={formState.selectedStatus}
                     onChange={(uuid) => {
-                      setSelectedStatusUuid(uuid);
+                      setSelectedStatusUuid(String(uuid));
                     }}>
                     {statuses?.map(({ uuid, display }) => (
                       <RadioButton
@@ -355,9 +357,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               ) : (
                 <RadioButtonGroup
                   className={styles.radioButtonGroup}
+                  name="priority"
                   valueSelected={formState.selectedPriority}
                   onChange={(uuid) => {
-                    setSelectedPriorityUuid(uuid);
+                    setSelectedPriorityUuid(String(uuid));
                   }}>
                   {priorities?.map(({ uuid, display }) => (
                     <RadioButton
@@ -405,6 +408,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   />
 
                   <TimePicker
+                    id="transitionTime"
                     labelText={t('time', 'Time')}
                     onChange={(event) => setTransitionTime(event.target.value)}
                     pattern={time12HourFormatRegexPattern}
@@ -415,7 +419,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       id="visitStartTimeSelect"
                       onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
                       value={formState.transitionTimeFormat}
-                      labelText={t('time', 'Time')}
                       aria-label={t('time', 'Time')}>
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />

@@ -20,7 +20,7 @@ beforeEach(() => {
 });
 
 jest.mock('../api/patient-list.resource', () => ({
-  addPatientToList: jest.fn(() => Promise.resolve()),
+  addPatientToList: jest.fn().mockResolvedValue({}),
   removePatientFromList: jest.fn(),
 }));
 

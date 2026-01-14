@@ -13,7 +13,7 @@ interface CompactPatientSearchProps {
   initialSearchTerm: string;
   /** An action to take when the patient is selected, other than navigation. If not provided, navigation takes place. */
   selectPatientAction?: (patientUuid: string) => undefined;
-  buttonProps?: Object;
+  buttonProps?: object;
 }
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
