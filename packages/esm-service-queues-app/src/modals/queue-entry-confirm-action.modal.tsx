@@ -1,8 +1,8 @@
 import React, { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type QueueEntry } from '../types';
 import { Button, ModalHeader, ModalBody, ModalFooter, Stack } from '@carbon/react';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
+import { type QueueEntry } from '../types';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 
 interface QueueEntryUndoActionsModalProps {
@@ -85,7 +85,7 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
             <span>{modalInstruction}</span>
           </Stack>
         ) : (
-          <p>{modalInstruction}</p>
+          <div>{modalInstruction}</div>
         )}
       </ModalBody>
       <ModalFooter>

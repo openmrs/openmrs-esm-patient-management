@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-const utc = require('dayjs/plugin/utc');
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,8 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, Pagination, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { PatientAppointmentsActionMenu } from './patient-appointments-action-menu.component';
 import styles from './patient-appointments-table.scss';
@@ -110,7 +109,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
           </TableContainer>
         )}
       </DataTable>
-      <PatientChartPagination
+      <Pagination
         currentItems={paginatedAppointments.length}
         totalItems={patientAppointments.length}
         onPageNumberChange={({ page }) => {

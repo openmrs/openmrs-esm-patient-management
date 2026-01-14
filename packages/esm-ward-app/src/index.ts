@@ -124,7 +124,7 @@ export const defaultWardView = getAsyncLifecycle(() => import('./ward-view/defau
 });
 
 export const maternalWardView = getAsyncLifecycle(
-  () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  () => import('./ward-view/maternal-ward/maternal-ward-view.component'),
   {
     featureName: 'maternal-ward-view',
     moduleName,
@@ -136,6 +136,11 @@ export const maternalWardView = getAsyncLifecycle(
 
 export const wardPatientWorkspaceBanner = getAsyncLifecycle(
   () => import('./ward-workspace/patient-banner/patient-banner.component'),
+  options,
+);
+
+export const deleteNoteModal = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/history/delete-note.modal'),
   options,
 );
 

@@ -65,7 +65,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 id="dateOfBirth"
                 placeholder="DD"
                 value={value || ''}
-                onChange={(e) => onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 className={styles.dobField}
                 type="number"
                 label={t('dayOfBirth', 'Day of Birth')}
@@ -85,7 +85,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 id="monthOfBirth"
                 placeholder="MM"
                 value={value || ''}
-                onChange={(e) => onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 className={styles.dobField}
                 type="number"
                 label={t('monthOfBirth', 'Month of Birth')}
@@ -105,7 +105,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 id="yearOfBirth"
                 placeholder="YYYY"
                 value={value || ''}
-                onChange={(e) => onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 className={styles.dobField}
                 type="number"
                 label={t('yearOfBirth', 'Year of Birth')}
@@ -130,7 +130,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
               <NumberInput
                 id={field.name}
                 value={value || ''}
-                onChange={(e) => onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 type="number"
                 label={t('age', 'Age')}
                 min={field.min}

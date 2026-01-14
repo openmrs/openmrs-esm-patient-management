@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useActiveTickets } from './useActiveTickets';
-import QueueScreen from './queue-screen.component';
 import { updateSelectedQueueLocationName, updateSelectedQueueLocationUuid } from '../store/store';
+import QueueScreen from './queue-screen.component';
 
 const mockUseActiveTickets = jest.mocked(useActiveTickets);
 
@@ -10,8 +10,15 @@ jest.mock('./useActiveTickets', () => ({
   useActiveTickets: jest.fn(),
 }));
 
-describe('QueueScreen component', () => {
+jest.mock('../hooks/useQueues', () => ({
+  useQueues: jest.fn(() => ({ queues: [] })),
+}));
 
+jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+}));
+
+describe('QueueScreen component', () => {
   beforeEach(() => {
     updateSelectedQueueLocationName('Room A');
     updateSelectedQueueLocationUuid('123');
@@ -22,7 +29,7 @@ describe('QueueScreen component', () => {
 
     render(<QueueScreen />);
 
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByTestId('queue-screen-skeleton')).toBeInTheDocument();
   });
 
   test('renders error message when there is an error fetching data', () => {

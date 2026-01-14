@@ -6,6 +6,7 @@ import { type WardViewContext } from '../../types';
 import AdmissionRequestsEmptyState from './admission-requests-empty-state.component';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import styles from './admission-requests-workspace.scss';
+
 export interface AdmissionRequestsWorkspaceProps {
   wardPendingPatients: ReactNode;
 }
