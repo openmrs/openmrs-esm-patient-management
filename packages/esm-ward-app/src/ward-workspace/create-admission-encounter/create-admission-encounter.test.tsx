@@ -1,4 +1,4 @@
-import { useAppContext, useVisit } from '@openmrs/esm-framework';
+import { useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -22,6 +22,17 @@ import { useAdmitPatient } from '../../ward.resource';
 import CreateAdmissionEncounterWorkspace from './create-admission-encounter.workspace';
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+const mockUseWorkspace2Context = jest.mocked(useWorkspace2Context);
+mockUseWorkspace2Context.mockReturnValue({
+  closeWorkspace: jest.fn(),
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: undefined,
+  windowProps: undefined,
+  groupProps: undefined,
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
+});
 
 const mockUseVisit = jest.mocked(useVisit).mockReturnValue({
   activeVisit: {
