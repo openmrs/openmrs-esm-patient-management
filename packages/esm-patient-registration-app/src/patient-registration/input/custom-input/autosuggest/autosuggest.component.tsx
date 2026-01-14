@@ -1,5 +1,5 @@
 import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
-import { Layer, Search, type SearchProps } from '@carbon/react';
+import { Layer, Search } from '@carbon/react';
 import classNames from 'classnames';
 import styles from './autosuggest.scss';
 
@@ -51,7 +51,7 @@ interface SearchProps extends InputPropsBase {
   /**
    * Optional callback called when the search value changes.
    */
-  onChange?(e: { target: HTMLInputElement; type: 'change' }): void;
+  onChange?(e: React.ChangeEvent<HTMLInputElement>): void;
 
   /**
    * Optional callback called when the search value is cleared.
@@ -98,9 +98,9 @@ interface SearchProps extends InputPropsBase {
 }
 
 interface AutosuggestProps extends SearchProps {
-  getDisplayValue: Function;
-  getFieldValue: Function;
-  getSearchResults: (query: string) => Promise<any>;
+  getDisplayValue: (suggestion: any) => string;
+  getFieldValue: (suggestion: any) => string;
+  getSearchResults: (query: string) => Promise<Array<any>>;
   onSuggestionSelected: (field: string, value: string) => void;
   invalid?: boolean | undefined;
   invalidText?: string | undefined;
@@ -128,8 +128,8 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     };
   }, [wrapper]);
 
-  const handleClickOutsideComponent = (e) => {
-    if (wrapper.current && !wrapper.current.contains(e.target)) {
+  const handleClickOutsideComponent = (e: MouseEvent) => {
+    if (wrapper.current && !wrapper.current.contains(e.target as Node)) {
       setSuggestions([]);
     }
   };
@@ -147,7 +147,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     }
   };
 
-  const handleClear = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleClear = () => {
     onSuggestionSelected(name, undefined);
   };
 

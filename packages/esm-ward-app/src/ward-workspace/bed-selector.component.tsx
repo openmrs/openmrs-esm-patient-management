@@ -88,7 +88,12 @@ const BedSelector: React.FC<BedSelectorProps> = ({
         items={bedDropdownItems}
         itemToString={(bedDropdownItem: BedDropdownItem) => bedDropdownItem.label}
         selectedItem={selectedItem}
-        onChange={({ selectedItem }: { selectedItem: BedLayout }) => onChange(selectedItem.bedId)}
+        onChange={(data) => {
+          const selectedDropdownItem = data.selectedItem as BedDropdownItem;
+          if (selectedDropdownItem) {
+            onChange(selectedDropdownItem.bedId);
+          }
+        }}
         invalid={!!error}
         invalidText={error?.message}
       />
@@ -105,7 +110,6 @@ const BedSelector: React.FC<BedSelectorProps> = ({
           <RadioButton
             key={bedId}
             labelText={label}
-            control={control}
             value={bedId}
             checked={bedId === selectedBedId}
             disabled={disabled}

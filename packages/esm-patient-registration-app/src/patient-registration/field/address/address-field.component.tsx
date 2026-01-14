@@ -74,7 +74,10 @@ export const AddressComponent: React.FC = () => {
   if (addressTemplate && !Object.keys(addressTemplate)?.length) {
     return (
       <AddressComponentContainer>
-        <SkeletonText role="progressbar" />
+        <SkeletonText
+          // @ts-expect-error
+          role="progressbar"
+        />
       </AddressComponentContainer>
     );
   }
@@ -99,7 +102,10 @@ export const AddressComponent: React.FC = () => {
   if (isLoadingFieldOrder) {
     return (
       <AddressComponentContainer>
-        <SkeletonText />
+        <SkeletonText
+          // @ts-expect-error
+          role="progressbar"
+        />
       </AddressComponentContainer>
     );
   }

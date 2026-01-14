@@ -162,7 +162,7 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace 
           </Column>
         </Stack>
         <ButtonSet className={styles.buttonSet}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">

@@ -10,7 +10,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
 }
 
 .row {
@@ -22,8 +21,12 @@
   color: colors.$gray-70;
 }
 
+.saveButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .saveButton {
-  margin-left: layout.$spacing-04;
   display: flex;
   align-content: flex-start;
   align-items: baseline;

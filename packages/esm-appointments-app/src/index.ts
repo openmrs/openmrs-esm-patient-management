@@ -1,4 +1,5 @@
 import {
+  createDashboard,
   defineConfigSchema,
   defineExtensionConfigSchema,
   getAsyncLifecycle,
@@ -92,13 +93,11 @@ export const metricsCardProvidersBooked = getAsyncLifecycle(
   options,
 );
 
-export const searchPatient = getAsyncLifecycle(() => import('./patient-search/patient-search.component'), options);
-
 // t('Appointments', 'Appointments')
-export const patientAppointmentsSummaryDashboardLink = getAsyncLifecycle(async () => {
-  const commonLib = await import('@openmrs/esm-patient-common-lib');
-  return { default: commonLib.createDashboardLink({ ...patientChartDashboardMeta, moduleName }) };
-}, options);
+export const patientAppointmentsSummaryDashboardLink = getAsyncLifecycle(
+  async () => ({ default: createDashboard({ ...patientChartDashboardMeta }) }),
+  options,
+);
 
 export const patientAppointmentsDetailedSummary = getAsyncLifecycle(
   () => import('./patient-appointments/patient-appointments-detailed-summary.extension'),
@@ -120,8 +119,12 @@ export const cancelAppointmentModal = getAsyncLifecycle(
   options,
 );
 
-// t('createNewAppointment', 'Create new appointment')
 export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.workspace'), options);
+
+export const exportedAppointmentsFormWorkspace = getAsyncLifecycle(
+  () => import('./form/exported-appointments-form.workspace'),
+  options,
+);
 
 export const endAppointmentModal = getAsyncLifecycle(
   () => import('./appointments/common-components/end-appointment.modal'),

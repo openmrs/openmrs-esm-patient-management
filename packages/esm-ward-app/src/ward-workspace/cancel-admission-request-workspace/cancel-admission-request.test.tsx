@@ -50,14 +50,7 @@ mockedUseWardLocation.mockReturnValue({
   errorFetchingLocation: null,
 });
 
-const mockWorkspaceProps: DefaultWorkspaceProps = {
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  closeWorkspace: jest.fn(),
-};
-
-const mockWardPatientAliceProps: WardPatient = {
+const mockWardPatientAlice: WardPatient = {
   visit: mockInpatientRequestAlice.visit,
   patient: mockPatientAlice,
   bed: null,
@@ -70,7 +63,16 @@ jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext)
 function renderCancelAdmissionRequestWorkspace() {
   renderWithSwr(
     <CancelAdmissionRequestWorkspace
-      {...{ ...mockWorkspaceProps, wardPatient: mockWardPatientAliceProps, WardPatientHeader: jest.fn() }}
+      launchChildWorkspace={jest.fn()}
+      closeWorkspace={jest.fn()}
+      workspaceProps={{
+        wardPatient: mockWardPatientAlice,
+      }}
+      windowProps={undefined}
+      groupProps={undefined}
+      workspaceName={''}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 }

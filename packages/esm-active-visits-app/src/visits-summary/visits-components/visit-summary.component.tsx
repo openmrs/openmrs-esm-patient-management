@@ -87,30 +87,32 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
           </p>
         )}
       </div>
-      <Tabs className={styles.verticalTabs}>
-        <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab className={classNames(styles.tab, styles.bodyLong01)} onClick={() => setSelectedTab(0)} id="notes-tab">
-            {t('notes', 'Notes')}
-          </Tab>
-          <Tab className={styles.tab} onClick={() => setSelectedTab(1)} id="tests-tab">
-            {t('tests', 'Tests')}
-          </Tab>
-          <Tab className={styles.tab} onClick={() => setSelectedTab(2)} id="tab-3">
-            {t('medications', 'Medications')}
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <NotesSummary notes={notes} />
-          </TabPanel>
-          <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
-          </TabPanel>
-          <TabPanel>
-            <MedicationSummary medications={medications} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <div className={styles.verticalTabs}>
+        <Tabs>
+          <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+            <Tab className={classNames(styles.tab, styles.bodyLong01)} onClick={() => setSelectedTab(0)} id="notes-tab">
+              {t('notes', 'Notes')}
+            </Tab>
+            <Tab className={styles.tab} onClick={() => setSelectedTab(1)} id="tests-tab">
+              {t('tests', 'Tests')}
+            </Tab>
+            <Tab className={styles.tab} onClick={() => setSelectedTab(2)} id="tab-3">
+              {t('medications', 'Medications')}
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <NotesSummary notes={notes} />
+            </TabPanel>
+            <TabPanel>
+              <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
+            </TabPanel>
+            <TabPanel>
+              <MedicationSummary medications={medications} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </div>
     </div>
   );
 };

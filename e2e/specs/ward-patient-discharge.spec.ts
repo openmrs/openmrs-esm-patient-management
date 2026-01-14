@@ -14,6 +14,7 @@ import {
   getProvider,
   startVisit,
   retireBedType,
+  waitForAdmissionRequestToBeProcessed,
   waitForAdmissionToBeProcessed,
 } from '../commands';
 import { test } from '../core';
@@ -25,7 +26,7 @@ let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api }) => {
+test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
@@ -33,6 +34,7 @@ test.beforeEach(async ({ api }) => {
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
 test('Discharge a patient from a ward', async ({ page, api }) => {
@@ -70,11 +72,11 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('And I admit the patient', async () => {
-    await page.getByRole('button', { name: /Admit/i }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I see an admission success message', async () => {
-    await expect(page.getByText(/Patient admitted/i)).toBeVisible();
+    await expect(page.getByText('Patient admitted successfully', { exact: true })).toBeVisible();
   });
 
   await test.step('Then I see the patient in the ward', async () => {

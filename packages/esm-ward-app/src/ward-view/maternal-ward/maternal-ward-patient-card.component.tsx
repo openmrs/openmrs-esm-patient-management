@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { WardViewContext, type WardPatient } from '../../types';
+import { type WardPatient } from '../../types';
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
 import MaternalWardPatientCardHeader from './maternal-ward-patient-card-header.component';
 import maternalWardPatientCardStyles from './maternal-ward-patient-card.scss';
@@ -33,7 +33,7 @@ export interface MaternalWardPatientCardProps {
  * but also those of the the patient's children in same bed. This is done to ensure that the children's
  * patient cards are always rendered right below the mother's.
  *
- * @param param0
+ * @param props
  * @returns
  */
 const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) => {

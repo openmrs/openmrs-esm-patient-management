@@ -40,6 +40,12 @@ export function useCreateEncounter() {
   return { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration };
 }
 
+export function deleteEncounter(encounterUuid: string) {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    method: 'DELETE',
+  });
+}
+
 export function useAdmitPatient() {
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
