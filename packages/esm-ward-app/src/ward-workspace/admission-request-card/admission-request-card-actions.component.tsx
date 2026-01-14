@@ -1,25 +1,24 @@
 import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { useAdmissionRequestsWorkspaceContext } from '../admission-request-workspace/admission-requests-context';
+import { closeWorkspaceGroup2, launchWorkspace2, useLayoutType, useWorkspace2Context } from '@openmrs/esm-framework';
 import type { WardPatientCardType, WardPatientWorkspaceProps } from '../../types';
 import AdmitPatientButton from '../admit-patient-button.component';
 import styles from './admission-request-card.scss';
 
 const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
   const { t } = useTranslation();
-  const { closeWorkspaceWithSavedChanges } = useAdmissionRequestsWorkspaceContext();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
+  const { closeWorkspace } = useWorkspace2Context();
 
   const launchPatientTransferForm = () => {
-    launchWorkspace<WardPatientWorkspaceProps>('patient-transfer-request-workspace', {
+    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('transfer-elsewhere-workspace', {
       wardPatient,
     });
   };
 
   const launchCancelAdmissionForm = () => {
-    launchWorkspace<WardPatientWorkspaceProps>('cancel-admission-request-workspace', {
+    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('cancel-admission-request-workspace', {
       wardPatient,
     });
   };
@@ -37,7 +36,10 @@ const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
       <AdmitPatientButton
         wardPatient={wardPatient}
         dispositionType={wardPatient.inpatientRequest.dispositionType}
-        onAdmitPatientSuccess={() => closeWorkspaceWithSavedChanges()}
+        onAdmitPatientSuccess={async () => {
+          await closeWorkspace({ discardUnsavedChanges: true });
+          closeWorkspaceGroup2();
+        }}
       />
     </div>
   );

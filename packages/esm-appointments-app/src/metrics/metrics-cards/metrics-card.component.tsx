@@ -9,7 +9,7 @@ dayjs.extend(isSameOrBefore);
 
 interface MetricsCardProps {
   label: string;
-  value: number;
+  value: number | string;
   headerLabel: string;
   count?: { pendingAppointments: Array<any>; arrivedAppointments: Array<any> };
 }

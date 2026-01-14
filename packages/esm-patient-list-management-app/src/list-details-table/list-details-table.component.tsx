@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
   Tile,
-  type DataTableRow,
 } from '@carbon/react';
 import {
   AddIcon,
@@ -32,7 +31,7 @@ import {
   useDebounce,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { addPatientToList, removePatientFromList } from '../api/api-remote';
+import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
 import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
 import styles from './list-details-table.scss';
 
@@ -195,7 +194,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       : patients;
   }, [debouncedSearchTerm, patients]);
 
-  const tableRows: Array<typeof DataTableRow> = useMemo(
+  const tableRows = useMemo(
     () =>
       filteredPatients?.map((patient) => ({
         id: patient.identifier,
@@ -372,10 +371,11 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                         <TableHeader
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable,
                           })}
                           className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}>
-                          {header.header?.content ?? header.header}
+                          {typeof header.header === 'object' && header.header !== null && 'content' in header.header
+                            ? (header.header.content as React.ReactNode)
+                            : (header.header as React.ReactNode)}
                         </TableHeader>
                       ))}
                     </TableRow>

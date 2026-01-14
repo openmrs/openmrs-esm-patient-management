@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { type EncounterPayload } from '../../types';
 import { type PatientNote, type RESTPatientNote, type UsePatientNotes } from './types';
 
-export function savePatientNote(payload: EncounterPayload, abortController: AbortController = new AbortController()) {
+export function createPatientNote(payload: EncounterPayload, abortController: AbortController = new AbortController()) {
   return openmrsFetch(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',
@@ -14,46 +14,51 @@ export function savePatientNote(payload: EncounterPayload, abortController: Abor
   });
 }
 
-export function usePatientNotes(
-  patientUuid: string,
-  visitUuid: string,
-  encounterType: string,
-  conceptUuid: string,
-): UsePatientNotes {
+export function editPatientNote(obsUuid: string, note: string) {
+  return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: { value: note },
+  });
+}
+
+export function usePatientNotes(patientUuid: string, visitUuid: string, conceptUuids: Array<string>): UsePatientNotes {
   const customRepresentation =
-    'custom:(uuid,display,encounterDatetime,patient,obs,' +
-    'encounterProviders:(uuid,display,' +
-    'encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display))),' +
-    'diagnoses';
-  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterType}&visit=${visitUuid}&v=${customRepresentation}`;
+    'custom:(uuid,patient:(uuid),obs:(uuid,concept:(uuid),obsDatetime,value:(uuid)),encounterType,' +
+    'encounterProviders:(uuid,provider:(uuid,person:(uuid,display)))';
+  const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&visit=${visitUuid}&v=${customRepresentation}`;
 
   const { data, error, isLoading, isValidating, mutate } = useOpenmrsFetchAll<RESTPatientNote>(
-    patientUuid && encounterType ? encountersApiUrl : null,
+    patientUuid ? encountersApiUrl : null,
   );
 
   const patientNotes: Array<PatientNote> | null = useMemo(
     () =>
       data
         ? data
-            .map((encounter) => {
-              const noteObs = encounter.obs.find((obs) => obs.concept.uuid === conceptUuid);
-
-              return {
-                id: encounter.uuid,
-                diagnoses: encounter.diagnoses.map((d) => d.display).join(', '),
-                encounterDate: encounter.encounterDatetime,
-                encounterNote: noteObs ? noteObs.value : '',
-                encounterNoteRecordedAt: noteObs ? noteObs.obsDatetime : '',
-                encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
-                encounterProviderRole: encounter.encounterProviders.map((ep) => ep.encounterRole.display).join(', '),
-              };
+            .flatMap((encounter) => {
+              return encounter.obs?.reduce((acc, obs) => {
+                if (conceptUuids.includes(obs.concept.uuid)) {
+                  acc.push({
+                    encounterUuid: encounter.uuid,
+                    obsUuid: obs.uuid,
+                    encounterNote: obs ? obs.value : '',
+                    encounterNoteRecordedAt: obs ? obs.obsDatetime : '',
+                    encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
+                    conceptUuid: obs.concept.uuid,
+                    encounterTypeUuid: encounter.encounterType.uuid,
+                  });
+                }
+                return acc;
+              }, [] as Array<PatientNote>);
             })
             .sort(
               (a, b) => new Date(b.encounterNoteRecordedAt).getTime() - new Date(a.encounterNoteRecordedAt).getTime(),
             )
         : [],
-    [data, conceptUuid],
+    [data, conceptUuids],
   );
 
   return useMemo(

@@ -30,9 +30,9 @@ import {
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useActiveVisits, useActiveVisitsSorting, useObsConcepts, useTableHeaders } from './active-visits.resource';
-import styles from './active-visits.scss';
 import { type ActiveVisitsConfigSchema } from '../config-schema';
 import { type ActiveVisit } from '../types';
+import styles from './active-visits.scss';
 
 const ActiveVisitsTable = () => {
   const { t } = useTranslation();
@@ -121,7 +121,6 @@ const ActiveVisitsTable = () => {
           showToolbar={false}
           zebra
           columnCount={headerData?.length}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
         />
       </div>
     );

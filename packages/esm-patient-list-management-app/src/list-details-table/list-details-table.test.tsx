@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { addPatientToList } from '../api/api-remote';
+import { addPatientToList } from '../api/patient-list.resource';
 import ListDetailsTable from './list-details-table.component';
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -19,8 +19,8 @@ beforeEach(() => {
   ));
 });
 
-jest.mock('../api/api-remote', () => ({
-  addPatientToList: jest.fn(() => Promise.resolve()),
+jest.mock('../api/patient-list.resource', () => ({
+  addPatientToList: jest.fn().mockResolvedValue({}),
   removePatientFromList: jest.fn(),
 }));
 

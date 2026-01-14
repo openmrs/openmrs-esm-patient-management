@@ -10,13 +10,14 @@ interface ComboInputProps {
   fieldProps: {
     value: string;
     labelText: string;
+    id?: string;
     [x: string]: any;
   };
   handleInputChange: (newValue: string) => void;
   handleSelection: (newSelection) => void;
 }
 
-const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInputChange, handleSelection }) => {
+const ComboInput: React.FC<ComboInputProps> = ({ entries, name, fieldProps, handleInputChange, handleSelection }) => {
   const [highlightedEntry, setHighlightedEntry] = useState(-1);
   const { value = '' } = fieldProps;
   const [showEntries, setShowEntries] = useState(false);
@@ -38,7 +39,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
   }, [entries, value]);
 
   const handleOptionClick = useCallback(
-    (newSelection: string, e: KeyboardEvent = null) => {
+    (newSelection: string, e: React.KeyboardEvent<HTMLInputElement> | null = null) => {
       e?.preventDefault();
       handleSelection(newSelection);
       setShowEntries(false);
@@ -47,7 +48,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
   );
 
   const handleKeyPress = useCallback(
-    (e: KeyboardEvent) => {
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
       const totalResults = filteredEntries.length ?? 0;
 
       if (e.key === 'Tab') {
@@ -84,6 +85,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
       <Layer>
         <TextInput
           {...fieldProps}
+          id={fieldProps.id || name}
           onChange={(e) => {
             setHighlightedEntry(-1);
             handleInputChange(e.target.value);

@@ -6,9 +6,11 @@ import {
   deletePatient,
   endVisit,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
+  waitForAdmissionRequestToBeProcessed,
+  waitForAdmissionToBeProcessed,
 } from '../commands';
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
@@ -27,43 +29,11 @@ test.beforeEach(async ({ api, page }) => {
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmission(api, provider.uuid, wardPatient?.uuid);
-
-  // Poll the admission requests API to verify the admission is queryable before navigating.
-  // This prevents race conditions where the UI loads before the backend has indexed the admission.
-  const maxAttempts = 10;
-  const delayMs = 1000;
-  let admissionFound = false;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const admissionRequestsResponse = await api.get(
-      `emrapi/inpatient/request?dispositionType=ADMIT,TRANSFER&dispositionLocation=${process.env.E2E_WARD_LOCATION_UUID}`,
-    );
-
-    if (admissionRequestsResponse.ok()) {
-      const data = await admissionRequestsResponse.json();
-      const results = data.results || [];
-      admissionFound = results.some((req: any) => req.patient?.uuid === wardPatient.uuid);
-
-      if (admissionFound) {
-        break;
-      }
-    }
-
-    if (attempt < maxAttempts - 1) {
-      // eslint-disable-next-line playwright/no-wait-for-timeout
-      await page.waitForTimeout(delayMs);
-    }
-  }
-
-  if (!admissionFound) {
-    throw new Error(
-      `Admission for patient ${wardPatient.uuid} not found in API after ${maxAttempts} attempts. This indicates a backend indexing issue.`,
-    );
-  }
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid);
+  await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
-test('Add a patient note to an inpatient admission', async ({ page }) => {
+test('Add a patient note to an inpatient admission', async ({ page, api }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
 
@@ -88,7 +58,7 @@ test('Add a patient note to an inpatient admission', async ({ page }) => {
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
-    await page.getByRole('button', { name: 'Admit' }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I should see a success message confirming the admission success', async () => {
@@ -97,6 +67,10 @@ test('Add a patient note to an inpatient admission', async ({ page }) => {
 
   await test.step('And I should see the patient in the ward view', async () => {
     await wardPage.waitForPatientInWardView(fullName);
+  });
+
+  await test.step('And I wait for the admission to be available in the API', async () => {
+    await waitForAdmissionToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   });
 
   await test.step('And when I click on the patient card to open the patient workspace', async () => {

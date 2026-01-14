@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Encounter, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
 import {
   changeToWardLocation,
   changeToDefaultLocation,
@@ -10,29 +10,31 @@ import {
   generateBedType,
   generateRandomBed,
   generateRandomPatient,
-  generateWardAdmission,
+  generateWardAdmissionRequest,
   getProvider,
   startVisit,
   retireBedType,
+  waitForAdmissionRequestToBeProcessed,
+  waitForAdmissionToBeProcessed,
 } from '../commands';
 import { test } from '../core';
 import { WardPage } from '../pages';
 
 let bed: Bed;
 let bedType: BedType;
-let encounter: Encounter;
 let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api }) => {
+test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  encounter = await generateWardAdmission(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
 test('Discharge a patient from a ward', async ({ page, api }) => {
@@ -70,16 +72,20 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('And I admit the patient', async () => {
-    await page.getByRole('button', { name: /Admit/i }).click();
+    await page.getByRole('button', { name: 'Admit', exact: true }).click();
   });
 
   await test.step('Then I see an admission success message', async () => {
-    await expect(page.getByText(/Patient admitted/i)).toBeVisible();
+    await expect(page.getByText('Patient admitted successfully', { exact: true })).toBeVisible();
   });
 
   await test.step('Then I see the patient in the ward', async () => {
     await expect(page.getByRole('heading', { name: 'Inpatient Ward' })).toBeVisible();
-    await expect(page.getByText(patientName, { exact: true })).toBeVisible();
+    await wardPage.waitForPatientInWardView(patientName);
+  });
+
+  await test.step('And I wait for the admission to be available in the API', async () => {
+    await waitForAdmissionToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   });
 
   await test.step("And when I click the patient's card to open the patient workspace", async () => {
@@ -87,7 +93,7 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step("Then I see the 'Discharge' button", async () => {
-    await expect(page.getByRole('button', { name: 'Discharge' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Discharge' })).toBeVisible({ timeout: 10000 });
   });
 
   await test.step('And I discharge the patient', async () => {
