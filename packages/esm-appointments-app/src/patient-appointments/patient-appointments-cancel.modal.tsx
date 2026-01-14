@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
-import { AccessibleModal } from '../components';
 
 interface CancelAppointmentModalProps {
   closeCancelModal: () => void;
@@ -61,17 +60,9 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
   };
 
   return (
-    <AccessibleModal
-      isOpen={true}
-      onClose={closeCancelModal}
-      modalHeadingId="cancel-appointment-modal-title"
-      modalDescriptionId="cancel-appointment-modal-body">
-      <ModalHeader
-        closeModal={closeCancelModal}
-        title={t('cancelAppointment', 'Cancel appointment')}
-        id="cancel-appointment-modal-title"
-      />
-      <ModalBody id="cancel-appointment-modal-body">
+    <>
+      <ModalHeader closeModal={closeCancelModal} title={t('cancelAppointment', 'Cancel appointment')} />
+      <ModalBody>
         <p>{t('cancelAppointmentModalConfirmationText', 'Are you sure you want to cancel this appointment?')}</p>
       </ModalBody>
       <ModalFooter>
@@ -82,7 +73,7 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
           {t('cancelAppointment', 'Cancel appointment')}
         </Button>
       </ModalFooter>
-    </AccessibleModal>
+    </>
   );
 };
 
