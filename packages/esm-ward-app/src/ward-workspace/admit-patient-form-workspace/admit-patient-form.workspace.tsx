@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, ButtonSet, Column, Form, InlineNotification, Row } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -141,13 +141,15 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
     setIsSubmitting(false);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return null;
+  }
 
   return (
     <Workspace2 title={t('admitPatient', 'Admit patient')} hasUnsavedChanges={isDirty}>
       <div className={styles.flexWrapper}>
         <WardPatientWorkspaceBanner {...{ wardPatient }} />
-        <Form control={control} className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
           <div className={styles.formContent}>
             <Row>
               <Column>

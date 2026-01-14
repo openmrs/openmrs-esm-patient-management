@@ -6,7 +6,7 @@
   },
   "optionalBackendDependencies": {
     "bedmanagement": {
-      "version": "^6.0.0 || 6.0.0-SNAPSHOT",
+      "version": ">=6.0.0 <8.0.0",
       "feature": {
         "flagName": "bedmanagement-module",
         "label": "Ward App Patient Service",
@@ -64,6 +64,12 @@
       "component": "wardPatientWorkspaceBanner",
       "name": "ward-patient-workspace-banner",
       "slot": "ward-workspace-patient-banner-slot"
+    }
+  ],
+  "modals": [
+    {
+      "name": "delete-note-modal",
+      "component": "deleteNoteModal"
     }
   ],
   "workspaces2": [

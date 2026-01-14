@@ -22,7 +22,7 @@ type TransferSectionValues = (typeof TransferSection)[keyof typeof TransferSecti
  * or to change their currently assigned bed
  */
 export default function PatientTransferAndSwapWorkspace({
-  groupProps: { wardPatient },
+  groupProps: { wardPatient, relatedTransferPatients },
   closeWorkspace,
 }: WardPatientWorkspaceDefinition) {
   const { t } = useTranslation();
@@ -31,6 +31,7 @@ export default function PatientTransferAndSwapWorkspace({
 
   const props: PatientAdmitOrTransferFormProps = {
     wardPatient,
+    relatedTransferPatients,
     onSuccess: async () => {
       await closeWorkspace({ discardUnsavedChanges: true });
       closeWorkspaceGroup2();
@@ -50,7 +51,10 @@ export default function PatientTransferAndSwapWorkspace({
           <div className={styles.contentSwitcherWrapper}>
             <h2 className={styles.productiveHeading02}>{t('typeOfTransfer', 'Type of transfer')}</h2>
             <div className={styles.contentSwitcher}>
-              <ContentSwitcher onChange={({ name }) => setSelectedSection(name)}>
+              <ContentSwitcher
+                size="md"
+                selectedIndex={selectedSection === TransferSection.TRANSFER ? 0 : 1}
+                onChange={({ name }) => setSelectedSection(name as TransferSectionValues)}>
                 <Switch name={TransferSection.TRANSFER} text={t('transfer', 'Transfer')} />
                 <Switch name={TransferSection.BED_SWAP} text={t('bedSwap', 'Bed swap')} />
               </ContentSwitcher>

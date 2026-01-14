@@ -4,6 +4,7 @@ import { type OpenmrsResource, type Patient, type Visit } from '@openmrs/esm-fra
 import { useTranslation } from 'react-i18next';
 import { useObs } from '../../hooks/useObs';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
+import { type CarbonTagType } from '../../types';
 import {
   getObsEncounterString,
   obsCustomRepresentation,
@@ -65,7 +66,7 @@ const CodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({ id, patien
         if (color) {
           return (
             <WardPatientResponsiveTooltip tooltipContent={getObsEncounterString(o, t)}>
-              <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
+              <Tag type={color as CarbonTagType} key={`ward-coded-obs-tag-${o.uuid}`}>
                 {display}
               </Tag>
             </WardPatientResponsiveTooltip>
@@ -88,7 +89,7 @@ const CodedObsTagsRow: React.FC<WardPatientCodedObsTagsRowProps> = ({ id, patien
             {coloredOpsTags}
             {summaryTagTooltipText.length > 0 ? (
               <WardPatientResponsiveTooltip tooltipContent={summaryTagTooltipText}>
-                <Tag type={summaryLabelColor}>
+                <Tag type={summaryLabelColor as CarbonTagType}>
                   {t('countItems', '{{count}} {{item}}', {
                     count: summaryTagTooltipText.length,
                     item: summaryLabelToDisplay,

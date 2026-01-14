@@ -36,7 +36,7 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
   const onSearchTermChange = useCallback(
     (value: string) => {
       setSearchTerm(value);
-      handleSearchTermUpdated && handleSearchTermUpdated(value);
+      void (handleSearchTermUpdated && handleSearchTermUpdated(value));
     },
     [handleSearchTermUpdated],
   );

@@ -16,16 +16,17 @@ import {
   TextArea,
   TimePicker,
   TimePickerSelect,
+  type OnChangeData,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
-import { type ConfigObject } from '../config-schema';
-import { type QueueEntry } from '../types';
-import QueuePriority from '../queue-table/components/queue-priority.component';
 import { convertTime12to24, type amPm } from './time-helpers';
+import { type ConfigObject } from '../config-schema';
+import { type Queue, type QueueEntry } from '../types';
+import QueuePriority from '../queue-table/components/queue-priority.component';
 import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
@@ -255,10 +256,11 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   <RadioButtonGroup
                     className={styles.radioButtonGroup}
                     id="queue"
+                    name="queue"
                     invalidText="Required"
                     valueSelected={formState.selectedQueue}
                     orientation="vertical"
-                    onChange={(uuid) => setSelectedQueueUuid(uuid)}>
+                    onChange={(uuid) => setSelectedQueueUuid(String(uuid))}>
                     {queues?.map(({ uuid, display, location }) => (
                       <RadioButton
                         key={uuid}
@@ -274,20 +276,25 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     ))}
                   </RadioButtonGroup>
                 ) : (
-                  <Dropdown
+                  <Dropdown<Queue>
                     id="queue"
                     label={selectedQueue.display}
                     initialSelectedItem={selectedQueue}
-                    value={formState.selectedQueue}
                     items={queues}
-                    itemToString={(item) =>
+                    itemToString={(item: Queue) =>
                       item.uuid === queueEntry.queue.uuid
                         ? t('currentValueFormatted', '{{value}} (Current)', {
                             value: `${item.display} - ${item.location?.display}`,
                           })
                         : `${item.display} - ${item.location?.display}`
                     }
-                    onChange={({ selectedItem }) => setSelectedQueueUuid(selectedItem.uuid)}
+                    onChange={(data: OnChangeData<Queue>) => {
+                      const queue = data.selectedItem;
+                      if (queue) {
+                        setSelectedQueueUuid(queue.uuid);
+                      }
+                    }}
+                    titleText=""
                   />
                 )}
               </section>
@@ -310,7 +317,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     name="status"
                     valueSelected={formState.selectedStatus}
                     onChange={(uuid) => {
-                      setSelectedStatusUuid(uuid);
+                      setSelectedStatusUuid(String(uuid));
                     }}>
                     {statuses?.map(({ uuid, display }) => (
                       <RadioButton
@@ -344,9 +351,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               ) : (
                 <RadioButtonGroup
                   className={styles.radioButtonGroup}
+                  name="priority"
                   valueSelected={formState.selectedPriority}
                   onChange={(uuid) => {
-                    setSelectedPriorityUuid(uuid);
+                    setSelectedPriorityUuid(String(uuid));
                   }}>
                   {priorities?.map(({ uuid, display }) => (
                     <RadioButton
@@ -394,6 +402,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   />
 
                   <TimePicker
+                    id="transitionTime"
                     labelText={t('time', 'Time')}
                     onChange={(event) => setTransitionTime(event.target.value)}
                     pattern={time12HourFormatRegexPattern}
@@ -404,7 +413,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       id="visitStartTimeSelect"
                       onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
                       value={formState.transitionTimeFormat}
-                      labelText={t('time', 'Time')}
                       aria-label={t('time', 'Time')}>
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />
