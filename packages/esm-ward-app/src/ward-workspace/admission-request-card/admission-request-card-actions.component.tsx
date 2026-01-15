@@ -9,18 +9,14 @@ import styles from './admission-request-card.scss';
 const AdmissionRequestCardActions: WardPatientCardType = ({ wardPatient }) => {
   const { t } = useTranslation();
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
-  const { closeWorkspace } = useWorkspace2Context();
+  const { closeWorkspace, launchChildWorkspace } = useWorkspace2Context();
 
   const launchPatientTransferForm = () => {
-    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('transfer-elsewhere-workspace', {
-      wardPatient,
-    });
+    launchChildWorkspace('transfer-elsewhere-workspace', { wardPatient });
   };
 
   const launchCancelAdmissionForm = () => {
-    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('cancel-admission-request-workspace', {
-      wardPatient,
-    });
+    launchChildWorkspace('cancel-admission-request-workspace', { wardPatient });
   };
 
   const isTransfer = wardPatient.inpatientRequest.dispositionType == 'TRANSFER';
