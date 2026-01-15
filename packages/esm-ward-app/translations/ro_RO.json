@@ -102,7 +102,6 @@
   "patientUnassignedFromBed": "Pacientul a fost eliberat de la pat",
   "patientUnassignedFromBedDetail": "{{patientName}} nu mai este atribuit unui pat",
   "patientWasDischarged": "Pacientul a fost externat",
-  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Externare în așteptare",
   "pendingOut": "Părăsire în așteptare",
   "pendingTransfer": "Transfer în așteptare",

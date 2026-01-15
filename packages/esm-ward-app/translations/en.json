@@ -104,7 +104,6 @@
   "patientUnassignedFromBed": "Patient unassigned from bed",
   "patientUnassignedFromBedDetail": "{{patientName}} is now unassigned from bed",
   "patientWasDischarged": "Patient was discharged",
-  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Pending Discharge",
   "pendingOut": "Pending out",
   "pendingTransfer": "Pending Transfer",

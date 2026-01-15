@@ -102,7 +102,6 @@
   "patientUnassignedFromBed": "პაციენტი მოხსნილია საწოლიდან",
   "patientUnassignedFromBedDetail": "{{patientName}} is now unassigned from bed",
   "patientWasDischarged": "პაციენტი გაწერილია",
-  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "რიგშია გასაწერად",
   "pendingOut": "რიგშია გასასვლელად",
   "pendingTransfer": "რიგშია გადასაყვანად",
