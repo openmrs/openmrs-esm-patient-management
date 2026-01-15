@@ -219,8 +219,7 @@
   "workspaceGroups2": [
     {
       "name": "ward-manage-admissions",
-      "overlay": true,
-      "persistence": "closable"
+      "overlay": true
     },
     {
       "name": "ward-patient",
