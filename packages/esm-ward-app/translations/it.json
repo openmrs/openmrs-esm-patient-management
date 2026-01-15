@@ -102,7 +102,6 @@
   "patientUnassignedFromBed": "Paziente disassegnato dal letto",
   "patientUnassignedFromBedDetail": "{{patientName}} non è più assegnato a un letto",
   "patientWasDischarged": "Paziente dimesso",
-  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Dimissione in sospeso",
   "pendingOut": "Uscita in sospeso",
   "pendingTransfer": "Trasferimento in sospeso",
