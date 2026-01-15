@@ -102,7 +102,6 @@
   "patientUnassignedFromBed": "Pasien tidak ditetapkan ke tempat tidur",
   "patientUnassignedFromBedDetail": "{{patientName}} sekarang tidak ditetapkan ke tempat tidur",
   "patientWasDischarged": "Pasien telah dipulangkan",
-  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Menunggu pemulangan",
   "pendingOut": "Menunggu keluar",
   "pendingTransfer": "Menunggu transfer",
