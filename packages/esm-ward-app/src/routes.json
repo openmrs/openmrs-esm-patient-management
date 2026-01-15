@@ -76,38 +76,38 @@
     {
       "name": "admission-requests-workspace",
       "component": "admissionRequestWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "transfer-elsewhere-workspace",
       "component": "patientTransferRequestWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "cancel-admission-request-workspace",
       "component": "cancelAdmissionRequestWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "admit-patient-form-workspace",
       "component": "admitPatientFormWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
 
     {
       "name": "ward-app-patient-search-workspace",
       "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
-      "window": "add-patient-to-ward"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "ward-app-start-visit-workspace",
       "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
-      "window": "add-patient-to-ward"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "create-admission-encounter-workspace",
       "component": "createAdmissionEncounterWorkspace",
-      "window": "add-patient-to-ward"
+      "window": "ward-manage-admissions-window"
     },
 
     
@@ -176,17 +176,10 @@
   ],
   "workspaceWindows2": [
     {
-      "name": "pending-admissions",
-      "group": "ward-manage-admissions",
-      "icon": "admissionRequestsWorkspaceSideRailIcon",
-      "width": "wider"
+      "name": "ward-manage-admissions-window",
+      "width": "wider",
+      "group": "ward-manage-admissions"
     },
-    {
-      "name": "add-patient-to-ward",
-      "group": "ward-manage-admissions",
-      "icon": "createAdmissionEncounterWorkspaceSideRailIcon"
-    },
-
     {
       "name": "ward-patient",
       "group": "ward-patient",
