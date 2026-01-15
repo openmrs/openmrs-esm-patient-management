@@ -137,6 +137,7 @@ export const AddressComponent: React.FC = () => {
             id={attributes.name}
             value={selected}
             required={attributes.required}
+            readOnly={attributes.label !== 'Fokontany'}
           />
         ))
       )}
