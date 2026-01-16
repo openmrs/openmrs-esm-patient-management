@@ -1,8 +1,9 @@
 import { writeFile, utils, type WorkSheet } from 'xlsx';
-import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framework';
+import { formatDate, getConfig } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
+import { getPatientPhoneNumber, fetchPatientFromFhir2 } from './functions';
 
 type RowData = {
   id: string; // Corresponds to the UUID of an appointment
@@ -27,12 +28,8 @@ export async function exportAppointmentsToSpreadsheet(
     appointments.map(async (appointment: Appointment) => {
       const matchingAppointment = rowData.find((row) => row.id === appointment.uuid);
       const identifier = matchingAppointment?.identifier ?? appointment.patient.identifier;
-
-      const patientInfo = await fetchCurrentPatient(appointment.patient.uuid);
-      const phoneNumber =
-        includePhoneNumbers && patientInfo?.telecom
-          ? patientInfo.telecom.map((telecomObj) => telecomObj?.value).join(', ')
-          : '';
+      const patientInfo = await fetchPatientFromFhir2(appointment.patient.uuid);
+      const phoneNumber = getPatientPhoneNumber(patientInfo);
 
       return {
         'Patient name': appointment.patient.name,
@@ -41,7 +38,7 @@ export async function exportAppointmentsToSpreadsheet(
         Identifier: identifier,
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-        ...(includePhoneNumbers ? { 'Telephone number': phoneNumber } : {}),
+        'Phone number': phoneNumber || '--',
       };
     }),
   );

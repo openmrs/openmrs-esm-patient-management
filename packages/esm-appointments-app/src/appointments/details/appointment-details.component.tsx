@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
-import { getGender } from '../../helpers';
+import { getGender, getPatientPhoneNumberByUuid, getPatientPhoneNumber } from '../../helpers';
 import { type Appointment } from '../../types';
 import styles from './appointment-details.scss';
 
@@ -13,6 +13,7 @@ interface AppointmentDetailsProps {
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) => {
   const { t } = useTranslation();
   const [isEnabledQuery, setIsEnabledQuery] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const { appointmentsCount, isLoading } = usePatientAppointmentHistory(appointment.patient.uuid);
   const { patient } = usePatient(appointment.patient.uuid);
 
@@ -21,6 +22,16 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
       setIsEnabledQuery(true);
     }
   }, [appointmentsCount, isLoading]);
+
+  // Fetch phone number
+  useEffect(() => {
+    const fetchPhoneNumber = async () => {
+      const phone = await getPatientPhoneNumberByUuid(appointment.patient.uuid);
+      setPhoneNumber(phone);
+    };
+
+    fetchPhoneNumber();
+  }, [appointment.patient.uuid]);
 
   return (
     <div className={styles.appointmentDetailsContainer}>
@@ -50,14 +61,14 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           ) : (
             ''
           )}
-          {patient && patient?.telecom
-            ? patient.telecom.map((contact, i) => (
-                <div key={i} className={styles.labelContainer}>
-                  <p className={styles.labelBold}>{t('Contact', 'Contact {{index}}', { index: i + 1 })}: </p>
-                  <p className={styles.label}>{contact.value}</p>
-                </div>
-              ))
-            : ''}
+          {patient && patient?.telecom && patient.telecom.length > 0 ? (
+            <div className={styles.labelContainer}>
+              <p className={styles.labelBold}>{t('phoneNumber', 'Phone number')}: </p>
+              <p className={styles.label}>{patient.telecom.map((contact) => contact.value).join(', ')}</p>
+            </div>
+          ) : (
+            ''
+          )}
         </div>
         <div>
           <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>
