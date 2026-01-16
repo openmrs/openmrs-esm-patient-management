@@ -53,9 +53,11 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
       <Button
         className={styles.manageButton}
         onClick={() => {
-          launchWorkspace2('admission-requests-workspace', {
-            wardPendingPatients,
-          });
+          launchWorkspace2(
+            'admission-requests-workspace',
+            { wardPendingPatients },
+            { startVisitWorkspaceName: 'ward-app-start-visit-workspace' },
+          );
         }}
         renderIcon={ArrowRightIcon}
         kind="ghost"

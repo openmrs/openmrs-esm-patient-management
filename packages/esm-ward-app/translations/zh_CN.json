@@ -102,7 +102,6 @@
   "patientUnassignedFromBed": "患者已从床位解除分配",
   "patientUnassignedFromBedDetail": "患者已从床位解除分配",
   "patientWasDischarged": "患者已出院",
-  "pendingAdmissions": "待处理入院",
   "pendingDischarge": "待处理出院",
   "pendingOut": "待出院",
   "pendingTransfer": "待转移",
