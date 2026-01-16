@@ -102,7 +102,6 @@
   "patientUnassignedFromBed": "Paciente desasignado de la cama",
   "patientUnassignedFromBedDetail": "{{patientName}} ahora está desasignado/a de la cama",
   "patientWasDischarged": "Paciente dado de alta",
-  "pendingAdmissions": "Pending admissions",
   "pendingDischarge": "Alta pendiente",
   "pendingOut": "Salida pendiente",
   "pendingTransfer": "Transferencia pendiente",
