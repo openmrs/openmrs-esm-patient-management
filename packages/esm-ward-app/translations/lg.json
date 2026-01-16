@@ -81,7 +81,7 @@
   "orderBasket": "Order basket",
   "Orders": "Ebiragiro",
   "other": "Ekirala",
-  "Patient": "patient",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "Omulwadde ayingiziddwa naye takyasindikiddwa ku kitanda",
   "patientAdmittedSuccessfully": "Omulwadde ayingiziddwa bulungi",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} has been successfully admitted and assigned to bed {{bedNumber}}",

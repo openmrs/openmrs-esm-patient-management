@@ -81,7 +81,7 @@
   "orderBasket": "Order basket",
   "Orders": "Perintah",
   "other": "Lainnya",
-  "Patient": "patient",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "Pasien berhasil diterima tetapi gagal menetapkan tempat tidur",
   "patientAdmittedSuccessfully": "Pasien berhasil diterima",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} telah berhasil diterima dan ditetapkan ke tempat tidur {{bedNumber}}",
