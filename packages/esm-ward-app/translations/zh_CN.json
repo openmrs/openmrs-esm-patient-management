@@ -81,7 +81,7 @@
   "orderBasket": "医嘱篮",
   "Orders": "医嘱",
   "other": "其他",
-  "Patient": "患者",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "患者已入院但未分配床位",
   "patientAdmittedSuccessfully": "患者已成功入院",
   "patientAdmittedSuccessfullySubtitle": "患者已成功入院到病房",
