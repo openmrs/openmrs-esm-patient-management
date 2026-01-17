@@ -95,10 +95,20 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const onSubmit = useCallback(
     async (visit: Visit) => {
       try {
+        const formValues = getValues();
+
         if (!hasCompleteQueueEntry) {
+          let missingField;
           if (!queueLocation) {
-            return Promise.resolve();
+            missingField = t('location', 'Location');
+          } else if (!formValues.queueService) {
+            missingField = t('service', 'Service');
+          } else if (!formValues.priority) {
+            missingField = t('priority', 'Priority');
           }
+          const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
+            fields: missingField,
+          });
 
           const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
           if (!isFormValid) {
@@ -113,32 +123,9 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
             });
             throw new Error(`Form validation failed:\n${errorMessages}`);
           }
-        }
 
-        const formValues = getValues();
-
-        if (queueLocation && (!formValues.queueService || !formValues.priority)) {
-          const missingFields = [];
-          if (!formValues.queueService) {
-            missingFields.push(t('service', 'Service'));
-          }
-          if (!formValues.priority) {
-            missingFields.push(t('priority', 'Priority'));
-          }
-
-          const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
-            fields: missingFields.join(', '),
-          });
-          showSnackbar({
-            title: t('incompleteForm', 'Incomplete form'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: errorMessage,
-          });
           throw new Error(errorMessage);
-        }
-
-        if (formValues.queueLocation && formValues.queueService && formValues.priority) {
+        } else {
           return postQueueEntry(
             visit.uuid,
             formValues.queueService,
@@ -180,11 +167,11 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
               throw error;
             });
         }
-
-        return Promise.resolve();
       } catch (error) {
         showSnackbar({
-          title: t('unexpectedError', 'Unexpected error'),
+          title: !hasCompleteQueueEntry
+            ? t('incompleteForm', 'Incomplete form')
+            : t('unexpectedError', 'Unexpected error'),
           kind: 'error',
           isLowContrast: false,
           subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
