@@ -81,7 +81,7 @@
   "orderBasket": "Order basket",
   "Orders": "Comenzi",
   "other": "Altul",
-  "Patient": "patient",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "Pacientul a fost internat cu succes, dar nu a fost atribuit un pat",
   "patientAdmittedSuccessfully": "Pacient internat cu succes",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} a fost internat cu succes și atribuit patului {{bedNumber}}",
