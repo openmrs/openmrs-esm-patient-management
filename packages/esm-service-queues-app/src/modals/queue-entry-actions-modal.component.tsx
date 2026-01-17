@@ -1,10 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
-  Dropdown,
+  ComboBox,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -18,16 +15,19 @@ import {
   TimePickerSelect,
   type OnChangeData,
 } from '@carbon/react';
+import { OpenmrsDatePicker, showSnackbar, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
+import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
-import { convertTime12to24, type amPm } from './time-helpers';
-import { type ConfigObject } from '../config-schema';
-import { type Queue, type QueueEntry } from '../types';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { type QueueEntry } from '../types';
 import styles from './queue-entry-actions.scss';
+import { convertTime12to24, type amPm } from './time-helpers';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -276,25 +276,31 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     ))}
                   </RadioButtonGroup>
                 ) : (
-                  <Dropdown<Queue>
+                  <ComboBox
                     id="queue"
-                    label={selectedQueue.display}
-                    initialSelectedItem={selectedQueue}
+                    titleText={selectedQueue?.display}
+                    selectedItem={selectedQueue}
                     items={queues}
-                    itemToString={(item: Queue) =>
-                      item.uuid === queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: `${item.display} - ${item.location?.display}`,
-                          })
-                        : `${item.display} - ${item.location?.display}`
+                    itemToString={(item) =>
+                      !item
+                        ? ''
+                        : item?.uuid === queueEntry?.queue?.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: `${item?.display} - ${item?.location?.display}`,
+                            })
+                          : `${item?.display} - ${item?.location?.display}`
                     }
-                    onChange={(data: OnChangeData<Queue>) => {
-                      const queue = data.selectedItem;
-                      if (queue) {
-                        setSelectedQueueUuid(queue.uuid);
+                    onChange={({ selectedItem }) => {
+                      if (selectedItem) {
+                        setSelectedQueueUuid(selectedItem.uuid);
                       }
                     }}
-                    titleText=""
+                    shouldFilterItem={(menu) => {
+                      return (
+                        menu?.item?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase()) ||
+                        menu?.item?.location?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase())
+                      );
+                    }}
                   />
                 )}
               </section>
