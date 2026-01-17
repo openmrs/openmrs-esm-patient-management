@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
+import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Tile } from '@carbon/react';
 import {
   AddIcon,
   CardHeader,
@@ -13,6 +13,7 @@ import {
 import { type Appointment } from '../types';
 import { usePatientAppointments } from './patient-appointments.resource';
 import PatientAppointmentsTable from './patient-appointments-table.component';
+import { AccessibleSwitch } from '../appointments/common-components/accessible-switch.component';
 import styles from './patient-appointments-detailed-summary.scss';
 
 interface PatientAppointmentsDetailProps {
@@ -92,9 +93,9 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                 setContentSwitcherValue(index);
                 setSwitchedView(true);
               }}>
-              <Switch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
-              <Switch name={'today'} text={t('today', 'Today')} />
-              <Switch name={'past'} text={t('past', 'Past')} />
+              <AccessibleSwitch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
+              <AccessibleSwitch name={'today'} text={t('today', 'Today')} />
+              <AccessibleSwitch name={'past'} text={t('past', 'Past')} />
             </ContentSwitcher>
             <div className={styles.divider}>|</div>
             <Button

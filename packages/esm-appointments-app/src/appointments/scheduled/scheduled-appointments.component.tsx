@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch } from '@carbon/react';
+import { ContentSwitcher } from '@carbon/react';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import {
   ExtensionSlot,
@@ -13,6 +13,7 @@ import {
   isDesktop,
 } from '@openmrs/esm-framework';
 import { useAppointmentsStore } from '../../store';
+import { AccessibleSwitch } from '../common-components/accessible-switch.component';
 import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
@@ -82,7 +83,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
         selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
         selectionMode="manual">
         {panelsToShow.map((panel) => (
-          <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
+          <AccessibleSwitch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
         ))}
       </ContentSwitcher>
 
