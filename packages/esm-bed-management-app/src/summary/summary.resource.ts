@@ -303,3 +303,12 @@ export async function deleteBedType({
     method: 'DELETE',
   });
 }
+
+export const deleteBed = (bedUuid: string) => {
+  const url = `${restBaseUrl}/bed/${bedUuid}`;
+
+  return openmrsFetch(url, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
