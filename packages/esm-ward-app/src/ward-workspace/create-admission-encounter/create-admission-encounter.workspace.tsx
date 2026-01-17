@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineNotification, SkeletonText } from '@carbon/react';
 import {
@@ -14,9 +14,12 @@ import { useInpatientAdmissionByPatients } from '../../hooks/useInpatientAdmissi
 import { useInpatientRequestByPatients } from '../../hooks/useInpatientRequestByPatients';
 import useRestPatient from '../../hooks/useRestPatient';
 import useWardLocation from '../../hooks/useWardLocation';
+import useLocations from '../../hooks/useLocations';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import type { Bed, WardPatient } from '../../types';
 import AdmitPatientButton from '../admit-patient-button.component';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import styles from './create-admission-encounter.workspace.scss';
 
 export interface CreateAdmissionEncounterWorkspaceProps {
   selectedPatientUuid: string;
@@ -40,6 +43,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<
   const { patient, isLoading: isLoadingPatient, error: errorLoadingPatient } = useRestPatient(selectedPatientUuid);
   const { activeVisit, isLoading: isLoadingVisit, error: errorLoadingVisit } = useVisit(selectedPatientUuid);
   const { t } = useTranslation();
+  const { emrConfiguration } = useEmrConfiguration();
   const {
     data: bedData,
     isLoading: isLoadingBed,
@@ -56,8 +60,39 @@ const CreateAdmissionEncounterWorkspace: React.FC<
     error: errorInpatientRequests,
   } = useInpatientRequestByPatients([selectedPatientUuid]);
 
+  const locationFilterCriteria: Array<Array<string>> = useMemo(() => {
+    const criteria = [];
+    if (emrConfiguration) {
+      criteria.push(['_tag', emrConfiguration.supportsTransferLocationTag.name]);
+    }
+    if (activeVisit?.location) {
+      criteria.push(['partof:below', activeVisit.location.uuid]);
+    }
+    if (location) {
+      criteria.push(['_id', location.uuid]);
+    }
+    return criteria;
+  }, [emrConfiguration, activeVisit?.location, location]);
+
+  const { data: validLocations, isLoading: isLoadingLocationValidation } = useLocations(
+    locationFilterCriteria,
+    1,
+    !emrConfiguration || !activeVisit?.location || !location,
+  );
+
+  const isWardLocationInvalidForVisit =
+    !isLoadingLocationValidation &&
+    emrConfiguration &&
+    activeVisit?.location.uuid !== location?.uuid &&
+    (!validLocations || validLocations?.length === 0);
+
   const isLoading =
-    isLoadingPatient || isLoadingVisit || isLoadingBed || isLoadingInpatientAdmission || isLoadingInpatientRequest;
+    isLoadingPatient ||
+    isLoadingVisit ||
+    isLoadingBed ||
+    isLoadingInpatientAdmission ||
+    isLoadingInpatientRequest ||
+    isLoadingLocationValidation;
   const hasError =
     errorLoadingPatient || errorLoadingVisit || errorLoadingBed || errorInpatientAdmission || errorInpatientRequests;
 
@@ -106,6 +141,25 @@ const CreateAdmissionEncounterWorkspace: React.FC<
         <WardPatientWorkspaceBanner wardPatient={wardPatient} />
         {activeVisit ? (
           <div>
+            <p className={styles.visitLocationInfo}>
+              {t('visitLocation', 'Visit location')}: <strong>{activeVisit.location.display}</strong>
+            </p>
+            {isWardLocationInvalidForVisit && (
+              <InlineNotification
+                kind="warning"
+                lowContrast={true}
+                hideCloseButton={true}
+                title={t('cannotAdmitToThisLocation', 'Cannot admit patient to this ward')}
+                subtitle={t(
+                  'wardNotSubLocationOfVisit',
+                  "This ward ({{wardLocation}}) is not a sub-location of the patient's visit location ({{visitLocation}}). Please use a different ward or update the patient's visit location.",
+                  {
+                    wardLocation: location.display,
+                    visitLocation: activeVisit.location.display,
+                  },
+                )}
+              />
+            )}
             {isAdmittedToCurrentLocation && (
               <InlineNotification
                 kind="warning"
@@ -145,7 +199,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<
                 await closeWorkspace({ discardUnsavedChanges: true });
                 closeWorkspaceGroup2();
               }}
-              disabled={isAdmittedToCurrentLocation}
+              disabled={isAdmittedToCurrentLocation || isWardLocationInvalidForVisit}
             />
           </div>
         ) : (

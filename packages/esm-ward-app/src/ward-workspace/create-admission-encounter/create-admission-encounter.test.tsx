@@ -15,6 +15,7 @@ import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { useInpatientAdmissionByPatients } from '../../hooks/useInpatientAdmissionByPatients';
 import { useInpatientRequestByPatients } from '../../hooks/useInpatientRequestByPatients';
+import useLocations from '../../hooks/useLocations';
 import useRestPatient from '../../hooks/useRestPatient';
 import useWardLocation from '../../hooks/useWardLocation';
 import { type WardViewContext } from '../../types';
@@ -40,6 +41,7 @@ const mockUseVisit = jest.mocked(useVisit).mockReturnValue({
     startDatetime: new Date().toISOString(),
     uuid: 'mock-visit',
     visitType: { display: 'Some Visit Type', uuid: 'some-visit-type-uuid' },
+    location: mockLocationInpatientWard,
   },
   currentVisit: null,
   currentVisitIsRetrospective: null,
@@ -56,6 +58,18 @@ mockedUseWardLocation.mockReturnValue({
   isLoadingLocation: false,
   errorFetchingLocation: null,
   invalidLocation: false,
+});
+
+jest.mock('../../hooks/useLocations', () => jest.fn());
+const mockedUseLocations = jest.mocked(useLocations);
+mockedUseLocations.mockReturnValue({
+  data: [{ id: mockLocationInpatientWard.uuid, name: mockLocationInpatientWard.display }],
+  isLoading: false,
+  totalCount: 1,
+  currentPage: 1,
+  totalPages: 1,
+  goToNext: jest.fn(),
+  goToPrevious: jest.fn(),
 });
 
 jest.mock('../../hooks/useRestPatient', () => jest.fn());
@@ -134,6 +148,10 @@ jest.mocked(useEmrConfiguration).mockReturnValue({
     },
     clinicianEncounterRole: {
       uuid: 'clinician-encounter-role-uuid',
+    },
+    supportsTransferLocationTag: {
+      name: 'Transfer Location',
+      uuid: 'transfer-tag-uuid',
     },
   },
   mutateEmrConfiguration: jest.fn(),
