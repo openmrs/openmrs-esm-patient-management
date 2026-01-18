@@ -13,7 +13,7 @@ import { Input } from '../../input/basic-input/input/input.component';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
-import { type AddressTemplate } from '../../patient-registration.types';
+import { type AddressTemplate, type NameTemplate } from '../../patient-registration.types';
 
 export const AddressComponent: React.FC = () => {
   const config = useConfig();
@@ -160,6 +160,7 @@ const AddressComponentContainer = ({ children }) => {
     <ResourcesContextProvider
       value={{
         addressTemplate: {} as AddressTemplate,
+        nameTemplate: {} as NameTemplate,
         currentSession: {} as Session,
         identifierTypes: [],
         relationshipTypes: [],
