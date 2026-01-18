@@ -85,7 +85,7 @@ export interface PatientRegistration {
     isNewPatient: boolean;
     formValues: FormValues;
     patientUuidMap: PatientUuidMapType;
-    initialAddressFieldValues: Record<string, any>;
+    initialAddressFieldValues: Partial<Record<AddressProperties, string>>;
     capturePhotoProps: CapturePhotoProps;
     currentLocation: string;
     initialIdentifierValues: FormValues['identifiers'];
@@ -251,6 +251,11 @@ export interface PersonAttributeResponse {
   };
 }
 
+export interface ConceptAnswers {
+  display: string;
+  uuid: string;
+}
+
 export interface ConceptResponse {
   uuid: string;
   display: string;
@@ -262,9 +267,18 @@ export interface ConceptResponse {
   setMembers: Array<ConceptAnswers>;
 }
 
-export interface ConceptAnswers {
-  display: string;
+export interface RelationshipType {
   uuid: string;
+  display: string;
+  aIsToB: string;
+  bIsToA: string;
+  displayAIsToB?: string;
+  displayBIsToA?: string;
+  description?: string;
+}
+
+export interface RelationshipTypesResponse {
+  results: Array<RelationshipType>;
 }
 
 export type AddressProperties =

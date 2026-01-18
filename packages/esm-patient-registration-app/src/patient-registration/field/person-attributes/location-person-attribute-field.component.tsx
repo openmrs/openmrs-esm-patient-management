@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { Field, useField } from 'formik';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
-import styles from './../field.scss';
-import { useLocations } from './location-person-attribute-field.resource';
 import { ComboBox, InlineLoading, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { Field, useField } from 'formik';
+import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { useLocations } from './location-person-attribute-field.resource';
+import styles from './../field.scss';
 
 export interface LocationPersonAttributeFieldProps {
   id: string;

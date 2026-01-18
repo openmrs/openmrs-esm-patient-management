@@ -1,112 +1,20 @@
-import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Search } from '@carbon/react';
 import classNames from 'classnames';
 import styles from './autosuggest.scss';
 
-// FIXME Temporarily included types from Carbon
-type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
+type SearchProps = React.ComponentProps<typeof Search>;
 
-interface SearchProps extends InputPropsBase {
-  /**
-   * Specify an optional value for the `autocomplete` property on the underlying
-   * `<input>`, defaults to "off"
-   */
-  autoComplete?: string;
-
-  /**
-   * Specify an optional className to be applied to the container node
-   */
-  className?: string;
-
-  /**
-   * Specify a label to be read by screen readers on the "close" button
-   */
-  closeButtonLabelText?: string;
-
-  /**
-   * Optionally provide the default value of the `<input>`
-   */
-  defaultValue?: string | number;
-
-  /**
-   * Specify whether the `<input>` should be disabled
-   */
-  disabled?: boolean;
-
-  /**
-   * Specify whether or not ExpandableSearch should render expanded or not
-   */
-  isExpanded?: boolean;
-
-  /**
-   * Specify a custom `id` for the input
-   */
-  id?: string;
-
-  /**
-   * Provide the label text for the Search icon
-   */
-  labelText: React.ReactNode;
-
-  /**
-   * Optional callback called when the search value changes.
-   */
-  onChange?(e: React.ChangeEvent<HTMLInputElement>): void;
-
-  /**
-   * Optional callback called when the search value is cleared.
-   */
-  onClear?(): void;
-
-  /**
-   * Optional callback called when the magnifier icon is clicked in ExpandableSearch.
-   */
-  onExpand?(e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>): void;
-
-  /**
-   * Provide an optional placeholder text for the Search.
-   * Note: if the label and placeholder differ,
-   * VoiceOver on Mac will read both
-   */
-  placeholder?: string;
-
-  /**
-   * Rendered icon for the Search.
-   * Can be a React component class
-   */
-  renderIcon?: React.ComponentType | React.FunctionComponent;
-
-  /**
-   * Specify the role for the underlying `<input>`, defaults to `searchbox`
-   */
-  role?: string;
-
-  /**
-   * Specify the size of the Search
-   */
-  size?: 'sm' | 'md' | 'lg';
-
-  /**
-   * Optional prop to specify the type of the `<input>`
-   */
-  type?: string;
-
-  /**
-   * Specify the value of the `<input>`
-   */
-  value?: string | number;
-}
-
-interface AutosuggestProps extends SearchProps {
-  getDisplayValue: (suggestion: any) => string;
-  getFieldValue: (suggestion: any) => string;
-  getSearchResults: (query: string) => Promise<Array<any>>;
+interface AutosuggestProps<Suggestion = unknown> extends SearchProps {
+  getDisplayValue: (suggestion: Suggestion) => string;
+  getFieldValue: (suggestion: Suggestion) => string;
+  getSearchResults: (query: string) => Promise<Array<Suggestion>>;
   onSuggestionSelected: (field: string, value: string) => void;
   invalid?: boolean | undefined;
   invalidText?: string | undefined;
 }
 
-export const Autosuggest: React.FC<AutosuggestProps> = ({
+export const Autosuggest = <Suggestion = unknown,>({
   getDisplayValue,
   getFieldValue,
   getSearchResults,
@@ -114,8 +22,8 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   invalid,
   invalidText,
   ...searchProps
-}) => {
-  const [suggestions, setSuggestions] = useState([]);
+}: AutosuggestProps<Suggestion>) => {
+  const [suggestions, setSuggestions] = useState<Array<Suggestion>>([]);
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const { id: name, labelText } = searchProps;
@@ -169,6 +77,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           onClear={handleClear}
           ref={searchBox}
           className={styles.autocompleteSearch}
+          labelText={labelText}
           {...searchProps}
         />
       </Layer>

@@ -3,125 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, TextInput } from '@carbon/react';
 import { useField } from 'formik';
 
-// FIXME Temporarily imported here
-export interface TextInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue' | 'id' | 'size' | 'value'> {
-  /**
-   * Specify an optional className to be applied to the `<input>` node
-   */
-  className?: string;
-
-  /**
-   * Optionally provide the default value of the `<input>`
-   */
-  defaultValue?: string | number;
-
-  /**
-   * Specify whether the `<input>` should be disabled
-   */
-  disabled?: boolean;
-
-  /**
-   * Specify whether to display the character counter
-   */
-  enableCounter?: boolean;
-
-  /**
-   * Provide text that is used alongside the control label for additional help
-   */
-  helperText?: React.ReactNode;
-
-  /**
-   * Specify whether you want the underlying label to be visually hidden
-   */
-  hideLabel?: boolean;
-
-  /**
-   * Specify a custom `id` for the `<input>`
-   */
-  id: string;
-
-  /**
-   * `true` to use the inline version.
-   */
-  inline?: boolean;
-
-  /**
-   * Specify whether the control is currently invalid
-   */
-  invalid?: boolean;
-
-  /**
-   * Provide the text that is displayed when the control is in an invalid state
-   */
-  invalidText?: React.ReactNode;
-
-  /**
-   * Provide the text that will be read by a screen reader when visiting this
-   * control
-   */
-  labelText: React.ReactNode;
-
-  /**
-   * `true` to use the light version. For use on $ui-01 backgrounds only.
-   * Don't use this to make tile background color same as container background color.
-   * 'The `light` prop for `TextInput` has ' +
-   'been deprecated in favor of the new `Layer` component. It will be removed in the next major release.'
-   */
-  light?: boolean;
-
-  /**
-   * Max character count allowed for the input. This is needed in order for enableCounter to display
-   */
-  maxCount?: number;
-
-  /**
-   * Optionally provide an `onChange` handler that is called whenever `<input>`
-   * is updated
-   */
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-
-  /**
-   * Optionally provide an `onClick` handler that is called whenever the
-   * `<input>` is clicked
-   */
-  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
-
-  /**
-   * Specify the placeholder attribute for the `<input>`
-   */
-  placeholder?: string;
-
-  /**
-   * Whether the input should be read-only
-   */
-  readOnly?: boolean;
-
-  /**
-   * Specify the size of the Text Input. Currently supports the following:
-   */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-
-  /**
-   * Specify the type of the `<input>`
-   */
-  type?: string;
-
-  /**
-   * Specify the value of the `<input>`
-   */
-  value?: string | number | undefined;
-
-  /**
-   * Specify whether the control is currently in warning state
-   */
-  warn?: boolean;
-
-  /**
-   * Provide the text that is displayed when the control is in warning state
-   */
-  warnText?: React.ReactNode;
-}
+export type TextInputProps = React.ComponentProps<typeof TextInput>;
 
 interface InputProps extends TextInputProps {
   checkWarning?(value: string): string;
@@ -146,9 +28,9 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('numberInNameDubious')
     t('yearsEstimateRequired')
     t('deathdayIsRequired', 'Death date is required when the patient is marked as deceased.')
-    t('deathdayInvalidDate', 'Date of death is invalid')
+    t('deathdayBeforeBirthday', 'Death date and time cannot be before the birthday')
     t('deathCauseRequired', 'Cause of death is required')
-    t('nonCodedCauseOfDeathRequired', 'Non-coded cause of death is required')
+    t('nonCodedCauseOfDeathRequiredWhenSelected', 'Non-coded cause of death is required')
   */
 
   const value = field.value || '';

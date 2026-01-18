@@ -10,6 +10,7 @@ import {
 } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
+  type AddressProperties,
   type AttributeValue,
   type CapturePhotoProps,
   type Encounter,
@@ -36,11 +37,13 @@ import {
 } from './patient-registration.resource';
 import { type RegistrationConfig } from '../config-schema';
 
+type AddressFieldValues = Partial<Record<AddressProperties, string>>;
+
 export type SavePatientForm = (
   isNewPatient: boolean,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
-  initialAddressFieldValues: Record<string, any>,
+  initialAddressFieldValues: AddressFieldValues,
   capturePhotoProps: CapturePhotoProps,
   currentLocation: string,
   initialIdentifierValues: FormValues['identifiers'],
@@ -303,7 +306,7 @@ export class FormManager {
     isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: Record<string, any>,
+    initialAddressFieldValues: AddressFieldValues,
     identifiers: Array<PatientIdentifier>,
     config?: RegistrationConfig,
   ): Patient {

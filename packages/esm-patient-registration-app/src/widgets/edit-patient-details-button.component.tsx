@@ -1,7 +1,6 @@
-import React from 'react';
-import { navigate } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './edit-patient-details-button.scss';
+import { navigate } from '@openmrs/esm-framework';
 
 interface EditPatientDetailsButtonProps {
   onTransition?: () => void;
@@ -10,7 +9,7 @@ interface EditPatientDetailsButtonProps {
 
 const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ patientUuid, onTransition }) => {
   const { t } = useTranslation();
-  const handleClick = React.useCallback(() => {
+  const handleClick = useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
     onTransition?.();
   }, [onTransition, patientUuid]);

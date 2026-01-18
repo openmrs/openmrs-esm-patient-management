@@ -5,7 +5,7 @@ import { type PersonAttributeTypeResponse } from '../../patient-registration.typ
 export function usePersonAttributeType(personAttributeTypeUuid: string): {
   data: PersonAttributeTypeResponse;
   isLoading: boolean;
-  error: any;
+  error: Error | undefined;
 } {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>>(
     `${restBaseUrl}/personattributetype/${personAttributeTypeUuid}`,

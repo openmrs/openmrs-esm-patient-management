@@ -419,7 +419,7 @@ export const esmPatientRegistrationSchema = {
   _validators: [
     validator(
       (config: RegistrationConfig) =>
-        !config.fieldDefinitions.some((d) => d.type == 'obs') || config.registrationObs.encounterTypeUuid != null,
+        !config.fieldDefinitions.some((d) => d.type === 'obs') || config.registrationObs.encounterTypeUuid !== null,
       "If fieldDefinitions contains any fields of type 'obs', `registrationObs.encounterTypeUuid` must be specified.",
     ),
     validator(

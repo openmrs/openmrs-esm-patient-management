@@ -11,7 +11,7 @@ export interface CustomFieldProps {
 
 export function CustomField({ name }: CustomFieldProps) {
   const config = useConfig<RegistrationConfig>();
-  const fieldDefinition = config.fieldDefinitions.filter((def) => def.id == name)[0];
+  const fieldDefinition = config.fieldDefinitions.filter((def) => def.id === name)[0];
 
   if (fieldDefinition.type === 'person attribute') {
     return <PersonAttributeField fieldDefinition={fieldDefinition} />;

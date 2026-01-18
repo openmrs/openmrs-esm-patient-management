@@ -5,7 +5,7 @@ export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: st
   isLoading: boolean;
 } {
   let data;
-  if (uuid == 'weight-uuid') {
+  if (uuid === 'weight-uuid') {
     data = {
       uuid: 'weight-uuid',
       display: 'Weight (kg)',
@@ -13,7 +13,7 @@ export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: st
       answers: [],
       setMembers: [],
     };
-  } else if (uuid == 'chief-complaint-uuid') {
+  } else if (uuid === 'chief-complaint-uuid') {
     data = {
       uuid: 'chief-complaint-uuid',
       display: 'Chief Complaint',
@@ -21,7 +21,7 @@ export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: st
       answers: [],
       setMembers: [],
     };
-  } else if (uuid == 'nationality-uuid') {
+  } else if (uuid === 'nationality-uuid') {
     data = {
       uuid: 'nationality-uuid',
       display: 'Nationality',
@@ -40,7 +40,7 @@ export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: st
 });
 
 export const useConceptAnswers = jest.fn((uuid: string) => {
-  if (uuid == 'nationality-uuid') {
+  if (uuid === 'nationality-uuid') {
     return {
       data: [
         { display: 'USA', uuid: 'usa' },
@@ -48,7 +48,7 @@ export const useConceptAnswers = jest.fn((uuid: string) => {
       ],
       isLoading: false,
     };
-  } else if (uuid == 'other-countries-uuid') {
+  } else if (uuid === 'other-countries-uuid') {
     return {
       data: [
         { display: 'Kenya', uuid: 'ke' },
