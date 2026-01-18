@@ -36,6 +36,7 @@ function useActionPropsByKey() {
             mappedQueueEntry.queue.name,
             mappedQueueEntry.visitQueueNumber,
             'calling',
+            mappedQueueEntry?.queueLocation,
           );
           if (callingQueueResponse.ok) {
             await mutateQueueEntries();
