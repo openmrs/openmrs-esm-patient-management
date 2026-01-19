@@ -296,11 +296,12 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       }
                     }}
                     shouldFilterItem={(menu) => {
-                      return (
-                        menu?.item?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase()) ||
-                        menu?.item?.location?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase())
-                      );
-                    }}
+                    const itemDisplay = (menu?.item?.display ?? '').toLowerCase();
+                    const locationDisplay = (menu?.item?.location?.display ?? '').toLowerCase();
+                    const inputValue = (menu?.inputValue ?? '').toLowerCase();
+                  
+                    return itemDisplay.includes(inputValue) || locationDisplay.includes(inputValue);
+                  }}
                   />
                 )}
               </section>
