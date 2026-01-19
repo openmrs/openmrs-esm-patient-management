@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeaderGlobalAction } from '@carbon/react';
 import { UserFollow } from '@carbon/react/icons';
@@ -7,7 +7,7 @@ import styles from './add-patient-link.scss';
 
 export default function Root() {
   const { t } = useTranslation();
-  const addPatient = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-registration' }), []);
+  const addPatient = useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-registration' }), []);
 
   return (
     <HeaderGlobalAction
