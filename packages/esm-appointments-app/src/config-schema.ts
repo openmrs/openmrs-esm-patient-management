@@ -111,8 +111,3 @@ export interface ConfigObject {
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
 }
-
-export type AppointmentTableColumn = {
-  header: string;
-  key: string;
-};
