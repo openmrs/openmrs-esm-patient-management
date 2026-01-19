@@ -3,17 +3,17 @@ import { Form, Formik } from 'formik';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType, isDesktop } from '@openmrs/esm-framework';
-import { type AddressTemplate, type FormValues, type PatientIdentifierType } from '../../patient-registration.types';
 import { mockPatient, mockSession } from '__mocks__';
 import { renderWithContext } from 'tools';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
-import { type Resources } from '../../../offline.resources';
 import {
   PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
 } from '../../patient-registration-context';
 import { ResourcesContextProvider } from '../../../resources-context';
 import PatientIdentifierOverlay from './identifier-selection-overlay.component';
+import type { AddressTemplate, FormValues, PatientIdentifierType } from '../../patient-registration.types';
+import type { Resources } from '../../../offline.resources';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUseLayoutType = jest.mocked(useLayoutType);

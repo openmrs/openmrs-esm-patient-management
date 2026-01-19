@@ -10,9 +10,9 @@ import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from './address
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from '__mocks__';
 import { ResourcesContextProvider } from '../../../resources-context';
-import AddressSearchComponent from './address-search.component';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
+import AddressSearchComponent from './address-search.component';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 const mockUseAddressHierarchy = jest.mocked(useAddressHierarchy);

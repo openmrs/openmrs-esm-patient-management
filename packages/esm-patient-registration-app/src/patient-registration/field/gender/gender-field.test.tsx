@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
+import { getValidationSchema } from '../../validation/patient-registration-validation';
 import { GenderField } from './gender-field.component';
 import { type FormValues } from '../../patient-registration.types';
-import { getValidationSchema } from '../../validation/patient-registration-validation';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
