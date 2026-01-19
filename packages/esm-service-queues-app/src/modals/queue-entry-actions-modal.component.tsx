@@ -1,3 +1,6 @@
+import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
@@ -13,21 +16,17 @@ import {
   TextArea,
   TimePicker,
   TimePickerSelect,
-  type OnChangeData,
 } from '@carbon/react';
-import { OpenmrsDatePicker, showSnackbar, useConfig, type FetchResponse } from '@openmrs/esm-framework';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type ConfigObject } from '../config-schema';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
+import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
-import QueuePriority from '../queue-table/components/queue-priority.component';
-import { type QueueEntry } from '../types';
-import styles from './queue-entry-actions.scss';
+import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
 import { convertTime12to24, type amPm } from './time-helpers';
+import { type ConfigObject } from '../config-schema';
+import { type QueueEntry } from '../types';
+import QueuePriority from '../queue-table/components/queue-priority.component';
+import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -296,12 +295,12 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                       }
                     }}
                     shouldFilterItem={(menu) => {
-                    const itemDisplay = (menu?.item?.display ?? '').toLowerCase();
-                    const locationDisplay = (menu?.item?.location?.display ?? '').toLowerCase();
-                    const inputValue = (menu?.inputValue ?? '').toLowerCase();
-                  
-                    return itemDisplay.includes(inputValue) || locationDisplay.includes(inputValue);
-                  }}
+                      const itemDisplay = (menu?.item?.display ?? '').toLowerCase();
+                      const locationDisplay = (menu?.item?.location?.display ?? '').toLowerCase();
+                      const inputValue = (menu?.inputValue ?? '').toLowerCase();
+
+                      return itemDisplay.includes(inputValue) || locationDisplay.includes(inputValue);
+                    }}
                   />
                 )}
               </section>
