@@ -81,7 +81,7 @@
   "orderBasket": "Order basket",
   "Orders": "Prescriptions",
   "other": "Autre",
-  "Patient": "Patient",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "Le patient est admis mais le lit n'a pas pu être assigné",
   "patientAdmittedSuccessfully": "Patient admis",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} est admis et assigné au lit {{bedNumber}}",

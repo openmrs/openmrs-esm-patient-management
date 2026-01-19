@@ -81,7 +81,7 @@
   "orderBasket": "Order basket",
   "Orders": "Órdenes",
   "other": "Otros",
-  "Patient": "patient",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "Paciente admitido con éxito, pero no se pudo asignar una cama",
   "patientAdmittedSuccessfully": "Paciente admitido con éxito",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} ha sido admitido con éxito y asignado a la cama {{bedNumber}}",

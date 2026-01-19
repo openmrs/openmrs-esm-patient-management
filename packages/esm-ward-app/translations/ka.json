@@ -81,7 +81,7 @@
   "orderBasket": "Order basket",
   "Orders": "შეკვეთები",
   "other": "სხვა",
-  "Patient": "patient",
+  "patient": "Patient",
   "patientAdmittedButBedNotAssigned": "Patient admitted successfully but fail to assign bed to patient",
   "patientAdmittedSuccessfully": "პაციენტის მიღება წარმატებულია",
   "patientAdmittedSuccessfullySubtitle": "{{patientName}} has been successfully admitted and assigned to bed {{bedNumber}}",
