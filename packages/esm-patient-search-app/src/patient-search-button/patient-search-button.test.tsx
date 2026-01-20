@@ -1,12 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, launchWorkspace2, useConfig } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchButton from './patient-search-button.component';
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
-const mockedLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockedLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 describe('PatientSearchButton', () => {
   beforeEach(() => {

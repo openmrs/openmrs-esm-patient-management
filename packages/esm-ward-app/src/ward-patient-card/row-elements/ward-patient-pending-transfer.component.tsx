@@ -1,6 +1,6 @@
 import { IconButton } from '@carbon/react';
 import { Movement } from '@carbon/react/icons';
-import { CloseOutlineIcon, launchWorkspace, launchWorkspace2 } from '@openmrs/esm-framework';
+import { CloseOutlineIcon, launchWorkspace2 } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type WardPatient, type WardPatientWorkspaceProps } from '../../types';

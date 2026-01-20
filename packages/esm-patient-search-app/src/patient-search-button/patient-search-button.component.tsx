@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { Button } from '@carbon/react';
 import { Search } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { type PatientSearchWorkspaceProps } from '../patient-search-workspace/patient-search.workspace';
 
 interface PatientSearchButtonProps {
@@ -24,7 +24,7 @@ interface PatientSearchButtonProps {
  * to add patient search functionality. It opens the search UI in a workspace.
  *
  * As it is possible to launch the patient search workspace directly with
- * `launchWorkspace('patient-search-workspace', props)`, this button only exists
+ * `launchWorkspace2('patient-search-workspace', props)`, this button only exists
  * for compatibility and should not be used otherwise.
  *
  * @returns
@@ -53,7 +53,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
       hidePatientSearch,
     };
 
-    launchWorkspace('patient-search-workspace', {
+    launchWorkspace2('patient-search-workspace', {
       ...workspaceProps,
       workspaceTitle,
     });

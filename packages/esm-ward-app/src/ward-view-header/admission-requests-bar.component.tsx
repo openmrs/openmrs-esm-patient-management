@@ -7,7 +7,7 @@ import {
   ArrowRightIcon,
   isDesktop,
   launchWorkspace2,
-  launchWorkspaceGroup,
+  launchWorkspace2Group,
   useAppContext,
   useLayoutType,
 } from '@openmrs/esm-framework';
