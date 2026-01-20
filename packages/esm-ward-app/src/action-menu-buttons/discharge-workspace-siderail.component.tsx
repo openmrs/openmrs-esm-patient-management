@@ -1,5 +1,5 @@
-import { ActionMenuButton2, launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
+import { ActionMenuButton2 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Exit } from '@carbon/react/icons';
 
