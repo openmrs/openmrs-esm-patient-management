@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { isDesktop, launchWorkspace2, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { addPatientToList } from '../api/patient-list.resource';
 import ListDetailsTable from './list-details-table.component';
@@ -158,5 +158,56 @@ describe('ListDetailsTable', () => {
         startVisitWorkspaceName: 'patient-list-start-visit-workspace',
       }),
     );
+  });
+
+  it('adds patient to list when onPatientSelected callback is invoked', async () => {
+    const mockMutateListDetails = jest.fn();
+    const mockMutateListMembers = jest.fn();
+    const mockCloseWorkspace = jest.fn();
+    const user = userEvent.setup();
+
+    render(
+      <ListDetailsTable
+        patients={patients}
+        columns={columns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={mockMutateListDetails}
+        mutateListMembers={mockMutateListMembers}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    const addButton = screen.getByRole('button', { name: /add patient to list/i });
+    await user.click(addButton);
+
+    const launchWorkspace2Call = mockLaunchWorkspace2.mock.calls[0];
+    const workspaceProps = launchWorkspace2Call[1];
+    const onPatientSelected = workspaceProps.onPatientSelected;
+
+    await onPatientSelected('new-patient-uuid', {} as fhir.Patient, jest.fn(), mockCloseWorkspace);
+
+    await waitFor(() => {
+      expect(addPatientToList).toHaveBeenCalledWith({
+        cohort: 'test-cohort',
+        patient: 'new-patient-uuid',
+        startDate: expect.any(String),
+      });
+    });
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subtitle: 'The list is now up to date',
+        title: 'Patient added to list',
+        kind: 'success',
+      }),
+    );
+
+    expect(mockMutateListMembers).toHaveBeenCalled();
+    expect(mockMutateListDetails).toHaveBeenCalled();
+
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 });

@@ -356,14 +356,13 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                       {
                         initialQuery: '',
                         workspaceTitle: t('addPatientToList', 'Add patient to list'),
-                        onPatientSelected(
+                        async onPatientSelected(
                           patientUuid: string,
                           patient: fhir.Patient,
                           launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
                           closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
                         ) {
-                          handleAddPatientToList(patientUuid);
-                          closeWorkspace();
+                          await handleAddPatientToList(patientUuid);
                         },
                       },
                       {
@@ -476,14 +475,13 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                 {
                   initialQuery: '',
                   workspaceTitle: t('addPatientToList', 'Add patient to list'),
-                  onPatientSelected(
+                  async onPatientSelected(
                     patientUuid: string,
                     patient: fhir.Patient,
                     launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
                     closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
                   ) {
-                    handleAddPatientToList(patientUuid);
-                    closeWorkspace();
+                    await handleAddPatientToList(patientUuid);
                   },
                 },
                 {
