@@ -7,29 +7,59 @@ import EditPatientDetailsButton from './edit-patient-details-button.component';
 
 const mockNavigate = jest.mocked(navigate);
 
+/**
+ * Helper to render EditPatientDetailsButton.
+ */
+function renderEditPatientDetailsButton(patientUuid: string, onTransition?: () => void) {
+  return render(<EditPatientDetailsButton patientUuid={patientUuid} onTransition={onTransition} />);
+}
+
 describe('EditPatientDetailsButton', () => {
   const patientUuid = mockPatient.uuid;
 
-  it('should navigate to the edit page when clicked', async () => {
-    const user = userEvent.setup();
+  describe('Rendering', () => {
+    it('renders button with correct text', () => {
+      renderEditPatientDetailsButton(patientUuid);
 
-    render(<EditPatientDetailsButton patientUuid={patientUuid} />);
-
-    const button = screen.getByRole('menuitem');
-    await user.click(button);
-
-    expect(mockNavigate).toHaveBeenCalledWith({ to: expect.stringContaining(`/patient/${patientUuid}/edit`) });
+      expect(screen.getByRole('menuitem')).toBeInTheDocument();
+      expect(screen.getByText(/edit patient details/i)).toBeInTheDocument();
+    });
   });
 
-  it('should call the onTransition function when provided', async () => {
-    const user = userEvent.setup();
+  describe('User interaction', () => {
+    it('navigates to edit page when clicked', async () => {
+      const user = userEvent.setup();
+      renderEditPatientDetailsButton(patientUuid);
 
-    const onTransitionMock = jest.fn();
-    render(<EditPatientDetailsButton patientUuid={patientUuid} onTransition={onTransitionMock} />);
+      const button = screen.getByRole('menuitem');
+      await user.click(button);
 
-    const button = screen.getByRole('menuitem');
-    await user.click(button);
+      expect(mockNavigate).toHaveBeenCalledWith({
+        to: expect.stringContaining(`/patient/${patientUuid}/edit`),
+      });
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+    });
 
-    expect(onTransitionMock).toHaveBeenCalled();
+    it('calls onTransition callback when provided and button is clicked', async () => {
+      const user = userEvent.setup();
+      const onTransitionMock = jest.fn();
+      renderEditPatientDetailsButton(patientUuid, onTransitionMock);
+
+      const button = screen.getByRole('menuitem');
+      await user.click(button);
+
+      expect(onTransitionMock).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    it('navigates even when onTransition is not provided', async () => {
+      const user = userEvent.setup();
+      renderEditPatientDetailsButton(patientUuid);
+
+      const button = screen.getByRole('menuitem');
+      await user.click(button);
+
+      expect(mockNavigate).toHaveBeenCalled();
+    });
   });
 });

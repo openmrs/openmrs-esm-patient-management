@@ -1,11 +1,15 @@
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
+import type { ObjectSchema } from 'yup';
 import mapValues from 'lodash/mapValues';
 import { type RegistrationConfig } from '../../config-schema';
 import { type FormValues } from '../patient-registration.types';
 import { getDatetime } from '../patient-registration.resource';
 
-export function getValidationSchema(config: RegistrationConfig, t: (key: string, defaultValue: string) => string) {
+export function getValidationSchema(
+  config: RegistrationConfig,
+  t: (key: string, defaultValue: string) => string,
+): ObjectSchema<any> {
   return Yup.object({
     givenName: Yup.string().required(t('givenNameRequired', 'Given name is required')),
     familyName: Yup.string().required(t('familyNameRequired', 'Family name is required')),
@@ -56,7 +60,7 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
       .max(new Date(), t('deathDateInFuture', 'Death date cannot be in future'))
       .test(
         'deathDate-after-birthdate',
-        t('deathdayInvalidDate', 'Death date and time cannot be before the birthday'),
+        t('deathdayBeforeBirthday', 'Death date and time cannot be before the birthday'),
         function (value) {
           const { birthdate } = this.parent;
           if (birthdate && value) {
@@ -95,7 +99,9 @@ export function getValidationSchema(config: RegistrationConfig, t: (key: string,
     }),
     nonCodedCauseOfDeath: Yup.string().when(['isDead', 'deathCause'], {
       is: (isDead, deathCause) => isDead && deathCause === config.freeTextFieldConceptUuid,
-      then: Yup.string().required(t('nonCodedCauseOfDeathRequired', 'Cause of death is required')),
+      then: Yup.string().required(
+        t('nonCodedCauseOfDeathRequiredWhenSelected', 'Non-coded cause of death is required'),
+      ),
       otherwise: Yup.string().nullable(),
     }),
     email: Yup.string().optional().email(t('invalidEmail', 'Invalid email')),
