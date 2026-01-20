@@ -5,9 +5,6 @@ import { Exit } from '@carbon/react/icons';
 
 export default function PatientDischargeSideRailIcon() {
   const { t } = useTranslation();
-  const handler = () => {
-    launchWorkspace('patient-discharge-workspace');
-  };
   return (
     <ActionMenuButton2
       icon={(props) => <Exit {...props} />}

@@ -153,7 +153,7 @@
       "window": "appointments-window"
     },
     {
-      "name": "appointments-patient-search-start-visit-workspace",
+      "name": "appointments-start-visit-workspace",
       "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
       "window": "appointments-window"
     }
