@@ -1,22 +1,20 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace2, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { addPatientToList } from '../api/patient-list.resource';
 import ListDetailsTable from './list-details-table.component';
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);
-const mockExtensionSlot = jest.mocked(ExtensionSlot);
+const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
 beforeEach(() => {
   mockUseLayoutType.mockReturnValue('small-desktop');
   mockIsDesktop.mockReturnValue(true);
   mockShowSnackbar.mockImplementation(() => {});
-  mockExtensionSlot.mockImplementation(({ state }: any) => (
-    <button onClick={() => state.selectPatientAction('new-patient')}>{state.buttonText}</button>
-  ));
+  mockLaunchWorkspace2.mockImplementation(() => {});
 });
 
 jest.mock('../api/patient-list.resource', () => ({
@@ -129,9 +127,7 @@ describe('ListDetailsTable', () => {
     expect(screen.getByRole('button', { name: /add patient to list/i })).toBeInTheDocument();
   });
 
-  it('adds a new patient to the list when add button is clicked', async () => {
-    const mockMutateListDetails = jest.fn();
-    const mockMutateListMembers = jest.fn();
+  it('launches patient search workspace when add button is clicked', async () => {
     const user = userEvent.setup();
     render(
       <ListDetailsTable
@@ -141,8 +137,8 @@ describe('ListDetailsTable', () => {
         isLoading={false}
         autoFocus={false}
         isFetching={false}
-        mutateListDetails={mockMutateListDetails}
-        mutateListMembers={mockMutateListMembers}
+        mutateListDetails={jest.fn()}
+        mutateListMembers={jest.fn()}
         cohortUuid="test-cohort"
       />,
     );
@@ -151,20 +147,16 @@ describe('ListDetailsTable', () => {
     expect(addButton).toBeInTheDocument();
     await user.click(addButton);
 
-    expect(addPatientToList).toHaveBeenCalledWith({
-      cohort: 'test-cohort',
-      patient: 'new-patient',
-      startDate: expect.any(String),
-    });
-    expect(mockShowSnackbar).toHaveBeenCalledWith(
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'patient-list-search-workspace',
       expect.objectContaining({
-        subtitle: 'The list is now up to date',
-        title: 'Patient added to list',
-        kind: 'success',
+        initialQuery: '',
+        workspaceTitle: 'Add patient to list',
+        onPatientSelected: expect.any(Function),
+      }),
+      expect.objectContaining({
+        startVisitWorkspaceName: 'patient-list-start-visit-workspace',
       }),
     );
-
-    expect(mockMutateListMembers).toHaveBeenCalled();
-    expect(mockMutateListDetails).toHaveBeenCalled();
   });
 });
