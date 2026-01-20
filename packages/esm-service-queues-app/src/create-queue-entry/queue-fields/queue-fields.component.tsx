@@ -98,16 +98,18 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
         const formValues = getValues();
 
         if (!hasCompleteQueueEntry) {
-          let missingField;
+          const missingFields = [];
           if (!queueLocation) {
-            missingField = t('location', 'Location');
-          } else if (!formValues.queueService) {
-            missingField = t('service', 'Service');
-          } else if (!formValues.priority) {
-            missingField = t('priority', 'Priority');
+            missingFields.push(t('location', 'Location'));
+          }
+          if (!formValues.queueService) {
+            missingFields.push(t('service', 'Service'));
+          }
+          if (!formValues.priority) {
+            missingFields.push(t('priority', 'Priority'));
           }
           const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
-            fields: missingField,
+            fields: missingFields.join(', '),
           });
 
           const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
