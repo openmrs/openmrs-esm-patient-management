@@ -117,7 +117,7 @@ export function useActiveVisits() {
     });
 
     // Add flattened observations
-    const allObs = visit.encounters.reduce((accumulator, encounter) => {
+    const allObs = (visit?.encounters ?? []).reduce((accumulator, encounter) => {
       return [...accumulator, ...(encounter.obs || [])];
     }, []);
 

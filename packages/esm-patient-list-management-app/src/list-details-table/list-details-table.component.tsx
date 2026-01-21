@@ -1,4 +1,12 @@
-import React, { type CSSProperties, type HTMLAttributes, useCallback, useId, useMemo, useState } from 'react';
+import React, {
+  type CSSProperties,
+  type HTMLAttributes,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
@@ -39,93 +47,22 @@ import styles from './list-details-table.scss';
 type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
 
 interface SearchProps extends InputPropsBase {
-  /**
-   * Specify an optional value for the `autocomplete` property on the underlying
-   * `<input>`, defaults to "off"
-   */
   autoComplete?: string;
-
-  /**
-   * Specify an optional className to be applied to the container node
-   */
   className?: string;
-
-  /**
-   * Specify a label to be read by screen readers on the "close" button
-   */
   closeButtonLabelText?: string;
-
-  /**
-   * Optionally provide the default value of the `<input>`
-   */
   defaultValue?: string | number;
-
-  /**
-   * Specify whether the `<input>` should be disabled
-   */
   disabled?: boolean;
-
-  /**
-   * Specify whether or not ExpandableSearch should render expanded or not
-   */
   isExpanded?: boolean;
-
-  /**
-   * Specify a custom `id` for the input
-   */
   id?: string;
-
-  /**
-   * Provide the label text for the Search icon
-   */
   labelText: React.ReactNode;
-
-  /**
-   * Optional callback called when the search value changes.
-   */
   onChange?(e: { target: HTMLInputElement; type: 'change' }): void;
-
-  /**
-   * Optional callback called when the search value is cleared.
-   */
   onClear?(): void;
-
-  /**
-   * Optional callback called when the magnifier icon is clicked in ExpandableSearch.
-   */
   onExpand?(e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>): void;
-
-  /**
-   * Provide an optional placeholder text for the Search.
-   * Note: if the label and placeholder differ,
-   * VoiceOver on Mac will read both
-   */
   placeholder?: string;
-
-  /**
-   * Rendered icon for the Search.
-   * Can be a React component class
-   */
   renderIcon?: React.ComponentType | React.FunctionComponent;
-
-  /**
-   * Specify the role for the underlying `<input>`, defaults to `searchbox`
-   */
   role?: string;
-
-  /**
-   * Specify the size of the Search
-   */
   size?: 'sm' | 'md' | 'lg';
-
-  /**
-   * Optional prop to specify the type of the `<input>`
-   */
   type?: string;
-
-  /**
-   * Specify the value of the `<input>`
-   */
   value?: string | number;
 }
 
@@ -179,6 +116,12 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
 
+  const isActiveVisitsList = cohortUuid === 'active-visits-system-list';
+
+  useEffect(() => {
+    setSearchTerm('');
+  }, [cohortUuid]);
+
   const filteredPatients = useMemo(() => {
     if (!debouncedSearchTerm) {
       return patients;
@@ -218,6 +161,16 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const handleRemovePatientFromList = useCallback(
     async (membershipUuidToRemove: string) => {
+      // Prevent removing from Active Visits list
+      if (isActiveVisitsList) {
+        showSnackbar({
+          kind: 'warning',
+          title: t('cannotModifySystemList', 'Cannot modify system list'),
+          subtitle: t('activeVisitsListAutoManaged', 'The Active Visits list is automatically managed'),
+        });
+        return;
+      }
+
       setIsDeleting(true);
 
       try {
@@ -237,11 +190,11 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           subtitle: error?.message,
           title: t('errorRemovingPatientFromList', 'Failed to remove patient from list'),
         });
+      } finally {
+        setIsDeleting(false);
       }
-
-      setIsDeleting(false);
     },
-    [mutateListDetails, mutateListMembers, t],
+    [isActiveVisitsList, mutateListDetails, mutateListMembers, t],
   );
 
   const handleLaunchRemovePatientFromListModal = useCallback(
@@ -258,7 +211,17 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const handleAddPatientToList = useCallback(
     async (patient) => {
-      const alreadyInList = patients.some((p) => patient == p.uuid);
+      // Prevent adding to Active Visits list
+      if (isActiveVisitsList) {
+        showSnackbar({
+          kind: 'warning',
+          title: t('cannotModifySystemList', 'Cannot modify system list'),
+          subtitle: t('activeVisitsListAutoManaged', 'The Active Visits list is automatically managed'),
+        });
+        return;
+      }
+
+      const alreadyInList = patients.some((p) => patient === p.uuid);
 
       if (alreadyInList) {
         showSnackbar({
@@ -294,7 +257,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         });
       }
     },
-    [cohortUuid, mutateListDetails, mutateListMembers, patients, t],
+    [cohortUuid, isActiveVisitsList, mutateListDetails, mutateListMembers, patients, t],
   );
 
   const BackButton = () => (
@@ -342,23 +305,27 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   placeholder={t('searchThisList', 'Search this list')}
                   size={responsiveSize}
+                  value={searchTerm}
                 />
               </Layer>
-              <Layer>
-                <ExtensionSlot
-                  key={`${id}-patient-search`}
-                  name="patient-search-button-slot"
-                  state={{
-                    buttonText: t('addPatientToList', 'Add patient to list'),
-                    buttonProps: {
-                      kind: 'secondary',
-                      renderIcon: (props) => <AddIcon {...props} />,
-                      size: 'sm',
-                    },
-                    selectPatientAction: handleAddPatientToList,
-                  }}
-                />
-              </Layer>
+              {/* Only show Add Patient button for regular lists */}
+              {!isActiveVisitsList && (
+                <Layer>
+                  <ExtensionSlot
+                    key={`${id}-patient-search`}
+                    name="patient-search-button-slot"
+                    state={{
+                      buttonText: t('addPatientToList', 'Add patient to list'),
+                      buttonProps: {
+                        kind: 'secondary',
+                        renderIcon: (props) => <AddIcon {...props} />,
+                        size: 'sm',
+                      },
+                      selectPatientAction: handleAddPatientToList,
+                    }}
+                  />
+                </Layer>
+              )}
             </div>
           </div>
           <DataTable rows={tableRows} headers={columns} isSortable size={responsiveSize} useZebraStyles>
@@ -378,6 +345,8 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                             : (header.header as React.ReactNode)}
                         </TableHeader>
                       ))}
+                      {/* Add empty header for actions column if not Active Visits list */}
+                      {!isActiveVisitsList && <TableHeader />}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -392,17 +361,21 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
-                          <TableCell className="cds--table-column-menu">
-                            <Button
-                              hasIconOnly
-                              iconDescription={t('removeFromList', 'Remove from list')}
-                              kind="ghost"
-                              onClick={() => handleLaunchRemovePatientFromListModal(currentPatient)}
-                              renderIcon={TrashCanIcon}
-                              size={responsiveSize}
-                              tooltipPosition="left"
-                            />
-                          </TableCell>
+                          {/* Only show remove button for regular lists */}
+                          {!isActiveVisitsList && (
+                            <TableCell className="cds--table-column-menu">
+                              <Button
+                                hasIconOnly
+                                iconDescription={t('removeFromList', 'Remove from list')}
+                                kind="ghost"
+                                disabled={isDeleting}
+                                onClick={() => handleLaunchRemovePatientFromListModal(currentPatient)}
+                                renderIcon={TrashCanIcon}
+                                size={responsiveSize}
+                                tooltipPosition="left"
+                              />
+                            </TableCell>
+                          )}
                         </TableRow>
                       );
                     })}
@@ -425,9 +398,9 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           )}
           {pagination.usePagination && (
             <Pagination
-              backwardText={t('nextPage', 'Next page')}
+              backwardText={t('previousPage', 'Previous page')}
               className={styles.paginationOverride}
-              forwardText={t('previousPage', 'Previous page')}
+              forwardText={t('nextPage', 'Next page')}
               isLastPage={pagination.lastPage}
               onChange={pagination.onChange}
               page={pagination.currentPage}
@@ -442,6 +415,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     );
   }
 
+  // Empty state
   return (
     <>
       <BackButton />
@@ -450,20 +424,27 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           <div className={styles.illo}>
             <EmptyDataIllustration />
           </div>
-          <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
-          <ExtensionSlot
-            key={`${id}-patient-search`}
-            name="patient-search-button-slot"
-            state={{
-              buttonText: t('addPatientToList', 'Add patient to list'),
-              buttonProps: {
-                kind: 'ghost',
-                renderIcon: (props) => <AddIcon {...props} />,
-                size: 'sm',
-              },
-              selectPatientAction: handleAddPatientToList,
-            }}
-          />
+          <p className={styles.content}>
+            {isActiveVisitsList
+              ? t('noActiveVisits', 'There are no active visits at this location')
+              : t('noPatientsInList', 'There are no patients in this list')}
+          </p>
+          {/* Only show Add Patient button for regular lists */}
+          {!isActiveVisitsList && (
+            <ExtensionSlot
+              key={`${id}-patient-search`}
+              name="patient-search-button-slot"
+              state={{
+                buttonText: t('addPatientToList', 'Add patient to list'),
+                buttonProps: {
+                  kind: 'ghost',
+                  renderIcon: (props) => <AddIcon {...props} />,
+                  size: 'sm',
+                },
+                selectPatientAction: handleAddPatientToList,
+              }}
+            />
+          )}
         </Tile>
       </Layer>
     </>
