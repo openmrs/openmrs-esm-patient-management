@@ -190,9 +190,8 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
   };
 }
 
-export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
+export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string, locationUuid?: string) {
   const abortController = new AbortController();
-
   return openmrsFetch(`${restBaseUrl}/queueutil/assignticket`, {
     method: 'POST',
     headers: {
@@ -203,6 +202,7 @@ export function serveQueueEntry(servicePointName: string, ticketNumber: string, 
       servicePointName,
       ticketNumber,
       status,
+      locationUuid: locationUuid,
     },
   });
 }
