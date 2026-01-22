@@ -82,7 +82,9 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
         selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
         selectionMode="manual">
         {panelsToShow.map((panel) => (
-          <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />
+          <Switch key={`panel-${panel.name}`} name={panel.name}>
+            {t(panel.config.title)}
+          </Switch>
         ))}
       </ContentSwitcher>
 
