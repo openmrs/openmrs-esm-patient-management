@@ -3,11 +3,11 @@ import { ContentSwitcher, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { closeWorkspaceGroup2, useFeatureFlag, Workspace2 } from '@openmrs/esm-framework';
 import type { WardPatientWorkspaceDefinition } from '../../types';
-import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import PatientAdmitOrTransferForm, {
   type PatientAdmitOrTransferFormProps,
 } from './patient-admit-or-transfer-request-form.component';
 import PatientBedSwapForm from './patient-bed-swap-form.component';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './patient-transfer-swap.scss';
 
 const TransferSection = {
