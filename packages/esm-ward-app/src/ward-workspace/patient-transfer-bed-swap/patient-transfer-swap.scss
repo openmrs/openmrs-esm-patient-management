@@ -48,6 +48,18 @@
   @include type.type-style('heading-compact-02');
 }
 
+.visitLocationInfo {
+  @include type.type-style('body-compact-01');
+  margin-bottom: layout.$spacing-04;
+  color: $text-02;
+}
+
+.helperText {
+  @include type.type-style('helper-text-01');
+  margin-bottom: layout.$spacing-03;
+  color: $text-02;
+}
+
 .formContainer {
   display: flex;
   flex-direction: column;

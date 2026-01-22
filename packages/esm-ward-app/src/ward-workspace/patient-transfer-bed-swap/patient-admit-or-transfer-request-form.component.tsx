@@ -252,7 +252,19 @@ export default function PatientAdmitOrTransferForm({
           </div>
         )}
         <div className={styles.field}>
+          {visit?.location && (
+            <p className={styles.visitLocationInfo}>
+              {t('visitLocation', 'Visit location')}: <strong>{visit.location.display}</strong>
+            </p>
+          )}
           <h2 className={styles.productiveHeading02}>{t('selectALocation', 'Select a location')}</h2>
+          {visit?.location && (
+            <p className={styles.helperText}>
+              {t('showingSubLocationsOf', 'Showing admission locations under {{visitLocation}}', {
+                visitLocation: visit.location.display,
+              })}
+            </p>
+          )}
           <Controller
             name="location"
             control={control}

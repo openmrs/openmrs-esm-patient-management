@@ -1,0 +1,11 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.visitLocationInfo {
+  @include type.type-style('body-compact-01');
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+  padding: 0 layout.$spacing-05;
+  color: $text-02;
+}
