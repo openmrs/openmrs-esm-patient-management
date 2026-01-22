@@ -11,17 +11,13 @@ export class WardPage {
   readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
 
   async clickPatientCard(patientName: string) {
-    // Wait for patient to be loaded - use first() to avoid strict mode violation
-    const cardLocator = this.page.locator(`[class*="wardPatientCard"]:has-text("${patientName}")`).first();
+     const cardLocator = this.page.locator(`[class*="wardPatientCard"]:has-text("${patientName}")`).first();
 
-    // Wait for the card to be visible with a reasonable timeout
-    await cardLocator.waitFor({ state: 'visible', timeout: 10000 });
+     await cardLocator.waitFor({ state: 'visible', timeout: 10000 });
 
-    // Scroll into view if needed
-    await cardLocator.scrollIntoViewIfNeeded();
+     await cardLocator.scrollIntoViewIfNeeded();
 
-    // Click the patient card directly without force option
-    await cardLocator.click();
+     await cardLocator.click();
   }
 
   async goTo() {
