@@ -1,22 +1,20 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { render, screen, waitFor } from '@testing-library/react';
+import { isDesktop, launchWorkspace2, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { addPatientToList } from '../api/patient-list.resource';
 import ListDetailsTable from './list-details-table.component';
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);
-const mockExtensionSlot = jest.mocked(ExtensionSlot);
+const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
 beforeEach(() => {
   mockUseLayoutType.mockReturnValue('small-desktop');
   mockIsDesktop.mockReturnValue(true);
   mockShowSnackbar.mockImplementation(() => {});
-  mockExtensionSlot.mockImplementation(({ state }: any) => (
-    <button onClick={() => state.selectPatientAction('new-patient')}>{state.buttonText}</button>
-  ));
+  mockLaunchWorkspace2.mockImplementation(() => {});
 });
 
 jest.mock('../api/patient-list.resource', () => ({
@@ -129,10 +127,45 @@ describe('ListDetailsTable', () => {
     expect(screen.getByRole('button', { name: /add patient to list/i })).toBeInTheDocument();
   });
 
-  it('adds a new patient to the list when add button is clicked', async () => {
+  it('launches patient search workspace when add button is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <ListDetailsTable
+        patients={patients}
+        columns={columns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={jest.fn()}
+        mutateListMembers={jest.fn()}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    const addButton = screen.getByRole('button', { name: /add patient to list/i });
+    expect(addButton).toBeInTheDocument();
+    await user.click(addButton);
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'patient-list-search-workspace',
+      expect.objectContaining({
+        initialQuery: '',
+        workspaceTitle: 'Add patient to list',
+        onPatientSelected: expect.any(Function),
+      }),
+      expect.objectContaining({
+        startVisitWorkspaceName: 'patient-list-start-visit-workspace',
+      }),
+    );
+  });
+
+  it('adds patient to list when onPatientSelected callback is invoked', async () => {
     const mockMutateListDetails = jest.fn();
     const mockMutateListMembers = jest.fn();
+    const mockCloseWorkspace = jest.fn();
     const user = userEvent.setup();
+
     render(
       <ListDetailsTable
         patients={patients}
@@ -148,14 +181,22 @@ describe('ListDetailsTable', () => {
     );
 
     const addButton = screen.getByRole('button', { name: /add patient to list/i });
-    expect(addButton).toBeInTheDocument();
     await user.click(addButton);
 
-    expect(addPatientToList).toHaveBeenCalledWith({
-      cohort: 'test-cohort',
-      patient: 'new-patient',
-      startDate: expect.any(String),
+    const launchWorkspace2Call = mockLaunchWorkspace2.mock.calls[0];
+    const workspaceProps = launchWorkspace2Call[1];
+    const onPatientSelected = workspaceProps.onPatientSelected;
+
+    await onPatientSelected('new-patient-uuid', {} as fhir.Patient, jest.fn(), mockCloseWorkspace);
+
+    await waitFor(() => {
+      expect(addPatientToList).toHaveBeenCalledWith({
+        cohort: 'test-cohort',
+        patient: 'new-patient-uuid',
+        startDate: expect.any(String),
+      });
     });
+
     expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         subtitle: 'The list is now up to date',
@@ -166,5 +207,7 @@ describe('ListDetailsTable', () => {
 
     expect(mockMutateListMembers).toHaveBeenCalled();
     expect(mockMutateListDetails).toHaveBeenCalled();
+
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 });
