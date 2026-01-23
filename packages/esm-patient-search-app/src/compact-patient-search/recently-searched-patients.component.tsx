@@ -103,27 +103,23 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchR
       );
     }
 
-    if (searchResults?.length === 0) {
-      return (
-        <div className={styles.searchResultsContainer}>
-          <div className={styles.searchResults}>
-            <Layer>
-              <Tile className={styles.emptySearchResultsTile}>
-                <EmptyDataIllustration />
-                <p className={styles.emptyResultText}>
-                  {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-                </p>
-                <p className={styles.actionText}>
-                  <span>
-                    {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
-                  </span>
-                </p>
-              </Tile>
-            </Layer>
-          </div>
+    return (
+      <div className={styles.searchResultsContainer}>
+        <div className={styles.searchResults}>
+          <Layer>
+            <Tile className={styles.emptySearchResultsTile}>
+              <EmptyDataIllustration />
+              <p className={styles.emptyResultText}>{t('noRecentlyViewedPatients', 'No recently viewed patients')}</p>
+              <p className={styles.actionText}>
+                <span>
+                  {t('recentPatientsEmptyStateHint', 'Patients you select will appear here for quick access')}
+                </span>
+              </p>
+            </Tile>
+          </Layer>
         </div>
-      );
-    }
+      </div>
+    );
   },
 );
 
