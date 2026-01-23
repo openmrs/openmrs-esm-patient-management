@@ -21,6 +21,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   ConfigurableLink,
+  EmptyCardIllustration,
   ErrorState,
   ExtensionSlot,
   isDesktop,
@@ -28,7 +29,6 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useActiveVisits, useActiveVisitsSorting, useObsConcepts, useTableHeaders } from './active-visits.resource';
 import { type ActiveVisitsConfigSchema } from '../config-schema';
 import { type ActiveVisit } from '../types';
@@ -144,7 +144,7 @@ const ActiveVisitsTable = () => {
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
               <h4>{t('activeVisits', 'Active Visits')}</h4>
             </div>
-            <EmptyDataIllustration />
+            <EmptyCardIllustration />
             <p className={styles.content}>
               {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
             </p>
