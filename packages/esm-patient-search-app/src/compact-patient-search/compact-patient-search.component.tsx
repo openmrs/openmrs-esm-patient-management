@@ -46,6 +46,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const {
     error: errorFetchingUserProperties,
+    isLoadingPatients,
     mutateUserProperties,
     recentlyViewedPatientUuids,
     updateRecentlyViewedPatients,
@@ -70,6 +71,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const addViewedPatientAndCloseSearchResults = useCallback(
     async (patientUuid: string) => {
       handleCloseSearchResults();
+      if (!showRecentlySearchedPatients) {
+        return;
+      }
       try {
         await updateRecentlyViewedPatients(patientUuid);
         await mutateUserProperties();
@@ -81,7 +85,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         });
       }
     },
-    [handleCloseSearchResults, mutateUserProperties, updateRecentlyViewedPatients, t],
+    [handleCloseSearchResults, mutateUserProperties, updateRecentlyViewedPatients, showRecentlySearchedPatients, t],
   );
 
   const handlePatientSelection = useCallback(
@@ -187,7 +191,11 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
             className={styles.floatingSearchResultsContainer}
             data-testid="floatingSearchResultsContainer"
             data-tutorial-target="floating-search-results-container">
-            <RecentlySearchedPatients ref={bannerContainerRef} {...recentPatientSearchResponse} />
+            <RecentlySearchedPatients
+              ref={bannerContainerRef}
+              {...recentPatientSearchResponse}
+              isLoading={recentPatientSearchResponse.isLoading || isLoadingPatients}
+            />
           </div>
         )}
       </div>

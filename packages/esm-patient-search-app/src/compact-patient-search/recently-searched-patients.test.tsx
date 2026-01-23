@@ -85,8 +85,19 @@ describe('RecentlySearchedPatients', () => {
       data: [],
     });
 
-    expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
-    expect(screen.getByText(/try to search again using the patient's unique ID number/i)).toBeInTheDocument();
+    expect(screen.getByText(/no recently viewed patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients you select will appear here for quick access/i)).toBeInTheDocument();
+    expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('renders an empty state when there is no recent data', () => {
+    renderRecentlySearchedPatients({
+      isLoading: false,
+      data: null,
+    });
+
+    expect(screen.getByText(/no recently viewed patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients you select will appear here for quick access/i)).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
   });
 
