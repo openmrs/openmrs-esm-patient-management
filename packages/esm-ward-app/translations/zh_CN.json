@@ -30,7 +30,6 @@
   "discharge": "出院小结",
   "editNote": "编辑记录",
   "emptyBed": "空床",
-  "emptyStateIllustration": "空状态插图",
   "emptyText": "空",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
   "errorCancellingAdmissionRequest": "取消入院申请发生错误",

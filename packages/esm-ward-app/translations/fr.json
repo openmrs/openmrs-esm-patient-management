@@ -30,7 +30,6 @@
   "discharge": "Fin d'hospitalisation",
   "editNote": "Edit note",
   "emptyBed": "Lit vide",
-  "emptyStateIllustration": "Illustration de l'état vide",
   "emptyText": "Vide",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
   "errorCancellingAdmissionRequest": "Erreur lors de l'annulation de la demande d'admission",

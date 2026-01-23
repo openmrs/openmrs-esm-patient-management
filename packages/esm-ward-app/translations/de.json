@@ -30,7 +30,6 @@
   "discharge": "Discharge",
   "editNote": "Edit note",
   "emptyBed": "Empty bed",
-  "emptyStateIllustration": "Empty state illustration",
   "emptyText": "Empty",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
   "errorCancellingAdmissionRequest": "Error cancelling admission request",
