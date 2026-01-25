@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, Stack } from '@carbon/react';
 import {
@@ -44,7 +44,7 @@ const CreateQueueEntryWorkspace: React.FC<
 }) => {
   const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
-  const { activeVisit, isLoading, error } = useVisit(selectedPatientUuid);
+  const { activeVisit, isLoading, error, mutate: mutateVisit } = useVisit(selectedPatientUuid);
 
   const [showContactDetails, setShowContactDetails] = useState(false);
 
@@ -53,6 +53,29 @@ const CreateQueueEntryWorkspace: React.FC<
   }, []);
 
   const patientName = patient && getPatientName(patient);
+
+  // Revalidate visit status periodically when there's no active visit
+  // This ensures the UI updates when a visit is created from the start-visit workspace
+  const previousActiveVisitRef = useRef(activeVisit);
+
+  useEffect(() => {
+    // If we had no visit and now have one, stop polling
+    if (!previousActiveVisitRef.current && activeVisit) {
+      previousActiveVisitRef.current = activeVisit;
+      return;
+    }
+
+    // If we have no active visit, poll every 3 seconds to check for new visits
+    if (!activeVisit && !isLoading && !error) {
+      const interval = setInterval(() => {
+        mutateVisit();
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+
+    previousActiveVisitRef.current = activeVisit;
+  }, [activeVisit, isLoading, error, mutateVisit]);
 
   if (!patient) {
     return null;

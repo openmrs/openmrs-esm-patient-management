@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
@@ -34,7 +34,7 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit, mutate: mutateVisit } = useVisit(patientUuid);
   const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
     usePatientSearchContext() ?? {};
   // if context2 is present, we use the new workspace v2 APIs,
@@ -52,6 +52,29 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   }, []);
 
   const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
+
+  // Revalidate visit status periodically when there's no active visit
+  // This ensures the UI updates when a visit is created from a child workspace
+  const previousActiveVisitRef = useRef(activeVisit);
+
+  useEffect(() => {
+    // If we had no visit and now have one, stop polling
+    if (!previousActiveVisitRef.current && activeVisit) {
+      previousActiveVisitRef.current = activeVisit;
+      return;
+    }
+
+    // If we have no active visit, poll every 3 seconds to check for new visits
+    if (!activeVisit) {
+      const interval = setInterval(() => {
+        mutateVisit();
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+
+    previousActiveVisitRef.current = activeVisit;
+  }, [activeVisit, mutateVisit]);
 
   return (
     <>
