@@ -256,7 +256,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             {showQueuePicker && (
               <section>
                 {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
-                {queues.length >= 8 ? (
+                {queues.length <= 8 ? (
                   <RadioButtonGroup
                     legendText={t('serviceLocation', 'Service location')}
                     className={styles.radioButtonGroup}
