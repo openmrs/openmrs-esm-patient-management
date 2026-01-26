@@ -120,7 +120,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByLabelText(/select a location/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/select a service/i)).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select a service/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write any additional points here/i)).toBeInTheDocument();
@@ -163,7 +163,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
@@ -244,7 +244,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
@@ -399,7 +399,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
@@ -443,7 +443,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const durationInput = screen.getByRole('spinbutton', { name: /duration \(minutes\)/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
@@ -476,7 +476,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const durationInput = screen.getByRole('spinbutton', { name: /duration \(minutes\)/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
@@ -511,7 +511,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
@@ -569,7 +569,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-    const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
     const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -608,7 +608,7 @@ describe('AppointmentForm', () => {
       await waitForLoadingToFinish();
 
       const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-      const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+      const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
       const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
       const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
       const dateInput = screen.getByRole('textbox', { name: /^date$/i });
@@ -679,7 +679,7 @@ describe('AppointmentForm', () => {
       await waitForLoadingToFinish();
 
       const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-      const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+      const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
       await user.selectOptions(locationSelect, ['Inpatient Ward']);
@@ -715,7 +715,7 @@ describe('AppointmentForm', () => {
       await waitForLoadingToFinish();
 
       const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-      const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+      const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
       const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
       const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
       const dateInput = screen.getByRole('textbox', { name: /^date$/i });
@@ -773,7 +773,7 @@ describe('AppointmentForm', () => {
       await waitForLoadingToFinish();
 
       const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-      const serviceSelect = screen.getByPlaceholderText(/select a service/i);
+      const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
       const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
       const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
       const dateInput = screen.getByRole('textbox', { name: /^date$/i });

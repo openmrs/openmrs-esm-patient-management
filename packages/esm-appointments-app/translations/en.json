@@ -51,6 +51,7 @@
   "chooseAppointmentType": "Choose appointment type",
   "chooseLocation": "Choose a location",
   "chooseProvider": "Choose a provider",
+  "chooseService": "Select service",
   "completed": "Completed",
   "Contact": "Contact {{index}}",
   "countMore_one": "{{count}} more",
