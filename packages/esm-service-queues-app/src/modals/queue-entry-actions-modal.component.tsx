@@ -24,7 +24,7 @@ import { useQueues } from '../hooks/useQueues';
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
 import { convertTime12to24, type amPm } from './time-helpers';
 import { type ConfigObject } from '../config-schema';
-import { type QueueEntry } from '../types';
+import { type Queue, type QueueEntry } from '../types';
 import QueuePriority from '../queue-table/components/queue-priority.component';
 import styles from './queue-entry-actions.scss';
 
@@ -240,6 +240,12 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     t,
   ]);
 
+  const getQueueDisplayText = (queue: Queue) => {
+    if (!queue) return '';
+    return queue.uuid === queueEntry.queue.uuid
+      ? t('currentValueFormatted', '{{value}} (Current)', { value: `${queue.display} - ${queue.location?.display}` })
+      : `${queue.display} - ${queue.location?.display}`;
+  };
   return (
     <>
       <ModalHeader closeModal={closeModal} title={modalTitle} />
@@ -249,10 +255,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             <p>{modalInstruction}</p>
             {showQueuePicker && (
               <section>
-                <div className={styles.sectionTitlePrimary}>{t('serviceLocation', 'Service location')}</div>
                 {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
-                {queues.length <= 8 ? (
+                {queues.length >= 8 ? (
                   <RadioButtonGroup
+                    legendText={t('serviceLocation', 'Service location')}
                     className={styles.radioButtonGroup}
                     id="queue"
                     name="queue"
@@ -260,35 +266,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     valueSelected={formState.selectedQueue}
                     orientation="vertical"
                     onChange={(uuid) => setSelectedQueueUuid(String(uuid))}>
-                    {queues?.map(({ uuid, display, location }) => (
-                      <RadioButton
-                        key={uuid}
-                        labelText={
-                          uuid === queueEntry.queue.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current)', {
-                                value: `${display} - ${location?.display}`,
-                              })
-                            : `${display} - ${location?.display}`
-                        }
-                        value={uuid}
-                      />
-                    ))}
+                    {queues?.map((queue) => {
+                      const { uuid } = queue;
+                      return <RadioButton key={uuid} labelText={getQueueDisplayText(queue)} value={uuid} />;
+                    })}
                   </RadioButtonGroup>
                 ) : (
-                  <ComboBox
+                  <ComboBox<Queue>
                     id="queue"
-                    titleText={selectedQueue?.display}
+                    titleText={t('serviceLocation', 'Service location')}
                     selectedItem={selectedQueue}
                     items={queues}
-                    itemToString={(item) =>
-                      !item
-                        ? ''
-                        : item?.uuid === queueEntry?.queue?.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', {
-                              value: `${item?.display} - ${item?.location?.display}`,
-                            })
-                          : `${item?.display} - ${item?.location?.display}`
-                    }
+                    itemToString={getQueueDisplayText}
                     onChange={({ selectedItem }) => {
                       if (selectedItem) {
                         setSelectedQueueUuid(selectedItem.uuid);
