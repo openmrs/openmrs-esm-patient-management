@@ -1,6 +1,7 @@
-import { useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
+import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
 import {
   mockInpatientAdmissions,
   mockInpatientRequests,
@@ -8,7 +9,6 @@ import {
   mockLocationMosoriot,
   mockPatientAlice,
 } from '__mocks__';
-import React from 'react';
 import { renderWithSwr } from '../../../../../tools';
 import { mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
@@ -26,6 +26,7 @@ const mockUseWorkspace2Context = jest.mocked(useWorkspace2Context);
 mockUseWorkspace2Context.mockReturnValue({
   closeWorkspace: jest.fn(),
   launchChildWorkspace: jest.fn(),
+  showActionMenu: false,
   workspaceProps: undefined,
   windowProps: undefined,
   groupProps: undefined,
@@ -40,6 +41,7 @@ const mockUseVisit = jest.mocked(useVisit).mockReturnValue({
     startDatetime: new Date().toISOString(),
     uuid: 'mock-visit',
     visitType: { display: 'Some Visit Type', uuid: 'some-visit-type-uuid' },
+    stopDatetime: null,
   },
   currentVisit: null,
   currentVisitIsRetrospective: null,
@@ -70,6 +72,7 @@ const mockUseRestPatient = jest.mocked(useRestPatient).mockReturnValue({
 jest.mock('../../hooks/useAssignedBedByPatient', () => ({
   useAssignedBedByPatient: jest.fn(),
 }));
+
 // @ts-ignore - we don't need to mock the entire object
 jest.mocked(useAssignedBedByPatient).mockReturnValue({
   data: {
@@ -242,6 +245,9 @@ describe('CreateAdmissionEncounterWorkspace', () => {
 function renderCreateAdmissionEncounterWorkspace(patentUuid: string) {
   renderWithSwr(
     <CreateAdmissionEncounterWorkspace
+      windowName={''}
+      isRootWorkspace={false}
+      showActionMenu={false}
       closeWorkspace={jest.fn()}
       launchChildWorkspace={jest.fn()}
       workspaceProps={{

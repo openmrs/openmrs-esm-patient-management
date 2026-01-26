@@ -26,7 +26,6 @@
   "editNameDescription": "Editeaza nume sau descriere",
   "editPatientListHeader": "Editeaza lista pacienti",
   "emptyList": "Aceasta lista nu contine pacienti",
-  "emptyStateIllustration": "Ilustratie stare goala",
   "emptyStateText": "Nu exista liste de pacienti {{listType}} de afisat",
   "error": "Eroare",
   "errorAddingPatientToList": "Adăugarea pacientului în listă a eșuat",

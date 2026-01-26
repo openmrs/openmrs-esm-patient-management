@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { createPatientNote, usePatientNotes } from './notes.resource';
-import WardPatientNotesWorkspace from './notes.workspace';
 import { emrConfigurationMock, mockInpatientRequestAlice, mockPatientAlice } from '__mocks__';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { type WardPatient, type WardPatientWorkspaceDefinition } from '../../types';
 import { configSchema, type WardConfigObject } from '../../config-schema';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import WardPatientNotesWorkspace from './notes.workspace';
 
 const mockWardPatientAlice: WardPatient = {
   visit: mockInpatientRequestAlice.visit,
@@ -28,6 +28,7 @@ const testProps: WardPatientWorkspaceDefinition = {
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: false,
 };
 
 const mockCreatePatientNote = createPatientNote as jest.Mock;

@@ -113,7 +113,6 @@ describe('ListDetails', () => {
 
     render(<ListDetails />);
 
-    expect(screen.getByTitle(/empty state illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 

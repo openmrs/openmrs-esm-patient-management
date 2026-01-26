@@ -123,7 +123,7 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
       },
     },
     {
-      startVisitWorkspaceName: 'appointments-patient-search-start-visit-workspace',
+      startVisitWorkspaceName: 'appointments-start-visit-workspace',
     },
   );
 };
