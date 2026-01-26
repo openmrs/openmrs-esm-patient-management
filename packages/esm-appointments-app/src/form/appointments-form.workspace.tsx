@@ -531,8 +531,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     onBlur={onBlur}
                     placeholder={t('selectService', 'Select a service')}
                     selectedItem={value}
-                    shouldFilterItem={(menu) => {
-                      return menu?.item?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+                    shouldFilterItem={({ inputValue = '', item = '' }) => {
+                      return item.toLowerCase().includes(inputValue.toLowerCase());
                     }}
                     onChange={({ selectedItem }) => {
                       if (!isEditing) {
