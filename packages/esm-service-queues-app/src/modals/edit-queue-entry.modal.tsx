@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../types';
-import QueueEntryActionModal from './queue-entry-actions-modal.component';
+import { convertTime12to24 } from './time-helpers';
 import { updateQueueEntry } from './queue-entry-actions.resource';
 import { useQueues } from '../hooks/useQueues';
-import { convertTime12to24 } from './time-helpers';
+import QueueEntryActionModal from './queue-entry-actions-modal.component';
 
 interface EditQueueEntryModalProps {
   queueEntry: QueueEntry;
@@ -37,7 +37,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
           return updateQueueEntry(queueEntry.uuid, {
             status: statuses.find((s) => s.uuid == formState.selectedStatus),
             priority: priorities.find((p) => p.uuid == formState.selectedPriority),
-            priorityComment: formState.prioritycomment,
+            priorityComment: formState.priorityComment,
             ...(formState.modifyDefaultTransitionDateTime ? { startedAt: startAtDate.toISOString() } : {}),
           });
         },
