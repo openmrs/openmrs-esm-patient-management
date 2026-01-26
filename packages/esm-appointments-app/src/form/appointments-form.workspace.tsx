@@ -19,7 +19,8 @@ import {
   TimePicker,
   TimePickerSelect,
   Toggle,
- ComboBox } from '@carbon/react';
+  ComboBox,
+} from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ExtensionSlot,
@@ -523,16 +524,16 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                 name="selectedService"
                 control={control}
                 render={({ field: { onBlur, onChange, value, ref } }) => (
-                  <ComboBox
+                  <ComboBox<string>
                     id="service"
                     invalid={!!errors?.selectedService}
                     invalidText={errors?.selectedService?.message}
-                    labelText={t('selectService', 'Select a service')}
+                    titleText={t('selectService', 'Select a service')}
                     onBlur={onBlur}
                     placeholder={t('selectService', 'Select a service')}
                     selectedItem={value}
-                    shouldFilterItem={(menu) => {
-                      return menu?.item?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+                    shouldFilterItem={({ inputValue = '', item = '' }) => {
+                      return item.toLowerCase().includes(inputValue.toLowerCase());
                     }}
                     onChange={({ selectedItem }) => {
                       if (!isEditing) {
