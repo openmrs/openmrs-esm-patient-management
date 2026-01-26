@@ -1,5 +1,5 @@
-import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
+import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type EncounterPayload } from '../../types';
 import { type PatientNote, type RESTPatientNote, type UsePatientNotes } from './types';
 

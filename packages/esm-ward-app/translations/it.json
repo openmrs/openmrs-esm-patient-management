@@ -30,7 +30,6 @@
   "discharge": "Dimissione",
   "editNote": "Edit note",
   "emptyBed": "Letto libero",
-  "emptyStateIllustration": "Empty state illustration",
   "emptyText": "Vuoto",
   "encounterDisplay": "{{encounterType}} {{encounterDate}}",
   "errorCancellingAdmissionRequest": "Errore nell'annullamento della richiesta di ricovero",
