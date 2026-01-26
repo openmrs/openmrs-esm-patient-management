@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
-  Dropdown,
+  ComboBox,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -16,7 +16,6 @@ import {
   TextArea,
   TimePicker,
   TimePickerSelect,
-  type OnChangeData,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
@@ -241,6 +240,12 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     t,
   ]);
 
+  const getQueueDisplayText = (queue: Queue) => {
+    if (!queue) return '';
+    return queue.uuid === queueEntry.queue.uuid
+      ? t('currentValueFormatted', '{{value}} (Current)', { value: `${queue.display} - ${queue.location?.display}` })
+      : `${queue.display} - ${queue.location?.display}`;
+  };
   return (
     <>
       <ModalHeader closeModal={closeModal} title={modalTitle} />
@@ -250,10 +255,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             <p>{modalInstruction}</p>
             {showQueuePicker && (
               <section>
-                <div className={styles.sectionTitlePrimary}>{t('serviceLocation', 'Service location')}</div>
                 {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
                 {queues.length <= 8 ? (
                   <RadioButtonGroup
+                    legendText={t('serviceLocation', 'Service location')}
                     className={styles.radioButtonGroup}
                     id="queue"
                     name="queue"
@@ -261,40 +266,30 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     valueSelected={formState.selectedQueue}
                     orientation="vertical"
                     onChange={(uuid) => setSelectedQueueUuid(String(uuid))}>
-                    {queues?.map(({ uuid, display, location }) => (
-                      <RadioButton
-                        key={uuid}
-                        labelText={
-                          uuid === queueEntry.queue.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current)', {
-                                value: `${display} - ${location?.display}`,
-                              })
-                            : `${display} - ${location?.display}`
-                        }
-                        value={uuid}
-                      />
-                    ))}
+                    {queues?.map((queue) => {
+                      const { uuid } = queue;
+                      return <RadioButton key={uuid} labelText={getQueueDisplayText(queue)} value={uuid} />;
+                    })}
                   </RadioButtonGroup>
                 ) : (
-                  <Dropdown<Queue>
+                  <ComboBox<Queue>
                     id="queue"
-                    label={selectedQueue.display}
-                    initialSelectedItem={selectedQueue}
+                    titleText={t('serviceLocation', 'Service location')}
+                    selectedItem={selectedQueue}
                     items={queues}
-                    itemToString={(item: Queue) =>
-                      item.uuid === queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: `${item.display} - ${item.location?.display}`,
-                          })
-                        : `${item.display} - ${item.location?.display}`
-                    }
-                    onChange={(data: OnChangeData<Queue>) => {
-                      const queue = data.selectedItem;
-                      if (queue) {
-                        setSelectedQueueUuid(queue.uuid);
+                    itemToString={getQueueDisplayText}
+                    onChange={({ selectedItem }) => {
+                      if (selectedItem) {
+                        setSelectedQueueUuid(selectedItem.uuid);
                       }
                     }}
-                    titleText=""
+                    shouldFilterItem={(menu) => {
+                      const itemDisplay = (menu?.item?.display ?? '').toLowerCase();
+                      const locationDisplay = (menu?.item?.location?.display ?? '').toLowerCase();
+                      const inputValue = (menu?.inputValue ?? '').toLowerCase();
+
+                      return itemDisplay.includes(inputValue) || locationDisplay.includes(inputValue);
+                    }}
                   />
                 )}
               </section>
