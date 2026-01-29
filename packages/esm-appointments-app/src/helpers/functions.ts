@@ -1,6 +1,6 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
-import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { launchWorkspace2, openmrsFetch, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type AppointmentSummary, type AppointmentCountMap } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
 
@@ -127,3 +127,42 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
     },
   );
 };
+
+export async function fetchPatientFromFhir2(patientUuid: string): Promise<fhir.Patient | null> {
+  if (!patientUuid) {
+    return null;
+  }
+
+  try {
+    const { data } = await openmrsFetch<fhir.Patient>(`/ws/fhir2/R4/Patient/${patientUuid}`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching patient from FHIR:', error);
+    return null;
+  }
+}
+
+export function getPatientPhoneNumber(patient: fhir.Patient | null): string {
+  if (!patient) {
+    return '';
+  }
+
+  if (!patient.telecom || patient.telecom.length === 0) {
+    return '';
+  }
+  let phoneContact = patient.telecom.find((contact) => contact.system === 'phone' && contact.value);
+  if (!phoneContact) {
+    phoneContact = patient.telecom.find((contact) => contact.value);
+  }
+  return phoneContact?.value || '';
+}
+
+export async function getPatientPhoneNumberByUuid(patientUuid: string): Promise<string> {
+  try {
+    const patient = await fetchPatientFromFhir2(patientUuid);
+    return getPatientPhoneNumber(patient);
+  } catch (error) {
+    console.error('Error getting patient phone number:', error);
+    return '';
+  }
+}
