@@ -105,6 +105,13 @@
       "component": "queueScreen",
       "name": "queue-screen",
       "slot": "queue-screen-slot"
+    },
+    {
+      "name": "add-patient-to-queue-button",
+      "component": "addPatientToQueueButton",
+      "slot": "patient-search-result-actions-slot",
+      "online": true,
+      "offline": true
     }
   ],
   "modals": [
@@ -193,5 +200,4 @@
   "workspaceGroups2": [{
     "name": "service-queues"
   }]
-
 }

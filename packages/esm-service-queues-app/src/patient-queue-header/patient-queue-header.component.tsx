@@ -70,25 +70,27 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   );
 
   useEffect(() => {
-    if (!isLoading && !error && !selectedQueueLocationUuid) {
-      if (queueLocations.length === 1) {
-        handleQueueLocationChange({ selectedItem: queueLocations[0] });
-      }
-      if (
-        queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid) &&
-        selectedQueueLocationUuid
-      ) {
-        handleQueueLocationChange({
-          selectedItem: {
-            id: userSession?.sessionLocation?.uuid,
-            name: userSession?.sessionLocation?.display,
-          },
-        });
+    if (!isLoading && !error) {
+      const sessionLocationId = userSession?.sessionLocation?.uuid;
+      const matchingLocation = queueLocations.find((location) => location.id === sessionLocationId);
+      const isSelectionValid =
+        selectedQueueLocationUuid && queueLocations.some((location) => location.id === selectedQueueLocationUuid);
+
+      if (matchingLocation) {
+        if (selectedQueueLocationUuid !== matchingLocation.id) {
+          handleQueueLocationChange({ selectedItem: matchingLocation });
+        }
+      } else if (queueLocations.length === 1) {
+        if (selectedQueueLocationUuid !== queueLocations[0].id) {
+          handleQueueLocationChange({ selectedItem: queueLocations[0] });
+        }
+      } else if (!isSelectionValid && selectedQueueLocationUuid) {
+        handleQueueLocationChange({ selectedItem: { id: 'all' } });
       }
     }
+    // We exclude `selectedQueueLocationUuid` to prevent the effect from re-running when the user manually selects a location, which would incorrectly reset the selection to the default session location.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    selectedQueueLocationName,
-    selectedQueueLocationUuid,
     error,
     handleQueueLocationChange,
     isLoading,
