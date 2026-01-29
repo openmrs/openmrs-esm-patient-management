@@ -62,7 +62,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
       paginatedAppointments?.map((appointment) => {
         return {
           id: appointment.uuid,
-          date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
+          date: formatDatetime(parseDate(String(appointment.startDateTime)), { mode: 'wide' }),
           location: appointment?.location?.name ? appointment?.location?.name : '——',
           service: appointment.service.name,
           status: appointment.status,
