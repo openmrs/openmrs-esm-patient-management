@@ -129,6 +129,10 @@
     {
       "name": "cancel-appointment-modal",
       "component": "cancelAppointmentModal"
+    },
+    {
+      "name": "batch-change-appointments-statuses-modal",
+      "component": "batchChangeAppointmentStatusesModal"
     }
   ],
   "workspaceGroups2": [{
