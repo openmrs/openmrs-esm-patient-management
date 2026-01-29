@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { showModal } from '@openmrs/esm-framework';
+import styles from './add-patient-to-patient-list-menu-item.scss';
 
 interface AddPastVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -20,7 +21,14 @@ const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProp
     closeMenu?.();
   }, [patientUuid, closeMenu]);
 
-  return <OverflowMenuItem closeMenu={closeMenu} itemText={t('openPatientList', 'Add to list')} onClick={openModal} />;
+  return (
+    <OverflowMenuItem
+      className={styles.menuitem}
+      closeMenu={closeMenu}
+      itemText={t('openPatientList', 'Add to list')}
+      onClick={openModal}
+    />
+  );
 };
 
 export default AddPatientToPatientListMenuItem;
