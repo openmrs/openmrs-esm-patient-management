@@ -100,6 +100,10 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
             return Promise.resolve();
           }
 
+          if (!isDataLoaded) {
+            return Promise.resolve();
+          }
+
           const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
           if (!isFormValid) {
             const errorMessages = Object.entries(errors)
@@ -203,6 +207,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
       getValues,
       hasCompleteQueueEntry,
       queueLocation,
+      isDataLoaded,
     ],
   );
 
