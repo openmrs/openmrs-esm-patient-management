@@ -155,7 +155,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           renderIcon={Download}
           onClick={() => {
             const date = appointments[0]?.startDateTime
-              ? formatDate(parseDate(appointments[0]?.startDateTime), {
+              ? formatDate(parseDate(String(appointments[0]?.startDateTime)), {
                   time: false,
                   noToday: true,
                 })
