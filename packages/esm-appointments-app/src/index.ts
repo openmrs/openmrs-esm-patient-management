@@ -25,6 +25,11 @@ const options = {
   moduleName,
 };
 
+export const serviceAvailabilityFormWorkspace = getAsyncLifecycle(async () => {
+  const mod = await import('./form/service-availability-form');
+  return { default: mod.default };
+}, options);
+
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
