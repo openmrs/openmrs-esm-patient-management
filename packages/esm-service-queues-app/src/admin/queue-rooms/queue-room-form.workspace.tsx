@@ -87,7 +87,7 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
         subtitle: t('queueRoomCreatedSuccessfully', 'Queue room created successfully'),
       });
 
-      await mutate(`${restBaseUrl}/queueroom`);
+      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room`));
       closeWorkspace();
     } catch (error) {
       showSnackbar({

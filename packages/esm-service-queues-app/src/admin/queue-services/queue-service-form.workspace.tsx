@@ -77,10 +77,7 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace 
       });
 
       closeWorkspace();
-      await Promise.all([
-        mutate(`${restBaseUrl}/queue?${data.userLocation}`),
-        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`),
-      ]);
+      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue`));
     } catch (error) {
       showSnackbar({
         title: t('errorCreatingQueueService', 'Error creating queue service'),
