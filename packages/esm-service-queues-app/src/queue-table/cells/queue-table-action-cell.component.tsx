@@ -6,6 +6,7 @@ import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type 
 import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
+import { useActionLock } from '../../hooks/useActionLock';
 import styles from './queue-table-action-cell.scss';
 
 type ActionProps = {
@@ -139,6 +140,7 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
   const { t } = useTranslation();
   const layout = useLayoutType();
   const actionPropsByKey = useActionPropsByKey();
+  const { runWithLock } = useActionLock();
 
   const actionProps = actionPropsByKey[actionKey];
   if (!actionProps) {
@@ -150,12 +152,18 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
     return null;
   }
 
+  const lockKey = `${queueEntry.uuid}:${actionKey}`;
+  const handleClick = () =>
+    runWithLock(lockKey, async () => {
+      await actionProps.onClick(queueEntry);
+    });
+
   return (
     <Button
       key={actionKey}
       kind="ghost"
       aria-label={t(actionProps.label, actionProps.text)}
-      onClick={() => actionProps.onClick(queueEntry)}
+      onClick={handleClick}
       size={isDesktop(layout) ? 'sm' : 'lg'}>
       {t(actionProps.label, actionProps.text)}
     </Button>
