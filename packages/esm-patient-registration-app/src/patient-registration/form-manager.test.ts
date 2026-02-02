@@ -7,7 +7,7 @@ jest.mock('./patient-registration.resource', () => ({
   generateIdentifier: jest.fn(),
 }));
 
-const mockGenerateIdentifier = generateIdentifier as jest.Mock;
+const mockGenerateIdentifier = jest.mocked(generateIdentifier);
 
 const formValues: FormValues = {
   patientUuid: '',
@@ -76,7 +76,7 @@ describe('FormManager', () => {
     it('should generate identifier if it has autoGeneration and manual entry disabled', async () => {
       formValues.identifiers.foo.autoGeneration = true;
       formValues.identifiers.foo.selectedSource.autoGenerationOption.manualEntryEnabled = false;
-      mockGenerateIdentifier.mockResolvedValue({ data: { identifier: '10001V' } });
+      mockGenerateIdentifier.mockResolvedValue({ data: { identifier: '10001V' } } as any);
       await FormManager.savePatientIdentifiers(true, undefined, formValues.identifiers, {}, 'Nyc');
       expect(mockGenerateIdentifier.mock.calls).toHaveLength(1);
     });

@@ -21,7 +21,7 @@ describe('filterOutUndefinedPatientIdentifiers', () => {
     },
   });
 
-  it('should fitler out undefined identifiers', () => {
+  it('should filter out undefined identifiers', () => {
     const filteredIdentifiers = filterOutUndefinedPatientIdentifiers(getIdentifiers());
     expect(filteredIdentifiers.OpenMRSId).not.toBeDefined();
   });

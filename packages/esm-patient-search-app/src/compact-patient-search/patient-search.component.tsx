@@ -1,9 +1,9 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
+import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
-import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
@@ -64,7 +64,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
         <div className={styles.searchResults}>
           <Layer>
             <Tile className={styles.emptySearchResultsTile}>
-              <EmptyDataIllustration />
+              <EmptyCardIllustration />
               <div>
                 <p className={styles.errorMessage}>{t('error', 'Error')}</p>
                 <p className={styles.errorCopy}>
@@ -105,7 +105,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
         <div className={styles.searchResults}>
           <Layer>
             <Tile className={styles.emptySearchResultsTile}>
-              <EmptyDataIllustration />
+              <EmptyCardIllustration />
               <p className={styles.emptyResultText}>
                 {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
               </p>

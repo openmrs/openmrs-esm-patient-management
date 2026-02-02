@@ -2,12 +2,12 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { savePatientNote, usePatientNotes } from './notes.resource';
-import WardPatientNotesWorkspace from './notes.workspace';
+import { createPatientNote, usePatientNotes } from './notes.resource';
 import { emrConfigurationMock, mockInpatientRequestAlice, mockPatientAlice } from '__mocks__';
-import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import { type WardPatient, type WardPatientWorkspaceDefinition } from '../../types';
 import { configSchema, type WardConfigObject } from '../../config-schema';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import WardPatientNotesWorkspace from './notes.workspace';
 
 const mockWardPatientAlice: WardPatient = {
   visit: mockInpatientRequestAlice.visit,
@@ -28,13 +28,14 @@ const testProps: WardPatientWorkspaceDefinition = {
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: false,
 };
 
-const mockSavePatientNote = savePatientNote as jest.Mock;
+const mockCreatePatientNote = createPatientNote as jest.Mock;
 const mockedShowSnackbar = jest.mocked(showSnackbar);
 
 jest.mock('./notes.resource', () => ({
-  savePatientNote: jest.fn(),
+  createPatientNote: jest.fn(),
   usePatientNotes: jest.fn(),
 }));
 
@@ -68,6 +69,7 @@ describe('<WardPatientNotesWorkspace>', () => {
   });
 
   test('renders a success snackbar upon successfully recording a visit note', async () => {
+    const user = userEvent.setup();
     const successPayload = {
       encounterProviders: expect.arrayContaining([
         {
@@ -86,23 +88,24 @@ describe('<WardPatientNotesWorkspace>', () => {
       patient: mockPatientAlice.uuid,
     };
 
-    mockSavePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
+    mockCreatePatientNote.mockResolvedValue({ status: 201, body: 'Condition created' });
 
     renderWardPatientNotesForm();
 
     const note = screen.getByRole('textbox', { name: /Write your notes/i });
-    await userEvent.clear(note);
-    await userEvent.type(note, 'Sample clinical note');
+    await user.clear(note);
+    await user.type(note, 'Sample clinical note');
     expect(note).toHaveValue('Sample clinical note');
 
     const submitButton = screen.getByRole('button', { name: /Save/i });
-    await userEvent.click(submitButton);
+    await user.click(submitButton);
 
-    expect(mockSavePatientNote).toHaveBeenCalledTimes(1);
-    expect(mockSavePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
+    expect(mockCreatePatientNote).toHaveBeenCalledTimes(1);
+    expect(mockCreatePatientNote).toHaveBeenCalledWith(expect.objectContaining(successPayload), new AbortController());
   });
 
   test('renders an error snackbar if there was a problem recording a visit note', async () => {
+    const user = userEvent.setup();
     const error = {
       message: 'Internal Server Error',
       response: {
@@ -111,17 +114,17 @@ describe('<WardPatientNotesWorkspace>', () => {
       },
     };
 
-    mockSavePatientNote.mockRejectedValueOnce(error);
+    mockCreatePatientNote.mockRejectedValueOnce(error);
     renderWardPatientNotesForm();
 
     const note = screen.getByRole('textbox', { name: /Write your notes/i });
-    await userEvent.clear(note);
-    await userEvent.type(note, 'Sample clinical note');
+    await user.clear(note);
+    await user.type(note, 'Sample clinical note');
     expect(note).toHaveValue('Sample clinical note');
 
     const submitButton = screen.getByRole('button', { name: /Save/i });
 
-    await userEvent.click(submitButton);
+    await user.click(submitButton);
 
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: false,

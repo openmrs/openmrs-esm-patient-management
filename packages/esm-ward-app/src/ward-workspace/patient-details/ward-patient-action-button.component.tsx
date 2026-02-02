@@ -8,7 +8,7 @@ export default function WardPatientActionButton() {
   return (
     <ActionMenuButton2
       icon={(props) => <UserAvatarIcon {...props} />}
-      label={t('Patient', 'patient')}
+      label={t('patient', 'Patient')}
       workspaceToLaunch={{
         workspaceName: 'ward-patient-workspace',
       }}
