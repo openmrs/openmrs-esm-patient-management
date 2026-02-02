@@ -2,6 +2,7 @@ import { useConfig, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import QueueFields from './queue-fields.component';
 import { type ConfigObject } from '../../config-schema';
+import { useFormContext } from 'react-hook-form';
 
 interface VisitFormCallbacks {
   onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
@@ -23,7 +24,14 @@ export interface VisitFormQueueFieldsProps {
 const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
   const config = useConfig<ConfigObject>();
   const { setVisitFormCallbacks, visitFormOpenedFrom, patientChartConfig } = props;
-  if (patientChartConfig.showServiceQueueFields || visitFormOpenedFrom == 'service-queues-add-patient') {
+
+  const { watch } = useFormContext();
+  const isRetrospective = watch('retrospective');
+
+  if (
+    (patientChartConfig.showServiceQueueFields || visitFormOpenedFrom == 'service-queues-add-patient') &&
+    !isRetrospective 
+  ) {
     return (
       <QueueFields
         setOnSubmit={(onSubmit) => setVisitFormCallbacks({ onVisitCreatedOrUpdated: onSubmit })}
