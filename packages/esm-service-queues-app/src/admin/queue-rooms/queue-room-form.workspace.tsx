@@ -26,7 +26,7 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { saveQueueRoom } from './queue-room.resource';
+import { saveQueueRoom, updateQueueRoom } from './queue-room.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
 import styles from './queue-room-form.scss';
@@ -55,9 +55,23 @@ const createQueueRoomSchema = (t: TFunction) =>
 
 type QueueRoomFormData = z.infer<ReturnType<typeof createQueueRoomSchema>>;
 
-const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) => {
+interface QueueRoomWorkspaceProps {
+  queueRoom?: {
+    uuid: string;
+    name: string;
+    queue: { uuid: string; display: string };
+  };
+}
+
+const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>> = ({
+  closeWorkspace,
+  workspaceProps,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const queueRoomToEdit = workspaceProps?.queueRoom;
+  const isEditMode = !!queueRoomToEdit;
+
   const {
     control,
     handleSubmit,
@@ -66,8 +80,8 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
   } = useForm<QueueRoomFormData>({
     resolver: zodResolver(createQueueRoomSchema(t)),
     defaultValues: {
-      queueRoomName: '',
-      queueRoomService: '',
+      queueRoomName: queueRoomToEdit?.name || '',
+      queueRoomService: queueRoomToEdit?.queue?.uuid || '',
       queueLocation: '',
     },
   });
@@ -76,22 +90,32 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
   const { queues } = useQueues(watchedQueueLocationId);
   const { queueLocations } = useQueueLocations();
 
-  const onSubmit = async (data: QueueRoomFormData) => {
+  const handleSaveQueueRoom = async (data: QueueRoomFormData) => {
     try {
-      // FIXME: We should collect a queue room description and pass it as the second argument
-      await saveQueueRoom(data.queueRoomName, '', data.queueRoomService);
-
-      showSnackbar({
-        title: t('queueRoomAdded', 'Queue room added'),
-        kind: 'success',
-        subtitle: t('queueRoomCreatedSuccessfully', 'Queue room created successfully'),
-      });
+      if (isEditMode) {
+        await updateQueueRoom(queueRoomToEdit.uuid, data.queueRoomName, '', data.queueRoomService);
+        showSnackbar({
+          title: t('queueRoomUpdated', 'Queue room updated'),
+          kind: 'success',
+          subtitle: t('queueRoomUpdatedSuccessfully', 'Queue room updated successfully'),
+        });
+      } else {
+        await saveQueueRoom(data.queueRoomName, '', data.queueRoomService);
+        showSnackbar({
+          title: t('queueRoomAdded', 'Queue room added'),
+          kind: 'success',
+          subtitle: t('queueRoomCreatedSuccessfully', 'Queue room created successfully'),
+        });
+      }
 
       await mutate(`${restBaseUrl}/queueroom`);
+      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room`));
       closeWorkspace();
     } catch (error) {
       showSnackbar({
-        title: t('errorCreatingQueueRoom', 'Error creating queue room'),
+        title: isEditMode
+          ? t('errorUpdatingQueueRoom', 'Error updating queue room')
+          : t('errorCreatingQueueRoom', 'Error creating queue room'),
         kind: 'error',
         isLowContrast: false,
         subtitle: error?.message,
@@ -100,8 +124,13 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
   };
 
   return (
-    <Workspace2 title={t('addNewQueueServiceRoom', 'Add new queue service room')}>
-      <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <Workspace2
+      title={
+        isEditMode
+          ? t('editQueueServiceRoom', 'Edit Queue Service Room')
+          : t('addNewQueueServiceRoom', 'Add new queue service room')
+      }>
+      <Form onSubmit={handleSubmit(handleSaveQueueRoom)} className={styles.form}>
         <Stack gap={4} className={styles.grid}>
           <Column>
             <Layer className={styles.input}>

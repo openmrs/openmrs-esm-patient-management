@@ -11,12 +11,14 @@ import {
   TableHeader,
   TableRow,
   Layer,
-} from '@carbon/react';
+ OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { launchWorkspace2, useLayoutType, ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
 import styles from './admin-page.scss';
+import DeleteQueueModal from '../modals/delete-queue-modal';
+import DeleteQueueRoomModal from '../modals/delete-queue-room-modal';
 
 const AdminPage = () => {
   const { t } = useTranslation();
@@ -26,6 +28,8 @@ const AdminPage = () => {
 
   const { queues, isLoading: isLoadingQueues, error: queuesError } = useQueuesMutable();
   const { queueRooms, isLoading: isLoadingQueueRooms, error: queueRoomsError } = useQueueRooms();
+  const [queueToDelete, setQueueToDelete] = React.useState(null);
+  const [queueRoomToDelete, setQueueRoomToDelete] = React.useState(null);
 
   const queueTableHeaders = [
     {
@@ -44,6 +48,10 @@ const AdminPage = () => {
       key: 'location',
       header: t('location', 'Location'),
     },
+    {
+      key: 'actions',
+      header: '',
+    },
   ];
 
   const queueRoomTableHeaders = [
@@ -59,6 +67,10 @@ const AdminPage = () => {
       key: 'queue',
       header: t('queue', 'Queue'),
     },
+    {
+      key: 'actions',
+      header: '',
+    },
   ];
 
   const queueTableRows = useMemo(() => {
@@ -69,9 +81,18 @@ const AdminPage = () => {
         description: queue.description || '--',
         service: queue.service?.display || '--',
         location: queue.location?.display || '--',
+        actions: (
+          <OverflowMenu flipped>
+            <OverflowMenuItem
+              itemText={t('rename', 'Rename')}
+              onClick={() => launchWorkspace2('service-queues-service-form', { queue })}
+            />
+            <OverflowMenuItem isDelete itemText={t('delete', 'Delete')} onClick={() => setQueueToDelete(queue)} />
+          </OverflowMenu>
+        ),
       })) || []
     );
-  }, [queues]);
+  }, [queues, t]);
 
   const queueRoomTableRows = useMemo(() => {
     return (
@@ -80,9 +101,18 @@ const AdminPage = () => {
         name: room.name || room.display,
         description: room.description || '--',
         queue: (room as any).queue?.display || '--',
+        actions: (
+          <OverflowMenu flipped>
+            <OverflowMenuItem
+              itemText={t('rename', 'Rename')}
+              onClick={() => launchWorkspace2('service-queues-room-workspace', { queueRoom: room })}
+            />
+            <OverflowMenuItem isDelete itemText={t('delete', 'Delete')} onClick={() => setQueueRoomToDelete(room)} />
+          </OverflowMenu>
+        ),
       })) || []
     );
-  }, [queueRooms]);
+  }, [queueRooms, t]);
 
   const handleAddQueue = () => {
     launchWorkspace2('service-queues-service-form');
@@ -201,6 +231,10 @@ const AdminPage = () => {
           </DataTable>
         </Layer>
       </div>
+      {queueToDelete && <DeleteQueueModal queue={queueToDelete} closeModal={() => setQueueToDelete(null)} />}
+      {queueRoomToDelete && (
+        <DeleteQueueRoomModal queueRoom={queueRoomToDelete} closeModal={() => setQueueRoomToDelete(null)} />
+      )}
     </div>
   );
 };
