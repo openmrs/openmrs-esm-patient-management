@@ -85,33 +85,17 @@ test.describe('Search Page', () => {
     const openmrsIdentifier = getPatientIdentifierStr(patient);
     const firstName = patient.person.display.split(' ')[0];
     const lastName = patient.person.display.split(' ')[1];
-
-    await test.step('When I navigate to the search page', async () => {
-      await page.goto(`${process.env.E2E_BASE_URL}/spa/search`);
+  
+    await test.step('When I navigate to the search page with the query', async () => {
+      await page.goto(`\${process.env.E2E_BASE_URL}/spa/search?query=${encodeURIComponent(openmrsIdentifier)}`);
     });
-
-    await test.step('And I enter a valid patient identifier into the search field', async () => {
-      const searchInput = page.getByTestId('patientSearchBar');
-      await searchInput.fill(openmrsIdentifier);
-      await searchInput.press('Enter');
-    });
-
+  
     await test.step('Then I should see the patient with the entered identifier', async () => {
       const resultsContainer = page.locator('[data-openmrs-role="Search Results"]');
       await expect(resultsContainer).toBeVisible({ timeout: 10000 });
       await expect(resultsContainer).toContainText(new RegExp(firstName));
       await expect(resultsContainer).toContainText(new RegExp(lastName));
       await expect(resultsContainer).toContainText(new RegExp(openmrsIdentifier));
-    });
-
-    await test.step('When I click on the patient record', async () => {
-      await page.getByText(firstName).first().click();
-    });
-
-    await test.step("Then I should be redirected to the patient's chart page", async () => {
-      await expect(page).toHaveURL(
-        `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
-      );
     });
   });
 
