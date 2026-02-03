@@ -125,5 +125,79 @@ export function getValidationSchema(
         relationshipType: Yup.string().required(),
       }),
     ),
+    address: Yup.object({
+      cityVillage: Yup.string()
+        .optional()
+        .test(
+          'valid-city-format',
+          t(
+            'invalidCityVillage',
+            'City/Village should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
+          (value) => {
+            if (!value) return true; // Allow empty values since field is optional
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
+          },
+        ),
+      stateProvince: Yup.string()
+        .optional()
+        .test(
+          'valid-state-format',
+          t(
+            'invalidStateProvince',
+            'State/Province should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
+          (value) => {
+            if (!value) return true; // Allow empty values since field is optional
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
+          },
+        ),
+      country: Yup.string()
+        .optional()
+        .test(
+          'valid-country-format',
+          t(
+            'invalidCountry',
+            'Country should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
+          (value) => {
+            if (!value) return true; // Allow empty values since field is optional
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
+          },
+        ),
+      postalCode: Yup.string()
+        .optional()
+        .test(
+          'valid-postal-format',
+          t(
+            'invalidPostalCode',
+            'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
+          ),
+          (value) => {
+            if (!value) return true; // Allow empty values since field is optional
+            // Allow alphanumeric characters, spaces, and hyphens to support international postal codes
+            return /^[A-Za-z0-9\s\-]+$/.test(value);
+          },
+        ),
+      address1: Yup.string().optional(),
+      address2: Yup.string().optional(),
+      countyDistrict: Yup.string()
+        .optional()
+        .test(
+          'valid-county-format',
+          t(
+            'invalidCountyDistrict',
+            'County/District should only contain letters, spaces, hyphens, apostrophes, periods, and parentheses',
+          ),
+          (value) => {
+            if (!value) return true; // Allow empty values since field is optional
+            // Allow letters (including Unicode characters for international names), combining marks, spaces, hyphens, apostrophes, periods, and parentheses
+            return /^[\p{L}\p{M}\s\-'.()]+$/u.test(value);
+          },
+        ),
+    }).optional(),
   });
 }
