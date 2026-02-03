@@ -181,6 +181,16 @@ export const queueScreen = getAsyncLifecycle(() => import('./queue-screen/queue-
   moduleName,
 });
 
+export const deleteQueueModal = getAsyncLifecycle(() => import('./admin/modals/delete-queue.modal'), {
+  featureName: 'delete-queue-modal',
+  moduleName,
+});
+
+export const deleteQueueRoomModal = getAsyncLifecycle(() => import('./admin/modals/delete-queue-room.modal'), {
+  featureName: 'delete-queue-room-modal',
+  moduleName,
+});
+
 export function startupApp() {
   registerBreadcrumbs([]);
 

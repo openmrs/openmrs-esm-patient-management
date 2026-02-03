@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '@carbon/react';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { retireQueueRoom } from '../queue-rooms/queue-room.resource';
 
@@ -12,14 +12,15 @@ interface DeleteQueueRoomModalProps {
 
 const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal, queueRoom }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
 
   const onDelete = async () => {
     try {
       await retireQueueRoom(queueRoom.uuid);
       showSnackbar({
         kind: 'success',
-        title: t('queueRoomDeleted', 'Queue Room deleted'),
-        subtitle: t('queueRoomDeletedSuccessfully', 'Queue Room deleted successfully'),
+        title: t('queueRoomDeleted', 'Queue room deleted'),
+        subtitle: t('queueRoomDeletedSuccessfully', 'Queue room deleted successfully'),
       });
       closeModal();
       mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room`));
@@ -36,7 +37,7 @@ const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal,
     <Modal
       open
       danger
-      modalHeading={t('deleteQueueRoom', 'Delete Queue Room')}
+      modalHeading={t('deleteQueueRoom', 'Delete queue room')}
       primaryButtonText={t('delete', 'Delete')}
       secondaryButtonText={t('cancel', 'Cancel')}
       onRequestClose={closeModal}

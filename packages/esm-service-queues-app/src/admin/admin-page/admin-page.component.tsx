@@ -11,14 +11,14 @@ import {
   TableHeader,
   TableRow,
   Layer,
- OverflowMenu, OverflowMenuItem } from '@carbon/react';
+  OverflowMenu,
+  OverflowMenuItem,
+} from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { launchWorkspace2, useLayoutType, ErrorState } from '@openmrs/esm-framework';
+import { showModal, launchWorkspace2, useLayoutType, ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
 import styles from './admin-page.scss';
-import DeleteQueueModal from '../modals/delete-queue-modal';
-import DeleteQueueRoomModal from '../modals/delete-queue-room-modal';
 
 const AdminPage = () => {
   const { t } = useTranslation();
@@ -28,8 +28,6 @@ const AdminPage = () => {
 
   const { queues, isLoading: isLoadingQueues, error: queuesError } = useQueuesMutable();
   const { queueRooms, isLoading: isLoadingQueueRooms, error: queueRoomsError } = useQueueRooms();
-  const [queueToDelete, setQueueToDelete] = React.useState(null);
-  const [queueRoomToDelete, setQueueRoomToDelete] = React.useState(null);
 
   const queueTableHeaders = [
     {
@@ -84,10 +82,21 @@ const AdminPage = () => {
         actions: (
           <OverflowMenu flipped>
             <OverflowMenuItem
-              itemText={t('rename', 'Rename')}
+              className={styles.menuitem}
+              itemText={t('edit', 'Edit')}
               onClick={() => launchWorkspace2('service-queues-service-form', { queue })}
             />
-            <OverflowMenuItem isDelete itemText={t('delete', 'Delete')} onClick={() => setQueueToDelete(queue)} />
+            <OverflowMenuItem
+              className={styles.menuitem}
+              isDelete
+              itemText={t('delete', 'Delete')}
+              onClick={() =>
+                showModal('delete-queue-modal', {
+                  closeModal: () => {},
+                  queue,
+                })
+              }
+            />
           </OverflowMenu>
         ),
       })) || []
@@ -104,10 +113,21 @@ const AdminPage = () => {
         actions: (
           <OverflowMenu flipped>
             <OverflowMenuItem
-              itemText={t('rename', 'Rename')}
+              className={styles.menuitem}
+              itemText={t('edit', 'Edit')}
               onClick={() => launchWorkspace2('service-queues-room-workspace', { queueRoom: room })}
             />
-            <OverflowMenuItem isDelete itemText={t('delete', 'Delete')} onClick={() => setQueueRoomToDelete(room)} />
+            <OverflowMenuItem
+              className={styles.menuitem}
+              isDelete
+              itemText={t('delete', 'Delete')}
+              onClick={() =>
+                showModal('delete-queue-room-modal', {
+                  closeModal: () => {},
+                  queueRoom: room,
+                })
+              }
+            />
           </OverflowMenu>
         ),
       })) || []
@@ -231,10 +251,6 @@ const AdminPage = () => {
           </DataTable>
         </Layer>
       </div>
-      {queueToDelete && <DeleteQueueModal queue={queueToDelete} closeModal={() => setQueueToDelete(null)} />}
-      {queueRoomToDelete && (
-        <DeleteQueueRoomModal queueRoom={queueRoomToDelete} closeModal={() => setQueueRoomToDelete(null)} />
-      )}
     </div>
   );
 };

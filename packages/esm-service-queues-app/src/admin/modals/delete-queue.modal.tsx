@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal } from '@carbon/react';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { retireQueue } from '../queue-services/queue-service.resource';
 
@@ -12,6 +12,7 @@ interface DeleteQueueModalProps {
 
 const DeleteQueueModal: React.FC<DeleteQueueModalProps> = ({ closeModal, queue }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
 
   const onDelete = async () => {
     try {

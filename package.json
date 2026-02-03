@@ -7,13 +7,16 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop",
+    "start": "openmrs develop --sources 'packages/*'",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
     "verify": "turbo run lint typescript test --concurrency=1",
     "test-e2e": "playwright test",
     "postinstall": "husky install"
+  },
+  "resolutions": {
+    "open": "8.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",

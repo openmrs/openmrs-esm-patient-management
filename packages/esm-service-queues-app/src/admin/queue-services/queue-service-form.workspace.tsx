@@ -12,11 +12,12 @@ import {
   InlineLoading,
   Layer,
   Select,
-  SelectItem,
   Stack,
+  SelectItem,
   TextInput,
+  TextArea,
 } from '@carbon/react';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { restBaseUrl, showSnackbar, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { saveQueue, updateQueue, useServiceConcepts } from './queue-service.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
@@ -42,6 +43,7 @@ const createQueueServiceSchema = (t: TFunction) =>
       })
       .trim()
       .min(1, t('queueLocationRequired', 'Queue location is required')),
+    description: z.string().optional(),
   });
 
 type QueueServiceFormData = z.infer<ReturnType<typeof createQueueServiceSchema>>;
@@ -50,6 +52,7 @@ interface QueueServiceWorkspaceProps {
   queue?: {
     uuid: string;
     name: string;
+    description?: string;
     service: { uuid: string; display: string };
     location: { uuid: string; display: string };
   };
@@ -60,6 +63,7 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
   workspaceProps,
 }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const { queueConcepts } = useServiceConcepts();
   const { queueLocations } = useQueueLocations();
   const queueToEdit = workspaceProps?.queue;
@@ -77,20 +81,21 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
       queueName: queueToEdit?.name || '',
       queueServiceType: queueToEdit?.service?.uuid || '',
       userLocation: queueToEdit?.location?.uuid || '',
+      description: queueToEdit?.description || '',
     },
   });
 
   const handleSaveQueue = async (data: QueueServiceFormData) => {
     try {
       if (isEditMode) {
-        await updateQueue(queueToEdit.uuid, data.queueName, data.queueServiceType, undefined, data.userLocation);
+        await updateQueue(queueToEdit.uuid, data.queueName, data.queueServiceType, data.description, data.userLocation);
         showSnackbar({
           title: t('queueServiceUpdated', 'Queue service updated'),
           kind: 'success',
           subtitle: t('queueServiceUpdatedSuccessfully', 'Queue service updated successfully'),
         });
       } else {
-        await saveQueue(data.queueName, data.queueServiceType, '', data.userLocation);
+        await saveQueue(data.queueName, data.queueServiceType, data.description, data.userLocation);
         showSnackbar({
           title: t('queueServiceCreated', 'Queue service created'),
           kind: 'success',
@@ -184,6 +189,23 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
                         </SelectItem>
                       ))}
                   </Select>
+                )}
+              />
+            </Layer>
+          </Column>
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <TextArea
+                    {...field}
+                    id="description"
+                    labelText={t('description', 'Description')}
+                    invalid={!!errors.description}
+                    invalidText={errors.description?.message}
+                  />
                 )}
               />
             </Layer>
