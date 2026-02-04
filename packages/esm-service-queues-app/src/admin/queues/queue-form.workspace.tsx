@@ -18,12 +18,13 @@ import {
   TextArea,
 } from '@carbon/react';
 import { useSWRConfig } from 'swr';
-import { restBaseUrl, showSnackbar, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { saveQueue, updateQueue, useServiceConcepts } from './queue-service.resource';
+import { showSnackbar, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { saveQueue, updateQueue, useServiceConcepts } from './queue.resource';
+import { queuesMutationKey } from '../queue-admin.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
-import styles from './queue-service-form.scss';
+import styles from './queue-form.scss';
 
-const createQueueServiceSchema = (t: TFunction) =>
+const createQueueSchema = (t: TFunction) =>
   z.object({
     queueName: z
       .string({
@@ -46,9 +47,9 @@ const createQueueServiceSchema = (t: TFunction) =>
     description: z.string().optional(),
   });
 
-type QueueServiceFormData = z.infer<ReturnType<typeof createQueueServiceSchema>>;
+type QueueFormData = z.infer<ReturnType<typeof createQueueSchema>>;
 
-interface QueueServiceWorkspaceProps {
+interface QueueWorkspaceProps {
   queue?: {
     uuid: string;
     name: string;
@@ -58,10 +59,7 @@ interface QueueServiceWorkspaceProps {
   };
 }
 
-const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspaceProps>> = ({
-  closeWorkspace,
-  workspaceProps,
-}) => {
+const QueueForm: React.FC<Workspace2DefinitionProps<QueueWorkspaceProps>> = ({ closeWorkspace, workspaceProps }) => {
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
   const { queueConcepts } = useServiceConcepts();
@@ -69,14 +67,14 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
   const queueToEdit = workspaceProps?.queue;
   const isEditMode = !!queueToEdit;
 
-  const QueueServiceSchema = createQueueServiceSchema(t);
+  const QueueSchema = createQueueSchema(t);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<QueueServiceFormData>({
-    resolver: zodResolver(QueueServiceSchema),
+  } = useForm<QueueFormData>({
+    resolver: zodResolver(QueueSchema),
     defaultValues: {
       queueName: queueToEdit?.name || '',
       queueServiceType: queueToEdit?.service?.uuid || '',
@@ -85,35 +83,31 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
     },
   });
 
-  const handleSaveQueue = async (data: QueueServiceFormData) => {
+  const handleSaveQueue = async (data: QueueFormData) => {
     try {
       if (isEditMode) {
         await updateQueue(queueToEdit.uuid, data.queueName, data.queueServiceType, data.description, data.userLocation);
         showSnackbar({
-          title: t('queueServiceUpdated', 'Queue service updated'),
+          title: t('queueUpdated', 'Queue updated'),
           kind: 'success',
-          subtitle: t('queueServiceUpdatedSuccessfully', 'Queue service updated successfully'),
+          subtitle: `${data.queueName}`,
         });
       } else {
         await saveQueue(data.queueName, data.queueServiceType, data.description, data.userLocation);
         showSnackbar({
-          title: t('queueServiceCreated', 'Queue service created'),
+          title: t('queueCreated', 'Queue created'),
           kind: 'success',
-          subtitle: t('queueServiceCreatedSuccessfully', 'Queue service created successfully'),
+          subtitle: `${data.queueName}`,
         });
       }
 
       closeWorkspace();
-      await Promise.all([
-        mutate(`${restBaseUrl}/queue?${data.userLocation}`),
-        mutate(`${restBaseUrl}/queue?location=${data.userLocation}`),
-        mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue`)),
-      ]);
+      await mutate(queuesMutationKey);
     } catch (error) {
       showSnackbar({
         title: isEditMode
-          ? t('errorUpdatingQueueService', 'Error updating queue service')
-          : t('errorCreatingQueueService', 'Error creating queue service'),
+          ? t('errorUpdatingQueue', 'Error updating queue')
+          : t('errorCreatingQueue', 'Error creating queue'),
         kind: 'error',
         isLowContrast: false,
         subtitle: error?.responseBody?.message || error?.message,
@@ -122,10 +116,7 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
   };
 
   return (
-    <Workspace2
-      title={
-        isEditMode ? t('editQueueService', 'Edit Queue Service') : t('addNewQueueService', 'Add New Queue Service')
-      }>
+    <Workspace2 title={isEditMode ? t('editQueue', 'Edit queue') : t('addNewQueue', 'Add new queue')}>
       <Form onSubmit={handleSubmit(handleSaveQueue)} className={styles.form}>
         <Stack gap={5} className={styles.grid}>
           <Column>
@@ -228,4 +219,4 @@ const QueueServiceForm: React.FC<Workspace2DefinitionProps<QueueServiceWorkspace
   );
 };
 
-export default QueueServiceForm;
+export default QueueForm;

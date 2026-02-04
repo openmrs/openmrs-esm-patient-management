@@ -391,6 +391,10 @@ export interface QueueRoom {
   display: string;
   name: string;
   description: string;
+  queue: {
+    uuid: string;
+    display: string;
+  };
 }
 
 export interface ProvidersQueueRoom {

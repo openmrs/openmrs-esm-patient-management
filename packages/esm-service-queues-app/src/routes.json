@@ -147,6 +147,14 @@
     {
       "name": "delete-queue-entry-modal",
       "component": "deleteQueueEntryModal"
+    },
+    {
+      "name": "delete-queue-modal",
+      "component": "deleteQueueModal"
+    },
+    {
+      "name": "delete-queue-room-modal",
+      "component": "deleteQueueRoomModal"
     }
   ],
   "workspaces2": [
@@ -167,7 +175,7 @@
     },
     {
       "name": "service-queues-service-form",
-      "component": "addNewQueueServiceWorkspace",
+      "component": "addNewQueueWorkspace",
       "window": "add-queue"
     },
     {

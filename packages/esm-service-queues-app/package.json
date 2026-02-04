@@ -13,9 +13,9 @@
     "debug": "npm run serve",
     "build": "rspack --mode production",
     "analyze": "rspack --mode=production --env.analyze=true",
-    "lint": "eslint src --ext ts,tsx",
-    "test": "jest --config jest.config.js --verbose false --passWithNoTests --color",
-    "test:watch": "jest --watch --config jest.config.js --color",
+    "lint": "cross-env eslint src --ext ts,tsx",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*modal.tsx' 'src/**/*.workspace.tsx' 'src/**/*.resource.ts' 'src/index.ts' --config ../../tools/i18next-parser.config.js"

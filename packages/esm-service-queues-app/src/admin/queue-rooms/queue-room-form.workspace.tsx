@@ -21,13 +21,13 @@ import {
 } from '@carbon/react';
 import {
   getCoreTranslation,
-  restBaseUrl,
   showSnackbar,
   useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { saveQueueRoom, updateQueueRoom } from './queue-room.resource';
+import { queueRoomsMutationKey } from '../queue-admin.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
 import styles from './queue-room-form.scss';
@@ -94,7 +94,7 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>
   });
 
   const watchedQueueLocationId = watch('queueLocation');
-  const { queues } = useQueues(watchedQueueLocationId);
+  const { queues } = useQueues(isEditMode ? undefined : watchedQueueLocationId);
   const { queueLocations } = useQueueLocations();
 
   const handleSaveQueueRoom = async (data: QueueRoomFormData) => {
@@ -104,19 +104,18 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>
         showSnackbar({
           title: t('queueRoomUpdated', 'Queue room updated'),
           kind: 'success',
-          subtitle: t('queueRoomUpdatedSuccessfully', 'Queue room updated successfully'),
+          subtitle: `${data.queueRoomName}`,
         });
       } else {
         await saveQueueRoom(data.queueRoomName, data.description, data.queueRoomService);
         showSnackbar({
-          title: t('queueRoomAdded', 'Queue room added'),
+          title: t('queueRoomCreated', 'Queue room created'),
           kind: 'success',
-          subtitle: t('queueRoomCreatedSuccessfully', 'Queue room created successfully'),
+          subtitle: `${data.queueRoomName}`,
         });
       }
 
-      await mutate(`${restBaseUrl}/queueroom`);
-      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room`));
+      await mutate(queueRoomsMutationKey);
       closeWorkspace();
     } catch (error) {
       showSnackbar({
@@ -125,18 +124,13 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>
           : t('errorCreatingQueueRoom', 'Error creating queue room'),
         kind: 'error',
         isLowContrast: false,
-        subtitle: error?.message,
+        subtitle: error?.responseBody?.message || error?.message,
       });
     }
   };
 
   return (
-    <Workspace2
-      title={
-        isEditMode
-          ? t('editQueueServiceRoom', 'Edit Queue Service Room')
-          : t('addNewQueueServiceRoom', 'Add new queue service room')
-      }>
+    <Workspace2 title={isEditMode ? t('editQueueRoom', 'Edit queue room') : t('addNewQueueRoom', 'Add new queue room')}>
       <Form onSubmit={handleSubmit(handleSaveQueueRoom)} className={styles.form}>
         <Stack gap={4} className={styles.grid}>
           <Column>

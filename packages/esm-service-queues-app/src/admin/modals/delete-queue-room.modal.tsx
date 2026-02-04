@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useSWRConfig } from 'swr';
-import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { retireQueueRoom } from '../queue-rooms/queue-room.resource';
+import { queueRoomsMutationKey } from '../queue-admin.resource';
 
 interface DeleteQueueRoomModalProps {
   closeModal: () => void;
@@ -13,28 +14,32 @@ interface DeleteQueueRoomModalProps {
 const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal, queueRoom }) => {
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const onDelete = async () => {
+  const onDelete = useCallback(async () => {
+    setIsDeleting(true);
     try {
       await retireQueueRoom(queueRoom.uuid);
       showSnackbar({
         kind: 'success',
         title: t('queueRoomDeleted', 'Queue room deleted'),
-        subtitle: t('queueRoomDeletedSuccessfully', 'Queue room deleted successfully'),
+        subtitle: `${queueRoom.name}`,
       });
       closeModal();
-      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room`));
+      await mutate(queueRoomsMutationKey);
     } catch (error) {
       showSnackbar({
         kind: 'error',
         title: t('errorDeletingQueueRoom', 'Error deleting queue room'),
-        subtitle: error?.message,
+        subtitle: error?.responseBody?.message || error?.message,
       });
+    } finally {
+      setIsDeleting(false);
     }
-  };
+  }, [closeModal, mutate, queueRoom.uuid, queueRoom.name, t]);
 
   return (
-    <Modal open danger onRequestClose={closeModal}>
+    <>
       <ModalHeader closeModal={closeModal} title={t('deleteQueueRoom', 'Delete queue room')} />
       <ModalBody>
         <p>
@@ -44,14 +49,14 @@ const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal,
         </p>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={closeModal}>
+        <Button kind="secondary" disabled={isDeleting} onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={onDelete}>
-          {t('delete', 'Delete')}
+        <Button kind="danger" disabled={isDeleting} onClick={onDelete}>
+          {isDeleting ? <InlineLoading description={t('deleting', 'Deleting') + '...'} /> : t('delete', 'Delete')}
         </Button>
       </ModalFooter>
-    </Modal>
+    </>
   );
 };
 
