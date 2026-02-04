@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal } from '@carbon/react';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useSWRConfig } from 'swr';
 import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { retireQueueRoom } from '../queue-rooms/queue-room.resource';
@@ -34,20 +34,7 @@ const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal,
   };
 
   return (
-    <Modal
-      open
-      danger
-      modalHeading={t('deleteQueueRoom', 'Delete queue room')}
-      primaryButtonText={t('delete', 'Delete')}
-      secondaryButtonText={t('cancel', 'Cancel')}
-      onRequestClose={closeModal}
-      onRequestSubmit={onDelete}>
-      <p>
-        {t('deleteQueueRoomConfirmation', 'Are you sure you want to delete the queue room "{{name}}"?', {
-          name: queueRoom.name,
-        })}
-      </p>
-    <>
+    <Modal open danger onRequestClose={closeModal}>
       <ModalHeader closeModal={closeModal} title={t('deleteQueueRoom', 'Delete queue room')} />
       <ModalBody>
         <p>
@@ -64,7 +51,7 @@ const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal,
           {t('delete', 'Delete')}
         </Button>
       </ModalFooter>
-    </>
+    </Modal>
   );
 };
 

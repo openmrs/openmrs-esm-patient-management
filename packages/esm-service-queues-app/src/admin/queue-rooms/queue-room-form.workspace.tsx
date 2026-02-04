@@ -32,7 +32,7 @@ import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocati
 import { useQueues } from '../../hooks/useQueues';
 import styles from './queue-room-form.scss';
 
-const createQueueRoomSchema = (t: TFunction) =>
+const createQueueRoomSchema = (t: TFunction, isEditMode: boolean) =>
   z.object({
     queueRoomName: z
       .string({
@@ -46,14 +46,14 @@ const createQueueRoomSchema = (t: TFunction) =>
       })
       .trim()
       .min(1, t('queueRequired', 'Queue is required')),
-queueLocation: isEditMode
-  ? z.string().optional()
-  : z
-      .string({
-        required_error: t('queueLocationRequired', 'Queue location is required'),
-      })
-      .trim()
-      .min(1, t('queueLocationRequired', 'Queue location is required')),
+    queueLocation: isEditMode
+      ? z.string().optional()
+      : z
+          .string({
+            required_error: t('queueLocationRequired', 'Queue location is required'),
+          })
+          .trim()
+          .min(1, t('queueLocationRequired', 'Queue location is required')),
     description: z.string().optional(),
   });
 
@@ -84,7 +84,7 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>
     watch,
     formState: { errors, isSubmitting },
   } = useForm<QueueRoomFormData>({
-    resolver: zodResolver(createQueueRoomSchema(t)),
+    resolver: zodResolver(createQueueRoomSchema(t, isEditMode)),
     defaultValues: {
       queueRoomName: queueRoomToEdit?.name || '',
       queueRoomService: queueRoomToEdit?.queue?.uuid || '',
