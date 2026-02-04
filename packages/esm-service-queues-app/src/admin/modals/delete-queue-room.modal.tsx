@@ -47,7 +47,24 @@ const DeleteQueueRoomModal: React.FC<DeleteQueueRoomModalProps> = ({ closeModal,
           name: queueRoom.name,
         })}
       </p>
-    </Modal>
+    <>
+      <ModalHeader closeModal={closeModal} title={t('deleteQueueRoom', 'Delete queue room')} />
+      <ModalBody>
+        <p>
+          {t('deleteQueueRoomConfirmation', 'Are you sure you want to delete the queue room "{{name}}"?', {
+            name: queueRoom.name,
+          })}
+        </p>
+      </ModalBody>
+      <ModalFooter>
+        <Button kind="secondary" onClick={closeModal}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button kind="danger" onClick={onDelete}>
+          {t('delete', 'Delete')}
+        </Button>
+      </ModalFooter>
+    </>
   );
 };
 
