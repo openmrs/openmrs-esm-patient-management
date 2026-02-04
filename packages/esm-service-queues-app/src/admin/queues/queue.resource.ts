@@ -36,3 +36,41 @@ export function saveQueue(
     },
   });
 }
+
+export function updateQueue(
+  queueUuid: string,
+  queueName: string,
+  queueServiceType: string,
+  queueDescription?: string,
+  queueLocation?: string,
+) {
+  const abortController = new AbortController();
+
+  return openmrsFetch(`${restBaseUrl}/queue/${queueUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      name: queueName,
+      description: queueDescription,
+      service: { uuid: queueServiceType },
+      location: {
+        uuid: queueLocation,
+      },
+    },
+  });
+}
+
+export function retireQueue(queueUuid: string) {
+  const abortController = new AbortController();
+
+  return openmrsFetch(`${restBaseUrl}/queue/${queueUuid}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+  });
+}

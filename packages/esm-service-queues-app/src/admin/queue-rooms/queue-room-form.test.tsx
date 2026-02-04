@@ -32,7 +32,7 @@ describe('QueueRoomForm', () => {
     render(<QueueRoomForm {...(workspaceProps as any)} />);
 
     expect(screen.getByLabelText(/queue room name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/queue room service/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^queue$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/queue location/i)).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.getByText('Save')).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe('QueueRoomForm', () => {
     render(<QueueRoomForm {...(workspaceProps as any)} />);
 
     await user.click(screen.getByText('Save'));
-    expect(screen.getByText('Queue room service is required')).toBeInTheDocument();
+    expect(screen.getByText('Queue is required')).toBeInTheDocument();
   });
 
   it('displays error notification if queue room service is missing on submission', async () => {
@@ -56,7 +56,7 @@ describe('QueueRoomForm', () => {
 
     await user.type(queueRoomNameInput, 'Room 123');
     await user.click(screen.getByText('Save'));
-    expect(screen.getByText('Queue room service is required')).toBeInTheDocument();
+    expect(screen.getByText('Queue is required')).toBeInTheDocument();
   });
 
   it('calls closePanel when Cancel button is clicked', async () => {
