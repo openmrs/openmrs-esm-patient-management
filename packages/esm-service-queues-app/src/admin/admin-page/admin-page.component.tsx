@@ -91,10 +91,10 @@ const AdminPage = () => {
               isDelete
               itemText={t('delete', 'Delete')}
               onClick={() =>
-                showModal('delete-queue-modal', {
-                  closeModal: () => {},
+                const dispose = showModal('delete-queue-modal', {
                   queue,
-                })
+                  closeModal: () => dispose(),
+                });
               }
             />
           </OverflowMenu>
