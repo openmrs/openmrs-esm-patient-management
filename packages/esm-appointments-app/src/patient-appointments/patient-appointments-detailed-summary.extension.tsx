@@ -2,9 +2,14 @@ import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
+import {
+  AddIcon,
+  CardHeader,
+  EmptyCardIllustration,
+  ErrorCard,
+  launchWorkspace2,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { usePatientAppointments } from './patient-appointments.resource';
 import PatientAppointmentsTable from './patient-appointments-table.component';
@@ -67,7 +72,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
   }
 
   if (error) {
-    return <ErrorState headerTitle={headerTitle} error={error} />;
+    return <ErrorCard headerTitle={headerTitle} error={error} />;
   }
 
   if (appointmentsData && Object.keys(appointmentsData)?.length) {
@@ -87,14 +92,14 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                 setContentSwitcherValue(index);
                 setSwitchedView(true);
               }}>
-              <Switch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
-              <Switch name={'today'} text={t('today', 'Today')} />
-              <Switch name={'past'} text={t('past', 'Past')} />
+              <Switch name={'upcoming'}>{t('upcoming', 'Upcoming')}</Switch>
+              <Switch name={'today'}>{t('today', 'Today')}</Switch>
+              <Switch name={'past'}>{t('past', 'Past')}</Switch>
             </ContentSwitcher>
             <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
-              renderIcon={(props) => <Add size={16} {...props} />}
+              renderIcon={(props) => <AddIcon size={16} {...props} />}
               iconDescription="Add Appointments"
               onClick={() => handleLaunchAppointmentForm(patientUuid)}>
               {t('add', 'Add')}
@@ -116,7 +121,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
             return (
               <Layer>
                 <Tile className={styles.tile}>
-                  <EmptyDataIllustration />
+                  <EmptyCardIllustration />
                   <p className={styles.content}>
                     {t(
                       'noUpcomingAppointmentsForPatient',
@@ -142,7 +147,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
             return (
               <Layer>
                 <Tile className={styles.tile}>
-                  <EmptyDataIllustration />
+                  <EmptyCardIllustration />
                   <p className={styles.content}>
                     {t(
                       'noCurrentAppointments',
@@ -168,7 +173,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
             return (
               <Layer>
                 <Tile className={styles.tile}>
-                  <EmptyDataIllustration />
+                  <EmptyCardIllustration />
                   <p className={styles.content}>
                     {t('noPastAppointments', 'There are no past appointments to display for this patient')}
                   </p>

@@ -64,8 +64,6 @@ const mockCohortTypeList = [
 
 describe('ListDetails', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     mockUsePatientListDetails.mockReturnValue({
       listDetails: mockPatientListDetails,
       error: null,
@@ -113,15 +111,15 @@ describe('ListDetails', () => {
 
     render(<ListDetails />);
 
-    expect(screen.getByTitle(/empty state illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
   it('opens workspace to edit patient list', async () => {
+    const user = userEvent.setup();
     render(<ListDetails />);
 
-    await userEvent.click(screen.getByText('Actions'));
-    await userEvent.click(screen.getByText('Edit name or description'));
+    await user.click(screen.getByText('Actions'));
+    await user.click(screen.getByText('Edit name or description'));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', {
       patientListDetails: mockPatientListDetails,
@@ -130,10 +128,12 @@ describe('ListDetails', () => {
   });
 
   it('opens delete confirmation modal', async () => {
+    const user = userEvent.setup();
+
     render(<ListDetails />);
 
-    await userEvent.click(screen.getByText('Actions'));
-    await userEvent.click(screen.getByText(/delete patient list/i));
+    await user.click(screen.getByText('Actions'));
+    await user.click(screen.getByText(/delete patient list/i));
 
     expect(mockShowModal).toHaveBeenCalledWith(
       'delete-patient-list-modal',

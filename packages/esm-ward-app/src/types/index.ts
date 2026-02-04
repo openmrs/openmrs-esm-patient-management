@@ -63,7 +63,14 @@ export interface WardPatientWorkspaceProps {
 /**
  * props type of workspaces in the 'ward-patient` workspace group.
  */
-export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<{}, {}, { wardPatient: WardPatient }>;
+export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<
+  {},
+  {},
+  {
+    wardPatient: WardPatient;
+    relatedTransferPatients?: WardPatient[];
+  }
+>;
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -230,9 +237,21 @@ export interface WardMetrics {
   patients: string;
   freeBeds: string;
   totalBeds: string;
+  femalesOfReproductiveAge?: string; // used in Maternal Ward View
+  newborns?: string; // used in Maternal Ward View
+}
+
+export enum WardMetricType {
+  PATIENTS = 'patients',
+  FREE_BEDS = 'freeBeds',
+  TOTAL_BEDS = 'totalBeds',
+  PENDING_OUT = 'pendingOut',
+  FEMALES_OF_REPRODUCTIVE_AGE = 'femalesOfReproductiveAge',
+  NEWBORNS = 'newborns',
 }
 
 export interface EncounterPayload {
+  uuid?: string;
   encounterDatetime?: string;
   encounterType: string;
   patient: string;

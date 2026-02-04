@@ -1,9 +1,9 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
+import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import type { PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
-import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
@@ -60,7 +60,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchR
         <div className={styles.searchResults}>
           <Layer>
             <Tile className={styles.emptySearchResultsTile}>
-              <EmptyDataIllustration />
+              <EmptyCardIllustration />
               <div>
                 <p className={styles.errorMessage}>{t('error', 'Error')}</p>
                 <p className={styles.errorCopy}>
@@ -103,27 +103,23 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchR
       );
     }
 
-    if (searchResults?.length === 0) {
-      return (
-        <div className={styles.searchResultsContainer}>
-          <div className={styles.searchResults}>
-            <Layer>
-              <Tile className={styles.emptySearchResultsTile}>
-                <EmptyDataIllustration />
-                <p className={styles.emptyResultText}>
-                  {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-                </p>
-                <p className={styles.actionText}>
-                  <span>
-                    {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
-                  </span>
-                </p>
-              </Tile>
-            </Layer>
-          </div>
+    return (
+      <div className={styles.searchResultsContainer}>
+        <div className={styles.searchResults}>
+          <Layer>
+            <Tile className={styles.emptySearchResultsTile}>
+              <EmptyCardIllustration />
+              <p className={styles.emptyResultText}>{t('noRecentlyViewedPatients', 'No recently viewed patients')}</p>
+              <p className={styles.actionText}>
+                <span>
+                  {t('recentPatientsEmptyStateHint', 'Patients you select will appear here for quick access')}
+                </span>
+              </p>
+            </Tile>
+          </Layer>
         </div>
-      );
-    }
+      </div>
+    );
   },
 );
 

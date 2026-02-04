@@ -72,7 +72,6 @@
   "durationInMinutes": "Duração (minutos)",
   "edit": "Editar",
   "editAppointment": "Alterar agendamento",
-  "emptyStateText": "Não tem <1>  {{displayText}}  </1> para mostrar",
   "endAppointmentAndVisitConfirmationMessage": "Ao retirar o utente marcará a consulta como concluída e encerrará a visita ativa desse utente.",
   "endAppointmentConfirmation": "Tem certeza de que deseja retirar o utente deste agendamento?",
   "endAppointmentConfirmationMessage": "A retirada do utente marcará o agendamento como concluído.",

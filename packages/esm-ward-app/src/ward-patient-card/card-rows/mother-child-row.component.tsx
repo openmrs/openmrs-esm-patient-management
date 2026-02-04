@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { BabyIcon, MotherIcon, type Patient, useAppContext } from '@openmrs/esm-framework';
 import { type InpatientAdmission, type MaternalWardViewContext } from '../../types';
-import { type MaternalWardPatientCardProps } from '../../ward-view/materal-ward/maternal-ward-patient-card.component';
+import { type MaternalWardPatientCardProps } from '../../ward-view/maternal-ward/maternal-ward-patient-card.component';
 import WardPatientAge from '../row-elements/ward-patient-age.component';
 import WardPatientIdentifier from '../row-elements/ward-patient-identifier.component';
 import WardPatientLocation from '../row-elements/ward-patient-location.component';

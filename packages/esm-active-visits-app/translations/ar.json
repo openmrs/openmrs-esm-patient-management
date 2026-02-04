@@ -6,7 +6,7 @@
   "dose": "الجرعة",
   "encounterType": "نوع اللقاء",
   "endDate": "تاريخ النهاية",
-  "filterActiveVisits": "Filter active visits",
+  "filterActiveVisits": "فلترة الزيارات الجارية",
   "filterTable": "فلتر الجدول",
   "indication": "اشارة",
   "medications": "الأدوية",
@@ -28,6 +28,6 @@
   "thereIsNoInformationToDisplayHere": "لا توجد معلومات لعرضها هنا",
   "time": "الوقت",
   "totalVisits": "عدد الزيارات اليوم",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "viewPatientChartFor": "عرض السجل الطبي لـ {{patientName}}",
   "visitSummary": "ملخص الزيارة"
 }

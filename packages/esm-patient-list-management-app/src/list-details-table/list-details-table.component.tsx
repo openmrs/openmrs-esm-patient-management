@@ -22,17 +22,18 @@ import {
   AddIcon,
   ArrowLeftIcon,
   ConfigurableLink,
-  ExtensionSlot,
+  EmptyCardIllustration,
   isDesktop,
+  launchWorkspace2,
   showSnackbar,
   showModal,
   toOmrsIsoString,
   TrashCanIcon,
   useDebounce,
   useLayoutType,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
-import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
 import styles from './list-details-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -345,19 +346,32 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                 />
               </Layer>
               <Layer>
-                <ExtensionSlot
-                  key={`${id}-patient-search`}
-                  name="patient-search-button-slot"
-                  state={{
-                    buttonText: t('addPatientToList', 'Add patient to list'),
-                    buttonProps: {
-                      kind: 'secondary',
-                      renderIcon: (props) => <AddIcon {...props} />,
-                      size: 'sm',
-                    },
-                    selectPatientAction: handleAddPatientToList,
-                  }}
-                />
+                <Button
+                  kind="secondary"
+                  renderIcon={(props) => <AddIcon {...props} />}
+                  size="sm"
+                  onClick={() =>
+                    launchWorkspace2(
+                      'patient-list-search-workspace',
+                      {
+                        initialQuery: '',
+                        workspaceTitle: t('addPatientToList', 'Add patient to list'),
+                        async onPatientSelected(
+                          patientUuid: string,
+                          patient: fhir.Patient,
+                          launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+                          closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+                        ) {
+                          await handleAddPatientToList(patientUuid);
+                        },
+                      },
+                      {
+                        startVisitWorkspaceName: 'patient-list-start-visit-workspace',
+                      },
+                    )
+                  }>
+                  {t('addPatientToList', 'Add patient to list')}
+                </Button>
               </Layer>
             </div>
           </div>
@@ -448,22 +462,35 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       <Layer>
         <Tile className={styles.tile} data-openmrs-role="Patient Empty tile">
           <div className={styles.illo}>
-            <EmptyDataIllustration />
+            <EmptyCardIllustration />
           </div>
           <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
-          <ExtensionSlot
-            key={`${id}-patient-search`}
-            name="patient-search-button-slot"
-            state={{
-              buttonText: t('addPatientToList', 'Add patient to list'),
-              buttonProps: {
-                kind: 'ghost',
-                renderIcon: (props) => <AddIcon {...props} />,
-                size: 'sm',
-              },
-              selectPatientAction: handleAddPatientToList,
-            }}
-          />
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <AddIcon {...props} />}
+            size="sm"
+            onClick={() =>
+              launchWorkspace2(
+                'patient-list-search-workspace',
+                {
+                  initialQuery: '',
+                  workspaceTitle: t('addPatientToList', 'Add patient to list'),
+                  async onPatientSelected(
+                    patientUuid: string,
+                    patient: fhir.Patient,
+                    launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+                    closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+                  ) {
+                    await handleAddPatientToList(patientUuid);
+                  },
+                },
+                {
+                  startVisitWorkspaceName: 'patient-list-start-visit-workspace',
+                },
+              )
+            }>
+            {t('addPatientToList', 'Add patient to list')}
+          </Button>
         </Tile>
       </Layer>
     </>
