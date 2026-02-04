@@ -90,12 +90,12 @@ const AdminPage = () => {
               className={styles.menuitem}
               isDelete
               itemText={t('delete', 'Delete')}
-              onClick={() =>
+              onClick={() => {
                 const dispose = showModal('delete-queue-modal', {
                   queue,
                   closeModal: () => dispose(),
                 });
-              }
+              }}
             />
           </OverflowMenu>
         ),
@@ -121,13 +121,12 @@ const AdminPage = () => {
               className={styles.menuitem}
               isDelete
               itemText={t('delete', 'Delete')}
-              onClick={() =>
-				const dispose = showModal('delete-queue-room-modal', {
-			      queueRoom,
-			      closeModal: () => dispose(),
-			    });
-                
-              }
+              onClick={() => {
+                const dispose = showModal('delete-queue-room-modal', {
+                  queueRoom: room,
+                  closeModal: () => dispose(),
+                });
+              }}
             />
           </OverflowMenu>
         ),
