@@ -46,7 +46,24 @@ const DeleteQueueModal: React.FC<DeleteQueueModalProps> = ({ closeModal, queue }
         {t('deleteQueueConfirmation', 'Are you sure you want to delete the queue "{{name}}"?', { name: queue.name })}
       </p>
     </Modal>
-  );
+    <>
+      <ModalHeader closeModal={closeModal} title={t('deleteQueue', 'Delete queue')} />
+      <ModalBody>
+        <p>
+          {t('deleteQueueConfirmation', 'Are you sure you want to delete the queue "{{name}}"?', {
+            name: queue.name,
+          })}
+        </p>
+      </ModalBody>
+      <ModalFooter>
+        <Button kind="secondary" onClick={closeModal}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button kind="danger" onClick={onDelete}>
+          {t('delete', 'Delete')}
+        </Button>
+      </ModalFooter>
+    </>
 };
 
 export default DeleteQueueModal;
