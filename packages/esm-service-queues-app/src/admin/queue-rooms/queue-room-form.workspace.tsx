@@ -46,7 +46,9 @@ const createQueueRoomSchema = (t: TFunction) =>
       })
       .trim()
       .min(1, t('queueRequired', 'Queue is required')),
-    queueLocation: z
+queueLocation: isEditMode
+  ? z.string().optional()
+  : z
       .string({
         required_error: t('queueLocationRequired', 'Queue location is required'),
       })
