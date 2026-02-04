@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop --sources 'packages/*'",
+    "start": "openmrs develop",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
