@@ -88,10 +88,18 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     const { t } = useTranslation();
     const layout = useLayoutType();
     const { providers } = useProviders();
-    const providerOptions = useMemo(
-      () => providers?.map((item) => ({ id: item.uuid, label: item.display })) ?? [],
-      [providers],
-    );
+    const providerOptions = useMemo(() => {
+      if (!appointments || !providers) return [];
+
+      const uniqueProviderUuids = [...new Set(appointments.map((s) => s.providers[0]?.uuid))];
+
+      return uniqueProviderUuids
+        .map((uuid) => {
+          const match = providers.find((p) => p.uuid === uuid);
+          return match ? { id: match.uuid, label: match.display } : null;
+        })
+        .filter(Boolean);
+    }, [providers]);
     const handleChangeProviderFilter = useCallback(({ selectedItem }) => {
       setAppointmentProvider(selectedItem);
     }, []);
