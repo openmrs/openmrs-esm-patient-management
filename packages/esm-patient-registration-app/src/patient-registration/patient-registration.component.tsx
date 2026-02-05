@@ -31,9 +31,15 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
   isOffline: boolean;
+  // 🔹 Extension hook to allow leveraging external form entry engine (O3-2511)
+  fieldRenderer?: (fieldName: string) => React.ReactNode;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
+  savePatientForm,
+  isOffline,
+  fieldRenderer,
+}) => {
   const { t } = useTranslation();
   const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
@@ -223,9 +229,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   className={styles.submitButton}
                   type="submit"
                   onClick={() => props.validateForm().then((errors) => displayErrors(errors))}
-                  // Current session and identifiers are required for patient registration.
-                  // If currentSession or identifierTypes are not available, then the
-                  // user should be blocked to register the patient.
                   disabled={!currentSession || !identifierTypes || props.isSubmitting}>
                   {props.isSubmitting ? (
                     <InlineLoading
@@ -251,6 +254,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     key={`registration-section-${section.id}`}
                     sectionDefinition={section}
                     index={index}
+                    fieldRenderer={fieldRenderer}
                   />
                 ))}
               </PatientRegistrationContextProvider>
@@ -262,8 +266,4 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   );
 };
 
-/**
- * @internal
- * Just exported for testing
- */
 export { exportedInitialFormValuesForTesting as initialFormValues };
