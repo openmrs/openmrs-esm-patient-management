@@ -135,8 +135,10 @@
       "component": "batchChangeAppointmentStatusesModal"
     }
   ],
-  "workspaceGroups2": [{
-      "name": "appointments-group"
+  "workspaceGroups2": [
+    {
+      "name": "appointments-group",
+      "scopePattern": "/home/appointments"
     }
   ],
   "workspaceWindows2": [
