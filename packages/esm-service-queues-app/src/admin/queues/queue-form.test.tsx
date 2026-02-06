@@ -2,11 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { showSnackbar, useLayoutType, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { saveQueue } from './queue.resource';
 import QueueForm from './queue-form.workspace';
 
-jest.mock('swr');
+jest.mock('swr', () => ({
+  useSWRConfig: jest.fn(),
+}));
 
 const defaultProps = {
   closeWorkspace: jest.fn(),
@@ -18,7 +20,7 @@ const defaultProps = {
 const mockSaveQueue = jest.mocked(saveQueue);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockMutate = jest.mocked(mutate);
+const mockMutate = jest.fn();
 
 jest.mock('./queue.resource', () => ({
   useServiceConcepts: () => ({
@@ -48,6 +50,7 @@ jest.mock('../../hooks/useQueues', () => ({
 describe('QueueForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
+    (useSWRConfig as jest.Mock).mockReturnValue({ mutate: mockMutate });
   });
 
   it('renders validation errors when form is submitted with missing fields', async () => {

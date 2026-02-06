@@ -2,18 +2,29 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLayoutType, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import QueueRoomForm from './queue-room-form.workspace';
 
-jest.mock('swr');
+jest.mock('swr', () => ({
+  useSWRConfig: jest.fn(),
+}));
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockMutate = jest.mocked(mutate);
+const mockMutate = jest.fn();
 
 jest.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
   ...jest.requireActual('../../create-queue-entry/hooks/useQueueLocations'),
   useQueueLocations: jest.fn(() => ({
     queueLocations: [{ id: 'e7786d9a-ab62-11ec-b909-0242ac120002', name: 'Location Test' }],
+  })),
+}));
+
+jest.mock('../../hooks/useQueues', () => ({
+  useQueues: jest.fn(() => ({
+    queues: [
+      { uuid: 'queue-uuid-1', display: 'Queue 1', service: { uuid: 'service-uuid-1' } },
+      { uuid: 'queue-uuid-2', display: 'Queue 2', service: { uuid: 'service-uuid-2' } },
+    ],
   })),
 }));
 
@@ -36,6 +47,7 @@ jest.mock('./queue-room.resource', () => ({
 describe('QueueRoomForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
+    (useSWRConfig as jest.Mock).mockReturnValue({ mutate: mockMutate });
   });
 
   it('renders the form with queue room elements', () => {
@@ -94,13 +106,13 @@ describe('QueueRoomForm', () => {
     render(<QueueRoomForm {...(workspaceProps as any)} />);
 
     const queueRoomNameInput = screen.getByLabelText('Queue room name');
-    const queueRoomServiceSelect = screen.getByLabelText('Queue room service');
+    const queueRoomServiceSelect = screen.getByLabelText('Queue');
     const queueLocationSelect = screen.getByLabelText('Queue location');
     const saveButton = screen.getByText('Save');
 
     await user.type(queueRoomNameInput, 'Room 123');
-    await user.selectOptions(queueRoomServiceSelect, 'service-uuid-1');
     await user.selectOptions(queueLocationSelect, 'e7786d9a-ab62-11ec-b909-0242ac120002');
+    await user.selectOptions(queueRoomServiceSelect, 'queue-uuid-1');
     await user.click(saveButton);
 
     expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
