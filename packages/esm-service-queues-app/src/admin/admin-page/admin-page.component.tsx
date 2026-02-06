@@ -1,8 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Button,
   DataTable,
   DataTableSkeleton,
+  Layer,
+  OverflowMenu,
+  OverflowMenuItem,
   Table,
   TableBody,
   TableCell,
@@ -10,12 +13,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Layer,
+  Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { launchWorkspace2, useLayoutType, ErrorState } from '@openmrs/esm-framework';
+import { EmptyCardIllustration, ErrorState, launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
+import type { Queue, QueueRoom } from '../../types';
 import styles from './admin-page.scss';
 
 const AdminPage = () => {
@@ -44,6 +48,10 @@ const AdminPage = () => {
       key: 'location',
       header: t('location', 'Location'),
     },
+    {
+      key: 'actions',
+      header: '',
+    },
   ];
 
   const queueRoomTableHeaders = [
@@ -59,7 +67,41 @@ const AdminPage = () => {
       key: 'queue',
       header: t('queue', 'Queue'),
     },
+    {
+      key: 'actions',
+      header: '',
+    },
   ];
+
+  const handleAddQueue = useCallback(() => {
+    launchWorkspace2('service-queues-service-form');
+  }, []);
+
+  const handleEditQueue = useCallback((queue: Queue) => {
+    launchWorkspace2('service-queues-service-form', { queue });
+  }, []);
+
+  const handleDeleteQueue = useCallback((queue: Queue) => {
+    const dispose = showModal('delete-queue-modal', {
+      queue,
+      closeModal: () => dispose(),
+    });
+  }, []);
+
+  const handleAddQueueRoom = useCallback(() => {
+    launchWorkspace2('service-queues-room-workspace');
+  }, []);
+
+  const handleEditQueueRoom = useCallback((queueRoom: QueueRoom) => {
+    launchWorkspace2('service-queues-room-workspace', { queueRoom });
+  }, []);
+
+  const handleDeleteQueueRoom = useCallback((queueRoom: QueueRoom) => {
+    const dispose = showModal('delete-queue-room-modal', {
+      queueRoom,
+      closeModal: () => dispose(),
+    });
+  }, []);
 
   const queueTableRows = useMemo(() => {
     return (
@@ -69,9 +111,24 @@ const AdminPage = () => {
         description: queue.description || '--',
         service: queue.service?.display || '--',
         location: queue.location?.display || '--',
+        actions: (
+          <OverflowMenu flipped>
+            <OverflowMenuItem
+              className={styles.menuitem}
+              itemText={t('edit', 'Edit')}
+              onClick={() => handleEditQueue(queue)}
+            />
+            <OverflowMenuItem
+              className={styles.menuitem}
+              isDelete
+              itemText={t('delete', 'Delete')}
+              onClick={() => handleDeleteQueue(queue)}
+            />
+          </OverflowMenu>
+        ),
       })) || []
     );
-  }, [queues]);
+  }, [queues, t, handleEditQueue, handleDeleteQueue]);
 
   const queueRoomTableRows = useMemo(() => {
     return (
@@ -79,127 +136,136 @@ const AdminPage = () => {
         id: room.uuid,
         name: room.name || room.display,
         description: room.description || '--',
-        queue: (room as any).queue?.display || '--',
+        queue: room.queue?.display || '--',
+        actions: (
+          <OverflowMenu flipped>
+            <OverflowMenuItem
+              className={styles.menuitem}
+              itemText={t('edit', 'Edit')}
+              onClick={() => handleEditQueueRoom(room)}
+            />
+            <OverflowMenuItem
+              className={styles.menuitem}
+              isDelete
+              itemText={t('delete', 'Delete')}
+              onClick={() => handleDeleteQueueRoom(room)}
+            />
+          </OverflowMenu>
+        ),
       })) || []
     );
-  }, [queueRooms]);
-
-  const handleAddQueue = () => {
-    launchWorkspace2('service-queues-service-form');
-  };
-
-  const handleAddQueueRoom = () => {
-    launchWorkspace2('service-queues-room-workspace');
-  };
-
-  if (isLoadingQueues || isLoadingQueueRooms) {
-    return (
-      <div className={styles.adminPage}>
-        <div className={styles.section}>
-          <h3>{t('queues', 'Queues')}</h3>
-          <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />
-        </div>
-        <div className={styles.section}>
-          <h3>{t('queueRooms', 'Queue Rooms')}</h3>
-          <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />
-        </div>
-      </div>
-    );
-  }
-
-  if (queuesError) {
-    return (
-      <div className={styles.adminPage}>
-        <ErrorState error={queuesError} headerTitle={t('queues', 'Queues')} />
-      </div>
-    );
-  }
-
-  if (queueRoomsError) {
-    return (
-      <div className={styles.adminPage}>
-        <ErrorState error={queueRoomsError} headerTitle={t('queueRooms', 'Queue Rooms')} />
-      </div>
-    );
-  }
+  }, [queueRooms, t, handleEditQueueRoom, handleDeleteQueueRoom]);
 
   return (
     <div className={styles.adminPage}>
-      {/* Queues Table */}
+      {/* Queues Section */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
           <h3>{t('queues', 'Queues')}</h3>
-          <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddQueue}>
-            {t('addQueue', 'Add Queue')}
-          </Button>
+          {!queuesError && (
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddQueue}>
+              {t('addQueue', 'Add queue')}
+            </Button>
+          )}
         </div>
-        <Layer>
-          <DataTable rows={queueTableRows} headers={queueTableHeaders} isSortable size={responsiveSize} useZebraStyles>
-            {({ rows, headers, getTableProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader key={header.key}>{header.header}</TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
+        {isLoadingQueues ? (
+          <DataTableSkeleton role="progressbar" compact={!isTablet} zebra columnCount={5} rowCount={3} />
+        ) : queuesError ? (
+          <ErrorState error={queuesError} headerTitle={t('queues', 'Queues')} />
+        ) : (
+          <Layer>
+            <DataTable
+              rows={queueTableRows}
+              headers={queueTableHeaders}
+              isSortable
+              size={responsiveSize}
+              useZebraStyles>
+              {({ rows, headers, getTableProps }) => (
+                <TableContainer className={styles.tableContainer}>
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      <TableRow>
+                        {headers.map((header) => (
+                          <TableHeader key={header.key}>{header.header}</TableHeader>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </DataTable>
+            {queueTableRows.length === 0 && (
+              <Tile className={styles.emptyState}>
+                <EmptyCardIllustration />
+                <p>{t('noQueuesToDisplay', 'No queues to display')}</p>
+              </Tile>
             )}
-          </DataTable>
-        </Layer>
+          </Layer>
+        )}
       </div>
 
-      {/* Queue Rooms Table */}
+      {/* Queue Rooms Section */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h3>{t('queueRooms', 'Queue Rooms')}</h3>
-          <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddQueueRoom}>
-            {t('addQueueRoom', 'Add Queue Room')}
-          </Button>
+          <h3>{t('queueRooms', 'Queue rooms')}</h3>
+          {!queueRoomsError && (
+            <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddQueueRoom}>
+              {t('addQueueRoom', 'Add queue room')}
+            </Button>
+          )}
         </div>
-        <Layer>
-          <DataTable
-            rows={queueRoomTableRows}
-            headers={queueRoomTableHeaders}
-            isSortable
-            size={responsiveSize}
-            useZebraStyles>
-            {({ rows, headers, getTableProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader key={header.key}>{header.header}</TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
+        {isLoadingQueueRooms ? (
+          <DataTableSkeleton role="progressbar" compact={!isTablet} zebra columnCount={4} rowCount={3} />
+        ) : queueRoomsError ? (
+          <ErrorState error={queueRoomsError} headerTitle={t('queueRooms', 'Queue rooms')} />
+        ) : (
+          <Layer>
+            <DataTable
+              rows={queueRoomTableRows}
+              headers={queueRoomTableHeaders}
+              isSortable
+              size={responsiveSize}
+              useZebraStyles>
+              {({ rows, headers, getTableProps }) => (
+                <TableContainer className={styles.tableContainer}>
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      <TableRow>
+                        {headers.map((header) => (
+                          <TableHeader key={header.key}>{header.header}</TableHeader>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </DataTable>
+            {queueRoomTableRows.length === 0 && (
+              <Tile className={styles.emptyState}>
+                <EmptyCardIllustration />
+                <p className={styles.emptyStateContent}>{t('noQueueRoomsToDisplay', 'No queue rooms to display')}</p>
+              </Tile>
             )}
-          </DataTable>
-        </Layer>
+          </Layer>
+        )}
       </div>
     </div>
   );
