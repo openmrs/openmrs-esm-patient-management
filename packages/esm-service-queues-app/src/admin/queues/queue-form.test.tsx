@@ -2,8 +2,8 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { showSnackbar, useLayoutType, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { saveQueue } from './queue-service.resource';
-import QueueServiceForm from './queue-service-form.workspace';
+import { saveQueue } from './queue.resource';
+import QueueForm from './queue-form.workspace';
 
 const defaultProps = {
   closeWorkspace: jest.fn(),
@@ -16,7 +16,7 @@ const mockSaveQueue = jest.mocked(saveQueue);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 
-jest.mock('./queue-service.resource', () => ({
+jest.mock('./queue.resource', () => ({
   useServiceConcepts: () => ({
     queueConcepts: [
       { uuid: '6f017eb0-b035-4acd-b284-da45f5067502', display: 'Concept 1' },
@@ -41,14 +41,14 @@ jest.mock('../../hooks/useQueues', () => ({
   useQueues: jest.fn(() => ({ queues: [] })),
 }));
 
-describe('QueueServiceForm', () => {
+describe('QueueForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
   });
 
   it('renders validation errors when form is submitted with missing fields', async () => {
     const user = userEvent.setup();
-    render(<QueueServiceForm {...(defaultProps as any)} />);
+    render(<QueueForm {...(defaultProps as any)} />);
 
     const queueNameInput = screen.getByRole('textbox', { name: /queue name/i });
     const serviceTypeSelect = screen.getByRole('combobox', { name: /select a service type/i });
@@ -80,7 +80,7 @@ describe('QueueServiceForm', () => {
 
   it('submits the form when all required fields are filled', async () => {
     const user = userEvent.setup();
-    render(<QueueServiceForm {...(defaultProps as any)} />);
+    render(<QueueForm {...(defaultProps as any)} />);
 
     const queueNameInput = screen.getByRole('textbox', { name: /queue name/i });
     const serviceTypeSelect = screen.getByRole('combobox', { name: /select a service type/i });
@@ -102,15 +102,15 @@ describe('QueueServiceForm', () => {
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
-      title: expect.stringMatching(/queue service created/i),
-      subtitle: expect.stringMatching(/queue service created successfully/i),
+      title: expect.stringMatching(/queue created/i),
+      subtitle: 'Test Queue',
     });
   });
 
-  it('renders an error message when the queue service creation fails', async () => {
+  it('renders an error message when the queue creation fails', async () => {
     const user = userEvent.setup();
     mockSaveQueue.mockRejectedValueOnce(new Error('Internal server error'));
-    render(<QueueServiceForm {...(defaultProps as any)} />);
+    render(<QueueForm {...(defaultProps as any)} />);
 
     const queueNameInput = screen.getByRole('textbox', { name: /queue name/i });
     const serviceTypeSelect = screen.getByRole('combobox', { name: /select a service type/i });
@@ -126,7 +126,7 @@ describe('QueueServiceForm', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: false,
       kind: 'error',
-      title: expect.stringMatching(/error creating queue service/i),
+      title: expect.stringMatching(/error creating queue/i),
       subtitle: expect.stringMatching(/internal server error/i),
     });
   });
