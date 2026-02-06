@@ -179,7 +179,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBatchActions
                   shouldShowBatchActions={selectedAppointmentUuids.size > 0}
                   totalSelected={selectedAppointmentUuids.size}
-                  // TODO: translateWithId
+                  // TODO: add translation for Carbon's table batch actions
+                  // https://openmrs.atlassian.net/browse/O3-5409
                   onCancel={() => setSelectedAppointmentUuids(new Set())}>
                   <TableBatchAction
                     renderIcon={Calendar}

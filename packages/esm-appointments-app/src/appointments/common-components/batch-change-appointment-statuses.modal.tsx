@@ -33,81 +33,82 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
   const { checkOutButton } = useConfig<ConfigObject>();
 
   const submit = useCallback(() => {
-    Promise.allSettled(
-      appointments.map((appointment) => {
-        // server throws an exception if we make a call to change the appointment status to its current
-        // status, so we just do nothing if that's the case
-        if(status === appointment.status) {
-          return Promise.resolve();
-        }
-        else {
-          return changeAppointmentStatus(status, appointment.uuid).then((res) => {
-            if (status === AppointmentStatus.COMPLETED) {
-              return getActiveVisitsForPatient(appointment.patient.uuid)
-                .then((response) => {
-                  const activeVisit = response.data.results?.[0];
-                  if (activeVisit) {
-                    const abortController = new AbortController();
-                    const endVisitPayload = { stopDatetime: new Date() };
+    const updateAppointment = (appointment: Appointment) => {
+      // server throws an exception if we make a call to change the appointment status to its current
+      // status, so we just do nothing if that's the case
+      if (status === appointment.status) {
+        return Promise.resolve();
+      }
 
-                    return updateVisit(activeVisit.uuid, endVisitPayload, abortController);
-                  }
-                })
-                .catch(() => {
-                  showSnackbar({
-                    title: t('failedToUpdateVisit', 'Failed to update visit'),
-                    subtitle: t('failedToEndActiveVisit', 'Failed to end active visit for {{patient}}', {
-                      patient: appointment.patient.name,
-                    }),
-                  });
-                  return res;
-                });
-            } else {
+      return changeAppointmentStatus(status, appointment.uuid).then((res) => {
+        if (status === AppointmentStatus.COMPLETED) {
+          return getActiveVisitsForPatient(appointment.patient.uuid)
+            .then((response) => {
+              const activeVisit = response.data.results?.[0];
+              if (activeVisit) {
+                const abortController = new AbortController();
+                const endVisitPayload = { stopDatetime: new Date() };
+
+                return updateVisit(activeVisit.uuid, endVisitPayload, abortController);
+              }
+            })
+            .catch(() => {
+              showSnackbar({
+                title: t('failedToUpdateVisit', 'Failed to update visit'),
+                subtitle: t('failedToEndActiveVisit', 'Failed to end active visit for {{patient}}', {
+                  patient: appointment.patient.name,
+                }),
+              });
               return res;
+            });
+        } else {
+          return res;
+        }
+      });
+    };
+
+    Promise.allSettled(appointments.map(updateAppointment))
+      .then(async (results) => {
+        const hasFailedResults = results.some((result) => result.status == 'rejected');
+        if (hasFailedResults) {
+          for (let i = 0; i < results.length; i++) {
+            const result = results[i];
+            if (result.status === 'rejected') {
+              const errorResponse = await result.reason.response.json();
+              const appointment = appointments[i];
+
+              showSnackbar({
+                title: t('appointmentsUpdateFailed', 'Appointments update failed'),
+                kind: 'error',
+                subtitle: (
+                  <div>
+                    {t(
+                      'appointmentsUpdateFailedMessage',
+                      'Appointments update failed for {{patient}}. Reason: {{reason}}',
+                      {
+                        patient: appointment.patient.name,
+                        reason: errorResponse.error.translatedMessage,
+                      },
+                    )}
+                  </div>
+                ),
+              });
             }
+          }
+        } else {
+          showSnackbar({
+            title: t('appointmentsUpdated', 'Appointments updated'),
+            subtitle: t(
+              'appointmentsUpdatedMessage',
+              'Appointments for selected patients have been successfully updated',
+            ),
           });
         }
-        
-      }),
-    )
-    .then(async (results) => {
-      const hasFailedResults = results.some(result => result.status == 'rejected');
-      if (hasFailedResults) {
-        for(let i = 0; i < results.length; i++) {
-          const result = results[i];
-          if(result.status === 'rejected') {
-            const errorResponse = await result.reason.response.json();
-            const appointment = appointments[i];
-
-            showSnackbar({
-              title: t('appointmentsUpdateFailed', 'Appointments update failed'),
-              kind: 'error',
-              subtitle: (
-                <div>
-                  {t('appointmentsUpdateFailedMessage', 'Appointments update failed for {{patient}}. Reason: {{reason}}', {
-                    patient: appointment.patient.name,
-                    reason: errorResponse.error.translatedMessage,
-                  })}
-                </div>
-              ),
-            });
-          }
-        }
-        
-      } else {
-        showSnackbar({
-          title: t('appointmentsUpdated', 'Appointments updated'),
-          subtitle: t(
-            'appointmentsUpdatedMessage',
-            'Appointments for selected patients have been successfully updated',
-          ),
-        });
-      }
-    })
-    .finally(() => {
-      mutateAppointments();
-      closeModal();
-    });
+      })
+      .finally(() => {
+        mutateAppointments();
+        closeModal();
+      });
   }, [status, appointments, closeModal, mutateAppointments, t]);
 
   return (
@@ -120,7 +121,8 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
             {appointments.map((appointment) => (
               <li key={appointment.patient.uuid}>
                 <Trans i18nKey="appointmentDisplay">
-                  <strong>{{patientName: appointment.patient.name} as any}</strong> - {{serviceName: appointment.service.name} as any}
+                  <strong>{{ patientName: appointment.patient.name } as any}</strong> -{' '}
+                  {{ serviceName: appointment.service.name } as any}
                 </Trans>
               </li>
             ))}
