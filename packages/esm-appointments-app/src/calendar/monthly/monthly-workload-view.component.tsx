@@ -50,7 +50,15 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => navigateToAppointmentsByDate('')}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigateToAppointmentsByDate('');
+        }
+      }}
       className={classNames(
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
@@ -64,7 +72,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
         <div>
           <span className={classNames(styles.totals)}>
             {currentData?.services ? (
-              <div role="button" tabIndex={0}>
+              <div>
                 <User size={16} />
                 <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
               </div>
@@ -83,6 +91,13 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   onClick={(e) => {
                     e.stopPropagation();
                     navigateToAppointmentsByDate(serviceUuid);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigateToAppointmentsByDate(serviceUuid);
+                    }
                   }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>
