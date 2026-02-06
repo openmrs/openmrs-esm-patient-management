@@ -94,17 +94,22 @@ export const builtInSections: Array<SectionDefinition> = [
     name: 'Basic Info',
     fields: ['name', 'gender', 'dob', 'id'],
   },
+  {
+    id: 'identity',
+    name: 'Identity',
+    fields: ['identifiers'],
+  },
   { id: 'contact', name: 'Contact Details', fields: ['address', 'phone'] },
   { id: 'death', name: 'Death Info', fields: ['dateAndTimeOfDeath', 'causeOfDeath'] },
   { id: 'relationships', name: 'Relationships', fields: [] },
 ];
 
-// These fields are handled specially in field.component.tsx
 export const builtInFields = [
   'name',
   'gender',
   'dob',
   'id',
+  'identifiers',
   'address',
   'phone',
   'causeOfDeath',
@@ -114,7 +119,7 @@ export const builtInFields = [
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships'],
+    _default: ['demographics', 'identity', 'contact', 'relationships'],
     _description: `An array of strings which are the keys from 'sectionDefinitions' or any of the following built-in sections: '${builtInSections
       .map((s) => s.id)
       .join("', '")}'.`,
@@ -150,7 +155,15 @@ export const esmPatientRegistrationSchema = {
   },
   fieldDefinitions: {
     _type: Type.Array,
-    _default: [],
+    _default: [
+      {
+        id: 'identifiers',
+        type: 'person attribute',
+        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        label: 'National ID',
+        showHeading: true,
+      },
+    ],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
     _elements: {
@@ -234,7 +247,6 @@ export const esmPatientRegistrationSchema = {
         },
       },
     },
-    // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
   },
   fieldConfigurations: {
     causeOfDeath: {

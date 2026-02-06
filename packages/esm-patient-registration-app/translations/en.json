@@ -118,5 +118,9 @@
   "updatePatientSuccessSnackbarSubtitle": "The patient's information has been successfully updated",
   "updatePatientSuccessSnackbarTitle": "Patient Details Updated",
   "yearsEstimateRequired": "Estimated years required",
-  "yes": "Yes"
+  "yes": "Yes",
+  "identitySection": "Identity",
+  "identifiersLabelText": "National ID / Patient Identifier",
+  "verifyID": "Verify ID",
+  "verifying": "Verifying..."
 }
