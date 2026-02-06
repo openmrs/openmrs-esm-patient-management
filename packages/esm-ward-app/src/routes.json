@@ -214,10 +214,12 @@
   "workspaceGroups2": [
     {
       "name": "ward-manage-admissions",
+      "scopePattern": "/home/ward",
       "overlay": true
     },
     {
       "name": "ward-patient",
+      "scopePattern": "/home/ward",
       "overlay": true,
       "persistence": "closable"
     }
