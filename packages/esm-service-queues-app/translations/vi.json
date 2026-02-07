@@ -90,6 +90,7 @@
   "movePatient": "Move {{patient}}",
   "name": "Tên",
   "nextPage": "Trang tiếp theo",
+  "noActiveTickets": "No active tickets to display",
   "noColumnsDefined": "Không có cột bảng nào được xác định. Kiểm tra cấu hình",
   "noEncountersFound": "Không tìm thấy cuộc gặp gỡ nào",
   "noMedicationsFound": "Không tìm thấy thuốc",
