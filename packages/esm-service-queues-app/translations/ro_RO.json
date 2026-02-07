@@ -90,6 +90,7 @@
   "movePatient": "Mută {{patient}}",
   "name": "Nume",
   "nextPage": "Pagina următoare",
+  "noActiveTickets": "No active tickets to display",
   "noColumnsDefined": "Nicio coloană definită în tabel. Verifică configurația",
   "noEncountersFound": "Nu au fost găsite consultații",
   "noMedicationsFound": "Nu au fost găsite medicamente",

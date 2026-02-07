@@ -90,6 +90,7 @@
   "movePatient": "Déplacer {{patient}}",
   "name": "Nom",
   "nextPage": "Page suivante",
+  "noActiveTickets": "No active tickets to display",
   "noColumnsDefined": "Aucune colonne de tableau définie. Vérifier la configuration",
   "noEncountersFound": "Aucune consultation trouvée",
   "noMedicationsFound": "Aucun médicament trouvé",

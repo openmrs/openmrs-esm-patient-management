@@ -90,6 +90,7 @@
   "movePatient": "Move {{patient}}",
   "name": "Nama",
   "nextPage": "Halaman berikutnya",
+  "noActiveTickets": "No active tickets to display",
   "noColumnsDefined": "Tidak ada kolom tabel yang ditentukan. Periksa Konfigurasi",
   "noEncountersFound": "Tidak ada pertemuan yang ditemukan",
   "noMedicationsFound": "Tidak ada obat yang ditemukan",
