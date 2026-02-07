@@ -134,13 +134,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   }
 
   if (!appointments?.length) {
+    const translatedHeading = t(tableHeading);
     return (
       <EmptyCard
-        headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
+        headerTitle={`${translatedHeading} ${t('appointments_lower', 'appointments')}`}
         displayText={
           tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
-            : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
+            : t('appointments_lower', 'appointments')
         }
         launchForm={() => launchCreateAppointmentForm(t)}
       />
