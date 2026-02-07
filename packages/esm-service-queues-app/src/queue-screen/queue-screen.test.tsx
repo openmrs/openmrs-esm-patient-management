@@ -42,7 +42,20 @@ describe('QueueScreen component', () => {
 
     render(<QueueScreen />);
 
-    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText('Error State')).toBeInTheDocument();
+  });
+
+  test('renders empty state when there are no active tickets', () => {
+    mockUseActiveTickets.mockReturnValue({
+      activeTickets: [],
+      isLoading: false,
+      error: undefined,
+      mutate: jest.fn(),
+    });
+
+    render(<QueueScreen />);
+
+    expect(screen.getByText('No active tickets to display')).toBeInTheDocument();
   });
 
   test('renders table with active tickets when data is loaded', () => {
