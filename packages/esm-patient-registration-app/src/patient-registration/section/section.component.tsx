@@ -7,9 +7,12 @@ import { RelationshipsSection } from './patient-relationships/relationships-sect
 
 export interface SectionProps {
   sectionDefinition: SectionDefinition;
+
+  // 🔹 Extension hook for future form-entry renderer reuse
+  fieldRenderer?: (fieldName: string) => React.ReactNode;
 }
 
-export function Section({ sectionDefinition }: SectionProps) {
+export function Section({ sectionDefinition, fieldRenderer }: SectionProps) {
   switch (sectionDefinition.id) {
     case 'demographics':
       return <DemographicsSection fields={sectionDefinition.fields} />;
@@ -17,7 +20,7 @@ export function Section({ sectionDefinition }: SectionProps) {
       return <DeathInfoSection fields={sectionDefinition.fields} />;
     case 'relationships':
       return <RelationshipsSection />;
-    default: // includes 'contact'
-      return <GenericSection sectionDefinition={sectionDefinition} />;
+    default:
+      return <GenericSection sectionDefinition={sectionDefinition} fieldRenderer={fieldRenderer} />;
   }
 }

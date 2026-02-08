@@ -8,20 +8,12 @@ import styles from './section.scss';
 export interface SectionWrapperProps {
   sectionDefinition: SectionDefinition;
   index: number;
+  fieldRenderer?: (fieldName: string) => React.ReactNode;
 }
 
-export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps) => {
+export const SectionWrapper = ({ sectionDefinition, index, fieldRenderer }: SectionWrapperProps) => {
   const { t } = useTranslation();
 
-  /*
-   * This comment exists to provide translation keys for the default section names.
-   *
-   * DO NOT REMOVE THESE UNLESS A DEFAULT SECTION IS REMOVED
-   * t('demographicsSection', 'Basic Info')
-   * t('contactSection', 'Contact Details')
-   * t('deathSection', 'Death Info')
-   * t('relationshipsSection', 'Relationships')
-   */
   return (
     <div id={sectionDefinition.id} style={{ scrollMarginTop: '4rem' }}>
       <h3 className={styles.productiveHeading02} style={{ color: '#161616' }}>
@@ -32,7 +24,7 @@ export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps
       </span>
       <div style={{ margin: '1rem 0 1rem' }}>
         <Tile>
-          <Section sectionDefinition={sectionDefinition} />
+          <Section sectionDefinition={sectionDefinition} fieldRenderer={fieldRenderer} />
         </Tile>
       </div>
     </div>
