@@ -90,6 +90,7 @@
   "movePatient": "Move {{patient}}",
   "name": "სახელი",
   "nextPage": "შემდეგი გვერდი",
+  "noActiveTickets": "No active tickets to display",
   "noColumnsDefined": "No table columns defined. Check Configuration",
   "noEncountersFound": "კონსულტაციები აღმოჩენილი არაა",
   "noMedicationsFound": "წამლები აღმოჩენილი არაა",

@@ -67,6 +67,7 @@
   "workspaceGroups2": [
     {
       "name": "bed-management-group",
+      "scopePattern": "/bed-management",
       "persistence": "closable"
     }
   ],
