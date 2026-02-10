@@ -152,7 +152,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     <Layer className={styles.container}>
       <Tile className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h4>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h4>
+          <h2>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h2>
         </div>
       </Tile>
       <DataTable
