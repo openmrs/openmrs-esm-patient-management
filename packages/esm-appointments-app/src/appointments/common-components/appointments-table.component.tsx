@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -30,6 +30,7 @@ import {
   TableToolbarSearch,
   Tile,
   Dropdown,
+  Search,
 } from '@carbon/react';
 import { Calendar, Download } from '@carbon/react/icons';
 import {
@@ -88,10 +89,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const { appointmentProvider } = useAppointmentsStore();
-
-  useEffect(() => {
-    setSelectedAppointmentUuids(new Set());
-  }, [appointments]);
 
   const headerData = appointmentsTableColumns.map((columnKey) => ({
     header: t(columnKey, columnKey),
@@ -263,31 +260,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     {t('changeStatus', 'Change status')}
                   </TableBatchAction>
                 </TableBatchActions>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    className={styles.searchbar}
-                    labelText={t('filterAppointments', 'Filter appointments')}
-                    placeholder={t('filterTable', 'Filter table')}
-                    onChange={(event) => setSearchString((event as React.ChangeEvent<HTMLInputElement>).target.value)}
-                    persistent
-                    size={responsiveSize}
-                  />
-                  <Button
-                    size={responsiveSize}
-                    kind="tertiary"
-                    renderIcon={Download}
-                    onClick={() => {
-                      const date = appointments[0]?.startDateTime
-                        ? formatDate(parseDate(appointments[0]?.startDateTime), {
-                            time: false,
-                            noToday: true,
-                          })
-                        : null;
-                      exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
-                    }}>
-                    {t('download', 'Download')}
-                  </Button>
-                </TableToolbarContent>
               </TableToolbar>
               <Table {...getTableProps()}>
                 <TableHead>

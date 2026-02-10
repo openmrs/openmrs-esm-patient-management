@@ -12,14 +12,8 @@ interface AppointmentsListProps {
   title: string;
 }
 
-const AppointmentsList: React.FC<AppointmentsListProps> = ({
-  appointmentServiceTypes,
-  date,
-  excludeCancelledAppointments = false,
-  status,
-  title,
-}) => {
-  const { appointmentList, isLoading } = useAppointmentList(undefined, date);
+const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointmentServiceTypes, date, status, title }) => {
+  const { appointmentList, isLoading } = useAppointmentList(status, date);
 
   const { appointmentProvider } = useAppointmentsStore();
 
@@ -36,9 +30,9 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   }));
 
   const activeAppointments = useMemo(() => {
-    return appointmentsFilteredByProvider
-      .filter((appt) => appointmentsFilteredByServiceType.some((s) => s.uuid === appt.uuid))
-      .filter((appointment) => appointment.status !== 'Cancelled');
+    return appointmentsFilteredByProvider.filter((appt) =>
+      appointmentsFilteredByServiceType.some((s) => s.uuid === appt.uuid),
+    );
   }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType]);
 
   return (
