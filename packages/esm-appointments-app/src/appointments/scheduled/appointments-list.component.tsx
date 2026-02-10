@@ -19,7 +19,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   status,
   title,
 }) => {
-  const { appointmentList, isLoading } = useAppointmentList(status, date);
+  const { appointmentList, isLoading } = useAppointmentList(undefined, date);
 
   const { appointmentProvider } = useAppointmentsStore();
 
@@ -36,18 +36,18 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   }));
 
   const activeAppointments = useMemo(() => {
-    const byProvider = appointmentsFilteredByProvider;
-    const byServiceType = appointmentsFilteredByServiceType;
-    const combined = byProvider.filter((appt) => byServiceType.some((s) => s.uuid === appt.uuid));
-    const finalList = excludeCancelledAppointments
-      ? combined.filter((appointment) => appointment.status !== 'Cancelled')
-      : combined;
-    return finalList;
-  }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType, excludeCancelledAppointments]);
+    return appointmentsFilteredByProvider
+      .filter((appt) => appointmentsFilteredByServiceType.some((s) => s.uuid === appt.uuid))
+      .filter((appointment) => appointment.status !== 'Cancelled');
+  }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType]);
 
   return (
     <AppointmentsTable
       appointments={activeAppointments}
+      allAppointments={appointmentList.map((appointment) => ({
+        id: appointment.uuid,
+        ...appointment,
+      }))}
       hasActiveFilters={appointmentServiceTypes?.length > 0 || appointmentProvider}
       isLoading={isLoading}
       tableHeading={title}

@@ -55,6 +55,7 @@ dayjs.extend(isToday);
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
+  allAppointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
   hasActiveFilters?: boolean;
@@ -62,6 +63,7 @@ interface AppointmentsTableProps {
 
 const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
+  allAppointments,
   isLoading,
   tableHeading,
   hasActiveFilters,
@@ -89,9 +91,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     const layout = useLayoutType();
     const { providers } = useProviders();
     const providerOptions = useMemo(() => {
-      if (!appointments || !providers) return [];
+      if (!allAppointments || !providers) return [];
 
-      const uniqueProviderUuids = [...new Set(appointments.map((s) => s.providers[0]?.uuid))];
+      const uniqueProviderUuids = [...new Set(allAppointments.map((s) => s.providers[0]?.uuid))];
 
       return uniqueProviderUuids
         .map((uuid) => {
