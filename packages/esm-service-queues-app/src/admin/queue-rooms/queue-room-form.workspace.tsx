@@ -21,13 +21,13 @@ import {
 } from '@carbon/react';
 import {
   getCoreTranslation,
+  restBaseUrl,
   showSnackbar,
   useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { saveQueueRoom, updateQueueRoom } from './queue-room.resource';
-import { queueRoomsMutationKey } from '../queue-admin.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
 import styles from './queue-room-form.scss';
@@ -115,7 +115,7 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>
         });
       }
 
-      await mutate(queueRoomsMutationKey);
+      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room?`));
       closeWorkspace();
     } catch (error) {
       showSnackbar({
