@@ -3,12 +3,15 @@ import { DataTableSkeleton, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { EmptyCardIllustration, ErrorState } from '@openmrs/esm-framework';
 import { useActiveTickets } from './useActiveTickets';
+import { useServiceQueuesStore } from '../store/store';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
 const QueueScreen: React.FC = () => {
   const { t } = useTranslation();
-  const { activeTickets, isLoading, error } = useActiveTickets();
+  const { selectedQueueLocationUuid } = useServiceQueuesStore();
+
+  const { activeTickets, isLoading, error } = useActiveTickets(selectedQueueLocationUuid);
 
   if (isLoading) {
     return <DataTableSkeleton rowCount={5} className={styles.queueScreen} data-testid="queue-screen-skeleton" />;
