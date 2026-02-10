@@ -53,7 +53,7 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
     <div className={styles.container}>
       <div className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h3>{selectedQueue.display}</h3>
+          <h2>{selectedQueue.display}</h2>
         </div>
       </div>
       <Tabs
@@ -64,7 +64,9 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
           navigate(url);
         }}>
         <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue status')} contained>
-          {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
+          {allowedStatuses?.map((s) => (
+            <Tab key={s?.uuid}>{s?.display}</Tab>
+          ))}
           {allStatusTabConfig && <Tab>{t('all', 'All')}</Tab>}
         </TabList>
         <TabPanels>
