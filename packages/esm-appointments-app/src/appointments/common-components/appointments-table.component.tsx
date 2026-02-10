@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -11,8 +11,9 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   Pagination,
-  Search,
   Table,
+  TableBatchAction,
+  TableBatchActions,
   TableBody,
   TableCell,
   TableContainer,
@@ -22,10 +23,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectAll,
+  TableSelectRow,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
   Tile,
   Dropdown,
 } from '@carbon/react';
-import { Download } from '@carbon/react/icons';
+import { Calendar, Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   EmptyCard,
@@ -37,6 +43,7 @@ import {
   useLayoutType,
   launchWorkspace2,
   usePagination,
+  showModal,
 } from '@openmrs/esm-framework';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
@@ -77,9 +84,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
   const { visits } = useTodaysVisits();
+  const [selectedAppointmentUuids, setSelectedAppointmentUuids] = useState(new Set<string>());
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const { appointmentProvider } = useAppointmentsStore();
+
+  useEffect(() => {
+    setSelectedAppointmentUuids(new Set());
+  }, [appointments]);
 
   const headerData = appointmentsTableColumns.map((columnKey) => ({
     header: t(columnKey, columnKey),
@@ -141,6 +153,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     location: appointment.location?.name,
     provider: appointment.providers?.[0]?.name ?? '--',
     status: <AppointmentActions appointment={appointment} />,
+    appointment,
   }));
 
   if (isLoading) {
@@ -163,13 +176,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   }
 
   if (!appointments?.length) {
+    const translatedHeading = t(tableHeading);
     return (
       <EmptyCard
-        headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
+        headerTitle={`${translatedHeading} ${t('appointments_lower', 'appointments')}`}
         displayText={
           tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
-            : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
+            : t('appointments_lower', 'appointments')
         }
         launchForm={() => launchCreateAppointmentForm(t)}
       />
@@ -223,15 +237,73 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           getExpandHeaderProps,
           getHeaderProps,
           getRowProps,
+          getSelectionProps,
           getTableProps,
           getTableContainerProps,
+          getToolbarProps,
         }) => (
           <>
             <TableContainer {...getTableContainerProps()}>
+              <TableToolbar {...getToolbarProps()} size={responsiveSize}>
+                <TableBatchActions
+                  shouldShowBatchActions={selectedAppointmentUuids.size > 0}
+                  totalSelected={selectedAppointmentUuids.size}
+                  // TODO: add translation for Carbon's table batch actions
+                  // https://openmrs.atlassian.net/browse/O3-5409
+                  onCancel={() => setSelectedAppointmentUuids(new Set())}>
+                  <TableBatchAction
+                    renderIcon={Calendar}
+                    onClick={() => {
+                      const selectedAppointments = appointments.filter((app) => selectedAppointmentUuids.has(app.uuid));
+                      const closeModal = showModal('batch-change-appointments-statuses-modal', {
+                        appointments: selectedAppointments,
+                        closeModal: () => closeModal(),
+                      });
+                    }}>
+                    {t('changeStatus', 'Change status')}
+                  </TableBatchAction>
+                </TableBatchActions>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    className={styles.searchbar}
+                    labelText={t('filterAppointments', 'Filter appointments')}
+                    placeholder={t('filterTable', 'Filter table')}
+                    onChange={(event) => setSearchString((event as React.ChangeEvent<HTMLInputElement>).target.value)}
+                    persistent
+                    size={responsiveSize}
+                  />
+                  <Button
+                    size={responsiveSize}
+                    kind="tertiary"
+                    renderIcon={Download}
+                    onClick={() => {
+                      const date = appointments[0]?.startDateTime
+                        ? formatDate(parseDate(appointments[0]?.startDateTime), {
+                            time: false,
+                            noToday: true,
+                          })
+                        : null;
+                      exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
+                    }}>
+                    {t('download', 'Download')}
+                  </Button>
+                </TableToolbarContent>
+              </TableToolbar>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                    <TableSelectAll
+                      {...getSelectionProps()}
+                      checked={selectedAppointmentUuids.size === rows.length}
+                      onSelect={() => {
+                        if (selectedAppointmentUuids.size < rows.length) {
+                          setSelectedAppointmentUuids(new Set(rows.map((row) => row.id)));
+                        } else {
+                          setSelectedAppointmentUuids(new Set());
+                        }
+                      }}
+                    />
                     {headers.map((header) => (
                       <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
@@ -257,6 +329,19 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     return (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
+                          <TableSelectRow
+                            {...getSelectionProps({ row })}
+                            checked={selectedAppointmentUuids.has(row.id)}
+                            onSelect={() => {
+                              if (selectedAppointmentUuids.has(row.id)) {
+                                setSelectedAppointmentUuids(
+                                  new Set([...selectedAppointmentUuids].filter((uuid) => uuid != row.id)),
+                                );
+                              } else {
+                                setSelectedAppointmentUuids(new Set([...selectedAppointmentUuids, row.id]));
+                              }
+                            }}
+                          />
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
