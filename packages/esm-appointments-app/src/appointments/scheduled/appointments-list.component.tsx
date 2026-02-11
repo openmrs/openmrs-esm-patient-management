@@ -12,9 +12,14 @@ interface AppointmentsListProps {
   title: string;
 }
 
-const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointmentServiceTypes, date, status, title }) => {
+const AppointmentsList: React.FC<AppointmentsListProps> = ({
+  appointmentServiceTypes,
+  date,
+  excludeCancelledAppointments = false,
+  status,
+  title,
+}) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
-
   const { appointmentProvider } = useAppointmentsStore();
 
   const appointmentsFilteredByServiceType = filterByServiceType(appointmentList, appointmentServiceTypes).map(
@@ -30,10 +35,14 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointmentServiceT
   }));
 
   const activeAppointments = useMemo(() => {
-    return appointmentsFilteredByProvider.filter((appt) =>
-      appointmentsFilteredByServiceType.some((s) => s.uuid === appt.uuid),
-    );
-  }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType]);
+    const byProvider = appointmentsFilteredByProvider;
+    const byServiceType = appointmentsFilteredByServiceType;
+    const combined = byProvider.filter((appt) => byServiceType.some((s) => s.uuid === appt.uuid));
+    const finalList = excludeCancelledAppointments
+      ? combined.filter((appointment) => appointment.status !== 'Cancelled')
+      : combined;
+    return finalList;
+  }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType, excludeCancelledAppointments]);
 
   return (
     <AppointmentsTable
