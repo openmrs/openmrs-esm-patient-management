@@ -7,8 +7,6 @@ import { RelationshipsSection } from './patient-relationships/relationships-sect
 
 export interface SectionProps {
   sectionDefinition: SectionDefinition;
-
-  // 🔹 Extension hook for future form-entry renderer reuse
   fieldRenderer?: (fieldName: string) => React.ReactNode;
 }
 
