@@ -161,7 +161,7 @@ const AdminPage = () => {
       {/* Queues Section */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h3>{t('queues', 'Queues')}</h3>
+          <h2>{t('queues', 'Queues')}</h2>
           {!queuesError && (
             <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddQueue}>
               {t('addQueue', 'Add queue')}
@@ -216,7 +216,7 @@ const AdminPage = () => {
       {/* Queue Rooms Section */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h3>{t('queueRooms', 'Queue rooms')}</h3>
+          <h2>{t('queueRooms', 'Queue rooms')}</h2>
           {!queueRoomsError && (
             <Button kind="ghost" renderIcon={(props) => <Add size={16} {...props} />} onClick={handleAddQueueRoom}>
               {t('addQueueRoom', 'Add queue room')}
