@@ -21,7 +21,7 @@ function DefaultQueueTable() {
       <Layer className={styles.tableSection}>
         <div className={styles.headerContainer}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+            <h2>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h2>
           </div>
           <div className={styles.headerButtons}>
             <AddPatientToQueueButton />
