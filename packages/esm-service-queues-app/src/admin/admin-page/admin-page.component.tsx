@@ -4,8 +4,6 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
-  OverflowMenu,
-  OverflowMenuItem,
   Table,
   TableBody,
   TableCell,
@@ -16,10 +14,11 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { EmptyCardIllustration, ErrorState, launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { EmptyCardIllustration, ErrorState, launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
-import type { Queue, QueueRoom } from '../../types';
+import QueueActionMenu from './queue-action-menu.component';
+import QueueRoomActionMenu from './queue-room-action-menu.component';
 import styles from './admin-page.scss';
 
 const AdminPage = () => {
@@ -48,10 +47,6 @@ const AdminPage = () => {
       key: 'location',
       header: t('location', 'Location'),
     },
-    {
-      key: 'actions',
-      header: '',
-    },
   ];
 
   const queueRoomTableHeaders = [
@@ -67,40 +62,14 @@ const AdminPage = () => {
       key: 'queue',
       header: t('queue', 'Queue'),
     },
-    {
-      key: 'actions',
-      header: '',
-    },
   ];
 
   const handleAddQueue = useCallback(() => {
     launchWorkspace2('service-queues-service-form');
   }, []);
 
-  const handleEditQueue = useCallback((queue: Queue) => {
-    launchWorkspace2('service-queues-service-form', { queue });
-  }, []);
-
-  const handleDeleteQueue = useCallback((queue: Queue) => {
-    const dispose = showModal('delete-queue-modal', {
-      queue,
-      closeModal: () => dispose(),
-    });
-  }, []);
-
   const handleAddQueueRoom = useCallback(() => {
     launchWorkspace2('service-queues-room-workspace');
-  }, []);
-
-  const handleEditQueueRoom = useCallback((queueRoom: QueueRoom) => {
-    launchWorkspace2('service-queues-room-workspace', { queueRoom });
-  }, []);
-
-  const handleDeleteQueueRoom = useCallback((queueRoom: QueueRoom) => {
-    const dispose = showModal('delete-queue-room-modal', {
-      queueRoom,
-      closeModal: () => dispose(),
-    });
   }, []);
 
   const queueTableRows = useMemo(() => {
@@ -111,24 +80,9 @@ const AdminPage = () => {
         description: queue.description || '--',
         service: queue.service?.display || '--',
         location: queue.location?.display || '--',
-        actions: (
-          <OverflowMenu flipped>
-            <OverflowMenuItem
-              className={styles.menuitem}
-              itemText={t('edit', 'Edit')}
-              onClick={() => handleEditQueue(queue)}
-            />
-            <OverflowMenuItem
-              className={styles.menuitem}
-              isDelete
-              itemText={t('delete', 'Delete')}
-              onClick={() => handleDeleteQueue(queue)}
-            />
-          </OverflowMenu>
-        ),
       })) || []
     );
-  }, [queues, t, handleEditQueue, handleDeleteQueue]);
+  }, [queues]);
 
   const queueRoomTableRows = useMemo(() => {
     return (
@@ -137,24 +91,9 @@ const AdminPage = () => {
         name: room.name || room.display,
         description: room.description || '--',
         queue: room.queue?.display || '--',
-        actions: (
-          <OverflowMenu flipped>
-            <OverflowMenuItem
-              className={styles.menuitem}
-              itemText={t('edit', 'Edit')}
-              onClick={() => handleEditQueueRoom(room)}
-            />
-            <OverflowMenuItem
-              className={styles.menuitem}
-              isDelete
-              itemText={t('delete', 'Delete')}
-              onClick={() => handleDeleteQueueRoom(room)}
-            />
-          </OverflowMenu>
-        ),
       })) || []
     );
-  }, [queueRooms, t, handleEditQueueRoom, handleDeleteQueueRoom]);
+  }, [queueRooms]);
 
   return (
     <div className={styles.adminPage}>
@@ -188,14 +127,18 @@ const AdminPage = () => {
                         {headers.map((header) => (
                           <TableHeader key={header.key}>{header.header}</TableHeader>
                         ))}
+                        <TableHeader aria-label={t('actions', 'Actions')} />
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
+                      {rows.map((row, i) => (
                         <TableRow key={row.id}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value}</TableCell>
                           ))}
+                          <TableCell className="cds--table-column-menu">
+                            <QueueActionMenu queue={queues[i]} />
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -243,14 +186,18 @@ const AdminPage = () => {
                         {headers.map((header) => (
                           <TableHeader key={header.key}>{header.header}</TableHeader>
                         ))}
+                        <TableHeader aria-label={t('actions', 'Actions')} />
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
+                      {rows.map((row, i) => (
                         <TableRow key={row.id}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value}</TableCell>
                           ))}
+                          <TableCell className="cds--table-column-menu">
+                            <QueueRoomActionMenu queueRoom={queueRooms[i]} />
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
