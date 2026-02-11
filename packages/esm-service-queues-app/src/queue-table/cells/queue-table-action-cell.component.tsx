@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -6,7 +6,6 @@ import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type 
 import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
-import { useActionLock } from '../../hooks/useActionLock';
 import styles from './queue-table-action-cell.scss';
 
 type ActionProps = {
@@ -140,7 +139,8 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
   const { t } = useTranslation();
   const layout = useLayoutType();
   const actionPropsByKey = useActionPropsByKey();
-  const { runWithLock } = useActionLock();
+  const [isPending, setIsPending] = useState(false);
+  const isPendingRef = useRef(false);
 
   const actionProps = actionPropsByKey[actionKey];
   if (!actionProps) {
@@ -152,17 +152,26 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
     return null;
   }
 
-  const lockKey = `${queueEntry.uuid}:${actionKey}`;
-  const handleClick = () =>
-    runWithLock(lockKey, async () => {
-      await actionProps.onClick(queueEntry);
-    });
+  const handleClick = async () => {
+    if (isPendingRef.current) {
+      return;
+    }
+    isPendingRef.current = true;
+    setIsPending(true);
+    try {
+      await Promise.resolve(actionProps.onClick(queueEntry));
+    } finally {
+      isPendingRef.current = false;
+      setIsPending(false);
+    }
+  };
 
   return (
     <Button
       key={actionKey}
       kind="ghost"
       aria-label={t(actionProps.label, actionProps.text)}
+      disabled={isPending}
       onClick={handleClick}
       size={isDesktop(layout) ? 'sm' : 'lg'}>
       {t(actionProps.label, actionProps.text)}
