@@ -129,10 +129,16 @@
     {
       "name": "cancel-appointment-modal",
       "component": "cancelAppointmentModal"
+    },
+    {
+      "name": "batch-change-appointments-statuses-modal",
+      "component": "batchChangeAppointmentStatusesModal"
     }
   ],
-  "workspaceGroups2": [{
-      "name": "appointments-group"
+  "workspaceGroups2": [
+    {
+      "name": "appointments-group",
+      "scopePattern": "/home/appointments"
     }
   ],
   "workspaceWindows2": [
@@ -153,7 +159,7 @@
       "window": "appointments-window"
     },
     {
-      "name": "appointments-patient-search-start-visit-workspace",
+      "name": "appointments-start-visit-workspace",
       "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
       "window": "appointments-window"
     }

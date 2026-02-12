@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../types';
-import QueueEntryActionModal from './queue-entry-actions-modal.component';
-import { transitionQueueEntry } from './queue-entry-actions.resource';
 import { convertTime12to24 } from './time-helpers';
+import { transitionQueueEntry } from './queue-entry-actions.resource';
+import QueueEntryActionModal from './queue-entry-actions-modal.component';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: QueueEntry;
@@ -32,7 +32,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             newQueue: formState.selectedQueue,
             newStatus: formState.selectedStatus,
             newPriority: formState.selectedPriority,
-            newPriorityComment: formState.prioritycomment,
+            newPriorityComment: formState.priorityComment,
             ...(formState.modifyDefaultTransitionDateTime ? { transitionDate: transitionDate.toISOString() } : {}),
           });
         },

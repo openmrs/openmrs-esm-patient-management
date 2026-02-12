@@ -26,7 +26,6 @@
   "editNameDescription": "Edit nama atau deskripsi",
   "editPatientListHeader": "Edit daftar pasien",
   "emptyList": "Daftar ini tidak memiliki pasien",
-  "emptyStateIllustration": "Ilustrasi keadaan kosong",
   "emptyStateText": "Tidak ada daftar pasien {{listType}} untuk ditampilkan",
   "error": "Kesalahan",
   "errorAddingPatientToList": "Failed to add patient to list",

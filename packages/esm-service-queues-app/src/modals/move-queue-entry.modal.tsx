@@ -32,7 +32,7 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
             newQueue: formState.selectedQueue,
             newStatus: formState.selectedStatus,
             newPriority: formState.selectedPriority,
-            newPriorityComment: formState.prioritycomment,
+            newPriorityComment: formState.priorityComment,
             ...(formState.modifyDefaultTransitionDateTime ? { transitionDate: transitionDate.toISOString() } : {}),
           });
         },
