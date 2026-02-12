@@ -245,6 +245,13 @@ describe('QueueTable', () => {
     // TODO: Figure out why this expectation is failing
     // expect(cells[1].childNodes[0]).toHaveTextContent('42');
   });
+
+  it('renders "No patients to display" when the list is empty', () => {
+    renderQueueTable({ queueEntries: [] });
+
+    expect(screen.getByText(/No patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/Check the filters above/i)).toBeInTheDocument();
+  });
 });
 
 function renderQueueTable(props = {}) {
