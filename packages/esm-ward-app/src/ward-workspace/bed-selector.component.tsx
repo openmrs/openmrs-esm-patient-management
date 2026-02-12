@@ -1,10 +1,10 @@
-import { Dropdown, InlineNotification, RadioButton, RadioButtonGroup, RadioButtonSkeleton } from '@carbon/react';
-import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
+import { Dropdown, InlineNotification, RadioButton, RadioButtonGroup, RadioButtonSkeleton } from '@carbon/react';
 import { type Control, type FieldError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import useWardLocation from '../hooks/useWardLocation';
+import { type Patient } from '@openmrs/esm-framework';
 import { type BedLayout } from '../types';
+import useWardLocation from '../hooks/useWardLocation';
 import styles from './bed-selector.scss';
 
 interface BedSelectorProps {

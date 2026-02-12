@@ -8,6 +8,7 @@ import {
   generateWardAdmissionRequest,
   getProvider,
   startVisit,
+  waitForAdmissionRequestToBeProcessed,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
@@ -23,11 +24,12 @@ let wardPatient: Patient;
 test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
   bedtype = await generateBedType(api);
-  bed = await generateRandomBed(api, bedtype, process.env.E2E_WARD_LOCATION_UUID);
+  bed = await generateRandomBed(api, bedtype);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
 test('Cancel an admission request', async ({ page }) => {

@@ -1,3 +1,4 @@
+
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
@@ -9,6 +10,7 @@ import {
   generateWardAdmissionRequest,
   getProvider,
   startVisit,
+  waitForAdmissionRequestToBeProcessed,
   waitForAdmissionToBeProcessed,
 } from '../commands';
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
@@ -24,43 +26,12 @@ let wardPatient: Patient;
 test.beforeEach(async ({ api, page }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
-  bed = await generateRandomBed(api, bedType, process.env.E2E_WARD_LOCATION_UUID);
+  bed = await generateRandomBed(api, bedType);
   provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  // Poll the admission requests API to verify the admission is queryable before navigating.
-  // This prevents race conditions where the UI loads before the backend has indexed the admission.
-  const maxAttempts = 10;
-  const delayMs = 1000;
-  let admissionFound = false;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const admissionRequestsResponse = await api.get(
-      `emrapi/inpatient/request?dispositionType=ADMIT,TRANSFER&dispositionLocation=${process.env.E2E_WARD_LOCATION_UUID}`,
-    );
-
-    if (admissionRequestsResponse.ok()) {
-      const data = await admissionRequestsResponse.json();
-      const results = data.results || [];
-      admissionFound = results.some((req: any) => req.patient?.uuid === wardPatient.uuid);
-
-      if (admissionFound) {
-        break;
-      }
-    }
-
-    if (attempt < maxAttempts - 1) {
-      // eslint-disable-next-line playwright/no-wait-for-timeout
-      await page.waitForTimeout(delayMs);
-    }
-  }
-
-  if (!admissionFound) {
-    throw new Error(
-      `Admission for patient ${wardPatient.uuid} not found in API after ${maxAttempts} attempts. This indicates a backend indexing issue.`,
-    );
-  }
+  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid);
+  await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
 test('Add a patient note to an inpatient admission', async ({ page, api }) => {

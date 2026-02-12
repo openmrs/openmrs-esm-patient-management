@@ -26,7 +26,6 @@
   "editNameDescription": "Chỉnh sửa tên hoặc mô tả",
   "editPatientListHeader": "Sửa danh sách bệnh nhân",
   "emptyList": "Danh sách này không có bệnh nhân nào",
-  "emptyStateIllustration": "Minh họa trạng thái rỗng",
   "emptyStateText": "Ở đây không có {{listType}} danh sách bệnh nhân để hiển thị",
   "error": "Lỗi",
   "errorAddingPatientToList": "Failed to add patient to list",

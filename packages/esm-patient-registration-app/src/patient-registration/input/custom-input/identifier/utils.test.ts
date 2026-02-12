@@ -31,23 +31,57 @@ function createIdentifierType(options: IdentifierTypeOptions) {
 describe('shouldBlockPatientIdentifierInOfflineMode function', () => {
   it('should return false if identifierType is not unique', () => {
     const identifierType = createIdentifierType({ uniquenessBehavior: null });
-
     const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
     expect(result).toBe(false);
   });
 
-  it('should return false if identifierType is unique and no manual entry is enabled', () => {
-    const identifierType = createIdentifierType({ uniquenessBehavior: null });
+  it('should return false if identifierType is NON_UNIQUE', () => {
+    const identifierType = createIdentifierType({ uniquenessBehavior: 'NON_UNIQUE' });
+    const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
+    expect(result).toBe(false);
+  });
+
+  it('should return false if identifierType is unique but has automatic generation only (no manual entry)', () => {
+    const identifierType = createIdentifierType({
+      uniquenessBehavior: 'UNIQUE',
+      manualEntryEnabled: false,
+      automaticGenerationEnabled: true,
+    });
     const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
     expect(result).toBe(false);
   });
 
   it('should return true if identifierType is unique and manual entry is enabled', () => {
-    const identifierType = createIdentifierType({ manualEntryEnabled: true, uniquenessBehavior: 'UNIQUE' });
+    const identifierType = createIdentifierType({
+      uniquenessBehavior: 'UNIQUE',
+      manualEntryEnabled: true,
+      automaticGenerationEnabled: false,
+    });
+    const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
+    expect(result).toBe(true);
+  });
+
+  it('should return true if identifierType is unique and both manual entry and auto generation are enabled', () => {
+    const identifierType = createIdentifierType({
+      uniquenessBehavior: 'UNIQUE',
+      manualEntryEnabled: true,
+      automaticGenerationEnabled: true,
+    });
+    const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
+
+    expect(result).toBe(true);
+  });
+
+  it('should return true if identifierType is unique with LOCATION behavior and manual entry enabled', () => {
+    const identifierType = createIdentifierType({
+      uniquenessBehavior: 'LOCATION',
+      manualEntryEnabled: true,
+      automaticGenerationEnabled: false,
+    });
     const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
     expect(result).toBe(true);
@@ -57,7 +91,6 @@ describe('shouldBlockPatientIdentifierInOfflineMode function', () => {
 describe('isUniqueIdentifierTypeForOffline function', () => {
   it('should return true if uniquenessBehavior is UNIQUE', () => {
     const identifierType = createIdentifierType({ uniquenessBehavior: 'UNIQUE' });
-
     const result = isUniqueIdentifierTypeForOffline(identifierType);
 
     expect(result).toBe(true);
@@ -65,15 +98,20 @@ describe('isUniqueIdentifierTypeForOffline function', () => {
 
   it('should return true if uniquenessBehavior is LOCATION', () => {
     const identifierType = createIdentifierType({ uniquenessBehavior: 'LOCATION' });
-
     const result = isUniqueIdentifierTypeForOffline(identifierType);
 
     expect(result).toBe(true);
   });
 
-  it('should return false for other uniqueness behaviors', () => {
-    const identifierType = createIdentifierType({ uniquenessBehavior: null });
+  it('should return false if uniquenessBehavior is NON_UNIQUE', () => {
+    const identifierType = createIdentifierType({ uniquenessBehavior: 'NON_UNIQUE' });
+    const result = isUniqueIdentifierTypeForOffline(identifierType);
 
+    expect(result).toBe(false);
+  });
+
+  it('should return false if uniquenessBehavior is null or undefined', () => {
+    const identifierType = createIdentifierType({ uniquenessBehavior: null });
     const result = isUniqueIdentifierTypeForOffline(identifierType);
 
     expect(result).toBe(false);

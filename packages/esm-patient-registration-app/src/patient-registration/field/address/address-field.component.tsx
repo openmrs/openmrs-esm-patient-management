@@ -9,11 +9,11 @@ import {
   usePatientRegistrationContext,
 } from '../../patient-registration-context';
 import { ResourcesContextProvider, useResourcesContext } from '../../../resources-context';
+import { type AddressTemplate } from '../../patient-registration.types';
 import { Input } from '../../input/basic-input/input/input.component';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
-import { type AddressTemplate } from '../../patient-registration.types';
 
 export const AddressComponent: React.FC = () => {
   const config = useConfig();
@@ -74,10 +74,9 @@ export const AddressComponent: React.FC = () => {
   if (addressTemplate && !Object.keys(addressTemplate)?.length) {
     return (
       <AddressComponentContainer>
-        <SkeletonText
-          // @ts-expect-error
-          role="progressbar"
-        />
+        <div role="progressbar" aria-label={t('loading', 'Loading')}>
+          <SkeletonText />
+        </div>
       </AddressComponentContainer>
     );
   }
@@ -102,10 +101,9 @@ export const AddressComponent: React.FC = () => {
   if (isLoadingFieldOrder) {
     return (
       <AddressComponentContainer>
-        <SkeletonText
-          // @ts-expect-error
-          role="progressbar"
-        />
+        <div role="progressbar" aria-label={t('loading', 'Loading')}>
+          <SkeletonText />
+        </div>
       </AddressComponentContainer>
     );
   }
@@ -150,7 +148,7 @@ const AddressComponentContainer = ({ children }) => {
     () =>
       ({
         fieldConfigurations: {},
-        setFieldValue: () => {},
+        setFieldValue: async () => {},
         values: {},
       }) as unknown as PatientRegistrationContextProps,
     [],
@@ -162,7 +160,7 @@ const AddressComponentContainer = ({ children }) => {
         addressTemplate: {} as AddressTemplate,
         currentSession: {} as Session,
         identifierTypes: [],
-        relationshipTypes: [],
+        relationshipTypes: { results: [] },
       }}>
       <PatientRegistrationContextProvider value={contextValue}>
         <div>
