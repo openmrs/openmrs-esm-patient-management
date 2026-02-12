@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { filterByServiceType } from '../utils';
+import { filterByProvider, filterByServiceType } from '../utils';
 import { useEarlyAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
+import { useAppointmentsStore } from '../../store';
 
 interface EarlyAppointmentsProps {
   appointmentServiceTypes?: Array<string>;
@@ -16,16 +17,34 @@ interface EarlyAppointmentsProps {
 const EarlyAppointments: React.FC<EarlyAppointmentsProps> = ({ appointmentServiceTypes, date }) => {
   const { t } = useTranslation();
   const { earlyAppointmentList, isLoading } = useEarlyAppointmentList(date);
+  const { appointmentProvider } = useAppointmentsStore();
 
-  const appointments = filterByServiceType(earlyAppointmentList, appointmentServiceTypes).map((appointment, index) => {
+  const byServiceType = filterByServiceType(earlyAppointmentList, appointmentServiceTypes).map((appointment, index) => {
     return {
       id: `${index}`,
       ...appointment,
     };
   });
 
+  const byProvider = filterByProvider(earlyAppointmentList, appointmentProvider).map((appointment, index) => ({
+    id: `${index}`,
+    ...appointment,
+  }));
+
+  const appointments = byProvider.filter((appt) => byServiceType.some((s) => s.uuid === appt.uuid));
+
+  const allAppointments = earlyAppointmentList.map((appointment, index) => ({
+    id: `${index}`,
+    ...appointment,
+  }));
+
   return (
-    <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={t('cameEarly', 'Came Early')} />
+    <AppointmentsTable
+      appointments={appointments}
+      allAppointments={allAppointments}
+      isLoading={isLoading}
+      tableHeading={t('cameEarly', 'Came Early')}
+    />
   );
 };
 
