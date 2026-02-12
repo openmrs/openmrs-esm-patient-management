@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/type';
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
@@ -23,19 +24,19 @@
   flex: 1;
 }
 
-.productiveHeading02 {
+.columnLabel {
   @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  padding: layout.$spacing-02;
 }
 
 .buttonSet {
-  margin: 0 (-(layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05));
+  display: flex;
+  align-items: center;
+  margin: ((layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05));
 
   button {
     max-width: unset !important;
-    width: auto !important;
-
-    > svg {
-      fill: currentColor !important;
-    }
+    width: 50% !important;
   }
 }
