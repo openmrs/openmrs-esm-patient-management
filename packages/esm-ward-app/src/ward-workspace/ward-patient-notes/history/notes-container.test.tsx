@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import PatientNotesHistory from './notes-container.component';
-import { usePatientNotes } from '../notes.resource';
 import { emrConfigurationMock } from '__mocks__';
 import { getDefaultsFromConfigSchema, useConfig, useEmrConfiguration } from '@openmrs/esm-framework';
 import { configSchema, type WardConfigObject } from '../../../config-schema';
 import { type PatientNote } from '../types';
+import { usePatientNotes } from '../notes.resource';
+import PatientNotesHistory from './notes-container.component';
 
 const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
 

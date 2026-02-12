@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import {
   ArrowRightIcon,
-  launchWorkspace2,
   showSnackbar,
   useAppContext,
   useFeatureFlag,
@@ -11,7 +10,7 @@ import {
   useWorkspace2Context,
 } from '@openmrs/esm-framework';
 import useWardLocation from '../hooks/useWardLocation';
-import type { DispositionType, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../types';
+import type { DispositionType, WardPatient, WardViewContext } from '../types';
 import { useAdmitPatient } from '../ward.resource';
 
 interface AdmitPatientButtonProps {

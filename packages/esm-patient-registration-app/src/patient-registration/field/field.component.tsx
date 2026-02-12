@@ -19,7 +19,7 @@ export function Field({ name }: FieldProps) {
   const config = useConfig<RegistrationConfig>();
   if (
     !(builtInFields as ReadonlyArray<string>).includes(name) &&
-    !config.fieldDefinitions.some((def) => def.id == name)
+    !config.fieldDefinitions.some((def) => def.id === name)
   ) {
     reportError(
       `Invalid field name '${name}'. Valid options are '${config.fieldDefinitions

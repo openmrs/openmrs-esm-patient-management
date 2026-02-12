@@ -1,32 +1,28 @@
-import React from 'react';
-import { navigate } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OverflowMenuItem } from '@carbon/react';
+import { navigate } from '@openmrs/esm-framework';
 import styles from './edit-patient-details-button.scss';
 
 interface EditPatientDetailsButtonProps {
-  onTransition?: () => void;
   patientUuid: string;
+  closeMenu?: () => void;
 }
 
-const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ patientUuid, onTransition }) => {
+const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ patientUuid, closeMenu }) => {
   const { t } = useTranslation();
-  const handleClick = React.useCallback(() => {
+
+  const handleClick = useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-    onTransition?.();
-  }, [onTransition, patientUuid]);
+  }, [patientUuid]);
 
   return (
-    <li className="cds--overflow-menu-options__option">
-      <button
-        className="cds--overflow-menu-options__btn"
-        role="menuitem"
-        data-floating-menu-primary-focus
-        onClick={handleClick}>
-        <span className="cds--overflow-menu-options__option-content">
-          {t('editPatientDetails', 'Edit patient details')}
-        </span>
-      </button>
-    </li>
+    <OverflowMenuItem
+      className={styles.menuitem}
+      closeMenu={closeMenu}
+      itemText={t('editPatientDetails', 'Edit patient details')}
+      onClick={handleClick}
+    />
   );
 };
 

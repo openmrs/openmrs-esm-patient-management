@@ -17,7 +17,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) =>
     <Layer>
       <Tile className={styles.tile}>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{headerTitle}</h4>
+          <h2>{headerTitle}</h2>
         </div>
         <p className={styles.errorMessage}>
           {t('error', 'Error')} {`${error?.response?.status}: `}

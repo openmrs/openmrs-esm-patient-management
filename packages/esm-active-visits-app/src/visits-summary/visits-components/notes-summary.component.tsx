@@ -2,9 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { EmptyCardIllustration, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import type { Note } from '../../types';
-import { EmptyDataIllustration } from '../../active-visits-widget/empty-data-illustration.component';
 import styles from '../visit-detail-overview.scss';
 
 interface NotesSummaryProps {
@@ -36,7 +35,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
               <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
                 <h4>{t('notes', 'Notes')}</h4>
               </div>
-              <EmptyDataIllustration />
+              <EmptyCardIllustration />
               <p className={styles.emptyStateContent}>
                 {t('noNotesToShowForPatient', 'There are no notes to display for this patient')}
               </p>

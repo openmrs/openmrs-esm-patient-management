@@ -1,6 +1,6 @@
-import { ActionMenuButton2, StickyNoteAddIcon } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ActionMenuButton2, StickyNoteAddIcon } from '@openmrs/esm-framework';
 
 export default function WardPatientNotesActionButton() {
   const { t } = useTranslation();

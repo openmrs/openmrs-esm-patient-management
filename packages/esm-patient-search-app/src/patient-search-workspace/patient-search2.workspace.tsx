@@ -12,6 +12,7 @@ export interface PatientSearchWorkspaceProps {
     patientUuid: string,
     patient: fhir.Patient,
     launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
+    closeWorkspace: () => void,
   ): void;
 }
 

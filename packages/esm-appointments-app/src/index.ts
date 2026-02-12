@@ -135,3 +135,8 @@ export const homeAppointmentsTile = getAsyncLifecycle(
   () => import('./homepage-tile/appointments-tile.component'),
   options,
 );
+
+export const batchChangeAppointmentStatusesModal = getAsyncLifecycle(
+  () => import('./appointments/common-components/batch-change-appointment-statuses.modal'),
+  options,
+);

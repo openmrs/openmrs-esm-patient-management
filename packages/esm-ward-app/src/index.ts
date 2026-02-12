@@ -100,16 +100,6 @@ export const orderBasketWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
-export const admissionRequestsWorkspaceSideRailIcon = getAsyncLifecycle(
-  () => import('./ward-workspace/admission-request-workspace/admission-requests-action-button.extension'),
-  options,
-);
-
-export const createAdmissionEncounterWorkspaceSideRailIcon = getAsyncLifecycle(
-  () => import('./ward-workspace/create-admission-encounter/create-admission-encounter-action-button.extension'),
-  options,
-);
-
 export const createAdmissionEncounterWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/create-admission-encounter/create-admission-encounter.workspace'),
   options,

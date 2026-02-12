@@ -279,16 +279,6 @@ export interface QueueEntryPayload {
 export type AllowedPriority = OpenmrsResource;
 export type AllowedStatus = OpenmrsResource;
 
-// TODO: remove this in favor of Queue
-export interface QueueServiceInfo {
-  uuid: string;
-  display: string;
-  name: string;
-  description: string;
-  allowedPriorities: Array<AllowedPriority>;
-  allowedStatuses: Array<AllowedStatus>;
-}
-
 export interface MappedServiceQueueEntry {
   id: string;
   name: string;
@@ -401,6 +391,10 @@ export interface QueueRoom {
   display: string;
   name: string;
   description: string;
+  queue: {
+    uuid: string;
+    display: string;
+  };
 }
 
 export interface ProvidersQueueRoom {
