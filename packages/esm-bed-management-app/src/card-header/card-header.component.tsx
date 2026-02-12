@@ -13,7 +13,7 @@ function CardHeader({ title, children }: CardHeaderProps) {
 
   return (
     <div className={classNames(isTablet ? styles.tabletHeader : styles.desktopHeader)}>
-      <h4>{title}</h4>
+      <h2>{title}</h2>
       {children}
     </div>
   );

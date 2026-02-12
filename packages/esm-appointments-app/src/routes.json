@@ -129,10 +129,16 @@
     {
       "name": "cancel-appointment-modal",
       "component": "cancelAppointmentModal"
+    },
+    {
+      "name": "batch-change-appointments-statuses-modal",
+      "component": "batchChangeAppointmentStatusesModal"
     }
   ],
-  "workspaceGroups2": [{
-      "name": "appointments-group"
+  "workspaceGroups2": [
+    {
+      "name": "appointments-group",
+      "scopePattern": "/home/appointments"
     }
   ],
   "workspaceWindows2": [
