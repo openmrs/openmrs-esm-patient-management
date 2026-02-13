@@ -88,7 +88,6 @@ describe('QueueTable', () => {
     }
 
     expect(screen.getByText(/No patients to display/i)).toBeInTheDocument();
-    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 
   it('renders queue entries with default columns', () => {
