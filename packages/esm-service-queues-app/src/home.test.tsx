@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from './config-schema';
+import { useQueueEntries } from './hooks/useQueueEntries';
 import { updateSelectedQueueLocationName } from './store/store';
 import Home from './home.component';
 
@@ -14,6 +15,20 @@ jest.mock('./hooks/useQueues', () => ({
 jest.mock('./create-queue-entry/hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
 }));
+
+jest.mock('./hooks/useQueueEntries', () => ({
+  ...jest.requireActual('./hooks/useQueueEntries'),
+  useQueueEntries: jest.fn(),
+}));
+
+jest.mocked(useQueueEntries).mockReturnValue({
+  queueEntries: [],
+  isLoading: false,
+  isValidating: false,
+  totalCount: 0,
+  error: undefined,
+  mutate: jest.fn(),
+});
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
