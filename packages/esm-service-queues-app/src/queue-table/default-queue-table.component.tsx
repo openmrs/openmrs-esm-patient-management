@@ -6,11 +6,11 @@ import { updateSelectedQueueStatus, useServiceQueuesStore } from '../store/store
 import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
-import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
-import QueueTableExpandedRow from './queue-table-expanded-row.component';
-import QueueTable from './queue-table.component';
-import styles from './queue-table.scss';
 import AddPatientToQueueButton from './components/add-patient-to-queue-button.component';
+import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
+import QueueTable from './queue-table.component';
+import QueueTableExpandedRow from './queue-table-expanded-row.component';
+import styles from './queue-table.scss';
 
 function DefaultQueueTable() {
   const { t } = useTranslation();
@@ -92,7 +92,6 @@ function QueueTableSection() {
   return (
     <QueueTable
       ExpandedRow={QueueTableExpandedRow}
-      isLoading={isLoading}
       isValidating={isValidating}
       queueEntries={filteredQueueEntries ?? []}
       queueUuid={null}
