@@ -5,7 +5,8 @@ import {
   DataTable,
   DataTableSkeleton,
   Dropdown,
-  IconButton,
+  OverflowMenu,
+  OverflowMenuItem,
   InlineLoading,
   Pagination,
   Table,
@@ -18,10 +19,11 @@ import {
   Tag,
   Tile,
 } from '@carbon/react';
-import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import {
   ErrorState,
   isDesktop as desktopLayout,
+  getCoreTranslation,
   launchWorkspace2,
   showModal,
   useLayoutType,
@@ -136,32 +138,21 @@ const BedAdministrationTable: React.FC = () => {
       occupancyStatus: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
-        <>
-          <IconButton
-            align="top-start"
-            enterDelayMs={300}
-            kind="ghost"
-            label={t('editBed', 'Edit bed')}
-            onClick={(e) => {
-              e.preventDefault();
-              handleLaunchBedWorkspace('edit', bed);
-            }}
-            size={responsiveSize}>
-            <Edit />
-          </IconButton>
-          <IconButton
-            align="top-right"
-            enterDelayMs={300}
-            kind="ghost"
-            label={t('deleteBed', 'Delete bed')}
-            onClick={(e) => {
-              e.preventDefault();
-              openDeleteBedModal(bed.uuid);
-            }}
-            size={responsiveSize}>
-            <TrashCan />
-          </IconButton>
-        </>
+        <OverflowMenu flipped size={responsiveSize} aria-label={t('actions', 'Actions')}>
+          <OverflowMenuItem
+            className={styles.menuitem}
+            data-testid={`edit-button-${bed.uuid}`}
+            itemText={getCoreTranslation('edit')}
+            onClick={() => handleLaunchBedWorkspace('edit', bed)}
+          />
+          <OverflowMenuItem
+            className={styles.menuitem}
+            isDelete
+            data-testid={`delete-button-${bed.uuid}`}
+            itemText={getCoreTranslation('delete')}
+            onClick={() => openDeleteBedModal(bed.uuid)}
+          />
+        </OverflowMenu>
       ),
     }));
   }, [handleLaunchBedWorkspace, openDeleteBedModal, responsiveSize, paginatedData, t]);

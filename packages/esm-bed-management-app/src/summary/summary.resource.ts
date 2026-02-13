@@ -304,11 +304,8 @@ export async function deleteBedType({
   });
 }
 
-export const deleteBed = (bedUuid: string) => {
-  const url = `${restBaseUrl}/bed/${bedUuid}`;
-
-  return openmrsFetch(url, {
+export async function deleteBed({ bedId, reason }: { bedId: string; reason: string }): Promise<FetchResponse> {
+  return await openmrsFetch(`${restBaseUrl}/bed/${bedId}?reason=${encodeURIComponent(reason)}`, {
     method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
   });
-};
+}
