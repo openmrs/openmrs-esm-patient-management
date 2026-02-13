@@ -57,18 +57,34 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
         if (response && response?.ok) {
           showSnackbar({
             kind: 'success',
-            title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
-            subtitle: t('patientAdmittedWoBed', 'Patient admitted successfully to {{location}}', {
-              location: location?.display,
-            }),
+            title:
+              dispositionType === 'ADMIT'
+                ? t('patientAdmittedSuccessfully', 'Patient admitted successfully')
+                : t('patientTransferredSuccessfully', 'Patient transferred successfully'),
+            subtitle:
+              dispositionType === 'ADMIT'
+                ? t('patientAdmittedToLocation', 'Patient admitted successfully to {{location}}', {
+                    location: location?.display,
+                  })
+                : t('patientTransferredToLocation', 'Patient transferred successfully to {{location}}', {
+                    location: location?.display,
+                  }),
           });
         }
         onAdmitPatientSuccess();
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : t('unknownError', 'An unknown error occurred');
+      } catch (err) {
+        // TODO: better way to handle / display error messages
+        // https://openmrs.atlassian.net/browse/O3-5423
+        const errorMessage =
+          err?.responseBody?.error?.globalErrors?.[0]?.message ??
+          err.message ??
+          t('unknownError', 'An unknown error occurred');
         showSnackbar({
           kind: 'error',
-          title: t('errorCreatingEncounter', 'Failed to admit patient'),
+          title:
+            dispositionType === 'ADMIT'
+              ? t('errrorAdmitingPatient', 'Failed to admit patient')
+              : t('errorTransferringPatient', 'Failed to transfer patient'),
           subtitle: errorMessage,
         });
       } finally {
