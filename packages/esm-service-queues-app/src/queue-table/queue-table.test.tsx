@@ -86,6 +86,9 @@ describe('QueueTable', () => {
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
     }
+
+    expect(screen.getByText(/No patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 
   it('renders queue entries with default columns', () => {
@@ -244,13 +247,6 @@ describe('QueueTable', () => {
     const cells = within(aliceRow).getAllByRole('cell');
     // TODO: Figure out why this expectation is failing
     // expect(cells[1].childNodes[0]).toHaveTextContent('42');
-  });
-
-  it('renders "No patients to display" when the list is empty', () => {
-    renderQueueTable({ queueEntries: [] });
-
-    expect(screen.getByText(/No patients to display/i)).toBeInTheDocument();
-    expect(screen.getByText(/Check the filters above/i)).toBeInTheDocument();
   });
 });
 
