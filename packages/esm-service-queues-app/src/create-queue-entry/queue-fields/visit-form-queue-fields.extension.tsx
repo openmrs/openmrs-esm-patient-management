@@ -29,7 +29,7 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
   const isRetrospective = watch('retrospective');
 
   if (
-    (patientChartConfig.showServiceQueueFields || visitFormOpenedFrom == 'service-queues-add-patient') &&
+    (patientChartConfig.showServiceQueueFields || visitFormOpenedFrom === 'service-queues-add-patient') &&
     !isRetrospective
   ) {
     return (
