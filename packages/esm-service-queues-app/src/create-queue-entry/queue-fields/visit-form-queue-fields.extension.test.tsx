@@ -8,12 +8,6 @@ jest.mock('react-hook-form', () => ({
   useFormContext: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  useConfig: jest.fn().mockReturnValue({}),
-}));
-
-jest.mock('./queue-fields.component', () => () => <div data-testid="queue-fields-component">Queue Fields</div>);
-
 describe('VisitFormQueueFields', () => {
   const mockSetVisitFormCallbacks = jest.fn();
 
@@ -33,7 +27,7 @@ describe('VisitFormQueueFields', () => {
       />
     );
 
-    expect(screen.getByTestId('queue-fields-component')).toBeInTheDocument();
+    expect(screen.getByText(/Service Queue/i)).toBeInTheDocument();
   });
 
   it('should NOT render queue fields when visit IS retrospective', () => {
@@ -52,6 +46,6 @@ describe('VisitFormQueueFields', () => {
       />
     );
 
-    expect(screen.queryByTestId('queue-fields-component')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Service Queue/i)).not.toBeInTheDocument();
   });
 });
