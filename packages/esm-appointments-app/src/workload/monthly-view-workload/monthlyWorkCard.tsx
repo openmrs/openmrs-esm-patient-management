@@ -34,7 +34,7 @@ const MonthlyWorkloadCard: React.FC<MonthlyWorkloadComponentProps> = ({ date, co
       <div>
         <b className={[styles.calendarDate, isToday ? styles.blue : ''].join(' ')}>{date.format('D')}</b>
         <div className={styles.currentData}>
-          <div tabIndex={0} role="button" className={classNames(styles.tileContainer, {})}></div>
+          <div className={classNames(styles.tileContainer, {})}></div>
           <div className={styles.serviceArea}>
             <span className={isActive ? styles.blue : ''}>{count}</span>
           </div>

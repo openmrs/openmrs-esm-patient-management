@@ -47,7 +47,15 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
           <div className={styles.monthlyCalendar}>
             {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleClick(dayjs(dateTime).toDate())}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleClick(dayjs(dateTime).toDate());
+                  }
+                }}
                 key={i}
                 className={`${styles.monthlyWorkloadCard} ${
                   dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
