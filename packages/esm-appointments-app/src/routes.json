@@ -163,5 +163,23 @@
       "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
       "window": "appointments-window"
     }
+  ],
+  "workspaces2": [
+    {
+      "name": "service-availability-form-workspace",
+      "component": "serviceAvailabilityFormWorkspace",
+      "window": "service-availability-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "service-availability-form-window",
+      "group": "appointments"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "appointments"
+    }
   ]
 }
