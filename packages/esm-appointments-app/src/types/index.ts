@@ -149,10 +149,10 @@ export interface AppointmentSummary {
 
 export interface Provider {
   uuid: string;
-  display: string;
+  display?: string;
   comments?: string;
   response?: string;
-  person: OpenmrsResource;
+  person?: OpenmrsResource;
   name?: string;
   retired?: boolean;
   attributes?: Array<{

@@ -5,6 +5,7 @@ export const appointmentLocationTagName = 'Appointment Location';
 
 export const moduleName = '@openmrs/esm-appointments-app';
 export const appointmentsFormWorkspace = 'appointments-form-workspace';
+export const printPrescriptionPreviewModal = 'print-prescription-preview-modal';
 
 export const dateFormat = 'DD/MM/YYYY';
 export const weekDays = [

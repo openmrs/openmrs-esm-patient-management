@@ -109,10 +109,6 @@
     {
       "name": "batch-change-appointments-statuses-modal",
       "component": "batchChangeAppointmentStatusesModal"
-    },
-    {
-      "name": "print-prescription-preview-modal",
-      "component": "printPrescriptionPreviewModal"
     }
   ],
   "workspaceGroups2": [

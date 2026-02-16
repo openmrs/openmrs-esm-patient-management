@@ -1,8 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
-import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { AppointmentStatus } from '../types';
-import { appointmentsFormWorkspace } from '../constants';
+import { launchWorkspace2, showModal, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { AppointmentStatus, type Appointment } from '../types';
+import { appointmentsFormWorkspace, printPrescriptionPreviewModal } from '../constants';
 
 export const formatAMPM = (date: Date): string => {
   const hours24 = date.getHours();
@@ -77,6 +77,13 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
       startVisitWorkspaceName: 'appointments-start-visit-workspace',
     },
   );
+};
+
+export const launchPrintPrescriptionPreview = (appointment: Appointment) => {
+  const dispose = showModal(printPrescriptionPreviewModal, {
+    onClose: () => dispose(),
+    appointment,
+  });
 };
 
 /**

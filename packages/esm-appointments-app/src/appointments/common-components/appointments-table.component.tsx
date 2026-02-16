@@ -50,7 +50,7 @@ import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { AppointmentStatus, type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
-import { launchCreateAppointmentForm } from '../../helpers';
+import { launchCreateAppointmentForm, launchPrintPrescriptionPreview } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import { useAppointmentsStore } from '../../store';
@@ -79,13 +79,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   const [selectedAppointmentUuids, setSelectedAppointmentUuids] = useState(new Set<string>());
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-
-  const handlePrintPrescription = (appointment: Appointment) => {
-    const dispose = showModal('print-prescription-preview-modal', {
-      onClose: () => dispose(),
-      appointment,
-    });
-  };
 
   useEffect(() => {
     setSelectedAppointmentUuids(new Set());
@@ -129,7 +122,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
             renderIcon={Printer}
             iconDescription={t('printPrescription', 'Print Prescription')}
             hasIconOnly
-            onClick={() => handlePrintPrescription(appointment)}
+            onClick={() => launchPrintPrescriptionPreview(appointment)}
             tooltipPosition="left"
           />
         ),
