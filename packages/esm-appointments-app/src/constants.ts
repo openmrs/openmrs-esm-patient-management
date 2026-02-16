@@ -69,4 +69,6 @@ export const appointmentColumnTypes = [
   'dateTime',
   // t('provider', 'Provider')
   'provider',
+  // t('prescription', 'Rx Sheet')
+  'prescription',
 ] as const;

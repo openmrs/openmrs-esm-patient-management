@@ -115,7 +115,12 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
         dateTime: formatDatetime(new Date(appointment.startDateTime)),
         serviceType: appointment.service.name,
         location: appointment.location?.name,
-        provider: appointment.providers?.[0]?.name ?? '--',
+        provider:
+          (appointment.providers as any[])
+            ?.filter((provider) => provider?.response === 'ACCEPTED')
+            ?.map((provider) => provider?.name ?? provider?.display)
+            ?.filter(Boolean)
+            ?.join(', ') ?? '--',
         status: <AppointmentActions appointment={appointment} />,
         prescription: (
           <Button
