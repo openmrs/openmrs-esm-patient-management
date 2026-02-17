@@ -4,7 +4,6 @@ import { Button, InlineNotification, SkeletonText } from '@carbon/react';
 import {
   ArrowLeftIcon,
   closeWorkspaceGroup2,
-  type DefaultWorkspaceProps,
   useVisit,
   Workspace2,
   type Workspace2DefinitionProps,
@@ -12,10 +11,11 @@ import {
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import { useInpatientAdmissionByPatients } from '../../hooks/useInpatientAdmissionByPatients';
 import { useInpatientRequestByPatients } from '../../hooks/useInpatientRequestByPatients';
+import type { Bed, WardPatient } from '../../types';
 import useRestPatient from '../../hooks/useRestPatient';
 import useWardLocation from '../../hooks/useWardLocation';
-import type { Bed, WardPatient } from '../../types';
 import AdmitPatientButton from '../admit-patient-button.component';
+import NoActiveVisitEmptyState from './no-active-visit-empty-state.component';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 
 export interface CreateAdmissionEncounterWorkspaceProps {
@@ -35,7 +35,12 @@ const CreateAdmissionEncounterWorkspace: React.FC<
     },
     {}
   >
-> = ({ closeWorkspace, workspaceProps: { selectedPatientUuid } }) => {
+> = ({
+  closeWorkspace,
+  workspaceProps: { selectedPatientUuid },
+  windowProps: { startVisitWorkspaceName },
+  launchChildWorkspace,
+}) => {
   const { location } = useWardLocation();
   const { patient, isLoading: isLoadingPatient, error: errorLoadingPatient } = useRestPatient(selectedPatientUuid);
   const { activeVisit, isLoading: isLoadingVisit, error: errorLoadingVisit } = useVisit(selectedPatientUuid);
@@ -149,19 +154,13 @@ const CreateAdmissionEncounterWorkspace: React.FC<
             />
           </div>
         ) : (
-          <div>
-            {/* TODO: This is a placeholder, and will likely change with ongoing designs with RDE */}
-            {t('patienthasNoActiveVisit', 'Patient has no active visit')}
-          </div>
+          <NoActiveVisitEmptyState
+            patientUuid={selectedPatientUuid}
+            launchChildWorkspace={launchChildWorkspace}
+            startVisitWorkspaceName={startVisitWorkspaceName}
+            closeWorkspace={() => closeWorkspace()}
+          />
         )}
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
-          iconDescription={t('backToSearchResults', 'Back to search results')}
-          size="sm"
-          onClick={() => closeWorkspace()}>
-          <span>{t('backToSearchResults', 'Back to search results')}</span>
-        </Button>
       </div>
     );
   }
