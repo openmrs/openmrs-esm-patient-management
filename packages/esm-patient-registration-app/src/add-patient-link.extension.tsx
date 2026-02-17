@@ -13,6 +13,8 @@ export default function Root() {
     <HeaderGlobalAction
       aria-label={t('addPatient', 'Add patient')}
       aria-labelledby={t('addPatient', 'Add patient')}
+      // @ts-expect-error - `name` is not a valid prop for the HeaderGlobalAction component, but we need it for the user onboarding app
+      name="AddPatientIcon"
       onClick={addPatient}
       className={styles.slotStyles}>
       <UserFollow size={20} />
