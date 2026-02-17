@@ -1,29 +1,45 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@openmrs/esm-framework';
+import { getLocalTimeZone, toCalendarDate, today, type CalendarDate } from '@internationalized/date';
 import { monthDays } from '../../helpers';
-import { useAppointmentsStore } from '../../store';
+import { getSelectedCalendarDate, locale } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
 
 interface MonthlyCalendarViewProps {
   calendarWorkload: Array<{ count: number; date: string }>;
-  dateToDisplay?: string;
+  dateToDisplay?: CalendarDate;
   onDateClick?: (pickedDate: Date) => void;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
-  calendarWorkload,
-  dateToDisplay = '',
-  onDateClick,
-}) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ calendarWorkload, dateToDisplay, onDateClick }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
-  const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-  const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
-  const daysInWeeks = daysInWeek.map((day) => t(day));
+  const date = getSelectedCalendarDate();
+  const todayDate = toCalendarDate(today(getLocalTimeZone()));
+  const todayShort = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+    .format(todayDate.toDate(getLocalTimeZone()))
+    .toUpperCase();
+
+  const daysInWeeks = React.useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+
+    const baseDate = new Date(Date.UTC(2021, 7, 1));
+
+    return Array.from({ length: 7 }).map((_, index) => {
+      const date = new Date(baseDate);
+      date.setUTCDate(baseDate.getUTCDate() + index);
+
+      const label = formatter.format(date).toUpperCase();
+      return {
+        label,
+        isToday: label === todayShort,
+      };
+    });
+  }, [todayShort]);
+
+  const monthViewDate: CalendarDate = dateToDisplay ?? date;
 
   const handleClick = (date: Date) => {
     if (onDateClick) {
@@ -36,32 +52,27 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
       <>
         <div className={styles.container}></div>
         <span className={styles.headerContainer}>
-          {formatDate(new Date(monthViewDate), { day: false, time: false, noToday: true })}
+          {formatDate(monthViewDate.toDate(getLocalTimeZone()), { day: false, time: false, noToday: true })}
         </span>
         <div className={styles.workLoadCard}>
-          {daysInWeeks?.map((day, i) => (
-            <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />
+          {daysInWeeks.map(({ label, isToday }, i) => (
+            <DaysOfWeekCard key={`${label}-${i}`} dayOfWeek={label} isToday={isToday} />
           ))}
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
-            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
+            {monthDays(monthViewDate).map((dateTime, i) => (
               <div
-                onClick={() => handleClick(dayjs(dateTime).toDate())}
+                onClick={() => handleClick(dateTime.toDate(getLocalTimeZone()))}
                 key={i}
                 className={`${styles.monthlyWorkloadCard} ${
-                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
-                    ? styles.selectedDate
-                    : ''
+                  dateTime.toString() === monthViewDate.toString() ? styles.selectedDate : ''
                 }`}>
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}
-                  isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
-                  count={
-                    calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
-                      ?.count ?? 0
-                  }
+                  isActive={dateToDisplay.toString() === dateTime.toString()}
+                  count={calendarWorkload.find((calendar) => calendar.date === dateTime.toString())?.count ?? 0}
                 />
               </div>
             ))}
