@@ -56,8 +56,6 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "@rspack/cli": "^1.3.11",
-    "@rspack/core": "^1.3.11",
-    "webpack": "^5.99.9"
+    "openmrs": "next"
   }
 }
