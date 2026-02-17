@@ -45,19 +45,22 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
       mappedQueueEntry.sortWeight,
     ).then(
       () => {
-        serveQueueEntry(mappedQueueEntry.queue.name, mappedQueueEntry.visitQueueNumber, 'serving').then(
-          ({ status }) => {
-            showSnackbar({
-              isLowContrast: true,
-              title: t('success', 'Success'),
-              kind: 'success',
-              subtitle: t('patientAttendingService', 'Patient attending service'),
-            });
-            closeModal();
-            mutateQueueEntries();
-            navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
-          },
-        );
+        serveQueueEntry(
+          mappedQueueEntry.queue.name,
+          mappedQueueEntry.visitQueueNumber,
+          'serving',
+          mappedQueueEntry?.queueLocation,
+        ).then(({ status }) => {
+          showSnackbar({
+            isLowContrast: true,
+            title: t('success', 'Success'),
+            kind: 'success',
+            subtitle: t('patientAttendingService', 'Patient attending service'),
+          });
+          closeModal();
+          mutateQueueEntries();
+          navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
+        });
       },
       (error) => {
         showSnackbar({
@@ -69,18 +72,19 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
       },
     );
   }, [
-    closeModal,
-    defaultTransitionStatus,
-    mutateQueueEntries,
+    mappedQueueEntry.visitUuid,
+    mappedQueueEntry.queueUuid,
+    mappedQueueEntry.queueEntryUuid,
     mappedQueueEntry.patientUuid,
     mappedQueueEntry.priority?.uuid,
-    mappedQueueEntry.queue.name,
-    mappedQueueEntry.queueEntryUuid,
-    mappedQueueEntry.queueUuid,
     mappedQueueEntry.sortWeight,
+    mappedQueueEntry.queue.name,
     mappedQueueEntry.visitQueueNumber,
-    mappedQueueEntry.visitUuid,
+    mappedQueueEntry?.queueLocation,
+    defaultTransitionStatus,
     t,
+    closeModal,
+    mutateQueueEntries,
   ]);
 
   const handleRequeuePatient = useCallback(() => {
