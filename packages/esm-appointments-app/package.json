@@ -56,6 +56,6 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "@openmrs/rspack-config": "next"
+    "openmrs": "next"
   }
 }
