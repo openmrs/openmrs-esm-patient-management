@@ -27,7 +27,8 @@ import {
 } from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
+import { time12HourFormatRegexPattern } from '../constants';
+import { getErrorMessage, isAlreadyEndedQueueEntryError, isDuplicateQueueEntryError } from './queue-entry-error.utils';
 import { convertTime12to24, type amPm } from './time-helpers';
 import { type ConfigObject } from '../config-schema';
 import { type Queue, type QueueEntry } from '../types';
@@ -193,10 +194,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         }
       })
       .catch((error) => {
-        const errorMessage = error?.responseBody?.error?.message || error?.message || '';
-        const isDuplicateQueueEntryError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
-
-        if (isDuplicateQueueEntryError) {
+        if (isAlreadyEndedQueueEntryError(error)) {
+          showSnackbar({
+            title: t('queueEntryAlreadyEnded', 'Queue entry is no longer active'),
+            kind: 'warning',
+            subtitle: t(
+              'queueEntryAlreadyEndedMessage',
+              'This queue entry has already been completed by another user. The queue has been refreshed.',
+            ),
+          });
+          mutateQueueEntries();
+          closeModal();
+        } else if (isDuplicateQueueEntryError(error)) {
           setSubmissionError({
             type: 'duplicate',
             message: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
@@ -205,7 +214,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         } else {
           setSubmissionError({
             type: 'error',
-            message: error?.message || t('unknownError', 'An unknown error occurred'),
+            message: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             title: submitFailureTitle,
           });
         }

@@ -4,11 +4,12 @@ import { screen } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
+import DeleteQueueEntryModal from './delete-queue-entry.modal';
 import RemoveQueueEntryModal from './remove-queue-entry.modal';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
-import DeleteQueueEntryModal from './delete-queue-entry.modal';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockMutateQueueEntries = jest.fn();
 
 jest.mock('../hooks/useQueues', () => {
   return {
@@ -17,6 +18,12 @@ jest.mock('../hooks/useQueues', () => {
     }),
   };
 });
+
+jest.mock('../hooks/useQueueEntries', () => ({
+  useMutateQueueEntries: () => ({
+    mutateQueueEntries: mockMutateQueueEntries,
+  }),
+}));
 
 describe('UndoTransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
@@ -119,5 +126,32 @@ describe('EndQueueEntryModal', () => {
       subtitle: 'Patient removed from queue successfully',
       title: 'Patient removed',
     });
+  });
+
+  it('closes modal and shows warning when queue entry has already ended', async () => {
+    mockOpenmrsFetch.mockRejectedValue({
+      responseBody: {
+        error: {
+          message: 'Cannot transition a queue entry that has already ended',
+        },
+      },
+    });
+
+    const closeModal = jest.fn();
+    const user = userEvent.setup();
+
+    renderWithSwr(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+
+    const submitButton = screen.getByRole('button', { name: /Remove/ });
+    await user.click(submitButton);
+
+    expect(showSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'warning',
+        title: 'Queue entry is no longer active',
+      }),
+    );
+    expect(mockMutateQueueEntries).toHaveBeenCalled();
+    expect(closeModal).toHaveBeenCalled();
   });
 });
