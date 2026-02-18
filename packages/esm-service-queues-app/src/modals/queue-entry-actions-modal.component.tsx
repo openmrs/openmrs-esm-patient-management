@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import {
@@ -109,7 +109,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isSubmittingRef = useRef(false);
   const [submissionError, setSubmissionError] = useState<{
     type: 'duplicate' | 'error';
     message: string;
@@ -177,10 +176,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   };
 
   const submitForm = () => {
-    if (isSubmittingRef.current) {
-      return;
-    }
-    isSubmittingRef.current = true;
     setIsSubmitting(true);
 
     submitAction(queueEntry, formState)
@@ -225,7 +220,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         }
       })
       .finally(() => {
-        isSubmittingRef.current = false;
         setIsSubmitting(false);
       });
   };

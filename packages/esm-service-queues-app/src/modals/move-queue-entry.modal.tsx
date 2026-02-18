@@ -24,12 +24,7 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
     if (isEnded) {
       mutateQueueEntries();
     }
-    // `mutateQueueEntries` is excluded from deps because useMutateQueueEntries()
-    // returns a new function reference each render, which would re-trigger this effect
-    // in a loop. `isEnded` is stable once true, so this runs at most once in production
-    // (twice in dev StrictMode, which is harmless for a cache invalidation).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEnded]);
+  }, [isEnded, mutateQueueEntries]);
 
   if (isLoading) {
     return (

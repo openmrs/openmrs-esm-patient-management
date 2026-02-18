@@ -1,4 +1,4 @@
-import React, { type ReactNode, useRef, useState } from 'react';
+import React, { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter, Stack } from '@carbon/react';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
@@ -43,14 +43,9 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
   } = modalParams;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isSubmittingRef = useRef(false);
 
   const submitForm = (e) => {
     e.preventDefault();
-    if (isSubmittingRef.current) {
-      return;
-    }
-    isSubmittingRef.current = true;
     setIsSubmitting(true);
 
     submitAction(queueEntry)
@@ -90,7 +85,6 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
         }
       })
       .finally(() => {
-        isSubmittingRef.current = false;
         setIsSubmitting(false);
       });
   };
