@@ -53,19 +53,23 @@ function getNextUrlFromResponse(data: QueueEntryResponse) {
 
 export function useMutateQueueEntries() {
   const { mutate } = useSWRConfig();
+  const mutateQueueEntries = useCallback(() => {
+    return mutate((key) => {
+      return (
+        typeof key === 'string' &&
+        (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
+      );
+    }).then(() => {
+      window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+    });
+  }, [mutate]);
 
-  return {
-    mutateQueueEntries: () => {
-      return mutate((key) => {
-        return (
-          typeof key === 'string' &&
-          (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
-        );
-      }).then(() => {
-        window.dispatchEvent(new CustomEvent('queue-entry-updated'));
-      });
-    },
-  };
+  return useMemo(
+    () => ({
+      mutateQueueEntries,
+    }),
+    [mutateQueueEntries],
+  );
 }
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
