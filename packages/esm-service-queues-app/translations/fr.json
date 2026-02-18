@@ -137,6 +137,8 @@
   "queueCreated": "Queue created",
   "queueDeleted": "Queue deleted",
   "queueEntryAddedSuccessfully": "Entrée dans la file d'attente ajoutée avec succès",
+  "queueEntryAlreadyEnded": "Queue entry is no longer active",
+  "queueEntryAlreadyEndedMessage": "This queue entry has already been completed by another user. The queue has been refreshed.",
   "queueEntryDeleteFailed": "Erreur lors de la suppression de l'entrée de la file d'attente",
   "queueEntryDeleteSuccessful": "Entrée de la file d'attente supprimée avec succès ",
   "queueEntryEdited": "Entrée de la file d'attente affichée",
