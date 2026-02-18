@@ -137,6 +137,8 @@
   "queueCreated": "Queue created",
   "queueDeleted": "Queue deleted",
   "queueEntryAddedSuccessfully": "La entrada en la cola fue agregada exitosamente",
+  "queueEntryAlreadyEnded": "Queue entry is no longer active",
+  "queueEntryAlreadyEndedMessage": "This queue entry has already been completed by another user. The queue has been refreshed.",
   "queueEntryDeleteFailed": "Error al eliminar la entrada de la cola",
   "queueEntryDeleteSuccessful": "La entrada de la cola fue eliminada exitosamente",
   "queueEntryEdited": "Entrada de la cola editada",
