@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DropdownSkeleton, InlineNotification, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { getCoreTranslation } from '@openmrs/esm-framework';
 import { convertTime12to24 } from './time-helpers';
 import { type QueueEntry } from '../types';
 import { updateQueueEntry } from './queue-entry-actions.resource';
@@ -64,7 +65,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t('close', 'Close')}
+            {getCoreTranslation('close')}
           </Button>
         </ModalFooter>
       </>
@@ -92,7 +93,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t('close', 'Close')}
+            {getCoreTranslation('close')}
           </Button>
         </ModalFooter>
       </>

@@ -23,7 +23,6 @@
   "clearAllQueueEntriesWarningMessage": "Clearing all queue entries will remove all the patients from the queues",
   "clearQueue": "Clear queue",
   "clearQueueEntries": "Clear queue entries",
-  "close": "Close",
   "comingFrom": "Coming from",
   "comment": "Comment",
   "configurePriorities": "Please configure priorities to continue.",

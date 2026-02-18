@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DropdownSkeleton, InlineNotification, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { getCoreTranslation } from '@openmrs/esm-framework';
 import { type QueueEntry } from '../types';
 import { useQueueEntry } from '../hooks/useQueueEntry';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
@@ -62,7 +63,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t('close', 'Close')}
+            {getCoreTranslation('close')}
           </Button>
         </ModalFooter>
       </>
@@ -90,7 +91,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t('close', 'Close')}
+            {getCoreTranslation('close')}
           </Button>
         </ModalFooter>
       </>
