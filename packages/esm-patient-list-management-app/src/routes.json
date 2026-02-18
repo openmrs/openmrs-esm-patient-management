@@ -69,6 +69,7 @@
   "workspaceGroups2": [
     {
       "name": "patient-list-form-workspace-group",
+      "scopePattern": "/home/patient-lists",
       "overlay": false
     }
   ]
