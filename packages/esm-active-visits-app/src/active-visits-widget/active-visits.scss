@@ -113,7 +113,7 @@
   text-align: left;
   text-transform: capitalize;
 
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
 
@@ -165,7 +165,7 @@ html[dir='rtl'] {
 
     .desktopHeading,
     .tabletHeading {
-      h4 {
+      h2 {
         text-align: right;
       }
     }
