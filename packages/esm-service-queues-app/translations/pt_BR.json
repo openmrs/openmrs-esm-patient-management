@@ -137,6 +137,8 @@
   "queueCreated": "Queue created",
   "queueDeleted": "Queue deleted",
   "queueEntryAddedSuccessfully": "Entrada de fila adicionada com sucesso",
+  "queueEntryAlreadyEnded": "Queue entry is no longer active",
+  "queueEntryAlreadyEndedMessage": "This queue entry has already been completed by another user. The queue has been refreshed.",
   "queueEntryDeleteFailed": "Erro ao excluir entrada na fila",
   "queueEntryDeleteSuccessful": "Entrada de fila excluída com sucesso",
   "queueEntryEdited": "Entrada de fila editada",

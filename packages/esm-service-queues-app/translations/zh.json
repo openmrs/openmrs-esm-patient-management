@@ -137,6 +137,8 @@
   "queueCreated": "Queue created",
   "queueDeleted": "Queue deleted",
   "queueEntryAddedSuccessfully": "队列条目添加成功",
+  "queueEntryAlreadyEnded": "Queue entry is no longer active",
+  "queueEntryAlreadyEndedMessage": "This queue entry has already been completed by another user. The queue has been refreshed.",
   "queueEntryDeleteFailed": "删除队列条目时出现错误",
   "queueEntryDeleteSuccessful": "队列条目删除成功",
   "queueEntryEdited": "队列条目已编辑",
