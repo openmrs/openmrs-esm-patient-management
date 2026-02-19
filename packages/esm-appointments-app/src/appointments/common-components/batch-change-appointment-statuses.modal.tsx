@@ -8,6 +8,7 @@ import { type Appointment, AppointmentStatus } from '../../types';
 import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
 import styles from './batch-change-appointment-statuses.scss';
 import { type ConfigObject } from '../../config-schema';
+import { canTransition } from '../../helpers';
 
 interface BatchChangeAppointmentStatusesModalProps {
   appointments: Array<Appointment>;
@@ -31,40 +32,45 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
   const isTablet = !isDesktop(useLayoutType());
   const [status, setStatus] = useState<AppointmentStatus>();
   const { checkOutButton } = useConfig<ConfigObject>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const invalidAppointment = appointments.find((appointment) => !canTransition(appointment.status, status));
 
   const submit = useCallback(() => {
     const updateAppointment = (appointment: Appointment) => {
+      setIsSubmitting(true);
       // server throws an exception if we make a call to change the appointment status to its current
       // status, so we just do nothing if that's the case
       if (status === appointment.status) {
         return Promise.resolve();
       }
 
-      return changeAppointmentStatus(status, appointment.uuid).then((res) => {
-        if (status === AppointmentStatus.COMPLETED) {
-          return getActiveVisitsForPatient(appointment.patient.uuid)
-            .then((response) => {
-              const activeVisit = response.data.results?.[0];
-              if (activeVisit) {
-                const abortController = new AbortController();
-                const endVisitPayload = { stopDatetime: new Date() };
+      return changeAppointmentStatus(status, appointment.uuid)
+        .then((res) => {
+          if (status === AppointmentStatus.COMPLETED) {
+            return getActiveVisitsForPatient(appointment.patient.uuid)
+              .then((response) => {
+                const activeVisit = response.data.results?.[0];
+                if (activeVisit) {
+                  const abortController = new AbortController();
+                  const endVisitPayload = { stopDatetime: new Date() };
 
-                return updateVisit(activeVisit.uuid, endVisitPayload, abortController);
-              }
-            })
-            .catch(() => {
-              showSnackbar({
-                title: t('failedToUpdateVisit', 'Failed to update visit'),
-                subtitle: t('failedToEndActiveVisit', 'Failed to end active visit for {{patient}}', {
-                  patient: appointment.patient.name,
-                }),
+                  return updateVisit(activeVisit.uuid, endVisitPayload, abortController);
+                }
+              })
+              .catch(() => {
+                showSnackbar({
+                  title: t('failedToUpdateVisit', 'Failed to update visit'),
+                  subtitle: t('failedToEndActiveVisit', 'Failed to end active visit for {{patient}}', {
+                    patient: appointment.patient.name,
+                  }),
+                });
+                return res;
               });
-              return res;
-            });
-        } else {
-          return res;
-        }
-      });
+          } else {
+            return res;
+          }
+        })
+        .finally(() => setIsSubmitting(false));
     };
 
     Promise.allSettled(appointments.map(updateAppointment))
@@ -122,7 +128,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
               <li key={appointment.patient.uuid}>
                 <Trans i18nKey="appointmentDisplay">
                   <strong>{{ patientName: appointment.patient.name } as any}</strong> -{' '}
-                  {{ serviceName: appointment.service.name } as any}
+                  {{ serviceName: appointment.service.name } as any} - {{ currentStatus: appointment.status } as any}
                 </Trans>
               </li>
             ))}
@@ -160,13 +166,30 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
               )}
             />
           )}
+          {status && invalidAppointment && (
+            <InlineNotification
+              kind="warning"
+              lowContrast={true}
+              hideCloseButton={true}
+              title={t(
+                'invalidAppointmentStatusChange',
+                'Cannot transition appointment with status {{currentStatus}} to status {{newStatus}}',
+                {
+                  currentStatus: invalidAppointment.status,
+                  newStatus: status,
+                },
+              )}
+            />
+          )}
         </Stack>
       </ModalBody>
       <ModalFooter className={styles.modalFooter}>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button onClick={submit}>{t('saveAndClose', 'Save and close')}</Button>
+        <Button disabled={isSubmitting || invalidAppointment != null || status == null} onClick={submit}>
+          {t('saveAndClose', 'Save and close')}
+        </Button>
       </ModalFooter>
     </>
   );
