@@ -123,7 +123,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
       <ModalBody className={styles.modalBody}>
         <Stack gap={5}>
           <p>{t('changeStatusForSelectedAppointments', 'Change the status for the following appointments.')}</p>
-          <ul>
+          <ul className={styles.appointmentsList}>
             {appointments.map((appointment) => (
               <li key={appointment.patient.uuid}>
                 <Trans i18nKey="appointmentDisplay">
@@ -183,11 +183,11 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
           )}
         </Stack>
       </ModalBody>
-      <ModalFooter className={styles.modalFooter}>
+      <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={isSubmitting || invalidAppointment != null || status == null} onClick={submit}>
+        <Button kind="primary" disabled={isSubmitting || invalidAppointment != null || status == null} onClick={submit}>
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ModalFooter>
