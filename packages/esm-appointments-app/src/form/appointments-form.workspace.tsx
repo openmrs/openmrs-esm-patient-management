@@ -19,6 +19,7 @@ import {
   TimePicker,
   TimePickerSelect,
   Toggle,
+  ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -525,41 +526,37 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                 name="selectedService"
                 control={control}
                 render={({ field: { onBlur, onChange, value, ref } }) => (
-                  <Select
+                  <ComboBox<string>
                     id="service"
                     invalid={!!errors?.selectedService}
                     invalidText={errors?.selectedService?.message}
-                    labelText={t('selectService', 'Select a service')}
+                    titleText={t('selectService', 'Select a service')}
                     onBlur={onBlur}
-                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+                    placeholder={t('selectService', 'Select a service')}
+                    selectedItem={value}
+                    shouldFilterItem={({ inputValue = '', item = '' }) => {
+                      return item.toLowerCase().includes(inputValue.toLowerCase());
+                    }}
+                    onChange={({ selectedItem }) => {
                       if (!isEditing) {
-                        setValue(
-                          'duration',
-                          services?.find((service) => service.name === event.target.value)?.durationMins,
-                        );
+                        setValue('duration', services?.find((service) => service.name === selectedItem)?.durationMins);
                       } else {
                         const previousServiceDuration = services?.find(
                           (service) => service.name === getValues('selectedService'),
                         )?.durationMins;
                         const selectedServiceDuration = services?.find(
-                          (service) => service.name === event.target.value,
+                          (service) => service.name === selectedItem,
                         )?.durationMins;
                         if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
                           setValue('duration', selectedServiceDuration);
                         }
                       }
-                      onChange(event);
+                      onChange(selectedItem);
                     }}
                     ref={ref}
-                    value={value}>
-                    <SelectItem text={t('chooseService', 'Select service')} value="" />
-                    {services?.length > 0 &&
-                      services.map((service) => (
-                        <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                          {service.name}
-                        </SelectItem>
-                      ))}
-                  </Select>
+                    items={services?.map((service) => service.name) ?? []}
+                    itemToString={(item) => item ?? ''}
+                  />
                 )}
               />
             </ResponsiveWrapper>
