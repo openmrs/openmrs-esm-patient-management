@@ -35,7 +35,6 @@ const RootComponent: React.FC = () => {
         <Route path="/" element={<ListsDashboard />} />
         <Route path="/:patientListUuid" element={<ListDetails />} />
       </Routes>
-      <WorkspaceContainer contextKey="patient-lists" />
     </BrowserRouter>
   );
 };
