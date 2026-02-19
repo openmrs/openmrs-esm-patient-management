@@ -120,7 +120,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
   return (
     <>
       <ModalHeader closeModal={closeModal} title={t('changeAppointmentsStatus', 'Change appointments status')} />
-      <ModalBody className={styles.modalBody}>
+      <ModalBody className={styles.modalBody} hasScrollingContent>
         <Stack gap={5}>
           <p>{t('changeStatusForSelectedAppointments', 'Change the status for the following appointments.')}</p>
           <ul>
