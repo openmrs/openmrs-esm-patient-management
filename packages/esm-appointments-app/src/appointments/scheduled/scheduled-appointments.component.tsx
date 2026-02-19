@@ -11,9 +11,11 @@ import {
   type ConfigObject,
   useLayoutType,
   isDesktop,
+  useAssignedExtensions,
 } from '@openmrs/esm-framework';
 import { useAppointmentsStore } from '../../store';
 import styles from './scheduled-appointments.scss';
+import { type AppointmentPanelConfig } from '../../scheduled-appointments-config-schema';
 
 dayjs.extend(isSameOrBefore);
 
@@ -37,7 +39,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
 
   const [currentTab, setCurrentTab] = useState(null);
   const [dateType, setDateType] = useState<DateType>('today');
-  const scheduledAppointmentPanels = useConnectedExtensions(scheduledAppointmentsPanelsSlot);
+  const scheduledAppointmentPanels = useAssignedExtensions(scheduledAppointmentsPanelsSlot);
   const { allowedExtensions, showExtension, hideExtension } = useAllowedExtensions();
   const shouldShowPanel = useCallback(
     (panel: Omit<ConnectedExtension, 'config'>) => allowedExtensions[panel.name] ?? false,
@@ -78,7 +80,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
       <ContentSwitcher
         className={styles.switcher}
         size={responsiveSize}
-        onChange={({ name }) => setCurrentTab(name)}
+        onChange={({ name }) => setCurrentTab(name as string)}
         selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
         selectionMode="manual">
         {panelsToShow.map((panel) => (
@@ -161,11 +163,17 @@ function ExtensionWrapper({
     ) {
       currentConfig.current = extension.config;
       currentDateType.current = dateType;
-      void (shouldDisplayExtensionTab(extension?.config, dateType)
-        ? showExtensionTab(extension.name)
-        : hideExtensionTab(extension.name));
+      if (shouldDisplayExtensionTab(extension?.config as AppointmentPanelConfig, dateType)) {
+        showExtensionTab(extension.name);
+      } else {
+        hideExtensionTab(extension.name);
+      }
     }
   }, [extension, dateType, showExtensionTab, hideExtensionTab]);
+
+  if (extension.config == null) {
+    return null;
+  }
 
   return (
     <div
@@ -184,7 +192,7 @@ function ExtensionWrapper({
   );
 }
 
-function shouldDisplayExtensionTab(config: ConfigObject | undefined, dateType: DateType): boolean {
+function shouldDisplayExtensionTab(config: AppointmentPanelConfig | undefined, dateType: DateType): boolean {
   if (!config) {
     return false;
   }
