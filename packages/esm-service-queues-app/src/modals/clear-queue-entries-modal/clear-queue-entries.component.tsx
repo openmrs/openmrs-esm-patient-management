@@ -9,13 +9,7 @@ interface ClearQueueEntriesProps {
   queueEntries: Array<QueueEntry>;
 }
 
-/**
- * Button to end queue entries of all patients in a queue table and end their visits.
- * TODO: Remove this button once we have a better way to end queue entries.
- * @param param0
- * @returns
- * @deprecated
- */
+/** Button to end all queue entries in a queue table. */
 const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
