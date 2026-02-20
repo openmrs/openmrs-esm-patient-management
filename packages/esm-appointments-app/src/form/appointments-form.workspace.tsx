@@ -690,7 +690,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       control={control}
                       render={({ field: { onChange, value } }) => (
                         <RadioButtonGroup
-                          legendText={t('period', 'Period')}
+                          aria-label={t('period', 'Period')}
                           name="radio-button-group"
                           onChange={(type) => onChange(type)}
                           valueSelected={value}>
