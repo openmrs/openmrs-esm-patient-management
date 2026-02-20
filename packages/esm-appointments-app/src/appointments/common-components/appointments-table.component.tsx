@@ -1,3 +1,4 @@
+
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -152,6 +153,46 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     status: <AppointmentActions appointment={appointment} />,
     appointment,
   }));
+  
+  const rowData = useMemo(
+    () =>
+      results?.map((appointment) => ({
+        id: appointment.uuid,
+        patientName: (
+          <ConfigurableLink
+            className={styles.link}
+            to={customPatientChartUrl}
+            templateParams={{ patientUuid: appointment.patient.uuid }}>
+            {appointment.patient.name}
+          </ConfigurableLink>
+        ),
+        nextAppointmentDate: '--',
+        identifier: patientIdentifierType
+          ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
+          : appointment.patient.identifier,
+        dateTime: formatDatetime(new Date(appointment.startDateTime)),
+        serviceType: appointment.service.name,
+        location: appointment.location?.name,
+        provider: appointment.providers?.[0]?.name ?? '--',
+        status: <AppointmentActions appointment={appointment} />,
+        appointment,
+      })),
+    [results, customPatientChartUrl, patientIdentifierType],
+  );
+
+  const appointmentUuidsWithChangeableStatus = useMemo(() => {
+    return appointments
+      .filter((appointment) => {
+        const visitDate = dayjs(appointment.startDateTime);
+        const isFutureAppointment = visitDate.isAfter(dayjs());
+        const isTodayAppointment = visitDate.isToday();
+        const hasActiveVisitToday = visits?.some(
+          (visit) => visit?.patient?.uuid === appointment.patient?.uuid && visit?.startDatetime,
+        );
+        return isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday);
+      })
+      .map((appointment) => appointment.uuid);
+  }, [appointments, visits]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;
@@ -191,7 +232,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     <Layer className={styles.container}>
       <Tile className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h4>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h4>
+          <h2>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h2>
         </div>
       </Tile>
       <div className={styles.toolbar}>
@@ -267,10 +308,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                     <TableSelectAll
                       {...getSelectionProps()}
-                      checked={selectedAppointmentUuids.size === rows.length}
+                      checked={
+                        selectedAppointmentUuids.size === appointmentUuidsWithChangeableStatus.length &&
+                        selectedAppointmentUuids.size > 0
+                      }
                       onSelect={() => {
-                        if (selectedAppointmentUuids.size < rows.length) {
-                          setSelectedAppointmentUuids(new Set(rows.map((row) => row.id)));
+                        if (selectedAppointmentUuids.size < appointmentUuidsWithChangeableStatus.length) {
+                          setSelectedAppointmentUuids(new Set(appointmentUuidsWithChangeableStatus));
                         } else {
                           setSelectedAppointmentUuids(new Set());
                         }
@@ -304,6 +348,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                           <TableSelectRow
                             {...getSelectionProps({ row })}
                             checked={selectedAppointmentUuids.has(row.id)}
+                            disabled={!canChangeStatus}
                             onSelect={() => {
                               if (selectedAppointmentUuids.has(row.id)) {
                                 setSelectedAppointmentUuids(
@@ -318,7 +363,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
-                            {isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday) ? (
+                            {canChangeStatus ? (
                               <OverflowMenu
                                 align="left"
                                 aria-label={t('actions', 'Actions')}

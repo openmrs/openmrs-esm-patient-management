@@ -1,7 +1,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
 import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type AppointmentSummary, type AppointmentCountMap } from '../types';
+import { type AppointmentSummary, type AppointmentCountMap, AppointmentStatus } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
 
 interface FlattenedAppointmentSummary {
@@ -126,4 +126,22 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
       startVisitWorkspaceName: 'appointments-start-visit-workspace',
     },
   );
+};
+
+/**
+ * Return whether we can transition from one appointment status to another,
+ * based on logic in backend. See:
+ * https://github.com/Bahmni/openmrs-module-appointments/blob/master/api/src/main/java/org/openmrs/module/appointments/model/AppointmentStatus.java
+ * https://github.com/Bahmni/openmrs-module-appointments/blob/master/api/src/main/java/org/openmrs/module/appointments/validator/impl/DefaultAppointmentStatusChangeValidator.java
+ */
+export const canTransition = (fromStatus: AppointmentStatus, toStatus: AppointmentStatus): boolean => {
+  const sequences = {
+    [AppointmentStatus.SCHEDULED]: 1,
+    [AppointmentStatus.CHECKEDIN]: 3,
+    [AppointmentStatus.COMPLETED]: 4,
+    [AppointmentStatus.CANCELLED]: 4,
+    [AppointmentStatus.MISSED]: 4,
+  };
+
+  return sequences[fromStatus] < sequences[toStatus] || toStatus === AppointmentStatus.SCHEDULED;
 };

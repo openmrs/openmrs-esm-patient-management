@@ -8,17 +8,19 @@ interface AppointmentsListProps {
   appointmentServiceTypes?: Array<string>;
   date: string;
   excludeCancelledAppointments?: boolean;
-  status?: string;
-  title: string;
 }
 
+/**
+ * This component is both rendered as a regular componant and as an extension.
+ * As an extension, it can be configured to display appointments of certain status.
+ */
 const AppointmentsList: React.FC<AppointmentsListProps> = ({
   appointmentServiceTypes,
   date,
   excludeCancelledAppointments = false,
-  status,
-  title,
 }) => {
+  const { t } = useTranslation();
+  const { status, title = t('todays', "Today's") } = useConfig<AppointmentPanelConfig>();
   const { appointmentList, isLoading } = useAppointmentList(status, date);
   const { appointmentProvider } = useAppointmentsStore();
 

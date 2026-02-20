@@ -164,6 +164,40 @@ describe('QueueEntryActionModal', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 
+  it('closes modal and shows warning snackbar when submission fails with already-ended error', async () => {
+    const mockSubmitAction = jest.fn().mockRejectedValue({
+      responseBody: {
+        error: {
+          message: 'Cannot transition a queue entry that has already ended',
+        },
+      },
+    });
+
+    const closeModal = jest.fn();
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        closeModal={closeModal}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+        }}
+      />,
+    );
+
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
+    await user.click(submitButton);
+
+    expect(showSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'warning',
+        title: 'Queue entry is no longer active',
+      }),
+    );
+    expect(closeModal).toHaveBeenCalled();
+  });
+
   it('shows inline error notification when submission fails with duplicate error', async () => {
     const mockSubmitAction = jest.fn().mockRejectedValue({
       responseBody: {

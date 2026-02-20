@@ -28,7 +28,7 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
         patientUuid: string,
         patient: fhir.Patient,
         launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-        closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
       ) {
         launchChildWorkspace('create-admission-encounter-workspace', {
           selectedPatientUuid: patient.id,
