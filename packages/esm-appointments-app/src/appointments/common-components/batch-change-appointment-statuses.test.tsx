@@ -1,19 +1,16 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, showSnackbar, updateVisit, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../form/appointments-form.resource';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
-import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import BatchChangeAppointmentStatusesModal from './batch-change-appointment-statuses.modal';
 
 const mockCloseModal = jest.fn();
 const mockMutateAppointments = jest.fn();
 const mockChangeAppointmentStatus = jest.mocked(changeAppointmentStatus);
-const mockGetActiveVisitsForPatient = jest.mocked(getActiveVisitsForPatient);
-const mockUpdateVisit = jest.mocked(updateVisit);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseMutateAppointments = jest.mocked(useMutateAppointments);

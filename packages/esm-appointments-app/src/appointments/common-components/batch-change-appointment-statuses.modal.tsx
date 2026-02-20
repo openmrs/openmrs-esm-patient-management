@@ -1,14 +1,31 @@
 import React, { useCallback, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Button, Dropdown, InlineNotification, Layer, ModalBody, ModalFooter, ModalHeader, Stack } from '@carbon/react';
-import { isDesktop, showSnackbar, updateVisit, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
-import { type Appointment, AppointmentStatus } from '../../types';
-import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
-import styles from './batch-change-appointment-statuses.scss';
-import { type ConfigObject } from '../../config-schema';
+import {
+  Button,
+  Dropdown,
+  InlineLoading,
+  InlineNotification,
+  Layer,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Stack,
+} from '@carbon/react';
+import {
+  getCoreTranslation,
+  isDesktop,
+  showSnackbar,
+  updateVisit,
+  useConfig,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { canTransition } from '../../helpers';
+import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
+import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
+import { type Appointment, AppointmentStatus } from '../../types';
+import { type ConfigObject } from '../../config-schema';
+import { useMutateAppointments } from '../../form/appointments-form.resource';
+import styles from './batch-change-appointment-statuses.scss';
 
 interface BatchChangeAppointmentStatusesModalProps {
   appointments: Array<Appointment>;
@@ -33,6 +50,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
   const [status, setStatus] = useState<AppointmentStatus>();
   const { checkOutButton } = useConfig<ConfigObject>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const invalidAppointment =
     status != null ? appointments.find((a) => a.status !== status && !canTransition(a.status, status)) : undefined;
 
@@ -111,9 +129,9 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
         }
       })
       .finally(() => {
+        setIsSubmitting(false);
         mutateAppointments();
         closeModal();
-        setIsSubmitting(false);
       });
   }, [status, appointments, closeModal, mutateAppointments, t]);
 
@@ -133,33 +151,31 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
               </li>
             ))}
           </ul>
-          <div>
-            <Layer>
-              <Dropdown
-                id={'statusDropdown'}
-                className={styles.statusDropdown}
-                label={t('selectStatus', 'Select status')}
-                titleText={''}
-                type="inline"
-                items={[
-                  { id: AppointmentStatus.SCHEDULED, label: t('scheduled', 'Scheduled') },
-                  { id: AppointmentStatus.CANCELLED, label: t('cancelled', 'Cancelled') },
-                  { id: AppointmentStatus.MISSED, label: t('missed', 'Missed') },
-                  ...(checkOutButton.enabled
-                    ? [{ id: AppointmentStatus.COMPLETED, label: t('completed', 'Completed') }]
-                    : []),
-                ]}
-                itemToString={(item) => (item ? item.label : '')}
-                onChange={(e) => setStatus(e.selectedItem.id)}
-                size={isTablet ? 'lg' : 'sm'}
-              />
-            </Layer>
-          </div>
+          <Layer>
+            <Dropdown
+              id={'statusDropdown'}
+              className={styles.statusDropdown}
+              label={t('selectStatus', 'Select status')}
+              titleText={''}
+              type="inline"
+              items={[
+                { id: AppointmentStatus.SCHEDULED, label: t('scheduled', 'Scheduled') },
+                { id: AppointmentStatus.CANCELLED, label: t('cancelled', 'Cancelled') },
+                { id: AppointmentStatus.MISSED, label: t('missed', 'Missed') },
+                ...(checkOutButton.enabled
+                  ? [{ id: AppointmentStatus.COMPLETED, label: t('completed', 'Completed') }]
+                  : []),
+              ]}
+              itemToString={(item) => (item ? item.label : '')}
+              onChange={(e) => setStatus(e.selectedItem.id)}
+              size={isTablet ? 'lg' : 'sm'}
+            />
+          </Layer>
           {status === AppointmentStatus.COMPLETED && (
             <InlineNotification
               kind="warning"
-              lowContrast={true}
-              hideCloseButton={true}
+              lowContrast
+              hideCloseButton
               title={t(
                 'markAppointmentAsCompletedMessage',
                 'Marking appointment as completed will end the active visit of the patient',
@@ -169,8 +185,8 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
           {status && invalidAppointment && (
             <InlineNotification
               kind="warning"
-              lowContrast={true}
-              hideCloseButton={true}
+              lowContrast
+              hideCloseButton
               title={t(
                 'invalidAppointmentStatusChange',
                 'Cannot transition appointment with status {{currentStatus}} to status {{newStatus}}',
@@ -185,10 +201,14 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button kind="primary" disabled={isSubmitting || invalidAppointment != null || status == null} onClick={submit}>
-          {t('saveAndClose', 'Save and close')}
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            <span>{t('saveAndClose', 'Save and close')}</span>
+          )}
         </Button>
       </ModalFooter>
     </>
