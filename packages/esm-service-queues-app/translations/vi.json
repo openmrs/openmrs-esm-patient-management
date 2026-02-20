@@ -137,6 +137,8 @@
   "queueCreated": "Queue created",
   "queueDeleted": "Queue deleted",
   "queueEntryAddedSuccessfully": "Đã thêm mục nhập hàng đợi thành công",
+  "queueEntryAlreadyEnded": "Queue entry is no longer active",
+  "queueEntryAlreadyEndedMessage": "This queue entry has already been completed by another user. The queue has been refreshed.",
   "queueEntryDeleteFailed": "Lỗi khi xóa mục nhập hàng đợi",
   "queueEntryDeleteSuccessful": "Đã xóa thành công mục nhập hàng đợi",
   "queueEntryEdited": "Đã chỉnh sửa mục nhập hàng đợi",

@@ -167,3 +167,11 @@ export const earlyAppointmentsPanelConfigSchema = {
     _default: false,
   },
 };
+
+export interface AppointmentPanelConfig {
+  title: string;
+  status?: string;
+  showForPastDate: boolean;
+  showForToday: boolean;
+  showForFutureDate: boolean;
+}
