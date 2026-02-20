@@ -34,12 +34,12 @@ export interface Appointment {
   comments: string;
   endDateTime: Date | number | any;
   location: AppointmentLocation;
+  // note: this is not a standard OpenMRS Patient object
   patient: {
     identifier: string;
-    identifiers: Array<Identifier>;
     name: string;
     uuid: string;
-    age?: string;
+    age?: number;
     gender?: string;
   };
   provider: OpenmrsResource;

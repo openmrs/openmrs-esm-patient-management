@@ -11,11 +11,10 @@ const appointment: Appointment = {
   appointmentNumber: '0000',
   patient: {
     identifier: '100GEJ',
-    identifiers: [],
     name: 'John Wilson',
     uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
     gender: 'M',
-    age: '35',
+    age: 35,
   },
   service: {
     appointmentServiceId: 1,
