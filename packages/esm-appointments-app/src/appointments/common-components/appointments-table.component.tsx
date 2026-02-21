@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -29,6 +30,8 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
+  Dropdown,
+  Search,
 } from '@carbon/react';
 import { Calendar, Download } from '@carbon/react/icons';
 import {
@@ -53,12 +56,15 @@ import { launchCreateAppointmentForm } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
+import { setAppointmentProvider, useAppointmentsStore } from '../../store';
+import { useProviders } from '../../hooks/useProviders';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
+  allAppointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
   hasActiveFilters?: boolean;
@@ -66,6 +72,7 @@ interface AppointmentsTableProps {
 
 const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
+  allAppointments,
   isLoading,
   tableHeading,
   hasActiveFilters,
@@ -82,16 +89,71 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const [selectedAppointmentUuids, setSelectedAppointmentUuids] = useState(new Set<string>());
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-
-  useEffect(() => {
-    setSelectedAppointmentUuids(new Set());
-  }, [appointments]);
+  const { appointmentProvider } = useAppointmentsStore();
 
   const headerData = appointmentsTableColumns.map((columnKey) => ({
     header: t(columnKey, columnKey),
     key: columnKey,
   }));
 
+  function StatusDropdownFilter() {
+    const { t } = useTranslation();
+    const layout = useLayoutType();
+    const { providers } = useProviders();
+    const providerOptions = useMemo(() => {
+      if (!allAppointments || !providers) return [];
+
+      const uniqueProviderUuids = [...new Set(allAppointments.map((s) => s.providers[0]?.uuid))];
+
+      return uniqueProviderUuids
+        .map((uuid) => {
+          const match = providers.find((p) => p.uuid === uuid);
+          return match ? { id: match.uuid, label: match.display } : null;
+        })
+        .filter(Boolean);
+    }, [providers]);
+    const handleChangeProviderFilter = useCallback(({ selectedItem }) => {
+      setAppointmentProvider(selectedItem);
+    }, []);
+
+    return (
+      <div className={styles.filterContainer}>
+        <Dropdown
+          id="statusFilter"
+          items={[{ label: `${t('any', 'Any')}` }, ...(providerOptions ?? [])]}
+          itemToString={(item) => (item ? item.label : '')}
+          label={appointmentProvider.label ?? t('all', 'All')}
+          onChange={handleChangeProviderFilter}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          titleText={t('filterAppointmentsByProvider', 'Filter appointments by provider:')}
+          type="inline"
+        />
+      </div>
+    );
+  }
+
+  const rowData = results?.map((appointment) => ({
+    id: appointment.uuid,
+    patientName: (
+      <ConfigurableLink
+        className={styles.link}
+        to={customPatientChartUrl}
+        templateParams={{ patientUuid: appointment.patient.uuid }}>
+        {appointment.patient.name}
+      </ConfigurableLink>
+    ),
+    nextAppointmentDate: '--',
+    identifier: patientIdentifierType
+      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
+      : appointment.patient.identifier,
+    dateTime: formatDatetime(new Date(appointment.startDateTime)),
+    serviceType: appointment.service.name,
+    location: appointment.location?.name,
+    provider: appointment.providers?.[0]?.name ?? '--',
+    status: <AppointmentActions appointment={appointment} />,
+    appointment,
+  }));
+  
   const rowData = useMemo(
     () =>
       results?.map((appointment) => ({
@@ -173,6 +235,32 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           <h2>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h2>
         </div>
       </Tile>
+      <div className={styles.toolbar}>
+        {appointmentsTableColumns.includes('provider') && <StatusDropdownFilter />}
+
+        <Search
+          className={styles.search}
+          labelText={t('filterAppointments', 'Filter appointments')}
+          placeholder={t('filterTable', 'Filter table')}
+          onChange={(event) => setSearchString(event.target.value)}
+          size={responsiveSize}
+        />
+        <Button
+          size={responsiveSize}
+          kind="tertiary"
+          renderIcon={Download}
+          onClick={() => {
+            const date = appointments[0]?.startDateTime
+              ? formatDate(parseDate(appointments[0]?.startDateTime), {
+                  time: false,
+                  noToday: true,
+                })
+              : null;
+            exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
+          }}>
+          {t('download', 'Download')}
+        </Button>
+      </div>
       <DataTable
         aria-label={t('appointmentsTable', 'Appointments table')}
         data-floating-menu-container
@@ -213,31 +301,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     {t('changeStatus', 'Change status')}
                   </TableBatchAction>
                 </TableBatchActions>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    className={styles.searchbar}
-                    labelText={t('filterAppointments', 'Filter appointments')}
-                    placeholder={t('filterTable', 'Filter table')}
-                    onChange={(event) => setSearchString((event as React.ChangeEvent<HTMLInputElement>).target.value)}
-                    persistent
-                    size={responsiveSize}
-                  />
-                  <Button
-                    size={responsiveSize}
-                    kind="tertiary"
-                    renderIcon={Download}
-                    onClick={() => {
-                      const date = appointments[0]?.startDateTime
-                        ? formatDate(parseDate(appointments[0]?.startDateTime), {
-                            time: false,
-                            noToday: true,
-                          })
-                        : null;
-                      exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
-                    }}>
-                    {t('download', 'Download')}
-                  </Button>
-                </TableToolbarContent>
               </TableToolbar>
               <Table {...getTableProps()}>
                 <TableHead>
@@ -271,7 +334,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                       return null;
                     }
 
-                    const canChangeStatus = appointmentUuidsWithChangeableStatus.includes(matchingAppointment.uuid);
+                    const patientUuid = matchingAppointment?.patient?.uuid;
+                    const visitDate = dayjs(matchingAppointment?.startDateTime);
+                    const isFutureAppointment = visitDate.isAfter(dayjs());
+                    const isTodayAppointment = visitDate.isToday();
+                    const hasActiveVisitToday = visits?.some(
+                      (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime,
+                    );
 
                     return (
                       <React.Fragment key={row.id}>

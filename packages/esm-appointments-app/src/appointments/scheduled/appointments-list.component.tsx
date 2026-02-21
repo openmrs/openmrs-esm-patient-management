@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react';
-import { filterByServiceType } from '../utils';
+import { filterByProvider, filterByServiceType } from '../utils';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
-import { useConfig } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { type AppointmentPanelConfig } from '../../scheduled-appointments-config-schema';
+import { useAppointmentsStore } from '../../store';
 
 interface AppointmentsListProps {
   appointmentServiceTypes?: Array<string>;
@@ -24,6 +22,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   const { t } = useTranslation();
   const { status, title = t('todays', "Today's") } = useConfig<AppointmentPanelConfig>();
   const { appointmentList, isLoading } = useAppointmentList(status, date);
+  const { appointmentProvider } = useAppointmentsStore();
 
   const appointmentsFilteredByServiceType = filterByServiceType(appointmentList, appointmentServiceTypes).map(
     (appointment) => ({
@@ -32,16 +31,29 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
     }),
   );
 
+  const appointmentsFilteredByProvider = filterByProvider(appointmentList, appointmentProvider).map((appointment) => ({
+    id: appointment.uuid,
+    ...appointment,
+  }));
+
   const activeAppointments = useMemo(() => {
-    return excludeCancelledAppointments
-      ? appointmentsFilteredByServiceType.filter((appointment) => appointment.status !== 'Cancelled')
-      : appointmentsFilteredByServiceType;
-  }, [excludeCancelledAppointments, appointmentsFilteredByServiceType]);
+    const byProvider = appointmentsFilteredByProvider;
+    const byServiceType = appointmentsFilteredByServiceType;
+    const combined = byProvider.filter((appt) => byServiceType.some((s) => s.uuid === appt.uuid));
+    const finalList = excludeCancelledAppointments
+      ? combined.filter((appointment) => appointment.status !== 'Cancelled')
+      : combined;
+    return finalList;
+  }, [appointmentsFilteredByProvider, appointmentsFilteredByServiceType, excludeCancelledAppointments]);
 
   return (
     <AppointmentsTable
       appointments={activeAppointments}
-      hasActiveFilters={appointmentServiceTypes?.length > 0}
+      allAppointments={appointmentList.map((appointment) => ({
+        id: appointment.uuid,
+        ...appointment,
+      }))}
+      hasActiveFilters={appointmentServiceTypes?.length > 0 || appointmentProvider}
       isLoading={isLoading}
       tableHeading={title}
     />
