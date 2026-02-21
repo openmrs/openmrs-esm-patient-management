@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { UserHasAccess } from '@openmrs/esm-framework';
-import VisitFormQueueFields, { PRIVILEGE_RDE_ACCESS } from './visit-form-queue-fields.extension';
+import VisitFormQueueFields from './visit-form-queue-fields.extension';
 import { useFormContext } from 'react-hook-form';
 
 // Mock react-hook-form
@@ -16,24 +15,17 @@ jest.mock('./queue-fields.component', () => {
   };
 });
 
-const mockUserHasAccess = UserHasAccess as jest.Mock;
-
 describe('VisitFormQueueFields', () => {
   const mockSetVisitFormCallbacks = jest.fn();
-
-  beforeEach(() => {
-    // Default: UserHasAccess renders children (user has privilege)
-    mockUserHasAccess.mockImplementation((props: any) => props.children);
-  });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('should render queue fields when visit is NOT retrospective and user has RDE privilege', () => {
+  it('should render queue fields when visit is NOT retrospective (visitStatus is "new")', () => {
     (useFormContext as jest.Mock).mockReturnValue({
       watch: (key: string) => {
-        if (key === 'retrospective') return false;
+        if (key === 'visitStatus') return 'new';
         return null;
       },
     });
@@ -48,16 +40,12 @@ describe('VisitFormQueueFields', () => {
     );
 
     expect(screen.getByText(/Service Queue/i)).toBeInTheDocument();
-    expect(mockUserHasAccess).toHaveBeenCalledWith(
-      expect.objectContaining({ privilege: PRIVILEGE_RDE_ACCESS }),
-      expect.anything(),
-    );
   });
 
-  it('should NOT render queue fields when visit IS retrospective', () => {
+  it('should render queue fields when visit status is "ongoing"', () => {
     (useFormContext as jest.Mock).mockReturnValue({
       watch: (key: string) => {
-        if (key === 'retrospective') return true;
+        if (key === 'visitStatus') return 'ongoing';
         return null;
       },
     });
@@ -71,15 +59,13 @@ describe('VisitFormQueueFields', () => {
       />,
     );
 
-    expect(screen.queryByText(/Service Queue/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Service Queue/i)).toBeInTheDocument();
   });
 
-  it('should NOT render queue fields when user lacks RDE privilege', () => {
-    mockUserHasAccess.mockImplementation(() => null);
-
+  it('should NOT render queue fields when visit IS retrospective (visitStatus is "past")', () => {
     (useFormContext as jest.Mock).mockReturnValue({
       watch: (key: string) => {
-        if (key === 'retrospective') return false;
+        if (key === 'visitStatus') return 'past';
         return null;
       },
     });
