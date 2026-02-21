@@ -10,6 +10,7 @@ let patientUuid: string;
 test('Register a new patient', async ({ page }) => {
   test.slow();
   const patientRegistrationPage = new RegistrationAndEditPage(page);
+  await page.context().grantPermissions(['camera']);
 
   const formValues: PatientRegistrationFormValues = {
     givenName: `Johnny`,
@@ -52,6 +53,42 @@ test('Register a new patient', async ({ page }) => {
     await patientRegistrationPage.birthdateDayInput().fill(formValues.birthdate.day);
     await patientRegistrationPage.birthdateMonthInput().fill(formValues.birthdate.month);
     await patientRegistrationPage.birthdateYearInput().fill(formValues.birthdate.year);
+  });
+
+  await test.step('And I Upload a profile picture', async () => {
+    await page.getByRole('button', { name: 'Edit' }).click();
+  });
+
+  await test.step('And I switch to the Webcam tab', async () => {
+    await page.getByRole('tab', { name: 'Webcam' }).click();
+  });
+
+  const video = page.locator('video');
+  await expect(video).toBeVisible({ timeout: 1000 });
+
+  await page.waitForFunction(
+    () => {
+      const video = document.querySelector('video');
+      return video && video.readyState === 4;
+    },
+    { timeout: 5000 },
+  );
+
+  await test.step('And I capture a photo from webcam', async () => {
+    await page.locator('#inner-circle').click();
+  });
+
+  await test.step('And I add a description for the image to upload', async () => {
+    await page.getByLabel(/image name/i).clear();
+    await page.getByLabel(/image name/i).fill('profile');
+  });
+
+  await test.step('And I click on the `Add Attachment` button', async () => {
+    await page.getByRole('button', { name: 'Add Image' }).click();
+  });
+
+  await test.step('Then I should see the captured image saved in attachments', async () => {
+    await expect(page.getByText(/upload complete/i)).toBeVisible();
   });
 
   await test.step(`And I fill in ${formValues.address1} as the address`, async () => {
