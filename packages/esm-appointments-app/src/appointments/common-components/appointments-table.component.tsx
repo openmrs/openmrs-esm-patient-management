@@ -62,7 +62,6 @@ interface AppointmentsTableProps {
   isLoading: boolean;
   tableHeading: string;
   hasActiveFilters?: boolean;
-  /** When true (e.g. in calendar day modal), selection and Edit appointment are enabled for all rows, including past dates */
   allowSelectionAndEditForAll?: boolean;
 }
 
