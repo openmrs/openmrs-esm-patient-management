@@ -25,22 +25,23 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     openmrsFetch,
     { errorRetryCount: 2 },
   );
-  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
-    const serviceName = service.appointmentService.name;
-    const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).map(([key, value]) => {
-      const existingEntry = acc.find((entry) => entry.appointmentDate === key);
-      if (existingEntry) {
-        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
-      } else {
-        acc.push({
-          appointmentDate: key,
-          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
-        });
-      }
-    });
-    return acc;
-  }, []);
+  const results: Array<DailyAppointmentsCountByService> =
+    data?.data?.reduce((acc, service) => {
+      const serviceName = service.appointmentService.name;
+      const serviceUuid = service.appointmentService.uuid;
+      Object.entries(service.appointmentCountMap || {}).map(([key, value]) => {
+        const existingEntry = acc.find((entry) => entry.appointmentDate === key);
+        if (existingEntry) {
+          existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
+        } else {
+          acc.push({
+            appointmentDate: key,
+            services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
+          });
+        }
+      });
+      return acc;
+    }, [] as Array<DailyAppointmentsCountByService>) ?? [];
   return { isLoading, calendarEvents: results, error };
 };
 

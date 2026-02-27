@@ -62,6 +62,8 @@ interface AppointmentsTableProps {
   isLoading: boolean;
   tableHeading: string;
   hasActiveFilters?: boolean;
+  /** When true (e.g. in calendar day modal), selection and Edit appointment are enabled for all rows, including past dates */
+  allowSelectionAndEditForAll?: boolean;
 }
 
 const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
@@ -69,6 +71,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   isLoading,
   tableHeading,
   hasActiveFilters,
+  allowSelectionAndEditForAll = false,
 }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
@@ -119,6 +122,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   );
 
   const appointmentUuidsWithChangeableStatus = useMemo(() => {
+    if (allowSelectionAndEditForAll) {
+      return appointments.map((appointment) => appointment.uuid);
+    }
     return appointments
       .filter((appointment) => {
         const visitDate = dayjs(appointment.startDateTime);
@@ -130,7 +136,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
         return isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday);
       })
       .map((appointment) => appointment.uuid);
-  }, [appointments, visits]);
+  }, [appointments, visits, allowSelectionAndEditForAll]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;

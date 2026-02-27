@@ -21,3 +21,72 @@
   min-height: calc(100vh - 80px);
   background-color: colors.$white;
 }
+
+.stubLabel {
+  margin-bottom: layout.$spacing-03;
+  font-weight: 600;
+}
+
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: layout.$spacing-03;
+}
+
+.weekDayCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: layout.$spacing-04;
+  border: 1px solid colors.$gray-30;
+  border-radius: 4px;
+  background: colors.$white;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: colors.$gray-10;
+  }
+}
+
+.weekDayName {
+  font-size: 0.75rem;
+  color: colors.$gray-70;
+}
+
+.weekDayDate {
+  font-weight: 600;
+  margin: layout.$spacing-02 0;
+}
+
+.weekDayCount {
+  font-size: 0.875rem;
+  color: colors.$blue-60;
+}
+
+.dayCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: layout.$spacing-06;
+  border: 1px solid colors.$gray-30;
+  border-radius: 4px;
+  background: colors.$white;
+  cursor: pointer;
+  max-width: 320px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: colors.$gray-10;
+  }
+}
+
+.dayCellDate {
+  font-weight: 600;
+  margin-bottom: layout.$spacing-02;
+}
+
+.dayCellCount {
+  font-size: 0.875rem;
+  color: colors.$blue-60;
+}

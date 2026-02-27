@@ -2,11 +2,17 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
+.calendarHeaderContainer {
+  margin-bottom: layout.$spacing-03;
+}
+
 .titleContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-left: layout.$spacing-05;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
 
   & > p {
     @include type.type-style('heading-02');
@@ -34,6 +40,11 @@
   span {
     order: 2;
   }
+}
+
+.viewSwitcher {
+  display: flex;
+  gap: layout.$spacing-02;
 }
 
 // Overriding styles for RTL support
