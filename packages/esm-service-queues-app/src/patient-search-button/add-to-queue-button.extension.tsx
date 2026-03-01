@@ -28,6 +28,21 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
     isEnded: false,
   });
 
+  React.useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    if (!activeVisit) {
+      // 10-second gentle polling instead of 1-second aggressive polling to reduce API traffic requests.
+      intervalId = setInterval(() => {
+        mutateVisit();
+      }, 10000);
+    }
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeVisit, mutateVisit]);
+
   const selectedQueue = useMemo(
     () => queues.find((q) => q.service.uuid === selectedServiceUuid),
     [queues, selectedServiceUuid],
@@ -39,20 +54,6 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
   );
 
   const isPatientInQueue = optimisticStatus !== null ? optimisticStatus === 'queued' : !!existingQueueEntry;
-
-  React.useEffect(() => {
-    let intervalId;
-    if (!activeVisit) {
-      intervalId = setInterval(() => {
-        mutateVisit();
-      }, 1000);
-    }
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [activeVisit, mutateVisit]);
 
   const handleAddToQueue = useCallback(async () => {
     if (!selectedServiceUuid) {
