@@ -132,7 +132,12 @@ export async function getAllPatientLists(
     description: cohort.description,
     type: cohort.cohortType?.display,
     size: cohort.size,
-    isStarred: false, // TODO
+    isStarred:
+      cohort.attributes?.some(
+        (attr) =>
+          (attr?.attributeType?.display === 'starred' || attr?.attributeType?.name === 'starred') &&
+          String(attr?.value) === 'true',
+      ) ?? false,
   }));
 }
 
@@ -150,11 +155,32 @@ export function starPatientList(userUuid: string, userProperties: LoggedInUser['
   });
 }
 
-export function updatePatientList(id: string, update: PatientListUpdate) {
-  // TODO: Support updating a full patient list, i.e. including the `isStarred` value.
-  // Basically implement the (missing) functionality which was previously declared as "TODO" here:
-  // https://github.com/openmrs/openmrs-esm-patient-management/blob/25ec687afd37c383a0dbd4d8be8b8e09c8c53129/packages/esm-patient-list-management-app/src/api/api.ts#L89
-  return Promise.resolve();
+export async function updatePatientList(id: string, update: PatientListUpdate, ac = new AbortController()) {
+  const { data: cohort } = await openmrsFetch<OpenmrsCohort>(`${cohortUrl}/cohort/${id}?v=full`, {
+    signal: ac.signal,
+  });
+
+  const attributes = cohort.attributes || [];
+  const starredAttrIndex = attributes.findIndex(
+    (attr) => attr?.attributeType?.display === 'starred' || attr?.attributeType?.name === 'starred',
+  );
+
+  if (starredAttrIndex > -1) {
+    attributes[starredAttrIndex].value = String(update.isStarred);
+  } else {
+    attributes.push({
+      attributeType: 'starred',
+      value: String(update.isStarred),
+    });
+  }
+
+  return postData(
+    `${cohortUrl}/cohort/${id}`,
+    {
+      attributes,
+    },
+    ac,
+  );
 }
 
 export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {
