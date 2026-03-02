@@ -156,10 +156,7 @@ export function starPatientList(userUuid: string, userProperties: LoggedInUser['
 }
 
 export async function updatePatientList(id: string, update: PatientListUpdate, ac = new AbortController()) {
-  const { data: cohort } = await openmrsFetch<OpenmrsCohort>(`${cohortUrl}/cohort/${id}?v=full`, {
-    signal: ac.signal,
-  });
-
+  const { data: cohort } = await openmrsFetch<OpenmrsCohort>(`${cohortUrl}/cohort/${id}?v=full`, { signal: ac.signal });
   const attributes = cohort.attributes || [];
   const starredAttrIndex = attributes.findIndex(
     (attr) => attr?.attributeType?.display === 'starred' || attr?.attributeType?.name === 'starred',
@@ -168,19 +165,22 @@ export async function updatePatientList(id: string, update: PatientListUpdate, a
   if (starredAttrIndex > -1) {
     attributes[starredAttrIndex].value = String(update.isStarred);
   } else {
+    const { data: attrTypes } = await openmrsFetch(`/ws/rest/v1/cohortm/cohortattributetype?v=full`, {
+      signal: ac.signal,
+    });
+
+    const starredType = attrTypes.results.find((t) => t.display === 'starred' || t.name === 'starred');
+
+    if (!starredType) {
+      throw new Error('Starred attribute type not found on this OpenMRS instance');
+    }
     attributes.push({
-      attributeType: 'starred',
+      attributeType: starredType.uuid,
       value: String(update.isStarred),
     });
   }
 
-  return postData(
-    `${cohortUrl}/cohort/${id}`,
-    {
-      attributes,
-    },
-    ac,
-  );
+  return postData(`${cohortUrl}/cohort/${id}`, { attributes }, ac);
 }
 
 export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {
