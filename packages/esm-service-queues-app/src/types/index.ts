@@ -463,7 +463,7 @@ export interface QueueEntry {
   queue: Queue;
   startedAt: string;
   status: Concept;
-  visit: Visit;
+  visit?: Visit | null;
   sortWeight: number;
   queueComingFrom: Queue;
   previousQueueEntry: QueueEntry;
