@@ -46,6 +46,14 @@
       "slot": "patient-search-actions-slot",
       "online": true,
       "offline": true
+    },
+    {
+      "component": "personAttributeTagsExtension",
+      "name": "person-attribute-tags",
+      "slot": "patient-banner-tags-slot",
+      "online": true,
+      "offline": true,
+      "order": 0
     }
   ],
   "modals": [

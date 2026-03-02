@@ -16,6 +16,8 @@ export interface FieldDefinition {
   allowFutureDates?: boolean;
   allowPastDates?: boolean;
   showHeading: boolean;
+  displayInPatientBanner?: boolean;
+  orderOfDisplayInPatientBanner?: number;
   validation?: {
     required: boolean;
     matches?: string;
@@ -192,6 +194,18 @@ export const esmPatientRegistrationSchema = {
         _type: Type.Boolean,
         _default: true,
         _description: 'Indicates whether the date input field should allow the selection of past dates or not.',
+      },
+      displayInPatientBanner: {
+        _type: Type.Boolean,
+        _default: false,
+        _description: 'Indicates whether the field should be displayed in the patient banner or not.',
+        _validators: [validators.oneOf([true, false])],
+      },
+      orderOfDisplayInPatientBanner: {
+        _type: Type.Number,
+        _default: 100,
+        _description: 'Indicates the order of display of the field in the patient banner.',
+        _validators: [validators.inRange(0, 100)],
       },
       validation: {
         required: {

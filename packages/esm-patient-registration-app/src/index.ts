@@ -51,3 +51,8 @@ export const deleteIdentifierConfirmationModal = getAsyncLifecycle(
   () => import('./widgets/delete-identifier-confirmation.modal'),
   options,
 );
+
+export const personAttributeTagsExtension = getAsyncLifecycle(
+  () => import('./person-attribute-tags.extension'),
+  options,
+);
