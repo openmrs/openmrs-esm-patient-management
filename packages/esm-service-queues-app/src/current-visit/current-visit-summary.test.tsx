@@ -41,4 +41,31 @@ describe('CurrentVisit', () => {
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
+
+  it('renders a fallback when visit uuid is missing', async () => {
+    useVisitMock.mockReturnValue({
+      visit: null,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+
+    render(<CurrentVisit patientUuid={patientUuid} />);
+
+    expect(useVisitMock).toHaveBeenCalledWith(undefined);
+    expect(screen.getByText('No active visit')).toBeInTheDocument();
+  });
+
+  it('renders a fallback when visit data is unavailable', async () => {
+    useVisitMock.mockReturnValue({
+      visit: null,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+
+    render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
+
+    expect(screen.getByText('No active visit')).toBeInTheDocument();
+  });
 });
