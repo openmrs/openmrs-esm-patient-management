@@ -254,7 +254,7 @@ export interface PatientProgram {
 
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
-  missedAppointmentsCount;
+  missedAppointmentsCount: number;
   appointmentDate: number;
   appointmentServiceUuid: string;
 }
