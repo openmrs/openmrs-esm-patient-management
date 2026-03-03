@@ -91,6 +91,7 @@
   "name": "שם",
   "nextPage": "Next page",
   "noActiveTickets": "No active tickets to display",
+  "noActiveVisit": "No active visit",
   "noColumnsDefined": "No table columns defined. Check Configuration",
   "noEncountersFound": "לא נמצאו פגישות",
   "noMedicationsFound": "לא נמצאו תרופות",
