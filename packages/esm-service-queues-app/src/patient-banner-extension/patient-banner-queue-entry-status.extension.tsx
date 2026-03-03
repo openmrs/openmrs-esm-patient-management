@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { type ConfigObject, isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -15,10 +15,20 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
+
+  const isPatientChart = renderedFrom === 'patient-chart';
+
+  // Force a refetch on mount so the banner shows up-to-date queue info
+  // after client-side navigation (e.g. from the "Serve" action).
+  useEffect(() => {
+    if (isPatientChart) {
+      window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+    }
+  }, [isPatientChart]);
+
   const queueEntry = queueEntries?.[0];
   const config = useConfig<ConfigObject>();
 
-  const isPatientChart = renderedFrom === 'patient-chart';
   if (!isPatientChart || !queueEntry) {
     return null;
   }
