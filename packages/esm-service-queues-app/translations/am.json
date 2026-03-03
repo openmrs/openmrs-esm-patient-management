@@ -91,6 +91,7 @@
   "name": "Name",
   "nextPage": "Next page",
   "noActiveTickets": "No active tickets to display",
+  "noActiveVisit": "No active visit",
   "noColumnsDefined": "No table columns defined. Check Configuration",
   "noEncountersFound": "No encounters found",
   "noMedicationsFound": "No medications found",

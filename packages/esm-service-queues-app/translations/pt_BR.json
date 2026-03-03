@@ -91,6 +91,7 @@
   "name": "Nome do módulo",
   "nextPage": "Próxima página",
   "noActiveTickets": "No active tickets to display",
+  "noActiveVisit": "No active visit",
   "noColumnsDefined": "Não há colunas de tabela definidas. Verifique a configuração",
   "noEncountersFound": "Nenhum encontro encontrado",
   "noMedicationsFound": "Nenhum medicamento encontrado",
