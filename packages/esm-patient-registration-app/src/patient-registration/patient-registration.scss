@@ -74,17 +74,22 @@
 }
 
 .stickyColumn {
+  position: -webkit-sticky;
   position: sticky;
   margin-top: layout.$spacing-05;
-  // layout.$spacing-09 for the nav height and layout.$spacing-05 for top margin
-  top: layout.$spacing-10;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  top: 5rem; // Explicit rem fallback slightly larger than nav height to ensure visibility
+  z-index: 10;
+
+  // ensure the column doesn't stretch and can scroll if viewport is tiny
+  height: max-content;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+
+  background: linear-gradient(145deg, #ffffff, #f4f8fe);
   padding: layout.$spacing-05;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(15, 98, 254, 0.1);
   transition: box-shadow 0.3s ease;
 
   &:hover {
