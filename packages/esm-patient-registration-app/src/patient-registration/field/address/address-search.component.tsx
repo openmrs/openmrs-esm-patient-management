@@ -16,7 +16,7 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
   const wrapper = useRef(null);
   const [searchString, setSearchString] = useState('');
 
-  const { addresses } = useAddressHierarchy(searchString, separator);
+  const { addresses, isLoading, error } = useAddressHierarchy(searchString, separator);
 
   const addressOptions: Array<string> = useMemo(() => {
     const options: Set<string> = new Set();
@@ -65,19 +65,31 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
     <div className={styles.autocomplete} ref={wrapper} style={{ marginBottom: '1rem' }}>
       <Search
         onChange={handleInputChange}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+          }
+        }}
         labelText={t('searchAddress', 'Search address')}
         placeholder={t('searchAddress', 'Search address')}
         ref={searchBox}
         value={searchString}
       />
-      {addressOptions.length > 0 && (
-        /* Since the input has a marginBottom of 1rem */
+      {searchString && (
         <ul className={styles.suggestions}>
-          {addressOptions.map((address, index) => (
-            <li key={index} onClick={(e) => handleChange(address)}>
-              {address}
-            </li>
-          ))}
+          {isLoading ? (
+            <li className={styles.loading}>{t('searching', 'Searching...')}</li>
+          ) : error ? (
+            <li className={styles.noResults}>{t('errorFetchingAddresses', 'Error fetching address results')}</li>
+          ) : addressOptions.length > 0 ? (
+            addressOptions.map((address, index) => (
+              <li key={index} onClick={() => handleChange(address)}>
+                {address}
+              </li>
+            ))
+          ) : (
+            <li className={styles.noResults}>{t('noAddressResults', 'No matching addresses found')}</li>
+          )}
         </ul>
       )}
     </div>

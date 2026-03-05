@@ -12,7 +12,7 @@
   margin-top: 0;
   max-height: 20rem;
   overflow-y: auto;
-  padding-left: 0;
+  padding: 0;
   width: 100%;
   position: absolute;
   left: 0;
@@ -26,7 +26,10 @@
   padding: layout.$spacing-05;
   line-height: 1.29;
   color: #525252;
-  border-bottom: 1px solid #8d8d8d;
+}
+
+.suggestions li:last-of-type {
+  border-bottom: none;
 }
 
 .suggestions li:hover {
@@ -45,6 +48,20 @@
 
 .autocompleteSearch {
   width: 100%;
+}
+
+.noResults,
+.loading {
+  color: $text-02;
+  cursor: default;
+  border-bottom: none;
+}
+
+.noResults:hover,
+.loading:hover {
+  background-color: inherit;
+  color: $text-02;
+  cursor: default;
 }
 
 .suggestions a {
