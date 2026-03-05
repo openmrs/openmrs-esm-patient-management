@@ -25,16 +25,15 @@ interface PatientListResponse {
 }
 
 export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
-  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType,location:(uuid,display))';
+  const custom =
+    'custom:(uuid,name,description,display,size,attributes,cohortType,location:(uuid,display),creator:(uuid,display))';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
   ];
   const config = useConfig<PatientListManagementConfig>();
 
-  if (type === PatientListType.USER) {
-    query.push(['cohortType', config.myListCohortTypeUUID]);
-  } else if (type === PatientListType.SYSTEM) {
+  if (type === PatientListType.SYSTEM) {
     query.push(['cohortType', config.systemListCohortTypeUUID]);
   }
 
@@ -77,13 +76,19 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     type: cohort.cohortType?.display,
     size: cohort.size,
     location: cohort.location,
+    creatorUuid: cohort?.creator?.uuid,
   }));
   const { user } = useSession();
 
+  let filteredResults = patientListsData;
+  if (type === PatientListType.USER) {
+    filteredResults = patientListsData.filter((cohort) => cohort.creatorUuid === user.uuid);
+  }
+
   return {
     patientLists: isStarred
-      ? patientListsData.filter(({ id }) => user?.userProperties?.starredPatientLists?.includes(id))
-      : patientListsData,
+      ? filteredResults.filter(({ id }) => user?.userProperties?.starredPatientLists?.includes(id))
+      : filteredResults,
     isLoading,
     isValidating,
     error,
@@ -115,7 +120,7 @@ export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: str
 }
 
 export function usePatientListDetails(patientListUuid: string) {
-  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate,cohortType)`;
+  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate,cohortType,creator:(uuid,display))`;
 
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<OpenmrsCohort>, Error>(
     patientListUuid ? url : null,
