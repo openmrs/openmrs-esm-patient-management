@@ -71,6 +71,7 @@
   display: flex;
   width: 100%;
   gap: clamp(1rem, 3vw, 3rem);
+  // Do NOT add align-items: flex-start here, doing so forces the first column to shrink and removes the vertical track needed for `position: sticky`
 }
 
 .stickyColumn {

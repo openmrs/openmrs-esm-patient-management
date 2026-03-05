@@ -1,7 +1,9 @@
 .root {
   background-color: white;
+  overflow: visible !important;
 }
 
 .grid {
   grid-template-columns: repeat(1, minmax(0, 1fr));
+  overflow: visible !important;
 }
