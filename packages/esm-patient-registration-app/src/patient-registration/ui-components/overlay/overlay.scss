@@ -10,7 +10,7 @@
   min-width: 27rem;
   background-color: $ui-02;
   border-left: 1px solid $text-03;
-  overflow: hidden;
+  overflow: visible;
   display: grid;
   grid-template-rows: auto 1fr auto;
   z-index: 999;
@@ -34,6 +34,7 @@
   button {
     background-color: $brand-01 !important;
   }
+
   .headerContent {
     color: $ui-02;
   }
@@ -59,5 +60,5 @@
 
 .overlayContent {
   padding: layout.$spacing-05;
-  overflow-y: auto;
+  overflow-y: visible;
 }
