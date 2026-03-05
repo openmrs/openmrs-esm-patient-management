@@ -11,13 +11,35 @@
 }
 
 .cancelButton {
-  width: 11.688rem;
+  width: 100%;
+  border-radius: 6px !important;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    background-color: #e5e5e5 !important;
+  }
 }
 
 .submitButton {
   margin-bottom: layout.$spacing-05;
-  width: 11.688rem;
+  width: 100%;
   display: block;
+
+  background: linear-gradient(135deg, #0f62fe, #5892ff) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 98, 254, 0.4) !important;
+    background: linear-gradient(135deg, #0e56e0, #4f85e8) !important;
+  }
 }
 
 .infoGrid {
@@ -48,6 +70,7 @@
 .formContainer {
   display: flex;
   width: 100%;
+  gap: clamp(1rem, 3vw, 3rem);
 }
 
 .stickyColumn {
@@ -55,6 +78,18 @@
   margin-top: layout.$spacing-05;
   // layout.$spacing-09 for the nav height and layout.$spacing-05 for top margin
   top: layout.$spacing-10;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: layout.$spacing-05;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .touchTarget a:active {
@@ -66,6 +101,12 @@
   line-height: 1.38;
   font-size: layout.$spacing-05;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 
   &:active {
     text-decoration: none;
@@ -74,8 +115,10 @@
 
   &:hover {
     text-decoration: none;
-    color: $color-gray-100;
+    color: #0f62fe;
     cursor: pointer;
+    background-color: rgba(15, 98, 254, 0.05);
+    transform: translateX(4px);
   }
 }
 
