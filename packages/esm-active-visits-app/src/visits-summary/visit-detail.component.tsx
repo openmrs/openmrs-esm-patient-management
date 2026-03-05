@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { formatDatetime, formatTime, Obs, parseDate } from '@openmrs/esm-framework';
+import { formatDatetime, formatTime, parseDate } from '@openmrs/esm-framework';
 import { useVisit } from './visit.resource';
 import EncounterList, { type EncounterListItem } from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
