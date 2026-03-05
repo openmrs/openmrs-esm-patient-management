@@ -77,13 +77,8 @@
   position: -webkit-sticky;
   position: sticky;
   margin-top: layout.$spacing-05;
-  top: 5rem; // Explicit rem fallback slightly larger than nav height to ensure visibility
+  top: layout.$spacing-10; // Explicit fallback
   z-index: 10;
-
-  // ensure the column doesn't stretch and can scroll if viewport is tiny
-  height: max-content;
-  max-height: calc(100vh - 6rem);
-  overflow-y: auto;
 
   background: linear-gradient(145deg, #ffffff, #f4f8fe);
   padding: layout.$spacing-05;
