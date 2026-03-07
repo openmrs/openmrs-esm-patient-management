@@ -4,6 +4,7 @@ import { Button, ModalHeader, ModalBody, ModalFooter, Stack } from '@carbon/reac
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import { type QueueEntry } from '../types';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
+import { getErrorMessage, isAlreadyEndedQueueEntryError } from './queue-entry-error.utils';
 
 interface QueueEntryUndoActionsModalProps {
   queueEntry: QueueEntry;
@@ -64,11 +65,24 @@ export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalPr
         }
       })
       .catch((error) => {
-        showSnackbar({
-          title: submitFailureTitle,
-          kind: 'error',
-          subtitle: error?.message,
-        });
+        if (isAlreadyEndedQueueEntryError(error)) {
+          showSnackbar({
+            title: t('queueEntryAlreadyEnded', 'Queue entry is no longer active'),
+            kind: 'warning',
+            subtitle: t(
+              'queueEntryAlreadyEndedMessage',
+              'This queue entry has already been completed by another user. The queue has been refreshed.',
+            ),
+          });
+          mutateQueueEntries();
+          closeModal();
+        } else {
+          showSnackbar({
+            title: submitFailureTitle,
+            kind: 'error',
+            subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
+          });
+        }
       })
       .finally(() => {
         setIsSubmitting(false);

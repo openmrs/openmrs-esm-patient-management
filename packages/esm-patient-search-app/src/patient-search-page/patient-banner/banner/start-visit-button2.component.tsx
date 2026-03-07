@@ -21,9 +21,9 @@ const StartVisitButton2 = ({
 }: StartVisitButtonProps) => {
   const { t } = useTranslation();
 
-  const handleStartVisit = useCallback(() => {
+  const handleStartVisit = useCallback(async () => {
     try {
-      launchChildWorkspace(startVisitWorkspaceName, {
+      await launchChildWorkspace(startVisitWorkspaceName, {
         openedFrom: 'patient-search-results',
         patient,
         patientUuid,
