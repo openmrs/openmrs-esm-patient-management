@@ -20,28 +20,13 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
   const [optimisticStatus, setOptimisticStatus] = React.useState<'queued' | 'not_queued' | null>(null);
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const config = useConfig<ConfigObject>();
-  const { activeVisit, mutate: mutateVisit } = useVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
   const { queues } = useQueues(selectedQueueLocationUuid);
   const { mutateQueueEntries } = useMutateQueueEntries();
   const { queueEntries, mutate: mutateQueueEntriesList } = useQueueEntries({
     patient: patientUuid,
     isEnded: false,
   });
-
-  React.useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-    if (!activeVisit) {
-      // 10-second gentle polling instead of 1-second aggressive polling to reduce API traffic requests.
-      intervalId = setInterval(() => {
-        mutateVisit();
-      }, 10000);
-    }
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [activeVisit, mutateVisit]);
 
   const selectedQueue = useMemo(
     () => queues.find((q) => q.service.uuid === selectedServiceUuid),
@@ -69,7 +54,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       showSnackbar({
         title: t('queueNotFound', 'Queue not found'),
         kind: 'error',
-        subtitle: t('queueNotFoundForSelectedService', 'Could not find a queue for the selected service'),
+        subtitle: t('queueNotFoundForService', 'Could not find a queue for the selected service'),
       });
       return;
     }
@@ -78,7 +63,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
       showSnackbar({
         title: t('noActiveVisit', 'No active visit'),
         kind: 'error',
-        subtitle: t('startVisitFirstForThisPatient', 'Please start a visit for this patient first'),
+        subtitle: t('startVisitFirst', 'Please start a visit for this patient first'),
       });
       return;
     }
@@ -113,8 +98,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
         visitQueueNumberAttributeUuid,
       );
 
-      await mutateQueueEntries();
-      await mutateQueueEntriesList();
+      await Promise.all([mutateQueueEntries(), mutateQueueEntriesList()]);
 
       setOptimisticStatus(null);
 
@@ -161,8 +145,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
         endedAt: new Date().toISOString(),
       });
 
-      await mutateQueueEntries();
-      await mutateQueueEntriesList();
+      await Promise.all([mutateQueueEntries(), mutateQueueEntriesList()]);
 
       setOptimisticStatus(null);
 
@@ -174,7 +157,7 @@ const AddPatientToQueueButton: React.FC<AddPatientToQueueButtonProps> = ({ patie
     } catch (error) {
       setOptimisticStatus(null);
       showSnackbar({
-        title: t('errorRemovingPatientFromQueue', 'Error, removing patient from queue'),
+        title: t('errorRemovingPatient', 'Error removing patient from queue'),
         kind: 'error',
         subtitle: error?.message,
       });

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { AddIcon, launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { serviceQueuesPatientSearchWorkspace } from '../../constants';
-import { useTranslation } from 'react-i18next';
 import { useServiceQueuesStore } from '../../store/store';
 
 const AddPatientToQueueButton: React.FC = () => {
