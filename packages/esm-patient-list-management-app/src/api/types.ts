@@ -59,7 +59,7 @@ export interface OpenmrsCohort {
   description: string;
   attributes: Array<any>;
   links: Array<any>;
-  location: Location | null;
+  location: { uuid: string; display: string } | null;
   groupCohort: boolean | null;
   startDate: string | null;
   endDate: string | null;
@@ -96,6 +96,7 @@ export interface NewCohortData {
   name: string;
   description: string;
   cohortType: string;
+  location?: string;
 }
 
 export interface NewCohortDataPayload {
