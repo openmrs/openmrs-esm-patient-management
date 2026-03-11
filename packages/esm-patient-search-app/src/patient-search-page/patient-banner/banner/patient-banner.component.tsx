@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { SkeletonIcon, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import {
   ConfigurableLink,
   ExtensionSlot,
@@ -34,13 +34,13 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
   const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
     usePatientSearchContext() ?? {};
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName, closeWorkspace } = context2 ?? {};
 
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;
@@ -85,7 +85,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patientUuid={patientUuid}
               />
             ) : null}
+            {!isDeceased && isLoadingVisit && <ButtonSkeleton />}
             {!isDeceased &&
+              !isLoadingVisit &&
               !activeVisit &&
               (context2 ? (
                 <ExtensionSlot
@@ -103,6 +105,28 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                     handleReturnToSearchList,
                     hidePatientSearch,
                     patientUuid,
+                  }}
+                />
+              ))}
+            {!isDeceased &&
+              !isLoadingVisit &&
+              activeVisit &&
+              (context2 ? (
+                <ExtensionSlot
+                  name="active-visit-patient-search-actions-slot"
+                  state={{
+                    patientUuid,
+                    activeVisit,
+                    launchChildWorkspace,
+                    closeWorkspace,
+                  }}
+                />
+              ) : (
+                <ExtensionSlot
+                  name="active-visit-patient-search-actions-slot"
+                  state={{
+                    patientUuid,
+                    activeVisit,
                   }}
                 />
               ))}
