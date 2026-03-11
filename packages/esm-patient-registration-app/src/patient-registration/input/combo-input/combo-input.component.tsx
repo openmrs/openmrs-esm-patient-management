@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { TextInput, Layer } from '@carbon/react';
 import SelectionTick from './selection-tick.component';
 import styles from '../input.scss';
@@ -8,6 +9,8 @@ type TextInputProps = React.ComponentProps<typeof TextInput>;
 
 interface ComboInputProps {
   entries: Array<string>;
+  error?: Error;
+  isLoading?: boolean;
   name: string;
   fieldProps: {
     value: string;
@@ -18,7 +21,16 @@ interface ComboInputProps {
   handleSelection: (newSelection: string) => void;
 }
 
-const ComboInput: React.FC<ComboInputProps> = ({ entries, name, fieldProps, handleInputChange, handleSelection }) => {
+const ComboInput: React.FC<ComboInputProps> = ({
+  entries,
+  error,
+  isLoading,
+  name,
+  fieldProps,
+  handleInputChange,
+  handleSelection,
+}) => {
+  const { t } = useTranslation();
   const [highlightedEntry, setHighlightedEntry] = useState(-1);
   const { value = '' } = fieldProps;
   const [showEntries, setShowEntries] = useState(false);
@@ -61,8 +73,11 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, name, fieldProps, hand
         setHighlightedEntry((prev) => Math.max(-1, prev - 1));
       } else if (e.key === 'ArrowDown') {
         setHighlightedEntry((prev) => Math.min(totalResults - 1, prev + 1));
-      } else if (e.key === 'Enter' && highlightedEntry > -1) {
-        handleOptionClick(filteredEntries[highlightedEntry], e);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (highlightedEntry > -1) {
+          handleOptionClick(filteredEntries[highlightedEntry]);
+        }
       }
     },
     [highlightedEntry, handleOptionClick, filteredEntries, setHighlightedEntry, setShowEntries],
@@ -100,26 +115,46 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, name, fieldProps, hand
         {showEntries && (
           <div className="cds--combo-box cds--list-box cds--list-box--expanded">
             <div id="downshift-1-menu" className="cds--list-box__menu" role="listbox">
-              {filteredEntries.map((entry, indx) => (
-                <div
-                  className={classNames('cds--list-box__menu-item', {
-                    'cds--list-box__menu-item--highlighted': indx === highlightedEntry,
-                  })}
-                  key={indx}
-                  id="downshift-1-item-0"
-                  role="option"
-                  tabIndex={-1}
-                  aria-selected="true"
-                  onClick={() => handleOptionClick(entry)}>
-                  <div
-                    className={classNames('cds--list-box__menu-item__option', styles.comboInputItemOption, {
-                      'cds--list-box__menu-item--active': entry === value,
-                    })}>
-                    {entry}
-                    {entry === value && <SelectionTick />}
+              {isLoading ? (
+                <div className="cds--list-box__menu-item">
+                  <div className={classNames('cds--list-box__menu-item__option', styles.comboInputItemOption)}>
+                    {t('searching', 'Searching...')}
                   </div>
                 </div>
-              ))}
+              ) : error ? (
+                <div className="cds--list-box__menu-item">
+                  <div className={classNames('cds--list-box__menu-item__option', styles.comboInputItemOption)}>
+                    {t('errorFetchingResults', 'Error fetching results')}
+                  </div>
+                </div>
+              ) : filteredEntries.length > 0 ? (
+                filteredEntries.map((entry, indx) => (
+                  <div
+                    className={classNames('cds--list-box__menu-item', {
+                      'cds--list-box__menu-item--highlighted': indx === highlightedEntry,
+                    })}
+                    key={indx}
+                    id="downshift-1-item-0"
+                    role="option"
+                    tabIndex={-1}
+                    aria-selected="true"
+                    onClick={() => handleOptionClick(entry)}>
+                    <div
+                      className={classNames('cds--list-box__menu-item__option', styles.comboInputItemOption, {
+                        'cds--list-box__menu-item--active': entry === value,
+                      })}>
+                      {entry}
+                      {entry === value && <SelectionTick />}
+                    </div>
+                  </div>
+                ))
+              ) : value ? (
+                <div className="cds--list-box__menu-item">
+                  <div className={classNames('cds--list-box__menu-item__option', styles.comboInputItemOption)}>
+                    {t('noMatchingResults', 'No matching results')}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         )}
