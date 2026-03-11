@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+
+.noAdmissionsNotification {
+  margin: layout.$spacing-05 0;
+}
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  width: 100%;
+}
