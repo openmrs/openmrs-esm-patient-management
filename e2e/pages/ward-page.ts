@@ -11,6 +11,9 @@ export class WardPage {
   readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
   readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
   readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
+  readonly dischargeButton = () => this.page.getByRole('button', { name: 'Discharge' });
+  readonly confirmDischargeButton = () => this.page.getByRole('button', { name: 'Proceed with patient discharge' });
+  readonly transferSiderailIcon = () => this.page.getByRole('button', { name: /transfers/i });
 
   async clickPatientCard(patientName: string) {
     // Wait for patient to be loaded - use first() to avoid strict mode violation
@@ -84,5 +87,75 @@ export class WardPage {
     await this.page
       .getByText(new RegExp(`${patientName}\\s+has been successfully admitted and assigned to bed ${bedNumber}`, 'i'))
       .waitFor({ state: 'visible' });
+  }
+
+  async clickTransferSiderailIcon() {
+    await this.transferSiderailIcon().click();
+  }
+
+  async selectTransferLocation(locationName: string): Promise<boolean> {
+    await Promise.race([
+      this.page.getByRole('radio').first().waitFor({ state: 'visible', timeout: 10000 }),
+      this.page.getByText(/no locations found/i).waitFor({ state: 'visible', timeout: 10000 }),
+    ]);
+
+    const targetLocation = this.page.getByRole('radio', { name: locationName });
+    if (await targetLocation.isVisible()) {
+      await this.page.locator('label.cds--radio-button__label', { hasText: locationName }).click();
+      return true;
+    } else {
+      const firstLocation = this.page.getByRole('radio').first();
+      if (await firstLocation.isVisible()) {
+        await this.page.locator('label.cds--radio-button__label').first().click();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  async attemptTransferThePatient(locationName: string, note: string) {
+    await Promise.race([
+      this.page.getByRole('radio').first().waitFor({ state: 'visible', timeout: 10000 }),
+      this.page.getByText(/no locations found/i).waitFor({ state: 'visible', timeout: 10000 }),
+    ]);
+
+    const targetLocation = this.page.getByRole('radio', { name: locationName });
+    if (await targetLocation.isVisible()) {
+      await this.page.locator('label.cds--radio-button__label', { hasText: locationName }).click();
+      await this.page.getByRole('textbox', { name: 'Notes' }).fill(note);
+      await this.saveButton().click();
+      await this.page.getByText(/patient transfer request created/i).waitFor({ state: 'visible' });
+    } else {
+      const firstLocation = this.page.getByRole('radio').first();
+      if (await firstLocation.isVisible()) {
+        await this.page.locator('label.cds--radio-button__label').first().click();
+        await this.page.getByRole('textbox', { name: 'Notes' }).fill(note);
+        await this.saveButton().click();
+        await this.page.getByText(/patient transfer request created/i).waitFor({ state: 'visible' });
+      } else {
+        await this.cancelButton().click();
+      }
+    }
+  }
+
+  async fillTransferNote(note: string) {
+    await this.page.getByRole('textbox', { name: 'Notes' }).fill(note);
+  }
+
+  async expectTransferRequestCreated() {
+    await this.page.getByText(/patient transfer request created/i).waitFor({ state: 'visible' });
+  }
+
+  async clickDischargeButton() {
+    await this.dischargeButton().click();
+  }
+
+  async clickConfirmDischargeButton() {
+    await this.confirmDischargeButton().click();
+  }
+
+  async expectDischargeSuccess() {
+    await this.page.getByText(/patient was discharged/i).waitFor({ state: 'visible' });
   }
 }
