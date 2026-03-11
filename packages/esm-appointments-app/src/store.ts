@@ -1,28 +1,38 @@
-import { createGlobalStore, isOmrsDateStrict, useStore } from '@openmrs/esm-framework';
+import { createGlobalStore, isOmrsDateStrict, useStoreWithActions } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from './constants';
+import { type AppointmentStatus } from './types';
 
-export const appointmentsStore = createGlobalStore('appointments-app', {
+interface AppointmentsStore {
+  appointmentServiceTypes: Array<string>;
+  selectedDate: string;
+  selectedAppointmentStatuses: Set<AppointmentStatus>;
+}
+
+export const appointmentsStore = createGlobalStore<AppointmentsStore>('appointments-app', {
   appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
+  selectedAppointmentStatuses: new Set(),
 });
 
 export function useAppointmentsStore() {
-  return useStore(appointmentsStore);
-}
-
-export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
-  appointmentsStore.setState({ appointmentServiceTypes: serviceTypes });
-}
-
-export function setSelectedDate(date: string) {
-  if (!isOmrsDateStrict(date)) {
-    console.warn(
-      'esm-appointments-app: setSelectedDate called with incorrectly formatted date. Should be omrsDateFormat string. Received:',
-      date,
-    );
-  }
-  appointmentsStore.setState({ selectedDate: date });
+  return useStoreWithActions(appointmentsStore, {
+    setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
+      return { appointmentServiceTypes };
+    },
+    setSelectedDate(_, selectedDate) {
+      if (!isOmrsDateStrict(selectedDate)) {
+        console.warn(
+          'esm-appointments-app: setSelectedDate called with incorrectly formatted date. Should be omrsDateFormat string. Received:',
+          selectedDate,
+        );
+      }
+      return { selectedDate };
+    },
+    setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Set<AppointmentStatus>) {
+      return { selectedAppointmentStatuses };
+    },
+  });
 }
 
 /* Set up localStorage serialization */

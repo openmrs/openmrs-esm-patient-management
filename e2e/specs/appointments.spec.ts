@@ -292,7 +292,18 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
     await expect(page.getByText('Appointments for selected patients have been successfully updated')).toBeVisible();
   });
 
-  await test.step('Then the row should not be visible in the appointments table anymore', async () => {
+  await test.step('Then the row should still be visible in the appointments table, but with status "Checked out"', async () => {
+    const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
+    await expect(appointmentRow).toHaveCount(1);
+    await expect(appointmentRow.getByText('Checked out')).toBeVisible();
+  });
+
+  await test.step("When I filter the appointments table by 'Missed' status", async () => {
+    await page.getByText('Filter appointments by status').click();
+    await page.getByRole('option', { name: 'Missed' }).locator('label').click();
+  });
+
+  await test.step('Then the row should not be visible in the appointments table', async () => {
     const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
     await expect(appointmentRow).toHaveCount(0);
   });
