@@ -1,15 +1,48 @@
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
-import type { ObjectSchema } from 'yup';
 import mapValues from 'lodash/mapValues';
 import { type RegistrationConfig } from '../../config-schema';
-import { type FormValues } from '../patient-registration.types';
+import { type AddressTemplate, type FormValues } from '../patient-registration.types';
 import { getDatetime } from '../patient-registration.resource';
+
+function getTemplateDrivenAddressValidationSchema(
+  addressTemplate: AddressTemplate | null,
+  t: (key: string, defaultValue: string) => string,
+) {
+  if (!addressTemplate) return Yup.object().optional();
+
+  const shapeEntries: Record<string, Yup.StringSchema> = {};
+  const fieldNames = Object.keys(addressTemplate.nameMappings ?? {});
+  const requiredElements = (addressTemplate.requiredElements ?? []) as Array<string>;
+
+  for (const fieldName of fieldNames) {
+    let fieldSchema = Yup.string();
+    const regex = addressTemplate.elementRegex?.[fieldName];
+    const regexFormat = addressTemplate.elementRegexFormats?.[fieldName];
+    const isRequired = requiredElements.includes(fieldName);
+
+    if (regex) {
+      fieldSchema = fieldSchema.matches(new RegExp(regex), regexFormat || t('invalidFormat', 'Invalid format'));
+    }
+
+    if (isRequired) {
+      fieldSchema = fieldSchema.required(t('requiredField', 'This field is required'));
+    } else {
+      fieldSchema = fieldSchema.optional();
+    }
+
+    shapeEntries[fieldName] = fieldSchema;
+  }
+
+  return Yup.object(shapeEntries).optional();
+}
 
 export function getValidationSchema(
   config: RegistrationConfig,
   t: (key: string, defaultValue: string) => string,
-): ObjectSchema<any> {
+  addressTemplate: AddressTemplate | null,
+) {
+  const addressValidationSchema = getTemplateDrivenAddressValidationSchema(addressTemplate, t);
   return Yup.object({
     givenName: Yup.string().required(t('givenNameRequired', 'Given name is required')),
     familyName: Yup.string().required(t('familyNameRequired', 'Family name is required')),
@@ -125,67 +158,6 @@ export function getValidationSchema(
         relationshipType: Yup.string().required(),
       }),
     ),
-    address: Yup.object({
-      cityVillage: Yup.string()
-        .optional()
-        .test(
-          'valid-city-format',
-          t('invalidCityVillage', 'City/Village should only contain letters, spaces, hyphens, and apostrophes'),
-          (value) => {
-            if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
-          },
-        ),
-      stateProvince: Yup.string()
-        .optional()
-        .test(
-          'valid-state-format',
-          t('invalidStateProvince', 'State/Province should only contain letters, spaces, hyphens, and apostrophes'),
-          (value) => {
-            if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
-          },
-        ),
-      country: Yup.string()
-        .optional()
-        .test(
-          'valid-country-format',
-          t('invalidCountry', 'Country should only contain letters, spaces, hyphens, and apostrophes'),
-          (value) => {
-            if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
-          },
-        ),
-      postalCode: Yup.string()
-        .optional()
-        .test(
-          'valid-postal-format',
-          t(
-            'invalidPostalCode',
-            'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
-          ),
-          (value) => {
-            if (!value) return true; // Allow empty values since field is optional
-            // Allow alphanumeric characters, spaces, and hyphens to support international postal codes
-            return /^[A-Za-z0-9\s\-]+$/.test(value);
-          },
-        ),
-      address1: Yup.string().optional(),
-      address2: Yup.string().optional(),
-      countyDistrict: Yup.string()
-        .optional()
-        .test(
-          'valid-county-format',
-          t('invalidCountyDistrict', 'County/District should only contain letters, spaces, hyphens, and apostrophes'),
-          (value) => {
-            if (!value) return true; // Allow empty values since field is optional
-            // Allow letters (including Unicode characters for international names), spaces, hyphens, apostrophes, periods, and parentheses
-            return /^[\p{L}\s\-'.()\u1780-\u17FF]+$/u.test(value);
-          },
-        ),
-    }).optional(),
+    address: addressValidationSchema ?? Yup.object().optional(),
   });
 }

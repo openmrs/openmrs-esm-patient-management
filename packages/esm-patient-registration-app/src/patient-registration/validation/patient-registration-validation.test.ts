@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { getConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../config-schema';
+import { type AddressTemplate } from '../patient-registration.types';
 import { getValidationSchema } from './patient-registration-validation';
 
 const mockGetConfig = jest.mocked(getConfig);
@@ -55,11 +56,11 @@ describe('Patient registration validation', () => {
     },
   };
 
-  const validateFormValues = async (formValues) => {
+  const validateFormValues = async (formValues, addressTemplate: AddressTemplate | null = null) => {
     const config = (await getConfig('@openmrs/esm-patient-registration-app')) as unknown as RegistrationConfig;
     const mockT = (key: string, defaultValue: string) => defaultValue;
 
-    const validationSchema = getValidationSchema(config, mockT);
+    const validationSchema = getValidationSchema(config, mockT, addressTemplate);
     try {
       await validationSchema.validate(formValues, { abortEarly: false });
     } catch (err) {
@@ -203,341 +204,116 @@ describe('Patient registration validation', () => {
     expect(validationError.errors).toContain('Death date cannot be in future');
   });
 
-  describe('Address validation', () => {
-    it('should allow valid address with all fields filled', async () => {
+  describe('Address validation from template', () => {
+    const mockAddressTemplate = {
+      displayName: null,
+      codeName: 'default',
+      country: null,
+      lines: null,
+      lineByLineFormat: null,
+      nameMappings: {
+        cityVillage: 'City/Village',
+      },
+      sizeMappings: null,
+      elementDefaults: null,
+      elementRegex: {
+        cityVillage: '^[A-Z]{3}$',
+      },
+      elementRegexFormats: {
+        cityVillage: 'City must be exactly 3 uppercase letters',
+      },
+      requiredElements: ['cityVillage'],
+    } as unknown as AddressTemplate;
+
+    it('should validate address using elementRegex from the template', async () => {
       const validFormValuesWithAddress = {
         ...validFormValues,
         address: {
-          cityVillage: 'New York',
-          stateProvince: 'New York',
-          country: 'United States',
-          postalCode: '10001',
-          address1: '123 Main Street',
-          address2: 'Apt 4B',
-          countyDistrict: 'Manhattan',
+          cityVillage: 'ABC',
         },
       };
-      const validationError = await validateFormValues(validFormValuesWithAddress);
+
+      const validationError = await validateFormValues(validFormValuesWithAddress, mockAddressTemplate);
       expect(validationError).toBeFalsy();
     });
 
-    it('should allow empty address fields since they are optional', async () => {
-      const validFormValuesWithEmptyAddress = {
+    it('should reject address values that do not match elementRegex', async () => {
+      const invalidFormValues = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'Abc',
+        },
+      };
+
+      const validationError = await validateFormValues(invalidFormValues, mockAddressTemplate);
+      expect(validationError.errors).toContain('City must be exactly 3 uppercase letters');
+    });
+
+    it('should enforce requiredElements from the template', async () => {
+      const invalidFormValues = {
         ...validFormValues,
         address: {
           cityVillage: '',
-          stateProvince: '',
-          country: '',
-          postalCode: '',
         },
       };
-      const validationError = await validateFormValues(validFormValuesWithEmptyAddress);
-      expect(validationError).toBeFalsy();
+
+      const validationError = await validateFormValues(invalidFormValues, mockAddressTemplate);
+      expect(validationError.errors).toContain('This field is required');
     });
 
-    it('should allow undefined address object', async () => {
-      const validFormValuesWithUndefinedAddress = {
+    it('should skip address validation when addressTemplate is null', async () => {
+      const formValuesWithAddress = {
         ...validFormValues,
-        address: undefined,
+        address: {
+          cityVillage: '12345!@#',
+        },
       };
-      const validationError = await validateFormValues(validFormValuesWithUndefinedAddress);
+
+      const validationError = await validateFormValues(formValuesWithAddress, null);
       expect(validationError).toBeFalsy();
     });
 
-    // City/Village validation tests
-    it('should reject numeric-only city/village', async () => {
+    it('should accept any string for fields without elementRegex', async () => {
+      const templateWithoutRegex = {
+        ...mockAddressTemplate,
+        nameMappings: {
+          cityVillage: 'City/Village',
+          stateProvince: 'State/Province',
+        },
+        elementRegex: {},
+        requiredElements: [],
+      } as unknown as AddressTemplate;
+
+      const formValuesWithAddress = {
+        ...validFormValues,
+        address: {
+          cityVillage: 'anything 123 !@#',
+          stateProvince: '99999',
+        },
+      };
+
+      const validationError = await validateFormValues(formValuesWithAddress, templateWithoutRegex);
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should use default error message when elementRegexFormats is not provided', async () => {
+      const templateWithRegexNoFormat = {
+        ...mockAddressTemplate,
+        elementRegex: {
+          cityVillage: '^[A-Z]+$',
+        },
+        elementRegexFormats: {},
+      } as unknown as AddressTemplate;
+
       const invalidFormValues = {
         ...validFormValues,
         address: {
-          cityVillage: '12345',
+          cityVillage: 'abc',
         },
       };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'City/Village should only contain letters, spaces, hyphens, and apostrophes',
-      );
-    });
 
-    it('should reject city/village with special characters', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          cityVillage: 'New York#$',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'City/Village should only contain letters, spaces, hyphens, and apostrophes',
-      );
-    });
-
-    it('should allow city/village with hyphens', async () => {
-      const validFormValuesWithHyphenatedCity = {
-        ...validFormValues,
-        address: {
-          cityVillage: 'Saint-Denis',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithHyphenatedCity);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow city/village with apostrophes', async () => {
-      const validFormValuesWithApostrophe = {
-        ...validFormValues,
-        address: {
-          cityVillage: "O'Fallon",
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithApostrophe);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow city/village with periods', async () => {
-      const validFormValuesWithPeriod = {
-        ...validFormValues,
-        address: {
-          cityVillage: 'St. Louis',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithPeriod);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow city/village with international characters', async () => {
-      const validFormValuesWithInternationalChars = {
-        ...validFormValues,
-        address: {
-          cityVillage: 'São Paulo',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithInternationalChars);
-      expect(validationError).toBeFalsy();
-    });
-
-    // State/Province validation tests
-    it('should reject numeric-only state/province', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          stateProvince: '12345',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'State/Province should only contain letters, spaces, hyphens, and apostrophes',
-      );
-    });
-
-    it('should reject state/province with special characters', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          stateProvince: 'California@#',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'State/Province should only contain letters, spaces, hyphens, and apostrophes',
-      );
-    });
-
-    it('should allow valid state/province with spaces', async () => {
-      const validFormValuesWithState = {
-        ...validFormValues,
-        address: {
-          stateProvince: 'New York',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithState);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow state/province with hyphens', async () => {
-      const validFormValuesWithHyphenatedState = {
-        ...validFormValues,
-        address: {
-          stateProvince: 'Nouvelle-Aquitaine',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithHyphenatedState);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow state/province with international characters', async () => {
-      const validFormValuesWithInternationalState = {
-        ...validFormValues,
-        address: {
-          stateProvince: 'São Paulo',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithInternationalState);
-      expect(validationError).toBeFalsy();
-    });
-
-    // Country validation tests
-    it('should reject numeric-only country', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          country: '12345',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain('Country should only contain letters, spaces, hyphens, and apostrophes');
-    });
-
-    it('should reject country with special characters', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          country: 'USA#$%',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain('Country should only contain letters, spaces, hyphens, and apostrophes');
-    });
-
-    it('should allow valid country names', async () => {
-      const validFormValuesWithCountry = {
-        ...validFormValues,
-        address: {
-          country: 'United States',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithCountry);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow country with hyphens', async () => {
-      const validFormValuesWithHyphenatedCountry = {
-        ...validFormValues,
-        address: {
-          country: 'Guinea-Bissau',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithHyphenatedCountry);
-      expect(validationError).toBeFalsy();
-    });
-
-    // Postal Code validation tests
-    it('should allow numeric postal codes', async () => {
-      const validFormValuesWithNumericPostalCode = {
-        ...validFormValues,
-        address: {
-          postalCode: '12345',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithNumericPostalCode);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow alphanumeric postal codes (UK format)', async () => {
-      const validFormValuesWithUKPostalCode = {
-        ...validFormValues,
-        address: {
-          postalCode: 'SW1A 1AA',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithUKPostalCode);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow alphanumeric postal codes (Canadian format)', async () => {
-      const validFormValuesWithCanadianPostalCode = {
-        ...validFormValues,
-        address: {
-          postalCode: 'K1A 0B1',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithCanadianPostalCode);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should allow postal codes with hyphens (US ZIP+4)', async () => {
-      const validFormValuesWithZipPlus4 = {
-        ...validFormValues,
-        address: {
-          postalCode: '12345-6789',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithZipPlus4);
-      expect(validationError).toBeFalsy();
-    });
-
-    it('should reject postal codes with special characters', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          postalCode: '503144ferge#$',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
-      );
-    });
-
-    // County/District validation tests
-    it('should reject numeric-only county/district', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          countyDistrict: '12345',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'County/District should only contain letters, spaces, hyphens, and apostrophes',
-      );
-    });
-
-    it('should reject county/district with special characters', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          countyDistrict: 'District#$',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'County/District should only contain letters, spaces, hyphens, and apostrophes',
-      );
-    });
-
-    it('should allow valid county/district', async () => {
-      const validFormValuesWithCounty = {
-        ...validFormValues,
-        address: {
-          countyDistrict: 'Los Angeles County',
-        },
-      };
-      const validationError = await validateFormValues(validFormValuesWithCounty);
-      expect(validationError).toBeFalsy();
-    });
-
-    // Combined validation tests
-    it('should reject multiple invalid address fields and return all errors', async () => {
-      const invalidFormValues = {
-        ...validFormValues,
-        address: {
-          cityVillage: '12345',
-          stateProvince: '67890',
-          country: 'USA#$',
-          postalCode: '503144ferge#$',
-        },
-      };
-      const validationError = await validateFormValues(invalidFormValues);
-      expect(validationError.errors).toContain(
-        'City/Village should only contain letters, spaces, hyphens, and apostrophes',
-      );
-      expect(validationError.errors).toContain(
-        'State/Province should only contain letters, spaces, hyphens, and apostrophes',
-      );
-      expect(validationError.errors).toContain('Country should only contain letters, spaces, hyphens, and apostrophes');
-      expect(validationError.errors).toContain(
-        'Postal code should only contain letters, numbers, spaces, and hyphens (e.g., 12345, SW1A 1AA, K1A 0B1)',
-      );
+      const validationError = await validateFormValues(invalidFormValues, templateWithRegexNoFormat);
+      expect(validationError.errors).toContain('Invalid format');
     });
   });
 });
