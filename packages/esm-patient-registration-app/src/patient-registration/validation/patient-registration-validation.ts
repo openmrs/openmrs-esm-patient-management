@@ -22,7 +22,17 @@ function getTemplateDrivenAddressValidationSchema(
     const isRequired = requiredElements.includes(fieldName);
 
     if (regex) {
-      fieldSchema = fieldSchema.matches(new RegExp(regex), regexFormat || t('invalidFormat', 'Invalid format'));
+      try {
+        const compiledRegex = new RegExp(regex);
+        fieldSchema = fieldSchema.matches(compiledRegex, {
+          message: regexFormat || t('invalidFormat', 'Invalid format'),
+          excludeEmptyString: true,
+        });
+      } catch {
+        // If the regex from the address template is invalid/malformed,
+        // skip regex-based validation for this field to avoid crashing the form
+        console.warn(`Invalid regex pattern for address field "${fieldName}": ${regex}`);
+      }
     }
 
     if (isRequired) {

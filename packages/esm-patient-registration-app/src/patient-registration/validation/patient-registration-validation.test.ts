@@ -315,5 +315,32 @@ describe('Patient registration validation', () => {
       const validationError = await validateFormValues(invalidFormValues, templateWithRegexNoFormat);
       expect(validationError.errors).toContain('Invalid format');
     });
+
+    it('should allow empty value for optional field even when elementRegex is defined', async () => {
+      const templateWithOptionalRegexField = {
+        ...mockAddressTemplate,
+        requiredElements: [],
+      } as unknown as AddressTemplate;
+
+      const validationError = await validateFormValues(
+        { ...validFormValues, address: { cityVillage: '' } },
+        templateWithOptionalRegexField,
+      );
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should not crash form when addressTemplate contains an invalid regex', async () => {
+      const templateWithBadRegex = {
+        ...mockAddressTemplate,
+        elementRegex: { cityVillage: '[invalid regex(' },
+      } as unknown as AddressTemplate;
+
+      // Should not throw, form should still work
+      const validationError = await validateFormValues(
+        { ...validFormValues, address: { cityVillage: 'ABC' } },
+        templateWithBadRegex,
+      );
+      expect(validationError).toBeFalsy();
+    });
   });
 });
