@@ -17,14 +17,14 @@ export function useMotherChildrenRelationshipsByPatient(
     mothers: allWardPatientUuids,
     requireMotherHasActiveVisit: true,
     requireChildHasActiveVisit: true,
-    requireChildBornDuringMothersActiveVisit: true,
+    requireChildBornDuringMothersActiveVisit: false,
   };
 
   const getMotherRequestParams: MothersAndChildrenSearchCriteria = {
     children: allWardPatientUuids,
     requireMotherHasActiveVisit: true,
     requireChildHasActiveVisit: true,
-    requireChildBornDuringMothersActiveVisit: true,
+    requireChildBornDuringMothersActiveVisit: false,
   };
 
   const {
