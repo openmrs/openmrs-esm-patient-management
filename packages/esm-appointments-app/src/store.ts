@@ -5,6 +5,7 @@ import { omrsDateFormat } from './constants';
 export const appointmentsStore = createGlobalStore('appointments-app', {
   appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
+  currentView: 'monthly' as 'daily' | 'weekly' | 'monthly',
 });
 
 export function useAppointmentsStore() {
@@ -23,6 +24,10 @@ export function setSelectedDate(date: string) {
     );
   }
   appointmentsStore.setState({ selectedDate: date });
+}
+
+export function setCurrentView(view: 'daily' | 'weekly' | 'monthly') {
+  appointmentsStore.setState({ currentView: view });
 }
 
 /* Set up localStorage serialization */
