@@ -12,6 +12,7 @@ export interface AddablePatientListViewModel {
   displayName: string;
   checked?: boolean;
   id: string;
+  location?: { uuid: string; display: string } | null;
 }
 
 export interface PatientList {

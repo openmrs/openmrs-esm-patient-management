@@ -176,6 +176,7 @@ const ListDetails = () => {
             mutateListDetails={mutateListDetails}
             mutateListMembers={mutateListMembers}
             patients={patients}
+            listLocation={listDetails?.location}
             pagination={{
               usePagination: listDetails?.size > currentPageSize,
               currentPage,

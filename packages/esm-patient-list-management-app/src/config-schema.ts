@@ -22,6 +22,12 @@ export const configSchema = {
     _default: false,
     _description: "If true, the patient list will default to filtering by the user's current session location.",
   },
+  enforcePatientListLocationMatch: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      "If true, show an error notification and block patient addition when the patient's identifier location does not match the patient list/cohort location.",
+  },
 };
 
 export interface PatientListManagementConfig {
@@ -29,4 +35,5 @@ export interface PatientListManagementConfig {
   systemListCohortTypeUUID: string;
   patientListsToShow: number;
   defaultToCurrentLocation: boolean;
+  enforcePatientListLocationMatch: boolean;
 }
