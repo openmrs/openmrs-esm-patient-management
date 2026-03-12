@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
 import {
   navigate,
@@ -10,7 +9,8 @@ import {
   parseDate,
   showSnackbar,
   CustomOverflowMenu,
-  launchWorkspace,
+  CustomOverflowMenuItem,
+  launchWorkspace2,
   showModal,
 } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/patient-list.resource';
@@ -95,12 +95,11 @@ const ListDetails = () => {
   );
 
   const handleEditPatientList = useCallback(() => {
-    launchWorkspace('patient-list-form-workspace', {
-      workspaceTitle: t('editPatientListHeader', 'Edit patient list'),
+    launchWorkspace2('patient-list-form-workspace', {
       patientListDetails: listDetails,
       onSuccess: mutateListDetails,
     });
-  }, [listDetails, mutateListDetails, t]);
+  }, [listDetails, mutateListDetails]);
 
   const handleDeletePatientList = useCallback(() => {
     const dispose = showModal('delete-patient-list-modal', {
@@ -149,12 +148,12 @@ const ListDetails = () => {
                 <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
               </>
             }>
-            <OverflowMenuItem
+            <CustomOverflowMenuItem
               className={styles.menuItem}
               itemText={t('editNameDescription', 'Edit name or description')}
               onClick={handleEditPatientList}
             />
-            <OverflowMenuItem
+            <CustomOverflowMenuItem
               className={styles.menuItem}
               isDelete
               itemText={t('deletePatientList', 'Delete patient list')}

@@ -21,6 +21,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   ConfigurableLink,
+  EmptyCardIllustration,
   ErrorState,
   ExtensionSlot,
   isDesktop,
@@ -28,11 +29,10 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useActiveVisits, useActiveVisitsSorting, useObsConcepts, useTableHeaders } from './active-visits.resource';
-import styles from './active-visits.scss';
 import { type ActiveVisitsConfigSchema } from '../config-schema';
 import { type ActiveVisit } from '../types';
+import styles from './active-visits.scss';
 
 const ActiveVisitsTable = () => {
   const { t } = useTranslation();
@@ -102,7 +102,7 @@ const ActiveVisitsTable = () => {
       <div className={styles.activeVisitsContainer}>
         <div className={styles.activeVisitsDetailHeaderContainer}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('activeVisits', 'Active Visits')}</h4>
+            <h2>{t('activeVisits', 'Active Visits')}</h2>
           </div>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>
@@ -121,7 +121,6 @@ const ActiveVisitsTable = () => {
           showToolbar={false}
           zebra
           columnCount={headerData?.length}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
         />
       </div>
     );
@@ -143,9 +142,9 @@ const ActiveVisitsTable = () => {
         <Layer>
           <Tile className={styles.tile}>
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('activeVisits', 'Active Visits')}</h4>
+              <h2>{t('activeVisits', 'Active Visits')}</h2>
             </div>
-            <EmptyDataIllustration />
+            <EmptyCardIllustration />
             <p className={styles.content}>
               {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
             </p>
@@ -159,7 +158,7 @@ const ActiveVisitsTable = () => {
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('activeVisits', 'Active Visits')}</h4>
+          <h2>{t('activeVisits', 'Active Visits')}</h2>
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableSkeleton, Stack } from '@carbon/react';
+import { Button, DataTableSkeleton, InlineNotification, Stack } from '@carbon/react';
 import {
   ArrowLeftIcon,
   ErrorState,
@@ -85,7 +85,7 @@ const CreateQueueEntryWorkspace: React.FC<
               renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
               iconDescription={t('backToSearchResults', 'Back to search results')}
               size="sm"
-              onClick={closeWorkspace}>
+              onClick={() => closeWorkspace()}>
               <span>{t('backToSearchResults', 'Back to search results')}</span>
             </Button>
           </div>
@@ -96,8 +96,13 @@ const CreateQueueEntryWorkspace: React.FC<
           ) : activeVisit ? (
             <ExistingVisitFormComponent closeWorkspace={closeWorkspace} visit={activeVisit} />
           ) : (
-            <Stack gap={4}>
-              <div>{t('visitRequiredToCreateQueueEntry', 'A visit is required to add patient to queue')}</div>
+            <Stack className={styles.noVisitContainer} gap={4}>
+              <InlineNotification
+                hideCloseButton
+                kind="info"
+                lowContrast
+                subtitle={t('visitRequiredToCreateQueueEntry', 'A visit is required to add this patient to the queue')}
+              />
               <ExtensionSlot
                 name="start-visit-button-slot2"
                 state={{

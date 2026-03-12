@@ -43,12 +43,34 @@
       "component": "deletePatientListModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "patient-list-form-workspace",
       "component": "patientListFormWorkspace",
-      "title": "patientListFormHeader",
-      "type": "patient-lists"
+      "window": "patient-list-form-window"
+    },
+    {
+      "name": "patient-list-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "patient-list-form-window"
+    },
+    {
+      "name": "patient-list-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "patient-list-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-list-form-window",
+      "group": "patient-list-form-workspace-group"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "patient-list-form-workspace-group",
+      "scopePattern": "/home/patient-lists",
+      "overlay": false
     }
   ]
 }

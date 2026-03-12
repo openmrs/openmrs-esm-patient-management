@@ -23,20 +23,22 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
   return (
     <div className={styles.appointmentList} data-testid="appointment-list">
       {showUnscheduledAppointmentsTab ? (
-        <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange} className={styles.tabs}>
-          <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
-            <Tab className={styles.tab}>{t('scheduled', 'Scheduled')}</Tab>
-            <Tab className={styles.tab}>{t('unscheduled', 'Unscheduled')}</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel className={styles.tabPanel}>
-              <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
-            </TabPanel>
-            <TabPanel className={styles.tabPanel}>
-              <UnscheduledAppointments />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        <div className={styles.tabs}>
+          <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange}>
+            <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
+              <Tab className={styles.tab}>{t('scheduled', 'Scheduled')}</Tab>
+              <Tab className={styles.tab}>{t('unscheduled', 'Unscheduled')}</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel className={styles.tabPanel}>
+                <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
+              </TabPanel>
+              <TabPanel className={styles.tabPanel}>
+                <UnscheduledAppointments />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </div>
       ) : (
         <ScheduledAppointments appointmentServiceTypes={appointmentServiceTypes} />
       )}

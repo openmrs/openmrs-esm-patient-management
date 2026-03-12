@@ -86,7 +86,7 @@ describe('AppointmentsTable', () => {
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
 
-    expect(getByTextWithMarkup('There are no scheduled appointments to display')).toBeInTheDocument();
+    expect(getByTextWithMarkup('There are no appointments to display')).toBeInTheDocument();
   });
 
   it('renders a loading state when fetching data', () => {

@@ -11,3 +11,8 @@
 .content {
   padding: layout.$spacing-05;
 }
+
+.addPatientToWardButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}

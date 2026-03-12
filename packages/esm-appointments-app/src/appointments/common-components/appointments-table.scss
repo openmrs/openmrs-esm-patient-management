@@ -21,6 +21,11 @@
 
 .container {
   border: 1px solid colors.$gray-20;
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+    overflow: visible;
+  }
 }
 
 .headerContainer {
@@ -32,7 +37,7 @@
 }
 
 .tabletHeading {
-  h4 {
+  h2 {
     @include type.type-style('heading-03');
     color: colors.$gray-70;
   }
@@ -45,7 +50,7 @@
   text-align: left;
   text-transform: capitalize;
 
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     color: colors.$gray-70;
 
@@ -126,7 +131,7 @@ html[dir='rtl'] {
       margin-left: 0;
       margin-right: layout.$spacing-03;
     }
-    h4 {
+    h2 {
       text-align: right;
     }
   }

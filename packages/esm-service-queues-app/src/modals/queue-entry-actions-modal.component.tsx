@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
-  Dropdown,
+  ComboBox,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -18,14 +18,21 @@ import {
   TimePickerSelect,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { OpenmrsDatePicker, showSnackbar, type FetchResponse, useConfig } from '@openmrs/esm-framework';
+import {
+  getCoreTranslation,
+  OpenmrsDatePicker,
+  showSnackbar,
+  type FetchResponse,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { useQueues } from '../hooks/useQueues';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, time12HourFormatRegexPattern } from '../constants';
-import { type ConfigObject } from '../config-schema';
-import { type QueueEntry } from '../types';
-import QueuePriority from '../queue-table/components/queue-priority.component';
+import { time12HourFormatRegexPattern } from '../constants';
+import { getErrorMessage, isAlreadyEndedQueueEntryError, isDuplicateQueueEntryError } from './queue-entry-error.utils';
 import { convertTime12to24, type amPm } from './time-helpers';
+import { type ConfigObject } from '../config-schema';
+import { type Queue, type QueueEntry } from '../types';
+import QueuePriority from '../queue-table/components/queue-priority.component';
 import styles from './queue-entry-actions.scss';
 
 interface QueueEntryActionModalProps {
@@ -38,7 +45,7 @@ interface FormState {
   selectedQueue: string;
   selectedPriority: string;
   selectedStatus: string;
-  prioritycomment: string;
+  priorityComment: string;
   modifyDefaultTransitionDateTime: boolean;
   transitionDate: Date;
   transitionTime: string;
@@ -53,7 +60,7 @@ interface ModalParams {
   submitSuccessText: string;
   submitFailureTitle: string;
   submitAction: (queueEntry: QueueEntry, formState: FormState) => Promise<FetchResponse<any>>;
-  disableSubmit: (queueEntry, formState) => boolean;
+  disableSubmit: (queueEntry: QueueEntry, formState: FormState) => boolean;
   isEdit: boolean; // editing existing queue entry?
   showQueuePicker: boolean;
   showStatusPicker: boolean;
@@ -94,7 +101,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
-    prioritycomment: queueEntry.priorityComment ?? '',
+    priorityComment: queueEntry.priorityComment ?? '',
     modifyDefaultTransitionDateTime: false,
     transitionDate: initialTransitionDate,
     transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
@@ -108,64 +115,67 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     title?: string;
   } | null>(null);
 
-  const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
+  const selectedQueue = queues.find((q) => q.uuid === formState.selectedQueue);
 
   const clearSubmissionError = () => setSubmissionError(null);
 
   const statuses = selectedQueue?.allowedStatuses;
-  const hasNoStatusesConfigured = selectedQueue && statuses.length == 0;
+  const hasNoStatusesConfigured = selectedQueue && statuses.length === 0;
   const priorities = selectedQueue?.allowedPriorities;
-  const hasNoPrioritiesConfigured = selectedQueue && priorities.length == 0;
+  const hasNoPrioritiesConfigured = selectedQueue && priorities.length === 0;
 
   const setSelectedQueueUuid = (selectedQueueUuid: string) => {
     clearSubmissionError();
-    const newSelectedQueue = queues.find((q) => q.uuid == selectedQueueUuid);
+    const newSelectedQueue = queues.find((queue) => queue.uuid === selectedQueueUuid);
+    if (!newSelectedQueue) {
+      return;
+    }
+
     const { allowedStatuses, allowedPriorities } = newSelectedQueue;
-    const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid == formState.selectedPriority);
+    const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid === formState.selectedPriority);
     const defaultStatusUuid = config.concepts.defaultStatusConceptUuid;
-    const newQueueHasDefaultStatus = allowedStatuses.find((s) => s.uuid == defaultStatusUuid);
+    const newQueueHasDefaultStatus = allowedStatuses.find((s) => s.uuid === defaultStatusUuid);
     const newStatus = newQueueHasDefaultStatus ? defaultStatusUuid : allowedStatuses[0]?.uuid;
 
-    setFormState({
-      ...formState,
+    setFormState((prev) => ({
+      ...prev,
       selectedQueue: selectedQueueUuid,
       selectedStatus: newStatus,
-      selectedPriority: newQueueHasCurrentPriority ? formState.selectedPriority : allowedPriorities[0]?.uuid,
-    });
+      selectedPriority: newQueueHasCurrentPriority ? prev.selectedPriority : allowedPriorities[0]?.uuid,
+    }));
   };
 
   const setSelectedPriorityUuid = (selectedPriorityUuid: string) => {
     clearSubmissionError();
-    setFormState({ ...formState, selectedPriority: selectedPriorityUuid });
+    setFormState((prev) => ({ ...prev, selectedPriority: selectedPriorityUuid }));
   };
 
   const setSelectedStatusUuid = (selectedStatusUuid: string) => {
     clearSubmissionError();
-    setFormState({ ...formState, selectedStatus: selectedStatusUuid });
+    setFormState((prev) => ({ ...prev, selectedStatus: selectedStatusUuid }));
   };
 
-  const setPriorityComment = (prioritycomment: string) => {
-    setFormState({ ...formState, prioritycomment });
+  const setPriorityComment = (priorityComment: string) => {
+    setFormState((prev) => ({ ...prev, priorityComment }));
   };
 
   const setTransitionDate = (transitionDate: Date) => {
-    setFormState({ ...formState, transitionDate });
+    setFormState((prev) => ({ ...prev, transitionDate }));
   };
 
   const setTransitionTime = (transitionTime: string) => {
-    setFormState({ ...formState, transitionTime });
+    setFormState((prev) => ({ ...prev, transitionTime }));
   };
 
   const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
-    setFormState({ ...formState, transitionTimeFormat });
+    setFormState((prev) => ({ ...prev, transitionTimeFormat }));
   };
 
-  const setModifyDefaultTransitionDateTime = (modifyDefaultTransitionDateTime) => {
-    setFormState({ ...formState, modifyDefaultTransitionDateTime });
+  const setModifyDefaultTransitionDateTime = (modifyDefaultTransitionDateTime: boolean) => {
+    setFormState((prev) => ({ ...prev, modifyDefaultTransitionDateTime }));
   };
 
-  const submitForm = (e) => {
-    e.preventDefault();
+  const submitForm = () => {
     setIsSubmitting(true);
 
     submitAction(queueEntry, formState)
@@ -184,10 +194,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         }
       })
       .catch((error) => {
-        const errorMessage = error?.responseBody?.error?.message || error?.message || '';
-        const isDuplicateQueueEntryError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
-
-        if (isDuplicateQueueEntryError) {
+        if (isAlreadyEndedQueueEntryError(error)) {
+          showSnackbar({
+            title: t('queueEntryAlreadyEnded', 'Queue entry is no longer active'),
+            kind: 'warning',
+            subtitle: t(
+              'queueEntryAlreadyEndedMessage',
+              'This queue entry has already been completed by another user. The queue has been refreshed.',
+            ),
+          });
+          mutateQueueEntries();
+          closeModal();
+        } else if (isDuplicateQueueEntryError(error)) {
           setSubmissionError({
             type: 'duplicate',
             message: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
@@ -196,7 +214,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         } else {
           setSubmissionError({
             type: 'error',
-            message: error?.message || t('unknownError', 'An unknown error occurred'),
+            message: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             title: submitFailureTitle,
           });
         }
@@ -221,6 +239,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     if (startAtDate > now) {
       return t('timeCannotBeInFuture', 'Time cannot be in the future');
     }
+
     if (startAtDate <= previousQueueEntryStartTime) {
       return t(
         'timeCannotBePriorToPreviousQueueEntry',
@@ -240,54 +259,57 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     t,
   ]);
 
+  const getQueueDisplayText = (queue: Queue) => {
+    if (!queue) return '';
+    return queue.uuid === queueEntry.queue.uuid
+      ? t('currentValueFormatted', '{{value}} (Current)', { value: `${queue.display} - ${queue.location?.display}` })
+      : `${queue.display} - ${queue.location?.display}`;
+  };
+
   return (
     <>
       <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <div className={styles.queueEntryActionModalBody}>
           <Stack gap={4}>
-            <p>{modalInstruction}</p>
+            {modalInstruction && <p>{modalInstruction}</p>}
             {showQueuePicker && (
               <section>
-                <div className={styles.sectionTitlePrimary}>{t('serviceLocation', 'Service location')}</div>
                 {/* Read this issue description for why we're using 8 locations as the cut off https://openmrs.atlassian.net/jira/software/c/projects/O3/issues/O3-4131 */}
                 {queues.length <= 8 ? (
                   <RadioButtonGroup
+                    legendText={t('serviceLocation', 'Service location')}
                     className={styles.radioButtonGroup}
                     id="queue"
+                    name="queue"
                     invalidText="Required"
                     valueSelected={formState.selectedQueue}
                     orientation="vertical"
-                    onChange={(uuid) => setSelectedQueueUuid(uuid)}>
-                    {queues?.map(({ uuid, display, location }) => (
-                      <RadioButton
-                        key={uuid}
-                        labelText={
-                          uuid === queueEntry.queue.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current)', {
-                                value: `${display} - ${location?.display}`,
-                              })
-                            : `${display} - ${location?.display}`
-                        }
-                        value={uuid}
-                      />
-                    ))}
+                    onChange={(uuid) => setSelectedQueueUuid(String(uuid))}>
+                    {queues?.map((queue) => {
+                      const { uuid } = queue;
+                      return <RadioButton key={uuid} labelText={getQueueDisplayText(queue)} value={uuid} />;
+                    })}
                   </RadioButtonGroup>
                 ) : (
-                  <Dropdown
+                  <ComboBox<Queue>
                     id="queue"
-                    label={selectedQueue.display}
-                    initialSelectedItem={selectedQueue}
-                    value={formState.selectedQueue}
+                    titleText={t('serviceLocation', 'Service location')}
+                    selectedItem={selectedQueue}
                     items={queues}
-                    itemToString={(item) =>
-                      item.uuid === queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: `${item.display} - ${item.location?.display}`,
-                          })
-                        : `${item.display} - ${item.location?.display}`
-                    }
-                    onChange={({ selectedItem }) => setSelectedQueueUuid(selectedItem.uuid)}
+                    itemToString={getQueueDisplayText}
+                    onChange={({ selectedItem }) => {
+                      if (selectedItem) {
+                        setSelectedQueueUuid(selectedItem.uuid);
+                      }
+                    }}
+                    shouldFilterItem={(menu) => {
+                      const itemDisplay = (menu?.item?.display ?? '').toLowerCase();
+                      const locationDisplay = (menu?.item?.location?.display ?? '').toLowerCase();
+                      const inputValue = (menu?.inputValue ?? '').toLowerCase();
+
+                      return itemDisplay.includes(inputValue) || locationDisplay.includes(inputValue);
+                    }}
                   />
                 )}
               </section>
@@ -310,14 +332,14 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     name="status"
                     valueSelected={formState.selectedStatus}
                     onChange={(uuid) => {
-                      setSelectedStatusUuid(uuid);
+                      setSelectedStatusUuid(String(uuid));
                     }}>
                     {statuses?.map(({ uuid, display }) => (
                       <RadioButton
                         key={uuid}
                         name={display}
                         labelText={
-                          uuid == queueEntry.status.uuid
+                          uuid === queueEntry.status.uuid
                             ? t('currentValueFormatted', '{{value}} (Current)', {
                                 value: display,
                               })
@@ -344,9 +366,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               ) : (
                 <RadioButtonGroup
                   className={styles.radioButtonGroup}
+                  name="priority"
                   valueSelected={formState.selectedPriority}
                   onChange={(uuid) => {
-                    setSelectedPriorityUuid(uuid);
+                    setSelectedPriorityUuid(String(uuid));
                   }}>
                   {priorities?.map(({ uuid, display }) => (
                     <RadioButton
@@ -366,7 +389,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
               <div className={styles.sectionTitle}>{t('comment', 'Comment')}</div>
               <TextArea
                 labelText=""
-                value={formState.prioritycomment}
+                value={formState.priorityComment}
                 onChange={(e) => setPriorityComment(e.target.value)}
                 placeholder={t('enterCommentHere', 'Enter comment here')}
               />
@@ -394,17 +417,17 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   />
 
                   <TimePicker
+                    id="transitionTime"
                     labelText={t('time', 'Time')}
                     onChange={(event) => setTransitionTime(event.target.value)}
                     pattern={time12HourFormatRegexPattern}
                     value={formState.transitionTime}
-                    invalid={timeInvalidMessage != null}
+                    invalid={timeInvalidMessage !== null}
                     invalidText={timeInvalidMessage}>
                     <TimePickerSelect
                       id="visitStartTimeSelect"
                       onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
                       value={formState.transitionTimeFormat}
-                      labelText={t('time', 'Time')}
                       aria-label={t('time', 'Time')}>
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />
@@ -428,7 +451,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button disabled={isSubmitting || disableSubmit(queueEntry, formState)} onClick={submitForm}>
           {submitButtonText}

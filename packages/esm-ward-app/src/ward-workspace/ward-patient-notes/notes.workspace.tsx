@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button, Column, Form, InlineLoading, InlineNotification, Row, Stack, TextArea } from '@carbon/react';
 import {
   closeWorkspaceGroup2,
+  getCoreTranslation,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
@@ -13,7 +14,7 @@ import {
   Workspace2,
 } from '@openmrs/esm-framework';
 import { moduleName } from '../../constant';
-import { savePatientNote } from './notes.resource';
+import { createPatientNote } from './notes.resource';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import styles from './notes.scss';
 import { type WardPatientWorkspaceDefinition, type EncounterPayload } from '../../types';
@@ -39,7 +40,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
   const session = useSession();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rows, setRows] = useState(0);
+  const [hasEditChanges, setHasEditChanges] = useState(false);
 
   const {
     control,
@@ -83,7 +84,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
 
       const abortController = new AbortController();
 
-      savePatientNote(notePayload, abortController)
+      createPatientNote(notePayload, abortController)
         .then(async () => {
           showSnackbar({
             isLowContrast: true,
@@ -119,7 +120,9 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
   const onError = (errors) => console.error(errors);
 
   return (
-    <Workspace2 hasUnsavedChanges={isDirty} title={t('inpatientNotesWorkspaceTitle', 'In-patient notes')}>
+    <Workspace2
+      hasUnsavedChanges={isDirty || hasEditChanges}
+      title={t('inpatientNotesWorkspaceTitle', 'In-patient notes')}>
       <WardPatientWorkspaceBanner {...{ wardPatient }} />
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         {errorFetchingEmrConfiguration && (
@@ -136,7 +139,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
             />
           </div>
         )}
-        <Stack className={styles.formContainer} gap={2}>
+        <Stack className={styles.formContainer} gap={4}>
           <Row className={styles.row}>
             <Column sm={1}>
               <span className={styles.columnLabel}>{t('note', 'Note')}</span>
@@ -155,12 +158,9 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
                       onBlur={onBlur}
                       onChange={(event) => {
                         onChange(event);
-                        const textAreaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                        const newRows = Math.ceil(event.target.scrollHeight / textAreaLineHeight);
-                        setRows(newRows);
                       }}
                       placeholder={t('wardClinicalNotePlaceholder', 'Write any notes here')}
-                      rows={rows}
+                      rows={6}
                       value={value}
                     />
                   </ResponsiveWrapper>
@@ -168,17 +168,26 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
               />
             </Column>
           </Row>
+
+          <Button
+            className={styles.saveButton}
+            disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
+            kind="primary"
+            type="submit">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving...')} />
+            ) : (
+              <span>{getCoreTranslation('save')}</span>
+            )}
+          </Button>
         </Stack>
-        <Button
-          className={styles.saveButton}
-          disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration}
-          kind="primary"
-          type="submit">
-          {isSubmitting ? <InlineLoading description={t('saving', 'Saving...')} /> : <span>{t('save', 'Save')}</span>}
-        </Button>
       </Form>
 
-      <PatientNotesHistory patientUuid={patientUuid} visitUuid={wardPatient?.visit?.uuid} />
+      <PatientNotesHistory
+        patientUuid={patientUuid}
+        visitUuid={wardPatient?.visit?.uuid}
+        promptBeforeClosing={setHasEditChanges}
+      />
     </Workspace2>
   );
 };

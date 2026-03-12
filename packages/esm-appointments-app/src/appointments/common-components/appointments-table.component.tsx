@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -11,8 +11,9 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   Pagination,
-  Search,
   Table,
+  TableBatchAction,
+  TableBatchActions,
   TableBody,
   TableCell,
   TableContainer,
@@ -22,27 +23,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectAll,
+  TableSelectRow,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Download } from '@carbon/react/icons';
+import { Calendar, Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
+  EmptyCard,
   formatDate,
   formatDatetime,
   isDesktop,
-  launchWorkspace,
-  launchWorkspace2,
   parseDate,
   useConfig,
   useLayoutType,
+  launchWorkspace2,
   usePagination,
+  showModal,
 } from '@openmrs/esm-framework';
-import { EmptyState } from '../../empty-state/empty-state.component';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
+import { launchCreateAppointmentForm } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
 import styles from './appointments-table.scss';
@@ -72,37 +79,61 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
   const { visits } = useTodaysVisits();
+  const [selectedAppointmentUuids, setSelectedAppointmentUuids] = useState(new Set<string>());
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+
+  useEffect(() => {
+    setSelectedAppointmentUuids(new Set());
+  }, [appointments]);
 
   const headerData = appointmentsTableColumns.map((columnKey) => ({
     header: t(columnKey, columnKey),
     key: columnKey,
   }));
 
-  const rowData = results?.map((appointment) => ({
-    id: appointment.uuid,
-    patientName: (
-      <ConfigurableLink
-        className={styles.link}
-        to={customPatientChartUrl}
-        templateParams={{ patientUuid: appointment.patient.uuid }}>
-        {appointment.patient.name}
-      </ConfigurableLink>
-    ),
-    nextAppointmentDate: '--',
-    identifier: patientIdentifierType
-      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
-      : appointment.patient.identifier,
-    dateTime: formatDatetime(new Date(appointment.startDateTime)),
-    serviceType: appointment.service.name,
-    location: appointment.location?.name,
-    provider: appointment.providers?.[0]?.name ?? '--',
-    status: <AppointmentActions appointment={appointment} />,
-  }));
+  const rowData = useMemo(
+    () =>
+      results?.map((appointment) => ({
+        id: appointment.uuid,
+        patientName: (
+          <ConfigurableLink
+            className={styles.link}
+            to={customPatientChartUrl}
+            templateParams={{ patientUuid: appointment.patient.uuid }}>
+            {appointment.patient.name}
+          </ConfigurableLink>
+        ),
+        nextAppointmentDate: '--',
+        identifier: patientIdentifierType
+          ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
+          : appointment.patient.identifier,
+        dateTime: formatDatetime(new Date(appointment.startDateTime)),
+        serviceType: appointment.service.name,
+        location: appointment.location?.name,
+        provider: appointment.providers?.[0]?.name ?? '--',
+        status: <AppointmentActions appointment={appointment} />,
+        appointment,
+      })),
+    [results, customPatientChartUrl, patientIdentifierType],
+  );
+
+  const appointmentUuidsWithChangeableStatus = useMemo(() => {
+    return appointments
+      .filter((appointment) => {
+        const visitDate = dayjs(appointment.startDateTime);
+        const isFutureAppointment = visitDate.isAfter(dayjs());
+        const isTodayAppointment = visitDate.isToday();
+        const hasActiveVisitToday = visits?.some(
+          (visit) => visit?.patient?.uuid === appointment.patient?.uuid && visit?.startDatetime,
+        );
+        return isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday);
+      })
+      .map((appointment) => appointment.uuid);
+  }, [appointments, visits]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" row={5} />;
+    return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
 
   if (hasActiveFilters && !appointments?.length) {
@@ -121,16 +152,16 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   }
 
   if (!appointments?.length) {
+    const translatedHeading = t(tableHeading);
     return (
-      <EmptyState
-        headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
+      <EmptyCard
+        headerTitle={`${translatedHeading} ${t('appointments_lower', 'appointments')}`}
         displayText={
           tableHeading === t('todays', "Today's")
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
-            : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
+            : t('appointments_lower', 'appointments')
         }
-        // TODO @brandones: Make this a workspace, not an extension
-        launchForm={() => launchWorkspace('search-patient')}
+        launchForm={() => launchCreateAppointmentForm(t)}
       />
     );
   }
@@ -139,33 +170,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     <Layer className={styles.container}>
       <Tile className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h4>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h4>
+          <h2>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h2>
         </div>
       </Tile>
-      <div className={styles.toolbar}>
-        <Search
-          className={styles.searchbar}
-          labelText={t('filterAppointments', 'Filter appointments')}
-          placeholder={t('filterTable', 'Filter table')}
-          onChange={(event) => setSearchString(event.target.value)}
-          size={responsiveSize}
-        />
-        <Button
-          size={responsiveSize}
-          kind="tertiary"
-          renderIcon={Download}
-          onClick={() => {
-            const date = appointments[0]?.startDateTime
-              ? formatDate(parseDate(appointments[0]?.startDateTime), {
-                  time: false,
-                  noToday: true,
-                })
-              : null;
-            exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
-          }}>
-          {t('download', 'Download')}
-        </Button>
-      </div>
       <DataTable
         aria-label={t('appointmentsTable', 'Appointments table')}
         data-floating-menu-container
@@ -180,15 +187,76 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           getExpandHeaderProps,
           getHeaderProps,
           getRowProps,
+          getSelectionProps,
           getTableProps,
           getTableContainerProps,
+          getToolbarProps,
         }) => (
           <>
             <TableContainer {...getTableContainerProps()}>
+              <TableToolbar {...getToolbarProps()} size={responsiveSize}>
+                <TableBatchActions
+                  shouldShowBatchActions={selectedAppointmentUuids.size > 0}
+                  totalSelected={selectedAppointmentUuids.size}
+                  // TODO: add translation for Carbon's table batch actions
+                  // https://openmrs.atlassian.net/browse/O3-5409
+                  onCancel={() => setSelectedAppointmentUuids(new Set())}>
+                  <TableBatchAction
+                    renderIcon={Calendar}
+                    onClick={() => {
+                      const selectedAppointments = appointments.filter((app) => selectedAppointmentUuids.has(app.uuid));
+                      const closeModal = showModal('batch-change-appointments-statuses-modal', {
+                        appointments: selectedAppointments,
+                        closeModal: () => closeModal(),
+                      });
+                    }}>
+                    {t('changeStatus', 'Change status')}
+                  </TableBatchAction>
+                </TableBatchActions>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    className={styles.searchbar}
+                    labelText={t('filterAppointments', 'Filter appointments')}
+                    placeholder={t('filterTable', 'Filter table')}
+                    onChange={(event) => setSearchString((event as React.ChangeEvent<HTMLInputElement>).target.value)}
+                    persistent
+                    size={responsiveSize}
+                  />
+                  <Button
+                    size={responsiveSize}
+                    kind="tertiary"
+                    renderIcon={Download}
+                    onClick={() => {
+                      const date = appointments[0]?.startDateTime
+                        ? formatDate(parseDate(appointments[0]?.startDateTime), {
+                            time: false,
+                            noToday: true,
+                          })
+                        : null;
+                      exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
+                    }}>
+                    {t('download', 'Download')}
+                  </Button>
+                </TableToolbarContent>
+              </TableToolbar>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                    <TableSelectAll
+                      {...getSelectionProps()}
+                      checked={
+                        selectedAppointmentUuids.size === appointmentUuidsWithChangeableStatus.length &&
+                        selectedAppointmentUuids.size > 0
+                      }
+                      onSelect={() => {
+                        if (selectedAppointmentUuids.size < appointmentUuidsWithChangeableStatus.length) {
+                          setSelectedAppointmentUuids(new Set(appointmentUuidsWithChangeableStatus));
+                        } else {
+                          setSelectedAppointmentUuids(new Set());
+                        }
+                      }}
+                    />
                     {headers.map((header) => (
                       <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                     ))}
@@ -198,22 +266,35 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBody>
                   {rows.map((row) => {
                     const matchingAppointment = appointments.find((appointment) => appointment.uuid === row.id);
-                    const patientUuid = matchingAppointment.patient?.uuid;
-                    const visitDate = dayjs(matchingAppointment.startDateTime);
-                    const isFutureAppointment = visitDate.isAfter(dayjs());
-                    const isTodayAppointment = visitDate.isToday();
-                    const hasActiveVisitToday = visits?.some(
-                      (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime,
-                    );
+
+                    if (!matchingAppointment) {
+                      return null;
+                    }
+
+                    const canChangeStatus = appointmentUuidsWithChangeableStatus.includes(matchingAppointment.uuid);
 
                     return (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
+                          <TableSelectRow
+                            {...getSelectionProps({ row })}
+                            checked={selectedAppointmentUuids.has(row.id)}
+                            disabled={!canChangeStatus}
+                            onSelect={() => {
+                              if (selectedAppointmentUuids.has(row.id)) {
+                                setSelectedAppointmentUuids(
+                                  new Set([...selectedAppointmentUuids].filter((uuid) => uuid != row.id)),
+                                );
+                              } else {
+                                setSelectedAppointmentUuids(new Set([...selectedAppointmentUuids, row.id]));
+                              }
+                            }}
+                          />
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
-                            {isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday) ? (
+                            {canChangeStatus ? (
                               <OverflowMenu
                                 align="left"
                                 aria-label={t('actions', 'Actions')}
@@ -222,12 +303,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                                 <OverflowMenuItem
                                   className={styles.menuItem}
                                   itemText={t('editAppointment', 'Edit appointment')}
-                                  size={responsiveSize}
                                   onClick={() =>
                                     launchWorkspace2('appointments-form-workspace', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
-                                      context: 'editing',
                                     })
                                   }
                                 />

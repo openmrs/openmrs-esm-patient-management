@@ -11,8 +11,7 @@ import {
   StructuredListRow,
   StructuredListWrapper,
 } from '@carbon/react';
-import { formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { ErrorCard, formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 import { type Appointment } from '../types';
 import { useMutateAppointments } from '../form/appointments-form.resource';
@@ -106,7 +105,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   }
 
   if (error) {
-    return <ErrorState headerTitle={headerTitle} error={error} />;
+    return <ErrorCard headerTitle={headerTitle} error={error} />;
   }
 
   if (isLoading) {

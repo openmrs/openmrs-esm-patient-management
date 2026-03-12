@@ -41,14 +41,14 @@ export const configSchema = {
     customUrl: {
       _type: Type.String,
       _default: '',
-      _description: 'Custom URL to open when clicking the check-in button (instead of thes start visit form)',
+      _description: 'Custom URL to open when clicking the check-in button (instead of the start visit form)',
     },
   },
   checkOutButton: {
     enabled: {
       _type: Type.Boolean,
       _default: true,
-      _description: 'Whether the check-out button on the "Appointments" list should be disabled',
+      _description: 'Whether the check-out button on the "Appointments" list should be enabled',
     },
     customUrl: {
       _type: Type.String,
@@ -111,8 +111,3 @@ export interface ConfigObject {
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
 }
-
-export type AppointmentTableColumn = {
-  header: string;
-  key: string;
-};

@@ -5,7 +5,7 @@ import { type Appointment } from '../../types';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
-import { navigate, useConfig, launchWorkspace } from '@openmrs/esm-framework';
+import { navigate, useConfig, launchWorkspace2 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -31,7 +31,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid 
                     to: checkInButton.customUrl,
                     templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
                   })
-                : launchWorkspace('start-visit-workspace-form', {
+                : launchWorkspace2('appointments-start-visit-workspace', {
                     patientUuid: patientUuid,
                     showPatientHeader: true,
                     openedFrom: 'appointments-check-in',

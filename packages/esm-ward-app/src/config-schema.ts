@@ -257,6 +257,12 @@ export const configSchema = {
     _default: false,
     _description: 'Configure whether to hide vital history and record vital links in the ward patient workspace.',
   },
+  additionalInpatientNotesConceptUuids: {
+    _type: Type.Array,
+    _default: [],
+    _description:
+      'List of uuids of concepts that represent notes to display in the notes view in addition to the consultFreeTextCommentsConcept defined by EMR-API',
+  },
 };
 
 export interface WardConfigObject {
@@ -270,6 +276,7 @@ export interface WardConfigObject {
   };
   wards: Array<WardDefinition>;
   hideWorkspaceVitalsLinks: boolean;
+  additionalInpatientNotesConceptUuids: Array<string>;
 }
 
 export interface PendingItemsElementConfig {

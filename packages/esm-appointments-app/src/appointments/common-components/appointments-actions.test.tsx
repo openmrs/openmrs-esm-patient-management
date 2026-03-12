@@ -11,11 +11,10 @@ const appointment: Appointment = {
   appointmentNumber: '0000',
   patient: {
     identifier: '100GEJ',
-    identifiers: [],
     name: 'John Wilson',
     uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
     gender: 'M',
-    age: '35',
+    age: 35,
   },
   service: {
     appointmentServiceId: 1,
@@ -216,33 +215,4 @@ describe('AppointmentActions', () => {
 
     expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
   });
-
-  // commenting these tests out as this functionality is not implemented yet so not sure how they would have ever passed?
-  /*it('renders the correct button when today is the appointment date and the schedule type is pending', () => {
-    mockUseConfig.mockReturnValue({
-      checkInButton: { enabled: true },
-      checkOutButton: { enabled: true },
-    }));
-    mockUseTodaysVisits.mockReturnValue({
-      visits: [],
-    }));
-    const props = { ...defaultProps, scheduleType: 'Pending' };
-    render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: /Checked out/i });
-    expect(button).toBeInTheDocument();
-  });
-
-  it('renders the correct button when today is the appointment date and the schedule type is not pending', () => {
-    mockUseConfig.mockReturnValue({
-      checkInButton: { enabled: true },
-      checkOutButton: { enabled: true },
-    }));
-    mockUseTodaysVisits.mockReturnValue({
-      visits: [],
-    }));
-    const props = { ...defaultProps, scheduleType: 'Confirmed' };
-    render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: /Checked out/i });
-    expect(button).toBeInTheDocument();
-  });*/
 });
