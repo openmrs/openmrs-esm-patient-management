@@ -1,13 +1,31 @@
 import React, { useCallback, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Button, Dropdown, InlineNotification, Layer, ModalBody, ModalFooter, ModalHeader, Stack } from '@carbon/react';
-import { isDesktop, showSnackbar, updateVisit, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import {
+  Button,
+  Dropdown,
+  InlineLoading,
+  InlineNotification,
+  Layer,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Stack,
+} from '@carbon/react';
+import {
+  getCoreTranslation,
+  isDesktop,
+  showSnackbar,
+  updateVisit,
+  useConfig,
+  useLayoutType,
+} from '@openmrs/esm-framework';
+import { canTransition } from '../../helpers';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
-import { type Appointment, AppointmentStatus } from '../../types';
 import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
-import styles from './batch-change-appointment-statuses.scss';
+import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
+import { useMutateAppointments } from '../../form/appointments-form.resource';
+import styles from './batch-change-appointment-statuses.scss';
 
 interface BatchChangeAppointmentStatusesModalProps {
   appointments: Array<Appointment>;
@@ -31,6 +49,10 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
   const isTablet = !isDesktop(useLayoutType());
   const [status, setStatus] = useState<AppointmentStatus>();
   const { checkOutButton } = useConfig<ConfigObject>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const invalidAppointment =
+    status != null ? appointments.find((a) => a.status !== status && !canTransition(a.status, status)) : undefined;
 
   const submit = useCallback(() => {
     const updateAppointment = (appointment: Appointment) => {
@@ -67,6 +89,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
       });
     };
 
+    setIsSubmitting(true);
     Promise.allSettled(appointments.map(updateAppointment))
       .then(async (results) => {
         const hasFailedResults = results.some((result) => result.status == 'rejected');
@@ -106,6 +129,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
         }
       })
       .finally(() => {
+        setIsSubmitting(false);
         mutateAppointments();
         closeModal();
       });
@@ -117,56 +141,75 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
       <ModalBody className={styles.modalBody}>
         <Stack gap={5}>
           <p>{t('changeStatusForSelectedAppointments', 'Change the status for the following appointments.')}</p>
-          <ul>
+          <ul className={styles.appointmentsList}>
             {appointments.map((appointment) => (
               <li key={appointment.patient.uuid}>
                 <Trans i18nKey="appointmentDisplay">
                   <strong>{{ patientName: appointment.patient.name } as any}</strong> -{' '}
-                  {{ serviceName: appointment.service.name } as any}
+                  {{ serviceName: appointment.service.name } as any} - {{ currentStatus: appointment.status } as any}
                 </Trans>
               </li>
             ))}
           </ul>
-          <div>
-            <Layer>
-              <Dropdown
-                id={'statusDropdown'}
-                className={styles.statusDropdown}
-                label={t('selectStatus', 'Select status')}
-                titleText={''}
-                type="inline"
-                items={[
-                  { id: AppointmentStatus.SCHEDULED, label: t('scheduled', 'Scheduled') },
-                  { id: AppointmentStatus.CANCELLED, label: t('cancelled', 'Cancelled') },
-                  { id: AppointmentStatus.MISSED, label: t('missed', 'Missed') },
-                  ...(checkOutButton.enabled
-                    ? [{ id: AppointmentStatus.COMPLETED, label: t('completed', 'Completed') }]
-                    : []),
-                ]}
-                itemToString={(item) => (item ? item.label : '')}
-                onChange={(e) => setStatus(e.selectedItem.id)}
-                size={isTablet ? 'lg' : 'sm'}
-              />
-            </Layer>
-          </div>
+          <Layer>
+            <Dropdown
+              id={'statusDropdown'}
+              className={styles.statusDropdown}
+              label={t('selectStatus', 'Select status')}
+              titleText={''}
+              type="inline"
+              items={[
+                { id: AppointmentStatus.SCHEDULED, label: t('scheduled', 'Scheduled') },
+                { id: AppointmentStatus.CANCELLED, label: t('cancelled', 'Cancelled') },
+                { id: AppointmentStatus.MISSED, label: t('missed', 'Missed') },
+                ...(checkOutButton.enabled
+                  ? [{ id: AppointmentStatus.COMPLETED, label: t('completed', 'Completed') }]
+                  : []),
+              ]}
+              itemToString={(item) => (item ? item.label : '')}
+              onChange={(e) => setStatus(e.selectedItem.id)}
+              size={isTablet ? 'lg' : 'sm'}
+            />
+          </Layer>
           {status === AppointmentStatus.COMPLETED && (
             <InlineNotification
               kind="warning"
-              lowContrast={true}
-              hideCloseButton={true}
+              lowContrast
+              hideCloseButton
               title={t(
                 'markAppointmentAsCompletedMessage',
                 'Marking appointment as completed will end the active visit of the patient',
               )}
             />
           )}
+          {status && invalidAppointment && (
+            <InlineNotification
+              kind="warning"
+              lowContrast
+              hideCloseButton
+              title={t(
+                'invalidAppointmentStatusChange',
+                'Cannot transition appointment with status {{currentStatus}} to status {{newStatus}}',
+                {
+                  currentStatus: invalidAppointment.status,
+                  newStatus: status,
+                },
+              )}
+            />
+          )}
         </Stack>
       </ModalBody>
-      <ModalFooter className={styles.modalFooter}>
+      <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
-        <Button onClick={submit}>{t('saveAndClose', 'Save and close')}</Button>
+        <Button kind="primary" disabled={isSubmitting || invalidAppointment != null || status == null} onClick={submit}>
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            <span>{t('saveAndClose', 'Save and close')}</span>
+          )}
+        </Button>
       </ModalFooter>
     </>
   );
