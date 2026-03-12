@@ -20,7 +20,7 @@ const WardViewHeader: React.FC<WardViewHeaderProps> = ({
     <div className={styles.wardViewHeader}>
       <h2>{location?.display}</h2>
       {wardMetrics}
-      {locationAllowsAdmissions && <AdmissionRequestsBar {...{ wardPendingPatients }} />}
+      <AdmissionRequestsBar locationAllowsAdmissions={locationAllowsAdmissions} {...{ wardPendingPatients }} />
     </div>
   );
 };

@@ -59,13 +59,10 @@ const DefaultWardView = () => {
       {!locationHasAllowAdmissionsTag && (
         <InlineNotification
           className={styles.noAdmissionsNotification}
-          kind="error"
+          kind="warning"
           hideCloseButton={true}
           lowContrast={true}
-          title={t(
-            'locationDoesNotAllowAdmissions',
-            'This location does not allow admissions. If there are patients here, please discharge them.',
-          )}
+          title={t('locationDoesNotAllowAdmissions', 'This location does not allow admissions.')}
         />
       )}
       <Ward wardBeds={<DefaultWardBeds />} wardUnassignedPatients={<DefaultWardUnassignedPatients />} />

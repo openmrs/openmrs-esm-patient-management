@@ -9,9 +9,13 @@ import styles from './admission-requests.scss';
 
 interface AdmissionRequestsBarProps {
   wardPendingPatients: ReactNode;
+  locationAllowsAdmissions?: boolean;
 }
 
-const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPendingPatients }) => {
+const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({
+  wardPendingPatients,
+  locationAllowsAdmissions,
+}) => {
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { inpatientRequests, isLoading, error } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
   const { t } = useTranslation();
@@ -48,7 +52,7 @@ const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ wardPending
         onClick={() => {
           launchWorkspace2(
             'admission-requests-workspace',
-            { wardPendingPatients },
+            { wardPendingPatients, locationAllowsAdmissions },
             { startVisitWorkspaceName: 'ward-app-start-visit-workspace' },
           );
         }}

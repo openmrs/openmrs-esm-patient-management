@@ -61,7 +61,7 @@
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "labelColon": "{{label}}:",
-  "locationDoesNotAllowAdmissions": "This location does not allow admissions. If there are patients here, please discharge them.",
+  "locationDoesNotAllowAdmissions": "This location does not allow admissions.",
   "male": "Male",
   "manage": "Manage",
   "minutes_one": "{{count}} minutes",
