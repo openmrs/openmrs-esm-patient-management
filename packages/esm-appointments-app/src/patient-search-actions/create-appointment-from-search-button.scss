@@ -1,0 +1,32 @@
+@use '@carbon/styles/scss/spacing';
+
+.actionContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: spacing.$spacing-03;
+}
+
+.skeletonWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.upcomingAppointmentsTag {
+  cursor: pointer;
+  margin: 0;
+  white-space: nowrap;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+
+  &:hover {
+    filter: brightness(0.9);
+  }
+}
+
+.createButton {
+  white-space: nowrap;
+  // Ensure the button is aligned with the baseline of other row items
+  margin-bottom: 0.125rem;
+}

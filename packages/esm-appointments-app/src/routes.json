@@ -119,6 +119,12 @@
       "component": "metricsCardProvidersBooked",
       "slot": "appointments-metrics-slot",
       "order": 3
+    },
+    {
+      "name": "create-appointment-from-search-button",
+      "slot": "active-visit-patient-search-actions-slot",
+      "component": "createAppointmentFromSearchButton",
+      "offline": true
     }
   ],
   "modals": [
