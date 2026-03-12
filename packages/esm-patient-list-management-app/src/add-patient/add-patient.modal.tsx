@@ -98,8 +98,9 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
                 title: t('error', 'Error'),
                 kind: 'error',
                 subtitle: t(
-                  'patientLocationMismatchError',
-                  `Patient location does not match list location. Patient cannot be added to: ${patientList.displayName}`,
+                  'patientLocationMismatchWithListNameError',
+                  `Patient location does not match list location. Patient cannot be added to: {{listName}}`,
+                  { listName: patientList.displayName }
                 ),
               });
               return Promise.resolve();
