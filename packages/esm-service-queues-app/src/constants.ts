@@ -13,4 +13,5 @@ export const queueEntryCustomRepresentation =
 
 // Error codes
 export const DUPLICATE_QUEUE_ENTRY_ERROR_CODE = '[queue.entry.duplicate.patient]';
+export const QUEUE_ENTRY_ERROR_CODE_DUPLICATE = 'queue.entry.error.duplicate';
 export const QUEUE_ENTRY_ALREADY_ENDED_ERROR = 'queue entry that has already ended';
