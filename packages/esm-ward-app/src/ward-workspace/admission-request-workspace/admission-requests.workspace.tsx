@@ -5,6 +5,8 @@ import { useAppContext, Workspace2, type Workspace2DefinitionProps } from '@open
 import { type WardViewContext } from '../../types';
 import AdmissionRequestsEmptyState from './admission-requests-empty-state.component';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import useWardLocation from '../../hooks/useWardLocation';
+import { isAdmissionLocation } from '../../ward-view/ward-view.resource';
 import styles from './admission-requests-workspace.scss';
 import { Add } from '@carbon/react/icons';
 
@@ -17,9 +19,11 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
   launchChildWorkspace,
 }) => {
   const { t } = useTranslation();
-  const { errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { emrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { inpatientRequests, isLoading } = wardPatientGroupDetails?.inpatientRequestResponse ?? {};
+  const { location } = useWardLocation();
+  const locationSupportsAdmission = isAdmissionLocation(location, emrConfiguration);
 
   const handleAddPatient = () => {
     launchChildWorkspace('ward-app-patient-search-workspace', {
@@ -58,11 +62,13 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
           (inpatientRequests?.length === 0 ? (
             <AdmissionRequestsEmptyState />
           ) : (
-            <div className={styles.addPatientToWardButtonContainer}>
-              <Button renderIcon={Add} kind="ghost" onClick={handleAddPatient}>
-                {t('addPatientToWard', 'Add patient to ward')}
-              </Button>
-            </div>
+            locationSupportsAdmission && (
+              <div className={styles.addPatientToWardButtonContainer}>
+                <Button renderIcon={Add} kind="ghost" onClick={handleAddPatient}>
+                  {t('addPatientToWard', 'Add patient to ward')}
+                </Button>
+              </div>
+            )
           ))}
         <div className={styles.content}>{wardPendingPatients}</div>
       </div>

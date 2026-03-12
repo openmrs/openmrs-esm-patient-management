@@ -9,12 +9,18 @@ import {
   useWorkspace2Context,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
+import useEmrConfiguration from '../../hooks/useEmrConfiguration';
+import useWardLocation from '../../hooks/useWardLocation';
+import { isAdmissionLocation } from '../../ward-view/ward-view.resource';
 import styles from './admission-requests-empty-state.scss';
 
 const AdmissionRequestsEmptyState: React.FC = () => {
   const { t } = useTranslation();
   const isDesktop = useLayoutType() !== 'tablet';
   const { launchChildWorkspace } = useWorkspace2Context();
+  const { emrConfiguration } = useEmrConfiguration();
+  const { location } = useWardLocation();
+  const locationSupportsAdmission = isAdmissionLocation(location, emrConfiguration);
 
   const handleAddPatient = () => {
     launchChildWorkspace('ward-app-patient-search-workspace', {
@@ -46,9 +52,11 @@ const AdmissionRequestsEmptyState: React.FC = () => {
           )}
         </p>
         <div className={styles.action}>
-          <Button renderIcon={Add} kind="ghost" onClick={handleAddPatient}>
-            {t('addPatientToWard', 'Add patient to ward')}
-          </Button>
+          {locationSupportsAdmission && (
+            <Button renderIcon={Add} kind="ghost" onClick={handleAddPatient}>
+              {t('addPatientToWard', 'Add patient to ward')}
+            </Button>
+          )}
         </div>
       </Tile>
     </Layer>
