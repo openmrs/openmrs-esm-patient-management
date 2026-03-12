@@ -24,7 +24,7 @@ export const configSchema = {
   },
   enforcePatientListLocationMatch: {
     _type: Type.Boolean,
-    _default: true,
+    _default: false,
     _description:
       "If true, show an error notification and block patient addition when the patient's identifier location does not match the patient list/cohort location.",
   },
