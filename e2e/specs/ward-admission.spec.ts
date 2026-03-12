@@ -60,6 +60,9 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
     await page.getByRole('button', { name: 'Admit patient' }).first().click();
   });
 
+  await test.step('And I click the "Choose an option" button', async () => {
+    await wardPage.clickChooseAnOptionButton();
+  });
   await test.step('And I select the bed for admission', async () => {
     await page.getByText(`${bed.bedNumber} · Empty`).click();
   });

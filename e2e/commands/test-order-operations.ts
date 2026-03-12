@@ -4,8 +4,8 @@ import { type Encounter, type Patient, type Provider, type Bed, type BedType } f
 import { generateRandomPatient, deletePatient } from './patient-operations';
 import { startVisit, endVisit } from './visit-operations';
 import { getProvider } from './provider-operations';
-import { createEncounter, deleteEncounter, generateWardAdmission } from './encounter-operations';
-import { generateBedType, generateRandomBed } from './bed-operations';
+import { createEncounter, deleteEncounter, generateWardAdmissionRequest } from './encounter-operations';
+import { dischargePatientFromBed, generateBedType, generateRandomBed } from './bed-operations';
 
 export interface LabOperationResults {
   patient: Patient;
@@ -18,6 +18,7 @@ export interface LabOperationResults {
 export interface LabOrderWithBedResults extends LabOperationResults {
   bed: Bed;
   bedType: BedType;
+  labEncounter: Encounter;
 }
 
 export const CreatePatientWithOrderedLabOrders = async (api: APIRequestContext): Promise<LabOperationResults> => {
@@ -45,7 +46,7 @@ export const CreatePatientWithOrderedLabOrdersAndBedAssignment = async (
   const visit = await startVisit(api, patient.uuid, process.env.E2E_WARD_LOCATION_UUID);
   const labEncounter = await createEncounter(api, patient.uuid, provider.uuid);
   const order = await generateRandomTestOrder(api, patient.uuid, labEncounter, provider.uuid);
-  const encounter = await generateWardAdmission(api, provider.uuid, patient.uuid);
+  const encounter = await generateWardAdmissionRequest(api, provider.uuid, patient.uuid);
 
   return {
     patient,
@@ -53,6 +54,7 @@ export const CreatePatientWithOrderedLabOrdersAndBedAssignment = async (
     visitUuid: visit.uuid,
     encounter,
     orderUuid: order.uuid,
+    labEncounter,
     bed,
     bedType,
   };
@@ -109,18 +111,27 @@ export const cleanupLabOrderWithBed = async (
     visitUuid: string;
     patientUuid?: string;
     bedUuid?: string;
+    bedID?: number;
     bedTypeUuid?: string;
     labEncounterUuid?: string;
   },
 ) => {
-  await deleteTestOrder(api, params.orderUuid);
-  await deleteEncounter(api, params.encounterUuid);
-  await deleteEncounter(api, params.labEncounterUuid);
-  await endVisit(api, params.visitUuid);
-
+  if (params.orderUuid) {
+    await deleteTestOrder(api, params.orderUuid);
+  }
+  if (params.encounterUuid) {
+    await deleteEncounter(api, params.encounterUuid);
+  }
+  if (params.labEncounterUuid) {
+    await deleteEncounter(api, params.labEncounterUuid);
+  }
+  if (params.bedUuid && params.bedID) {
+    await dischargePatientFromBed(api, params.bedID, params.patientUuid);
+  }
+  if (params.visitUuid) {
+    await endVisit(api, params.visitUuid, true);
+  }
   if (params.patientUuid) {
     await deletePatient(api, params.patientUuid);
   }
-
-  // Note: Bed and bedType cleanup would need to be added to bed-operations.ts if needed
 };

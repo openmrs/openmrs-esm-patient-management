@@ -45,6 +45,9 @@ test('view lab orders in the patient Card in the Ward App', async ({ api, page }
   await test.step('Click "Admit Patient" button', async () => {
     await wardPage.clickAdmitPatientButton(patientName);
   });
+  await test.step('And I click the "Choose an option" button', async () => {
+    await wardPage.clickChooseAnOptionButton();
+  });
   await test.step('And I select the bed for admission', async () => {
     await page.getByText(`${bed.bedNumber} · Empty`).click();
   });
@@ -66,7 +69,9 @@ test.afterEach(async ({ api }) => {
     encounterUuid: generatedData.encounter.uuid,
     visitUuid: generatedData.visitUuid,
     patientUuid: generatedData.patient.uuid,
+    bedID: generatedData.bed.id,
     bedUuid: generatedData.bed.uuid,
     bedTypeUuid: generatedData.bedType.uuid,
+    labEncounterUuid: generatedData.labEncounter.uuid,
   });
 });

@@ -66,13 +66,18 @@ export class WardPage {
   }
 
   async clickAdmitButton() {
-    await this.page.getByRole('button', { name: /Admit/i }).click();
+    await this.page.getByRole('button', { name: 'Admit', exact: true }).click();
   }
   async waitForPatientInWardView(patientName: string) {
     await this.page
       .locator(`[class*="wardPatientCard"]:has-text("${patientName}")`)
       .first()
       .waitFor({ state: 'visible' });
+  }
+  async clickChooseAnOptionButton() {
+    const dropdown = this.page.getByRole('combobox', { name: /choose an option/i });
+    await dropdown.waitFor({ state: 'visible' });
+    await dropdown.click();
   }
 
   async clickAdmitPatientButton(patientName: string) {

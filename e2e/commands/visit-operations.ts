@@ -18,12 +18,10 @@ export const startVisit = async (api: APIRequestContext, patientId: string, loca
 };
 
 export const endVisit = async (api: APIRequestContext, uuid: string, isWardTest = false) => {
-  await api.post(`visit/${uuid}`, {
+  const response = await api.post(`visit/${uuid}`, {
     data: {
-      location: isWardTest ? process.env.E2E_WARD_LOCATION_UUID : process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-      startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
-      visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-      stopDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+      stopDatetime: dayjs().add(1, 'minute').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
     },
   });
+  await expect(response.ok()).toBeTruthy();
 };
