@@ -41,6 +41,9 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
           closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
           mutateQueueEntries();
         })
+        .catch((error) => {
+          console.error('Failed to add patient to queue', error);
+        })
         .finally(() => {
           setIsSubmitting(false);
         });

@@ -99,7 +99,9 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const onSubmit = useCallback(
     async (visit: Visit) => {
       const isFormValid = await trigger();
-      if (!isFormValid) throw new Error('Form validation failed');
+      if (!isFormValid) {
+        return;
+      }
       const formValues = getValues();
 
       return postQueueEntry(
