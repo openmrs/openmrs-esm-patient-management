@@ -91,6 +91,7 @@
   "name": "姓名",
   "nextPage": "下一页",
   "noActiveTickets": "No active tickets to display",
+  "noActiveVisit": "No active visit",
   "noColumnsDefined": "未定义表格列，请检查配置。",
   "noEncountersFound": "未找到问诊记录",
   "noMedicationsFound": "未找到药物",

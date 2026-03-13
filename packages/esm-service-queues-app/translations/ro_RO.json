@@ -91,6 +91,7 @@
   "name": "Nume",
   "nextPage": "Pagina următoare",
   "noActiveTickets": "No active tickets to display",
+  "noActiveVisit": "No active visit",
   "noColumnsDefined": "Nicio coloană definită în tabel. Verifică configurația",
   "noEncountersFound": "Nu au fost găsite consultații",
   "noMedicationsFound": "Nu au fost găsite medicamente",

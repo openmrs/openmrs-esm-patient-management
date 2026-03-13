@@ -91,6 +91,7 @@
   "name": "სახელი",
   "nextPage": "შემდეგი გვერდი",
   "noActiveTickets": "No active tickets to display",
+  "noActiveVisit": "No active visit",
   "noColumnsDefined": "No table columns defined. Check Configuration",
   "noEncountersFound": "კონსულტაციები აღმოჩენილი არაა",
   "noMedicationsFound": "წამლები აღმოჩენილი არაა",
