@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type QueueEntry } from '../../types';
@@ -43,7 +43,7 @@ const ClearQueueEntriesModal: React.FC<ClearQueueEntriesModalProps> = ({ queueEn
   }, [closeModal, mutateQueueEntries, t, queueEntries]);
 
   return (
-    <div>
+    <div className={styles.clearQueueModalContainer}>
       <ModalHeader
         closeModal={closeModal}
         label={t('serviceQueues', 'Service queues')}

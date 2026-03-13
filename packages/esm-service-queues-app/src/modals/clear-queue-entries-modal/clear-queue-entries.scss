@@ -10,3 +10,50 @@
 .clearQueueButton:hover {
   color: $danger;
 }
+
+@media (max-width: 600px) {
+  :global {
+    .cds--modal {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .cds--modal-container {
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      transform: none !important;
+      width: 90% !important;
+      min-width: 0 !important;
+      height: auto !important;
+      max-height: 90vh !important;
+    }
+
+    .cds--modal-footer {
+      display: flex !important;
+      flex-direction: column-reverse !important;
+      height: auto !important;
+      padding: 1rem !important;
+    }
+
+    .cds--modal-footer .cds--btn {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+
+      justify-content: center !important;
+      text-align: center !important;
+
+      align-items: center !important;
+
+      padding: 0.75rem 1rem !important;
+
+      font-size: 1rem !important;
+    }
+
+    .cds--modal-footer .cds--btn:last-child {
+      margin-bottom: 0.5rem !important;
+    }
+  }
+}
