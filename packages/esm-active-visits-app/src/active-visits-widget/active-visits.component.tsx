@@ -102,7 +102,7 @@ const ActiveVisitsTable = () => {
       <div className={styles.activeVisitsContainer}>
         <div className={styles.activeVisitsDetailHeaderContainer}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('activeVisits', 'Active Visits')}</h4>
+            <h2>{t('activeVisits', 'Active Visits')}</h2>
           </div>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>
@@ -142,7 +142,7 @@ const ActiveVisitsTable = () => {
         <Layer>
           <Tile className={styles.tile}>
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('activeVisits', 'Active Visits')}</h4>
+              <h2>{t('activeVisits', 'Active Visits')}</h2>
             </div>
             <EmptyCardIllustration />
             <p className={styles.content}>
@@ -158,7 +158,7 @@ const ActiveVisitsTable = () => {
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('activeVisits', 'Active Visits')}</h4>
+          <h2>{t('activeVisits', 'Active Visits')}</h2>
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>

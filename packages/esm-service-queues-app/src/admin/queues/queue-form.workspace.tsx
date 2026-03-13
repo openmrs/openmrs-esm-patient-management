@@ -18,9 +18,8 @@ import {
   TextArea,
 } from '@carbon/react';
 import { useSWRConfig } from 'swr';
-import { showSnackbar, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { restBaseUrl, showSnackbar, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { saveQueue, updateQueue, useServiceConcepts } from './queue.resource';
-import { queuesMutationKey } from '../queue-admin.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
 import styles from './queue-form.scss';
 
@@ -102,7 +101,7 @@ const QueueForm: React.FC<Workspace2DefinitionProps<QueueWorkspaceProps>> = ({ c
       }
 
       closeWorkspace();
-      await mutate(queuesMutationKey);
+      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue?`));
     } catch (error) {
       showSnackbar({
         title: isEditMode

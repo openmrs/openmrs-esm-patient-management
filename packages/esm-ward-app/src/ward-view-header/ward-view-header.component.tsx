@@ -13,7 +13,7 @@ const WardViewHeader: React.FC<WardViewHeaderProps> = ({ wardPendingPatients, wa
 
   return (
     <div className={styles.wardViewHeader}>
-      <h4>{location?.display}</h4>
+      <h2>{location?.display}</h2>
       {wardMetrics}
       <AdmissionRequestsBar {...{ wardPendingPatients }} />
     </div>
