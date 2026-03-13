@@ -27,6 +27,15 @@
 
 .createButton {
   white-space: nowrap;
-  // Ensure the button is aligned with the baseline of other row items
-  margin-bottom: 0.125rem;
+  // Overrides Carbon's fixed size="sm" height to allow visual extension
+  height: auto;
+  min-height: 3rem;
+  // Push the button background down to touch the row boundaries
+  margin-bottom: -0.75rem;
+
+  // Center text both horizontally and vertically
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem; // Carbon horizontal padding
 }

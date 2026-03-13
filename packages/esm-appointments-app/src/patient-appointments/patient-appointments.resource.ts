@@ -29,6 +29,10 @@ export function usePatientAppointments(patientUuid: string, startDate: string, a
   const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
     patientUuid ? [appointmentsSearchUrl, patientUuid, startDate] : null,
     fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+    },
   );
 
   const appointments = data?.data?.length ? data.data : null;
@@ -40,11 +44,11 @@ export function usePatientAppointments(patientUuid: string, startDate: string, a
       dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
     );
 
-  // Fix: compare against start of today so today's appointments show correctly
+  // Fix: compare against current time so past appointments today are not included in upcoming
   const upcomingAppointments = appointments
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
-    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(dayjs().startOf('day')));
+    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(dayjs()));
 
   const todaysAppointments = appointments
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))

@@ -27,7 +27,10 @@ const CreateAppointmentFromSearchButton: React.FC<CreateAppointmentFromSearchBut
 
   const { data: appointmentsData, isLoading } = usePatientAppointments(patientUuid, startDate, ac);
 
-  const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
+  // Filter today's appointments to only include those that are happening now or in the future
+  const todaysAppointments = appointmentsData?.todaysAppointments?.length
+    ? appointmentsData.todaysAppointments.filter((apt) => dayjs(apt.startDateTime).isAfter(dayjs()))
+    : [];
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
     ? appointmentsData?.upcomingAppointments
     : [];
@@ -48,31 +51,19 @@ const CreateAppointmentFromSearchButton: React.FC<CreateAppointmentFromSearchBut
 
   return (
     <div className={styles.actionContainer}>
-      {isLoading ? (
-        <div className={styles.skeletonWrapper}>
-          <ButtonSkeleton small />
-        </div>
-      ) : (
-        <>
-          {upcomingAppointmentsCount > 0 && (
-            <Tag
-              className={styles.upcomingAppointmentsTag}
-              type="green"
-              renderIcon={Calendar}
-              onClick={handleViewUpcoming}>
-              {t('upcomingAppointmentsCount', '{{count}} upcoming', { count: upcomingAppointmentsCount })}
-            </Tag>
-          )}
-          <Button
-            aria-label={t('schedule', 'Schedule')}
-            className={styles.createButton}
-            kind="primary"
-            size="sm"
-            onClick={handleCreateAppointment}>
-            {t('schedule', 'Schedule')}
-          </Button>
-        </>
+      {upcomingAppointmentsCount > 0 && (
+        <Tag className={styles.upcomingAppointmentsTag} type="green" renderIcon={Calendar} onClick={handleViewUpcoming}>
+          {t('upcomingAppointmentsCount', '{{count}} upcoming', { count: upcomingAppointmentsCount })}
+        </Tag>
       )}
+      <Button
+        aria-label={t('schedule', 'Schedule')}
+        className={styles.createButton}
+        kind="primary"
+        size="sm"
+        onClick={handleCreateAppointment}>
+        {t('schedule', 'Schedule')}
+      </Button>
     </div>
   );
 };
