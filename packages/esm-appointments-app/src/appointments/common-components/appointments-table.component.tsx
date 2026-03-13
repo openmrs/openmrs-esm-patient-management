@@ -1,4 +1,3 @@
-
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -132,28 +131,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     );
   }
 
-  const rowData = results?.map((appointment) => ({
-    id: appointment.uuid,
-    patientName: (
-      <ConfigurableLink
-        className={styles.link}
-        to={customPatientChartUrl}
-        templateParams={{ patientUuid: appointment.patient.uuid }}>
-        {appointment.patient.name}
-      </ConfigurableLink>
-    ),
-    nextAppointmentDate: '--',
-    identifier: patientIdentifierType
-      ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
-      : appointment.patient.identifier,
-    dateTime: formatDatetime(new Date(appointment.startDateTime)),
-    serviceType: appointment.service.name,
-    location: appointment.location?.name,
-    provider: appointment.providers?.[0]?.name ?? '--',
-    status: <AppointmentActions appointment={appointment} />,
-    appointment,
-  }));
-  
   const rowData = useMemo(
     () =>
       results?.map((appointment) => ({
@@ -341,6 +318,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     const hasActiveVisitToday = visits?.some(
                       (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime,
                     );
+                    const canChangeStatus = isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday);
 
                     return (
                       <React.Fragment key={row.id}>

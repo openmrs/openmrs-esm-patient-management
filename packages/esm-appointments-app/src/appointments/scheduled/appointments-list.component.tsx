@@ -3,6 +3,9 @@ import { filterByProvider, filterByServiceType } from '../utils';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 import { useAppointmentsStore } from '../../store';
+import { useConfig } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { type AppointmentPanelConfig } from '../../scheduled-appointments-config-schema';
 
 interface AppointmentsListProps {
   appointmentServiceTypes?: Array<string>;
