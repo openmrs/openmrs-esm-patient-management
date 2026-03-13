@@ -1,4 +1,4 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { oneOf, Type, validator, validators } from '@openmrs/esm-framework';
 import { appointmentColumnTypes } from './constants';
 
 type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
@@ -17,6 +17,18 @@ export const configSchema = {
       _type: Type.String,
       _description: 'Status of an appointment',
     },
+    _validators: [
+      validator(
+        (v) =>
+          Array.isArray(v) &&
+          v.every((e) =>
+            ['Requested', 'WaitList', 'Scheduled', 'Arrived', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'].includes(
+              e,
+            ),
+          ),
+        `Valid appointment types are: Requested, WaitList, Scheduled, Arrived, CheckedIn, Completed, Cancelled or Missed.`,
+      ),
+    ],
   },
   appointmentTypes: {
     _type: Type.Array,
@@ -26,6 +38,12 @@ export const configSchema = {
       _type: Type.String,
       _description: 'Type of an appointment',
     },
+    _validators: [
+      validator(
+        (v) => Array.isArray(v) && v.every((e) => ['Scheduled', 'WalkIn', 'Virtual'].includes(e)),
+        `Valid appointment types are: Scheduled, WalkIn, or Virtual.`,
+      ),
+    ],
   },
   checkInButton: {
     enabled: {

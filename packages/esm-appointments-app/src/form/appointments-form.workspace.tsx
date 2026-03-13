@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +47,7 @@ import {
   useAppointmentService,
   useMutateAppointments,
 } from './appointments-form.resource';
-import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
+import { appointmentLocationTagName, dateFormat, weekDays } from '../constants';
 import { useAppointmentsStore } from '../store';
 import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
@@ -63,6 +63,22 @@ const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
 const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
+
+/*
+ * Translation strings for appointment types and statuses
+ *
+ * These are Enums in the backend so only specific strings are allowed
+ */
+// t('requested', 'Requested')
+// t('waitList', 'Wait List')
+// t('scheduled', 'Scheduled')
+// t('arrived', 'Arrived)
+// t('checkedIn', 'Checked In')
+// t('completed', 'Completed')
+// t('cancelled', 'Cancelled')
+// t('missed', 'Missed')
+// t('walkIn', 'Walk In')
+// t('virtual', 'Virtual')
 
 /**
  * Workspace used to create or edit an appointment within the appointments app
@@ -126,25 +142,25 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       duration: z.union([z.number(), z.null()]).optional(),
       isAllDayAppointment: z.boolean(),
       location: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
+        message: t('locationRequired', 'Location is required'),
       }),
       provider: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
+        message: t('providerRequired', 'Provider is required'),
       }),
       appointmentStatus: z.string().optional(),
       appointmentNote: z.string(),
       appointmentType: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
+        message: t('appointmentTypeRequired', 'Appointment type is required'),
       }),
       selectedService: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
+        message: t('serviceRequired', 'Service is required'),
       }),
       recurringPatternType: z.enum(['DAY', 'WEEK']),
       recurringPatternPeriod: z.number(),
       recurringPatternDaysOfWeek: z.array(z.string()),
       selectedDaysOfWeekText: z.string().optional(),
       startTime: z.string().refine((value) => isValidTime(value), {
-        message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
+        message: t('invalidTime', 'Invalid time'),
       }),
       timeFormat: z.enum(['AM', 'PM']),
       appointmentDateTime: z.object({
@@ -201,18 +217,14 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         ctx.addIssue({
           path: ['duration'],
           code: z.ZodIssueCode.custom,
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+          message: t('durationErrorMessage', 'Duration should be greater than zero'),
         });
       }
       if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
         ctx.addIssue({
           path: ['duration'],
           code: z.ZodIssueCode.custom,
-          message: translateFrom(
-            moduleName,
-            'durationMaxErrorMessage',
-            'Duration cannot exceed 1440 minutes (24 hours)',
-          ),
+          message: t('durationMaxErrorMessage', 'Duration cannot exceed 1440 minutes (24 hours)'),
         });
       }
     });
@@ -330,124 +342,50 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
   const isEditing = Boolean(appointment);
 
-  // Same for creating and editing
-  const handleSaveAppointment = async (data: AppointmentFormData) => {
-    setIsSubmitting(true);
-    // Construct appointment payload
-    const appointmentPayload = constructAppointmentPayload(data);
+  const constructAppointmentPayload = useCallback(
+    (data: AppointmentFormData): AppointmentPayload => {
+      const {
+        selectedService,
+        startTime,
+        timeFormat,
+        appointmentDateTime: { startDate },
+        duration,
+        appointmentType: selectedAppointmentType,
+        location,
+        provider,
+        appointmentNote,
+        appointmentStatus,
+        dateAppointmentScheduled,
+        isAllDayAppointment,
+      } = data;
 
-    // Check if a duplicate response occurs
-    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
-    let errorMessage = t('appointmentConflict', 'Appointment conflict');
-    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
-      errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
-    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
-    }
+      const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+      const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
+      const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+      const minutes = hoursAndMinutes[1];
+      const startDatetime = startDate.setHours(hours, minutes);
+      const endDatetime = isAllDayAppointment
+        ? dayjs(startDate).endOf('day').toDate()
+        : dayjs(startDatetime).add(duration, 'minutes').toDate();
 
-    if (response.status === 200 && errorMessage) {
-      setIsSubmitting(false);
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'error',
-        title: errorMessage,
-      });
-      return;
-    }
+      return {
+        appointmentKind: selectedAppointmentType,
+        status: appointmentStatus,
+        serviceUuid: serviceUuid,
+        startDateTime: dayjs(startDatetime).format(),
+        endDateTime: dayjs(endDatetime).format(),
+        locationUuid: location,
+        providers: [{ uuid: provider }],
+        patientUuid: patientUuid,
+        comments: appointmentNote,
+        uuid: isEditing ? appointment.uuid : undefined,
+        dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
+      };
+    },
+    [appointment?.uuid, isEditing, patientUuid, services],
+  );
 
-    // Construct recurring pattern payload
-    const recurringAppointmentPayload = {
-      appointmentRequest: appointmentPayload,
-      recurringPattern: constructRecurringPattern(data),
-    };
-
-    const abortController = new AbortController();
-
-    (isRecurringAppointment
-      ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
-      : saveAppointment(appointmentPayload, abortController)
-    ).then(
-      ({ status }) => {
-        if (status === 200) {
-          setIsSubmitting(false);
-          setIsSuccessful(true);
-          mutateAppointments();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title: isEditing
-              ? t('appointmentEdited', 'Appointment edited')
-              : t('appointmentScheduled', 'Appointment scheduled'),
-          });
-        }
-        if (status === 204) {
-          setIsSubmitting(false);
-          showSnackbar({
-            title: isEditing
-              ? t('appointmentEditError', 'Error editing appointment')
-              : t('appointmentFormError', 'Error scheduling appointment'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: t('noContent', 'No Content'),
-          });
-        }
-      },
-      (error) => {
-        setIsSubmitting(false);
-        showSnackbar({
-          title: isEditing
-            ? t('appointmentEditError', 'Error editing appointment')
-            : t('appointmentFormError', 'Error scheduling appointment'),
-          kind: 'error',
-          isLowContrast: false,
-          subtitle: error?.message,
-        });
-      },
-    );
-  };
-
-  const constructAppointmentPayload = (data: AppointmentFormData): AppointmentPayload => {
-    const {
-      selectedService,
-      startTime,
-      timeFormat,
-      appointmentDateTime: { startDate },
-      duration,
-      appointmentType: selectedAppointmentType,
-      location,
-      provider,
-      appointmentNote,
-      appointmentStatus,
-      dateAppointmentScheduled,
-      isAllDayAppointment,
-    } = data;
-
-    const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
-    const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
-    const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
-    const minutes = hoursAndMinutes[1];
-    const startDatetime = startDate.setHours(hours, minutes);
-    const endDatetime = isAllDayAppointment
-      ? dayjs(startDate).endOf('day').toDate()
-      : dayjs(startDatetime).add(duration, 'minutes').toDate();
-
-    return {
-      appointmentKind: selectedAppointmentType,
-      status: appointmentStatus,
-      serviceUuid: serviceUuid,
-      startDateTime: dayjs(startDatetime).format(),
-      endDateTime: dayjs(endDatetime).format(),
-      locationUuid: location,
-      providers: [{ uuid: provider }],
-      patientUuid: patientUuid,
-      comments: appointmentNote,
-      uuid: isEditing ? appointment.uuid : undefined,
-      dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
-    };
-  };
-
-  const constructRecurringPattern = (data: AppointmentFormData): RecurringPattern => {
+  const constructRecurringPattern = useCallback((data: AppointmentFormData): RecurringPattern => {
     const {
       appointmentDateTime: { recurringPatternEndDate },
       recurringPatternType,
@@ -464,11 +402,91 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       endDate: endDate ? dayjs(endDate).format() : null,
       daysOfWeek: recurringPatternDaysOfWeek,
     };
-  };
+  }, []);
 
   const title = isEditing
     ? t('editAppointment', 'Edit appointment')
     : t('createNewAppointment', 'Create new appointment');
+
+  // Same for creating and editing
+  const handleSaveAppointment = useCallback(
+    async (data: AppointmentFormData) => {
+      setIsSubmitting(true);
+      // Construct appointment payload
+      const appointmentPayload = constructAppointmentPayload(data);
+
+      // Check if a duplicate response occurs
+      const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+      let errorMessage = t('appointmentConflict', 'Appointment conflict');
+      if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+        errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
+      } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+        errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+      }
+
+      if (response.status === 200 && errorMessage) {
+        setIsSubmitting(false);
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'error',
+          title: errorMessage,
+        });
+        return;
+      }
+
+      // Construct recurring pattern payload
+      const recurringAppointmentPayload = {
+        appointmentRequest: appointmentPayload,
+        recurringPattern: constructRecurringPattern(data),
+      };
+
+      const abortController = new AbortController();
+
+      (isRecurringAppointment
+        ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
+        : saveAppointment(appointmentPayload, abortController)
+      ).then(
+        ({ status }) => {
+          if (status === 200) {
+            setIsSubmitting(false);
+            setIsSuccessful(true);
+            mutateAppointments();
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
+              title: isEditing
+                ? t('appointmentEdited', 'Appointment edited')
+                : t('appointmentScheduled', 'Appointment scheduled'),
+            });
+          }
+          if (status === 204) {
+            setIsSubmitting(false);
+            showSnackbar({
+              title: isEditing
+                ? t('appointmentEditError', 'Error editing appointment')
+                : t('appointmentFormError', 'Error scheduling appointment'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: t('noContent', 'No Content'),
+            });
+          }
+        },
+        (error) => {
+          setIsSubmitting(false);
+          showSnackbar({
+            title: isEditing
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: error?.message,
+          });
+        },
+      );
+    },
+    [constructAppointmentPayload, constructRecurringPattern, isEditing, isRecurringAppointment, mutateAppointments, t],
+  );
 
   if (isLoading) {
     return (
@@ -583,7 +601,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                     {appointmentTypes?.length > 0 &&
                       appointmentTypes.map((appointmentType, index) => (
-                        <SelectItem key={index} text={appointmentType} value={appointmentType}>
+                        <SelectItem
+                          key={index}
+                          text={t(`${appointmentType[0].toLowerCase()}${appointmentType.slice(1)}`)}
+                          value={appointmentType}>
                           {appointmentType}
                         </SelectItem>
                       ))}
@@ -813,7 +834,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
                       {appointmentStatuses?.length > 0 &&
                         appointmentStatuses.map((appointmentStatus, index) => (
-                          <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>
+                          <SelectItem
+                            key={index}
+                            text={t(`${appointmentStatus[0].toLowerCase()}${appointmentStatus.slice(1)}`)}
+                            value={appointmentStatus}>
                             {appointmentStatus}
                           </SelectItem>
                         ))}
