@@ -92,7 +92,7 @@ export const mapVisitQueueEntryProperties = (
   startedAt: dayjs(queueEntry.startedAt).toDate(),
   endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,
-  queueLocation: (queueEntry?.queue as any)?.location?.uuid,
+  queueLocation: queueEntry?.queue?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
   queueUuid: queueEntry.queue.uuid,
