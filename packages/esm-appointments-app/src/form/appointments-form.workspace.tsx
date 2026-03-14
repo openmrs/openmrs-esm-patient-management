@@ -466,15 +466,17 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     };
   };
 
-  if (isLoading) {
-    return (
-      <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-    );
-  }
-
   const title = isEditing
     ? t('editAppointment', 'Edit appointment')
     : t('createNewAppointment', 'Create new appointment');
+
+  if (isLoading) {
+    return (
+      <Workspace2 title={title}>
+        <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      </Workspace2>
+    );
+  }
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={isDirty}>

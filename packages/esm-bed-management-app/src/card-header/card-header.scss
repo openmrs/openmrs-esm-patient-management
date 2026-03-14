@@ -10,7 +10,7 @@
   padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
   background-color: $ui-background;
 
-  h4:after {
+  h2:after {
     content: '';
     display: block;
     width: layout.$spacing-07;
@@ -21,7 +21,7 @@
 
 .desktopHeader {
   height: layout.$spacing-09;
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
   }
@@ -29,7 +29,7 @@
 
 .tabletHeader {
   height: 4.5rem;
-  h4 {
+  h2 {
     @include type.type-style('heading-03');
     color: $text-02;
   }

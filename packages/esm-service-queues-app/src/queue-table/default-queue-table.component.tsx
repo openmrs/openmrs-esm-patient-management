@@ -6,11 +6,11 @@ import { updateSelectedQueueStatus, useServiceQueuesStore } from '../store/store
 import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
-import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
-import QueueTableExpandedRow from './queue-table-expanded-row.component';
-import QueueTable from './queue-table.component';
-import styles from './queue-table.scss';
 import AddPatientToQueueButton from './components/add-patient-to-queue-button.component';
+import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
+import QueueTable from './queue-table.component';
+import QueueTableExpandedRow from './queue-table-expanded-row.component';
+import styles from './queue-table.scss';
 
 function DefaultQueueTable() {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ function DefaultQueueTable() {
       <Layer className={styles.tableSection}>
         <div className={styles.headerContainer}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+            <h2>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h2>
           </div>
           <div className={styles.headerButtons}>
             <AddPatientToQueueButton />
@@ -92,14 +92,13 @@ function QueueTableSection() {
   return (
     <QueueTable
       ExpandedRow={QueueTableExpandedRow}
-      isLoading={isLoading}
       isValidating={isValidating}
       queueEntries={filteredQueueEntries ?? []}
       queueUuid={null}
       statusUuid={null}
       tableFilters={
         <>
-          <ClearQueueEntries queueEntries={filteredQueueEntries} />
+          {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
           <StatusDropdownFilter />
           <TableToolbarSearch
             className={styles.search}
