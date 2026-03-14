@@ -198,9 +198,19 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 <TableBatchActions
                   shouldShowBatchActions={selectedAppointmentUuids.size > 0}
                   totalSelected={selectedAppointmentUuids.size}
-                  // TODO: add translation for Carbon's table batch actions
+                  onCancel={() => setSelectedAppointmentUuids(new Set())}
+                  translateWithId={(id) => {
+                    if (id === 'carbon.table.batch.cancel') {
+                      return t('cancel', 'Cancel');
+                    }
+                    if (id === 'carbon.table.batch.items.selected') {
+                      return t('itemsSelected', 'items selected');
+                    }
+                    if (id === 'carbon.table.batch.item.selected') {
+                      return t('itemSelected', 'item selected');
+                    }
+                  }}>
                   // https://openmrs.atlassian.net/browse/O3-5409
-                  onCancel={() => setSelectedAppointmentUuids(new Set())}>
                   <TableBatchAction
                     renderIcon={Calendar}
                     onClick={() => {
