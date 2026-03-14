@@ -1,0 +1,144 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.weeklyCalendarContainer {
+  margin: layout.$spacing-05;
+}
+
+.weeklyHeader {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-04;
+}
+
+.weekLabel {
+  @include type.type-style('heading-02');
+  flex: 1;
+  text-align: center;
+}
+
+.weeklyGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid colors.$gray-20;
+  border-left: 1px solid colors.$gray-20;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid colors.$gray-20;
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: layout.$spacing-03 layout.$spacing-02;
+  background-color: colors.$gray-10;
+  border-bottom: 1px solid colors.$gray-20;
+  gap: layout.$spacing-01;
+}
+
+.dayName {
+  @include type.type-style('label-02');
+  color: colors.$gray-60;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.dayDate {
+  @include type.type-style('heading-04');
+  color: colors.$gray-100;
+}
+
+.dayCell {
+  flex: 1;
+  min-height: 8rem;
+  padding: layout.$spacing-03;
+  cursor: pointer;
+  background: colors.$white;
+  border-bottom: 1px solid colors.$gray-20;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+
+  &.today {
+    .dayDate {
+      color: colors.$blue-60;
+      font-weight: 700;
+    }
+    background-color: colors.$blue-10;
+  }
+
+  &.selected {
+    outline: 2px solid colors.$blue-60;
+    outline-offset: -2px;
+  }
+}
+
+.totalCount {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  margin-bottom: layout.$spacing-02;
+  @include type.type-style('label-02');
+  color: colors.$gray-60;
+}
+
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+}
+
+.serviceRow {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  @include type.type-style('label-01');
+  color: colors.$gray-100;
+  padding: layout.$spacing-01;
+  border-radius: 2px;
+  background: colors.$gray-10;
+}
+
+.serviceName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.serviceCount {
+  text-align: right;
+  font-weight: 600;
+}
+
+.emptyCell {
+  @include type.type-style('label-01');
+  color: colors.$gray-40;
+  font-style: italic;
+}
+
+.modalTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: layout.$spacing-04;
+
+  th,
+  td {
+    text-align: left;
+    padding: layout.$spacing-03;
+    border-bottom: 1px solid colors.$gray-20;
+    @include type.type-style('body-compact-01');
+  }
+
+  th {
+    @include type.type-style('label-02');
+    font-weight: 600;
+    background: colors.$gray-10;
+  }
+}

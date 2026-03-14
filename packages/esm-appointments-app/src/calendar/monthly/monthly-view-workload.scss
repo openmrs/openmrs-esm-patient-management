@@ -182,3 +182,23 @@
   outline: none;
   cursor: pointer;
 }
+
+.modalTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: layout.$spacing-04;
+
+  th,
+  td {
+    text-align: left;
+    padding: layout.$spacing-03 layout.$spacing-04;
+    border-bottom: 1px solid colors.$gray-20;
+    @include type.type-style('body-compact-01');
+  }
+
+  th {
+    @include type.type-style('label-02');
+    font-weight: 600;
+    background: colors.$gray-10;
+  }
+}

@@ -1,0 +1,103 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.dailyContainer {
+  margin: layout.$spacing-05;
+}
+
+.dailyHeader {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-06;
+}
+
+.dateDisplay {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: layout.$spacing-01;
+}
+
+.dayName {
+  @include type.type-style('heading-04');
+  color: colors.$gray-100;
+}
+
+.fullDate {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-60;
+}
+
+.todayBadge {
+  @include type.type-style('label-01');
+  background-color: colors.$blue-60;
+  color: colors.$white;
+  border-radius: 1rem;
+  padding: layout.$spacing-01 layout.$spacing-03;
+  font-weight: 600;
+}
+
+.dailyBody {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.summaryCard {
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  border-radius: 4px;
+  padding: layout.$spacing-05;
+}
+
+.summaryHeader {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-05;
+  padding-bottom: layout.$spacing-04;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.totalLabel {
+  @include type.type-style('heading-02');
+  color: colors.$gray-100;
+}
+
+.serviceTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: layout.$spacing-03 layout.$spacing-04;
+    border-bottom: 1px solid colors.$gray-20;
+    @include type.type-style('body-compact-01');
+  }
+
+  th {
+    @include type.type-style('label-02');
+    font-weight: 600;
+    background: colors.$gray-10;
+  }
+}
+
+.serviceRow {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: colors.$blue-10;
+  }
+}
+
+.noData {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-60;
+  font-style: italic;
+  padding: layout.$spacing-05 0;
+}

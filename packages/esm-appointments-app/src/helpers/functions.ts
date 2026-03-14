@@ -41,6 +41,11 @@ export const monthDays = (currentDate: Dayjs) => {
   return days;
 };
 
+export const weekDays = (currentDate: Dayjs): Dayjs[] => {
+  const startOfWeek = dayjs(currentDate).startOf('week');
+  return Array.from({ length: 7 }, (_, i) => startOfWeek.add(i, 'day'));
+};
+
 export const getGender = (gender: string | undefined, t: TFunction<'translation', undefined>): string => {
   switch (gender) {
     case 'M':

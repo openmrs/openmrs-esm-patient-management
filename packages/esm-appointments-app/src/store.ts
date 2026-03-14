@@ -1,9 +1,12 @@
 import { type Actions, createGlobalStore, useStoreWithActions } from '@openmrs/esm-framework';
 import { type AppointmentStatus } from './types';
 
+export type CalendarView = 'monthly' | 'weekly' | 'daily';
+
 interface AppointmentsStore {
   appointmentServiceTypes: Array<string>;
   selectedAppointmentStatuses: Array<AppointmentStatus>;
+  calendarView: CalendarView;
 }
 
 export const appointmentsStore = createGlobalStore<AppointmentsStore>(
@@ -11,6 +14,7 @@ export const appointmentsStore = createGlobalStore<AppointmentsStore>(
   {
     appointmentServiceTypes: [],
     selectedAppointmentStatuses: [],
+    calendarView: 'monthly',
   },
   'sessionStorage',
 );
@@ -21,6 +25,9 @@ export const storeActions = {
   },
   setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Array<AppointmentStatus>) {
     return { selectedAppointmentStatuses };
+  },
+  setCalendarView(_, calendarView: CalendarView) {
+    return { calendarView };
   },
 } satisfies Actions<AppointmentsStore>;
 
