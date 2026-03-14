@@ -21,7 +21,7 @@ import { postQueueEntry } from './queue-fields.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, QUEUE_ENTRY_ERROR_CODE_DUPLICATE } from '../../constants';
+import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
 import { useServiceQueuesStore } from '../../store/store';
 
 export interface QueueFieldsProps {
@@ -125,7 +125,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           const errorMessage = error?.responseBody?.error?.message || error?.message || '';
           const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
           const globalErrors = error?.responseBody?.error?.globalErrors;
-          if (globalErrors?.find((error) => error.code === QUEUE_ENTRY_ERROR_CODE_DUPLICATE)) {
+          if (globalErrors?.find((error) => error.code === DUPLICATE_QUEUE_ENTRY_ERROR_CODE)) {
             showSnackbar({
               title: t('patientAlreadyInQueue', 'Patient already in queue'),
               kind: 'warning',
