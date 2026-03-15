@@ -3,16 +3,22 @@ import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import { useAppointmentsStore } from '../store';
+import { useRef, useEffect } from 'react';
 
 export function usePatientAppointmentHistory(patientUuid: string) {
-  const abortController = new AbortController();
+  const abortControllerRef = useRef(new AbortController());
+
+  useEffect(() => {
+    const controller = abortControllerRef.current;
+    return () => controller.abort();
+  }, []);
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const { selectedDate } = useAppointmentsStore();
 
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
-      signal: abortController.signal,
+      signal: abortControllerRef.current.signal,
       headers: {
         'Content-Type': 'application/json',
       },

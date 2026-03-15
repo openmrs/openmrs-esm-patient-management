@@ -4,6 +4,7 @@ import { type Appointment, type AppointmentsFetchResponse } from '../types/index
 import { type Provider } from '../types';
 import { startOfDay } from '../constants';
 import dayjs from 'dayjs';
+import { useRef, useEffect } from 'react';
 
 export function useAppointments() {
   const apiUrl = `${restBaseUrl}/appointment/all?forDate=${startOfDay}`;
@@ -47,13 +48,18 @@ export function useProviders() {
 }
 
 export function usePatientAppointments(patientUuid: string, startDate) {
-  const abortController = new AbortController();
+  const abortControllerRef = useRef(new AbortController());
+
+  useEffect(() => {
+    const controller = abortControllerRef.current;
+    return () => controller.abort();
+  }, []);
 
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
-      signal: abortController.signal,
+      signal: abortControllerRef.current.signal,
       headers: {
         'Content-Type': 'application/json',
       },

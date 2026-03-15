@@ -3,18 +3,24 @@ import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import { useAppointmentsStore } from '../store';
+import { useRef, useEffect } from 'react';
 
 export const useAppointmentList = (appointmentStatus: string, date?: string) => {
   const { selectedDate } = useAppointmentsStore();
   const startDate = date ? date : selectedDate;
   const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
   const searchUrl = `${restBaseUrl}/appointments/search`;
-  const abortController = new AbortController();
+  const abortControllerRef = useRef(new AbortController());
+
+  useEffect(() => {
+    const controller = abortControllerRef.current;
+    return () => controller.abort();
+  }, []);
 
   const fetcher = ([url, startDate, endDate, status]) =>
     openmrsFetch(url, {
       method: 'POST',
-      signal: abortController.signal,
+      signal: abortControllerRef.current.signal,
       headers: {
         'Content-Type': 'application/json',
       },
