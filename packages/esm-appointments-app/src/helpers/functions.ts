@@ -1,7 +1,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
 import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type AppointmentSummary, type AppointmentCountMap, AppointmentStatus } from '../types';
+import { type AppointmentCountMap, AppointmentStatus, type AppointmentSummary } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
 
 interface FlattenedAppointmentSummary {
@@ -144,4 +144,10 @@ export const canTransition = (fromStatus: AppointmentStatus, toStatus: Appointme
   };
 
   return sequences[fromStatus] < sequences[toStatus] || toStatus === AppointmentStatus.SCHEDULED;
+};
+
+// Returns the 7 days of the week containing the given date (Sun → Sat)
+export const getWeekDays = (date: Dayjs): Dayjs[] => {
+  const start = date.startOf('week');
+  return Array.from({ length: 7 }, (_, i) => start.add(i, 'day'));
 };
