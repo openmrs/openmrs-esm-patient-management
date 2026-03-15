@@ -145,8 +145,8 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
             {appointments.map((appointment) => (
               <li key={appointment.patient.uuid}>
                 <Trans i18nKey="appointmentDisplay">
-                  <strong>{{ patientName: appointment.patient.name } as any}</strong> -{' '}
-                  {{ serviceName: appointment.service.name } as any} - {{ currentStatus: appointment.status } as any}
+                  <strong>{{ patientName: appointment.patient.name } as unknown as React.ReactNode}</strong> -{' '}
+                  {{ serviceName: appointment.service.name }} - {{ currentStatus: appointment.status }}
                 </Trans>
               </li>
             ))}
