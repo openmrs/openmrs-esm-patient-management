@@ -10,15 +10,14 @@ export const useAppointmentList = (appointmentStatus: string, date?: string) => 
   const startDate = date ? date : selectedDate;
   const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
   const searchUrl = `${restBaseUrl}/appointments/search`;
-  const abortControllerRef = useRef(new AbortController());
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    const controller = abortControllerRef.current;
-    return () => controller.abort();
-  }, []);
-
-  const fetcher = ([url, startDate, endDate, status]) =>
-    openmrsFetch(url, {
+  const fetcher = ([url, startDate, endDate, status]) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    return openmrsFetch(url, {
       method: 'POST',
       signal: abortControllerRef.current.signal,
       headers: {
@@ -30,12 +29,19 @@ export const useAppointmentList = (appointmentStatus: string, date?: string) => 
         status: status,
       },
     });
+  };
 
   const { data, error, isLoading, mutate } = useSWR<AppointmentsFetchResponse, Error>(
     [searchUrl, startDate, endDate, appointmentStatus],
     fetcher,
     { errorRetryCount: 2 },
   );
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   return { appointmentList: data?.data ?? [], isLoading, error, mutate };
 };

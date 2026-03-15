@@ -6,27 +6,30 @@ import { useAppointmentsStore } from '../store';
 import { useRef, useEffect } from 'react';
 
 export function usePatientAppointmentHistory(patientUuid: string) {
-  const abortControllerRef = useRef(new AbortController());
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    const controller = abortControllerRef.current;
-    return () => controller.abort();
-  }, []);
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const { selectedDate } = useAppointmentsStore();
 
-  const fetcher = () =>
-    openmrsFetch(appointmentsSearchUrl, {
+  const fetcher = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+
+    return openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
       signal: abortControllerRef.current.signal,
       headers: {
         'Content-Type': 'application/json',
       },
       body: {
-        patientUuid: patientUuid,
+        patientUuid,
         startDate: selectedDate,
       },
     });
+  };
 
   const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
     patientUuid ? appointmentsSearchUrl : null,
@@ -46,6 +49,11 @@ export function usePatientAppointmentHistory(patientUuid: string) {
     ? data.data?.filter((appointment: any) => dayjs((appointment.startDateTime / 1000) * 1000).isAfter(dayjs())).length
     : 0;
 
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
   return {
     appointmentsCount: { missedAppointments, completedAppointments, cancelledAppointments, upcomingAppointments },
     error,
