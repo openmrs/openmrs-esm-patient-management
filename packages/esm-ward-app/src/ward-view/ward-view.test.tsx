@@ -7,6 +7,7 @@ import { mockWardPatientGroupDetails, mockWardViewContext } from '../../mock';
 import { renderWithSwr } from 'tools';
 import { type WardViewContext } from '../types';
 import { useObs } from '../hooks/useObs';
+import useEmrConfiguration from '../hooks/useEmrConfiguration';
 import useWardLocation from '../hooks/useWardLocation';
 import DefaultWardView from './default-ward/default-ward-view.component';
 import WardView from './ward-view.component';
@@ -16,6 +17,9 @@ const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
 const mockUseWardLocation = jest.mocked(useWardLocation);
 const mockUseParams = jest.mocked(useParams);
 
+jest.mock('../hooks/useEmrConfiguration', () => jest.fn());
+const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: jest.fn().mockReturnValue({}),
@@ -23,7 +27,11 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('../hooks/useWardLocation', () =>
   jest.fn().mockReturnValue({
-    location: { uuid: 'abcd', display: 'mock location' },
+    location: {
+      uuid: 'abcd',
+      display: 'mock location',
+      tags: [{ uuid: 'admission-location-tag-uuid', display: 'Admission Location', name: 'Admission Location' }],
+    },
     isLoadingLocation: false,
     errorFetchingLocation: null,
     invalidLocation: false,
@@ -50,6 +58,19 @@ window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverM
 beforeEach(() => {
   const config = getDefaultsFromConfigSchema<WardConfigObject>(configSchema);
   mockUseConfig.mockReturnValue(config);
+  mockUseEmrConfiguration.mockReturnValue({
+    isLoadingEmrConfiguration: false,
+    errorFetchingEmrConfiguration: null,
+    // @ts-ignore - we only need these keys for now
+    emrConfiguration: {
+      supportsAdmissionLocationTag: {
+        uuid: 'admission-location-tag-uuid',
+        display: 'Admission Location',
+        name: 'Admission Location',
+      },
+    },
+    mutateEmrConfiguration: jest.fn(),
+  });
 });
 
 describe('WardView', () => {
@@ -121,6 +142,40 @@ describe('WardView', () => {
     renderWithSwr(<WardView />);
     const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
     expect(noBedsConfiguredForThisLocation).not.toBeInTheDocument();
+  });
+
+  it('renders a message when location is not an admission location', () => {
+    mockUseWardLocation.mockReturnValueOnce({
+      location: {
+        uuid: 'non-admission-uuid',
+        display: 'Pharmacy',
+        tags: [{ uuid: 'some-other-tag-uuid', display: 'Login Location', name: 'Login Location' }],
+      },
+      isLoadingLocation: false,
+      errorFetchingLocation: null,
+      invalidLocation: false,
+    });
+
+    renderWithSwr(<WardView />);
+    expect(screen.getByText('Pharmacy')).toBeInTheDocument();
+    expect(screen.getByText('This location does not allow admissions')).toBeInTheDocument();
+  });
+
+  it('renders a message when location has no tags', () => {
+    mockUseWardLocation.mockReturnValueOnce({
+      location: {
+        uuid: 'no-tags-uuid',
+        display: 'Lab',
+        tags: [],
+      },
+      isLoadingLocation: false,
+      errorFetchingLocation: null,
+      invalidLocation: false,
+    });
+
+    renderWithSwr(<WardView />);
+    expect(screen.getByText('Lab')).toBeInTheDocument();
+    expect(screen.getByText('This location does not allow admissions')).toBeInTheDocument();
   });
 
   afterEach(() => {
