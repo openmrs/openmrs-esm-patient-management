@@ -79,23 +79,6 @@ export async function getPatientLocationFromIdentifiers(
   }
 }
 
-/**
- * Checks if a patient's location matches a target location.
- * Returns true if the patient has at least one identifier whose location matches the target.
- *
- * @param patientUuid - The UUID of the patient
- * @param targetLocationUuid - The UUID of the target location to check against
- * @returns true if patient's location matches target, false otherwise
- */
-export async function doesPatientLocationMatchTarget(
-  patientUuid: string,
-  targetLocationUuid: string,
-  ac = new AbortController(),
-): Promise<boolean> {
-  const patientLocation = await getPatientLocationFromIdentifiers(patientUuid, ac);
-  return patientLocation?.uuid === targetLocationUuid;
-}
-
 async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
     signal: ac.signal,
