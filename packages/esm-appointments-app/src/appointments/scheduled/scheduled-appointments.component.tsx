@@ -175,11 +175,11 @@ function ExtensionWrapper({
     return null;
   }
 
+  if (currentTab !== extension.name) {
+    return null;
+  }
   return (
-    <div
-      key={extension.name}
-      className={styles.container}
-      style={{ display: currentTab === extension.name ? 'block' : 'none' }}>
+    <div key={extension.name} className={styles.container}>
       <Extension
         state={{
           date,
