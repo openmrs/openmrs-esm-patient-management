@@ -145,7 +145,7 @@ function QueueTable({
                           </TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && row.isExpanded ? (
+                      {ExpandedRow && row.isExpanded && paginatedQueueEntries[i] ? (
                         <TableExpandedRow
                           className={styles.expandedActiveVisitRow}
                           colSpan={headers.length + 2}

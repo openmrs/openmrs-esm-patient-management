@@ -53,19 +53,23 @@ function getNextUrlFromResponse(data: QueueEntryResponse) {
 
 export function useMutateQueueEntries() {
   const { mutate } = useSWRConfig();
+  const mutateQueueEntries = useCallback(() => {
+    return mutate((key) => {
+      return (
+        typeof key === 'string' &&
+        (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
+      );
+    }).then(() => {
+      window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+    });
+  }, [mutate]);
 
-  return {
-    mutateQueueEntries: () => {
-      return mutate((key) => {
-        return (
-          typeof key === 'string' &&
-          (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
-        );
-      }).then(() => {
-        window.dispatchEvent(new CustomEvent('queue-entry-updated'));
-      });
-    },
-  };
+  return useMemo(
+    () => ({
+      mutateQueueEntries,
+    }),
+    [mutateQueueEntries],
+  );
 }
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
@@ -87,7 +91,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
   const [error, setError] = useState<Error | undefined>(undefined);
   const [pageUrl, setPageUrl] = useState(getInitialUrl(currentRep, currentSearchCriteria));
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount, setTotalCount] = useState<number>();
   const [waitingForMutate, setWaitingForMutate] = useState(false);
 
   const refetchAllData = useCallback(
@@ -158,10 +162,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   }, [pageData, data, currentPage, totalCount, waitingForMutate, isValidating]);
 
   useEffect(() => {
-    // An error to one is an error to all
-    if (pageError) {
-      setError(pageError);
-    }
+    setError(pageError);
   }, [pageError]);
 
   const queueUpdateListener = useCallback(() => {
@@ -180,7 +181,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   return {
     queueEntries,
     totalCount,
-    isLoading: totalCount === undefined || (totalCount && queueEntries.length < totalCount),
+    isLoading: !error && (totalCount === undefined || (totalCount && queueEntries.length < totalCount)),
     isValidating: isValidating || currentPage < data.length,
     error,
     mutate: mutateQueueEntries,

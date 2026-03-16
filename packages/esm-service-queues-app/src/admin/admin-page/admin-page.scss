@@ -23,7 +23,7 @@
   margin-bottom: layout.$spacing-05;
   border-bottom: 1px solid $ui-03;
 
-  h3 {
+  h2 {
     @include type.type-style('heading-compact-02');
     margin: 0;
     color: var(--cds-text-primary);

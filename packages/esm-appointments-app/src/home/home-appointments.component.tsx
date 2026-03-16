@@ -13,7 +13,6 @@ const HomeAppointments = () => {
       <AppointmentsList
         date={toOmrsIsoString(dayjs().startOf('day').toDate())}
         excludeCancelledAppointments
-        title={t('todays', "Today's")}
       />
     </div>
   );
