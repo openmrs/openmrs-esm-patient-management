@@ -6,13 +6,19 @@ import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import { useAppointmentsStore } from '../../store';
+import type { CalendarViewMode } from '../appointments-calendar-view.component';
 import styles from './calendar-header.scss';
 
-const CalendarHeader: React.FC = () => {
+interface CalendarHeaderProps {
+  viewMode: CalendarViewMode;
+  onViewModeChange: (mode: CalendarViewMode) => void;
+}
+
+const CalendarHeader: React.FC<CalendarHeaderProps> = ({ viewMode, onViewModeChange }) => {
   const { t } = useTranslation();
   const { selectedDate } = useAppointmentsStore();
 
-  const handleClick = () => {
+  const handleBackClick = () => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });
   };
 
@@ -23,11 +29,31 @@ const CalendarHeader: React.FC = () => {
           className={styles.backButton}
           iconDescription={t('back', 'Back')}
           kind="ghost"
-          onClick={handleClick}
+          onClick={handleBackClick}
           renderIcon={ArrowLeft}
           size="lg">
           <span>{t('back', 'Back')}</span>
         </Button>
+        <div className={styles.viewSwitcher}>
+          <Button
+            kind={viewMode === 'monthly' ? 'primary' : 'tertiary'}
+            size="sm"
+            onClick={() => onViewModeChange('monthly')}>
+            {t('month', 'Month')}
+          </Button>
+          <Button
+            kind={viewMode === 'weekly' ? 'primary' : 'tertiary'}
+            size="sm"
+            onClick={() => onViewModeChange('weekly')}>
+            {t('week', 'Week')}
+          </Button>
+          <Button
+            kind={viewMode === 'daily' ? 'primary' : 'tertiary'}
+            size="sm"
+            onClick={() => onViewModeChange('daily')}>
+            {t('day', 'Day')}
+          </Button>
+        </div>
       </div>
     </div>
   );

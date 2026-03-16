@@ -12,9 +12,10 @@ dayjs.extend(isBetween);
 
 interface MonthlyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;
+  onDayClick?: (date: string, serviceUuid?: string) => void;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events }) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, onDayClick }) => {
   const { selectedDate } = useAppointmentsStore();
 
   return (
@@ -23,7 +24,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events }) => 
       <div className={styles.wrapper}>
         <div className={styles.monthlyCalendar}>
           {monthDays(dayjs(selectedDate)).map((dateTime, i) => (
-            <MonthlyViewWorkload key={i} dateTime={dateTime} events={events} />
+            <MonthlyViewWorkload key={i} dateTime={dateTime} events={events} onDayClick={onDayClick} />
           ))}
         </div>
       </div>

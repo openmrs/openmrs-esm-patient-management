@@ -2,8 +2,7 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { spaHomePage } from '../../constants';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { useAppointmentsStore } from '../../store';
@@ -14,9 +13,15 @@ export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
   showAllServices?: boolean;
+  onDayClick?: (date: string, serviceUuid?: string) => void;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
+  dateTime,
+  events,
+  showAllServices = false,
+  onDayClick,
+}) => {
   const layout = useLayoutType();
   const { selectedDate } = useAppointmentsStore();
 
@@ -44,13 +49,16 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     return false;
   }, [currentData?.services, layout, showAllServices]);
 
-  const navigateToAppointmentsByDate = (serviceUuid: string) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
+  const handleDayOrServiceClick = (serviceUuid?: string) => {
+    const dateStr = dayjs(dateTime).format('YYYY-MM-DD');
+    if (onDayClick) {
+      onDayClick(dateStr, serviceUuid);
+    }
   };
 
   return (
     <div
-      onClick={() => navigateToAppointmentsByDate('')}
+      onClick={() => handleDayOrServiceClick()}
       className={classNames(
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
@@ -82,7 +90,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigateToAppointmentsByDate(serviceUuid);
+                    handleDayOrServiceClick(serviceUuid);
                   }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>
@@ -94,6 +102,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
                   events={events}
                   dateTime={dateTime}
+                  onDayClick={onDayClick}
                 />
               ) : (
                 ''
