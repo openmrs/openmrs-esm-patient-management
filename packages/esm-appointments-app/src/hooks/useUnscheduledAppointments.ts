@@ -4,6 +4,16 @@ import { type Identifier } from '../types';
 import { configSchema } from '../config-schema';
 import { useAppointmentsStore } from '../store';
 
+export interface MappedUnscheduledAppointment {
+  name: string;
+  identifier: string;
+  dateTime: Date;
+  gender: string;
+  phoneNumber: string;
+  age: number;
+  uuid: string;
+}
+
 interface UnscheduledAppointment {
   age: number;
   dob: number;

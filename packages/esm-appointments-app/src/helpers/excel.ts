@@ -3,6 +3,7 @@ import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framewo
 import { type Appointment } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
+import { type MappedUnscheduledAppointment } from '../hooks/useUnscheduledAppointments';
 
 type RowData = {
   id: string; // Corresponds to the UUID of an appointment
@@ -57,7 +58,7 @@ Exports unscheduled appointments as an Excel spreadsheet.
 @param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
 */
 export function exportUnscheduledAppointmentsToSpreadsheet(
-  unscheduledAppointments: Array<any>,
+  unscheduledAppointments: Array<MappedUnscheduledAppointment>,
   fileName: string = `Unscheduled appointments ${formatDate(new Date(), { year: true, time: true })}`,
 ) {
   const appointmentsJSON = unscheduledAppointments?.map((appointment) => ({
@@ -76,8 +77,8 @@ export function exportUnscheduledAppointmentsToSpreadsheet(
   });
 }
 
-function createWorksheet(data: any[]) {
-  const max_width = data.reduce((w, r) => Math.max(w, r['Patient name'].length), 30);
+function createWorksheet(data: Array<Record<string, string | number>>) {
+  const max_width = data.reduce((w, r) => Math.max(w, (r['Patient name'] as string).length), 30);
   const worksheet = utils.json_to_sheet(data);
   worksheet['!cols'] = [{ wch: max_width }];
   return worksheet;
