@@ -333,78 +333,81 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
-    // Construct appointment payload
-    const appointmentPayload = constructAppointmentPayload(data);
+    try {
+      // Construct appointment payload
+      const appointmentPayload = constructAppointmentPayload(data);
 
-    // Check if a duplicate response occurs
-    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
-    let errorMessage = t('appointmentConflict', 'Appointment conflict');
-    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
-      errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
-    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
-    }
+      // Check if a duplicate response occurs
+      const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+      let errorMessage = t('appointmentConflict', 'Appointment conflict');
 
-    if (response.status === 200 && errorMessage) {
-      setIsSubmitting(false);
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'error',
-        title: errorMessage,
-      });
-      return;
-    }
+      if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+        errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
+      } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+        errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+      }
 
-    // Construct recurring pattern payload
-    const recurringAppointmentPayload = {
-      appointmentRequest: appointmentPayload,
-      recurringPattern: constructRecurringPattern(data),
-    };
+      if (response.status === 200 && errorMessage) {
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'error',
+          title: errorMessage,
+        });
+        return; // finally block will still run and set isSubmitting to false
+      }
 
-    const abortController = new AbortController();
+      // Construct recurring pattern payload
+      const recurringAppointmentPayload = {
+        appointmentRequest: appointmentPayload,
+        recurringPattern: constructRecurringPattern(data),
+      };
 
-    (isRecurringAppointment
-      ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
-      : saveAppointment(appointmentPayload, abortController)
-    ).then(
-      ({ status }) => {
-        if (status === 200) {
-          setIsSubmitting(false);
-          setIsSuccessful(true);
-          mutateAppointments();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title: isEditing
-              ? t('appointmentEdited', 'Appointment edited')
-              : t('appointmentScheduled', 'Appointment scheduled'),
-          });
-        }
-        if (status === 204) {
-          setIsSubmitting(false);
-          showSnackbar({
-            title: isEditing
-              ? t('appointmentEditError', 'Error editing appointment')
-              : t('appointmentFormError', 'Error scheduling appointment'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: t('noContent', 'No Content'),
-          });
-        }
-      },
-      (error) => {
-        setIsSubmitting(false);
+      const abortController = new AbortController();
+
+      // Convert the .then() chain into a clean await so 'finally' fires at the correct time
+      const saveResponse = await (isRecurringAppointment
+        ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
+        : saveAppointment(appointmentPayload, abortController));
+
+      const { status } = saveResponse;
+
+      if (status === 200) {
+        setIsSuccessful(true);
+        mutateAppointments();
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
+          title: isEditing
+            ? t('appointmentEdited', 'Appointment edited')
+            : t('appointmentScheduled', 'Appointment scheduled'),
+        });
+      }
+
+      if (status === 204) {
         showSnackbar({
           title: isEditing
             ? t('appointmentEditError', 'Error editing appointment')
             : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           isLowContrast: false,
-          subtitle: error?.message,
+          subtitle: t('noContent', 'No Content'),
         });
-      },
-    );
+      }
+    } catch (error: any) {
+      // Catches errors from BOTH checkAppointmentConflict and saveAppointment
+      showSnackbar({
+        title: isEditing
+          ? t('appointmentEditError', 'Error editing appointment')
+          : t('appointmentFormError', 'Error scheduling appointment'),
+        kind: 'error',
+        isLowContrast: false,
+        subtitle: error?.message,
+      });
+    } finally {
+      // Guarantees the button is re-enabled regardless of success, early returns, or thrown errors
+      setIsSubmitting(false);
+    }
   };
 
   const constructAppointmentPayload = (data: AppointmentFormData): AppointmentPayload => {
