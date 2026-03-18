@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionMenuButton2, AddIcon, ShoppingCartIcon } from '@openmrs/esm-framework';
+import { ActionMenuButton2, AddIcon, ShoppingCartIcon, usePatient } from '@openmrs/esm-framework';
 import { type WardPatientWorkspaceDefinition } from '../types';
 
 /**
@@ -8,6 +8,7 @@ import { type WardPatientWorkspaceDefinition } from '../types';
  */
 function WardPatientOrderBasketActionButton({ groupProps: { wardPatient } }: WardPatientWorkspaceDefinition) {
   const { t } = useTranslation();
+  const { patient: fhirPatient } = usePatient(wardPatient.patient.uuid);
 
   return (
     <ActionMenuButton2
@@ -17,7 +18,7 @@ function WardPatientOrderBasketActionButton({ groupProps: { wardPatient } }: War
         workspaceName: 'ward-patient-order-basket-workspace',
         windowProps: {
           patientUuid: wardPatient.patient.uuid,
-          patient: wardPatient.patient,
+          patient: fhirPatient,
           visitContext: wardPatient.visit,
           drugOrderWorkspaceName: 'ward-patient-order-basket-add-drug-order-workspace',
           labOrderWorkspaceName: 'ward-patient-order-basket-add-lab-order-workspace',
