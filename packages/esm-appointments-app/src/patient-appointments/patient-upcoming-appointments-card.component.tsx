@@ -14,7 +14,7 @@ import {
 import { ErrorCard, formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 import { type Appointment } from '../types';
-import { useMutateAppointments } from '../form/appointments-form.resource';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import styles from './patient-upcoming-appointments-card.scss';
 
 interface VisitFormCallbacks {
@@ -47,7 +47,6 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment>(null);
   const { mutateAppointments } = useMutateAppointments();
-  const memoMutateAppointments = useMemo(() => mutateAppointments, [mutateAppointments]);
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
@@ -59,7 +58,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
         if (selectedAppointment) {
           return changeAppointmentStatus('CheckedIn', selectedAppointment.uuid)
             .then(() => {
-              memoMutateAppointments();
+              mutateAppointments();
               showSnackbar({
                 isLowContrast: true,
                 kind: 'success',
@@ -80,7 +79,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
         }
       },
     }),
-    [selectedAppointment, memoMutateAppointments, t],
+    [selectedAppointment, mutateAppointments, t],
   );
 
   useEffect(() => {

@@ -19,6 +19,9 @@ interface UnscheduledAppointment {
   };
 }
 
+/**
+ * This is a non-standard API that does not come with the appointments module by default
+ */
 export function useUnscheduledAppointments() {
   const { selectedDate } = useAppointmentsStore();
   // TODO/NOTE: this endpoint is not implemented in main Bahmni Appointments backend

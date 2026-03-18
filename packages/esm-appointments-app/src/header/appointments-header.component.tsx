@@ -5,7 +5,7 @@ import { MultiSelect } from '@carbon/react';
 import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import { useAppointmentsStore, setSelectedDate, setAppointmentServiceTypes } from '../store';
+import { useAppointmentsStore } from '../store';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
@@ -15,13 +15,16 @@ interface AppointmentHeaderProps {
 
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter }) => {
   const { t } = useTranslation();
-  const { selectedDate, appointmentServiceTypes } = useAppointmentsStore();
+  const { selectedDate, appointmentServiceTypes, setAppointmentServiceTypes, setSelectedDate } = useAppointmentsStore();
   const { serviceTypes } = useAppointmentServices();
 
-  const handleChangeServiceTypeFilter = useCallback(({ selectedItems }) => {
-    const selectedUuids = selectedItems.map((item) => item.id);
-    setAppointmentServiceTypes(selectedUuids);
-  }, []);
+  const handleChangeServiceTypeFilter = useCallback(
+    ({ selectedItems }) => {
+      const selectedUuids = selectedItems.map((item) => item.id);
+      setAppointmentServiceTypes(selectedUuids);
+    },
+    [setAppointmentServiceTypes],
+  );
 
   const serviceTypeOptions = useMemo(
     () => serviceTypes?.map((item) => ({ id: item.uuid, label: item.name })) ?? [],

@@ -7,11 +7,11 @@ import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
-import { useAppointmentsStore, setSelectedDate } from '../store';
+import { useAppointmentsStore } from '../store';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
+  const { selectedDate, setSelectedDate } = useAppointmentsStore();
   const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
 
   let params = useParams();
@@ -20,7 +20,7 @@ const AppointmentsCalendarView: React.FC = () => {
     if (params.date) {
       setSelectedDate(dayjs(params.date).startOf('day').format(omrsDateFormat));
     }
-  }, [params.date]);
+  }, [params.date, setSelectedDate]);
 
   return (
     <div data-testid="appointments-calendar">
