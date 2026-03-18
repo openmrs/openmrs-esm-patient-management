@@ -21,7 +21,7 @@ const OccupiedBed: React.FC<WardBedProps> = ({ patientCards, isLoadingDivider })
     if (index == 0) {
       return [patientCard];
     } else {
-      return [<BedShareDivider key={'divider-' + index} isLoading={isLoadingDivider} />, patientCard];
+      return [<BedShareDivider key={`divider-${index}`} isLoading={isLoadingDivider} />, patientCard];
     }
   });
 

@@ -17,7 +17,7 @@ const QueueStatus: React.FC<QueueStatusProps> = ({ status, queue, statusConfigs 
       <StatusIcon statusConfig={statusConfig} />
       <span>
         {status.display}
-        {queue ? ' - ' + queue.display : ''}
+        {queue ? ` - ${queue.display}` : ''}
       </span>
     </span>
   );
