@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import MetricsCard from './metrics-card.component';
 import MetricsErrorCard from './metrics-error-card.component';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { useAppointmentsStore } from '../../store';
 import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 export default function HighestVolumeServiceExtension() {
   const { t } = useTranslation();
   const { appointmentForSelectedDateFilteredByServiceTypes, error } = useAppointmentsAppContext();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
   const highestServiceLoad = useMemo(() => {
