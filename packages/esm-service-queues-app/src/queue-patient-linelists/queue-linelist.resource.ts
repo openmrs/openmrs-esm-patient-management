@@ -4,6 +4,7 @@ import { type Appointment, type AppointmentsFetchResponse } from '../types/index
 import { type Provider } from '../types';
 import { startOfDay } from '../constants';
 import dayjs from 'dayjs';
+import { useRef, useEffect } from 'react';
 
 export function useAppointments() {
   const apiUrl = `${restBaseUrl}/appointment/all?forDate=${startOfDay}`;
@@ -47,21 +48,28 @@ export function useProviders() {
 }
 
 export function usePatientAppointments(patientUuid: string, startDate) {
-  const abortController = new AbortController();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
-  const fetcher = () =>
-    openmrsFetch(appointmentsSearchUrl, {
+  const fetcher = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+
+    return openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
-      signal: abortController.signal,
+      signal: abortControllerRef.current.signal,
       headers: {
         'Content-Type': 'application/json',
       },
       body: {
-        patientUuid: patientUuid,
-        startDate: startDate,
+        patientUuid,
+        startDate,
       },
     });
+  };
 
   const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
     appointmentsSearchUrl,
@@ -74,6 +82,12 @@ export function usePatientAppointments(patientUuid: string, startDate) {
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
     ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()));
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   return {
     upcomingAppointment: upcomingAppointments ? upcomingAppointments?.[0] : null,

@@ -3,18 +3,23 @@ import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import { useAppointmentsStore } from '../store';
+import { useRef, useEffect } from 'react';
 
 export const useAppointmentList = (appointmentStatus: string, date?: string) => {
   const { selectedDate } = useAppointmentsStore();
   const startDate = date ? date : selectedDate;
   const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
   const searchUrl = `${restBaseUrl}/appointments/search`;
-  const abortController = new AbortController();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetcher = ([url, startDate, endDate, status]) =>
-    openmrsFetch(url, {
+  const fetcher = ([url, startDate, endDate, status]) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    return openmrsFetch(url, {
       method: 'POST',
-      signal: abortController.signal,
+      signal: abortControllerRef.current.signal,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -24,12 +29,19 @@ export const useAppointmentList = (appointmentStatus: string, date?: string) => 
         status: status,
       },
     });
+  };
 
   const { data, error, isLoading, mutate } = useSWR<AppointmentsFetchResponse, Error>(
     [searchUrl, startDate, endDate, appointmentStatus],
     fetcher,
     { errorRetryCount: 2 },
   );
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   return { appointmentList: data?.data ?? [], isLoading, error, mutate };
 };
