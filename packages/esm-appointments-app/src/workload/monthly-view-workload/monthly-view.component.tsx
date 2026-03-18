@@ -3,10 +3,10 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@openmrs/esm-framework';
 import { monthDays } from '../../helpers';
-import { useAppointmentsStore } from '../../store';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 interface MonthlyCalendarViewProps {
   calendarWorkload: Array<{ count: number; date: string }>;
@@ -20,7 +20,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   onDateClick,
 }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
   const daysInWeeks = daysInWeek.map((day) => t(day));

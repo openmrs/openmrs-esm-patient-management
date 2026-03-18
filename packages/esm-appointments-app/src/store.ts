@@ -1,56 +1,29 @@
-import { createGlobalStore, isOmrsDateStrict, useStoreWithActions } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
-import { omrsDateFormat } from './constants';
+import { type Actions, createGlobalStore, useStoreWithActions } from '@openmrs/esm-framework';
 import { type AppointmentStatus } from './types';
 
 interface AppointmentsStore {
   appointmentServiceTypes: Array<string>;
-  selectedDate: string;
-  selectedAppointmentStatuses: Set<AppointmentStatus>;
+  selectedAppointmentStatuses: Array<AppointmentStatus>;
 }
 
-export const appointmentsStore = createGlobalStore<AppointmentsStore>('appointments-app', {
-  appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
-  selectedDate: dayjs().startOf('day').format(omrsDateFormat),
-  selectedAppointmentStatuses: new Set(),
-});
+export const appointmentsStore = createGlobalStore<AppointmentsStore>(
+  'appointments-app',
+  {
+    appointmentServiceTypes: [],
+    selectedAppointmentStatuses: [],
+  },
+  'sessionStorage',
+);
+
+export const storeActions = {
+  setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
+    return { appointmentServiceTypes };
+  },
+  setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Array<AppointmentStatus>) {
+    return { selectedAppointmentStatuses };
+  },
+} satisfies Actions<AppointmentsStore>;
 
 export function useAppointmentsStore() {
-  return useStoreWithActions(appointmentsStore, {
-    setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
-      return { appointmentServiceTypes };
-    },
-    setSelectedDate(_, selectedDate) {
-      if (!isOmrsDateStrict(selectedDate)) {
-        console.warn(
-          'esm-appointments-app: setSelectedDate called with incorrectly formatted date. Should be omrsDateFormat string. Received:',
-          selectedDate,
-        );
-      }
-      return { selectedDate };
-    },
-    setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Set<AppointmentStatus>) {
-      return { selectedAppointmentStatuses };
-    },
-  });
+  return useStoreWithActions(appointmentsStore, storeActions);
 }
-
-/* Set up localStorage serialization */
-
-let lastValueOfAppointmentServiceTypes = getFromLocalStorage('openmrs:appointments:serviceTypes');
-
-function getFromLocalStorage(key: string) {
-  const value = localStorage.getItem(key);
-  return value ? JSON.parse(value) : undefined;
-}
-
-function setInLocalStorage(key: string, value: any) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-appointmentsStore.subscribe(({ appointmentServiceTypes }) => {
-  if (lastValueOfAppointmentServiceTypes !== appointmentServiceTypes) {
-    setInLocalStorage('openmrs:appointments:serviceTypes', appointmentServiceTypes);
-    lastValueOfAppointmentServiceTypes = appointmentServiceTypes;
-  }
-});

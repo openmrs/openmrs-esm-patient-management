@@ -54,17 +54,18 @@ export function useSearchResults<T>(data: T[], searchString: string): T[] {
  * case-insensitive exact match on any of the patient identifiers
  * @param {Appointment[]} data - The array of data to filter
  * @param {string} searchString - The string to search for in the data
+ * @param {Array<AppointmentStatus>} selectedAppointmentStatuses - The array of selected appointment statuses to filter by
  * @returns {Appointment[]} The filtered array of data
  */
 export function useAppointmentSearchResults(
   data: Appointment[],
   searchString: string,
-  selectedAppointmentStatuses: Set<AppointmentStatus>,
+  selectedAppointmentStatuses: Array<AppointmentStatus>,
 ): Appointment[] {
   return useMemo(
     () =>
       data.filter((appointment) => {
-        if (selectedAppointmentStatuses.size > 0 && !selectedAppointmentStatuses.has(appointment.status)) {
+        if (selectedAppointmentStatuses.length > 0 && !selectedAppointmentStatuses.includes(appointment.status)) {
           return false;
         }
 
