@@ -1,5 +1,12 @@
+@use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+
+.modalContainer {
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 
 .subHeading {
   @include type.type-style('heading-compact-01');
@@ -9,4 +16,15 @@
 .clearQueueButton,
 .clearQueueButton:hover {
   color: $danger;
+}
+
+@media (max-width: 600px) {
+  :global(.cds--modal-footer) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
 }
