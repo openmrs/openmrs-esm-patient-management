@@ -10,3 +10,17 @@
 .clearQueueButton:hover {
   color: $danger;
 }
+
+@media (max-width: 41.9375rem) {
+  :global(.cds--modal-container) {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    margin: auto 0 auto -42% !important;
+    width: 84% !important;
+    max-height: 90% !important;
+    height: fit-content !important;
+    grid-template-rows: auto auto auto !important;
+  }
+}
