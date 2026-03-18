@@ -97,9 +97,9 @@ export function createAndGetWardPatientGrouping(
   const bedLayouts = admissionLocation && filterBeds(admissionLocation);
   const allWardPatientUuids = new Set<string>();
   let wardPatientPendingCount = 0;
-  bedLayouts?.map((bedLayout) => {
+  bedLayouts?.forEach((bedLayout) => {
     const { patients } = bedLayout;
-    patients.map((patient) => {
+    patients.forEach((patient) => {
       const admission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
       allWardPatientUuids.add(patient.uuid);
       if (admission?.currentInpatientLocation?.uuid == currentWardLocation.uuid) {
