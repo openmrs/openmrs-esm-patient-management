@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
+import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import BatchChangeAppointmentStatusesModal from './batch-change-appointment-statuses.modal';
@@ -19,12 +19,12 @@ jest.mock('../../patient-appointments/patient-appointments.resource', () => ({
   changeAppointmentStatus: jest.fn(),
 }));
 
-jest.mock('../../form/appointments-form.resource', () => ({
-  useMutateAppointments: jest.fn(),
-}));
-
 jest.mock('./batch-change-appointment-statuses.resources', () => ({
   getActiveVisitsForPatient: jest.fn(),
+}));
+
+jest.mock('../../hooks/useMutateAppointments', () => ({
+  useMutateAppointments: jest.fn(),
 }));
 
 const mockAppointment1: Appointment = {
@@ -86,10 +86,12 @@ const mockAppointment2: Appointment = {
 describe('BatchChangeAppointmentStatusesModal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseMutateAppointments.mockReturnValue({ mutateAppointments: mockMutateAppointments });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       checkOutButton: { enabled: true, customUrl: '' },
+    });
+    mockUseMutateAppointments.mockReturnValue({
+      mutateAppointments: mockMutateAppointments,
     });
   });
 

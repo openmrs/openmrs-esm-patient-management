@@ -1,7 +1,8 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": ">=2.2.0"
+    "webservices.rest": ">=2.2.0",
+    "appointments": ">=2.0.0"
   },
   "extensions": [
     {
@@ -40,31 +41,6 @@
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
       "component": "homeAppointments"
-    },
-    {
-      "name": "expected-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "checked-in-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "completed-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "missed-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "cancelled-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
     },
     {
       "name": "early-appointments-panel",

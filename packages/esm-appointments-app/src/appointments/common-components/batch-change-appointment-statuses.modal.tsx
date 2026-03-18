@@ -24,7 +24,7 @@ import { changeAppointmentStatus } from '../../patient-appointments/patient-appo
 import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
 import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
+import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import styles from './batch-change-appointment-statuses.scss';
 
 interface BatchChangeAppointmentStatusesModalProps {
