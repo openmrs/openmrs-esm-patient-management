@@ -8,6 +8,7 @@ import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
 import { useSelectedDate } from '../../hooks/useSelectedDate';
+import AppointmentSummaryModal from '../shared/appointment-summary-modal.component';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -107,32 +108,12 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       </div>
 
       {modalOpen && (
-        <Modal
+        <AppointmentSummaryModal
           open={modalOpen}
-          modalHeading={`${t('appointments', 'Appointments')} — ${dateTime.format('dddd, MMMM D YYYY')}`}
-          passiveModal
-          onRequestClose={() => setModalOpen(false)}>
-          {currentData?.services?.length ? (
-            <table className={styles.modalTable}>
-              <thead>
-                <tr>
-                  <th>{t('service', 'Service')}</th>
-                  <th>{t('count', 'Count')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentData.services.map(({ serviceName, serviceUuid, count }) => (
-                  <tr key={serviceUuid}>
-                    <td>{serviceName}</td>
-                    <td>{count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>{t('noAppointmentsForDay', 'No appointments scheduled for this day.')}</p>
-          )}
-        </Modal>
+          heading={`${t('appointments', 'Appointments')} — ${dateTime.format('dddd, MMMM D YYYY')}`}
+          services={currentData?.services}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </>
   );

@@ -10,8 +10,6 @@ import { type DailyAppointmentsCountByService } from '../../types';
 import WeeklyWorkloadView from './weekly-workload-view.component';
 import styles from './weekly-calendar-view.scss';
 
-const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-
 interface WeeklyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;
 }
@@ -52,7 +50,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ events }) => {
         {days.map((day, i) => (
           <div key={i} className={styles.dayColumn}>
             <div className={styles.dayHeader}>
-              <span className={styles.dayName}>{t(DAYS_IN_WEEK[day.day()])}</span>
+              <span className={styles.dayName}>{day.format('ddd').toUpperCase()}</span>
               <span className={styles.dayDate}>{day.format('D')}</span>
             </div>
             <WeeklyWorkloadView dateTime={day} events={events} />

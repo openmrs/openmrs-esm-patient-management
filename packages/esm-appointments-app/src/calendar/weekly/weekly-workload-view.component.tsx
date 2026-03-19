@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
-import { Modal } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { useAppointmentsStore } from '../../store';
+import AppointmentSummaryModal from '../shared/appointment-summary-modal.component';
 import styles from './weekly-calendar-view.scss';
 
 interface WeeklyWorkloadViewProps {
@@ -20,12 +20,9 @@ const WeeklyWorkloadView: React.FC<WeeklyWorkloadViewProps> = ({ dateTime, event
 
   const isToday = dateTime.isSame(dayjs(), 'day');
   const isSelected = dateTime.isSame(dayjs(selectedDate), 'day');
-
-  const currentData = useMemo(
-    () => events?.find((e) => dayjs(e.appointmentDate).format('YYYY-MM-DD') === dateTime.format('YYYY-MM-DD')),
-    [dateTime, events],
+  const currentData = events?.find(
+    (e) => dayjs(e.appointmentDate).format('YYYY-MM-DD') === dateTime.format('YYYY-MM-DD'),
   );
-
   const totalCount = currentData?.services?.reduce((sum, { count = 0 }) => sum + count, 0) ?? 0;
 
   return (
@@ -38,8 +35,8 @@ const WeeklyWorkloadView: React.FC<WeeklyWorkloadViewProps> = ({ dateTime, event
           [styles.selected]: isSelected,
           [styles.hasData]: !!currentData,
         })}
-        onClick={() => setModalOpen(true)}
-        onKeyDown={(e) => e.key === 'Enter' && setModalOpen(true)}>
+        onClick={() => currentData && setModalOpen(true)}
+        onKeyDown={(e) => e.key === 'Enter' && currentData && setModalOpen(true)}>
         {currentData?.services ? (
           <>
             <div className={styles.totalCount}>
@@ -61,32 +58,12 @@ const WeeklyWorkloadView: React.FC<WeeklyWorkloadViewProps> = ({ dateTime, event
       </div>
 
       {modalOpen && (
-        <Modal
+        <AppointmentSummaryModal
           open={modalOpen}
-          modalHeading={`${t('appointments', 'Appointments')} — ${dateTime.format('dddd, MMMM D YYYY')}`}
-          passiveModal
-          onRequestClose={() => setModalOpen(false)}>
-          {currentData?.services?.length ? (
-            <table className={styles.modalTable}>
-              <thead>
-                <tr>
-                  <th>{t('service', 'Service')}</th>
-                  <th>{t('count', 'Count')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentData.services.map(({ serviceName, serviceUuid, count }) => (
-                  <tr key={serviceUuid}>
-                    <td>{serviceName}</td>
-                    <td>{count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>{t('noAppointmentsForDay', 'No appointments scheduled for this day.')}</p>
-          )}
-        </Modal>
+          heading={`${t('appointments', 'Appointments')} — ${dateTime.format('dddd, MMMM D YYYY')}`}
+          services={currentData?.services}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </>
   );

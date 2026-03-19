@@ -1,12 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Button, Modal } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { User } from '@carbon/react/icons';
 import { formatDate } from '@openmrs/esm-framework';
 import { omrsDateFormat } from '../../constants';
 import { useAppointmentsStore, setSelectedDate } from '../../store';
 import { type DailyAppointmentsCountByService } from '../../types';
+import AppointmentSummaryModal from '../shared/appointment-summary-modal.component';
 import styles from './daily-calendar-view.scss';
 
 interface DailyCalendarViewProps {
@@ -92,32 +93,12 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ events }) => {
       </div>
 
       {modalOpen && (
-        <Modal
+        <AppointmentSummaryModal
           open={modalOpen}
-          modalHeading={`${t('appointments', 'Appointments')} — ${dayjs(selectedDate).format('dddd, MMMM D YYYY')}`}
-          passiveModal
-          onRequestClose={() => setModalOpen(false)}>
-          {currentData?.services?.length ? (
-            <table className={styles.serviceTable}>
-              <thead>
-                <tr>
-                  <th>{t('service', 'Service')}</th>
-                  <th>{t('count', 'Count')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentData.services.map(({ serviceName, serviceUuid, count }) => (
-                  <tr key={serviceUuid}>
-                    <td>{serviceName}</td>
-                    <td>{count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>{t('noAppointmentsForDay', 'No appointments scheduled for this day.')}</p>
-          )}
-        </Modal>
+          heading={`${t('appointments', 'Appointments')} — ${dayjs(selectedDate).format('dddd, MMMM D YYYY')}`}
+          services={currentData?.services}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </div>
   );

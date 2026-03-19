@@ -38,7 +38,7 @@ describe('WeeklyCalendarView', () => {
     expect(screen.getByText('MON')).toBeInTheDocument();
     expect(screen.getByText('TUE')).toBeInTheDocument();
     expect(screen.getByText('WED')).toBeInTheDocument();
-    expect(screen.getByText('THUR')).toBeInTheDocument();
+    expect(screen.getByText('THU')).toBeInTheDocument();
     expect(screen.getByText('FRI')).toBeInTheDocument();
     expect(screen.getByText('SAT')).toBeInTheDocument();
   });

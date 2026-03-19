@@ -79,6 +79,10 @@
     outline: 2px solid colors.$blue-60;
     outline-offset: -2px;
   }
+
+  &.hasData {
+    cursor: pointer;
+  }
 }
 
 .totalCount {
