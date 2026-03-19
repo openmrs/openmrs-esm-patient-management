@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { WorkspaceContainer, launchWorkspace } from '@openmrs/esm-framework';
+import { WorkspaceContainer, launchWorkspace2 } from '@openmrs/esm-framework';
 import ListDetails from './list-details/list-details.component';
 import ListsDashboard from './lists-dashboard/lists-dashboard.component';
 
@@ -15,9 +15,7 @@ const AutoLaunchPatientListWorkspace: React.FC = () => {
     if (shouldOpenCreate && !hasOpenedRef.current) {
       hasOpenedRef.current = true;
       const rafId = requestAnimationFrame(() => {
-        launchWorkspace('patient-list-form-workspace', {
-          workspaceTitle: t('newPatientListHeader', 'New patient list'),
-        });
+        launchWorkspace2('patient-list-form-workspace');
         setSearchParams({}, { replace: true });
       });
       return () => cancelAnimationFrame(rafId);

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, launchWorkspace2 } from '@openmrs/esm-framework';
 import { useCohortTypes, usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/patient-list.resource';
 import { getByTextWithMarkup } from 'tools';
@@ -13,6 +13,7 @@ const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
 const mockDeletePatientList = jest.mocked(deletePatientList);
 const mockUseCohortTypes = jest.mocked(useCohortTypes);
 const mockShowModal = jest.mocked(showModal);
+const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
 jest.mock('../api/hooks', () => ({
   usePatientListDetails: jest.fn(),
@@ -110,23 +111,29 @@ describe('ListDetails', () => {
 
     render(<ListDetails />);
 
-    expect(screen.getByTitle(/empty state illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
-  it('opens overlay with a form when the "Edit name or description" button is clicked', async () => {
+  it('opens workspace to edit patient list', async () => {
+    const user = userEvent.setup();
     render(<ListDetails />);
 
-    await userEvent.click(screen.getByText('Actions'));
-    const editBtn = screen.getByText('Edit name or description');
-    await userEvent.click(editBtn);
+    await user.click(screen.getByText('Actions'));
+    await user.click(screen.getByText('Edit name or description'));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-list-form-workspace', {
+      patientListDetails: mockPatientListDetails,
+      onSuccess: expect.any(Function),
+    });
   });
 
-  it('deletes patient list and navigates back to the list page', async () => {
+  it('opens delete confirmation modal', async () => {
+    const user = userEvent.setup();
+
     render(<ListDetails />);
 
-    await userEvent.click(screen.getByText('Actions'));
-    await userEvent.click(screen.getByText(/delete patient list/i));
+    await user.click(screen.getByText('Actions'));
+    await user.click(screen.getByText(/delete patient list/i));
 
     expect(mockShowModal).toHaveBeenCalledWith(
       'delete-patient-list-modal',

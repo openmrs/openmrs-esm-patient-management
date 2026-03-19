@@ -21,23 +21,15 @@ import { Add, Edit } from '@carbon/react/icons';
 import {
   ErrorState,
   isDesktop as desktopLayout,
-  launchWorkspace,
+  launchWorkspace2,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { type Bed } from '../types';
+import { type Bed, type BedFormWorkspaceConfig, type WorkspaceMode } from '../types';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import CardHeader from '../card-header/card-header.component';
 import Header from '../header/header.component';
 import styles from './bed-administration-table.scss';
-
-type WorkspaceMode = 'add' | 'edit';
-
-interface BedWorkspaceConfig {
-  workspaceTitle: string;
-  bed?: Bed;
-  mutateBeds: () => void;
-}
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -76,8 +68,7 @@ const BedAdministrationTable: React.FC = () => {
 
   const handleLaunchBedWorkspace = useCallback(
     (mode: WorkspaceMode, bed?: Bed) => {
-      const config: BedWorkspaceConfig = {
-        workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
+      const config: BedFormWorkspaceConfig = {
         mutateBeds: mutateBedsGroupedByLocation,
       };
 
@@ -85,9 +76,9 @@ const BedAdministrationTable: React.FC = () => {
         config.bed = bed;
       }
 
-      launchWorkspace('bed-form-workspace', config);
+      launchWorkspace2('bed-form-workspace', config);
     },
-    [t, mutateBedsGroupedByLocation],
+    [mutateBedsGroupedByLocation],
   );
 
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
@@ -133,7 +124,6 @@ const BedAdministrationTable: React.FC = () => {
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
         <Button
-          enterDelayMs={300}
           renderIcon={Edit}
           onClick={() => handleLaunchBedWorkspace('edit', bed)}
           kind={'ghost'}
@@ -204,7 +194,11 @@ const BedAdministrationTable: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
+                      <TableHeader key={header.key}>
+                        {typeof header.header === 'object' && header.header !== null && 'content' in header.header
+                          ? (header.header.content as React.ReactNode)
+                          : (header.header as React.ReactNode)}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -212,7 +206,11 @@ const BedAdministrationTable: React.FC = () => {
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell key={cell.id}>
+                          {typeof cell.value === 'object' && cell.value !== null && 'content' in cell.value
+                            ? (cell.value.content as React.ReactNode)
+                            : (cell.value as React.ReactNode)}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))}

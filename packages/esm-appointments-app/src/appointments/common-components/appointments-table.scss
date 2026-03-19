@@ -20,19 +20,25 @@
 }
 
 .container {
-  border: 1px solid colors.$gray-20;
+  background: colors.$gray-10;
+  padding: layout.$spacing-05;
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+    overflow: visible;
+  }
 }
 
 .headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
-  background-color: colors.$white-0;
+  padding: layout.$spacing-04 0;
+  background-color: colors.$gray-10;
 }
 
 .tabletHeading {
-  h4 {
+  h2 {
     @include type.type-style('heading-03');
     color: colors.$gray-70;
   }
@@ -43,9 +49,8 @@
   display: flex;
   justify-content: space-between;
   text-align: left;
-  text-transform: capitalize;
 
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     color: colors.$gray-70;
 
@@ -68,7 +73,7 @@
 
 .searchbar {
   input {
-    background-color: colors.$gray-10;
+    background-color: $ui-02 !important;
   }
 }
 
@@ -121,12 +126,11 @@
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .headerContainer {
-    padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-04 0;
     svg {
       margin-left: 0;
       margin-right: layout.$spacing-03;
     }
-    h4 {
+    h2 {
       text-align: right;
     }
   }

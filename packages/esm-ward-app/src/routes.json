@@ -6,7 +6,7 @@
   },
   "optionalBackendDependencies": {
     "bedmanagement": {
-      "version": "^6.0.0 || 6.0.0-SNAPSHOT",
+      "version": ">=6.0.0 <8.0.0",
       "feature": {
         "flagName": "bedmanagement-module",
         "label": "Ward App Patient Service",
@@ -66,45 +66,48 @@
       "slot": "ward-workspace-patient-banner-slot"
     }
   ],
+  "modals": [
+    {
+      "name": "delete-note-modal",
+      "component": "deleteNoteModal"
+    }
+  ],
   "workspaces2": [
     {
       "name": "admission-requests-workspace",
       "component": "admissionRequestWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "transfer-elsewhere-workspace",
       "component": "patientTransferRequestWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "cancel-admission-request-workspace",
       "component": "cancelAdmissionRequestWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "admit-patient-form-workspace",
       "component": "admitPatientFormWorkspace",
-      "window": "pending-admissions"
+      "window": "ward-manage-admissions-window"
     },
-
     {
       "name": "ward-app-patient-search-workspace",
       "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
-      "window": "add-patient-to-ward"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "ward-app-start-visit-workspace",
       "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
-      "window": "add-patient-to-ward"
+      "window": "ward-manage-admissions-window"
     },
     {
       "name": "create-admission-encounter-workspace",
       "component": "createAdmissionEncounterWorkspace",
-      "window": "add-patient-to-ward"
+      "window": "ward-manage-admissions-window"
     },
-
-    
     {
       "name": "ward-patient-workspace",
       "component": "wardPatientWorkspace",
@@ -115,12 +118,10 @@
       "component": "@openmrs/esm-patient-vitals-app#exportedVitalsBiometricsFormWorkspace",
       "window": "ward-patient"
     },
-
     {
       "name": "ward-patient-notes-workspace",
       "component": "wardPatientNotesWorkspace",
       "window": "ward-patient-notes"
-
     },
     {
       "name": "ward-patient-transfer-swap-workspace",
@@ -170,17 +171,10 @@
   ],
   "workspaceWindows2": [
     {
-      "name": "pending-admissions",
-      "group": "ward-manage-admissions",
-      "icon": "admissionRequestsWorkspaceSideRailIcon",
-      "width": "wider"
+      "name": "ward-manage-admissions-window",
+      "width": "wider",
+      "group": "ward-manage-admissions"
     },
-    {
-      "name": "add-patient-to-ward",
-      "group": "ward-manage-admissions",
-      "icon": "createAdmissionEncounterWorkspaceSideRailIcon"
-    },
-
     {
       "name": "ward-patient",
       "group": "ward-patient",
@@ -220,11 +214,12 @@
   "workspaceGroups2": [
     {
       "name": "ward-manage-admissions",
-      "overlay": true,
-      "persistence": "closable"
+      "scopePattern": "/home/ward",
+      "overlay": true
     },
     {
       "name": "ward-patient",
+      "scopePattern": "/home/ward",
       "overlay": true,
       "persistence": "closable"
     }

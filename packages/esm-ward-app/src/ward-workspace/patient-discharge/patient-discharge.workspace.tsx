@@ -41,10 +41,12 @@ export default function PatientDischargeWorkspace({
           closeWorkspaceGroup2();
         }
       })
-      .catch((err: Error) => {
+      .catch((err) => {
+        // TODO: better way to handle / display error messages
+        // https://openmrs.atlassian.net/browse/O3-5423
         showSnackbar({
           title: t('errorDischargingPatient', 'Error discharging patient'),
-          subtitle: err.message,
+          subtitle: err?.responseBody?.error?.globalErrors?.[0]?.message ?? err.message,
           kind: 'error',
         });
       })

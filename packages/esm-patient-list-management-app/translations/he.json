@@ -26,7 +26,6 @@
   "editNameDescription": "ערוך שם/תיאור",
   "editPatientListHeader": "ערוך רשימת מטופלים",
   "emptyList": "רשימה זו אין בה מטופלים",
-  "emptyStateIllustration": "איור למצב ריק",
   "emptyStateText": "אין {{listType}} רשימות מטופלים להצגה",
   "error": "שגיאה",
   "errorAddingPatientToList": "Failed to add patient to list",

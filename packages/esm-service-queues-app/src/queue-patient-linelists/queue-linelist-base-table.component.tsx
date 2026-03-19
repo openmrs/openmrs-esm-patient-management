@@ -4,8 +4,9 @@ import { type TFunction } from 'i18next';
 import {
   Button,
   DataTable,
-  type DataTableHeader,
+  DataTableSkeleton,
   Layer,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -18,8 +19,6 @@ import {
   TableToolbarSearch,
   Tag,
   Tile,
-  DataTableSkeleton,
-  Pagination,
 } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
 import { ConfigurableLink, ExtensionSlot, formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';

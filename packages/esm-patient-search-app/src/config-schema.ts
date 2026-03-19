@@ -131,8 +131,6 @@ export const configSchema = {
   },
 };
 
-export type BuiltInFieldType = 'gender' | 'dateOfBirth' | 'age' | 'postcode';
-
 export interface PersonAttributeFieldConfig {
   attributeTypeUuid: string;
   placeholder?: string;

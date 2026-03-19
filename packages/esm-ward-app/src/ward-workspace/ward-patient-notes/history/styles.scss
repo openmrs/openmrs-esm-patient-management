@@ -24,13 +24,13 @@
 .noteTile {
   padding: layout.$spacing-04;
   margin-bottom: layout.$spacing-04;
+  background-color: $ui-01;
 }
 
 .noteHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: layout.$spacing-04;
 }
 
 .noteProviderRole {
@@ -41,8 +41,9 @@
 }
 
 .noteBody {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: $text-02;
+  white-space: pre-wrap;
 }
 
 .noteDateAndTime {
@@ -51,11 +52,23 @@
 }
 
 .noteProviderName {
-  font-size: layout.$spacing-04;
+  font-size: 0.75rem;
   margin-top: layout.$spacing-04;
   color: $text-02;
 }
 
 .noteSkeletonContainer {
   height: layout.$spacing-13;
+}
+
+.editFields {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+}
+
+.editButtons {
+  display: flex;
+  gap: layout.$spacing-02;
+  justify-content: flex-end;
 }

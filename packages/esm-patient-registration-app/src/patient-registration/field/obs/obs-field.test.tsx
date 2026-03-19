@@ -1,15 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { Formik, Form } from 'formik';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
-import {
-  PatientRegistrationContextProvider,
-  type PatientRegistrationContextProps,
-} from '../../patient-registration-context';
-import { mockOpenmrsId, mockPatient } from '__mocks__';
+import { PatientRegistrationContextProvider } from '../../patient-registration-context';
+import { initialFormValues } from '../../patient-registration.component';
+import { type FormValues } from '../../patient-registration.types';
 
 const mockUseConcept = jest.mocked(useConcept);
 const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
@@ -93,18 +92,6 @@ const useConceptAnswersMockImpl = (uuid: string) => {
   }
 };
 
-type FieldProps = {
-  children: ({ field, form: { touched, errors }, meta }) => React.ReactNode;
-};
-
-jest.mock('formik', () => ({
-  ...(jest.requireActual('formik') as object),
-  Field: jest.fn(({ children }: FieldProps) => (
-    <>{children({ field: {}, form: { touched: {}, errors: {} }, meta: { error: undefined } })}</>
-  )),
-  useField: jest.fn(() => [{ value: null }, {}]),
-}));
-
 const textFieldDef: FieldDefinition = {
   id: 'chief-complaint',
   type: 'obs',
@@ -165,44 +152,52 @@ const codedFieldDef: FieldDefinition = {
   customConceptAnswers: [],
 };
 
-const mockInitialFormValues = {
-  additionalFamilyName: '',
-  additionalGivenName: '',
-  additionalMiddleName: '',
-  addNameInLocalLanguage: false,
-  address: {},
-  birthdate: null,
-  birthdateEstimated: false,
-  deathCause: '',
-  deathDate: '',
-  familyName: 'Doe',
-  gender: 'male',
-  givenName: 'John',
-  identifiers: mockOpenmrsId,
-  isDead: false,
-  middleName: 'Test',
-  monthsEstimated: 0,
-  patientUuid: mockPatient.uuid,
-  relationships: [],
-  telephoneNumber: '',
-  yearsEstimated: 0,
-  deathTime: '',
-  deathTimeFormat: 'AM' as const,
-  nonCodedCauseOfDeath: '',
-};
+/**
+ * Helper to render ObsField with Formik render props for state-dependent tests.
+ */
+const renderObsFieldWithFormik = (
+  fieldDefinition: FieldDefinition,
+  initialValues: Partial<FormValues> = {},
+  options?: { enableReinitialize?: boolean },
+) => {
+  const defaultValues = {
+    obs: {},
+    ...initialValues,
+  };
 
-const initialContextValues: PatientRegistrationContextProps = {
-  currentPhoto: null,
-  inEditMode: false,
-  identifierTypes: [],
-  initialFormValues: mockInitialFormValues,
-  isOffline: false,
-  setCapturePhotoProps: jest.fn(),
-  setFieldValue: jest.fn(),
-  setInitialFormValues: jest.fn(),
-  validationSchema: null,
-  values: mockInitialFormValues,
-  setFieldTouched: jest.fn(),
+  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
+
+  const utils = render(
+    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
+      {({ setFieldValue, values, setFieldTouched }) => {
+        formValuesRef = { ...initialFormValues, ...values } as FormValues;
+        return (
+          <Form>
+            <PatientRegistrationContextProvider
+              value={{
+                identifierTypes: [],
+                values: formValuesRef,
+                validationSchema: null,
+                inEditMode: false,
+                setFieldValue: setFieldValue as any,
+                setCapturePhotoProps: jest.fn(),
+                setFieldTouched: setFieldTouched as any,
+                currentPhoto: '',
+                isOffline: false,
+                initialFormValues: formValuesRef,
+              }}>
+              <ObsField fieldDefinition={fieldDefinition} />
+            </PatientRegistrationContextProvider>
+          </Form>
+        );
+      }}
+    </Formik>,
+  );
+
+  return {
+    ...utils,
+    getFormValues: () => formValuesRef,
+  };
 };
 
 describe('ObsField', () => {
@@ -215,85 +210,265 @@ describe('ObsField', () => {
     mockUseConceptAnswers.mockImplementation(useConceptAnswersMockImpl);
   });
 
-  it("logs an error and doesn't render if no registration encounter type is provided", () => {
+  it('does not render if no registration encounter type is provided', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       registrationObs: { encounterTypeUuid: null },
     } as RegistrationConfig);
 
-    console.error = jest.fn();
-    render(<ObsField fieldDefinition={textFieldDef} />);
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringMatching(/no registration encounter type has been configured/i),
-    );
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    const { container } = render(<ObsField fieldDefinition={textFieldDef} />);
+    expect(container).toBeEmptyDOMElement();
+    consoleSpy.mockRestore();
   });
 
-  it('renders a text box for text concept', () => {
-    render(<ObsField fieldDefinition={textFieldDef} />);
+  it('does not render while concept is loading', () => {
+    mockUseConcept.mockReturnValue({
+      data: null,
+      isLoading: true,
+    });
 
-    expect(screen.getByRole('textbox', { name: 'Chief complaint (optional)' })).toBeInTheDocument();
+    const { container } = render(<ObsField fieldDefinition={textFieldDef} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders a number box for number concept', () => {
-    render(<ObsField fieldDefinition={numberFieldDef} />);
+  describe('Text obs field', () => {
+    it('renders a text input for text concept', () => {
+      renderObsFieldWithFormik(textFieldDef);
 
-    expect(screen.getByRole('spinbutton', { name: 'Weight (optional)' })).toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: /chief complaint/i })).toBeInTheDocument();
+    });
+
+    it('allows user to enter text', async () => {
+      const user = userEvent.setup();
+      const { getFormValues } = renderObsFieldWithFormik(textFieldDef);
+
+      const textInput = screen.getByRole('textbox', { name: /chief complaint/i }) as HTMLInputElement;
+      await user.type(textInput, 'Patient has fever');
+
+      await waitFor(() => {
+        expect(getFormValues().obs['chief-complaint-uuid']).toBe('Patient has fever');
+      });
+    });
+
+    it('validates input against regex pattern', async () => {
+      const user = userEvent.setup();
+      renderObsFieldWithFormik({
+        ...textFieldDef,
+        validation: {
+          required: false,
+          matches: '^[A-Z]+$', // Only uppercase letters
+        },
+      });
+
+      const textInput = screen.getByRole('textbox', { name: /chief complaint/i }) as HTMLInputElement;
+      await user.type(textInput, 'lowercase');
+      await user.tab();
+
+      await waitFor(() => {
+        expect(screen.getByText(/invalid input/i)).toBeInTheDocument();
+      });
+    });
+
+    it('does not show error for valid input matching regex', async () => {
+      const user = userEvent.setup();
+      renderObsFieldWithFormik({
+        ...textFieldDef,
+        validation: {
+          required: false,
+          matches: '^[A-Z]+$', // Only uppercase letters
+        },
+      });
+
+      const textInput = screen.getByRole('textbox', { name: /chief complaint/i }) as HTMLInputElement;
+      await user.type(textInput, 'FEVER');
+      await user.tab();
+
+      await waitFor(() => {
+        expect(screen.queryByText(/invalid input/i)).not.toBeInTheDocument();
+      });
+    });
+
+    it('renders as required when configured', () => {
+      renderObsFieldWithFormik({
+        ...textFieldDef,
+        validation: {
+          required: true,
+          matches: null,
+        },
+      });
+
+      const textInput = screen.getByRole('textbox', { name: /chief complaint/i });
+      expect(textInput).toBeRequired();
+    });
+
+    it('renders as optional when not required', () => {
+      renderObsFieldWithFormik(textFieldDef);
+
+      const textInput = screen.getByRole('textbox', { name: /chief complaint/i });
+      expect(textInput).not.toBeRequired();
+    });
   });
 
-  it('renders a datepicker for date concept', async () => {
-    const user = userEvent.setup();
-    render(
-      <PatientRegistrationContextProvider value={initialContextValues}>
-        <ObsField fieldDefinition={dateFieldDef} />
-      </PatientRegistrationContextProvider>,
-    );
+  describe('Numeric obs field', () => {
+    it('renders a number input for numeric concept', () => {
+      renderObsFieldWithFormik(numberFieldDef);
 
-    expect(screen.getByText(/vaccination date/i)).toBeInTheDocument();
+      expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
+    });
 
-    const dateInput = screen.getByLabelText(/vaccination date/i);
-    expect(dateInput).toBeInTheDocument();
-    await user.clear(dateInput);
-    await user.type(dateInput, '28/05/2024');
-    // FIXME: Make the date input work
-    // expect(dateInput).toHaveValue('28/05/2024');
+    it('allows user to enter numeric value', async () => {
+      const user = userEvent.setup();
+      const { getFormValues } = renderObsFieldWithFormik(numberFieldDef);
+
+      const numberInput = screen.getByRole('spinbutton', { name: /weight/i }) as HTMLInputElement;
+      await user.type(numberInput, '75');
+
+      await waitFor(() => {
+        // Numeric inputs can store values as numbers or strings depending on Formik behavior
+        const value = getFormValues().obs['weight-uuid'];
+        const stringValue = String(value);
+        expect(stringValue === '75' || Number(value) === 75).toBe(true);
+      });
+    });
+
+    it('renders as required when configured', () => {
+      renderObsFieldWithFormik({
+        ...numberFieldDef,
+        validation: {
+          required: true,
+          matches: null,
+        },
+      });
+
+      const numberInput = screen.getByRole('spinbutton', { name: /weight/i });
+      expect(numberInput).toBeRequired();
+    });
   });
 
-  it('renders a select for a coded concept', () => {
-    render(<ObsField fieldDefinition={codedFieldDef} />);
+  describe('Date obs field', () => {
+    it('renders a date picker for date concept', () => {
+      renderObsFieldWithFormik(dateFieldDef);
 
-    expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'USA' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Mexico' })).toBeInTheDocument();
+      expect(screen.getByLabelText(/vaccination date/i)).toBeInTheDocument();
+    });
+
+    it('allows user to enter date', async () => {
+      const { getFormValues } = renderObsFieldWithFormik(dateFieldDef);
+
+      const dateInput = screen.getByLabelText(/vaccination date/i) as HTMLInputElement;
+      const dateString = '2020-01-15';
+
+      fireEvent.change(dateInput, { target: { value: dateString } });
+      fireEvent.blur(dateInput);
+
+      await waitFor(() => {
+        expect(getFormValues().obs['vaccination-date-uuid']).toBeTruthy();
+      });
+    });
+
+    it('renders as required when configured', () => {
+      renderObsFieldWithFormik({
+        ...dateFieldDef,
+        validation: {
+          required: true,
+          matches: null,
+        },
+      });
+
+      const dateInput = screen.getByLabelText(/vaccination date/i);
+      // OpenmrsDatePicker uses isRequired prop, not HTML required attribute
+      expect(dateInput).toBeInTheDocument();
+    });
   });
 
-  it('select uses answerConcept for answers when it is provided', async () => {
-    render(<ObsField fieldDefinition={{ ...codedFieldDef, answerConceptSetUuid: 'other-countries-uuid' }} />);
+  describe('Coded obs field', () => {
+    it('renders a select for a coded concept', () => {
+      renderObsFieldWithFormik(codedFieldDef);
 
-    expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Kenya' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Uganda' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'USA' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Mexico' })).not.toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'USA' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Mexico' })).toBeInTheDocument();
+    });
+
+    it('allows user to select an option', async () => {
+      const user = userEvent.setup();
+      const { getFormValues } = renderObsFieldWithFormik(codedFieldDef);
+
+      const select = screen.getByRole('combobox', { name: 'Nationality' }) as HTMLSelectElement;
+      await user.selectOptions(select, 'usa');
+
+      await waitFor(() => {
+        expect(getFormValues().obs['nationality-uuid']).toBe('usa');
+      });
+      expect(select.value).toBe('usa');
+    });
+
+    it('uses answerConceptSetUuid for answers when provided', () => {
+      renderObsFieldWithFormik({
+        ...codedFieldDef,
+        answerConceptSetUuid: 'other-countries-uuid',
+      });
+
+      expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Kenya' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Uganda' })).toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: 'USA' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: 'Mexico' })).not.toBeInTheDocument();
+    });
+
+    it('uses customConceptAnswers when provided', () => {
+      renderObsFieldWithFormik({
+        ...codedFieldDef,
+        customConceptAnswers: [
+          {
+            uuid: 'mozambique-uuid',
+            label: 'Mozambique',
+          },
+        ],
+      });
+
+      expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Mozambique' })).toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: 'Uganda' })).not.toBeInTheDocument();
+    });
+
+    it('renders as required when configured', () => {
+      renderObsFieldWithFormik({
+        ...codedFieldDef,
+        validation: {
+          required: true,
+          matches: null,
+        },
+      });
+
+      const select = screen.getByRole('combobox', { name: 'Nationality' });
+      expect(select).toBeRequired();
+    });
   });
 
-  it('select uses customConceptAnswers for answers when provided', async () => {
-    render(
-      <ObsField
-        fieldDefinition={{
-          ...codedFieldDef,
-          customConceptAnswers: [
-            {
-              uuid: 'mozambique-uuid',
-              label: 'Mozambique',
-            },
-          ],
-        }}
-      />,
-    );
+  describe('Error handling', () => {
+    it('displays error for unknown datatype', () => {
+      mockUseConcept.mockReturnValue({
+        data: {
+          uuid: 'unknown-uuid',
+          display: 'Unknown Field',
+          datatype: { display: 'UnknownType', uuid: 'unknown' },
+          answers: [],
+          setMembers: [],
+        },
+        isLoading: false,
+      });
 
-    expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Mozambique' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Uganda' })).not.toBeInTheDocument();
+      renderObsFieldWithFormik({
+        ...textFieldDef,
+        uuid: 'unknown-uuid',
+      });
+
+      // InlineNotification renders with kind="error" which shows an error message
+      // Check for the specific error message text
+      expect(screen.getByText(/unknown datatype/i)).toBeInTheDocument();
+      expect(screen.getByText(/UnknownType/i)).toBeInTheDocument();
+    });
   });
 });

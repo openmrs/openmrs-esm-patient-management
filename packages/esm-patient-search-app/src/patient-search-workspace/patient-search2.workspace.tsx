@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useConfig, useDebounce, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
+import { PatientSearchContext2 } from '../patient-search-context';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
-import { PatientSearchContext2 } from '../patient-search-context';
 
 export interface PatientSearchWorkspaceProps {
   initialQuery?: string;
@@ -12,6 +12,7 @@ export interface PatientSearchWorkspaceProps {
     patientUuid: string,
     patient: fhir.Patient,
     launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
+    closeWorkspace: () => void,
   ): void;
 }
 

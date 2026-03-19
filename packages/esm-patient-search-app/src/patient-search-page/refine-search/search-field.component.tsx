@@ -36,17 +36,17 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                   size={isTablet ? 'lg' : 'md'}
                   onChange={({ name }) => onChange(name)}
                   selectedIndex={['any', 'male', 'female'].indexOf(value)}>
-                  <Switch name="any" text={t('any', 'Any')} />
-                  <Switch name="male" text={t('male', 'Male')} />
-                  <Switch name="female" text={t('female', 'Female')} />
+                  <Switch name="any">{t('any', 'Any')}</Switch>
+                  <Switch name="male">{t('male', 'Male')}</Switch>
+                  <Switch name="female">{t('female', 'Female')}</Switch>
                 </ContentSwitcher>
                 <ContentSwitcher
                   id="gender"
                   size={isTablet ? 'lg' : 'md'}
                   onChange={({ name }) => onChange(name)}
                   selectedIndex={['other', 'unknown'].indexOf(value)}>
-                  <Switch name="other" text={t('other', 'Other')} />
-                  <Switch name="unknown" text={t('unknown', 'Unknown')} />
+                  <Switch name="other">{t('other', 'Other')}</Switch>
+                  <Switch name="unknown">{t('unknown', 'Unknown')}</Switch>
                 </ContentSwitcher>
               </>
             )}
@@ -65,7 +65,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 id="dateOfBirth"
                 placeholder="DD"
                 value={value || ''}
-                onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 className={styles.dobField}
                 type="number"
                 label={t('dayOfBirth', 'Day of Birth')}
@@ -85,7 +85,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 id="monthOfBirth"
                 placeholder="MM"
                 value={value || ''}
-                onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 className={styles.dobField}
                 type="number"
                 label={t('monthOfBirth', 'Month of Birth')}
@@ -105,7 +105,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 id="yearOfBirth"
                 placeholder="YYYY"
                 value={value || ''}
-                onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 className={styles.dobField}
                 type="number"
                 label={t('yearOfBirth', 'Year of Birth')}
@@ -130,7 +130,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
               <NumberInput
                 id={field.name}
                 value={value || ''}
-                onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+                onChange={(e) => onChange(parseInt((e.target as HTMLInputElement).value) || 0)}
                 type="number"
                 label={t('age', 'Age')}
                 min={field.min}

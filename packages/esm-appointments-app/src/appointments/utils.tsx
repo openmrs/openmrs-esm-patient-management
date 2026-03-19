@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { type Appointment } from '../types';
+import { type AppointmentStatus, type Appointment } from '../types';
 
 /**
  * Returns an array of page sizes for the given data and page size.
@@ -46,31 +46,44 @@ export function useSearchResults<T>(data: T[], searchString: string): T[] {
 }
 
 /**
- * Accepts an array of Appointment and a searchString
- * Returns those Appointments that match the search string based on the following:
+ * Performs client-side filtering of appointments based on the selected
+ * statuses and the search string.
+ * The search string matches on the following:
  * case-insensitive partial match on patient name
  * case-insensitive partial match on the primary patient identifier
  * case-insensitive exact match on any of the patient identifiers
  * @param {Appointment[]} data - The array of data to filter
  * @param {string} searchString - The string to search for in the data
+ * @param {Array<AppointmentStatus>} selectedAppointmentStatuses - The array of selected appointment statuses to filter by
  * @returns {Appointment[]} The filtered array of data
  */
-export function useAppointmentSearchResults(data: Appointment[], searchString: string): Appointment[] {
-  return useMemo(() => {
-    if (searchString && searchString.trim() !== '') {
-      const lowerCaseSearch = searchString.toLowerCase();
-      return data.filter((appointment) => {
-        if (appointment.patient.name?.toLowerCase()?.includes(lowerCaseSearch)) {
+export function useAppointmentSearchResults(
+  data: Appointment[],
+  searchString: string,
+  selectedAppointmentStatuses: Array<AppointmentStatus>,
+): Appointment[] {
+  return useMemo(
+    () =>
+      data.filter((appointment) => {
+        if (selectedAppointmentStatuses.length > 0 && !selectedAppointmentStatuses.includes(appointment.status)) {
+          return false;
+        }
+
+        if (searchString && searchString.trim() !== '') {
+          const lowerCaseSearch = searchString.toLowerCase();
+          if (appointment.patient.name?.toLowerCase()?.includes(lowerCaseSearch)) {
+            return true;
+          }
+          if (appointment.patient.identifier?.toLowerCase()?.includes(lowerCaseSearch)) {
+            return true;
+          }
+          return false;
+        } else {
           return true;
         }
-        if (appointment.patient.identifier?.toLowerCase()?.includes(lowerCaseSearch)) {
-          return true;
-        }
-        return false;
-      });
-    }
-    return data;
-  }, [searchString, data]);
+      }),
+    [searchString, data, selectedAppointmentStatuses],
+  );
 }
 
 export function filterByServiceType(appointmentList: Array<Appointment>, appointmentServiceTypes: Array<string>) {

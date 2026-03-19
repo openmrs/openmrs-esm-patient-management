@@ -11,7 +11,7 @@ const AppointmentsTile: React.FC = () => {
 
   return (
     <Tile className={styles.tileContainer}>
-      <header className={styles.tileHeader}>{t('scheduledForToday', 'Scheduled For Today')}</header>
+      <h2 className={styles.tileHeader}>{t('scheduledForToday', 'Scheduled For Today')}</h2>
       <div className={styles.displayDetails}>
         <div className={styles.countLabel}>{t('patients', 'Patients')}</div>
         <div className={styles.displayData}>{appointmentsData?.length ?? 0}</div>

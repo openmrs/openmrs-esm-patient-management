@@ -17,7 +17,7 @@ import {
   Tag,
 } from '@carbon/react';
 import { ArrowLeft, Add } from '@carbon/react/icons';
-import { launchWorkspace, navigate, usePagination } from '@openmrs/esm-framework';
+import { launchWorkspace2, navigate, usePagination } from '@openmrs/esm-framework';
 import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
 import { type Bed, type WorkspaceMode } from '../types';
 import Header from '../header/header.component';
@@ -76,17 +76,18 @@ const WardWithBeds: React.FC = () => {
   };
 
   const tableRows = useMemo(() => {
-    return paginatedData?.map((bed) => ({
-      id: bed.id,
-      number: bed.number,
-      type: bed.type,
-      occupied: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
-    }));
+    return (
+      paginatedData?.map((bed) => ({
+        id: String(bed.id),
+        number: bed.number,
+        type: bed.type,
+        occupied: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
+      })) ?? []
+    );
   }, [paginatedData]);
 
   const handleLaunchBedFormWorkspace = (mode: WorkspaceMode, bed?: Bed) => {
-    launchWorkspace('bed-form-workspace', {
-      workspaceTitle: mode === 'add' ? t('addBed', 'Add bed') : t('editBed', 'Edit bed'),
+    launchWorkspace2('bed-form-workspace', {
       mutateBeds: mutate,
       defaultLocation: { display: name, uuid: location },
       ...(mode === 'edit' && bed ? { bed } : {}),
@@ -99,7 +100,7 @@ const WardWithBeds: React.FC = () => {
 
       {isLoadingBeds && (
         <div className={styles.container}>
-          <DataTableSkeleton role="progressbar" zebra />
+          <DataTableSkeleton zebra />
         </div>
       )}
 
@@ -121,7 +122,7 @@ const WardWithBeds: React.FC = () => {
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={handleLaunchBedFormWorkspace}>
+              onClick={() => handleLaunchBedFormWorkspace('add')}>
               <span>{t('addBed', 'Add bed')}</span>
             </Button>
           </div>
@@ -143,7 +144,11 @@ const WardWithBeds: React.FC = () => {
                       {rows.map((row) => (
                         <TableRow key={row.id} {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                            <TableCell key={cell.id}>
+                              {typeof cell.value === 'object' && cell.value !== null && 'content' in cell.value
+                                ? (cell.value.content as React.ReactNode)
+                                : (cell.value as React.ReactNode)}
+                            </TableCell>
                           ))}
                         </TableRow>
                       ))}
