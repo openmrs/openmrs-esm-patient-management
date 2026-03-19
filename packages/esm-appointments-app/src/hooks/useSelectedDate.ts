@@ -10,7 +10,7 @@ export function useSelectedDate() {
   const params = useParams();
   return useMemo(() => {
     if (params.date) {
-      const parsedDate = dayjs(params.date, 'YYYY-MM-DD');
+      const parsedDate = dayjs(params.date, 'YYYY-MM-DD').startOf('day');
       if (!parsedDate.isValid()) {
         console.warn(
           `Invalid date format in URL parameter: ${params.date}. Format should be YYYY-MM-DD. Falling back to current date.`,
