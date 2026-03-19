@@ -21,3 +21,9 @@
   min-height: calc(100vh - 80px);
   background-color: colors.$white;
 }
+
+/* Row of day-of-week column headers (SUN, MON…) */
+.workLoadCard {
+  display: flex;
+  color: colors.$black;
+}

@@ -169,5 +169,20 @@
   "updateError": "Error updating upcoming appointment",
   "WED": "WED",
   "week": "Week",
-  "yes": "Yes"
+  "yes": "Yes",
+  "all": "All",
+  "appointmentCount": "{{count}} appointment(s)",
+  "calendarSystem": "Calendar system",
+  "close": "Close",
+  "daily": "Daily",
+  "dayView": "Day View",
+  "loadingAppointments": "Loading appointments…",
+  "monthly": "Monthly",
+  "noAppointments": "No appointments scheduled",
+  "noAppointmentsForDay": "No appointments for this day",
+  "noAppointmentsFound": "No appointments found",
+  "previous": "Previous",
+  "unknownService": "Unknown Service",
+  "viewMode": "View mode",
+  "weekly": "Weekly"
 }

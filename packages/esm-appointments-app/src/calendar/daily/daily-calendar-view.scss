@@ -1,0 +1,122 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.dailyViewContainer {
+  padding: layout.$spacing-05;
+}
+
+.dayHeading {
+  padding-bottom: layout.$spacing-04;
+  border-bottom: 1px solid colors.$gray-20;
+  margin-bottom: layout.$spacing-05;
+}
+
+.dayTitle {
+  @include type.type-style('heading-04');
+  color: colors.$gray-100;
+  margin: 0 0 layout.$spacing-01 0;
+}
+
+.daySubtitle {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-60;
+}
+
+/* ── Hour rows ── */
+
+.hourRow {
+  display: flex;
+  gap: layout.$spacing-04;
+  margin-bottom: 0;
+}
+
+.hourLabel {
+  width: 4rem;
+  flex-shrink: 0;
+  text-align: right;
+  padding-top: layout.$spacing-02;
+  @include type.type-style('helper-text-01');
+  color: colors.$gray-50;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hourSlot {
+  flex: 1;
+  min-height: 3.25rem;
+  border-top: 1px solid colors.$gray-10;
+  padding-top: layout.$spacing-02;
+  padding-bottom: layout.$spacing-02;
+}
+
+/* ── Appointment cards in daily view ── */
+
+.apptCard {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: layout.$spacing-03 layout.$spacing-04;
+  margin-bottom: layout.$spacing-02;
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+.apptTime {
+  @include type.type-style('label-02');
+  color: colors.$gray-60;
+  width: 3.5rem;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.apptDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.apptPatientName {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-100;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apptService {
+  @include type.type-style('helper-text-01');
+  margin-top: 1px;
+}
+
+.apptStatusBadge {
+  @include type.type-style('label-01');
+  border-radius: 1rem;
+  padding: 2px layout.$spacing-03;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+/* ── Loading / empty states ── */
+
+.loadingWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-10 0;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: layout.$spacing-10 0;
+  color: colors.$gray-50;
+  @include type.type-style('body-compact-01');
+}
+
+.emptyStateIcon {
+  font-size: 2rem;
+  margin-bottom: layout.$spacing-03;
+}

@@ -9,11 +9,20 @@ import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 
-const MonthlyHeader: React.FC = () => {
-  const { t } = useTranslation();
-  const selectedDate = useSelectedDate();
+interface MonthlyHeaderProps {
+  /**
+   * Optional ISO date to display. When not provided, falls back to the
+   * URL param via useSelectedDate (legacy behaviour for standalone usage).
+   */
+  navIsoDate?: string;
+}
 
-  const [calendarSelectedDate, setCalendarSelectedDate] = useState(dayjs(selectedDate));
+const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ navIsoDate }) => {
+  const { t } = useTranslation();
+  const urlDate = useSelectedDate();
+  const baseDate = navIsoDate ?? urlDate;
+
+  const [calendarSelectedDate, setCalendarSelectedDate] = useState(dayjs(baseDate));
 
   const handleSelectPrevMonth = useCallback(() => {
     setCalendarSelectedDate(calendarSelectedDate.subtract(1, 'month'));
@@ -33,7 +42,7 @@ const MonthlyHeader: React.FC = () => {
           size="sm">
           {t('prev', 'Prev')}
         </Button>
-        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
+        <span>{formatDate(new Date(baseDate), { day: false, time: false, noToday: true })}</span>
         <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={handleSelectNextMonth} size="sm">
           {t('next', 'Next')}
         </Button>

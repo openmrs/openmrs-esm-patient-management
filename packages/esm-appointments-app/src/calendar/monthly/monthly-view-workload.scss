@@ -182,3 +182,9 @@
   outline: none;
   cursor: pointer;
 }
+
+.calendarDate {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-100;
+  text-align: right;
+}

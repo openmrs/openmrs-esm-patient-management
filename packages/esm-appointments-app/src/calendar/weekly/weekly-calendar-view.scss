@@ -1,0 +1,120 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.weeklyViewContainer {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.weeklyGrid {
+  display: grid;
+  grid-template-columns: 3.5rem repeat(7, 1fr);
+  min-width: 42rem;
+  border-top: 1px solid colors.$gray-20;
+  border-left: 1px solid colors.$gray-20;
+}
+
+/* ── Column headers (day names + dates) ── */
+
+.cornerCell {
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 2px solid colors.$gray-30;
+  background: colors.$gray-10;
+}
+
+.dayHeader {
+  padding: layout.$spacing-02 layout.$spacing-01;
+  text-align: center;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 2px solid colors.$gray-30;
+  background: colors.$gray-10;
+}
+
+.dayHeaderToday {
+  background: #e0f2fe;
+}
+
+.dayHeaderDowLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dayHeaderDayNum {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+  margin-top: layout.$spacing-01;
+}
+
+.dayHeaderDayNumToday {
+  color: #0369a1;
+  font-weight: 800;
+}
+
+.dayHeaderMonthLabel {
+  @include type.type-style('helper-text-01');
+  color: colors.$gray-50;
+}
+
+/* ── Time-slot rows ── */
+
+.timeLabel {
+  padding: layout.$spacing-01 layout.$spacing-02;
+  text-align: right;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-10;
+  background: colors.$gray-10;
+  @include type.type-style('helper-text-01');
+  color: colors.$gray-50;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.slotCell {
+  min-height: 3.25rem;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-10;
+  padding: layout.$spacing-01;
+  background: colors.$white;
+  cursor: default;
+  transition: background 0.1s;
+}
+
+.slotCellToday {
+  background: #fafeff;
+}
+
+.slotCellHasAppts {
+  cursor: pointer;
+
+  &:hover {
+    background: colors.$gray-10;
+  }
+}
+
+/* ── Appointment chips inside slot cells ── */
+
+.apptChip {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 4px 4px 0;
+  padding: layout.$spacing-01 layout.$spacing-02;
+  margin-bottom: 2px;
+  font-size: 0.6875rem;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
+.apptChipName {
+  font-weight: 600;
+  color: colors.$gray-100;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apptChipStatus {
+  font-size: 0.625rem;
+}

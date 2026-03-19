@@ -1,0 +1,221 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+/* ── Backdrop ── */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-05;
+}
+
+/* ── Dialog shell ── */
+.modalContainer {
+  background: colors.$white;
+  border-radius: 1rem;
+  width: min(96vw, 38rem);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.modalHeader {
+  padding: layout.$spacing-05 layout.$spacing-06 layout.$spacing-04;
+  border-bottom: 1px solid colors.$gray-20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: layout.$spacing-04;
+  flex-shrink: 0;
+}
+
+.modalHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+}
+
+.modalHeaderLabel {
+  @include type.type-style('label-02');
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.modalHeaderTitle {
+  @include type.type-style('heading-04');
+  color: colors.$gray-100;
+  margin: 0;
+}
+
+.modalHeaderSubtitle {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-60;
+}
+
+.modalHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  flex-shrink: 0;
+}
+
+.drillDownButton {
+  @include type.type-style('label-02');
+  padding: layout.$spacing-02 layout.$spacing-04;
+  border-radius: 0.5rem;
+  border: 1px solid colors.$gray-30;
+  background: colors.$gray-10;
+  color: #0369a1;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.1s;
+
+  &:hover {
+    background: colors.$gray-20;
+  }
+}
+
+.closeButton {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: colors.$gray-10;
+  color: colors.$gray-60;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: background 0.1s;
+
+  &:hover {
+    background: colors.$gray-20;
+  }
+}
+
+/* ── Status filter chips ── */
+.filterBar {
+  padding: layout.$spacing-03 layout.$spacing-06 0;
+  display: flex;
+  gap: layout.$spacing-02;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.filterChip {
+  @include type.type-style('label-01');
+  padding: layout.$spacing-01 layout.$spacing-03;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+/* ── Scrollable body ── */
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: layout.$spacing-04 layout.$spacing-06 layout.$spacing-06;
+}
+
+/* ── Loading / empty ── */
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  padding: layout.$spacing-08 0;
+}
+
+.emptyState {
+  text-align: center;
+  color: colors.$gray-50;
+  padding: layout.$spacing-08 0;
+  @include type.type-style('body-compact-01');
+}
+
+/* ── Service group ── */
+.serviceGroup {
+  margin-bottom: layout.$spacing-06;
+}
+
+.serviceGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-03;
+  padding-bottom: layout.$spacing-02;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+}
+
+.serviceGroupDot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.serviceGroupName {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+}
+
+.serviceGroupCount {
+  margin-left: auto;
+  @include type.type-style('label-01');
+  border-radius: 1rem;
+  padding: 1px layout.$spacing-03;
+  font-weight: 700;
+}
+
+/* ── Appointment row inside modal ── */
+.apptRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03 layout.$spacing-04;
+  border-radius: 0.5rem;
+  margin-bottom: layout.$spacing-02;
+  background: colors.$gray-10;
+  border: 1px solid colors.$gray-20;
+}
+
+.apptRowTime {
+  @include type.type-style('label-02');
+  color: colors.$gray-60;
+  width: 3rem;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.apptRowName {
+  flex: 1;
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-100;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apptRowStatus {
+  @include type.type-style('label-01');
+  border-radius: 1rem;
+  padding: 2px layout.$spacing-03;
+  flex-shrink: 0;
+  font-weight: 600;
+}

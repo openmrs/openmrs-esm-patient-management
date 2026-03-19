@@ -2,23 +2,40 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { spaHomePage } from '../../constants';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
-import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
   showAllServices?: boolean;
+  /**
+   * The ISO date (YYYY-MM-DD) of the month being navigated.
+   * Used to determine which cells are in the current month vs overflow days.
+   * Passed from the orchestrator so calendar-system switching works correctly.
+   */
+  navIsoDate?: string;
+  /**
+   * Called when the user clicks a day cell that has appointments.
+   * Receives the ISO date (YYYY-MM-DD).
+   * When provided, opens the modal instead of navigating away.
+   */
+  onSelectDate?: (isoDate: string) => void;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
+  dateTime,
+  events,
+  showAllServices = false,
+  navIsoDate,
+  onSelectDate,
+}) => {
   const layout = useLayoutType();
-  const selectedDate = useSelectedDate();
+  // Fall back to today if navIsoDate is not provided (backwards-compatible)
+  const referenceDate = navIsoDate ? dayjs(navIsoDate) : dayjs();
 
   const currentData = useMemo(
     () =>
@@ -44,15 +61,20 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     return false;
   }, [currentData?.services, layout, showAllServices]);
 
-  const navigateToAppointmentsByDate = (serviceUuid: string) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
+  const handleDateClick = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!currentData?.services?.length) return;
+    const isoDate = dayjs(dateTime).format('YYYY-MM-DD');
+    if (onSelectDate) {
+      onSelectDate(isoDate);
+    }
   };
 
   return (
     <div
-      onClick={() => navigateToAppointmentsByDate('')}
+      onClick={handleDateClick}
       className={classNames(
-        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        styles[isSameMonth(dateTime, referenceDate) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
           ? {}
           : {
@@ -60,7 +82,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               [styles.largeDesktop]: layout !== 'small-desktop',
             },
       )}>
-      {isSameMonth(dateTime, dayjs(selectedDate)) && (
+      {isSameMonth(dateTime, referenceDate) && (
         <div>
           <span className={classNames(styles.totals)}>
             {currentData?.services ? (
@@ -82,7 +104,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigateToAppointmentsByDate(serviceUuid);
+                    handleDateClick(e);
                   }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>
@@ -94,6 +116,8 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
                   events={events}
                   dateTime={dateTime}
+                  navIsoDate={navIsoDate}
+                  onSelectDate={onSelectDate}
                 />
               ) : (
                 ''

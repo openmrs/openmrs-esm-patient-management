@@ -2,43 +2,133 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.titleContainer {
+.calendarHeaderContainer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-left: layout.$spacing-05;
-
-  & > p {
-    @include type.type-style('heading-02');
-  }
-
-  & > button {
-    color: colors.$blue-60;
-    @include type.type-style('label-02');
-  }
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background: colors.$white;
+  border-bottom: 1px solid colors.$gray-20;
 }
 
-.titleContent {
+/* ── Left side: back + nav ── */
+
+.leftGroup {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: layout.$spacing-03;
 }
 
 .backButton {
   svg {
     order: 1;
-    margin-right: layout.$spacing-03;
+    margin-right: layout.$spacing-02;
     margin-left: 0 !important;
   }
-
   span {
     order: 2;
   }
 }
 
-// Overriding styles for RTL support
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.navButton {
+  padding: layout.$spacing-02 layout.$spacing-04;
+  border-radius: 0.5rem;
+  border: 1px solid colors.$gray-30;
+  background: colors.$gray-10;
+  color: colors.$gray-70;
+  cursor: pointer;
+  @include type.type-style('label-02');
+  font-weight: 600;
+  transition: background 0.1s;
+
+  &:hover {
+    background: colors.$gray-20;
+  }
+}
+
+.titleLabel {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+  min-width: 14rem;
+  text-align: center;
+}
+
+/* ── Right side: view toggle + calendar selector ── */
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-04;
+  flex-wrap: wrap;
+}
+
+/* View-mode segmented control */
+.viewToggle {
+  display: flex;
+  background: colors.$gray-10;
+  border-radius: 0.625rem;
+  padding: 3px;
+  gap: 2px;
+}
+
+.viewToggleButton {
+  padding: layout.$spacing-02 layout.$spacing-04;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  @include type.type-style('label-02');
+  font-weight: 600;
+  transition: all 0.12s;
+  background: transparent;
+  color: colors.$gray-60;
+
+  &:hover {
+    background: colors.$gray-20;
+  }
+}
+
+.viewToggleButtonActive {
+  background: colors.$white;
+  color: #0369a1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar system selector */
+.calendarSelect {
+  padding: layout.$spacing-02 layout.$spacing-04;
+  border-radius: 0.5rem;
+  border: 1px solid colors.$gray-30;
+  background: colors.$gray-10;
+  @include type.type-style('label-02');
+  font-weight: 600;
+  color: colors.$gray-70;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    background: colors.$gray-20;
+  }
+
+  &:focus {
+    border-color: colors.$blue-50;
+    outline: 2px solid colors.$blue-30;
+  }
+}
+
+// RTL support
 html[dir='rtl'] {
-  .titleContent {
-    margin-left: layout.$spacing-05;
+  .leftGroup {
+    flex-direction: row-reverse;
+  }
+  .rightGroup {
+    flex-direction: row-reverse;
   }
 }
