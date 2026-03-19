@@ -119,12 +119,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
     return appointments
       .filter((appointment) => {
         const visitDate = dayjs(appointment.startDateTime);
-        const isFutureAppointment = visitDate.isAfter(dayjs());
-        const isTodayAppointment = visitDate.isToday();
-        const hasActiveVisitToday = visits?.some(
-          (visit) => visit?.patient?.uuid === appointment.patient?.uuid && visit?.startDatetime,
-        );
-        return isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday);
+	const isFutureAppointment = visitDate.isAfter(dayjs());
+	const isTodayAppointment = visitDate.isToday();
+	const hasActiveVisitToday = visits?.some(
+  (visit) => visit?.patient?.uuid === appointment.patient?.uuid && visit?.startDatetime,
+);
+const isPastAppointment = visitDate.isBefore(dayjs(), 'day');
+return isFutureAppointment || (isTodayAppointment && !hasActiveVisitToday) || isPastAppointment;
       })
       .map((appointment) => appointment.uuid);
   }, [appointments, visits]);
