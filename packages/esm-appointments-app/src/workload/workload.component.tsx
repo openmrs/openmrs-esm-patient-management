@@ -12,7 +12,8 @@ interface WorkloadProps {
 
 const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, onWorkloadDateChange }) => {
   const { data: services } = useAppointmentService();
-  const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+  const serviceDetails = services?.find((service) => service.name === selectedService);
+  const serviceUuid = serviceDetails?.uuid;
 
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -32,6 +33,7 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
         calendarWorkload={monthlyCalendarWorkload}
         dateToDisplay={appointmentDate.toISOString()}
         onDateClick={handleDateClick}
+        serviceDetails={serviceDetails}
       />
     </div>
   );

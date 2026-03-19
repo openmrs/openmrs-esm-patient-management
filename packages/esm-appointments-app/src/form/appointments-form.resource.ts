@@ -7,7 +7,7 @@ import { type AppointmentPayload, type AppointmentService, type RecurringAppoint
 dayjs.extend(isToday);
 
 export function useAppointmentService() {
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }, Error>(
+  const { data, error, isLoading, mutate } = useSWR<{ data: Array<AppointmentService> }, Error>(
     `${restBaseUrl}/appointmentService/all/full`,
     openmrsFetch,
   );
@@ -16,6 +16,7 @@ export function useAppointmentService() {
     data: data ? data.data : null,
     error,
     isLoading,
+    mutate,
   };
 }
 
