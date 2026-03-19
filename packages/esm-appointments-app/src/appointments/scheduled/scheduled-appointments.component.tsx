@@ -7,6 +7,7 @@ import { useAppointmentsStore } from '../../store';
 import { type AppointmentsAppContext } from '../../types';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
+import AppointmentsError from '../common-components/appointments-error.component';
 import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
@@ -15,7 +16,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
   const { t } = useTranslation();
   const { selectedDate, appointmentServiceTypes } = useAppointmentsStore();
 
-  const { appointmentList: appointmentsForSelectedDate, isLoading, error } = useAppointmentList(selectedDate);
+  const { data: appointmentsForSelectedDate, isLoading, error } = useAppointmentList(selectedDate);
 
   const appointmentForSelectedDateFilteredByServiceTypes =
     appointmentServiceTypes.length > 0
@@ -31,6 +32,13 @@ const ScheduledAppointments: React.FC<{}> = () => {
 
   return (
     <div className={styles.container}>
+      {error && (
+        <AppointmentsError
+          error={error}
+          title="appointmentsLoadError"
+          subtitle="Unable to load scheduled appointments"
+        />
+      )}
       <AppointmentsTable
         appointments={appointmentForSelectedDateFilteredByServiceTypes}
         isLoading={isLoading}

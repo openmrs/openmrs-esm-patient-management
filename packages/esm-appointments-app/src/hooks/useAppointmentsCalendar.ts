@@ -16,7 +16,24 @@ interface AppointmentSummaryResponse {
   appointmentCountMap: Map<string, AppointmentCountMapEntry>;
 }
 
-export const useAppointmentsCalendar = (forDate: string, period: string) => {
+import { type UseAppointmentHookResult } from './hook-types';
+
+interface AppointmentCountMapEntry {
+  allAppointmentsCount: number;
+}
+
+interface AppointmentSummaryResponse {
+  appointmentService: {
+    name: string;
+    uuid: string;
+  };
+  appointmentCountMap: Map<string, AppointmentCountMapEntry>;
+}
+
+export const useAppointmentsCalendar = (
+  forDate: string,
+  period: string,
+): UseAppointmentHookResult<Array<DailyAppointmentsCountByService>> => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
   const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
 
@@ -41,7 +58,7 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     });
     return acc;
   }, []);
-  return { isLoading, calendarEvents: results, error };
+  return { data: results, error: error ?? null, isLoading };
 };
 
 function evaluateAppointmentCalendarDates(forDate: string, period: string) {
