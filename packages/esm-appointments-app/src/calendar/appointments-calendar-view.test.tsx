@@ -1,10 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
+import { BrowserRouter } from 'react-router-dom';
 
 describe('Appointment calendar view', () => {
   it('renders appointments in calendar view from appointments list', async () => {
-    render(<AppointmentsCalendarView />);
+    render(
+      <BrowserRouter>
+        <AppointmentsCalendarView />
+      </BrowserRouter>,
+    );
 
     const expectedTableRows = [
       /John Wilson 30-Aug-2021 03:35 03:35 Dr James Cook Outpatient Walk in appointments/,

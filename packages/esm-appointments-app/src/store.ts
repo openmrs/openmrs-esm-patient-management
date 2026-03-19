@@ -1,47 +1,42 @@
-import { createGlobalStore, isOmrsDateStrict, useStoreWithActions } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
+import { type Actions, createGlobalStore, useStoreWithActions } from '@openmrs/esm-framework';
 import { omrsDateFormat } from './constants';
 import { type AppointmentStatus } from './types';
 
 interface AppointmentsStore {
   appointmentServiceTypes: Array<string>;
   selectedDate: string;
+  currentView: 'daily' | 'weekly' | 'monthly';
   selectedAppointmentStatuses: Set<AppointmentStatus>;
 }
 
 export const appointmentsStore = createGlobalStore<AppointmentsStore>('appointments-app', {
   appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
-  currentView: 'monthly' as 'daily' | 'weekly' | 'monthly',
+  currentView: 'monthly',
   selectedAppointmentStatuses: new Set(),
 });
 
-export function useAppointmentsStore() {
-  return useStoreWithActions(appointmentsStore, {
-    setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
-      return { appointmentServiceTypes };
-    },
-    setSelectedDate(_, selectedDate) {
-      if (!isOmrsDateStrict(selectedDate)) {
-        console.warn(
-          'esm-appointments-app: setSelectedDate called with incorrectly formatted date. Should be omrsDateFormat string. Received:',
-          selectedDate,
-        );
-      }
-      return { selectedDate };
-    },
-    setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Set<AppointmentStatus>) {
-      return { selectedAppointmentStatuses };
-    },
-  });
-}
+export const storeActions = {
+  setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
+    return { appointmentServiceTypes };
+  },
+  setSelectedDate(_, selectedDate: string) {
+    return { selectedDate };
+  },
+  setCurrentView(_, currentView: 'daily' | 'weekly' | 'monthly') {
+    return { currentView };
+  },
+  setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Set<AppointmentStatus>) {
+    return { selectedAppointmentStatuses };
+  },
+} satisfies Actions<AppointmentsStore>;
 
-export function setCurrentView(view: 'daily' | 'weekly' | 'monthly') {
-  appointmentsStore.setState({ currentView: view });
+export function useAppointmentsStore() {
+  return useStoreWithActions(appointmentsStore, storeActions);
 }
 
 /* Set up localStorage serialization */
-
 let lastValueOfAppointmentServiceTypes = getFromLocalStorage('openmrs:appointments:serviceTypes');
 
 function getFromLocalStorage(key: string) {

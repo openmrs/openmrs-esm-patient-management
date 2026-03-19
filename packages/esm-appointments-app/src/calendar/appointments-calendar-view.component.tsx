@@ -8,7 +8,7 @@ import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
-import { useAppointmentsStore } from '../store';
+import { useAppointmentsStore } from '../store'; // ✅ replaces useSelectedDate
 
 type CalendarView = 'daily' | 'weekly' | 'monthly';
 
@@ -48,12 +48,8 @@ const AppointmentsCalendarView: React.FC = () => {
       </div>
       <CalendarHeader />
       {currentView === 'monthly' && <MonthlyCalendarView events={calendarEvents} />}
-      {currentView === 'weekly' && (
-        <p>{t('weeklyViewComingSoon', 'Weekly view coming soon')}</p>
-      )}
-      {currentView === 'daily' && (
-        <p>{t('dailyViewComingSoon', 'Daily view coming soon')}</p>
-      )}
+      {currentView === 'weekly' && <p>{t('weeklyViewComingSoon', 'Weekly view coming soon')}</p>}
+      {currentView === 'daily' && <p>{t('dailyViewComingSoon', 'Daily view coming soon')}</p>}
     </div>
   );
 };

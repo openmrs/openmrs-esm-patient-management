@@ -9,10 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { useAppointmentsStore } from '../../store';
-
 import AppointmentsList from '../../appointments/scheduled/appointments-list.component';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
-
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -24,7 +22,7 @@ export interface MonthlyWorkloadViewProps {
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { selectedDate } = useAppointmentsStore();
+  const { selectedDate } = useAppointmentsStore(); // ✅ replaces useSelectedDate()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -55,13 +53,8 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     return services.reduce((sum, { count = 0 }) => sum + count, 0);
   }, [services]);
 
-  const openModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -97,7 +90,6 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               ) : (
                 <div />
               )}
-
               <b className={styles.calendarDate}>{dateTime.format('D')}</b>
             </span>
 
@@ -131,9 +123,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       {isModalOpen && (
         <Modal
           open={isModalOpen}
-          modalHeading={t('appointmentsFor', 'Appointments for {{date}}', {
-            date: formattedDisplayDate,
-          })}
+          modalHeading={t('appointmentsFor', 'Appointments for {{date}}', { date: formattedDisplayDate })}
           passiveModal
           onRequestClose={closeModal}>
           <AppointmentsList date={dateTime.format('YYYY-MM-DDTHH:mm:ss.SSSZZ')} />

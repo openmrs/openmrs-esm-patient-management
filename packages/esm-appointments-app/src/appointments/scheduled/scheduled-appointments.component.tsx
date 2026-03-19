@@ -7,13 +7,15 @@ import { useAppointmentsStore } from '../../store';
 import { type AppointmentsAppContext } from '../../types';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './scheduled-appointments.scss';
 
 dayjs.extend(isSameOrBefore);
 
 const ScheduledAppointments: React.FC<{}> = () => {
   const { t } = useTranslation();
-  const { selectedDate, appointmentServiceTypes } = useAppointmentsStore();
+  const { appointmentServiceTypes } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
 
   const { appointmentList: appointmentsForSelectedDate, isLoading, error } = useAppointmentList(selectedDate);
 
