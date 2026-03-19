@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import DayAppointmentsModal from './day-appointments-modal.component';
 import { CALENDAR_SYSTEMS } from '../calendar-systems';
@@ -93,17 +93,13 @@ describe('DayAppointmentsModal', () => {
 
   it('renders with the correct date label in Gregorian calendar', async () => {
     renderModal();
-    await waitFor(() => {
-      expect(screen.getByText(/march 10, 2026/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/march 10, 2026/i)).toBeInTheDocument();
   });
 
   it('renders with the correct date label when Ethiopic calendar is active', async () => {
     renderModal({ calendarSystem: CALENDAR_SYSTEMS.ethiopic });
-    await waitFor(() => {
-      // 2026-03-10 in Ethiopic is Megabit 1, 2018
-      expect(screen.getByText(/megabit/i)).toBeInTheDocument();
-    });
+    // 2026-03-10 in Ethiopic is Megabit 1, 2018
+    expect(await screen.findByText(/megabit/i)).toBeInTheDocument();
   });
 
   it('shows loading indicator while fetching', async () => {
@@ -114,37 +110,33 @@ describe('DayAppointmentsModal', () => {
 
   it('shows all appointments after data loads', async () => {
     renderModal();
-    await screen.findByText('Alice Kamau');
+    expect(await screen.findByText('Alice Kamau')).toBeInTheDocument();
     expect(screen.getByText('Bob Njoroge')).toBeInTheDocument();
     expect(screen.getByText('Carol Wanjiru')).toBeInTheDocument();
   });
 
   it('groups appointments by service', async () => {
     renderModal();
-    await screen.findByText('General Medicine');
+    expect(await screen.findByText('General Medicine')).toBeInTheDocument();
     expect(screen.getByText('Dental')).toBeInTheDocument();
   });
 
   it('shows total appointment count', async () => {
     renderModal();
-    await waitFor(() => {
-      expect(screen.getByText(/3 appointment/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/3 appointment/i)).toBeInTheDocument();
   });
 
   it('shows empty state when no appointments exist', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as unknown as FetchResponse);
     renderModal();
-    await waitFor(() => {
-      expect(screen.getByText(/no appointments found/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/no appointments found/i)).toBeInTheDocument();
   });
 
   // ── Status filter chips ────────────────────────────────────────────────
 
   it('renders status filter chips for statuses present in the data', async () => {
     renderModal();
-    await screen.findByRole('button', { name: /all/i });
+    expect(await screen.findByRole('button', { name: /all/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /scheduled/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /checkedin/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /missed/i })).toBeInTheDocument();
@@ -154,7 +146,6 @@ describe('DayAppointmentsModal', () => {
     renderModal();
     await screen.findByText('Alice Kamau');
 
-    // Click "Scheduled" filter — only Alice should be visible
     fireEvent.click(screen.getByRole('button', { name: /^scheduled/i }));
 
     expect(screen.getByText('Alice Kamau')).toBeInTheDocument();
@@ -176,24 +167,21 @@ describe('DayAppointmentsModal', () => {
 
   // ── Close behaviour ────────────────────────────────────────────────────
 
-  it('calls onClose when the × button is clicked', async () => {
+  it('calls onClose when the × button is clicked', () => {
     const onClose = jest.fn();
     renderModal({ onClose });
-    const closeBtn = screen.getByRole('button', { name: /close/i });
-    fireEvent.click(closeBtn);
+    fireEvent.click(screen.getByRole('button', { name: /close/i }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClose when the backdrop is clicked', async () => {
+  it('calls onClose when the backdrop is clicked', () => {
     const onClose = jest.fn();
     renderModal({ onClose });
-    // The backdrop is the outermost div with role="dialog"
-    const backdrop = screen.getByRole('dialog');
-    fireEvent.click(backdrop);
+    fireEvent.click(screen.getByRole('dialog'));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClose when ESC key is pressed', async () => {
+  it('calls onClose when ESC key is pressed', () => {
     const onClose = jest.fn();
     renderModal({ onClose });
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -210,11 +198,10 @@ describe('DayAppointmentsModal', () => {
 
   // ── Drill-down ─────────────────────────────────────────────────────────
 
-  it('calls onDrillDown with daily mode and the ISO date when Day View is clicked', async () => {
+  it('calls onDrillDown with daily mode and the ISO date when Day View is clicked', () => {
     const onDrillDown = jest.fn();
     renderModal({ onDrillDown });
-    const dayViewBtn = screen.getByRole('button', { name: /day view/i });
-    fireEvent.click(dayViewBtn);
+    fireEvent.click(screen.getByRole('button', { name: /day view/i }));
     expect(onDrillDown).toHaveBeenCalledWith('daily', '2026-03-10');
   });
 });

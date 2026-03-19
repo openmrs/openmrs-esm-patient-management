@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { BrowserRouter } from 'react-router-dom';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
@@ -8,26 +8,17 @@ import AppointmentsCalendarView from './appointments-calendar-view.component';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
-/** Minimal appointment summary response (used by useAppointmentsCalendar) */
 const mockSummaryResponse = {
   data: [
     {
       appointmentService: { name: 'General Medicine', uuid: 'svc-uuid-1' },
       appointmentCountMap: {
         '2026-03-10 00:00:00': { allAppointmentsCount: 3, missedAppointmentsCount: 0 },
-        '2026-03-11 00:00:00': { allAppointmentsCount: 1, missedAppointmentsCount: 0 },
-      },
-    },
-    {
-      appointmentService: { name: 'Dental', uuid: 'svc-uuid-2' },
-      appointmentCountMap: {
-        '2026-03-10 00:00:00': { allAppointmentsCount: 2, missedAppointmentsCount: 1 },
       },
     },
   ],
 };
 
-/** Minimal appointments list response (used by useAppointmentsByDate) */
 const mockAppointmentListResponse = {
   data: [
     {
@@ -82,7 +73,6 @@ const renderCalendar = () =>
 
 describe('AppointmentsCalendarView', () => {
   beforeEach(() => {
-    // Default: both API shapes return successfully
     mockOpenmrsFetch.mockResolvedValue({
       ...mockSummaryResponse,
     } as unknown as FetchResponse);
@@ -92,8 +82,6 @@ describe('AppointmentsCalendarView', () => {
     jest.clearAllMocks();
   });
 
-  // ── Smoke ──────────────────────────────────────────────────────────────────
-
   it('renders without crashing and shows the calendar container', () => {
     renderCalendar();
     expect(screen.getByTestId('appointments-calendar')).toBeInTheDocument();
@@ -101,11 +89,8 @@ describe('AppointmentsCalendarView', () => {
 
   it('renders the page header with Calendar title', () => {
     renderCalendar();
-    // AppointmentsHeader receives title="Calendar"
     expect(screen.getByText(/calendar/i)).toBeInTheDocument();
   });
-
-  // ── View mode toggle ───────────────────────────────────────────────────────
 
   it('renders the view-mode toggle with Monthly, Weekly and Daily buttons', () => {
     renderCalendar();
@@ -116,27 +101,21 @@ describe('AppointmentsCalendarView', () => {
 
   it('starts in Monthly view by default', () => {
     renderCalendar();
-    const monthlyBtn = screen.getByRole('button', { name: /monthly/i });
-    expect(monthlyBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /monthly/i })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('switches to Weekly view when the Weekly button is clicked', () => {
     renderCalendar();
     fireEvent.click(screen.getByRole('button', { name: /weekly/i }));
-    const weeklyBtn = screen.getByRole('button', { name: /weekly/i });
-    expect(weeklyBtn).toHaveAttribute('aria-pressed', 'true');
-    const monthlyBtn = screen.getByRole('button', { name: /monthly/i });
-    expect(monthlyBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: /weekly/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /monthly/i })).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('switches to Daily view when the Daily button is clicked', () => {
     renderCalendar();
     fireEvent.click(screen.getByRole('button', { name: /daily/i }));
-    const dailyBtn = screen.getByRole('button', { name: /daily/i });
-    expect(dailyBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /daily/i })).toHaveAttribute('aria-pressed', 'true');
   });
-
-  // ── Navigation ─────────────────────────────────────────────────────────────
 
   it('renders Previous and Next navigation buttons', () => {
     renderCalendar();
@@ -144,26 +123,17 @@ describe('AppointmentsCalendarView', () => {
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 
-  it('advances to the next month when the Next button is clicked in Monthly view', () => {
+  it('advances to the next month when Next is clicked', () => {
     renderCalendar();
-    // The title label contains the current month name — clicking Next changes it
-    const nextBtn = screen.getByRole('button', { name: /next/i });
-    const initialTitle = screen.getByText(/\d{4}/); // something like "March 2026"
-    const initialText = initialTitle.textContent;
-    fireEvent.click(nextBtn);
-    // Month name should change (or at minimum year might change)
-    // We just verify the click doesn't throw and the label is still present
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByText(/\d{4}/)).toBeInTheDocument();
   });
 
-  it('goes back to the previous month when Prev is clicked in Monthly view', () => {
+  it('goes back when Prev is clicked', () => {
     renderCalendar();
-    const prevBtn = screen.getByRole('button', { name: /previous/i });
-    fireEvent.click(prevBtn);
+    fireEvent.click(screen.getByRole('button', { name: /previous/i }));
     expect(screen.getByText(/\d{4}/)).toBeInTheDocument();
   });
-
-  // ── Calendar system selector ───────────────────────────────────────────────
 
   it('renders the calendar system selector with Gregorian selected by default', () => {
     renderCalendar();
@@ -185,16 +155,12 @@ describe('AppointmentsCalendarView', () => {
     const select = screen.getByRole('combobox', { name: /calendar system/i });
     fireEvent.change(select, { target: { value: 'ethiopic' } });
     expect((select as HTMLSelectElement).value).toBe('ethiopic');
-    // Ethiopic month names should appear in the title label
     expect(
       screen.getByText(/Meskerem|Tikimt|Hidar|Tahesas|Tir|Yekatit|Megabit|Miazia|Ginbot|Sene|Hamle|Nehase|Pagume/i),
     ).toBeInTheDocument();
   });
 
-  // ── Daily view content ─────────────────────────────────────────────────────
-
   it('shows a loading indicator in Daily view while fetching', async () => {
-    // Make the fetch hang so we can catch the loading state
     mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as unknown as Promise<FetchResponse>);
     renderCalendar();
     fireEvent.click(screen.getByRole('button', { name: /daily/i }));
@@ -205,27 +171,18 @@ describe('AppointmentsCalendarView', () => {
     mockOpenmrsFetch.mockResolvedValue({
       ...mockAppointmentListResponse,
     } as unknown as FetchResponse);
-
     renderCalendar();
     fireEvent.click(screen.getByRole('button', { name: /daily/i }));
-
-    // ✅ NEW
-    await screen.findByText('Alice Kamau');
+    expect(await screen.findByText('Alice Kamau')).toBeInTheDocument();
     expect(screen.getByText('Bob Njoroge')).toBeInTheDocument();
   });
 
   it('shows empty state in Daily view when no appointments exist', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as unknown as FetchResponse);
-
     renderCalendar();
     fireEvent.click(screen.getByRole('button', { name: /daily/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/no appointments/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/no appointments/i)).toBeInTheDocument();
   });
-
-  // ── Back button ────────────────────────────────────────────────────────────
 
   it('renders the Back navigation button', () => {
     renderCalendar();
