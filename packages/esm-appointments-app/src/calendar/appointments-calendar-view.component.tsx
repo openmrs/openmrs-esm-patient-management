@@ -19,12 +19,20 @@ const AppointmentsCalendarView: React.FC = () => {
   const params = useParams();
   const viewOptions: CalendarView[] = ['daily', 'weekly', 'monthly'];
   const selectedIndex = viewOptions.indexOf(currentView);
+import { useAppointmentsStore } from '../store';
+
+const AppointmentsCalendarView: React.FC = () => {
+  const { t } = useTranslation();
+  const { selectedDate, setSelectedDate } = useAppointmentsStore();
+  const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
+
+  let params = useParams();
 
   useEffect(() => {
     if (params.date) {
       setSelectedDate(dayjs(params.date).startOf('day').format(omrsDateFormat));
     }
-  }, [params.date]);
+  }, [params.date, setSelectedDate]);
 
   return (
     <div data-testid="appointments-calendar">

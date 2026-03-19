@@ -45,11 +45,11 @@ import {
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
-  useMutateAppointments,
 } from './appointments-form.resource';
 import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
 import { useAppointmentsStore } from '../store';
 import { useProviders } from '../hooks/useProviders';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import Workload from '../workload/workload.component';
 import styles from './appointments-form.scss';
 
