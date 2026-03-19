@@ -17,22 +17,15 @@ const AppointmentsCalendarView: React.FC = () => {
   const { selectedDate, currentView } = useAppointmentsStore();
   const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), currentView);
   const params = useParams();
+
   const viewOptions: CalendarView[] = ['daily', 'weekly', 'monthly'];
-  const selectedIndex = viewOptions.indexOf(currentView);
-import { useAppointmentsStore } from '../store';
-
-const AppointmentsCalendarView: React.FC = () => {
-  const { t } = useTranslation();
-  const { selectedDate, setSelectedDate } = useAppointmentsStore();
-  const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
-
-  let params = useParams();
+  const selectedIndex = Math.max(0, viewOptions.indexOf(currentView));
 
   useEffect(() => {
     if (params.date) {
       setSelectedDate(dayjs(params.date).startOf('day').format(omrsDateFormat));
     }
-  }, [params.date, setSelectedDate]);
+  }, [params.date]);
 
   return (
     <div data-testid="appointments-calendar">
@@ -50,16 +43,10 @@ const AppointmentsCalendarView: React.FC = () => {
       <CalendarHeader />
       {currentView === 'monthly' && <MonthlyCalendarView events={calendarEvents} />}
       {currentView === 'weekly' && (
-        <>
-          {/* TODO: Implement WeeklyCalendarView component */}
-          <p>{t('weeklyViewComingSoon', 'Weekly view coming soon')}</p>
-        </>
+        <p>{t('weeklyViewComingSoon', 'Weekly view coming soon')}</p>
       )}
       {currentView === 'daily' && (
-        <>
-          {/* TODO: Implement DailyCalendarView component */}
-          <p>{t('dailyViewComingSoon', 'Daily view coming soon')}</p>
-        </>
+        <p>{t('dailyViewComingSoon', 'Daily view coming soon')}</p>
       )}
     </div>
   );
