@@ -7,12 +7,17 @@ import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
+import AppointmentsError from '../appointments/common-components/appointments-error.component';
 import { useAppointmentsStore } from '../store';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
   const { selectedDate, setSelectedDate } = useAppointmentsStore();
-  const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
+  const {
+    data: calendarEvents,
+    error,
+    isLoading,
+  } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
 
   let params = useParams();
 
@@ -25,8 +30,9 @@ const AppointmentsCalendarView: React.FC = () => {
   return (
     <div data-testid="appointments-calendar">
       <AppointmentsHeader title={t('calendar', 'Calendar')} />
+      {error && <AppointmentsError error={error} title="calendarLoadError" subtitle="Unable to load calendar data" />}
       <CalendarHeader />
-      <MonthlyCalendarView events={calendarEvents} />
+      <MonthlyCalendarView events={calendarEvents} isLoading={isLoading} />
     </div>
   );
 };

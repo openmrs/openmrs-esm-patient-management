@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { filterByServiceType } from '../utils';
 import { useEarlyAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
+import AppointmentsError from '../common-components/appointments-error.component';
 import { useAppointmentsStore } from '../../store';
 
 /**
@@ -12,7 +13,7 @@ import { useAppointmentsStore } from '../../store';
 const EarlyAppointments: React.FC = () => {
   const { t } = useTranslation();
   const { appointmentServiceTypes, selectedDate } = useAppointmentsStore();
-  const { earlyAppointmentList, isLoading } = useEarlyAppointmentList(selectedDate);
+  const { data: earlyAppointmentList, isLoading, error } = useEarlyAppointmentList(selectedDate);
 
   const appointments = filterByServiceType(earlyAppointmentList, appointmentServiceTypes).map((appointment, index) => {
     return {
@@ -22,7 +23,20 @@ const EarlyAppointments: React.FC = () => {
   });
 
   return (
-    <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={t('cameEarly', 'Came Early')} />
+    <>
+      {error && (
+        <AppointmentsError
+          error={error}
+          title="earlyAppointmentsLoadError"
+          subtitle="Unable to load early appointments"
+        />
+      )}
+      <AppointmentsTable
+        appointments={appointments}
+        isLoading={isLoading}
+        tableHeading={t('cameEarly', 'Came Early')}
+      />
+    </>
   );
 };
 

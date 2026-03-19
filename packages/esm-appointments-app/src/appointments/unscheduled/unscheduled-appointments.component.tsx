@@ -19,6 +19,7 @@ import {
 import { Download } from '@carbon/react/icons';
 import { ConfigurableLink, EmptyCard, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
+import AppointmentsError from '../common-components/appointments-error.component';
 import { exportUnscheduledAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { getPageSizes, useSearchResults } from '../utils';
 import { type ConfigObject } from '../../config-schema';
@@ -66,6 +67,16 @@ const UnscheduledAppointments: React.FC = () => {
     phoneNumber: visit.phoneNumber === '' ? '--' : visit.phoneNumber,
     identifier: visit?.identifier,
   }));
+
+  if (error) {
+    return (
+      <AppointmentsError
+        error={error}
+        title="unscheduledAppointmentsLoadError"
+        subtitle="Unable to load unscheduled appointments"
+      />
+    );
+  }
 
   if (isLoading) {
     return <DataTableSkeleton />;

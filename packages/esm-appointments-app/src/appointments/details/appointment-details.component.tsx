@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
+import AppointmentsError from '../common-components/appointments-error.component';
 import { getGender } from '../../helpers';
 import { type Appointment } from '../../types';
 import styles from './appointment-details.scss';
@@ -13,7 +14,7 @@ interface AppointmentDetailsProps {
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) => {
   const { t } = useTranslation();
   const [isEnabledQuery, setIsEnabledQuery] = useState(false);
-  const { appointmentsCount, isLoading } = usePatientAppointmentHistory(appointment.patient.uuid);
+  const { data: appointmentsCount, isLoading, error } = usePatientAppointmentHistory(appointment.patient.uuid);
   const { patient } = usePatient(appointment.patient.uuid);
 
   useEffect(() => {
@@ -21,6 +22,16 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
       setIsEnabledQuery(true);
     }
   }, [appointmentsCount, isLoading]);
+
+  if (error) {
+    return (
+      <AppointmentsError
+        error={error}
+        title="appointmentDetailsLoadError"
+        subtitle="Unable to load appointment history"
+      />
+    );
+  }
 
   return (
     <div className={styles.appointmentDetailsContainer}>

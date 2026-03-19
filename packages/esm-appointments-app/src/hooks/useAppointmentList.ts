@@ -3,13 +3,14 @@ import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import { useAppointmentsStore } from '../store';
+import { type UseAppointmentHookResult } from './hook-types';
 
-export const useAppointmentList = (date: string) => {
+export const useAppointmentList = (date: string): UseAppointmentHookResult<AppointmentsFetchResponse['data']> => {
   const startOfDay = dayjs(date).startOf('day').toISOString();
   const searchUrl = `${restBaseUrl}/appointments?forDate=${startOfDay}`;
 
-  const { data, ...rest } = useSWR<AppointmentsFetchResponse, Error>(searchUrl, openmrsFetch);
-  return { appointmentList: data?.data ?? [], ...rest };
+  const { data, error, isLoading } = useSWR<AppointmentsFetchResponse, Error>(searchUrl, openmrsFetch);
+  return { data: data?.data ?? [], error: error ?? null, isLoading };
 };
 
 /**
@@ -17,7 +18,9 @@ export const useAppointmentList = (date: string) => {
  * @param startDate
  * @returns
  */
-export const useEarlyAppointmentList = (startDate?: string) => {
+export const useEarlyAppointmentList = (
+  startDate?: string,
+): UseAppointmentHookResult<AppointmentsFetchResponse['data']> => {
   const { selectedDate } = useAppointmentsStore();
   const forDate = startDate ? startDate : selectedDate;
   const url = `${restBaseUrl}/appointment/earlyAppointment?forDate=${forDate}`;
@@ -26,5 +29,5 @@ export const useEarlyAppointmentList = (startDate?: string) => {
     errorRetryCount: 2,
   });
 
-  return { earlyAppointmentList: data?.data ?? [], isLoading, error };
+  return { data: data?.data ?? [], error: error ?? null, isLoading };
 };

@@ -12,10 +12,15 @@ dayjs.extend(isBetween);
 
 interface MonthlyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;
+  isLoading?: boolean;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events }) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, isLoading = false }) => {
   const { selectedDate } = useAppointmentsStore();
+
+  if (isLoading) {
+    return <div className={styles.calendarViewContainer}>Loading calendar...</div>;
+  }
 
   return (
     <div className={styles.calendarViewContainer}>

@@ -3,6 +3,7 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Identifier } from '../types';
 import { configSchema } from '../config-schema';
 import { useAppointmentsStore } from '../store';
+import { type UseAppointmentHookResult } from './hook-types';
 
 interface UnscheduledAppointment {
   age: number;
@@ -19,10 +20,20 @@ interface UnscheduledAppointment {
   };
 }
 
+interface UnscheduledAppointmentObject {
+  name: string;
+  identifier: string;
+  dateTime: Date;
+  gender: string;
+  phoneNumber: string;
+  age: number;
+  uuid: string;
+}
+
 /**
  * This is a non-standard API that does not come with the appointments module by default
  */
-export function useUnscheduledAppointments() {
+export function useUnscheduledAppointments(): UseAppointmentHookResult<Array<UnscheduledAppointmentObject>> {
   const { selectedDate } = useAppointmentsStore();
   // TODO/NOTE: this endpoint is not implemented in main Bahmni Appointments backend
   const url = `${restBaseUrl}/appointment/unScheduledAppointment?forDate=${selectedDate}`;
@@ -31,10 +42,10 @@ export function useUnscheduledAppointments() {
   });
   const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment));
 
-  return { isLoading, data: appointments ?? [], error };
+  return { data: appointments ?? [], error: error ?? null, isLoading };
 }
 
-function toAppointmentObject(appointment: UnscheduledAppointment) {
+function toAppointmentObject(appointment: UnscheduledAppointment): UnscheduledAppointmentObject {
   return {
     name: appointment.name,
     identifier: appointment?.identifiers?.find(

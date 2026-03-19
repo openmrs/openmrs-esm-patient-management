@@ -54,12 +54,14 @@ const mockUsePatient = jest.mocked(usePatient);
 
 jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
   usePatientAppointmentHistory: () => ({
-    appointmentsCount: {
+    data: {
       completedAppointments: 1,
       missedAppointments: 2,
       cancelledAppointments: 3,
       upcomingAppointments: 4,
     },
+    error: null,
+    isLoading: false,
   }),
 }));
 

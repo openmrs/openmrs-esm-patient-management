@@ -3,8 +3,16 @@ import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import { useAppointmentsStore } from '../store';
+import { type UseAppointmentHookResult } from './hook-types';
 
-export function usePatientAppointmentHistory(patientUuid: string) {
+interface AppointmentCountData {
+  missedAppointments: number;
+  completedAppointments: number;
+  cancelledAppointments: number;
+  upcomingAppointments: number;
+}
+
+export function usePatientAppointmentHistory(patientUuid: string): UseAppointmentHookResult<AppointmentCountData> {
   const abortController = new AbortController();
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const { selectedDate } = useAppointmentsStore();
@@ -22,7 +30,7 @@ export function usePatientAppointmentHistory(patientUuid: string) {
       },
     });
 
-  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
+  const { data, error, isLoading } = useSWR<AppointmentsFetchResponse, Error>(
     patientUuid ? appointmentsSearchUrl : null,
     fetcher,
   );
@@ -41,9 +49,8 @@ export function usePatientAppointmentHistory(patientUuid: string) {
     : 0;
 
   return {
-    appointmentsCount: { missedAppointments, completedAppointments, cancelledAppointments, upcomingAppointments },
-    error,
+    data: { missedAppointments, completedAppointments, cancelledAppointments, upcomingAppointments },
+    error: error ?? null,
     isLoading,
-    isValidating,
   };
 }
