@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
-import MetricsCard from './metrics-card.component';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { useAppointmentsStore } from '../../store';
+import MetricsCard from './metrics-card.component';
 import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 export default function ProvidersBookedExtension() {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   const { appointmentForSelectedDateFilteredByServiceTypes } = useAppointmentsAppContext();
 
   const totalProviders = useMemo(() => {

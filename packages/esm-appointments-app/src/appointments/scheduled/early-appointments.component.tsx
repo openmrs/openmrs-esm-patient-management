@@ -4,6 +4,7 @@ import { filterByServiceType } from '../utils';
 import { useEarlyAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
 import { useAppointmentsStore } from '../../store';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 /**
  * Component to display early appointments
@@ -11,7 +12,8 @@ import { useAppointmentsStore } from '../../store';
  */
 const EarlyAppointments: React.FC = () => {
   const { t } = useTranslation();
-  const { appointmentServiceTypes, selectedDate } = useAppointmentsStore();
+  const { appointmentServiceTypes } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   const { earlyAppointmentList, isLoading } = useEarlyAppointmentList(selectedDate);
 
   const appointments = filterByServiceType(earlyAppointmentList, appointmentServiceTypes).map((appointment, index) => {

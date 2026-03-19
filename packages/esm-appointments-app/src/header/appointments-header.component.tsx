@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MultiSelect } from '@carbon/react';
 import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
-import { omrsDateFormat } from '../constants';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
+import { useSelectedDate } from '../hooks/useSelectedDate';
 import { useAppointmentsStore } from '../store';
 import styles from './appointments-header.scss';
 
@@ -15,8 +16,13 @@ interface AppointmentHeaderProps {
 
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter }) => {
   const { t } = useTranslation();
-  const { selectedDate, appointmentServiceTypes, setAppointmentServiceTypes, setSelectedDate } = useAppointmentsStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { appointmentServiceTypes, setAppointmentServiceTypes } = useAppointmentsStore();
   const { serviceTypes } = useAppointmentServices();
+  const selectedDate = useSelectedDate();
+
+  const selectedDateValue = useMemo(() => dayjs(selectedDate).toDate(), [selectedDate]);
 
   const handleChangeServiceTypeFilter = useCallback(
     ({ selectedItems }) => {
@@ -39,8 +45,17 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServi
           data-testid="appointment-date-picker"
           id="appointment-date-picker"
           aria-label={t('appointmentDate', 'Appointment date')}
-          onChange={(date) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
-          value={dayjs(selectedDate).toDate()}
+          onChange={(date) => {
+            if (!date) {
+              return;
+            }
+
+            const target = `/${dayjs(date).format('YYYY-MM-DD')}`;
+            if (!location.pathname.endsWith(target)) {
+              navigate(target);
+            }
+          }}
+          value={selectedDateValue}
         />
         {showServiceTypeFilter && (
           <MultiSelect

@@ -196,10 +196,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                     itemToString={(item) => (item ? item.label : '')}
                     label={t('filterAppointmentsByStatus', 'Filter appointments by status')}
                     onChange={({ selectedItems }) =>
-                      setSelectedAppointmentStatuses(new Set(selectedItems.map((item) => item.id)))
+                      setSelectedAppointmentStatuses([...new Set(selectedItems.map((item) => item.id))])
                     }
                     type="inline"
-                    selectedItems={[...selectedAppointmentStatuses].map((status) => ({ id: status, label: t(status) }))}
+                    selectedItems={selectedAppointmentStatuses.map((status) => ({ id: status, label: t(status) }))}
                   />
                   <Button
                     size={responsiveSize}
