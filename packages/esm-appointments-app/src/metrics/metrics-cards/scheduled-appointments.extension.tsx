@@ -14,13 +14,15 @@ export default function ScheduledAppointmentsExtension() {
 
   const { totalScheduledAppointments } = useScheduledAppointments(appointmentServiceTypes);
 
-  const filteredArrivedAppointments = appointmentServiceTypes
-    ? arrivedAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
-    : arrivedAppointments;
+  const filteredArrivedAppointments =
+    appointmentServiceTypes.length > 0
+      ? arrivedAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
+      : arrivedAppointments;
 
-  const filteredPendingAppointments = appointmentServiceTypes
-    ? pendingAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
-    : pendingAppointments;
+  const filteredPendingAppointments =
+    appointmentServiceTypes.length > 0
+      ? pendingAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
+      : pendingAppointments;
 
   return (
     <MetricsCard
