@@ -1,13 +1,25 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import Appointments from './appointments.component';
+import { type ConfigObject, configSchema } from './config-schema';
+import { BrowserRouter } from 'react-router-dom';
 
-// TODO: Tweak the ExtensionSlot stub in the framework to not return a function. Functions are not valid React children.
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+
 describe('Appointments', () => {
-  it('renders the appointments dashboard', async () => {
-    render(<Appointments />);
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+    });
+  });
 
-    await screen.findByRole('combobox');
+  it('renders the appointments dashboard', async () => {
+    render(
+      <BrowserRouter>
+        <Appointments />
+      </BrowserRouter>,
+    );
 
     expect(screen.getByRole('button', { name: /appointments calendar/i })).toBeInTheDocument();
     expect(screen.getByText(/filter appointments by service type/i)).toBeInTheDocument();
