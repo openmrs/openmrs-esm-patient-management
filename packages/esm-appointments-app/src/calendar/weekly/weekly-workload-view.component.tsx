@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
@@ -20,8 +20,9 @@ const WeeklyWorkloadView: React.FC<WeeklyWorkloadViewProps> = ({ dateTime, event
 
   const isToday = dateTime.isSame(dayjs(), 'day');
   const isSelected = dateTime.isSame(dayjs(selectedDate), 'day');
-  const currentData = events?.find(
-    (e) => dayjs(e.appointmentDate).format('YYYY-MM-DD') === dateTime.format('YYYY-MM-DD'),
+  const currentData = useMemo(
+    () => events?.find((e) => dayjs(e.appointmentDate).format('YYYY-MM-DD') === dateTime.format('YYYY-MM-DD')),
+    [dateTime, events],
   );
   const totalCount = currentData?.services?.reduce((sum, { count = 0 }) => sum + count, 0) ?? 0;
 
