@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { omrsDateFormat } from '../constants';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
 import { ContentSwitcher, Switch } from '@carbon/react';

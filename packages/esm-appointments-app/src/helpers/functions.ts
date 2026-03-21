@@ -4,55 +4,6 @@ import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-f
 import { type AppointmentCountMap, AppointmentStatus, type AppointmentSummary } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
 
-interface FlattenedAppointmentSummary {
-  serviceName: string;
-  countMap: AppointmentCountMap[];
-}
-
-interface ServiceLoadSummary {
-  serviceName: string;
-  count: number;
-}
-
-export const getHighestAppointmentServiceLoad = (
-  appointmentSummary: FlattenedAppointmentSummary[] = [],
-): ServiceLoadSummary | undefined => {
-  const groupedAppointments = appointmentSummary.map(({ countMap, serviceName }) => ({
-    serviceName: serviceName,
-    count: countMap.reduce((accumulator, currentValue) => accumulator + currentValue.allAppointmentsCount, 0),
-  }));
-  if (groupedAppointments.length === 0) {
-    return undefined;
-  }
-  return groupedAppointments.find((summary) => summary.count === Math.max(...groupedAppointments.map((x) => x.count)));
-};
-
-export const flattenAppointmentSummary = (
-  appointmentToTransform: AppointmentSummary[],
-): FlattenedAppointmentSummary[] =>
-  appointmentToTransform.flatMap((el) => ({
-    serviceName: el.appointmentService.name,
-    countMap: Object.entries(el.appointmentCountMap).flatMap(([, countMap]) => countMap),
-  }));
-
-export const getServiceCountByAppointmentType = (
-  appointmentSummary: AppointmentSummary[],
-  appointmentType: 'allAppointmentsCount' | 'missedAppointmentsCount',
-): number => {
-  return appointmentSummary
-    .map((el) =>
-      Object.values(el.appointmentCountMap).map((countMap) => {
-        const value = countMap[appointmentType];
-        if (typeof value === 'number') {
-          return value;
-        }
-        return 0;
-      }),
-    )
-    .flat(1)
-    .reduce((count, val) => count + val, 0);
-};
-
 export const formatAMPM = (date: Date): string => {
   const hours24 = date.getHours();
   const minutes = date.getMinutes();

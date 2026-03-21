@@ -13,6 +13,13 @@ export interface AppointmentLocation {
   name: string;
 }
 
+// added to prevent auto-removal of translations for dynamic keys
+// t('Scheduled', 'Scheduled');
+// t('CheckedIn', 'Checked in');
+// t('Cancelled', 'Cancelled');
+// t('Missed', 'Missed');
+// t('Completed', 'Completed');
+
 // note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
 export enum AppointmentStatus {
   SCHEDULED = 'Scheduled',
@@ -183,4 +190,10 @@ export interface RecurringAppointmentsPayload {
 
 export interface PatientDetails {
   dateOfBirth: string;
+}
+
+export interface AppointmentsAppContext {
+  appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
+  isLoading: boolean;
+  error: any;
 }
