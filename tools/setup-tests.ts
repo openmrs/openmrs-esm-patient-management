@@ -1,4 +1,19 @@
 import '@testing-library/jest-dom';
+import type { ReactNode } from 'react';
+
+jest.mock('@openmrs/esm-framework', () => {
+  const actual = jest.requireActual('@openmrs/esm-framework');
+
+  if (!actual.TableBatchActions) {
+    Object.defineProperty(actual, 'TableBatchActions', {
+      value: ({ children }: { children?: ReactNode }) => children ?? null,
+      configurable: true,
+      writable: true,
+    });
+  }
+
+  return actual;
+});
 
 // Prevent single-spa from emitting warnings / touching navigation during unit tests.
 jest.mock('single-spa', () => ({
