@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -28,10 +28,11 @@ export default function WaitingPatientsExtension() {
   };
 
   const serviceItems: ServiceListItem[] = [defaultServiceItem, ...(services ?? [])];
-
-  const [initialSelectedItem, setInitialSelectItem] = useState(() => {
-    return !selectedServiceDisplay || !selectedServiceUuid;
-  });
+  const selectedServiceItem =
+    serviceItems.find((item) => item.uuid === selectedServiceUuid) ??
+    (selectedServiceUuid && selectedServiceDisplay
+      ? ({ uuid: selectedServiceUuid, display: selectedServiceDisplay } as Concept)
+      : defaultServiceItem);
 
   const { totalCount, queueEntries } = useQueueEntries({
     service: selectedServiceUuid,
@@ -43,12 +44,12 @@ export default function WaitingPatientsExtension() {
   const urgentCount = queueEntries.filter((entry) => entry.priority?.display?.toLowerCase() === 'urgent').length;
 
   const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedService(selectedItem.uuid, selectedItem.display);
-    if (selectedItem.uuid === undefined) {
-      setInitialSelectItem(true);
-    } else {
-      setInitialSelectItem(false);
+    if (!selectedItem?.uuid) {
+      updateSelectedService(null, t('all', 'All'));
+      return;
     }
+
+    updateSelectedService(selectedItem.uuid, selectedItem.display);
   };
 
   return (
@@ -56,12 +57,12 @@ export default function WaitingPatientsExtension() {
       <MetricsCardHeader title={t('waitingFor', 'Waiting for') + ':'}>
         <Dropdown
           id="inline"
-          initialSelectedItem={defaultServiceItem}
           items={serviceItems}
           itemToString={(item) =>
             item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
           }
           label=""
+          selectedItem={selectedServiceItem}
           titleText=""
           onChange={handleServiceChange}
           size={isDesktop(layout) ? 'sm' : 'lg'}
@@ -71,7 +72,7 @@ export default function WaitingPatientsExtension() {
       <MetricsCardBody>
         <MetricsCardItem
           label={t('patients', 'Patients')}
-          value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
+          value={!selectedServiceUuid ? (totalCount ?? '--') : serviceCount}
         />
         <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount > 0 ? urgentCount : null} color="red" small />
       </MetricsCardBody>
