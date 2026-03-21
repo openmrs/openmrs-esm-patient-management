@@ -6,14 +6,10 @@ interface AppointmentsStore {
   selectedAppointmentStatuses: Array<AppointmentStatus>;
 }
 
-export const appointmentsStore = createGlobalStore<AppointmentsStore>(
-  'appointments-app',
-  {
-    appointmentServiceTypes: [],
-    selectedAppointmentStatuses: [],
-  },
-  'sessionStorage',
-);
+export const appointmentsStore = createGlobalStore<AppointmentsStore>('appointments-app', {
+  appointmentServiceTypes: [],
+  selectedAppointmentStatuses: [],
+});
 
 export const storeActions = {
   setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
