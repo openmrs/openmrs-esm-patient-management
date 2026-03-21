@@ -6,8 +6,8 @@ import { omrsDateFormat } from '../../constants';
 import { isSameMonth } from '../../helpers';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './monthly-view-workload.scss';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
 
@@ -22,7 +22,7 @@ const MAX_VISIBLE_PATIENTS = 3;
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
   const layout = useLayoutType();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
 
   const currentData = useMemo(
     () =>
