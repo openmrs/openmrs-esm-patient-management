@@ -182,3 +182,14 @@
   outline: none;
   cursor: pointer;
 }
+
+/* Highlight current day cell across all calendar views */
+.todayCell {
+  border: 0.2rem solid colors.$blue-70;
+}
+
+/* Highlight date number for today's cell */
+.todayText {
+  color: colors.$blue-70;
+  font-weight: bold;
+}

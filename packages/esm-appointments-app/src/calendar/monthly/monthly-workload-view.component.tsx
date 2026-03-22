@@ -20,6 +20,9 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   const layout = useLayoutType();
   const { selectedDate } = useAppointmentsStore();
 
+  /* Determine if the current cell represents today's date */
+  const isToday = dayjs(dateTime).isSame(dayjs(), 'day');
+
   const currentData = useMemo(
     () =>
       events?.find(
@@ -52,7 +55,15 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     <div
       onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
+        /* Apply base styles depending on whether the date belongs to current month */
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+
+        /* Highlight today's date across monthly, weekly, and daily views */
+        {
+          [styles.todayCell]: isToday,
+        },
+
+        /* Preserve responsive layout behavior */
         showAllServices
           ? {}
           : {
@@ -71,7 +82,15 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
             ) : (
               <div />
             )}
-            <b className={styles.calendarDate}>{dateTime.format('D')}</b>
+
+            <b
+              className={classNames(
+                styles.calendarDate,
+                /* Highlights today's date text */
+                { [styles.todayText]: isToday },
+              )}>
+              {dateTime.format('D')}{' '}
+            </b>
           </span>
           {currentData?.services && (
             <div className={styles.currentData}>

@@ -3,12 +3,19 @@ import dayjs from 'dayjs';
 import { omrsDateFormat } from './constants';
 
 export const appointmentsStore = createGlobalStore('appointments-app', {
-  appointmentServiceTypes: getFromLocalStorage('openmrs:appointments:serviceTypes') || [],
+  /* Controls the current calendar display mode (day | week | month) */
+  appointmentServiceTypes: [],
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
+  calendarView: 'monthly',
 });
 
 export function useAppointmentsStore() {
   return useStore(appointmentsStore);
+}
+
+/* Updates the global calendar view mode */
+export function setCalendarView(view: 'daily' | 'weekly' | 'monthly') {
+  appointmentsStore.setState({ calendarView: view });
 }
 
 export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
