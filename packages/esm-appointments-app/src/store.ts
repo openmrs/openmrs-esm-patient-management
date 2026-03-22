@@ -2,26 +2,28 @@ import { createGlobalStore, isOmrsDateStrict, useStore } from '@openmrs/esm-fram
 import dayjs from 'dayjs';
 import { omrsDateFormat } from './constants';
 
+/* Global store for appointments calendar */
 export const appointmentsStore = createGlobalStore('appointments-app', {
-  /* Controls the current calendar display mode (day | week | month) */
   appointmentServiceTypes: [],
+
+  /* Selected date used across monthly, weekly, and daily views */
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
+
+  /* Controls current calendar view */
   calendarView: 'monthly',
 });
 
+/* Hook to access global store */
 export function useAppointmentsStore() {
   return useStore(appointmentsStore);
 }
 
-/* Updates the global calendar view mode */
+/* Update calendar view (month / week / day) */
 export function setCalendarView(view: 'daily' | 'weekly' | 'monthly') {
   appointmentsStore.setState({ calendarView: view });
 }
 
-export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
-  appointmentsStore.setState({ appointmentServiceTypes: serviceTypes });
-}
-
+/* Update selected date */
 export function setSelectedDate(date: string) {
   if (!isOmrsDateStrict(date)) {
     console.warn(
@@ -29,11 +31,16 @@ export function setSelectedDate(date: string) {
       date,
     );
   }
+
   appointmentsStore.setState({ selectedDate: date });
 }
 
-/* Set up localStorage serialization */
+/* Update service filters */
+export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
+  appointmentsStore.setState({ appointmentServiceTypes: serviceTypes });
+}
 
+/* Persist service types in localStorage */
 let lastValueOfAppointmentServiceTypes = getFromLocalStorage('openmrs:appointments:serviceTypes');
 
 function getFromLocalStorage(key: string) {
