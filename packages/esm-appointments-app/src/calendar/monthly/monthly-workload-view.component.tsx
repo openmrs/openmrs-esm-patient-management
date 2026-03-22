@@ -21,7 +21,8 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   const selectedDate = useSelectedDate();
 
   /* Determine if the current cell represents today's date */
-  const isToday = dayjs(dateTime).isSame(dayjs(), 'day');
+  const today = dayjs().startOf('day');
+  const isToday = dayjs(dateTime).isSame(today, 'day');
 
   const currentData = useMemo(
     () =>
@@ -118,9 +119,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   events={events}
                   dateTime={dateTime}
                 />
-              ) : (
-                ''
-              )}
+              ) : null}
             </div>
           )}
         </div>
