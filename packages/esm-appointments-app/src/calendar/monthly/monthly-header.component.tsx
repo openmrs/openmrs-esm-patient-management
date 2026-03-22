@@ -9,6 +9,7 @@ import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 
+const MonthlyHeader: React.FC = () => {
 /* Extend header to support navigation for different calendar views */
 interface MonthlyHeaderProps {
   mode?: 'monthly' | 'weekly' | 'daily';
@@ -18,6 +19,9 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
 
+  const [calendarSelectedDate, setCalendarSelectedDate] = useState(dayjs(selectedDate));
+
+<<<<<<< fixed-appointments-calender-limited-drill-down-capability
   /* Determine navigation unit dynamically based on active calendar view */
   const getUnit = useCallback(() => {
     if (mode === 'weekly') return 'week';
@@ -34,52 +38,49 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
   const handleSelectNext = useCallback(() => {
     setSelectedDate(dayjs(selectedDate).add(1, getUnit()).format(omrsDateFormat));
   }, [selectedDate, getUnit]);
+=======
+  const handleSelectPrevMonth = useCallback(() => {
+    setCalendarSelectedDate(calendarSelectedDate.subtract(1, 'month'));
+  }, [calendarSelectedDate, setCalendarSelectedDate]);
+
+  const handleSelectNextMonth = useCallback(() => {
+    setCalendarSelectedDate(calendarSelectedDate.add(1, 'month'));
+  }, [calendarSelectedDate, setCalendarSelectedDate]);
+>>>>>>> main
 
   return (
     <>
       <div className={styles.container}>
-        {/* Previous navigation button */}
         <Button
-          aria-label={t('previous', 'Previous')}
+          aria-label={t('previousMonth', 'Previous month')}
           kind="tertiary"
-          onClick={handleSelectPrev}
+          onClick={handleSelectPrevMonth}
           size="sm">
+        <Button aria-label={t('previous', 'Previous')} kind="tertiary" onClick={handleSelectPrev} size="sm">
           {t('prev', 'Prev')}
         </Button>
 
-        {/* Display current selected date */}
-        <span>
-          {formatDate(new Date(selectedDate), {
-            day: false,
-            time: false,
-            noToday: true,
-          })}
-        </span>
+        {/* Display formatted selected date (updates dynamically with navigation) */}
+        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
+        <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={handleSelectNextMonth} size="sm">
 
-        {/* Next navigation button */}
-        <Button
-          aria-label={t('next', 'Next')}
-          kind="tertiary"
-          onClick={handleSelectNext}
-          size="sm">
+        <Button aria-label={t('next', 'Next')} kind="tertiary" onClick={handleSelectNext} size="sm">
           {t('next', 'Next')}
         </Button>
       </div>
 
-      {/* Weekday header rendering */}
+      {/* Show days-of-week header for monthly and weekly views only */}
       <div className={styles.workLoadCard}>
+        {DAYS_IN_WEEK.map((day) => (
+          <DaysOfWeekCard key={day} dayOfWeek={day} />
+        ))}
         {mode === 'daily' ? (
-          /* Show ONLY one day for daily view */
           <div style={{ width: '14.28%' }}>
-            <DaysOfWeekCard
-              dayOfWeek={dayjs(selectedDate).format('ddd').toUpperCase()}
-            />
+            <DaysOfWeekCard dayOfWeek={dayjs(selectedDate).format('ddd').toUpperCase()} />
           </div>
         ) : (
-          /* Show full week for monthly + weekly views */
-          DAYS_IN_WEEK.map((day) => (
-            <DaysOfWeekCard key={day} dayOfWeek={day} />
-          ))
+          /* Full week (monthly + weekly) */
+          DAYS_IN_WEEK.map((day) => <DaysOfWeekCard key={day} dayOfWeek={day} />)
         )}
       </div>
     </>
