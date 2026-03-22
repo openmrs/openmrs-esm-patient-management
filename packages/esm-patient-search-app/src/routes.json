@@ -27,6 +27,12 @@
       "component": "patientSearchBar",
       "slot": "patient-search-bar-slot",
       "offline": true
+    },
+    {
+      "name": "patient-search-start-visit-button",
+      "component": "patientSearchStartVisitButton2",
+      "slot": "start-visit-button-slot2",
+      "offline": true
     }
   ],
   "workspaces": [

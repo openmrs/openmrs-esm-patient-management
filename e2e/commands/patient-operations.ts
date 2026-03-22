@@ -59,3 +59,7 @@ export const deletePatient = async (api: APIRequestContext, uuid: string) => {
   const response = await api.delete(`patient/${uuid}`);
   await expect(response.ok()).toBeTruthy();
 };
+
+export function getPatientIdentifierStr(patient: Patient) {
+  return patient.identifiers[0].display.split('=')[1].trim();
+}

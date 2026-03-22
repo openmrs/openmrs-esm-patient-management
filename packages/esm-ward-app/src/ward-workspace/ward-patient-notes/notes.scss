@@ -1,0 +1,33 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.formContainer {
+  margin: layout.$spacing-05;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.row {
+  margin: layout.$spacing-05 0 0;
+}
+
+.columnLabel {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+}
+
+.saveButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+}

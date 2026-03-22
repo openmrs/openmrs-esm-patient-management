@@ -62,6 +62,7 @@ export default function WaitingPatientsExtension() {
             item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
           }
           label=""
+          titleText=""
           onChange={handleServiceChange}
           size={isDesktop(layout) ? 'sm' : 'lg'}
           type="inline"

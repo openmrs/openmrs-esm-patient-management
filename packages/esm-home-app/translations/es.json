@@ -1,6 +1,6 @@
 {
-  "contactAdministrator": "Please try using the left navigation menu links. If the issue persists, contact your system administrator.",
-  "dashboardNotFound": "The dashboard you are looking for does not exist.",
-  "dashboardNotFoundDescription": "The page you requested could not be found. It may have been moved, deleted, or the configured dashboard does not exist.",
-  "pageNotFound": "Page not found"
+  "contactAdministrator": "Por favor, intente usar los links del menú de navegación situado a la izquierda. Si el problema persiste, contacte con su administrador del sistema.",
+  "dashboardNotFound": "El panel que está buscando no existe.",
+  "dashboardNotFoundDescription": "No se pudo encontrar la página solicitada. Es posible que se haya movido, eliminado o que el panel configurado no exista.",
+  "pageNotFound": "Página no encontrada"
 }

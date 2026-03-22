@@ -43,5 +43,8 @@
 
 .content {
   @include type.type-style('heading-compact-01');
-  margin-right: layout.$spacing-03;
+}
+
+.manageButton {
+  margin: 0 layout.$spacing-03;
 }

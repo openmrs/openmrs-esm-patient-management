@@ -16,8 +16,8 @@ jobs:
     if: github.repository_owner == 'openmrs'
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Push source file using transifex client
+      - uses: actions/checkout@v6
+      - name: Pull source files using transifex client
         uses: transifex/cli-action@v2
         with:
           token: ${{ secrets.TRANSIFEX_TOKEN }}

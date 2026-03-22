@@ -8,6 +8,7 @@ import DefaultWardPendingPatients from './default-ward-pending-patients.componen
 import DefaultWardUnassignedPatients from './default-ward-unassigned-patients.component';
 import Ward from '../ward.component';
 import WardViewHeader from '../../ward-view-header/ward-view-header.component';
+import WardMetrics from '../../ward-view-header/ward-metrics.component';
 
 const DefaultWardView = () => {
   const wardPatientGroupDetails = useWardPatientGrouping();
@@ -17,12 +18,13 @@ const DefaultWardView = () => {
   });
 
   const wardBeds = <DefaultWardBeds />;
+  const wardMetrics = <WardMetrics />;
   const wardUnassignedPatients = <DefaultWardUnassignedPatients />;
   const wardPendingPatients = <DefaultWardPendingPatients />;
 
   return (
     <>
-      <WardViewHeader {...{ wardPendingPatients }} />
+      <WardViewHeader {...{ wardPendingPatients, wardMetrics }} />
       <Ward {...{ wardBeds, wardUnassignedPatients }} />
     </>
   );

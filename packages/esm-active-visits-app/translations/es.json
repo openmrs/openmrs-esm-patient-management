@@ -6,7 +6,7 @@
   "dose": "Dosis",
   "encounterType": "Tipo De Encuentro",
   "endDate": "Fecha de finalización",
-  "filterActiveVisits": "Filtrar Consultas Activas",
+  "filterActiveVisits": "Filtrar consultas activas",
   "filterTable": "Filtrar la tabla",
   "indication": "Indicación",
   "medications": "Medicamentos",
@@ -28,6 +28,6 @@
   "thereIsNoInformationToDisplayHere": "No hay información para mostrar aquí",
   "time": "Hora",
   "totalVisits": "Total de Consultas Hoy",
-  "viewPatientChartFor": "Ver historial clínico de {{patientName}}",
+  "viewPatientChartFor": "Ver historia clínica de {{patientName}}",
   "visitSummary": "Resumen de la Consulta"
 }

@@ -2,7 +2,7 @@
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
     "webservices.rest": ">=2.2.0",
-    "queue": "^2.4.0-0"
+    "queue": ">=2.4.0 <4.0.0"
   },
   "extensions": [
     {
@@ -54,7 +54,7 @@
     {
       "name": "visit-form-queue-fields",
       "component": "visitFormQueueFields",
-      "slot":"visit-form-bottom-slot"
+      "slot": "visit-form-bottom-slot"
     },
     {
       "name": "queue-patient-info-queue-entry-status",
@@ -100,6 +100,11 @@
       "component": "serviceQueuesAdminPage",
       "name": "service-queues-admin",
       "slot": "service-queues-admin-page-slot"
+    },
+    {
+      "component": "queueScreen",
+      "name": "queue-screen",
+      "slot": "queue-screen-slot"
     }
   ],
   "modals": [
@@ -142,33 +147,61 @@
     {
       "name": "delete-queue-entry-modal",
       "component": "deleteQueueEntryModal"
+    },
+    {
+      "name": "delete-queue-modal",
+      "component": "deleteQueueModal"
+    },
+    {
+      "name": "delete-queue-room-modal",
+      "component": "deleteQueueRoomModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
+    {
+      "name": "create-queue-entry-workspace",
+      "component": "createQueueEntryWorkspace",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "queue-patient-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "queue-patient-search-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "add-queue-entry"
+    },
     {
       "name": "service-queues-service-form",
-      "title": "addNewQueueService",
-      "component": "addNewQueueServiceWorkspace",
-      "type": "service-queues"
+      "component": "addNewQueueWorkspace",
+      "window": "add-queue"
     },
     {
       "name": "service-queues-room-workspace",
-      "title": "addNewQueueServiceRoom",
       "component": "addNewQueueServiceRoomWorkspace",
-      "type": "service-queues"
+      "window": "add-queue-room"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "add-queue-entry",
+      "group": "service-queues"
     },
     {
-      "name": "service-queues-linelist-filter",
-      "title": "filter",
-      "component": "queueLinelistFilterWorkspace",
-      "type": "service-queues"
+      "name": "add-queue",
+      "group": "service-queues"
     },
     {
-      "name": "create-queue-entry-workspace",
-      "title": "addPatientToQueue",
-      "component": "createQueueEntryWorkspace",
-      "type": "service-queues",
-      "width": "wider"
+      "name": "add-queue-room",
+      "group": "service-queues"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "service-queues",
+      "scopePattern": "/home/service-queues"
     }
   ]
 }

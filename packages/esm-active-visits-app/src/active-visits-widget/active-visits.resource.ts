@@ -185,6 +185,7 @@ export function useActiveVisitsSorting(tableRows: Array<any>) {
 
   const sortRow = (cellA, cellB, { key, sortDirection }) => {
     setSortParams({ key, sortDirection });
+    return 0; // Return value is not used, actual sorting happens in useMemo
   };
 
   const getSortValue = (item: any, key: string) => {

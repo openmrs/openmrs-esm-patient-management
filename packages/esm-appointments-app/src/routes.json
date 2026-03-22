@@ -1,7 +1,8 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": ">=2.2.0"
+    "webservices.rest": ">=2.2.0",
+    "appointments": ">=2.0.0"
   },
   "extensions": [
     {
@@ -42,31 +43,6 @@
       "component": "homeAppointments"
     },
     {
-      "name": "expected-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "checked-in-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "completed-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "missed-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "cancelled-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
       "name": "early-appointments-panel",
       "component": "earlyAppointments"
     },
@@ -96,10 +72,6 @@
       "name": "patient-upcoming-appointment-widget",
       "component": "patientUpcomingAppointmentsWidget",
       "slot": "visit-form-top-slot"
-    },
-    {
-      "name": "search-patient",
-      "component": "searchPatient"
     },
     {
       "name": "home-appointments-tile",
@@ -133,14 +105,39 @@
     {
       "name": "cancel-appointment-modal",
       "component": "cancelAppointmentModal"
+    },
+    {
+      "name": "batch-change-appointments-statuses-modal",
+      "component": "batchChangeAppointmentStatusesModal"
     }
   ],
-  "workspaces": [
+  "workspaceGroups2": [
+    {
+      "name": "appointments-group",
+      "scopePattern": "/home/appointments"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "appointments-window",
+      "group": "appointments-group"
+    }
+  ],
+  "workspaces2": [
     {
       "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",
-      "title": "createNewAppointment",
-      "type": "form"
+      "window": "appointments-window"
+    },
+    {
+      "name": "appointments-patient-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "appointments-window"
+    },
+    {
+      "name": "appointments-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "appointments-window"
     }
   ]
 }

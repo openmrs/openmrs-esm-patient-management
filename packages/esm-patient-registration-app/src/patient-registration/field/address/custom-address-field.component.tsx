@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
-import styles from '../field.scss';
 import { type FieldDefinition } from '../../../config-schema';
+import styles from '../field.scss';
 
 export interface AddressFieldProps {
   fieldDefinition: FieldDefinition;

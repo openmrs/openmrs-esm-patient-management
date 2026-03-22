@@ -85,8 +85,19 @@ describe('RecentlySearchedPatients', () => {
       data: [],
     });
 
-    expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
-    expect(screen.getByText(/try to search again using the patient's unique ID number/i)).toBeInTheDocument();
+    expect(screen.getByText(/no recently viewed patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients you select will appear here for quick access/i)).toBeInTheDocument();
+    expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('renders an empty state when there is no recent data', () => {
+    renderRecentlySearchedPatients({
+      isLoading: false,
+      data: null,
+    });
+
+    expect(screen.getByText(/no recently viewed patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients you select will appear here for quick access/i)).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
   });
 
@@ -125,7 +136,7 @@ describe('RecentlySearchedPatients', () => {
     //   `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
     // );
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/i })).toBeInTheDocument();
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
     expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
   });
 

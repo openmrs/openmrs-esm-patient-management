@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { InlineNotification, TextInputSkeleton } from '@carbon/react';
 import { type FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
-import { useTranslation } from 'react-i18next';
-import styles from '../field.scss';
 import { LocationPersonAttributeField } from './location-person-attribute-field.component';
+import styles from '../field.scss';
 
 export interface PersonAttributeFieldProps {
   fieldDefinition: FieldDefinition;

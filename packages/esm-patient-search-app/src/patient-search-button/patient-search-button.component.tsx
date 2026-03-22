@@ -6,14 +6,14 @@ import { launchWorkspace } from '@openmrs/esm-framework';
 import { type PatientSearchWorkspaceProps } from '../patient-search-workspace/patient-search.workspace';
 
 interface PatientSearchButtonProps {
-  buttonProps?: Object;
+  buttonProps?: object;
   buttonText?: string;
   handleReturnToSearchList?: () => void;
   hidePatientSearch?: () => void;
   isOpen?: boolean;
   searchQuery?: string;
-  searchQueryUpdatedAction?: (query: string) => {};
-  selectPatientAction?: (patientUuid: string, patient: fhir.Patient) => {};
+  searchQueryUpdatedAction?: (query: string) => void;
+  selectPatientAction?: (patientUuid: string, patient: fhir.Patient) => void;
   showPatientSearch?: () => void;
   workspaceTitle?: string;
 }
@@ -78,7 +78,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
       aria-label={t('searchPatientButton', 'Search Patient Button')}
       onClick={() => {
         launchPatientSearchWorkspace();
-        searchQueryUpdatedAction && searchQueryUpdatedAction('');
+        void (searchQueryUpdatedAction && searchQueryUpdatedAction(''));
       }}
       renderIcon={(props) => <Search size={20} {...props} />}
       {...buttonProps}>

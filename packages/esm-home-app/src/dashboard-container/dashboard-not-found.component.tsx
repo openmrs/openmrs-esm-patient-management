@@ -23,10 +23,10 @@ export const DashboardNotFound = () => {
         <Layer>
           <Tile className={styles.notFoundTile}>
             <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('pageNotFound', 'Page not found')}</h4>
+              <h1>{t('pageNotFound', 'Page not found')}</h1>
             </div>
             <div className={styles.notFoundContent}>
-              <h1 className={styles.errorCode}>404</h1>
+              <p className={styles.errorCode}>404</p>
               <p className={styles.errorMessage}>
                 {t('dashboardNotFound', 'The dashboard you are looking for does not exist.')}
               </p>

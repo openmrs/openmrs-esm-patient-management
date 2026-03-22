@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type TFunction } from 'i18next';
 import {
   Button,
   DataTable,
-  type DataTableHeader,
+  DataTableSkeleton,
   Layer,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -18,18 +19,9 @@ import {
   TableToolbarSearch,
   Tag,
   Tile,
-  DataTableSkeleton,
-  Pagination,
 } from '@carbon/react';
-import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
-import {
-  ConfigurableLink,
-  ExtensionSlot,
-  formatDatetime,
-  launchWorkspace,
-  parseDate,
-  usePagination,
-} from '@openmrs/esm-framework';
+import { OverflowMenuVertical } from '@carbon/react/icons';
+import { ConfigurableLink, ExtensionSlot, formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
 import { type FilterTypes } from '../types';
 
@@ -151,17 +143,6 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           <Tag size="md" type="blue">
             {t('today', 'Today')}
           </Tag>
-
-          <div className={styles.actionsBtn}>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <Filter size={16} {...props} />}
-              iconDescription={t('filter', 'Filter')}
-              onClick={() => launchWorkspace('service-queues-linelist-filter')}
-              size="sm">
-              {t('filter', 'Filter')}
-            </Button>
-          </div>
         </Tile>
       </Layer>
 

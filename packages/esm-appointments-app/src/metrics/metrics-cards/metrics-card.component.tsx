@@ -5,18 +5,19 @@ import { useTranslation } from 'react-i18next';
 import { isEmpty } from 'lodash-es';
 import { useAppointmentsStore } from '../../store';
 import styles from './metrics-card.scss';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 dayjs.extend(isSameOrBefore);
 
 interface MetricsCardProps {
   label: string;
-  value: number;
+  value: number | string;
   headerLabel: string;
   count?: { pendingAppointments: Array<any>; arrivedAppointments: Array<any> };
 }
 
 const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, count }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   const isSelectedDateInPast = useMemo(() => dayjs(selectedDate).isBefore(dayjs(), 'date'), [selectedDate]);
 
   return (

@@ -53,7 +53,6 @@ jest.mock('react-hook-form', () => ({
       fieldState: { error: undefined },
     }),
 }));
-it;
 
 describe('SearchField', () => {
   const defaultProps = {

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-list-management-app",
-  "version": "9.2.0",
+  "version": "10.0.2",
   "description": "Microfrontend for managing patient lists in O3",
   "browser": "dist/openmrs-esm-patient-list-management-app.js",
   "main": "src/index.ts",
@@ -9,16 +9,16 @@
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
   "scripts": {
     "start": "openmrs develop",
-    "serve": "webpack serve --mode=development",
+    "serve": "rspack serve --mode=development",
     "debug": "npm run serve",
-    "build": "webpack --mode production",
-    "analyze": "webpack --mode=production --env.analyze=true",
+    "build": "rspack --mode production",
+    "analyze": "rspack --mode=production --env.analyze=true",
     "lint": "cross-env eslint src --ext ts,tsx",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*modal.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*modal.tsx' 'src/**/*.workspace.tsx' 'src/**/*.resource.ts' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -45,13 +45,13 @@
     "zod": "^3.24.1"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "8.x",
+    "@openmrs/esm-framework": "9.x",
     "react": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
-    "webpack": "^5.99.9"
+    "openmrs": "next"
   }
 }

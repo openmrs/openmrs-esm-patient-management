@@ -1,12 +1,12 @@
 import type {
   Concept,
-  DefaultWorkspaceProps,
   Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
   Patient,
   Person,
   Visit,
+  Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 import type { useWardPatientGrouping } from '../hooks/useWardPatientGrouping';
@@ -50,7 +50,7 @@ export type WardPatient = {
   inpatientRequest: InpatientRequest;
 };
 
-export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
+export interface WardPatientWorkspaceProps {
   wardPatient: WardPatient;
 
   /**
@@ -59,6 +59,18 @@ export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
    */
   relatedTransferPatients?: WardPatient[];
 }
+
+/**
+ * props type of workspaces in the 'ward-patient` workspace group.
+ */
+export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<
+  {},
+  {},
+  {
+    wardPatient: WardPatient;
+    relatedTransferPatients?: WardPatient[];
+  }
+>;
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -224,10 +236,22 @@ export interface EncounterRole extends OpenmrsResourceStrict {
 export interface WardMetrics {
   patients: string;
   freeBeds: string;
-  capacity: string;
+  totalBeds: string;
+  femalesOfReproductiveAge?: string; // used in Maternal Ward View
+  newborns?: string; // used in Maternal Ward View
+}
+
+export enum WardMetricType {
+  PATIENTS = 'patients',
+  FREE_BEDS = 'freeBeds',
+  TOTAL_BEDS = 'totalBeds',
+  PENDING_OUT = 'pendingOut',
+  FEMALES_OF_REPRODUCTIVE_AGE = 'femalesOfReproductiveAge',
+  NEWBORNS = 'newborns',
 }
 
 export interface EncounterPayload {
+  uuid?: string;
   encounterDatetime?: string;
   encounterType: string;
   patient: string;
@@ -272,4 +296,17 @@ export interface MaternalWardViewContext {
   [key: symbol]: unknown;
 }
 
-export type PatientWorkspaceAdditionalProps = Omit<WardPatientWorkspaceProps, keyof DefaultWorkspaceProps>;
+// Carbon Tag color types
+export type CarbonTagType =
+  | 'red'
+  | 'magenta'
+  | 'purple'
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'green'
+  | 'gray'
+  | 'cool-gray'
+  | 'warm-gray'
+  | 'high-contrast'
+  | 'outline';
