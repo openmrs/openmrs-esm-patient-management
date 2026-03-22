@@ -32,7 +32,7 @@ export interface Appointment {
   appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
-  endDateTime: Date | number | any;
+  endDateTime: Date | number;
   location: AppointmentLocation;
   // note: this is not a standard OpenMRS Patient object
   patient: {
@@ -46,14 +46,14 @@ export interface Appointment {
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: string | any;
-  dateAppointmentScheduled: string | any;
+  startDateTime: string;
+  dateAppointmentScheduled: string;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
   serviceTypes?: Array<ServiceTypes> | null;
   voided: boolean;
-  extensions: {};
+  extensions: Record<string, unknown>;
   teleconsultationLink: string | null;
 }
 
@@ -108,7 +108,7 @@ export interface Observation {
       display: string;
     };
   }>;
-  value: any;
+  value: string | number | boolean | OpenmrsResource;
   obsDatetime: string;
 }
 
