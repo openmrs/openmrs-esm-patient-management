@@ -55,22 +55,25 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     <div
       onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
-        /* Apply base styles depending on whether the date belongs to current month */
+        
+        /* Base styles depending on whether date is in current month */
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
-
-        /* Highlight today's date across monthly, weekly, and daily views */
+        
+        /* Highlight today's cell */
         {
           [styles.todayCell]: isToday,
         },
-
-        /* Preserve responsive layout behavior */
+        
+        /* Preserve responsive layout */
         showAllServices
-          ? {}
-          : {
-              [styles.smallDesktop]: layout === 'small-desktop',
-              [styles.largeDesktop]: layout !== 'small-desktop',
-            },
-      )}>
+        ? {}
+        : {
+          [styles.smallDesktop]: layout === 'small-desktop',
+          [styles.largeDesktop]: layout !== 'small-desktop',
+        }
+      )}
+      >
+      
       {isSameMonth(dateTime, dayjs(selectedDate)) && (
         <div>
           <span className={classNames(styles.totals)}>
@@ -83,13 +86,18 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               <div />
             )}
 
-            <b
+            <b 
               className={classNames(
                 styles.calendarDate,
-                /* Highlights today's date text */
-                { [styles.todayText]: isToday },
+                {
+                  /* Highlights today's date text */
+                  [styles.todayText]: isToday,
+                }
               )}>
-              {dateTime.format('D')}{' '}
+              {dateTime.format('D')}
+            </b>
+            
+            {dateTime.format('D')}
             </b>
           </span>
           {currentData?.services && (
