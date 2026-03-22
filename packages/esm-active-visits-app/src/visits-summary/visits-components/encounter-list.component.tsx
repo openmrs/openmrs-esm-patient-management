@@ -18,14 +18,16 @@ import { useTranslation } from 'react-i18next';
 import styles from '../visit-detail-overview.scss';
 import EncounterObservations from './encounter-observations.component';
 
+export interface EncounterListItem {
+  id: string;
+  time: string;
+  encounterType: string;
+  provider: string;
+  obs: Array<Obs>;
+}
+
 interface EncounterListProps {
-  encounters: Array<{
-    id: any;
-    time: any;
-    encounterType: string;
-    provider: string;
-    obs: Array<Obs>;
-  }>;
+  encounters: Array<EncounterListItem>;
   visitUuid: string;
 }
 

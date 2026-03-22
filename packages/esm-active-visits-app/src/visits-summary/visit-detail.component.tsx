@@ -4,7 +4,7 @@ import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDatetime, formatTime, parseDate } from '@openmrs/esm-framework';
 import { useVisit } from './visit.resource';
-import EncounterList from './visits-components/encounter-list.component';
+import EncounterList, { type EncounterListItem } from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
 
@@ -18,7 +18,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(0);
   const { visit, isLoading } = useVisit(visitUuid);
 
-  const encounters = useMemo(
+  const encounters = useMemo<Array<EncounterListItem>>(
     () =>
       visit
         ? visit?.encounters?.map((encounter) => ({
