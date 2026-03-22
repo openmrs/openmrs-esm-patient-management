@@ -1,6 +1,5 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
@@ -19,10 +18,10 @@ import DailyCalendarView from '../calendar/daily/daily-calendar-view.component';
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
 
-  /* Retrieve current calendar view along with selected date from global store */
+  /* Use global store as single source of truth */
   const { selectedDate, calendarView } = useAppointmentsStore();
 
-  /* Fetch calendar events based on selected date and active calendar view */
+  /* Fetch events dynamically based on selected view */
   const { calendarEvents } = useAppointmentsCalendar(
     dayjs(selectedDate).toISOString(),
     calendarView
@@ -33,10 +32,10 @@ const AppointmentsCalendarView: React.FC = () => {
       <AppointmentsHeader title={t('calendar', 'Calendar')} />
       <CalendarHeader />
 
-      {/* UI control for switching between calendar views */}
+      {/* Dropdown to switch between Month / Week / Day views */}
       <CalendarViewSwitcher />
 
-      {/* Render calendar view dynamically based on selected calendarView */}
+      {/* Render only the selected calendar view */}
       {calendarView === 'monthly' && <MonthlyCalendarView events={calendarEvents} />}
       {calendarView === 'weekly' && <WeeklyCalendarView events={calendarEvents} />}
       {calendarView === 'daily' && <DailyCalendarView events={calendarEvents} />}
