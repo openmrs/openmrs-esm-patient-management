@@ -313,7 +313,7 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
 function useStarredLists() {
   const { t } = useTranslation();
   const [starredLists, setStarredLists] = useState([]);
-  const [starhandleTimeout, setStarHandleTimeout] = useState(null);
+  const [starHandleTimeout, setStarHandleTimeout] = useState(null);
   const { user: currentUser } = useSession();
 
   const setInitialStarredLists = useCallback(() => {
@@ -351,13 +351,13 @@ function useStarredLists() {
         ? [...starredLists, cohortUuid]
         : starredLists.filter((uuid) => uuid !== cohortUuid);
       setStarredLists(newStarredLists);
-      if (starhandleTimeout) {
-        clearTimeout(starhandleTimeout);
+      if (starHandleTimeout) {
+        clearTimeout(starHandleTimeout);
       }
       const timeout = setTimeout(() => updateUserProperties(newStarredLists), 1500);
       setStarHandleTimeout(timeout);
     },
-    [starredLists, starhandleTimeout, setStarredLists, setStarHandleTimeout, updateUserProperties],
+    [starredLists, starHandleTimeout, setStarredLists, setStarHandleTimeout, updateUserProperties],
   );
 
   useEffect(() => {
