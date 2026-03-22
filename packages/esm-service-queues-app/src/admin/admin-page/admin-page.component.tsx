@@ -108,7 +108,7 @@ const AdminPage = () => {
           )}
         </div>
         {isLoadingQueues ? (
-          <DataTableSkeleton role="progressbar" compact={!isTablet} zebra columnCount={5} rowCount={3} />
+          <DataTableSkeleton role="progressbar" zebra columnCount={5} rowCount={3} />
         ) : queuesError ? (
           <ErrorState error={queuesError} headerTitle={t('queues', 'Queues')} />
         ) : (
@@ -167,7 +167,7 @@ const AdminPage = () => {
           )}
         </div>
         {isLoadingQueueRooms ? (
-          <DataTableSkeleton role="progressbar" compact={!isTablet} zebra columnCount={4} rowCount={3} />
+          <DataTableSkeleton role="progressbar" zebra columnCount={4} rowCount={3} />
         ) : queueRoomsError ? (
           <ErrorState error={queueRoomsError} headerTitle={t('queueRooms', 'Queue rooms')} />
         ) : (
