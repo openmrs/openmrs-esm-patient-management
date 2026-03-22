@@ -1,7 +1,6 @@
 import {
   createDashboard,
   defineConfigSchema,
-  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
@@ -9,14 +8,6 @@ import {
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta, appointmentCalendarDashboardMeta, patientChartDashboardMeta } from './dashboard.meta';
-import {
-  cancelledAppointmentsPanelConfigSchema,
-  checkedInAppointmentsPanelConfigSchema,
-  completedAppointmentsPanelConfigSchema,
-  earlyAppointmentsPanelConfigSchema,
-  expectedAppointmentsPanelConfigSchema,
-  missedAppointmentsPanelConfigSchema,
-} from './scheduled-appointments-config-schema';
 
 const moduleName = '@openmrs/esm-appointments-app';
 
@@ -31,13 +22,6 @@ export function startupApp() {
   const appointmentsBasePath = `${window.spaBase}/home/appointments`;
 
   defineConfigSchema(moduleName, configSchema);
-
-  defineExtensionConfigSchema('expected-appointments-panel', expectedAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('checked-in-appointments-panel', checkedInAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('completed-appointments-panel', completedAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('missed-appointments-panel', missedAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('cancelled-appointments-panel', cancelledAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('early-appointments-panel', earlyAppointmentsPanelConfigSchema);
 
   registerBreadcrumbs([
     {
@@ -67,11 +51,6 @@ export const appointmentsCalendarDashboardLink = getSyncLifecycle(
 export const appointmentsDashboard = getAsyncLifecycle(() => import('./appointments.component'), options);
 
 export const homeAppointments = getAsyncLifecycle(() => import('./home/home-appointments.component'), options);
-
-export const appointmentsList = getAsyncLifecycle(
-  () => import('./appointments/scheduled/appointments-list.component'),
-  options,
-);
 
 export const earlyAppointments = getAsyncLifecycle(
   () => import('./appointments/scheduled/early-appointments.component'),
