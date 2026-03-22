@@ -2,40 +2,23 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
-import { useAppointmentsStore } from '../store';
+import { useSelectedDate } from './useSelectedDate';
 
-export const useAppointmentList = (appointmentStatus: string, date?: string) => {
-  const { selectedDate } = useAppointmentsStore();
-  const startDate = date ? date : selectedDate;
-  const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
-  const searchUrl = `${restBaseUrl}/appointments/search`;
-  const abortController = new AbortController();
+export const useAppointmentList = (date: string) => {
+  const startOfDay = dayjs(date).startOf('day').toISOString();
+  const searchUrl = `${restBaseUrl}/appointments?forDate=${startOfDay}`;
 
-  const fetcher = ([url, startDate, endDate, status]) =>
-    openmrsFetch(url, {
-      method: 'POST',
-      signal: abortController.signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: {
-        startDate: startDate,
-        endDate: endDate,
-        status: status,
-      },
-    });
-
-  const { data, error, isLoading, mutate } = useSWR<AppointmentsFetchResponse, Error>(
-    [searchUrl, startDate, endDate, appointmentStatus],
-    fetcher,
-    { errorRetryCount: 2 },
-  );
-
-  return { appointmentList: data?.data ?? [], isLoading, error, mutate };
+  const { data, ...rest } = useSWR<AppointmentsFetchResponse, Error>(searchUrl, openmrsFetch);
+  return { appointmentList: data?.data ?? [], ...rest };
 };
 
+/**
+ * This is a non-standard API that does not come with the appointments module by default
+ * @param startDate
+ * @returns
+ */
 export const useEarlyAppointmentList = (startDate?: string) => {
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   const forDate = startDate ? startDate : selectedDate;
   const url = `${restBaseUrl}/appointment/earlyAppointment?forDate=${forDate}`;
 
