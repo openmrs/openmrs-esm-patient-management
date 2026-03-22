@@ -1,7 +1,8 @@
 {
   "action": "Aksi",
   "actions": "Tindakan",
-  "add": "Tambah",
+  ""add": "Tambah",
+  "addAppointments": "Add Appointments",
   "age": "Usia",
   "allDay": "Sepanjang hari",
   "appointment": "Appointment",

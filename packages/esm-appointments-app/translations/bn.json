@@ -1,7 +1,8 @@
 {
   "action": "Action",
   "actions": "Actions",
-  "add": "যুক্ত করুন",
+  ""add": "যুক্ত করুন",
+  "addAppointments": "Add Appointments",
   "age": "বয়স",
   "allDay": "সারাদিন",
   "appointment": "Appointment",

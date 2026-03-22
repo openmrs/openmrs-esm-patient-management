@@ -1,7 +1,8 @@
 {
   "action": "Veprim",
   "actions": "Veprime",
-  "add": "Shto",
+  ""add": "Shto",
+  "addAppointments": "Add Appointments",
   "age": "Mosha",
   "allDay": "Gjatë gjithë ditës",
   "appointment": "Takim",

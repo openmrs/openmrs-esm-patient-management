@@ -1,7 +1,8 @@
 {
   "action": "Action",
   "actions": "Actions",
-  "add": "Ajouter",
+  ""add": "Ajouter",
+  "addAppointments": "Add Appointments",
   "age": "Âge",
   "allDay": "Toute la journée",
   "appointment": "Rendez-vous",
