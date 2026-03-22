@@ -119,7 +119,9 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   events={events}
                   dateTime={dateTime}
                 />
-              ) : null}
+              ) : (
+                ''
+              )}
             </div>
           )}
         </div>
