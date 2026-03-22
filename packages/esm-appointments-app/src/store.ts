@@ -1,29 +1,51 @@
+import { type Actions, createGlobalStore, useStoreWithActions } from '@openmrs/esm-framework';
+import { type AppointmentStatus } from './types';
 import { createGlobalStore, isOmrsDateStrict, useStore } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from './constants';
 
-/* Global store for appointments calendar */
+interface AppointmentsStore {
+  appointmentServiceTypes: Array<string>;
+  selectedAppointmentStatuses: Array<AppointmentStatus>;
 export const appointmentsStore = createGlobalStore('appointments-app', {
+  /* Controls the current calendar display mode (day | week | month) */
   appointmentServiceTypes: [],
-
-  /* Selected date used across monthly, weekly, and daily views */
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
-
-  /* Controls current calendar view */
   calendarView: 'monthly',
 });
 
-/* Hook to access global store */
 export function useAppointmentsStore() {
   return useStore(appointmentsStore);
 }
 
-/* Update calendar view (month / week / day) */
+export const appointmentsStore = createGlobalStore<AppointmentsStore>(
+  'appointments-app',
+  {
+    appointmentServiceTypes: [],
+    selectedAppointmentStatuses: [],
+  },
+  'sessionStorage',
+);
+
+export const storeActions = {
+  setAppointmentServiceTypes(_, appointmentServiceTypes: Array<string>) {
+    return { appointmentServiceTypes };
+  },
+  setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Array<AppointmentStatus>) {
+    return { selectedAppointmentStatuses };
+  },
+} satisfies Actions<AppointmentsStore>;
+/* Updates the global calendar view mode */
 export function setCalendarView(view: 'daily' | 'weekly' | 'monthly') {
   appointmentsStore.setState({ calendarView: view });
 }
 
-/* Update selected date */
+export function useAppointmentsStore() {
+  return useStoreWithActions(appointmentsStore, storeActions);
+export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
+  appointmentsStore.setState({ appointmentServiceTypes: serviceTypes });
+}
+
 export function setSelectedDate(date: string) {
   if (!isOmrsDateStrict(date)) {
     console.warn(
@@ -31,16 +53,11 @@ export function setSelectedDate(date: string) {
       date,
     );
   }
-
   appointmentsStore.setState({ selectedDate: date });
 }
 
-/* Update service filters */
-export function setAppointmentServiceTypes(serviceTypes: Array<string>) {
-  appointmentsStore.setState({ appointmentServiceTypes: serviceTypes });
-}
+/* Set up localStorage serialization */
 
-/* Persist service types in localStorage */
 let lastValueOfAppointmentServiceTypes = getFromLocalStorage('openmrs:appointments:serviceTypes');
 
 function getFromLocalStorage(key: string) {
