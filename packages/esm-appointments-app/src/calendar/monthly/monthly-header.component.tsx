@@ -18,8 +18,6 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
 
-  const [calendarSelectedDate, setCalendarSelectedDate] = useState(dayjs(selectedDate));
-
   /* Determine navigation unit dynamically based on active calendar view */
   const getUnit = useCallback(() => {
     if (mode === 'weekly') return 'week';
@@ -40,27 +38,49 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
   return (
     <>
       <div className={styles.container}>
-        <Button aria-label={t('previous', 'Previous')} kind="tertiary" onClick={handleSelectPrev} size="sm">
+        {/* Previous navigation button */}
+        <Button
+          aria-label={t('previous', 'Previous')}
+          kind="tertiary"
+          onClick={handleSelectPrev}
+          size="sm">
           {t('prev', 'Prev')}
         </Button>
 
-        {/* Display formatted selected date (updates dynamically with navigation) */}
-        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
+        {/* Display current selected date */}
+        <span>
+          {formatDate(new Date(selectedDate), {
+            day: false,
+            time: false,
+            noToday: true,
+          })}
+        </span>
 
-        <Button aria-label={t('next', 'Next')} kind="tertiary" onClick={handleSelectNext} size="sm">
+        {/* Next navigation button */}
+        <Button
+          aria-label={t('next', 'Next')}
+          kind="tertiary"
+          onClick={handleSelectNext}
+          size="sm">
           {t('next', 'Next')}
         </Button>
       </div>
 
-      {/* Show days-of-week header for monthly and weekly views only */}
+      {/* Weekday header rendering */}
       <div className={styles.workLoadCard}>
         {mode === 'daily' ? (
-      <div style={{ width: '14.28%' }}>
-        <DaysOfWeekCard dayOfWeek={dayjs(selectedDate).format('ddd').toUpperCase()} />
-      </div>
-    ) : (
-      DAYS_IN_WEEK.map((day) => <DaysOfWeekCard key={day} dayOfWeek={day} />)
-    )}
+          /* Show ONLY one day for daily view */
+          <div style={{ width: '14.28%' }}>
+            <DaysOfWeekCard
+              dayOfWeek={dayjs(selectedDate).format('ddd').toUpperCase()}
+            />
+          </div>
+        ) : (
+          /* Show full week for monthly + weekly views */
+          DAYS_IN_WEEK.map((day) => (
+            <DaysOfWeekCard key={day} dayOfWeek={day} />
+          ))
+        )}
       </div>
     </>
   );
