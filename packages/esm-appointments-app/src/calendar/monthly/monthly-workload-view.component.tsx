@@ -58,7 +58,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
         
         /* Base styles depending on whether date is in current month */
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
-        
+
         /* Highlight today's cell */
         {
           [styles.todayCell]: isToday,
@@ -70,38 +70,34 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
         : {
           [styles.smallDesktop]: layout === 'small-desktop',
           [styles.largeDesktop]: layout !== 'small-desktop',
-        }
+        },
       )}
       >
-      
       {isSameMonth(dateTime, dayjs(selectedDate)) && (
         <div>
-          <span className={classNames(styles.totals)}>
+          <span className={styles.totals}>
             {currentData?.services ? (
-              <div role="button" tabIndex={0}>
-                <User size={16} />
-                <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
-              </div>
-            ) : (
-              <div />
-            )}
+          <div role="button" tabIndex={0}>
+            <User size={16} />
+            <span>
+              {currentData.services.reduce((sum, { count = 0 }) => sum + count, 0)}
+            </span>
+          </div>
+        ) : (
+          <div />
+        )}
 
-            <b 
-              className={classNames(
-                styles.calendarDate,
-                {
-                  /* Highlights today's date text */
-                  [styles.todayText]: isToday,
-                }
-              )}>
-              {dateTime.format('D')}
-            </b>
-            
-            {dateTime.format('D')}
-            </b>
-          </span>
-          {currentData?.services && (
-            <div className={styles.currentData}>
+        <b
+          className={classNames(styles.calendarDate, {
+            [styles.todayText]: isToday,
+          })}
+        >
+          {dateTime.format('D')}
+        </b>
+      </span>
+
+      {currentData?.services && (
+        <div className={styles.currentData}>
               {visibleServices.map(({ serviceName, serviceUuid, count }, i) => (
                 <div
                   key={`${serviceUuid}-${count}-${i}`}
