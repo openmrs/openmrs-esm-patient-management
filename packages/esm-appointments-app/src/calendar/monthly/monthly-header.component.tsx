@@ -20,7 +20,6 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
 
   const [calendarSelectedDate, setCalendarSelectedDate] = useState(dayjs(selectedDate));
 
-<<<<<<< fixed-appointments-calender-limited-drill-down-capability
   /* Determine navigation unit dynamically based on active calendar view */
   const getUnit = useCallback(() => {
     if (mode === 'weekly') return 'week';
@@ -37,15 +36,6 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
   const handleSelectNext = useCallback(() => {
     setSelectedDate(dayjs(selectedDate).add(1, getUnit()).format(omrsDateFormat));
   }, [selectedDate, getUnit]);
-=======
-  const handleSelectPrevMonth = useCallback(() => {
-    setCalendarSelectedDate(calendarSelectedDate.subtract(1, 'month'));
-  }, [calendarSelectedDate, setCalendarSelectedDate]);
-
-  const handleSelectNextMonth = useCallback(() => {
-    setCalendarSelectedDate(calendarSelectedDate.add(1, 'month'));
-  }, [calendarSelectedDate, setCalendarSelectedDate]);
->>>>>>> main
 
   return (
     <>
@@ -65,13 +55,12 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({ mode = 'monthly' }) => {
       {/* Show days-of-week header for monthly and weekly views only */}
       <div className={styles.workLoadCard}>
         {mode === 'daily' ? (
-          <div style={{ width: '14.28%' }}>
-            <DaysOfWeekCard dayOfWeek={dayjs(selectedDate).format('ddd').toUpperCase()} />
-          </div>
-        ) : (
-          /* Full week (monthly + weekly) */
-          DAYS_IN_WEEK.map((day) => <DaysOfWeekCard key={day} dayOfWeek={day} />)
-        )}
+      <div style={{ width: '14.28%' }}>
+        <DaysOfWeekCard dayOfWeek={dayjs(selectedDate).format('ddd').toUpperCase()} />
+      </div>
+    ) : (
+      DAYS_IN_WEEK.map((day) => <DaysOfWeekCard key={day} dayOfWeek={day} />)
+    )}
       </div>
     </>
   );
