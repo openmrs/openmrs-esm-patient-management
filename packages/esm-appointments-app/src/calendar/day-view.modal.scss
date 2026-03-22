@@ -1,0 +1,248 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// ── Modal container override ──────────────────────────────────────────────────
+// Below 42rem Carbon makes the modal full-screen by default.
+// Override to float it centred with margins, no slide-in animation.
+:global(.cds--modal-container) {
+  @media (max-width: 42rem) {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    transition: none !important;
+    width: calc(100% - 4rem);
+    height: auto;
+    max-height: 85vh;
+    border-radius: 4px;
+  }
+}
+
+// Also suppress the parent modal's slide animation below 42rem
+:global(.cds--modal) {
+  @media (max-width: 42rem) {
+    transition: none !important;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.modalHeaderContent {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  padding-bottom: layout.$spacing-02;
+}
+
+.modalTitle {
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
+
+  @media (max-width: 42rem) {
+    @include type.type-style('heading-02');
+  }
+}
+
+.modalSubtitle {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+// ── Body ─────────────────────────────────────────────────────────────────────
+
+.modalBody {
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  @media (max-width: 42rem) {
+    max-height: 65vh;
+  }
+}
+
+.loader {
+  padding: layout.$spacing-07 layout.$spacing-05;
+}
+
+.emptyText {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  padding: layout.$spacing-07 layout.$spacing-05;
+}
+
+// ── Accordion ────────────────────────────────────────────────────────────────
+
+.accordionList {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-04;
+  padding: layout.$spacing-05;
+
+  @media (max-width: 42rem) {
+    gap: layout.$spacing-03;
+    padding: layout.$spacing-03;
+  }
+}
+
+.accordionItem {
+  border: 1px solid colors.$gray-20;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-04 layout.$spacing-04;
+  background-color: colors.$gray-10;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+
+  @media (max-width: 42rem) {
+    padding: layout.$spacing-03;
+    flex-wrap: wrap;
+    gap: layout.$spacing-02;
+  }
+
+  &:hover {
+    background-color: colors.$gray-20;
+  }
+}
+
+.accordionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  min-width: 0;
+  flex: 1;
+
+  @media (max-width: 42rem) {
+    flex: 1 1 100%;
+  }
+}
+
+.accordionChevron {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  width: layout.$spacing-05;
+  flex-shrink: 0;
+}
+
+.serviceName {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 42rem) {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
+  }
+}
+
+// ── Appointment rows ──────────────────────────────────────────────────────────
+
+.accordionBody {
+  display: flex;
+  flex-direction: column;
+  background-color: colors.$white;
+}
+
+.appointmentRow {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-04 layout.$spacing-06;
+  border-bottom: 1px solid colors.$gray-10;
+
+  // On small screens: time top-left, tag top-right, patient name spans full width below
+  @media (max-width: 42rem) {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: layout.$spacing-02 layout.$spacing-03;
+    padding: layout.$spacing-03;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+}
+
+// ── Time column ───────────────────────────────────────────────────────────────
+
+.timeColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  @media (max-width: 42rem) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+.startTime {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-100;
+  font-weight: 600;
+}
+
+.endTime {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+// ── Patient + provider column ─────────────────────────────────────────────────
+
+.detailsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+  min-width: 0;
+
+  @media (max-width: 42rem) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+.patientName {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-100;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.providerName {
+  @include type.type-style('label-01');
+  color: $text-02;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Status tag — top-right on small screens, aligned with time
+:global(.cds--tag) {
+  @media (max-width: 42rem) {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    margin: 0;
+  }
+}

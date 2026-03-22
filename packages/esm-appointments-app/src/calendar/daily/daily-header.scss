@@ -1,0 +1,18 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-10;
+  padding: 0 layout.$spacing-05;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.dateLabel {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-100;
+}

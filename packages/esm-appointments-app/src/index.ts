@@ -119,3 +119,5 @@ export const batchChangeAppointmentStatusesModal = getAsyncLifecycle(
   () => import('./appointments/common-components/batch-change-appointment-statuses.modal'),
   options,
 );
+
+export const dayViewModal = getAsyncLifecycle(() => import('./calendar/day-view.modal'), options);
