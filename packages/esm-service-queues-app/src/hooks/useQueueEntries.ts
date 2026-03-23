@@ -132,9 +132,11 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
         setTotalCount(pageData?.data?.totalCount);
       }
       if (pageData?.data?.results) {
-        const newData = [...data];
-        newData[currentPage] = pageData?.data?.results;
-        setData(newData);
+        setData((prevData) => {
+          const newData = [...prevData];
+          newData[currentPage] = pageData?.data?.results;
+          return newData;
+        });
       }
       setCurrentPage(currentPage + 1);
       setPageUrl(nextUrl);
