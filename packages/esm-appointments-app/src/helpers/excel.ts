@@ -9,6 +9,16 @@ type RowData = {
   identifier?: string; // Optional identifier property
 } & Record<string, unknown>; // Allow for other dynamic properties
 
+interface AppointmentSpreadsheetData {
+  'Patient name': string;
+  Gender: string;
+  Age: number;
+  Identifier: string;
+  'Appointment type'?: string;
+  Date?: string;
+  'Telephone number'?: string;
+}
+
 /**
  * Exports the provided appointments as an Excel spreadsheet.
  * @param {Array<Appointment>} appointments - The list of appointments to export.
@@ -57,15 +67,14 @@ Exports unscheduled appointments as an Excel spreadsheet.
 @param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
 */
 export function exportUnscheduledAppointmentsToSpreadsheet(
-  unscheduledAppointments: Array<any>,
+  unscheduledAppointments: Array<Partial<Appointment>>,
   fileName: string = `Unscheduled appointments ${formatDate(new Date(), { year: true, time: true })}`,
 ) {
   const appointmentsJSON = unscheduledAppointments?.map((appointment) => ({
-    'Patient name': appointment.name,
-    Gender: appointment.gender === 'F' ? 'Female' : 'Male',
-    Age: appointment.age,
-    'Phone Number': appointment.phoneNumber ?? '--',
-    Identifier: appointment.identifier ?? '--',
+    'Patient name': appointment.patient.name,
+    Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
+    Age: appointment.patient.age,
+    Identifier: appointment.patient.identifier ?? '--',
   }));
 
   const worksheet = createWorksheet(appointmentsJSON);
@@ -76,7 +85,7 @@ export function exportUnscheduledAppointmentsToSpreadsheet(
   });
 }
 
-function createWorksheet(data: any[]) {
+function createWorksheet(data: AppointmentSpreadsheetData[]) {
   const max_width = data.reduce((w, r) => Math.max(w, r['Patient name'].length), 30);
   const worksheet = utils.json_to_sheet(data);
   worksheet['!cols'] = [{ wch: max_width }];

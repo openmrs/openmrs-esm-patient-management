@@ -19,7 +19,7 @@ const PatientAppointmentsOverview: React.FC = () => {
   const layout = useLayoutType();
 
   return response.isLoading ? (
-    <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />
+    <DataTableSkeleton role="progressbar" size={isDesktop(layout) ? 'sm' : undefined} zebra />
   ) : (
     <div className={styles.patientAppointmentsOverview}>
       <PatientAppointmentsHeader patient={response.patient} />
