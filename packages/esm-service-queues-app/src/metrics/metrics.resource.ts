@@ -41,15 +41,22 @@ export function useActiveVisits() {
 }
 
 export function useAverageWaitTime(serviceUuid: string, statusUuid: string) {
-  const apiUrl = `${restBaseUrl}/queue-metrics?queue=${serviceUuid}&status=${statusUuid}`;
+  const params = new URLSearchParams();
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(
-    serviceUuid && statusUuid ? apiUrl : null,
-    openmrsFetch,
-  );
+  if (serviceUuid) {
+    params.append('queue', serviceUuid);
+  }
+
+  if (statusUuid) {
+    params.append('status', statusUuid);
+  }
+
+  const apiUrl = `${restBaseUrl}/queue-metrics${params.toString() ? `?${params.toString()}` : ''}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(apiUrl, openmrsFetch);
 
   return {
-    waitTime: data ? data?.data : null,
+    waitTime: data ? data.data : null,
     isLoading,
     error,
     isValidating,

@@ -9,11 +9,18 @@ export default function AverageWaitTimeExtension() {
   const { selectedServiceUuid } = useServiceQueuesStore();
   const { waitTime } = useAverageWaitTime(selectedServiceUuid, '');
 
+  const averageWaitTime = (waitTime as any)?.propValues?.find(
+    (item: any) => item?.property === 'averageWaitTime',
+  )?.value;
+
+  const formatted =
+    averageWaitTime != null ? `${Math.floor(averageWaitTime / 60)}h ${Math.round(averageWaitTime % 60)}m` : '--';
+
   return (
     <MetricsCard>
       <MetricsCardHeader title={t('averageWaitTime', 'Average wait time today')} />
       <MetricsCardBody>
-        <MetricsCardItem label={t('minutes', 'Minutes')} value={waitTime ? waitTime.averageWaitTime : '--'} />
+        <MetricsCardItem label={t('minutes', 'Minutes')} value={formatted} />
       </MetricsCardBody>
     </MetricsCard>
   );
