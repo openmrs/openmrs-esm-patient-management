@@ -222,15 +222,31 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         });
       }
 
+      const buildAppointmentDateTime = (
+        startDate: unknown,
+        startTime: string,
+        timeFormat: string,
+      ) => {
+        const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
+
+        if (hoursAndMinutes.length !== 2 || isNaN(hoursAndMinutes[0]) || isNaN(hoursAndMinutes[1])) {
+          return null;
+        }
+
+        const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+        const minutes = hoursAndMinutes[1];
+
+        return dayjs(startDate).hour(hours).minute(minutes);
+      };
+
       if (!data.isAllDayAppointment && data.appointmentDateTime?.startDate && data.startTime && data.timeFormat) {
-        const hoursAndMinutes = data.startTime.split(':').map((item) => parseInt(item, 10));
+        const selectedDateTime = buildAppointmentDateTime(
+          data.appointmentDateTime.startDate,
+          data.startTime,
+          data.timeFormat,
+        );
 
-        if (hoursAndMinutes.length === 2 && !isNaN(hoursAndMinutes[0]) && !isNaN(hoursAndMinutes[1])) {
-          const hours = (hoursAndMinutes[0] % 12) + (data.timeFormat === 'PM' ? 12 : 0);
-          const minutes = hoursAndMinutes[1];
-
-          const selectedDateTime = dayjs(data.appointmentDateTime.startDate).hour(hours).minute(minutes);
-
+        if (selectedDateTime) {
           let isTimeChanged = true;
           if (isEditing && appointment?.startDateTime) {
             const originalDateTime = dayjs(appointment.startDateTime);
