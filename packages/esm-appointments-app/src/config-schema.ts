@@ -1,8 +1,6 @@
 import { Type, validators } from '@openmrs/esm-framework';
 import { appointmentColumnTypes } from './constants';
 
-type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
-
 export const configSchema = {
   allowAllDayAppointments: {
     _type: Type.Boolean,
@@ -80,6 +78,12 @@ export const configSchema = {
     _description:
       'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
   },
+  showEarlyAppointmentsTab: {
+    _type: Type.Boolean,
+    _default: false,
+    _description:
+      'Whether to show the Early Appointments tab. Note that configuring this to true requires a custom earlyAppointment endpoint not currently available',
+  },
   appointmentsTableColumns: {
     _type: Type.Array,
     _description:
@@ -110,4 +114,5 @@ export interface ConfigObject {
   includePhoneNumberInExcelSpreadsheet: boolean;
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
+  showEarlyAppointmentsTab: boolean;
 }
