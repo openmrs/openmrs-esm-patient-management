@@ -247,13 +247,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         );
 
         if (selectedDateTime) {
-          let isTimeChanged = true;
+          let isStartDateTimeChanged = true;
           if (isEditing && appointment?.startDateTime) {
             const originalDateTime = dayjs(appointment.startDateTime);
-            isTimeChanged = !selectedDateTime.isSame(originalDateTime, 'minute');
+            isStartDateTimeChanged = !selectedDateTime.isSame(originalDateTime, 'minute');
           }
 
-          if ((!isEditing || isTimeChanged) && selectedDateTime.isBefore(dayjs(), 'minute')) {
+          if ((!isEditing || isStartDateTimeChanged) && selectedDateTime.isBefore(dayjs(), 'minute')) {
             ctx.addIssue({
               path: ['startTime'],
               code: z.ZodIssueCode.custom,
