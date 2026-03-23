@@ -176,6 +176,8 @@
 .dotSeparatedChildren {
   display: flex;
   flex-wrap: wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
 
   > *:not(*:first-of-type):not(:empty) {
     display: flex;
