@@ -1,4 +1,5 @@
 import type { OpenmrsResource } from '@openmrs/esm-framework';
+import type { ErrorObject } from './patient-list.resource';
 
 export enum PatientListType {
   STARRED = 'Starred',
@@ -38,7 +39,7 @@ export interface PatientListFilter {
 export interface PatientListOption {
   type: string;
   name: string;
-  value: string | boolean;
+  value: string | number | boolean;
 }
 
 export interface PatientListMember {
@@ -58,7 +59,7 @@ export interface OpenmrsCohort {
   name: string;
   description: string;
   attributes: Array<OpenmrsResource>;
-  links: Array<{ rel: string; uri: string; resourceAlias: string }>;
+  links: Array<{ rel: string; uri: string; resourceAlias?: string }>;
   location: Location | null;
   groupCohort: boolean | null;
   startDate: string | null;
@@ -88,7 +89,7 @@ export interface OpenmrsCohortMember {
 
 export interface CohortResponse<T> {
   results: Array<T>;
-  error: Error | null;
+  error: ErrorObject | null;
   totalCount: number;
 }
 
