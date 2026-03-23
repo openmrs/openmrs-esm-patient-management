@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Erreur de chargement de l'unité",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Femme",
   "fetchingEmrConfigurationFailed": "Echec de téléchargement de la configuration EMR. Essayez de rafraichir la page ou contactez l'administrateur",
   "fetchingPatientNotesFailed": "Echec de téléchargement des notes de patients. Essayez de rafraichir la page ou contactez l'administrateur",

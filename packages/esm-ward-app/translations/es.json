@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Error al cargar la ubicación de la sala",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Femenino",
   "fetchingEmrConfigurationFailed": "Error al obtener la configuración de EMR. Intente refrescar la página o contacte al administrador de su sistema.",
   "fetchingPatientNotesFailed": "Error al obtener las notas del paciente. Intente refrescar la página o contacte al administrador de su sistema.",

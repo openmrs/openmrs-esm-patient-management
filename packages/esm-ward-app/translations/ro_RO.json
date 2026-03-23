@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Eroare la încărcarea locației salonului",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Femeie",
   "fetchingEmrConfigurationFailed": "Eroare la încărcarea configurației EMR. Reîncarcă pagina sau contactează administratorul.",
   "fetchingPatientNotesFailed": "Eroare la încărcarea notelor pacientului. Reîncarcă pagina sau contactează administratorul.",

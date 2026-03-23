@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Error loading ward location",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Female",
   "fetchingEmrConfigurationFailed": "Fetching EMR configuration failed. Try refreshing the page or contact your system administrator.",
   "fetchingPatientNotesFailed": "Fetching patient notes failed. Try refreshing the page or contact your system administrator.",

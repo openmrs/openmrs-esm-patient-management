@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Gagal memuat lokasi bangsal",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Perempuan",
   "fetchingEmrConfigurationFailed": "Gagal mengambil konfigurasi EMR. Coba segarkan halaman atau hubungi administrator sistem.",
   "fetchingPatientNotesFailed": "Gagal mengambil catatan pasien. Coba segarkan halaman atau hubungi administrator sistem.",

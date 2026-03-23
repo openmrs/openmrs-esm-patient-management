@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Errore nel caricamento della posizione del reparto",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Femmina",
   "fetchingEmrConfigurationFailed": "Errore nel recupero della configurazione EMR. Prova a ricaricare la pagina o contatta l'amministratore di sistema.",
   "fetchingPatientNotesFailed": "Errore nel recupero delle note del paziente. Prova a ricaricare la pagina o contatta l'amministratore di sistema.",

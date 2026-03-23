@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "加载病房位置时出错",
   "errorSavingPatientNote": "保存患者记录时出错",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "女性",
   "fetchingEmrConfigurationFailed": "获取EMR配置失败",
   "fetchingPatientNotesFailed": "获取患者记录失败",

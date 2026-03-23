@@ -49,7 +49,7 @@
   "errorLoadingWardLocation": "Ensobi mu kuleeta ekifo ky’awulirwa abalwadde",
   "errorSavingPatientNote": "Error saving patient note",
   "errorTransferringPatient": "Failed to transfer patient",
-  "errrorAdmitingPatient": "Failed to admit patient",
+  "errorAdmittingPatient": "Failed to admit patient",
   "female": "Mukazi",
   "fetchingEmrConfigurationFailed": "Okufuna engeri EMR gy’eteekeddwa kulemereddwa. Gezaako okuddamu okuvumbula omuko oba weekwate ku mukulu wa sisitimu",
   "fetchingPatientNotesFailed": "Okufuna ebigambo by’omulwadde kulemereddwa. Gezaako okuddamu okuvumbula omuko oba weekwate ku mukulu wa sisitimu",

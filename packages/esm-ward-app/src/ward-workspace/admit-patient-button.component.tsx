@@ -83,7 +83,7 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
           kind: 'error',
           title:
             dispositionType === 'ADMIT'
-              ? t('errrorAdmitingPatient', 'Failed to admit patient')
+              ? t('errorAdmittingPatient', 'Failed to admit patient')
               : t('errorTransferringPatient', 'Failed to transfer patient'),
           subtitle: errorMessage,
         });
