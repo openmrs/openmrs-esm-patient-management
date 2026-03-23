@@ -12,8 +12,12 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
-import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
+import {
+  assignPatientToBed,
+  getAssignedBedByPatient,
+  removePatientFromBed,
+  useAdmitPatient,
+} from '../../ward.resource';
 import useWardLocation from '../../hooks/useWardLocation';
 import BedSelector from '../bed-selector.component';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
@@ -26,7 +30,7 @@ import styles from './admit-patient-form.scss';
  * a bed to assign to patient
  */
 const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
-  workspaceProps: { wardPatient },
+  workspaceProps: { wardPatient, relatedTransferPatients },
   closeWorkspace,
 }) => {
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
@@ -40,9 +44,6 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
 
-  const { data: bedsAssignedToPatient, isLoading: isLoadingBedsAssignedToPatient } = useAssignedBedByPatient(
-    patient.uuid,
-  );
   const beds = isLoading ? [] : (wardPatientGroupDetails?.bedLayouts ?? []);
 
   const zodSchema = useMemo(
@@ -67,18 +68,36 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
     setShowErrorNotifications(false);
     setIsSubmitting(true);
     const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
-    admitPatient(patient, dispositionType, visit.uuid)
+    const allPatientsToAdmit = [wardPatient, ...(relatedTransferPatients ?? [])];
+    Promise.all(
+      allPatientsToAdmit.map((wp) =>
+        admitPatient(wp.patient, wp.inpatientRequest?.dispositionType ?? dispositionType, wp.visit.uuid),
+      ),
+    )
       .then(
-        async (response) => {
-          if (response.ok) {
+        async (responses) => {
+          const [primaryResponse, ...relatedResponses] = responses;
+          if (primaryResponse.ok) {
             if (bedSelected) {
-              return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
+              return Promise.all([
+                assignPatientToBed(values.bedId, patient.uuid, primaryResponse.data.uuid),
+                ...relatedResponses
+                  .filter((r) => r.ok)
+                  .map((r, i) =>
+                    assignPatientToBed(values.bedId, relatedTransferPatients[i].patient.uuid, r.data.uuid),
+                  ),
+              ]).then(() => primaryResponse);
             } else {
-              const assignedBedId = bedsAssignedToPatient?.data?.results?.[0]?.bedId;
-              if (assignedBedId) {
-                return removePatientFromBed(assignedBedId, patient.uuid);
-              }
-              return response;
+              const bedResponses = await Promise.all(
+                allPatientsToAdmit.map((wp) => getAssignedBedByPatient(wp.patient.uuid)),
+              );
+              await Promise.all(
+                bedResponses.flatMap((bedResponse, i) => {
+                  const assignedBedId = bedResponse.data?.results?.[0]?.bedId;
+                  return assignedBedId ? [removePatientFromBed(assignedBedId, allPatientsToAdmit[i].patient.uuid)] : [];
+                }),
+              );
+              return primaryResponse;
             }
           }
         },
@@ -149,6 +168,9 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
     <Workspace2 title={t('admitPatient', 'Admit patient')} hasUnsavedChanges={isDirty}>
       <div className={styles.flexWrapper}>
         <WardPatientWorkspaceBanner {...{ wardPatient }} />
+        {relatedTransferPatients?.map((rp) => (
+          <WardPatientWorkspaceBanner key={rp.patient.uuid} wardPatient={rp} />
+        ))}
         <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
           <div className={styles.formContent}>
             <Row>
@@ -195,13 +217,7 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
             <Button
               type="submit"
               size="xl"
-              disabled={
-                isSubmitting ||
-                isLoadingEmrConfiguration ||
-                errorFetchingEmrConfiguration ||
-                isLoading ||
-                isLoadingBedsAssignedToPatient
-              }>
+              disabled={isSubmitting || isLoadingEmrConfiguration || errorFetchingEmrConfiguration || isLoading}>
               {!isSubmitting ? t('admit', 'Admit') : t('admitting', 'Admitting...')}
             </Button>
           </ButtonSet>

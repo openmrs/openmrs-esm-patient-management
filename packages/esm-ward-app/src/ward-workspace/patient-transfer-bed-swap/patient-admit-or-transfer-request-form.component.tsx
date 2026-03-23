@@ -35,6 +35,7 @@ export interface PatientAdmitOrTransferFormProps {
 
   onSuccess(): void;
   onCancel(): void;
+  preSelectRelatedPatients?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export default function PatientAdmitOrTransferForm({
   relatedTransferPatients = [],
   onSuccess,
   onCancel,
+  preSelectRelatedPatients,
 }: PatientAdmitOrTransferFormProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
@@ -61,7 +63,9 @@ export default function PatientAdmitOrTransferForm({
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
-  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
+  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>(() =>
+    preSelectRelatedPatients ? relatedTransferPatients.map((rp) => rp.patient.uuid) : [],
+  );
 
   const zodSchema = useMemo(
     () =>

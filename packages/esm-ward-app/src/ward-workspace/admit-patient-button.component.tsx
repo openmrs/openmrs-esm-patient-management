@@ -16,6 +16,8 @@ import { useAdmitPatient } from '../ward.resource';
 interface AdmitPatientButtonProps {
   wardPatient: WardPatient;
 
+  relatedTransferPatients?: WardPatient[];
+
   /**
    * whether to create an admit or transfer encounter for the given patient
    */
@@ -26,6 +28,7 @@ interface AdmitPatientButtonProps {
 
 const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   wardPatient,
+  relatedTransferPatients,
   onAdmitPatientSuccess,
   disabled,
   dispositionType,
@@ -39,7 +42,8 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   const [isAdmitting, setIsAdmitting] = useState(false);
   const { launchChildWorkspace } = useWorkspace2Context();
 
-  const launchPatientAdmissionForm = () => launchChildWorkspace('admit-patient-form-workspace', { wardPatient });
+  const launchPatientAdmissionForm = () =>
+    launchChildWorkspace('admit-patient-form-workspace', { wardPatient, relatedTransferPatients });
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
@@ -52,7 +56,12 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
     } else {
       setIsAdmitting(true);
       try {
-        const response = await admitPatient(patient, dispositionType, visit.uuid);
+        const [response] = await Promise.all([
+          admitPatient(patient, dispositionType, visit.uuid),
+          ...(relatedTransferPatients ?? []).map((rp) =>
+            admitPatient(rp.patient, rp.inpatientRequest.dispositionType, rp.visit.uuid),
+          ),
+        ]);
         await wardPatientGroupDetails?.mutate?.();
         if (response && response?.ok) {
           showSnackbar({

@@ -13,7 +13,12 @@ import { renderWithSwr } from 'tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { assignPatientToBed, removePatientFromBed, useAdmitPatient } from '../../ward.resource';
+import {
+  assignPatientToBed,
+  getAssignedBedByPatient,
+  removePatientFromBed,
+  useAdmitPatient,
+} from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import useWardLocation from '../../hooks/useWardLocation';
 
@@ -43,6 +48,7 @@ jest.mock('../../ward.resource', () => ({
   useAdmitPatient: jest.fn(),
   assignPatientToBed: jest.fn(),
   removePatientFromBed: jest.fn(),
+  getAssignedBedByPatient: jest.fn(),
 }));
 
 const mockedUseWardLocation = jest.mocked(useWardLocation);
@@ -53,6 +59,7 @@ const mockedUseAssignedBedByPatient = jest.mocked(useAssignedBedByPatient);
 const mockedAssignPatientToBed = jest.mocked(assignPatientToBed);
 const mockedRemovePatientFromBed = jest.mocked(removePatientFromBed);
 const mockedUseAdmitPatient = jest.mocked(useAdmitPatient);
+const mockedGetAssignedBedByPatient = jest.mocked(getAssignedBedByPatient);
 
 jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
@@ -83,6 +90,7 @@ const mockWorkspaceProps: Workspace2DefinitionProps<WardPatientWorkspaceProps, {
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: false,
 };
 
 function renderAdmissionForm() {
@@ -145,6 +153,13 @@ describe('Testing AdmitPatientForm', () => {
     // @ts-ignore - we only need the ok key for now
     mockedRemovePatientFromBed.mockResolvedValue({
       ok: true,
+    });
+
+    // @ts-ignore - we only need the data key for now
+    mockedGetAssignedBedByPatient.mockResolvedValue({
+      data: {
+        results: [{ bedId: 1 }],
+      },
     });
   });
 

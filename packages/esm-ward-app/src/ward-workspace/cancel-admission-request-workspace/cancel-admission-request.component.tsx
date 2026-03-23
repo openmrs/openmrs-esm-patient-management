@@ -21,10 +21,15 @@ import styles from './cancel-admission-request.scss';
 
 interface CancelAdmissionRequestProps {
   wardPatient: WardPatient;
+  relatedTransferPatients?: WardPatient[];
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
-const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWorkspace, wardPatient }) => {
+const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({
+  closeWorkspace,
+  wardPatient,
+  relatedTransferPatients,
+}) => {
   const { patient, visit } = wardPatient ?? {};
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,7 +80,12 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWo
         },
       ];
 
-      createEncounter(patient, emrConfiguration?.cancelADTRequestEncounterType, visit?.uuid, obs)
+      const allPatientsToCancel = [wardPatient, ...(relatedTransferPatients ?? [])];
+      Promise.all(
+        allPatientsToCancel.map(({ patient: p, visit: v }) =>
+          createEncounter(p, emrConfiguration?.cancelADTRequestEncounterType, v?.uuid, obs),
+        ),
+      )
         .then(() => {
           showSnackbar({
             title: t('admissionRequestCancelled', 'Admission request cancelled.'),
@@ -102,10 +112,10 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWo
       emrConfiguration?.denyAdmissionConcept?.uuid,
       emrConfiguration?.cancelADTRequestEncounterType,
       createEncounter,
-      patient,
+      wardPatient,
+      relatedTransferPatients,
       t,
       wardPatientGroupDetails,
-      visit?.uuid,
       closeWorkspace,
     ],
   );
@@ -120,6 +130,9 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWo
     <Workspace2 title={t('cancelAdmissionRequest', 'Cancel admission request')} hasUnsavedChanges={isDirty}>
       <div className={styles.flexWrapper}>
         <WardPatientWorkspaceBanner wardPatient={wardPatient} />
+        {relatedTransferPatients?.map((rp) => (
+          <WardPatientWorkspaceBanner key={rp.patient.uuid} wardPatient={rp} />
+        ))}
         <Form
           onSubmit={handleSubmit(onSubmit, onError)}
           className={classNames(styles.formContainer, styles.workspaceContent)}>
