@@ -67,14 +67,15 @@ Exports unscheduled appointments as an Excel spreadsheet.
 @param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
 */
 export function exportUnscheduledAppointmentsToSpreadsheet(
-  unscheduledAppointments: Array<Partial<Appointment>>,
+  unscheduledAppointments: Array<any>,
   fileName: string = `Unscheduled appointments ${formatDate(new Date(), { year: true, time: true })}`,
 ) {
   const appointmentsJSON = unscheduledAppointments?.map((appointment) => ({
-    'Patient name': appointment.patient.name,
-    Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
-    Age: appointment.patient.age,
-    Identifier: appointment.patient.identifier ?? '--',
+    'Patient name': appointment.name,
+    Gender: appointment.gender === 'F' ? 'Female' : 'Male',
+    Age: appointment.age,
+    'Phone Number': appointment.phoneNumber ?? '--',
+    Identifier: appointment.identifier ?? '--',
   }));
 
   const worksheet = createWorksheet(appointmentsJSON);
