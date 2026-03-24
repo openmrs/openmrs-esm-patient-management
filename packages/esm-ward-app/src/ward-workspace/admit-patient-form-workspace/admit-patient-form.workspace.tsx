@@ -69,86 +69,73 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
     setIsSubmitting(true);
     const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
     const allPatientsToAdmit = [wardPatient, ...(relatedTransferPatients ?? [])];
-    Promise.all(
+
+    return Promise.allSettled(
       allPatientsToAdmit.map((wp) =>
         admitPatient(wp.patient, wp.inpatientRequest?.dispositionType ?? dispositionType, wp.visit.uuid),
       ),
     )
-      .then(
-        async (responses) => {
-          const [primaryResponse, ...relatedResponses] = responses;
-          if (primaryResponse.ok) {
-            if (bedSelected) {
-              return Promise.all([
-                assignPatientToBed(values.bedId, patient.uuid, primaryResponse.data.uuid),
-                ...relatedResponses
-                  .filter((r) => r.ok)
-                  .map((r, i) =>
-                    assignPatientToBed(values.bedId, relatedTransferPatients[i].patient.uuid, r.data.uuid),
-                  ),
-              ]).then(() => primaryResponse);
-            } else {
-              const bedResponses = await Promise.all(
-                allPatientsToAdmit.map((wp) => getAssignedBedByPatient(wp.patient.uuid)),
-              );
-              await Promise.all(
-                bedResponses.flatMap((bedResponse, i) => {
-                  const assignedBedId = bedResponse.data?.results?.[0]?.bedId;
-                  return assignedBedId ? [removePatientFromBed(assignedBedId, allPatientsToAdmit[i].patient.uuid)] : [];
-                }),
-              );
-              return primaryResponse;
-            }
-          }
-        },
-        (err: Error) => {
-          showSnackbar({
-            kind: 'error',
-            title: t('errorCreatingEncounter', 'Failed to admit patient'),
-            subtitle: err.message,
-          });
-        },
-      )
-      .then(
-        (response) => {
-          if (response && response?.ok) {
-            if (bedSelected) {
+      .then(async (admitResults) => {
+        await Promise.allSettled(
+          admitResults.map(async (result, i) => {
+            const wp = allPatientsToAdmit[i];
+            const patientName = wp.patient.person.preferredName.display;
+
+            if (result.status === 'rejected') {
               showSnackbar({
-                kind: 'success',
+                kind: 'error',
+                title: t('errorAdmittingPatient', 'Failed to admit {{patientName}}', { patientName }),
+                subtitle: (result.reason as Error)?.message,
+              });
+              return;
+            }
+
+            try {
+              if (bedSelected) {
+                await assignPatientToBed(values.bedId, wp.patient.uuid, result.value.data.uuid);
+                showSnackbar({
+                  kind: 'success',
+                  title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
+                  subtitle: t(
+                    'patientAdmittedSuccessfullySubtitle',
+                    '{{patientName}} has been successfully admitted and assigned to bed {{bedNumber}}',
+                    { patientName, bedNumber: bedSelected.bedNumber },
+                  ),
+                });
+              } else {
+                const bedResponse = await getAssignedBedByPatient(wp.patient.uuid);
+                const assignedBedId = bedResponse.data?.results?.[0]?.bedId;
+                if (assignedBedId) {
+                  await removePatientFromBed(assignedBedId, wp.patient.uuid);
+                }
+                showSnackbar({
+                  kind: 'success',
+                  title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
+                  subtitle: t('patientAdmittedWoBed', '{{patientName}} admitted successfully to {{location}}', {
+                    patientName,
+                    location: location?.display,
+                  }),
+                });
+              }
+            } catch {
+              showSnackbar({
+                kind: 'warning',
                 title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
                 subtitle: t(
-                  'patientAdmittedSuccessfullySubtitle',
-                  '{{patientName}} has been successfully admitted and assigned to bed {{bedNumber}}',
-                  {
-                    patientName: patient.person.preferredName.display,
-                    bedNumber: bedSelected.bedNumber,
-                  },
+                  'patientAdmittedButBedNotAssigned',
+                  '{{patientName}} admitted successfully but failed to assign bed',
+                  { patientName },
                 ),
               });
-            } else {
-              showSnackbar({
-                kind: 'success',
-                title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
-                subtitle: t('patientAdmittedWoBed', 'Patient admitted successfully to {{location}}', {
-                  location: location?.display,
-                }),
-              });
             }
-            closeWorkspace({ discardUnsavedChanges: true });
-            closeWorkspaceGroup2();
-          }
-        },
-        () => {
-          showSnackbar({
-            kind: 'warning',
-            title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
-            subtitle: t(
-              'patientAdmittedButBedNotAssigned',
-              'Patient admitted successfully but fail to assign bed to patient',
-            ),
-          });
-        },
-      )
+          }),
+        );
+
+        if (admitResults.some((r) => r.status === 'fulfilled')) {
+          closeWorkspace({ discardUnsavedChanges: true });
+          closeWorkspaceGroup2();
+        }
+      })
       .finally(async () => {
         await wardPatientGroupDetails?.mutate?.();
         setIsSubmitting(false);

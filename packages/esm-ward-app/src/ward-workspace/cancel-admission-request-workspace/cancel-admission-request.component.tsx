@@ -81,25 +81,36 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({
       ];
 
       const allPatientsToCancel = [wardPatient, ...(relatedTransferPatients ?? [])];
-      Promise.all(
+      Promise.allSettled(
         allPatientsToCancel.map(({ patient: p, visit: v }) =>
           createEncounter(p, emrConfiguration?.cancelADTRequestEncounterType, v?.uuid, obs),
         ),
       )
-        .then(() => {
-          showSnackbar({
-            title: t('admissionRequestCancelled', 'Admission request cancelled.'),
-            kind: 'success',
+        .then((results) => {
+          results.forEach((result, i) => {
+            const patientName = allPatientsToCancel[i].patient.person.preferredName.display;
+            if (result.status === 'fulfilled') {
+              showSnackbar({
+                title: t('admissionRequestCancelledForPatient', 'Admission request cancelled for {{patientName}}', {
+                  patientName,
+                }),
+                kind: 'success',
+              });
+            } else {
+              showSnackbar({
+                title: t('errorCancellingAdmissionRequest', 'Error cancelling admission request for {{patientName}}', {
+                  patientName,
+                }),
+                subtitle: (result.reason as Error)?.message,
+                kind: 'error',
+              });
+            }
           });
-          closeWorkspace({ discardUnsavedChanges: true });
-          closeWorkspaceGroup2();
-        })
-        .catch((err: Error) => {
-          showSnackbar({
-            title: t('errorCancellingAdmissionRequest', 'Error cancelling admission request'),
-            subtitle: err.message,
-            kind: 'error',
-          });
+
+          if (results.some((r) => r.status === 'fulfilled')) {
+            closeWorkspace({ discardUnsavedChanges: true });
+            closeWorkspaceGroup2();
+          }
         })
         .finally(() => {
           setIsSubmitting(false);

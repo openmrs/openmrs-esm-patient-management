@@ -228,7 +228,7 @@ describe('Testing AdmitPatientForm', () => {
     await user.click(admitButton);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'error',
-      title: 'Failed to admit patient',
+      title: 'Failed to admit Alice Johnson',
       subtitle: 'Failed to create encounter',
     });
   });
@@ -246,7 +246,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'warning',
       title: 'Patient admitted successfully',
-      subtitle: 'Patient admitted successfully but fail to assign bed to patient',
+      subtitle: 'Alice Johnson admitted successfully but failed to assign bed',
     });
   });
 
@@ -260,7 +260,7 @@ describe('Testing AdmitPatientForm', () => {
     expect(mockedRemovePatientFromBed).toHaveBeenCalledWith(1, mockPatientAlice.uuid);
     expect(mockedShowSnackbar).toHaveBeenCalledWith({
       kind: 'success',
-      subtitle: 'Patient admitted successfully to Inpatient Ward',
+      subtitle: 'Alice Johnson admitted successfully to Inpatient Ward',
       title: 'Patient admitted successfully',
     });
   });
