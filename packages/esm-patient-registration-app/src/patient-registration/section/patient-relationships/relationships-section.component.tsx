@@ -202,9 +202,8 @@ export const RelationshipsSection = () => {
           <div>
             {relationships && relationships.length > 0
               ? relationships.map((relationship: RelationshipValue, index) => {
-                  const key=relationship.uuid;
                   return (
-                    <div key={key} className={sectionStyles.formSection}>
+                    <div key={relationship.uuid} className={sectionStyles.formSection}>
                       <RelationshipView
                         relationship={relationship}
                         index={index}
