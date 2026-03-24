@@ -22,8 +22,11 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
 
   const vitalsToDisplay = vitals.reduce(
-    (previousVital, currentVital) => Object.assign(previousVital, currentVital),
-    {},
+    (mergedVitals, currentVital) => ({
+      ...mergedVitals,
+      ...currentVital,
+    }),
+    {} as Record<string, any>,
   );
 
   return (
