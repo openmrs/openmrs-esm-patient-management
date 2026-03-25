@@ -121,8 +121,14 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           });
           mutateQueueEntries();
         })
-        .catch((error) => {
-          const errorMessage = error?.responseBody?.error?.message || error?.message || ''; // this section of code is undefined
+        .catch(async (error) => {
+          let errorMessage = '';
+          try {
+            const body = await error?.responseBody;
+            errorMessage = body?.error?.message || error?.message || '';
+          } catch {
+            errorMessage = error?.message || '';
+          }
           const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
 
           if (isDuplicatePatientError) {
@@ -140,7 +146,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
               subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
             });
           }
-          throw error;
+          //throw error; causes error propagation
         });
     },
     [defaultStatusConceptUuid, mutateQueueEntries, sortWeight, t, trigger, visitQueueNumberAttributeUuid, getValues],
