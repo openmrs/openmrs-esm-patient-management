@@ -6,9 +6,11 @@ import QueuePatientBaseTable from './queue-linelist-base-table.component';
 const ServicesTable: React.FC = () => {
   const { t } = useTranslation();
 
-  const currentPathName: string = window.location.pathname.replace('%20', ' ');
-  let service = currentPathName.split('/')[6];
-  let locationUuid = currentPathName.split('/')[8];
+  const currentPathName: string = decodeURIComponent(window.location.pathname);
+  const pathSegments = currentPathName.split('/');
+  const service = pathSegments[6];
+  const locationUuid = pathSegments[8];
+
   const { serviceQueueEntries, isLoading } = useServiceQueueEntries(service, locationUuid);
 
   const tableHeaders = useMemo(
