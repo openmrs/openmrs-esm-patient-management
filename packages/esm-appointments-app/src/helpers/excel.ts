@@ -19,6 +19,23 @@ interface AppointmentSpreadsheetData {
   'Telephone number'?: string;
 }
 
+interface AppointmentExcelInput {
+  uuid: string;
+  name: string;
+  gender: string;
+  age: number;
+  identifier?: string;
+  phoneNumber?: string;
+  startDateTime?: string;
+  service?: {
+    name: string;
+  };
+  patient?: {
+    uuid: string;
+    identifier?: string;
+  };
+}
+
 /**
  * Exports the provided appointments as an Excel spreadsheet.
  * @param {Array<Appointment>} appointments - The list of appointments to export.
@@ -26,7 +43,7 @@ interface AppointmentSpreadsheetData {
  * @param {string} [fileName] - The name of the downloaded file
  */
 export async function exportAppointmentsToSpreadsheet(
-  appointments: Array<Appointment>,
+  appointments: Array<AppointmentExcelInput>,
   rowData: Array<RowData>,
   fileName = 'Appointments',
 ) {
@@ -34,7 +51,7 @@ export async function exportAppointmentsToSpreadsheet(
   const includePhoneNumbers = config.includePhoneNumberInExcelSpreadsheet ?? false;
 
   const appointmentsJSON = await Promise.all(
-    appointments.map(async (appointment: Appointment) => {
+    appointments.map(async (appointment: AppointmentExcelInput) => {
       const matchingAppointment = rowData.find((row) => row.id === appointment.uuid);
       const identifier = matchingAppointment?.identifier ?? appointment.patient.identifier;
 
@@ -45,9 +62,9 @@ export async function exportAppointmentsToSpreadsheet(
           : '';
 
       return {
-        'Patient name': appointment.patient.name,
-        Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
-        Age: appointment.patient.age,
+        'Patient name': appointment.name,
+        Gender: appointment.gender === 'F' ? 'Female' : 'Male',
+        Age: appointment.age,
         Identifier: identifier,
         'Appointment type': appointment.service?.name,
         Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
@@ -67,7 +84,7 @@ Exports unscheduled appointments as an Excel spreadsheet.
 @param {string} fileName - The name of the file to download. Defaults to 'Unscheduled appointments {current date and time}'.
 */
 export function exportUnscheduledAppointmentsToSpreadsheet(
-  unscheduledAppointments: Array<any>,
+  unscheduledAppointments: Array<AppointmentExcelInput>,
   fileName: string = `Unscheduled appointments ${formatDate(new Date(), { year: true, time: true })}`,
 ) {
   const appointmentsJSON = unscheduledAppointments?.map((appointment) => ({
