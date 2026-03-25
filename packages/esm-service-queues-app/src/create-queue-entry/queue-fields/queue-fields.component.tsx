@@ -122,7 +122,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           mutateQueueEntries();
         })
         .catch((error) => {
-          const errorMessage = error?.responseBody?.error?.message || error?.message || '';
+          const errorMessage = error?.responseBody?.error?.message || error?.message || ''; // this section of code is undefined
           const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
 
           if (isDuplicatePatientError) {
