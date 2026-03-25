@@ -4,35 +4,47 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { monthDays } from '../../helpers';
 import MonthlyViewWorkload from './monthly-workload-view.component';
-import DaysOfWeekCard from './days-of-week.component';
 import styles from '../appointments-calendar-view-view.scss';
+import { CALENDAR_SYSTEMS } from '../calendar-systems';
 
 dayjs.extend(isBetween);
 
-const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-
 interface MonthlyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;
-  /**
-   * The ISO date (YYYY-MM-DD) representing the month to display.
-   * Driven by the parent orchestrator's navDate state so that calendar-system
-   * switching and Prev/Next navigation work correctly.
-   */
   navIsoDate: string;
-  /**
-   * Called when a day cell with appointments is clicked.
-   * Receives the ISO date (YYYY-MM-DD). Opens the modal instead of navigating away.
-   */
+  calendarSystemKey?: string;
   onSelectDate?: (isoDate: string) => void;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, navIsoDate, onSelectDate }) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
+  events,
+  navIsoDate,
+  calendarSystemKey = 'gregory',
+  onSelectDate,
+}) => {
+  const cs = CALENDAR_SYSTEMS[calendarSystemKey];
+
+  // Build the 7 day-of-week labels in the correct order for this calendar system
+  const orderedDowLabels = [...cs.daysOfWeek.slice(cs.firstDayOfWeek), ...cs.daysOfWeek.slice(0, cs.firstDayOfWeek)];
+
   return (
     <div className={styles.calendarViewContainer}>
-      {/* Days-of-week column labels */}
+      {/* Days-of-week header row */}
       <div className={styles.workLoadCard}>
-        {DAYS_IN_WEEK.map((day) => (
-          <DaysOfWeekCard key={day} dayOfWeek={day} />
+        {orderedDowLabels.map((label, i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              textAlign: 'center',
+              padding: '0.5rem 0',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              color: '#4b5563',
+              borderBottom: '1px solid #e5e7eb',
+            }}>
+            {label}
+          </div>
         ))}
       </div>
       <div className={styles.wrapper}>

@@ -144,7 +144,12 @@ const AppointmentsCalendarView: React.FC = () => {
 
       {/* ── Calendar body ── */}
       {viewMode === 'monthly' && (
-        <MonthlyCalendarView events={calendarEvents} navIsoDate={navIsoDate} onSelectDate={handleSelectDate} />
+        <MonthlyCalendarView
+          events={calendarEvents}
+          navIsoDate={navIsoDate}
+          calendarSystemKey={calSysKey}
+          onSelectDate={handleSelectDate}
+        />
       )}
 
       {viewMode === 'weekly' && (
