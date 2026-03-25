@@ -177,8 +177,6 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           ref={searchInputRef}
         />
 
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
-
         {!isSearchPage && hasSearchTerm && (
           <div
             className={styles.floatingSearchResultsContainer}
