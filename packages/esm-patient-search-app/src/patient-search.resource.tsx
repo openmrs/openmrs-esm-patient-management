@@ -13,6 +13,7 @@ type InfinitePatientSearchResponse = FetchResponse<{
 const patientProperties = [
   'patientId',
   'uuid',
+  'voided',
   'identifiers',
   'display',
   'patientIdentifier:(uuid,identifier)',
@@ -21,6 +22,11 @@ const patientProperties = [
 ];
 
 const patientSearchCustomRepresentation = `custom:(${patientProperties.join(',')})`;
+
+export const userPropertiesRepresentation = 'custom:(userProperties)';
+
+export const getUserPropertiesUrl = (userUuid: string) =>
+  `${restBaseUrl}/user/${userUuid}?v=${encodeURIComponent(userPropertiesRepresentation)}`;
 
 /**
  * A custom React hook for implementing infinite scrolling patient search.
@@ -117,7 +123,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
   const { user } = useSession();
   const userUuid = user?.uuid;
   const shouldFetchRecentlyViewedPatients = showRecentlySearchedPatients && userUuid;
-  const url = `${restBaseUrl}/user/${userUuid}`;
+  const url = userUuid ? getUserPropertiesUrl(userUuid) : null;
 
   // This request will be loaded from the SWR cache as a preload request happens ahead  when the user hovers over the search icon.
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(
@@ -209,13 +215,15 @@ export function useRestPatients(
     },
   );
 
-  // Filter out null patients and patients with null person property to prevent errors
+  // Filter out null, voided, and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
   // (in the hook) to ensure all consumers receive clean, valid data.
   const mappedData =
     data
       ?.flatMap((res) => res.data)
-      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
+      ?.filter(
+        (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
+      ) ?? null;
 
   return useMemo(
     () => ({

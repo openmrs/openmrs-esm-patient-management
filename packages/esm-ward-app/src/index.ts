@@ -100,16 +100,6 @@ export const orderBasketWorkspaceSideRailIcon = getAsyncLifecycle(
   options,
 );
 
-export const admissionRequestsWorkspaceSideRailIcon = getAsyncLifecycle(
-  () => import('./ward-workspace/admission-request-workspace/admission-requests-action-button.extension'),
-  options,
-);
-
-export const createAdmissionEncounterWorkspaceSideRailIcon = getAsyncLifecycle(
-  () => import('./ward-workspace/create-admission-encounter/create-admission-encounter-action-button.extension'),
-  options,
-);
-
 export const createAdmissionEncounterWorkspace = getAsyncLifecycle(
   () => import('./ward-workspace/create-admission-encounter/create-admission-encounter.workspace'),
   options,
@@ -124,7 +114,7 @@ export const defaultWardView = getAsyncLifecycle(() => import('./ward-view/defau
 });
 
 export const maternalWardView = getAsyncLifecycle(
-  () => import('./ward-view/materal-ward/maternal-ward-view.component'),
+  () => import('./ward-view/maternal-ward/maternal-ward-view.component'),
   {
     featureName: 'maternal-ward-view',
     moduleName,
@@ -136,6 +126,11 @@ export const maternalWardView = getAsyncLifecycle(
 
 export const wardPatientWorkspaceBanner = getAsyncLifecycle(
   () => import('./ward-workspace/patient-banner/patient-banner.component'),
+  options,
+);
+
+export const deleteNoteModal = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/history/delete-note.modal'),
   options,
 );
 

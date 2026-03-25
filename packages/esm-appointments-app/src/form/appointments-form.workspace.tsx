@@ -45,12 +45,12 @@ import {
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
-  useMutateAppointments,
 } from './appointments-form.resource';
 import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
-import { useAppointmentsStore } from '../store';
 import { useProviders } from '../hooks/useProviders';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import Workload from '../workload/workload.component';
+import { useSelectedDate } from '../hooks/useSelectedDate';
 import styles from './appointments-form.scss';
 
 interface AppointmentsFormProps {
@@ -84,7 +84,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
-  const { selectedDate } = useAppointmentsStore();
+
+  const selectedDate = useSelectedDate();
   const { data: services, isLoading } = useAppointmentService();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
@@ -466,15 +467,17 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     };
   };
 
-  if (isLoading) {
-    return (
-      <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-    );
-  }
-
   const title = isEditing
     ? t('editAppointment', 'Edit appointment')
     : t('createNewAppointment', 'Create new appointment');
+
+  if (isLoading) {
+    return (
+      <Workspace2 title={title}>
+        <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      </Workspace2>
+    );
+  }
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={isDirty}>

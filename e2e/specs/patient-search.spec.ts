@@ -4,7 +4,6 @@ import { HomePage } from '../pages';
 import { getPatientIdentifierStr } from '../commands';
 
 test('Search patient by patient identifier', async ({ page, patient }) => {
-  // extract details from the created patient
   const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
@@ -37,7 +36,6 @@ test('Search patient by patient identifier', async ({ page, patient }) => {
 });
 
 test('Search patient by full name', async ({ page, patient }) => {
-  // extract details from the created patient
   const openmrsIdentifier = getPatientIdentifierStr(patient);
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
@@ -70,7 +68,8 @@ test('Search patient by full name', async ({ page, patient }) => {
   });
 
   await test.step('When I click on the app logo', async () => {
-    await page.getByRole('link', { name: /openmrs logo/i }).click();
+    const logoLink = page.getByRole('link', { name: /openmrs logo/i });
+    await logoLink.click();
   });
 
   await test.step('Then I should be redirected to the home page', async () => {

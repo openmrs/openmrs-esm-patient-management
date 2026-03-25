@@ -76,6 +76,58 @@ export const mockQueueSurgery: Queue = {
 
 export const mockQueues = [mockQueueTriage, mockQueueSurgery];
 
+export const mockQueueNoStatuses: Queue = {
+  ...mockQueueTriage,
+  uuid: '00000000-0000-0000-0003-000000000000',
+  display: 'NoStatus',
+  name: 'NoStatus',
+  allowedStatuses: [],
+};
+
+export const mockQueueNoPriorities: Queue = {
+  ...mockQueueTriage,
+  uuid: '00000000-0000-0000-0004-000000000000',
+  display: 'NoPriority',
+  name: 'NoPriority',
+  allowedPriorities: [],
+};
+
+export const mockQueueAltPriorities: Queue = {
+  ...mockQueueTriage,
+  uuid: '00000000-0000-0000-0005-000000000000',
+  display: 'AltPriority',
+  name: 'AltPriority',
+  allowedPriorities: [mockPriorityUrgent],
+};
+
+/**
+ * Mock queues that exceed the radio button threshold (>8) to trigger ComboBox rendering.
+ * @see queue-entry-actions-modal.component.tsx for the threshold logic
+ */
+const createMockQueue = (id: number, name: string, locationName: string): Queue => ({
+  uuid: `00000000-0000-0000-000${id}-000000000000`,
+  display: name,
+  name: name,
+  description: '',
+  location: { uuid: `00000000-0000-0000-0000-00000000003${id}`, display: locationName },
+  service: mockServiceTriage,
+  allowedPriorities: [mockPriorityNonUrgent, mockPriorityUrgent],
+  allowedStatuses: [mockStatusWaiting, mockStatusInService],
+});
+
+export const mockQueuesForComboBox: Queue[] = [
+  mockQueueSurgery, // Current queue for mockQueueEntryAlice
+  createMockQueue(1, 'Triage', 'Main Hospital'),
+  createMockQueue(2, 'Pharmacy', 'Main Hospital'),
+  createMockQueue(3, 'Laboratory', 'Main Hospital'),
+  createMockQueue(4, 'Radiology', 'Imaging Center'),
+  createMockQueue(5, 'Cardiology', 'Heart Center'),
+  createMockQueue(6, 'Pediatrics', 'Children Wing'),
+  createMockQueue(7, 'Orthopedics', 'West Wing'),
+  createMockQueue(8, 'Neurology', 'East Wing'),
+  createMockQueue(9, 'Dermatology', 'Outpatient Clinic'),
+];
+
 // Queues Entries:
 export const mockQueueEntryBrian: QueueEntry = {
   uuid: '8824d1e4-8513-4a78-bcec-37173f417f18',
@@ -158,6 +210,16 @@ export const mockQueueEntryAlice: QueueEntry = {
 };
 
 export const mockQueueEntries = [mockQueueEntryBrian, mockQueueEntryAlice];
+
+export const mockQueueEntryNoStatuses: QueueEntry = {
+  ...mockQueueEntryAlice,
+  queue: mockQueueNoStatuses,
+};
+
+export const mockQueueEntryNoPriorities: QueueEntry = {
+  ...mockQueueEntryAlice,
+  queue: mockQueueNoPriorities,
+};
 
 export const mockMappedQueueEntry: MappedQueueEntry = {
   id: '8824d1e4-8513-4a78-bcec-37173f417f18',

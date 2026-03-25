@@ -182,10 +182,9 @@ export const RelationshipsSection = () => {
   if (!relationshipTypes) {
     return (
       <section aria-label="Loading relationships section">
-        <SkeletonText
-          // @ts-expect-error
-          role="progressbar"
-        />
+        <div role="progressbar" aria-label={t('loading', 'Loading')}>
+          <SkeletonText />
+        </div>
       </section>
     );
   }
@@ -202,17 +201,18 @@ export const RelationshipsSection = () => {
         }) => (
           <div>
             {relationships && relationships.length > 0
-              ? relationships.map((relationship: RelationshipValue, index) => (
-                  <div key={index} className={sectionStyles.formSection}>
-                    <RelationshipView
-                      relationship={relationship}
-                      index={index}
-                      displayRelationshipTypes={displayRelationshipTypes}
-                      key={index}
-                      remove={remove}
-                    />
-                  </div>
-                ))
+              ? relationships.map((relationship: RelationshipValue, index) => {
+                  return (
+                    <div key={relationship.uuid} className={sectionStyles.formSection}>
+                      <RelationshipView
+                        relationship={relationship}
+                        index={index}
+                        displayRelationshipTypes={displayRelationshipTypes}
+                        remove={remove}
+                      />
+                    </div>
+                  );
+                })
               : null}
             <div className={styles.actions}>
               <Button

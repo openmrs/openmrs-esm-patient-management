@@ -145,7 +145,7 @@ export const waitForAdmissionToBeProcessed = async (
     uiCacheRefreshDelayMs?: number;
   } = {},
 ): Promise<void> => {
-  const { maxAttempts = 30, delayMs = 2000, uiCacheRefreshDelayMs = 3000 } = options;
+  const { maxAttempts = 10, delayMs = 1000, uiCacheRefreshDelayMs = 0 } = options;
 
   let admissionFound = false;
   let lastResponse: any = null;
@@ -196,6 +196,75 @@ export const waitForAdmissionToBeProcessed = async (
   }
 
   // Give the UI time to refresh its SWR cache with the updated admission data
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(uiCacheRefreshDelayMs);
+};
+
+/**
+ * Waits for an inpatient admission request to be available via EMR API.
+ * This is used after creating an admission request encounter so the UI can render it.
+ */
+export const waitForAdmissionRequestToBeProcessed = async (
+  api: APIRequestContext,
+  page: Page,
+  patientUuid: string,
+  wardLocationUuid: string,
+  options: {
+    maxAttempts?: number;
+    delayMs?: number;
+    uiCacheRefreshDelayMs?: number;
+  } = {},
+): Promise<void> => {
+  const { maxAttempts = 30, delayMs = 2000, uiCacheRefreshDelayMs = 3000 } = options;
+
+  let requestFound = false;
+  let lastResponse: any = null;
+
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const response = await api.get(
+      `emrapi/inpatient/request?dispositionType=ADMIT,TRANSFER&dispositionLocation=${wardLocationUuid}`,
+    );
+
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (response.ok()) {
+      const data = await response.json();
+      const results = data.results || [];
+      lastResponse = { results, totalResults: results.length };
+
+      requestFound = results.some((request: any) => {
+        const requestPatientUuid = request.patient?.uuid || request.visit?.patient?.uuid;
+        return requestPatientUuid === patientUuid;
+      });
+
+      // eslint-disable-next-line playwright/no-conditional-in-test
+      if (requestFound) {
+        break;
+      }
+    } else {
+      lastResponse = { status: response.status(), statusText: response.statusText() };
+    }
+
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (attempt < maxAttempts - 1) {
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(delayMs);
+    }
+  }
+
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (!requestFound) {
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    const debugInfo = lastResponse
+      ? ` Last API response: ${JSON.stringify(lastResponse)}`
+      : ' No successful API responses received.';
+    throw new Error(
+      `Admission request for patient ${patientUuid} not found in emrapi API after ${maxAttempts} attempts (${maxAttempts * delayMs}ms).${debugInfo} ` +
+        `This may indicate: (1) emrapi configuration issue, (2) encounter type mismatch, or (3) backend processing delay.`,
+    );
+  }
+
+  // Give the UI time to refresh its SWR cache with the updated request data
   // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(uiCacheRefreshDelayMs);
 };

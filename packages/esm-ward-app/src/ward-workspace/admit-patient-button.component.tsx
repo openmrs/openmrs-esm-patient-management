@@ -3,15 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import {
   ArrowRightIcon,
-  launchWorkspace2,
   showSnackbar,
   useAppContext,
   useFeatureFlag,
   useLayoutType,
-  Workspace2DefinitionProps,
+  useWorkspace2Context,
 } from '@openmrs/esm-framework';
 import useWardLocation from '../hooks/useWardLocation';
-import type { DispositionType, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../types';
+import type { DispositionType, WardPatient, WardViewContext } from '../types';
 import { useAdmitPatient } from '../ward.resource';
 
 interface AdmitPatientButtonProps {
@@ -38,9 +37,9 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { admitPatient, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useAdmitPatient();
   const [isAdmitting, setIsAdmitting] = useState(false);
+  const { launchChildWorkspace } = useWorkspace2Context();
 
-  const launchPatientAdmissionForm = () =>
-    launchWorkspace2<WardPatientWorkspaceProps, {}, {}>('admit-patient-form-workspace', { wardPatient });
+  const launchPatientAdmissionForm = () => launchChildWorkspace('admit-patient-form-workspace', { wardPatient });
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
@@ -58,18 +57,34 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
         if (response && response?.ok) {
           showSnackbar({
             kind: 'success',
-            title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
-            subtitle: t('patientAdmittedWoBed', 'Patient admitted successfully to {{location}}', {
-              location: location?.display,
-            }),
+            title:
+              dispositionType === 'ADMIT'
+                ? t('patientAdmittedSuccessfully', 'Patient admitted successfully')
+                : t('patientTransferredSuccessfully', 'Patient transferred successfully'),
+            subtitle:
+              dispositionType === 'ADMIT'
+                ? t('patientAdmittedToLocation', 'Patient admitted successfully to {{location}}', {
+                    location: location?.display,
+                  })
+                : t('patientTransferredToLocation', 'Patient transferred successfully to {{location}}', {
+                    location: location?.display,
+                  }),
           });
         }
         onAdmitPatientSuccess();
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : t('unknownError', 'An unknown error occurred');
+      } catch (err) {
+        // TODO: better way to handle / display error messages
+        // https://openmrs.atlassian.net/browse/O3-5423
+        const errorMessage =
+          err?.responseBody?.error?.globalErrors?.[0]?.message ??
+          err.message ??
+          t('unknownError', 'An unknown error occurred');
         showSnackbar({
           kind: 'error',
-          title: t('errorCreatingEncounter', 'Failed to admit patient'),
+          title:
+            dispositionType === 'ADMIT'
+              ? t('errrorAdmitingPatient', 'Failed to admit patient')
+              : t('errorTransferringPatient', 'Failed to transfer patient'),
           subtitle: errorMessage,
         });
       } finally {

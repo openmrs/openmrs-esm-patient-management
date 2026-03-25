@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-management",
-  "version": "9.2.0",
+  "version": "10.0.2",
   "private": true,
   "description": "Patient management microfrontend for the OpenMRS 3.x frontend",
   "workspaces": [
@@ -68,10 +68,7 @@
     "swr": "2.2.5",
     "turbo": "^2.5.2",
     "typedoc": "^0.22.15",
-    "typescript": "^5.0.0",
-    "webpack": "^5.99.9",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2"
+    "typescript": "^5.0.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",

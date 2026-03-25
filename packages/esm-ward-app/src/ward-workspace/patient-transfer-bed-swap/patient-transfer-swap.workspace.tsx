@@ -1,13 +1,13 @@
-import { ContentSwitcher, Switch } from '@carbon/react';
-import { closeWorkspaceGroup2, useFeatureFlag, Workspace2, Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
+import { ContentSwitcher, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import type { WardPatientWorkspaceDefinition, WardPatientWorkspaceProps } from '../../types';
-import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
+import { closeWorkspaceGroup2, useFeatureFlag, Workspace2 } from '@openmrs/esm-framework';
+import type { WardPatientWorkspaceDefinition } from '../../types';
 import PatientAdmitOrTransferForm, {
   type PatientAdmitOrTransferFormProps,
 } from './patient-admit-or-transfer-request-form.component';
 import PatientBedSwapForm from './patient-bed-swap-form.component';
+import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './patient-transfer-swap.scss';
 
 const TransferSection = {
@@ -22,7 +22,7 @@ type TransferSectionValues = (typeof TransferSection)[keyof typeof TransferSecti
  * or to change their currently assigned bed
  */
 export default function PatientTransferAndSwapWorkspace({
-  groupProps: { wardPatient },
+  groupProps: { wardPatient, relatedTransferPatients },
   closeWorkspace,
 }: WardPatientWorkspaceDefinition) {
   const { t } = useTranslation();
@@ -31,6 +31,7 @@ export default function PatientTransferAndSwapWorkspace({
 
   const props: PatientAdmitOrTransferFormProps = {
     wardPatient,
+    relatedTransferPatients,
     onSuccess: async () => {
       await closeWorkspace({ discardUnsavedChanges: true });
       closeWorkspaceGroup2();
@@ -54,8 +55,8 @@ export default function PatientTransferAndSwapWorkspace({
                 size="md"
                 selectedIndex={selectedSection === TransferSection.TRANSFER ? 0 : 1}
                 onChange={({ name }) => setSelectedSection(name as TransferSectionValues)}>
-                <Switch name={TransferSection.TRANSFER} text={t('transfer', 'Transfer')} />
-                <Switch name={TransferSection.BED_SWAP} text={t('bedSwap', 'Bed swap')} />
+                <Switch name={TransferSection.TRANSFER}>{t('transfer', 'Transfer')}</Switch>
+                <Switch name={TransferSection.BED_SWAP}>{t('bedSwap', 'Bed swap')}</Switch>
               </ContentSwitcher>
             </div>
           </div>

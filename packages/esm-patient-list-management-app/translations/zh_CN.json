@@ -26,7 +26,6 @@
   "editNameDescription": "编辑名称或描述",
   "editPatientListHeader": "编辑患者列表",
   "emptyList": "此列表中没有患者",
-  "emptyStateIllustration": "空状态插图",
   "emptyStateText": "没有{{listType}}患者列表可供显示",
   "error": "错误",
   "errorAddingPatientToList": "未能将患者添加至列表",

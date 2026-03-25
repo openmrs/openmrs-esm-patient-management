@@ -1,27 +1,28 @@
 import React from 'react';
+import { InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type PatientUuid, useConfig } from '@openmrs/esm-framework';
+import { useConfig, useEmrConfiguration, type PatientUuid } from '@openmrs/esm-framework';
 import { usePatientNotes } from '../notes.resource';
 import InPatientNote, { InPatientNoteSkeleton } from './note.component';
-import styles from './styles.scss';
-import { InlineNotification } from '@carbon/react';
-import useEmrConfiguration from '../../../hooks/useEmrConfiguration';
 import { type WardConfigObject } from '../../../config-schema';
+import styles from './styles.scss';
 
 interface PatientNotesHistoryProps {
   patientUuid: PatientUuid;
   visitUuid: string;
+  promptBeforeClosing(hasUnsavedChanges: boolean): void;
 }
 
-const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid }) => {
+const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, visitUuid, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const { emrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
   const config = useConfig<WardConfigObject>();
 
-  const { patientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(patientUuid, visitUuid, [
-    emrConfiguration?.consultFreeTextCommentsConcept.uuid,
-    ...config.additionalInpatientNotesConceptUuids,
-  ]);
+  const { patientNotes, mutatePatientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
+    patientUuid,
+    visitUuid,
+    [emrConfiguration?.consultFreeTextCommentsConcept.uuid, ...config.additionalInpatientNotesConceptUuids],
+  );
 
   const isLoading = isLoadingPatientNotes || isLoadingEmrConfiguration;
 
@@ -34,7 +35,12 @@ const PatientNotesHistory: React.FC<PatientNotesHistoryProps> = ({ patientUuid, 
       </div>
       {isLoading ? [1, 2, 3, 4].map((item, index) => <InPatientNoteSkeleton key={index} />) : null}
       {patientNotes.map((patientNote) => (
-        <InPatientNote key={patientNote.id} note={patientNote} />
+        <InPatientNote
+          key={patientNote.encounterUuid}
+          note={patientNote}
+          mutatePatientNotes={mutatePatientNotes}
+          promptBeforeClosing={promptBeforeClosing}
+        />
       ))}
       {errorFetchingPatientNotes && (
         <InlineNotification

@@ -1,28 +1,34 @@
 import { showNotification, useAppContext, useFeatureFlag } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { WardViewContext } from '../types';
-import {
-  getWardMetricNameTranslation,
-  getWardMetrics,
-  getWardMetricValueTranslation,
-} from '../ward-view/ward-view.resource';
+import { WardMetricType, type WardViewContext } from '../types';
+import { getWardMetricNameTranslation, getWardMetrics } from '../ward-view/ward-view.resource';
 import WardMetric from './ward-metric.component';
 import styles from './ward-metrics.scss';
 
-const wardMetrics = [{ name: 'patients' }, { name: 'freeBeds' }, { name: 'totalBeds' }];
+interface WardMetricsProps {
+  metrics?: WardMetricType[];
+}
 
-const WardMetrics = () => {
+const WardMetrics: React.FC<WardMetricsProps> = ({
+  metrics = [WardMetricType.PATIENTS, WardMetricType.FREE_BEDS, WardMetricType.TOTAL_BEDS, WardMetricType.PENDING_OUT],
+}) => {
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse, bedLayouts } =
+  const { admissionLocationResponse, inpatientAdmissionResponse, inpatientRequestResponse } =
     wardPatientGroupDetails || {};
   const { isLoading, error } = admissionLocationResponse ?? {};
   const isDataLoading =
     admissionLocationResponse?.isLoading ||
     inpatientAdmissionResponse?.isLoading ||
     inpatientRequestResponse?.isLoading;
+
+  const wardMetricValues = useMemo(
+    () => (!wardPatientGroupDetails ? {} : getWardMetrics(wardPatientGroupDetails)),
+    [wardPatientGroupDetails],
+  );
+
   if (!wardPatientGroupDetails) return <></>;
 
   if (error) {
@@ -33,43 +39,63 @@ const WardMetrics = () => {
     });
   }
 
-  const wardMetricValues = getWardMetrics(bedLayouts, wardPatientGroupDetails);
   return (
     <div className={styles.metricsContainer}>
-      {isBedManagementModuleInstalled ? (
-        wardMetrics.map((wardMetric) => {
-          return (
-            <WardMetric
-              metricName={getWardMetricNameTranslation(wardMetric.name, t)}
-              metricValue={getWardMetricValueTranslation(wardMetric.name, t, wardMetricValues[wardMetric.name])}
-              isLoading={!!isLoading || !!isDataLoading}
-              key={wardMetric.name}
-            />
-          );
-        })
-      ) : (
+      {metrics.includes(WardMetricType.PATIENTS) && (
         <WardMetric
           metricName={getWardMetricNameTranslation('patients', t)}
-          metricValue={'--'}
+          metricValue={wardMetricValues['patients'] ?? '--'}
           isLoading={false}
           key={'patients'}
         />
       )}
+      {metrics.includes(WardMetricType.FEMALES_OF_REPRODUCTIVE_AGE) &&
+        wardMetricValues['femalesOfReproductiveAge'] &&
+        wardMetricValues['femalesOfReproductiveAge'] !== '0' && (
+          <WardMetric
+            metricName={getWardMetricNameTranslation('femalesOfReproductiveAge', t)}
+            metricValue={wardMetricValues['femalesOfReproductiveAge'] ?? '--'}
+            isLoading={!!isLoading || !!isDataLoading}
+            key={'femalesOfReproductiveAge'}
+          />
+        )}
+      {metrics.includes(WardMetricType.NEWBORNS) &&
+        wardMetricValues['newborns'] &&
+        wardMetricValues['newborns'] !== '0' && (
+          <WardMetric
+            metricName={getWardMetricNameTranslation('newborns', t)}
+            metricValue={wardMetricValues['newborns'] ?? '--'}
+            isLoading={!!isLoading || !!isDataLoading}
+            key={'newborns'}
+          />
+        )}
       {isBedManagementModuleInstalled && (
-        <WardMetric
-          metricName={getWardMetricNameTranslation('pendingOut', t)}
-          metricValue={
-            error
-              ? '--'
-              : getWardMetricValueTranslation(
-                  'pendingOut',
-                  t,
-                  wardPatientGroupDetails?.wardPatientPendingCount?.toString(),
-                )
-          }
-          isLoading={!!isDataLoading}
-          key="pending"
-        />
+        <>
+          {metrics.includes(WardMetricType.FREE_BEDS) && (
+            <WardMetric
+              metricName={getWardMetricNameTranslation('freeBeds', t)}
+              metricValue={wardMetricValues['freeBeds'] ?? '--'}
+              isLoading={!!isLoading || !!isDataLoading}
+              key={'freeBeds'}
+            />
+          )}
+          {metrics.includes(WardMetricType.TOTAL_BEDS) && (
+            <WardMetric
+              metricName={getWardMetricNameTranslation('totalBeds', t)}
+              metricValue={wardMetricValues['totalBeds'] ?? '--'}
+              isLoading={!!isLoading || !!isDataLoading}
+              key={'totalBeds'}
+            />
+          )}
+          {metrics.includes(WardMetricType.PENDING_OUT) && (
+            <WardMetric
+              metricName={getWardMetricNameTranslation('pendingOut', t)}
+              metricValue={error ? '--' : (wardPatientGroupDetails?.wardPatientPendingCount?.toString() ?? '--')}
+              isLoading={!!isDataLoading}
+              key={'pendingOut'}
+            />
+          )}
+        </>
       )}
     </div>
   );

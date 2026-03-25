@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
 import {
   navigate,
@@ -10,6 +9,7 @@ import {
   parseDate,
   showSnackbar,
   CustomOverflowMenu,
+  CustomOverflowMenuItem,
   launchWorkspace2,
   showModal,
 } from '@openmrs/esm-framework';
@@ -148,12 +148,12 @@ const ListDetails = () => {
                 <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
               </>
             }>
-            <OverflowMenuItem
+            <CustomOverflowMenuItem
               className={styles.menuItem}
               itemText={t('editNameDescription', 'Edit name or description')}
               onClick={handleEditPatientList}
             />
-            <OverflowMenuItem
+            <CustomOverflowMenuItem
               className={styles.menuItem}
               isDelete
               itemText={t('deletePatientList', 'Delete patient list')}

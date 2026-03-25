@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -10,19 +11,18 @@ import {
   Stack,
   TextArea,
 } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext, Workspace2 } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import LocationSelector from '../../location-selector/location-selector.component';
-import type { ObsPayload, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { useCreateEncounter } from '../../ward.resource';
-import styles from './patient-transfer-swap.scss';
+import type { ObsPayload, WardPatient, WardViewContext } from '../../types';
+import LocationSelector from '../../location-selector/location-selector.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
+import styles from './patient-transfer-swap.scss';
 
 export interface PatientAdmitOrTransferFormProps {
   wardPatient: WardPatient;
