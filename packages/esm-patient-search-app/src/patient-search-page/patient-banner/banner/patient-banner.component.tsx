@@ -74,7 +74,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             toggleContactDetails={handleToggleContactDetails}
           />
           <div className={styles.rightActions}>
-            {!hideActionsOverflow ? (
+            {!hideActionsOverflow && !onPatientSelected ? (
               <PatientBannerActionsMenu
                 actionsSlotName="patient-search-actions-slot"
                 additionalActionsSlotState={{
