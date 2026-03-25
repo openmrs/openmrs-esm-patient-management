@@ -1,0 +1,15 @@
+name: OWASP Dependency Check
+
+on:
+  push:
+    branches: [ master, feat/owasp ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/owasp-dependency-check.yml@feat/owasp/frontend
+    secrets:
+      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+      BOT_GH_TOKEN: ${{ secrets.OMRS_BOT_GH_TOKEN }}
