@@ -45,6 +45,7 @@ import {
   usePagination,
   showModal,
 } from '@openmrs/esm-framework';
+import { appointmentTableColumnHeaderLabels } from '../../constants';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { AppointmentStatus, type Appointment } from '../../types';
@@ -85,7 +86,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   }, [appointments]);
 
   const headerData = appointmentsTableColumns.map((columnKey) => ({
-    header: t(columnKey, columnKey),
+    header: appointmentTableColumnHeaderLabels[columnKey] ?? t(columnKey, columnKey),
     key: columnKey,
   }));
 

@@ -73,3 +73,7 @@ export const appointmentColumnTypes = [
   // t('prescription', 'Rx Sheet')
   'prescription',
 ] as const;
+
+export const appointmentTableColumnHeaderLabels: Partial<Record<(typeof appointmentColumnTypes)[number], string>> = {
+  status: 'Actions',
+};
