@@ -6,8 +6,8 @@ import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -18,7 +18,7 @@ export interface MonthlyWorkloadViewProps {
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
   const layout = useLayoutType();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
 
   const currentData = useMemo(
     () =>

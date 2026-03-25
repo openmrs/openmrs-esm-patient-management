@@ -3,19 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { filterByServiceType } from '../utils';
 import { useEarlyAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
-
-interface EarlyAppointmentsProps {
-  appointmentServiceTypes?: Array<string>;
-  date: string;
-}
+import { useAppointmentsStore } from '../../store';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 /**
  * Component to display early appointments
  * Note that although we define this extension in routes.jsx, we currently don't wire it into the scheduled-appointments-panels-slot by default because it requests a custom endpoint (see useEarlyAppointments) not provided by the standard Bahmni Appointments module
  */
-const EarlyAppointments: React.FC<EarlyAppointmentsProps> = ({ appointmentServiceTypes, date }) => {
+const EarlyAppointments: React.FC = () => {
   const { t } = useTranslation();
-  const { earlyAppointmentList, isLoading } = useEarlyAppointmentList(date);
+  const { appointmentServiceTypes } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
+  const { earlyAppointmentList, isLoading } = useEarlyAppointmentList(selectedDate);
 
   const appointments = filterByServiceType(earlyAppointmentList, appointmentServiceTypes).map((appointment, index) => {
     return {
