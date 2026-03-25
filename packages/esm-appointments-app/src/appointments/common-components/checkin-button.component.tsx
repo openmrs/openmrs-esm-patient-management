@@ -49,10 +49,16 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
                     });
                     mutateAppointments?.();
                   })
-                  .catch(() => {
+                  .catch((error) => {
+                    console.error('Check-in failed:', error);
                     showSnackbar({
                       title: t('checkInFailed', 'Check-in failed'),
-                      subtitle: t('appointmentCheckInFailed', 'An error occurred while checking in the appointment'),
+                      subtitle:
+                        error?.message ??
+                        t(
+                          'appointmentCheckInFailed',
+                          'An error occurred while checking in the appointment',
+                        ),
                       kind: 'error',
                       isLowContrast: false,
                     });
