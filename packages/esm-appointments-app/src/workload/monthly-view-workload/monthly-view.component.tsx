@@ -34,7 +34,6 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   return (
     <div className={styles.calendarViewContainer}>
       <>
-        <div className={styles.container}></div>
         <span className={styles.headerContainer}>
           {formatDate(new Date(monthViewDate), { day: false, time: false, noToday: true })}
         </span>

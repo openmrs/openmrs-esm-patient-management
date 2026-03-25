@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, screen } from '@testing-library/react';
 import {
@@ -7,11 +8,10 @@ import {
   openmrsFetch,
   showSnackbar,
   useConfig,
-  useLocations,
   useSession,
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { mockUseAppointmentServiceData, mockSession, mockLocations, mockProviders } from '__mocks__';
+import { mockUseAppointmentServiceData, mockSession, mockProviders } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { saveAppointment, checkAppointmentConflict } from './appointments-form.resource';
 import { useProviders } from '../hooks/useProviders';
@@ -66,7 +66,6 @@ const mockSaveAppointment = jest.mocked(saveAppointment);
 const mockCheckAppointmentConflict = jest.mocked(checkAppointmentConflict);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseLocations = jest.mocked(useLocations);
 const mockUseProviders = jest.mocked(useProviders);
 const mockUseSession = jest.mocked(useSession);
 
@@ -94,11 +93,15 @@ describe('AppointmentForm', () => {
   const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3}Z|\+00:00)$/;
 
   beforeEach(() => {
+    const defaultConfig = getDefaultsFromConfigSchema(configSchema);
     mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
+      ...defaultConfig,
       appointmentTypes: ['Scheduled', 'WalkIn'],
+      appointmentFormDefaults: {
+        ...defaultConfig.appointmentFormDefaults,
+        showMoreExpanded: true,
+      },
     });
-    mockUseLocations.mockReturnValue(mockLocations.data.results);
     mockUseSession.mockReturnValue(mockSession.data);
     mockUseProviders.mockReturnValue({
       providers: mockProviders.data,
@@ -112,28 +115,49 @@ describe('AppointmentForm', () => {
     return toggles.find((toggle) => toggle.getAttribute('id') === 'allDayToggle');
   };
 
+  const clickShowMore = async (user: ReturnType<typeof userEvent.setup>) => {
+    const showMoreButton = screen.queryByRole('button', { name: /show more/i });
+    if (showMoreButton) {
+      await user.click(showMoreButton);
+    }
+  };
+
   it('renders the appointments form', async () => {
+    const defaultConfig = getDefaultsFromConfigSchema(configSchema);
     mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      appointmentFormDefaults: {
+        ...defaultConfig.appointmentFormDefaults,
+        showMoreExpanded: false,
+      },
+    });
+    const user = userEvent.setup();
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByLabelText(/select a location/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/select a service/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/select the type of appointment/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/write an additional note/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/write any additional points here/i)).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /mosoriot/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /inpatient ward/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/select a provider/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/select a location/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /show more/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/select the type of appointment/i)).not.toBeInTheDocument();
     expect(screen.getByRole('option', { name: /^am$/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /^pm$/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /choose appointment type/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /scheduled/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /walkin/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
+
+    await clickShowMore(user);
+
+    expect(screen.getByLabelText(/select the type of appointment/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/write an additional note/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/write any additional points here/i)).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /choose appointment type/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /scheduled/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /walkin/i })).toBeInTheDocument();
   });
 
   it('closes the workspace when the cancel button is clicked', async () => {
@@ -162,26 +186,26 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const timeFormat = screen.getByRole('combobox', { name: /time/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
+    await clickShowMore(user);
 
-    const date = '2024-01-04';
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+    const date = dayjs().format('YYYY-MM-DD');
     const time = '09:30';
 
     fireEvent.change(dateInput, { target: { value: date } });
@@ -240,26 +264,26 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const timeFormat = screen.getByRole('combobox', { name: /time/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
+    await clickShowMore(user);
 
-    const date = '2024-01-04';
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+    const date = dayjs().format('YYYY-MM-DD');
     const time = '09:30';
 
     fireEvent.change(dateInput, { target: { value: date } });
@@ -392,21 +416,21 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const allDayToggle = getAllDayToggle();
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
-    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
+    await clickShowMore(user);
 
-    const date = '2024-01-04';
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+    const date = dayjs().format('YYYY-MM-DD');
 
     fireEvent.change(dateInput, { target: { value: date } });
     await user.click(dateAppointmentIssuedInput);
@@ -433,12 +457,10 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const durationInput = screen.getByRole('spinbutton', { name: /duration \(minutes\)/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
 
     // Wait for service selection to update duration field
@@ -463,12 +485,10 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const durationInput = screen.getByRole('spinbutton', { name: /duration \(minutes\)/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
 
     // Wait for service selection to update duration field
@@ -495,26 +515,26 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
     const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const timeInput = screen.getByRole('textbox', { name: /time/i });
     const durationInput = screen.getByRole('spinbutton', { name: /duration \(minutes\)/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
+    await clickShowMore(user);
 
-    const date = '2024-01-04';
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+    const date = dayjs().format('YYYY-MM-DD');
     const time = '09:30';
 
     fireEvent.change(dateInput, { target: { value: date } });
@@ -550,14 +570,14 @@ describe('AppointmentForm', () => {
 
     await waitForLoadingToFinish();
 
-    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
     const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
     const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-    await user.selectOptions(locationSelect, ['Inpatient Ward']);
     await user.selectOptions(serviceSelect, ['Outpatient']);
+    await clickShowMore(user);
+
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
 
     // Set appointment date to today
     const appointmentDate = '2024-01-04';
@@ -586,26 +606,26 @@ describe('AppointmentForm', () => {
 
       await waitForLoadingToFinish();
 
-      const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
       const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-      const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
       const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
       const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-      const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
       const timeInput = screen.getByRole('textbox', { name: /time/i });
       const timeFormat = screen.getByRole('combobox', { name: /time/i });
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-      await user.selectOptions(locationSelect, ['Inpatient Ward']);
       await user.selectOptions(serviceSelect, ['Outpatient']);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
       await user.selectOptions(providerSelect, ['doctor - James Cook']);
+      await clickShowMore(user);
 
-      const date = '2024-01-04';
+      const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+      const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+      await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+      const date = dayjs().format('YYYY-MM-DD');
       const time = '09:30';
 
       fireEvent.change(dateInput, { target: { value: date } });
@@ -645,31 +665,14 @@ describe('AppointmentForm', () => {
       });
     });
 
-    it('should validate recurring appointment end date', async () => {
-      const user = userEvent.setup();
-
+    it('should render the recurring appointment toggle in the expanded section', async () => {
       mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
 
       renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
 
-      const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
-      const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-      const saveButton = screen.getByRole('button', { name: /save and close/i });
-
-      await user.selectOptions(locationSelect, ['Inpatient Ward']);
-      await user.selectOptions(serviceSelect, ['Outpatient']);
-
-      // Wait for service selection to update duration field
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Enable recurring appointment (this would require finding the recurring toggle)
-      // For now, we'll test the validation by checking if the form prevents submission
-      await user.click(saveButton);
-
-      // Should prevent submission if recurring appointment is enabled without end date
-      expect(mockSaveAppointment).not.toHaveBeenCalled();
+      expect(screen.getByRole('switch', { name: /is this a recurring appointment\?/i })).toBeInTheDocument();
     });
   });
 
@@ -687,26 +690,26 @@ describe('AppointmentForm', () => {
 
       await waitForLoadingToFinish();
 
-      const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
       const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-      const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
       const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
       const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-      const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
       const timeInput = screen.getByRole('textbox', { name: /time/i });
       const timeFormat = screen.getByRole('combobox', { name: /time/i });
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-      await user.selectOptions(locationSelect, ['Inpatient Ward']);
       await user.selectOptions(serviceSelect, ['Outpatient']);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
       await user.selectOptions(providerSelect, ['doctor - James Cook']);
+      await clickShowMore(user);
 
-      const date = '2024-01-04';
+      const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+      const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+      await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+      const date = dayjs().format('YYYY-MM-DD');
       const time = '09:30';
 
       fireEvent.change(dateInput, { target: { value: date } });
@@ -742,26 +745,26 @@ describe('AppointmentForm', () => {
 
       await waitForLoadingToFinish();
 
-      const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
       const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
-      const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
       const providerSelect = screen.getByRole('combobox', { name: /select a provider/i });
       const dateInput = screen.getByRole('textbox', { name: /^date$/i });
-      const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
       const timeInput = screen.getByRole('textbox', { name: /time/i });
       const timeFormat = screen.getByRole('combobox', { name: /time/i });
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
-      await user.selectOptions(locationSelect, ['Inpatient Ward']);
       await user.selectOptions(serviceSelect, ['Outpatient']);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
       await user.selectOptions(providerSelect, ['doctor - James Cook']);
+      await clickShowMore(user);
 
-      const date = '2024-01-04';
+      const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+      const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+      await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+      const date = dayjs().format('YYYY-MM-DD');
       const time = '09:30';
 
       fireEvent.change(dateInput, { target: { value: date } });
@@ -807,6 +810,7 @@ describe('AppointmentForm', () => {
       );
 
       await waitForLoadingToFinish();
+      await clickShowMore(user);
 
       const appointmentNoteTextarea = screen.getByRole('textbox', { name: /write an additional note/i });
       const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -851,6 +855,8 @@ describe('AppointmentForm', () => {
       );
 
       await waitForLoadingToFinish();
+      const user = userEvent.setup();
+      await clickShowMore(user);
 
       // Check that form fields are pre-populated
       expect(screen.getByDisplayValue('Existing appointment note')).toBeInTheDocument();
@@ -875,6 +881,7 @@ describe('AppointmentForm', () => {
       );
 
       await waitForLoadingToFinish();
+      await clickShowMore(user);
 
       const appointmentNoteTextarea = screen.getByRole('textbox', { name: /write an additional note/i });
       const saveButton = screen.getByRole('button', { name: /save and close/i });
@@ -912,6 +919,7 @@ describe('AppointmentForm', () => {
       renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
+      await clickShowMore(user);
 
       const appointmentNoteTextarea = screen.getByRole('textbox', { name: /write an additional note/i });
 
@@ -931,6 +939,7 @@ describe('AppointmentForm', () => {
       renderWithSwr(<AppointmentForm {...defaultProps} />);
 
       await waitForLoadingToFinish();
+      await clickShowMore(user);
 
       const appointmentNoteTextarea = screen.getByRole('textbox', { name: /write an additional note/i });
       const cancelButton = screen.getByRole('button', { name: /Discard/i });

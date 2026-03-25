@@ -25,6 +25,23 @@ export const configSchema = {
       _description: 'Type of an appointment',
     },
   },
+  appointmentFormDefaults: {
+    serviceName: {
+      _type: Type.String,
+      _default: 'Consultation',
+      _description: 'Default service name to preselect in the appointment form',
+    },
+    appointmentType: {
+      _type: Type.String,
+      _default: 'Scheduled',
+      _description: 'Default appointment type to preselect in the appointment form',
+    },
+    showMoreExpanded: {
+      _type: Type.Boolean,
+      _default: false,
+      _description: 'Whether the appointment form show more section should be expanded by default',
+    },
+  },
   checkInButton: {
     enabled: {
       _type: Type.Boolean,
@@ -105,6 +122,11 @@ export interface ConfigObject {
   allowAllDayAppointments: boolean;
   appointmentStatuses: Array<string>;
   appointmentTypes: Array<string>;
+  appointmentFormDefaults: {
+    serviceName: string;
+    appointmentType: string;
+    showMoreExpanded: boolean;
+  };
   appointmentsTableColumns: Array<string>;
   checkInButton: {
     enabled: boolean;
