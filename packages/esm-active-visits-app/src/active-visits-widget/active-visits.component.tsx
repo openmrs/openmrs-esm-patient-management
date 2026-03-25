@@ -57,7 +57,7 @@ const ActiveVisitsTable = () => {
         if (latestObs) {
           // Handle both string and object values
           displayData[`obs-${concept.uuid}`] =
-            typeof latestObs.value === 'object' ? latestObs.value.display : latestObs.value;
+            typeof latestObs.value === 'object' ? latestObs.value.display : String(latestObs.value);
         } else {
           displayData[`obs-${concept.uuid}`] = '--';
         }
@@ -90,7 +90,7 @@ const ActiveVisitsTable = () => {
   const { paginated, goTo, results, currentPage } = usePagination(sortedRows, pageSize as number);
 
   const handleSearch = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       goTo(1);
       setSearchString(e.target.value);
     },
