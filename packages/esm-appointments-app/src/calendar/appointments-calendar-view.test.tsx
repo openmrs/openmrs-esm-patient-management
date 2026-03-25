@@ -19,5 +19,7 @@ describe('Appointment calendar view', () => {
     expectedTableRows.forEach((row) => {
       expect(screen.queryByRole('row', { name: new RegExp(row, 'i') })).not.toBeInTheDocument();
     });
+
+    expect(screen.getByRole('button', { name: /create new appointment/i })).toBeInTheDocument();
   });
 });

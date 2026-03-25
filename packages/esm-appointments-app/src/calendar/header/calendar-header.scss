@@ -18,6 +18,13 @@
   }
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-right: layout.$spacing-05;
+}
+
 .titleContent {
   display: flex;
   justify-content: space-between;
@@ -25,6 +32,9 @@
 }
 
 .backButton {
+  color: colors.$blue-60;
+  @include type.type-style('label-02');
+
   svg {
     order: 1;
     margin-right: layout.$spacing-03;
@@ -39,6 +49,11 @@
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .titleContent {
+    margin-left: layout.$spacing-05;
+  }
+
+  .actions {
+    margin-right: 0;
     margin-left: layout.$spacing-05;
   }
 }
