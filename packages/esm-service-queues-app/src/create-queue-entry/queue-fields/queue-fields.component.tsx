@@ -143,10 +143,9 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
               title: t('queueEntryError', 'Error adding patient to the queue'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
+              subtitle: errorMessage || t('unknownError', 'An unknown error occurred'),
             });
           }
-          //throw error; causes error propagation
         });
     },
     [defaultStatusConceptUuid, mutateQueueEntries, sortWeight, t, trigger, visitQueueNumberAttributeUuid, getValues],
