@@ -5,7 +5,8 @@ import { type Appointment } from '../../types';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
-import { navigate, useConfig, launchWorkspace2 } from '@openmrs/esm-framework';
+import { navigate, useConfig, launchWorkspace2, showSnackbar } from '@openmrs/esm-framework';
+import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { type ConfigObject } from '../../config-schema';
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -13,9 +14,16 @@ dayjs.extend(isToday);
 interface CheckInButtonProps {
   patientUuid: string;
   appointment: Appointment;
+  hasActiveVisit?: boolean;
+  mutateAppointments?: () => void;
 }
 
-const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid }) => {
+const CheckInButton: React.FC<CheckInButtonProps> = ({
+  appointment,
+  patientUuid,
+  hasActiveVisit,
+  mutateAppointments,
+}) => {
   const { checkInButton } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   return (
@@ -25,18 +33,47 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid 
           <Button
             size="sm"
             kind="tertiary"
-            onClick={() =>
-              checkInButton.customUrl
-                ? navigate({
-                    to: checkInButton.customUrl,
-                    templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
+            onClick={() => {
+              if (hasActiveVisit) {
+                // Patient already has an active visit — only update appointment status, do not start a new visit
+                changeAppointmentStatus('CheckedIn', appointment.uuid)
+                  .then(() => {
+                    showSnackbar({
+                      title: t('checkedIn', 'Checked in'),
+                      subtitle: t(
+                        'appointmentCheckedInWithExistingVisit',
+                        'Appointment checked in using existing active visit',
+                      ),
+                      kind: 'success',
+                      isLowContrast: true,
+                    });
+                    mutateAppointments?.();
                   })
-                : launchWorkspace2('appointments-start-visit-workspace', {
-                    patientUuid: patientUuid,
-                    showPatientHeader: true,
-                    openedFrom: 'appointments-check-in',
-                  })
-            }>
+                  .catch(() => {
+                    showSnackbar({
+                      title: t('checkInFailed', 'Check-in failed'),
+                      subtitle: t('appointmentCheckInFailed', 'An error occurred while checking in the appointment'),
+                      kind: 'error',
+                      isLowContrast: false,
+                    });
+                  });
+                return;
+              }
+
+              // No active visit — existing behavior
+              if (checkInButton.customUrl) {
+                navigate({
+                  to: checkInButton.customUrl,
+                  templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
+                });
+              } else {
+                launchWorkspace2('appointments-start-visit-workspace', {
+                  patientUuid: patientUuid,
+                  showPatientHeader: true,
+                  openedFrom: 'appointments-check-in',
+                });
+              }
+            }}>
             {t('checkIn', 'Check in')}
           </Button>
         )}

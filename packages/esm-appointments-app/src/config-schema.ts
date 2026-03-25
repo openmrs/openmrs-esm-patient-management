@@ -33,7 +33,7 @@ export const configSchema = {
     },
     showIfActiveVisit: {
       _type: Type.Boolean,
-      _default: false,
+      _default: true,
       _description: 'Whether to show the check-in button if the patient currently has an active visit',
     },
     customUrl: {

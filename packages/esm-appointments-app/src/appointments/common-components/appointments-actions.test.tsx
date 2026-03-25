@@ -5,6 +5,11 @@ import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
 import AppointmentActions from './appointments-actions.component';
+import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
+import userEvent from '@testing-library/user-event';
+
+jest.mock('../../patient-appointments/patient-appointments.resource');
+const mockChangeAppointmentStatus = changeAppointmentStatus as jest.Mock;
 
 const appointment: Appointment = {
   uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
@@ -214,5 +219,64 @@ describe('AppointmentActions', () => {
     render(<AppointmentActions {...props} />);
 
     expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the check-in button when the patient has an active visit and showIfActiveVisit is true', () => {
+    appointment.status = AppointmentStatus.SCHEDULED;
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      checkInButton: { enabled: true, showIfActiveVisit: true, customUrl: '' },
+    });
+    mockUseTodaysVisits.mockReturnValue({
+      visits: [
+        {
+          patient: { uuid: 'test-patient-uuid' },
+          startDatetime: new Date().toISOString(),
+          stopDatetime: null,
+          uuid: 'test-visit-uuid',
+          encounters: [],
+          visitType: {
+            uuid: 'test-visit-type-uuid',
+            display: 'Facility Visit',
+          },
+        },
+      ],
+      mutateVisit: jest.fn(),
+      error: null,
+      isLoading: false,
+    });
+    render(<AppointmentActions appointment={appointment} />);
+    expect(screen.getByRole('button', { name: /check in/i })).toBeInTheDocument();
+  });
+
+  it('calls changeAppointmentStatus with CheckedIn when patient has active visit and check-in button is clicked', async () => {
+    appointment.status = AppointmentStatus.SCHEDULED;
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      checkInButton: { enabled: true, showIfActiveVisit: true, customUrl: '' },
+    });
+    mockUseTodaysVisits.mockReturnValue({
+      visits: [
+        {
+          patient: { uuid: 'test-patient-uuid' },
+          startDatetime: new Date().toISOString(),
+          stopDatetime: null,
+          uuid: 'test-visit-uuid',
+          encounters: [],
+          visitType: {
+            uuid: 'test-visit-type-uuid',
+            display: 'Facility Visit',
+          },
+        },
+      ],
+      mutateVisit: jest.fn(),
+      error: null,
+      isLoading: false,
+    });
+    mockChangeAppointmentStatus.mockResolvedValue({});
+    render(<AppointmentActions appointment={appointment} />);
+    const checkInButton = screen.getByRole('button', { name: /check in/i });
+    await userEvent.click(checkInButton);
+    expect(mockChangeAppointmentStatus).toHaveBeenCalledWith('CheckedIn', appointment.uuid);
   });
 });

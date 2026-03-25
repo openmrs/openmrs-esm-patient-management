@@ -9,6 +9,7 @@ import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
 import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
+import { useMutateAppointments } from '../../form/appointments-form.resource';
 import CheckInButton from './checkin-button.component';
 import styles from './appointments-actions.scss';
 
@@ -23,6 +24,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
   const { t } = useTranslation();
   const { checkInButton, checkOutButton } = useConfig<ConfigObject>();
   const { visits, mutateVisit } = useTodaysVisits(); // TODO doesn't work if visit didn't start today?  what about inpatient?
+  const { mutateAppointments } = useMutateAppointments();
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
   const hasActiveVisitToday = visits?.some(
@@ -69,7 +71,14 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
           </Button>
         );
       case checkInButton.enabled && (!hasActiveVisitToday || checkInButton.showIfActiveVisit) && isTodaysAppointment: {
-        return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
+        return (
+          <CheckInButton
+            patientUuid={patientUuid}
+            appointment={appointment}
+            hasActiveVisit={true}
+            mutateAppointments={mutateAppointments}
+          />
+        );
       }
       default:
         return null;
