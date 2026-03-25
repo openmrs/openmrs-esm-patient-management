@@ -75,7 +75,7 @@ describe('AppointmentActions', () => {
     jest.useRealTimers();
   });
 
-  it('renders the check in button when appointment is today and the patient has not checked in and check in button enabled', () => {
+  it('renders the check in button when appointment is today and enabled', () => {
     appointment.status = AppointmentStatus.SCHEDULED;
 
     mockUseConfig.mockReturnValue({
@@ -95,7 +95,7 @@ describe('AppointmentActions', () => {
     expect(screen.getByText(/check in/i)).toBeInTheDocument();
   });
 
-  it('does not render the check in button when check-in button is disabled', () => {
+  it('does not render check in button when disabled', () => {
     appointment.status = AppointmentStatus.SCHEDULED;
 
     mockUseConfig.mockReturnValue({
@@ -115,7 +115,7 @@ describe('AppointmentActions', () => {
     expect(screen.queryByText(/check in/i)).not.toBeInTheDocument();
   });
 
-  it('renders the checked out button when the patient has checked out', () => {
+  it('renders checked out button when completed', () => {
     appointment.status = AppointmentStatus.COMPLETED;
 
     mockUseConfig.mockReturnValue({
@@ -144,7 +144,7 @@ describe('AppointmentActions', () => {
     expect(screen.getByText('Checked out')).toBeInTheDocument();
   });
 
-  it('renders the check out button when patient has active visit', () => {
+  it('renders check out button when active visit exists', () => {
     appointment.status = AppointmentStatus.CHECKEDIN;
 
     mockUseConfig.mockReturnValue({
@@ -197,11 +197,10 @@ describe('AppointmentActions', () => {
       isLoading: false,
     });
 
-    render(<AppointmentActions appointment={appointment} />);
+    render(<AppointmentActions {...defaultProps} />);
     expect(screen.getByRole('button', { name: /check in/i })).toBeInTheDocument();
   });
 
-  // ✅ NEW TEST (review fix)
   it('does not render check-in button when active visit exists and showIfActiveVisit is false', () => {
     appointment.status = AppointmentStatus.SCHEDULED;
 
@@ -226,7 +225,7 @@ describe('AppointmentActions', () => {
       isLoading: false,
     });
 
-    render(<AppointmentActions appointment={appointment} />);
+    render(<AppointmentActions {...defaultProps} />);
     expect(screen.queryByRole('button', { name: /check in/i })).not.toBeInTheDocument();
   });
 
@@ -255,7 +254,7 @@ describe('AppointmentActions', () => {
     });
 
     mockChangeAppointmentStatus.mockResolvedValue({});
-    render(<AppointmentActions appointment={appointment} />);
+    render(<AppointmentActions {...defaultProps} />);
 
     const btn = screen.getByRole('button', { name: /check in/i });
     await userEvent.click(btn);
