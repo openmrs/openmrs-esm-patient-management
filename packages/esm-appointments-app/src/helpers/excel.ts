@@ -1,6 +1,6 @@
 import { writeFile, utils, type WorkSheet } from 'xlsx';
 import { fetchCurrentPatient, formatDate, getConfig } from '@openmrs/esm-framework';
-import { type Appointment } from '../types';
+import { type AppointmentExcelInput } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { moduleName } from '../constants';
 
@@ -17,23 +17,6 @@ interface AppointmentSpreadsheetData {
   'Appointment type'?: string;
   Date?: string;
   'Telephone number'?: string;
-}
-
-interface AppointmentExcelInput {
-  uuid: string;
-  name: string;
-  gender: string;
-  age: number;
-  identifier?: string;
-  phoneNumber?: string;
-  startDateTime?: string;
-  service?: {
-    name: string;
-  };
-  patient?: {
-    uuid: string;
-    identifier?: string;
-  };
 }
 
 /**

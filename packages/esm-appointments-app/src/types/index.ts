@@ -64,6 +64,23 @@ export interface Appointment {
   teleconsultationLink: string | null;
 }
 
+export interface AppointmentExcelInput {
+  uuid: string;
+  name: string;
+  gender: string;
+  age: number;
+  identifier?: string;
+  phoneNumber?: string;
+  startDateTime?: string;
+  service?: {
+    name: string;
+  };
+  patient?: {
+    uuid: string;
+    identifier?: string;
+  };
+}
+
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
