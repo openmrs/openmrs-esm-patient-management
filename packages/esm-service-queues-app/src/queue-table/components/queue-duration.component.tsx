@@ -22,16 +22,16 @@ function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt: Date
     return () => clearInterval(handle);
   }, []);
 
-  const totalMinutes = dayjs(endedTime ?? currentTime).diff(startedAt, 'minutes');
+  const totalMinutes = Math.abs(dayjs(endedTime ?? currentTime).diff(startedAt, 'minutes'));
   const hours = Math.trunc(totalMinutes / 60);
   const minutes = Math.trunc(totalMinutes % 60);
 
   return (
     <span>
-      {Math.abs(hours) > 0
+      {hours > 0
         ? t('hourAndMinuteFormatted', '{{hours}} hour(s) and {{minutes}} minute(s)', {
             hours,
-            minutes: Math.abs(minutes),
+            minutes,
           })
         : t('minuteFormatted', '{{minutes}} minute(s)', { minutes })}
     </span>
