@@ -86,8 +86,8 @@ export function exportUnscheduledAppointmentsToSpreadsheet(
   });
 }
 
-function createWorksheet(data: AppointmentSpreadsheetData[]) {
-  const max_width = data.reduce((w, r) => Math.max(w, r['Patient name'].length), 30);
+function createWorksheet(data: Record<string, string | number | undefined>[]) {
+  const max_width = data.reduce((w, r) => Math.max(w, String(r['Patient name'] || '').length), 30);
   const worksheet = utils.json_to_sheet(data);
   worksheet['!cols'] = [{ wch: max_width }];
   return worksheet;
