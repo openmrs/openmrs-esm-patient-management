@@ -137,7 +137,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
               subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             });
           }
-          throw error;
+          throw new Error(getErrorMessage(error));
         });
     },
     [defaultStatusConceptUuid, mutateQueueEntries, sortWeight, t, trigger, visitQueueNumberAttributeUuid, getValues],
