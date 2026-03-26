@@ -1,13 +1,14 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, restBaseUrl, useConfig, useVisit } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext } from '../patient-search-context';
 import CompactPatientBanner from './compact-patient-banner.component';
 
 const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
+const mockUseVisit = jest.mocked(useVisit);
 
 const birthdate = '1990-01-01T00:00:00.000+0000';
 const age = dayjs().diff(birthdate, 'years');
@@ -56,7 +57,10 @@ const patients: Array<SearchedPatient> = [
 ];
 
 describe('CompactPatientBanner', () => {
-  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUseVisit.mockReturnValue({ activeVisit: null } as any);
+  });
 
   it('renders a compact patient banner', () => {
     render(
@@ -71,6 +75,8 @@ describe('CompactPatientBanner', () => {
     // ).toBeInTheDocument();
     // expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${patients[0].uuid}/chart/`);
     expect(screen.getByText('Patient Photo')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /check in/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create appointment/i })).toBeInTheDocument();
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
   });
 

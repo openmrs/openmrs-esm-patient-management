@@ -18,6 +18,7 @@ import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
 import { usePatientSearchContext, usePatientSearchContext2 } from '../../../patient-search-context';
 import { mapToFhirPatient } from '../../../utils/fhir-mapper';
+import PatientSearchActionButtons from '../../../patient-search-action-buttons.component';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -87,30 +88,24 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               />
             ) : null}
             {!isDeceased &&
-              !activeVisit &&
               (context2 ? (
-                <ExtensionSlot
-                  name="start-visit-button-slot2"
-                  state={{
-                    closeWorkspace: context2?.closeWorkspace,
-                    onPatientSelected,
-                    patient: fhirMappedPatient,
-                    patientUuid,
-                    launchChildWorkspace,
-                    primaryActionLabel,
-                    primaryActionMode,
-                    startVisitWorkspaceName,
-                  }}
-                />
+                !activeVisit ? (
+                  <ExtensionSlot
+                    name="start-visit-button-slot2"
+                    state={{
+                      closeWorkspace: context2?.closeWorkspace,
+                      onPatientSelected,
+                      patient: fhirMappedPatient,
+                      patientUuid,
+                      launchChildWorkspace,
+                      primaryActionLabel,
+                      primaryActionMode,
+                      startVisitWorkspaceName,
+                    }}
+                  />
+                ) : null
               ) : (
-                <ExtensionSlot
-                  name="start-visit-button-slot"
-                  state={{
-                    handleReturnToSearchList,
-                    hidePatientSearch,
-                    patientUuid,
-                  }}
-                />
+                <PatientSearchActionButtons patientUuid={patientUuid} />
               ))}
           </div>
         </div>

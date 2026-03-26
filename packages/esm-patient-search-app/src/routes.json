@@ -44,5 +44,29 @@
       "type": "patient-search-workspace",
       "width": "narrow"
     }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "patient-search-global-workspace-group",
+      "scopePattern": "/"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-search-global-window",
+      "group": "patient-search-global-workspace-group"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "global-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "patient-search-global-window"
+    },
+    {
+      "name": "global-appointments-form-workspace",
+      "component": "@openmrs/esm-appointments-app#exportedAppointmentsFormWorkspace",
+      "window": "patient-search-global-window"
+    }
   ]
 }

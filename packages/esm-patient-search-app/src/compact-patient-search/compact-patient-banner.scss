@@ -7,7 +7,8 @@
   display: flex;
   align-items: center;
   border: none;
-  border-bottom: 1px solid $ui-03;
+  flex: 1 1 auto;
+  min-width: 0;
 
   &:hover,
   &:focus {
@@ -19,6 +20,15 @@
   background: none;
   cursor: pointer;
   width: 100%;
+}
+
+.patientSearchResultCard,
+.deceased.patientSearchResultCard {
+  border-bottom: 1px solid $ui-03;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
 }
 
 .patientAvatar {

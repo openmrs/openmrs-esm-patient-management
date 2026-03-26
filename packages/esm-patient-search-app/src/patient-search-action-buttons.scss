@@ -1,0 +1,33 @@
+@use '@carbon/layout';
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.inlineActions {
+  margin-right: layout.$spacing-03;
+}
+
+.compactActions {
+  margin-left: auto;
+  padding-right: layout.$spacing-05;
+  flex-shrink: 0;
+}
+
+.actionButton {
+  white-space: nowrap;
+}
+
+.secondaryActionButton {
+  flex-shrink: 0;
+  min-height: 2rem;
+  padding-inline: layout.$spacing-03;
+}
+
+.primaryActionButton {
+  flex-shrink: 0;
+  min-height: 2rem;
+  padding-inline: layout.$spacing-04;
+}
