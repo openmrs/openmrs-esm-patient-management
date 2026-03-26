@@ -36,6 +36,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
             size="sm"
             kind="tertiary"
             onClick={() => {
+              // customUrl always takes priority — operator-configured override for entire check-in flow
               if (checkInButton.customUrl) {
                 navigate({
                   to: checkInButton.customUrl,
@@ -44,6 +45,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
                 return;
               }
 
+              // Patient already has an active visit — only update appointment status, do not start a new visit
               if (hasActiveVisit) {
                 changeAppointmentStatus('CheckedIn', appointment.uuid)
                   .then(() => {
@@ -77,7 +79,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
 
               // No active visit, no customUrl — launch default start visit workspace
               launchWorkspace2('appointments-start-visit-workspace', {
-                patientUuid: patientUuid,
+                patientUuid,
                 showPatientHeader: true,
                 openedFrom: 'appointments-check-in',
               });
