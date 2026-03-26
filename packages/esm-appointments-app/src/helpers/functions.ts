@@ -60,7 +60,10 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
   launchWorkspace2(
     'appointments-patient-search-workspace',
     {
+      hideActionsOverflow: true,
       initialQuery: '',
+      primaryActionLabel: t('createAppointment', 'Create appointment'),
+      primaryActionMode: 'selectPatient',
       workspaceTitle: t('createNewAppointment', 'Create new appointment'),
       onPatientSelected(
         patientUuid: string,

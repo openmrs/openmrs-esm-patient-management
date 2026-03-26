@@ -6,7 +6,10 @@ import PatientSearchBar from '../patient-search-bar/patient-search-bar.component
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
 export interface PatientSearchWorkspaceProps {
+  hideActionsOverflow?: boolean;
   initialQuery?: string;
+  primaryActionLabel?: string;
+  primaryActionMode?: 'startVisit' | 'selectPatient';
   workspaceTitle: string;
   onPatientSelected(
     patientUuid: string,
@@ -26,7 +29,14 @@ export interface PatientSearchWorkspaceWindowProps {
 const PatientSearchWorkspace2: React.FC<
   Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, {}>
 > = ({
-  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle },
+  workspaceProps: {
+    hideActionsOverflow = false,
+    initialQuery = '',
+    onPatientSelected,
+    primaryActionLabel,
+    primaryActionMode = 'startVisit',
+    workspaceTitle,
+  },
   windowProps: { startVisitWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
@@ -43,14 +53,27 @@ const PatientSearchWorkspace2: React.FC<
   return (
     <Workspace2 title={workspaceTitle}>
       <PatientSearchContext2.Provider
-        value={{ onPatientSelected, launchChildWorkspace, closeWorkspace, startVisitWorkspaceName }}>
+        value={{
+          onPatientSelected,
+          launchChildWorkspace,
+          closeWorkspace,
+          startVisitWorkspaceName,
+          primaryActionLabel,
+          primaryActionMode,
+        }}>
         <PatientSearchBar
           initialSearchTerm={initialQuery}
           onChange={(value) => !disableTabletSearchOnKeyUp && setSearchTerm(value)}
           onClear={handleClearSearchTerm}
           onSubmit={setSearchTerm}
         />
-        {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
+        {showSearchResults && (
+          <AdvancedPatientSearchComponent
+            hideActionsOverflow={hideActionsOverflow}
+            query={debouncedSearchTerm}
+            inTabletOrOverlay
+          />
+        )}
       </PatientSearchContext2.Provider>
     </Workspace2>
   );

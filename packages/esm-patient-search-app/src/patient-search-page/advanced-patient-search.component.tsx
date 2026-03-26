@@ -8,12 +8,14 @@ import styles from './advanced-patient-search.scss';
 import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 interface AdvancedPatientSearchProps {
+  hideActionsOverflow?: boolean;
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
+  hideActionsOverflow = false,
   query,
   stickyPagination,
   inTabletOrOverlay,
@@ -143,6 +145,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           [styles.patientSearchResultsDesktop]: !inTabletOrOverlay,
         })}>
         <PatientSearchComponent
+          hideActionsOverflow={hideActionsOverflow}
           query={query}
           stickyPagination={stickyPagination}
           inTabletOrOverlay={inTabletOrOverlay}

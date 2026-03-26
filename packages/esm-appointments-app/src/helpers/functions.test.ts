@@ -1,5 +1,31 @@
+import { launchWorkspace2 } from '@openmrs/esm-framework';
+import { launchCreateAppointmentForm , canTransition } from './functions';
+
+const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+
+describe('launchCreateAppointmentForm', () => {
+  it('opens patient search with the appointment primary action override', () => {
+    const t = jest.fn((key: string, fallback: string) => fallback);
+
+    launchCreateAppointmentForm(t as any);
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'appointments-patient-search-workspace',
+      expect.objectContaining({
+        hideActionsOverflow: true,
+        initialQuery: '',
+        primaryActionLabel: 'Create appointment',
+        primaryActionMode: 'selectPatient',
+        workspaceTitle: 'Create new appointment',
+        onPatientSelected: expect.any(Function),
+      }),
+      expect.objectContaining({
+        startVisitWorkspaceName: 'appointments-start-visit-workspace',
+      }),
+    );
+  });
+});
 import { AppointmentStatus } from '../types';
-import { canTransition } from './functions';
 
 describe('canTransition', () => {
   // Forward transitions (should be allowed)

@@ -7,6 +7,7 @@ import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/pa
 import styles from './patient-search-lg.scss';
 
 interface PatientSearchResultsProps {
+  hideActionsOverflow?: boolean;
   searchResults: SearchedPatient[];
 }
 
@@ -59,11 +60,19 @@ export const ErrorState: React.FC = () => {
   );
 };
 
-export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
+export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
+  hideActionsOverflow = false,
+  searchResults,
+}) => {
   return (
     <div data-openmrs-role="Search Results">
       {searchResults.map((patient) => (
-        <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
+        <PatientBanner
+          hideActionsOverflow={hideActionsOverflow}
+          key={patient.uuid}
+          patientUuid={patient.uuid}
+          patient={patient}
+        />
       ))}
     </div>
   );

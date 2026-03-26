@@ -40,7 +40,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName, primaryActionLabel, primaryActionMode } =
+    context2 ?? {};
 
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;
@@ -91,8 +92,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 <ExtensionSlot
                   name="start-visit-button-slot2"
                   state={{
+                    closeWorkspace: context2?.closeWorkspace,
+                    onPatientSelected,
+                    patient: fhirMappedPatient,
                     patientUuid,
                     launchChildWorkspace,
+                    primaryActionLabel,
+                    primaryActionMode,
                     startVisitWorkspaceName,
                   }}
                 />

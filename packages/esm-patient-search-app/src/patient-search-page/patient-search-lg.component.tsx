@@ -8,6 +8,7 @@ import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
 
 interface PatientSearchComponentProps {
+  hideActionsOverflow?: boolean;
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
@@ -17,6 +18,7 @@ interface PatientSearchComponentProps {
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
+  hideActionsOverflow = false,
   query,
   stickyPagination,
   inTabletOrOverlay,
@@ -50,8 +52,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       return <EmptyState />;
     }
 
-    return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+    return <PatientSearchResults hideActionsOverflow={hideActionsOverflow} searchResults={results} />;
+  }, [fetchError, hideActionsOverflow, isLoading, results]);
 
   return (
     <div

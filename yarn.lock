@@ -2601,22 +2601,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-prescription-app@workspace:packages/esm-patient-prescription-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-prescription-app@workspace:packages/esm-patient-prescription-app"
-  dependencies:
-    "@carbon/react": "npm:^1.83.0"
-    openmrs: "npm:next"
-    react-to-print: "npm:^2.15.1"
-  peerDependencies:
-    "@openmrs/esm-framework": 9.x
-    react: 18.x
-    react-dom: 18.x
-    react-i18next: 16.x
-    swr: 2.x
-  languageName: unknown
-  linkType: soft
-
 "@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
@@ -15847,16 +15831,6 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
   checksum: 10/f59f86aca0797e389698fc20a7e88a26748e00e56e011dd6d9f7a4fa1ba7fda32083bc8e5f2af000957d20ad9f4c74dd151cb667b958dcac8f3959d860905fd4
-  languageName: node
-  linkType: hard
-
-"react-to-print@npm:^2.15.1":
-  version: 2.15.1
-  resolution: "react-to-print@npm:2.15.1"
-  peerDependencies:
-    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-  checksum: 10/0786fd5dd055b5b50f9a0dba99f0ccb30b9407b8e77748f5fc2557446ed0d0c65759e927cc2cdaa9e34f286838bbb230d3b0ba03d20b9754d0469fc4dac7c529
   languageName: node
   linkType: hard
 

@@ -28,6 +28,8 @@ export const PatientSearchContextProvider = PatientSearchContext.Provider;
 export const usePatientSearchContext = () => useContext(PatientSearchContext);
 
 export interface PatientSearchContext2Props {
+  primaryActionLabel?: string;
+  primaryActionMode?: 'startVisit' | 'selectPatient';
   onPatientSelected?(
     patientUuid: string,
     patient: fhir.Patient,
