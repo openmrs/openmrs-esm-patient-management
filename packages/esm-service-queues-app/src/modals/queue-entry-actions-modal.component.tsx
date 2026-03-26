@@ -241,6 +241,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     }
 
     if (startAtDate <= previousQueueEntryStartTime) {
+      //first we check existence then we round the start time downwards seconds wise. ( simplest fix)
       return t(
         'timeCannotBePriorToPreviousQueueEntry',
         'Time cannot be before start of previous queue entry: {{time}}',
