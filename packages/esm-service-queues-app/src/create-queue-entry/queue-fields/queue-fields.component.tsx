@@ -21,7 +21,7 @@ import { postQueueEntry } from './queue-fields.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
+import { getErrorMessage, isDuplicateQueueEntryError } from '../../modals/queue-entry-error.utils';
 import { useServiceQueuesStore } from '../../store/store';
 
 export interface QueueFieldsProps {
@@ -121,17 +121,8 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
           });
           mutateQueueEntries();
         })
-        .catch(async (error) => {
-          let errorMessage = '';
-          try {
-            const body = await error?.responseBody;
-            errorMessage = body?.error?.message || error?.message || '';
-          } catch {
-            errorMessage = error?.message || '';
-          }
-          const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
-
-          if (isDuplicatePatientError) {
+        .catch((error) => {
+          if (isDuplicateQueueEntryError(error)) {
             showSnackbar({
               title: t('patientAlreadyInQueue', 'Patient already in queue'),
               kind: 'warning',
@@ -143,9 +134,10 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
               title: t('queueEntryError', 'Error adding patient to the queue'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: errorMessage || t('unknownError', 'An unknown error occurred'),
+              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             });
           }
+          throw error;
         });
     },
     [defaultStatusConceptUuid, mutateQueueEntries, sortWeight, t, trigger, visitQueueNumberAttributeUuid, getValues],
