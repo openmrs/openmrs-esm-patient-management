@@ -7,7 +7,9 @@ import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
 import { navigate, useConfig, launchWorkspace2, showSnackbar } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
+import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import { type ConfigObject } from '../../config-schema';
+
 dayjs.extend(utc);
 dayjs.extend(isToday);
 
@@ -15,17 +17,17 @@ interface CheckInButtonProps {
   patientUuid: string;
   appointment: Appointment;
   hasActiveVisit?: boolean;
-  mutateAppointments?: () => void;
 }
 
 const CheckInButton: React.FC<CheckInButtonProps> = ({
   appointment,
   patientUuid,
   hasActiveVisit,
-  mutateAppointments,
 }) => {
   const { checkInButton } = useConfig<ConfigObject>();
   const { t } = useTranslation();
+  const { mutateAppointments } = useMutateAppointments();
+
   return (
     <>
       {checkInButton.enabled &&
@@ -34,8 +36,15 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
             size="sm"
             kind="tertiary"
             onClick={() => {
+              if (checkInButton.customUrl) {
+                navigate({
+                  to: checkInButton.customUrl,
+                  templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
+                });
+                return;
+              }
+
               if (hasActiveVisit) {
-                // Patient already has an active visit — only update appointment status, do not start a new visit
                 changeAppointmentStatus('CheckedIn', appointment.uuid)
                   .then(() => {
                     showSnackbar({
@@ -66,19 +75,12 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
                 return;
               }
 
-              // No active visit — existing behavior
-              if (checkInButton.customUrl) {
-                navigate({
-                  to: checkInButton.customUrl,
-                  templateParams: { patientUuid: appointment.patient.uuid, appointmentUuid: appointment.uuid },
-                });
-              } else {
-                launchWorkspace2('appointments-start-visit-workspace', {
-                  patientUuid: patientUuid,
-                  showPatientHeader: true,
-                  openedFrom: 'appointments-check-in',
-                });
-              }
+              // No active visit, no customUrl — launch default start visit workspace
+              launchWorkspace2('appointments-start-visit-workspace', {
+                patientUuid: patientUuid,
+                showPatientHeader: true,
+                openedFrom: 'appointments-check-in',
+              });
             }}>
             {t('checkIn', 'Check in')}
           </Button>
