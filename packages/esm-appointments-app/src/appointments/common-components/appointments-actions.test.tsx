@@ -169,7 +169,7 @@ describe('AppointmentActions', () => {
       mutateVisit: jest.fn(),
     });
 
-    render(<AppointmentActions {...defaultProps, scheduleType: 'Scheduled'} />);
+    render(<AppointmentActions {...defaultProps} />);
     expect(screen.getByText(/check out/i)).toBeInTheDocument();
   });
 
