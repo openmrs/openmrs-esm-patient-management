@@ -9,7 +9,7 @@ import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
 import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
+import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import CheckInButton from './checkin-button.component';
 import styles from './appointments-actions.scss';
 
