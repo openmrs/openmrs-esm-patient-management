@@ -75,7 +75,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
           <CheckInButton
             patientUuid={patientUuid}
             appointment={appointment}
-            hasActiveVisit={true}
+            hasActiveVisit={hasActiveVisitToday}
             mutateAppointments={mutateAppointments}
           />
         );
