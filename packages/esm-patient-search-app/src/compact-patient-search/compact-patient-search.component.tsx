@@ -26,6 +26,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const bannerContainerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -107,6 +108,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     handlePatientSelection,
     handleFocusToInput,
     -1,
+    searchContainerRef,
   );
 
   useEffect(() => {
@@ -141,17 +143,17 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   }, [fetchError, errorFetchingUserProperties, t]);
 
   const handleSubmit = useCallback(
-    (debouncedSearchTerm) => {
-      if (shouldNavigateToPatientSearchPage && hasSearchTerm) {
+    (searchTerm: string) => {
+      if (shouldNavigateToPatientSearchPage && searchTerm?.trim()) {
         if (!isSearchPage) {
           window.sessionStorage.setItem('searchReturnUrl', window.location.pathname);
         }
         navigate({
-          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(debouncedSearchTerm)}`,
+          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(searchTerm)}`,
         });
       }
     },
-    [isSearchPage, shouldNavigateToPatientSearchPage, hasSearchTerm],
+    [isSearchPage, shouldNavigateToPatientSearchPage],
   );
 
   const handleClear = useCallback(() => {
@@ -165,7 +167,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       value={{
         patientClickSideEffect: addViewedPatientAndCloseSearchResults,
       }}>
-      <div className={styles.patientSearchBar}>
+      <div className={styles.patientSearchBar} ref={searchContainerRef}>
         <PatientSearchBar
           isCompact
           initialSearchTerm={initialSearchTerm ?? ''}
@@ -174,8 +176,6 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           onClear={handleClear}
           ref={searchInputRef}
         />
-
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
 
         {!isSearchPage && hasSearchTerm && (
           <div
