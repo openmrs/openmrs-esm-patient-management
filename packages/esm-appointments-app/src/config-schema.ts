@@ -41,6 +41,25 @@ export const configSchema = {
       _default: false,
       _description: 'Whether the appointment form show more section should be expanded by default',
     },
+    fallbackDurationMins: {
+      _type: Type.Number,
+      _default: 1,
+      _description:
+        'Fallback duration in minutes used when auto-creating an appointment from the start visit form and the selected service has no valid duration',
+    },
+  },
+  startVisitProviderSelection: {
+    enabled: {
+      _type: Type.Boolean,
+      _default: true,
+      _description:
+        'Whether the start visit form should show provider selection when the patient has no upcoming appointments',
+    },
+    required: {
+      _type: Type.Boolean,
+      _default: false,
+      _description: 'Whether provider selection should be required when starting a visit without an appointment',
+    },
   },
   checkInButton: {
     enabled: {
@@ -126,6 +145,11 @@ export interface ConfigObject {
     serviceName: string;
     appointmentType: string;
     showMoreExpanded: boolean;
+    fallbackDurationMins: number;
+  };
+  startVisitProviderSelection: {
+    enabled: boolean;
+    required: boolean;
   };
   appointmentsTableColumns: Array<string>;
   checkInButton: {

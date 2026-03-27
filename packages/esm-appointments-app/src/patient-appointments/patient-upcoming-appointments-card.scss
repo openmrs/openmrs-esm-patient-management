@@ -45,3 +45,10 @@
   max-width: unset;
   padding: 0;
 }
+
+.selectedItemsSummary {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-top: layout.$spacing-02;
+  overflow-wrap: anywhere;
+}

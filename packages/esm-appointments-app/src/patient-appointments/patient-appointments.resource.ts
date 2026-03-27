@@ -42,7 +42,10 @@ export function usePatientAppointments(patientUuid: string, startDate: string, a
   const upcomingAppointments = appointments
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
-    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()));
+    ?.filter(({ startDateTime }) => {
+      const appointmentDate = dayjs(new Date(startDateTime).toISOString());
+      return appointmentDate.isAfter(new Date()) && !appointmentDate.isToday();
+    });
 
   const todaysAppointments = appointments
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))

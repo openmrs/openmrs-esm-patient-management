@@ -52,7 +52,7 @@ export const checkAppointmentConflict = async (appointmentPayload: AppointmentPa
       serviceUuid: appointmentPayload.serviceUuid,
       startDateTime: appointmentPayload.startDateTime,
       endDateTime: appointmentPayload.endDateTime,
-      providers: [],
+      providers: appointmentPayload.providers ?? [],
       locationUuid: appointmentPayload.locationUuid,
       appointmentKind: appointmentPayload.appointmentKind,
       ...(appointmentPayload.uuid && { uuid: appointmentPayload.uuid }),
