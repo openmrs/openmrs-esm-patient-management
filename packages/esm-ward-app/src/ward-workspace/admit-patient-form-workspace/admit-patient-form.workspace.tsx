@@ -92,6 +92,8 @@ const AdmitPatientFormWorkspace: React.FC<Workspace2DefinitionProps<WardPatientW
 
             try {
               if (bedSelected) {
+                // assign patient, and related transfer patients to the same bed.
+                // (Support for related patients is only implemented for maternal ward)
                 await assignPatientToBed(values.bedId, wp.patient.uuid, result.value.data.uuid);
                 showSnackbar({
                   kind: 'success',

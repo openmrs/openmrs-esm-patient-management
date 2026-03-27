@@ -66,15 +66,16 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
       results.forEach((result, i) => {
         const wp = allPatientsToAdmit[i];
         const patientName = wp.patient.person.preferredName.display;
+        const wpDispositionType = wp.inpatientRequest?.dispositionType ?? dispositionType;
         if (result.status === 'fulfilled') {
           showSnackbar({
             kind: 'success',
             title:
-              dispositionType === 'ADMIT'
+              wpDispositionType === 'ADMIT'
                 ? t('patientAdmittedSuccessfully', 'Patient admitted successfully')
                 : t('patientTransferredSuccessfully', 'Patient transferred successfully'),
             subtitle:
-              dispositionType === 'ADMIT'
+              wpDispositionType === 'ADMIT'
                 ? t('patientAdmittedToLocation', '{{patientName}} admitted successfully to {{location}}', {
                     patientName,
                     location: location?.display,
@@ -95,7 +96,7 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
           showSnackbar({
             kind: 'error',
             title:
-              dispositionType === 'ADMIT'
+              wpDispositionType === 'ADMIT'
                 ? t('errorAdmittingPatient', 'Failed to admit {{patientName}}', { patientName })
                 : t('errorTransferringPatient', 'Failed to transfer {{patientName}}', { patientName }),
             subtitle: errorMessage,
