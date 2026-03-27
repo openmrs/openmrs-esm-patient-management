@@ -139,6 +139,10 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 
   const updateRecentlyViewedPatients = useCallback(
     (patientUuid: string) => {
+      if (!url) {
+        return Promise.resolve();
+      }
+
       const uniquePatients = Array.from(new Set([patientUuid, ...patientsVisited]));
       const mostRecentPatients = uniquePatients.slice(0, 10);
       const newUserProperties = { ...userProperties, patientsVisited: mostRecentPatients.join(',') };
