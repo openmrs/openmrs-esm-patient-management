@@ -129,10 +129,22 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       .map((appointment) => appointment.uuid);
   }, [appointments, visits]);
 
+  const statusItems = useMemo(
+    () =>
+      Object.values(AppointmentStatus).map((status) => ({
+        id: status,
+        label: t(status),
+      })),
+    [t],
+  );
+
+  const selectedStatusItems = useMemo(
+    () => selectedAppointmentStatuses.map((status) => statusItems.find((item) => item.id === status)).filter(Boolean),
+    [selectedAppointmentStatuses, statusItems],
+  );
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
-
   return (
     <Layer className={styles.container}>
       <div className={styles.headerContainer}>
@@ -192,14 +204,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                   <MultiSelect
                     id="statusMultiSelect"
                     size={responsiveSize}
-                    items={Object.values(AppointmentStatus).map((status) => ({ id: status, label: t(status) }))}
+                    items={statusItems}
                     itemToString={(item) => (item ? item.label : '')}
                     label={t('filterAppointmentsByStatus', 'Filter appointments by status')}
                     onChange={({ selectedItems }) =>
                       setSelectedAppointmentStatuses([...new Set(selectedItems.map((item) => item.id))])
                     }
                     type="inline"
-                    selectedItems={selectedAppointmentStatuses.map((status) => ({ id: status, label: t(status) }))}
+                    selectedItems={selectedStatusItems}
                   />
                   <Button
                     size={responsiveSize}
