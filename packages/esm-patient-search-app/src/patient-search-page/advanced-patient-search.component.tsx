@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import { useConfig, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type PatientSearchConfig } from '../config-schema';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import { type AdvancedPatientSearchState } from '../types';
 import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch, { initialFilters } from './refine-search/refine-search.component';
 import styles from './advanced-patient-search.scss';
-import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 interface AdvancedPatientSearchProps {
   query: string;
@@ -18,6 +19,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   stickyPagination,
   inTabletOrOverlay,
 }) => {
+  const { includeDead } = useConfig<PatientSearchConfig>();
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialFilters);
   const filtersApplied = useMemo(() => {
     let count = 0;
@@ -40,7 +42,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     hasMore,
     isLoading,
     fetchError,
-  } = useInfinitePatientSearch(query, false, !!query, 50);
+  } = useInfinitePatientSearch(query, includeDead, !!query, 50);
 
   useEffect(() => {
     if (searchResults?.length === currentPage * 50 && hasMore) {
