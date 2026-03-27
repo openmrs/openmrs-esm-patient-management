@@ -130,6 +130,16 @@ interface SearchProps extends InputPropsBase {
   value?: string | number;
 }
 
+interface PatientListPatient {
+  name: string;
+  identifier: string;
+  sex: string;
+  startDate: string;
+  mobile?: string;
+  membershipUuid: string;
+  uuid: string;
+}
+
 interface ListDetailsTableProps {
   autoFocus?: boolean;
   columns: Array<PatientTableColumn>;
@@ -140,7 +150,7 @@ interface ListDetailsTableProps {
   pagination: {
     usePagination: boolean;
     currentPage: number;
-    onChange(props: any): any;
+    onChange(data: { page: number; pageSize: number }): void;
     pageSize: number;
     totalItems: number;
     pagesUnknown?: boolean;
@@ -154,9 +164,10 @@ interface ListDetailsTableProps {
 interface PatientTableColumn {
   key: string;
   header: string;
-  getValue?(patient: any): any;
+  getValue?(patient: PatientListPatient): string | React.ReactNode;
   link?: {
-    getUrl(patient: any): string;
+    getUrl(patient: PatientListPatient): string;
+};
   };
 }
 
@@ -188,7 +199,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     return debouncedSearchTerm
       ? fuzzy
           .filter(debouncedSearchTerm, patients, {
-            extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
+            extract: (patient: PatientListPatient) => `${patient.name} ${patient.identifier} ${patient.sex}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
           .map((result) => result.original)
