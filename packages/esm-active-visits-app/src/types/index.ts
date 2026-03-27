@@ -165,17 +165,21 @@ export interface OrderItem {
 
 export interface ActiveVisit {
   age: string;
+  billingStatus?: string;
+  billUuid?: string;
   id: string;
   idNumber: string;
   gender: string;
   location: string;
   name: string;
   patientUuid: string;
+  visitStartDatetime?: string;
   visitStartTime: string;
+  visitStopDatetime?: string;
   visitType: string;
   visitUuid: string;
   observations?: Record<string, Observation[]>;
-  [identifier: string]: string | Record<string, Observation[]>;
+  [identifier: string]: string | Record<string, Observation[]> | undefined;
 }
 
 export interface VisitResponse {

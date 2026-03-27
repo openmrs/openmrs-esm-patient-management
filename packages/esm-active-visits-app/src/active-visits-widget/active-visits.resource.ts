@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { last } from 'lodash-es';
 import dayjs from 'dayjs';
@@ -21,6 +21,225 @@ import { type ActiveVisit, type VisitResponse } from '../types';
 
 dayjs.extend(isToday);
 const refreshActiveVisitsEventName = 'openmrs:active-visits-refresh';
+const billingRepresentation = 'custom:(uuid,status,dateCreated,patient:(uuid))';
+
+interface BillSummary {
+  uuid: string;
+  status?: string;
+  dateCreated?: string;
+  patient?: {
+    uuid?: string;
+  };
+}
+
+interface BillsResponse {
+  results: Array<BillSummary>;
+}
+
+interface BillingLookupConfig {
+  endDate: string;
+  lookupKey: string;
+  patientUuid: string;
+  startDate: string;
+}
+
+function getBillingLookupConfig(visit: ActiveVisit): BillingLookupConfig | null {
+  if (!visit.patientUuid || !visit.visitStartDatetime) {
+    return null;
+  }
+
+  const visitStart = dayjs(visit.visitStartDatetime);
+
+  if (!visitStart.isValid()) {
+    return null;
+  }
+
+  const visitEnd = visit.visitStopDatetime ? dayjs(visit.visitStopDatetime) : visitStart.endOf('day');
+  const startDate = visitStart.startOf('day').toISOString();
+  const endDate = (visitEnd.isValid() ? visitEnd : visitStart.endOf('day')).endOf('day').toISOString();
+
+  return {
+    endDate,
+    lookupKey: `${visit.patientUuid}:${startDate}:${endDate}`,
+    patientUuid: visit.patientUuid,
+    startDate,
+  };
+}
+
+function getLatestBill(bills: Array<BillSummary>) {
+  return bills.reduce<BillSummary | null>((latestBill, currentBill) => {
+    if (!currentBill?.uuid) {
+      return latestBill;
+    }
+
+    if (!latestBill?.dateCreated) {
+      return currentBill;
+    }
+
+    if (!currentBill.dateCreated) {
+      return latestBill;
+    }
+
+    return dayjs(currentBill.dateCreated).isAfter(dayjs(latestBill.dateCreated)) ? currentBill : latestBill;
+  }, null);
+}
+
+/** Bill statuses that mean nothing further is owed for this bill (Kenya cashier / O3 billing). */
+function isBillPaidStatus(status?: string) {
+  const normalized = (status ?? '').toUpperCase();
+  return normalized === 'PAID' || normalized === 'POSTED';
+}
+
+/** Most recently created bill that is not fully paid/posted. */
+function getLatestUnpaidBill(bills: Array<BillSummary>) {
+  const dated = bills.filter((bill) => bill?.uuid);
+  if (!dated.length) {
+    return null;
+  }
+
+  const sorted = [...dated].sort((a, b) => {
+    const timeA = a.dateCreated ? dayjs(a.dateCreated).valueOf() : 0;
+    const timeB = b.dateCreated ? dayjs(b.dateCreated).valueOf() : 0;
+    return timeB - timeA;
+  });
+
+  return sorted.find((bill) => !isBillPaidStatus(bill.status)) ?? null;
+}
+
+function useActiveVisitBilling(activeVisits: Array<ActiveVisit>) {
+  const billingLookups = useMemo(() => {
+    const uniqueLookups = new Map<string, BillingLookupConfig>();
+
+    activeVisits.forEach((visit) => {
+      const lookup = getBillingLookupConfig(visit);
+
+      if (lookup) {
+        uniqueLookups.set(lookup.lookupKey, lookup);
+      }
+    });
+
+    return Array.from(uniqueLookups.values());
+  }, [activeVisits]);
+
+  const {
+    data: windowBillingByLookupKey,
+    error: windowError,
+    isLoading: isLoadingWindow,
+    isValidating: isValidatingWindow,
+  } = useSWR<Record<string, BillSummary | null>, Error>(
+    billingLookups.length ? ['active-visit-billing-window', JSON.stringify(billingLookups)] : null,
+    async ([, serializedLookups]) => {
+      const parsedLookups = JSON.parse(serializedLookups as string) as Array<BillingLookupConfig>;
+      const lookupEntries = await Promise.all(
+        parsedLookups.map(async (lookup) => {
+          const urlSearchParams = new URLSearchParams({
+            createdOnOrAfter: lookup.startDate,
+            createdOnOrBefore: lookup.endDate,
+            patientUuid: lookup.patientUuid,
+            v: billingRepresentation,
+          });
+
+          const response = await openmrsFetch<BillsResponse>(
+            `${restBaseUrl}/cashier/bill?${urlSearchParams.toString()}`,
+          );
+          const latestBill = getLatestBill(response?.data?.results ?? []);
+
+          return [lookup.lookupKey, latestBill] as const;
+        }),
+      );
+
+      return Object.fromEntries(lookupEntries);
+    },
+  );
+
+  const patientUuidsNeedingFallback = useMemo(() => {
+    if (!windowBillingByLookupKey) {
+      return [] as Array<string>;
+    }
+
+    const uniquePatients = new Set<string>();
+
+    activeVisits.forEach((visit) => {
+      const lookup = getBillingLookupConfig(visit);
+
+      if (!lookup || !visit.patientUuid) {
+        return;
+      }
+
+      const windowBill = windowBillingByLookupKey[lookup.lookupKey];
+
+      if (!windowBill) {
+        uniquePatients.add(visit.patientUuid);
+      }
+    });
+
+    return Array.from(uniquePatients).sort();
+  }, [activeVisits, windowBillingByLookupKey]);
+
+  const fallbackSerializedKey = patientUuidsNeedingFallback.length > 0 ? patientUuidsNeedingFallback.join(',') : '';
+
+  const {
+    data: fallbackBillingByPatientUuid,
+    error: fallbackError,
+    isLoading: isLoadingFallback,
+    isValidating: isValidatingFallback,
+  } = useSWR<Record<string, BillSummary | null>, Error>(
+    fallbackSerializedKey ? ['active-visit-billing-fallback', fallbackSerializedKey] : null,
+    async ([, patientList]) => {
+      const patientUuids = (patientList as string).split(',').filter(Boolean);
+      const farPast = dayjs().subtract(10, 'year').startOf('day').toISOString();
+      const endNow = dayjs().endOf('day').toISOString();
+
+      const entries = await Promise.all(
+        patientUuids.map(async (patientUuid) => {
+          const urlSearchParams = new URLSearchParams({
+            createdOnOrAfter: farPast,
+            createdOnOrBefore: endNow,
+            limit: '100',
+            patientUuid,
+            v: billingRepresentation,
+          });
+
+          const response = await openmrsFetch<BillsResponse>(
+            `${restBaseUrl}/cashier/bill?${urlSearchParams.toString()}`,
+          );
+          const latestUnpaid = getLatestUnpaidBill(response?.data?.results ?? []);
+
+          return [patientUuid, latestUnpaid] as const;
+        }),
+      );
+
+      return Object.fromEntries(entries);
+    },
+  );
+
+  const billingByVisitId = useMemo(() => {
+    return activeVisits.reduce<Record<string, Pick<ActiveVisit, 'billUuid' | 'billingStatus'>>>(
+      (accumulator, visit) => {
+        const lookup = getBillingLookupConfig(visit);
+        const windowBill = lookup ? windowBillingByLookupKey?.[lookup.lookupKey] : null;
+        const fallbackBill =
+          !windowBill && visit.patientUuid ? fallbackBillingByPatientUuid?.[visit.patientUuid] : null;
+        const matchedBill = windowBill ?? fallbackBill ?? null;
+
+        accumulator[visit.id] = {
+          billingStatus: matchedBill?.status ?? '',
+          billUuid: matchedBill?.uuid,
+        };
+
+        return accumulator;
+      },
+      {},
+    );
+  }, [activeVisits, fallbackBillingByPatientUuid, windowBillingByLookupKey]);
+
+  return {
+    billingByVisitId,
+    billingError: windowError ?? fallbackError,
+    isLoadingBilling: isLoadingWindow || isLoadingFallback,
+    isValidatingBilling: isValidatingWindow || isValidatingFallback,
+  };
+}
 
 export function useActiveVisits() {
   const session = useSession();
@@ -78,83 +297,103 @@ export function useActiveVisits() {
     return () => window.removeEventListener(refreshActiveVisitsEventName, handleRefresh);
   }, [mutate]);
 
-  const mapVisitProperties = (visit: Visit): ActiveVisit => {
-    // create base object
-    const age = visit?.patient?.person?.age;
-    const activeVisits: ActiveVisit = {
-      age: age ? String(age) : null,
-      id: visit.uuid,
-      idNumber: null,
-      gender: visit?.patient?.person?.gender,
-      location: visit?.location?.uuid,
-      name: visit?.patient?.person?.display,
-      patientUuid: visit?.patient?.uuid,
-      visitStartTime: formatDatetime(parseDate(visit?.startDatetime)),
-      visitType: visit?.visitType?.display,
-      visitUuid: visit.uuid,
-    };
+  const mapVisitProperties = useCallback(
+    (visit: Visit): ActiveVisit => {
+      // create base object
+      const age = visit?.patient?.person?.age;
+      const activeVisits: ActiveVisit = {
+        age: age ? String(age) : null,
+        billingStatus: '',
+        billUuid: undefined,
+        id: visit.uuid,
+        idNumber: null,
+        gender: visit?.patient?.person?.gender,
+        location: visit?.location?.uuid,
+        name: visit?.patient?.person?.display,
+        patientUuid: visit?.patient?.uuid,
+        visitStartDatetime: visit?.startDatetime,
+        visitStartTime: formatDatetime(parseDate(visit?.startDatetime)),
+        visitStopDatetime: visit?.stopDatetime,
+        visitType: visit?.visitType?.display,
+        visitUuid: visit.uuid,
+      };
 
-    // in case no configuration is given the previous behavior remains the same
-    if (!config?.activeVisits?.identifiers) {
-      activeVisits.idNumber = visit?.patient?.identifiers[0]?.identifier ?? '--';
-    } else {
-      // map identifiers on config
-      config?.activeVisits?.identifiers?.map((configIdentifier) => {
-        // check if in the current visit the patient has in his identifiers the current identifierType name
-        const visitIdentifier = visit?.patient?.identifiers.find(
-          (visitIdentifier) => visitIdentifier?.identifierType?.name === configIdentifier?.identifierName,
+      // in case no configuration is given the previous behavior remains the same
+      if (!config?.activeVisits?.identifiers) {
+        activeVisits.idNumber = visit?.patient?.identifiers[0]?.identifier ?? '--';
+      } else {
+        // map identifiers on config
+        config?.activeVisits?.identifiers?.map((configIdentifier) => {
+          // check if in the current visit the patient has in his identifiers the current identifierType name
+          const visitIdentifier = visit?.patient?.identifiers.find(
+            (visitIdentifier) => visitIdentifier?.identifierType?.name === configIdentifier?.identifierName,
+          );
+
+          // add the new identifier or rewrite existing one to activeVisit object
+          // the parameter will corresponds to the name of the key value of the configuration
+          // and the respective value is the visit identifier
+          // If there isn't a identifier we display this default text '--'
+          activeVisits[configIdentifier.header?.key] = visitIdentifier?.identifier ?? '--';
+        });
+      }
+
+      // map attributes on config
+      config?.activeVisits?.attributes?.map(({ display, header }) => {
+        // check if in the current visit the person has in his attributes the current display
+        const personAttributes = visit?.patient?.person?.attributes.find(
+          (personAttributes) => personAttributes?.attributeType?.display === display,
         );
 
-        // add the new identifier or rewrite existing one to activeVisit object
-        // the parameter will corresponds to the name of the key value of the configuration
-        // and the respective value is the visit identifier
-        // If there isn't a identifier we display this default text '--'
-        activeVisits[configIdentifier.header?.key] = visitIdentifier?.identifier ?? '--';
+        // add the new attribute or rewrite existing one to activeVisit object
+        // the parameter will correspond to the name of the key value of the configuration
+        // and the respective value is the persons value
+        // If there isn't a attribute we display this default text '--'
+        activeVisits[header?.key] = personAttributes?.value ?? '--';
       });
+
+      // Add flattened observations
+      const allObs = visit.encounters.reduce((accumulator, encounter) => {
+        return [...accumulator, ...(encounter.obs || [])];
+      }, []);
+
+      activeVisits.observations = allObs.reduce((map, obs) => {
+        const key = obs.concept.uuid;
+        if (!map[key]) {
+          map[key] = [];
+        }
+        map[key].push({
+          value: obs.value,
+          uuid: obs.uuid,
+        });
+        return map;
+      }, {});
+
+      return activeVisits;
+    },
+    [config],
+  );
+
+  const formattedActiveVisits = useMemo(() => {
+    if (!data) {
+      return [];
     }
+    return [].concat(...data.map((res) => res?.data?.results?.map(mapVisitProperties)));
+  }, [data, mapVisitProperties]);
+  const { billingByVisitId, isLoadingBilling } = useActiveVisitBilling(formattedActiveVisits);
 
-    // map attributes on config
-    config?.activeVisits?.attributes?.map(({ display, header }) => {
-      // check if in the current visit the person has in his attributes the current display
-      const personAttributes = visit?.patient?.person?.attributes.find(
-        (personAttributes) => personAttributes?.attributeType?.display === display,
-      );
-
-      // add the new attribute or rewrite existing one to activeVisit object
-      // the parameter will correspond to the name of the key value of the configuration
-      // and the respective value is the persons value
-      // If there isn't a attribute we display this default text '--'
-      activeVisits[header?.key] = personAttributes?.value ?? '--';
-    });
-
-    // Add flattened observations
-    const allObs = visit.encounters.reduce((accumulator, encounter) => {
-      return [...accumulator, ...(encounter.obs || [])];
-    }, []);
-
-    activeVisits.observations = allObs.reduce((map, obs) => {
-      const key = obs.concept.uuid;
-      if (!map[key]) {
-        map[key] = [];
-      }
-      map[key].push({
-        value: obs.value,
-        uuid: obs.uuid,
-      });
-      return map;
-    }, {});
-
-    return activeVisits;
-  };
-
-  const formattedActiveVisits: Array<ActiveVisit> = data
-    ? [].concat(...data?.map((res) => res?.data?.results?.map(mapVisitProperties)))
-    : [];
+  const activeVisitsWithBilling = useMemo(
+    () =>
+      formattedActiveVisits.map((visit) => ({
+        ...visit,
+        ...billingByVisitId[visit.id],
+      })),
+    [billingByVisitId, formattedActiveVisits],
+  );
 
   return {
-    activeVisits: formattedActiveVisits,
+    activeVisits: activeVisitsWithBilling,
     error,
-    isLoading,
+    isLoading: isLoading || isLoadingBilling,
     isValidating,
     totalResults: data?.[0]?.data?.totalCount ?? 0,
   };
@@ -329,6 +568,11 @@ export function useTableHeaders(obsConcepts: OpenmrsResource[]) {
         id: headersIndex++,
         header: t('visitType', 'Visit Type'),
         key: 'visitType',
+      },
+      {
+        id: headersIndex++,
+        header: t('billing', 'Billing'),
+        key: 'billingStatus',
       },
     );
 

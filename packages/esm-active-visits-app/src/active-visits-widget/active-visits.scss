@@ -55,6 +55,12 @@
   text-decoration: none;
 }
 
+// Match appointments table status actions: ghost button + icon in a flex row
+.billingActionContainer {
+  display: flex;
+  align-items: center;
+}
+
 .pagination {
   overflow: hidden;
 

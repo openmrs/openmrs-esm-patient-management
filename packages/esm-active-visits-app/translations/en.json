@@ -28,6 +28,7 @@
   "thereIsNoInformationToDisplayHere": "There is no information to display here",
   "time": "Time",
   "totalVisits": "Total Visits Today",
+  "viewBillFor": "View bill for {{patientName}}",
   "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitSummary": "Visit Summary"
 }

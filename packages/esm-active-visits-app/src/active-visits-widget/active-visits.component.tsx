@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
+  Button,
   DataTable,
   DataTableSkeleton,
   InlineLoading,
@@ -18,6 +19,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
+import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
   ConfigurableLink,
@@ -25,6 +27,7 @@ import {
   ErrorState,
   ExtensionSlot,
   isDesktop,
+  navigate,
   useConfig,
   useLayoutType,
   usePagination,
@@ -198,6 +201,7 @@ const ActiveVisitsTable = () => {
                   }
 
                   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart';
+                  const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${billUuid}';
 
                   return (
                     <React.Fragment key={`active-visit-row-${index}`}>
@@ -215,6 +219,30 @@ const ActiveVisitsTable = () => {
                                 })}>
                                 {cell.value}
                               </ConfigurableLink>
+                            ) : cell.info.header === 'billingStatus' &&
+                              currentVisit.patientUuid &&
+                              currentVisit.billUuid &&
+                              cell.value ? (
+                              <div className={styles.billingActionContainer}>
+                                <Button
+                                  kind="ghost"
+                                  renderIcon={TaskComplete}
+                                  iconDescription={t('viewBillFor', 'View bill for {{patientName}}', {
+                                    patientName: currentVisit.name,
+                                  })}
+                                  size={isDesktop(layout) ? 'sm' : 'lg'}
+                                  onClick={() =>
+                                    navigate({
+                                      to: billingUrl,
+                                      templateParams: {
+                                        billUuid: currentVisit.billUuid,
+                                        patientUuid: currentVisit.patientUuid,
+                                      },
+                                    })
+                                  }>
+                                  {cell.value}
+                                </Button>
+                              </div>
                             ) : (
                               cell.value
                             )}

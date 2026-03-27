@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, type OpenmrsResource, useConfig } from '@openmrs/esm-framework';
+import { render, screen, within } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, type OpenmrsResource, navigate, useConfig } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import { type ActiveVisitsConfigSchema, configSchema } from '../config-schema';
 import { type ActiveVisit, type Observation } from '../types';
@@ -16,6 +16,11 @@ jest.mock('./active-visits.resource', () => ({
   ...jest.requireActual('./active-visits.resource'),
   useActiveVisits: jest.fn(),
   useObsConcepts: jest.fn(),
+}));
+
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  navigate: jest.fn(),
 }));
 
 const mockObsConcepts: Array<OpenmrsResource> = [
@@ -58,8 +63,11 @@ const mockActiveVisits: ActiveVisit[] = [
   },
 ];
 
+const mockNavigate = jest.mocked(navigate);
+
 describe('ActiveVisitsTable', () => {
   beforeEach(() => {
+    mockNavigate.mockClear();
     mockUseConfig.mockReturnValue(mockConfig);
     mockUseObsConcepts.mockReturnValue({
       obsConcepts: mockObsConcepts,
@@ -101,7 +109,7 @@ describe('ActiveVisitsTable', () => {
 
     render(<ActiveVisitsTable />);
 
-    const standardColumnHeaders = [/Visit Time/, /Name/, /Gender/, /Age/, /Visit Type/];
+    const standardColumnHeaders = [/Visit Time/, /Name/, /Gender/, /Age/, /Visit Type/, /Billing/];
     standardColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
     });
@@ -159,6 +167,65 @@ describe('ActiveVisitsTable', () => {
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.queryByText('Some One')).not.toBeInTheDocument();
+  });
+
+  it('renders billing status as a ghost button when a bill is matched', async () => {
+    const user = userEvent.setup();
+    mockUseActiveVisits.mockReturnValue({
+      activeVisits: [
+        {
+          ...mockActiveVisits[0],
+          billingStatus: 'Pending',
+          billUuid: 'bill-uuid-1',
+        },
+        {
+          ...mockActiveVisits[1],
+          billingStatus: '',
+          billUuid: undefined,
+        },
+      ],
+      isLoading: false,
+      isValidating: false,
+      error: undefined,
+      totalResults: 2,
+    });
+
+    render(<ActiveVisitsTable />);
+
+    const billingButton = screen.getByRole('button', { name: /pending/i });
+    expect(billingButton).toHaveTextContent('Pending');
+
+    await user.click(billingButton);
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${billUuid}',
+      templateParams: { patientUuid: 'uuid1', billUuid: 'bill-uuid-1' },
+    });
+  });
+
+  it('renders an empty billing cell when no bill is matched', () => {
+    mockUseActiveVisits.mockReturnValue({
+      activeVisits: [
+        {
+          ...mockActiveVisits[0],
+          billingStatus: 'Pending',
+          billUuid: 'bill-uuid-1',
+        },
+        {
+          ...mockActiveVisits[1],
+          billingStatus: '',
+          billUuid: undefined,
+        },
+      ],
+      isLoading: false,
+      isValidating: false,
+      error: undefined,
+      totalResults: 2,
+    });
+
+    render(<ActiveVisitsTable />);
+
+    const secondRow = screen.getByTestId('activeVisitRowuuid2');
+    expect(within(secondRow).queryByRole('button', { name: /pending|paid/i })).not.toBeInTheDocument();
   });
 
   it('displays empty state when there are no active visits', () => {
