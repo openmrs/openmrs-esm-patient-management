@@ -80,7 +80,7 @@ function QueueTableSection() {
   const filteredQueueEntries = useMemo(() => {
     const searchTermLowercase = searchTerm.toLowerCase();
     return queueEntries?.filter((queueEntry) => {
-      return columns.some((column) => {
+      return columns?.some((column) => {
         const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });
