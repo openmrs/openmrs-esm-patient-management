@@ -52,6 +52,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "jest": "^30.3.0",
     "openmrs": "next"
   }
 }
