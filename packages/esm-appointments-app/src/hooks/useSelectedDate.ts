@@ -20,5 +20,5 @@ export function useSelectedDate() {
       }
     }
     return dayjs().startOf('day').format('YYYY-MM-DD');
-  }, [params]);
+  }, [params.date]);
 }
