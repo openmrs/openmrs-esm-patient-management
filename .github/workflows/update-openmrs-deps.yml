@@ -23,13 +23,13 @@ jobs:
     steps:
       # Step 1: Check out repository
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Step 2: Setup Node.js environment
       - name: 🛠️ Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'yarn'
 
       # Step 3: Install dependencies
