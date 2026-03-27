@@ -1,0 +1,77 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.emptyStateTile {
+  text-align: center;
+  padding: layout.$spacing-05;
+}
+
+.desktopTile {
+  border-bottom: 1px solid $ui-03;
+}
+
+.illustration {
+  margin-top: layout.$spacing-05;
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helperText {
+  @include type.type-style('body-01');
+  color: $text-02;
+  margin-bottom: layout.$spacing-05;
+}
+
+.action {
+  display: flex;
+  justify-content: center;
+}
+
+.separator {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+  width: 80%;
+  margin: layout.$spacing-06 auto;
+  overflow: hidden;
+  text-align: center;
+
+  &::before,
+  &::after {
+    background-color: colors.$gray-40;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: layout.$spacing-03;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: layout.$spacing-03;
+    margin-right: -50%;
+  }
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+
+  svg {
+    fill: currentColor !important;
+  }
+}
