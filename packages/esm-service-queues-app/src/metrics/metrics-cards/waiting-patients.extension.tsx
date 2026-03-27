@@ -12,7 +12,7 @@ import styles from './metrics-card.scss';
 export default function WaitingPatientsExtension() {
   const { t } = useTranslation();
   const { selectedServiceUuid, selectedServiceDisplay, selectedQueueLocationUuid } = useServiceQueuesStore();
-  const { services, isLoadingQueueServices } = useQueueServices();
+  const { services, queueServicesError, isLoadingQueueServices } = useQueueServices();
   const { serviceCount } = useServiceMetricsCount(selectedServiceUuid, selectedQueueLocationUuid);
   const {
     concepts: { defaultStatusConceptUuid },
@@ -20,7 +20,9 @@ export default function WaitingPatientsExtension() {
   const matchedService = services?.find((service) => service.uuid === selectedServiceUuid);
   const selectedServiceLabel = !selectedServiceUuid
     ? t('all', 'All')
-    : (matchedService?.display ?? (isLoadingQueueServices ? selectedServiceDisplay : null) ?? t('all', 'All'));
+    : (matchedService?.display ??
+      (isLoadingQueueServices || queueServicesError ? selectedServiceDisplay : null) ??
+      t('all', 'All'));
 
   const { totalCount, queueEntries } = useQueueEntries({
     service: selectedServiceUuid,

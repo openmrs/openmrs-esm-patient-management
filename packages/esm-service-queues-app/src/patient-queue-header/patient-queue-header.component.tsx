@@ -26,7 +26,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   const userSession = useSession();
   const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceUuid, selectedServiceDisplay } =
     useServiceQueuesStore();
-  const { queues, isLoading: isLoadingQueues } = useQueues();
+  const { queues, error: queueFetchError, isLoading: isLoadingQueues } = useQueues();
   const showLocationDropdown = showFilters && queueLocations.length > 1;
   const showServiceDropdown = showFilters && queues.length > 1;
 
@@ -41,10 +41,12 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
       }, []);
     return options.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...options] : options;
   }, [queues, t]);
-  const selectedServiceOption = serviceOptions.find((option) => option.id === selectedServiceUuid);
+  const selectedServiceOption = serviceOptions.find((option) => option.id === (selectedServiceUuid ?? 'all')) ?? null;
   const selectedServiceLabel = !selectedServiceUuid
     ? t('all', 'All')
-    : (selectedServiceOption?.name ?? (isLoadingQueues ? selectedServiceDisplay : null) ?? t('all', 'All'));
+    : (selectedServiceOption?.name ??
+      (isLoadingQueues || queueFetchError ? selectedServiceDisplay : null) ??
+      t('all', 'All'));
 
   const handleQueueLocationChange = useCallback(
     ({ selectedItem }) => {
@@ -103,10 +105,10 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   ]);
 
   useEffect(() => {
-    if (!isLoadingQueues && selectedServiceUuid && !selectedServiceOption) {
+    if (!isLoadingQueues && !queueFetchError && !selectedServiceOption) {
       updateSelectedService(null, t('all', 'All'));
     }
-  }, [isLoadingQueues, selectedServiceOption, selectedServiceUuid, t]);
+  }, [isLoadingQueues, queueFetchError, selectedServiceOption, t]);
 
   return (
     <PageHeader className={styles.header} data-testid="patient-queue-header">
