@@ -20,6 +20,7 @@ import { type ActiveVisitsConfigSchema } from '../config-schema';
 import { type ActiveVisit, type VisitResponse } from '../types';
 
 dayjs.extend(isToday);
+const refreshActiveVisitsEventName = 'openmrs:active-visits-refresh';
 
 export function useActiveVisits() {
   const session = useSession();
@@ -59,6 +60,7 @@ export function useActiveVisits() {
     isValidating,
     size: pageNumber,
     setSize,
+    mutate,
   } = useSWRInfinite<FetchResponse<VisitResponse>, Error>(sessionLocation ? getUrl : null, openmrsFetch);
 
   useEffect(() => {
@@ -66,6 +68,15 @@ export function useActiveVisits() {
       setSize((currentSize) => currentSize + 1);
     }
   }, [data, pageNumber, setSize]);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      mutate();
+    };
+
+    window.addEventListener(refreshActiveVisitsEventName, handleRefresh);
+    return () => window.removeEventListener(refreshActiveVisitsEventName, handleRefresh);
+  }, [mutate]);
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => {
     // create base object

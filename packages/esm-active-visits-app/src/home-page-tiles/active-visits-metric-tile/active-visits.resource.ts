@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
+
+const refreshActiveVisitsEventName = 'openmrs:active-visits-refresh';
 
 export default function useActiveVisits() {
   const session = useSession();
@@ -19,7 +22,16 @@ export default function useActiveVisits() {
     return url + urlSearchParams.toString();
   };
 
-  const { data, error, isLoading } = useSWR<{ data: { totalCount: number } }>(getUrl, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<{ data: { totalCount: number } }>(getUrl, openmrsFetch);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      mutate();
+    };
+
+    window.addEventListener(refreshActiveVisitsEventName, handleRefresh);
+    return () => window.removeEventListener(refreshActiveVisitsEventName, handleRefresh);
+  }, [mutate]);
 
   return {
     count: data?.data?.totalCount,
