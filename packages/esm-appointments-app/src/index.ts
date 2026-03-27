@@ -119,3 +119,11 @@ export const batchChangeAppointmentStatusesModal = getAsyncLifecycle(
   () => import('./appointments/common-components/batch-change-appointment-statuses.modal'),
   options,
 );
+
+export const createAppointmentFromSearchButton = getAsyncLifecycle(
+  () => import('./patient-search-actions/create-appointment-from-search-button.extension'),
+  {
+    featureName: 'patient-search-create-appointment',
+    moduleName,
+  },
+);

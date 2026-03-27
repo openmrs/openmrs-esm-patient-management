@@ -129,6 +129,14 @@ export const wardPatientWorkspaceBanner = getAsyncLifecycle(
   options,
 );
 
+export const admitToWardFromSearchButton = getAsyncLifecycle(
+  () => import('./ward-workspace/admit-to-ward-from-search-button.extension'),
+  {
+    featureName: 'patient-search-admit-to-ward',
+    moduleName,
+  },
+);
+
 export const deleteNoteModal = getAsyncLifecycle(
   () => import('./ward-workspace/ward-patient-notes/history/delete-note.modal'),
   options,
