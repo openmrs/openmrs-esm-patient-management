@@ -5,6 +5,8 @@ import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 
+const refreshActiveVisitsEventName = 'openmrs:active-visits-refresh';
+
 interface EndAppointmentModalProps {
   patientUuid: string;
   appointmentUuid: string;
@@ -36,6 +38,7 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
                 kind: 'success',
               });
               mutate();
+              window.dispatchEvent(new CustomEvent(refreshActiveVisitsEventName));
             })
             .catch((error) => {
               showSnackbar({

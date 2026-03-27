@@ -27,6 +27,8 @@ import { type ConfigObject } from '../../config-schema';
 import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import styles from './batch-change-appointment-statuses.scss';
 
+const refreshActiveVisitsEventName = 'openmrs:active-visits-refresh';
+
 interface BatchChangeAppointmentStatusesModalProps {
   appointments: Array<Appointment>;
   closeModal: () => void;
@@ -71,7 +73,10 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
                 const abortController = new AbortController();
                 const endVisitPayload = { stopDatetime: new Date() };
 
-                return updateVisit(activeVisit.uuid, endVisitPayload, abortController);
+                return updateVisit(activeVisit.uuid, endVisitPayload, abortController).then((result) => {
+                  window.dispatchEvent(new CustomEvent(refreshActiveVisitsEventName));
+                  return result;
+                });
               }
             })
             .catch(() => {
