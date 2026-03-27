@@ -40,8 +40,9 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
 import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import { useProviders } from '../hooks/useProviders';
-import { useAppointmentsStore } from '../store';
+import { useSelectedDate } from '../hooks/useSelectedDate';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import Workload from '../workload/workload.component';
 import {
@@ -50,12 +51,14 @@ import {
   saveRecurringAppointments,
   useAppointmentService,
 } from './appointments-form.resource';
-import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
-import { useProviders } from '../hooks/useProviders';
-import { useMutateAppointments } from '../hooks/useMutateAppointments';
-import Workload from '../workload/workload.component';
-import { useSelectedDate } from '../hooks/useSelectedDate';
 import styles from './appointments-form.scss';
+
+const buildAppointmentDateTime = (baseDate: string | Date, timeString: string, timeFormat: string) => {
+  const hoursAndMinutes = timeString.split(':').map(Number);
+  const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+  const minutes = hoursAndMinutes[1];
+  return dayjs(baseDate).hour(hours).minute(minutes).second(0).millisecond(0);
+};
 
 interface AppointmentsFormProps {
   appointment?: Appointment;
@@ -222,23 +225,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         });
       }
 
-      const buildAppointmentDateTime = (
-        startDate: unknown,
-        startTime: string,
-        timeFormat: string,
-      ) => {
-        const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
-
-        if (hoursAndMinutes.length !== 2 || isNaN(hoursAndMinutes[0]) || isNaN(hoursAndMinutes[1])) {
-          return null;
-        }
-
-        const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
-        const minutes = hoursAndMinutes[1];
-
-        return dayjs(startDate).hour(hours).minute(minutes);
-      };
-
+      // Note: We intentionally bypass past-time validation for "All Day" appointments
+      // to support retrospective data entry (a common pattern in low-resource clinics).
       if (!data.isAllDayAppointment && data.appointmentDateTime?.startDate && data.startTime && data.timeFormat) {
         const selectedDateTime = buildAppointmentDateTime(
           data.appointmentDateTime.startDate,
@@ -469,10 +457,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
-    const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
-    const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
-    const minutes = hoursAndMinutes[1];
-    const startDatetime = startDate.setHours(hours, minutes);
+
+    const startDatetime = buildAppointmentDateTime(startDate, startTime, timeFormat).toDate();
+
     const endDatetime = isAllDayAppointment
       ? dayjs(startDate).endOf('day').toDate()
       : dayjs(startDatetime).add(duration, 'minutes').toDate();
