@@ -67,13 +67,15 @@ function QueueTableSection() {
   }, [error?.message, t]);
 
   const columns = useColumns(null, null);
-  if (!columns) {
-    showSnackbar({
-      kind: 'warning',
-      title: t('notableConfig', 'No table configuration'),
-      subtitle: 'No table configuration defined for queue: null and status: null',
-    });
-  }
+  useEffect(() => {
+    if (!columns) {
+      showSnackbar({
+        kind: 'warning',
+        title: t('notableConfig', 'No table configuration'),
+        subtitle: 'No table configuration defined for queue: null and status: null',
+      });
+    }
+  }, [columns, t]);
 
   const filteredQueueEntries = useMemo(() => {
     const searchTermLowercase = searchTerm.toLowerCase();
