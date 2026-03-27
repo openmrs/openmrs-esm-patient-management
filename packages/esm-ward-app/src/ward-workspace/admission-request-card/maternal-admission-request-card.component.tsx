@@ -9,7 +9,18 @@ import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission
 import MotherOrChild from '../../ward-patient-card/row-elements/ward-mother-or-child.component';
 import { Checkbox, CheckboxGroup } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import React, { useMemo, useState, type ReactNode } from 'react';
+import { Checkbox, CheckboxGroup } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { useAppContext } from '@openmrs/esm-framework';
 import { makeWardPatient } from './maternal-admission-request-card.resource';
+import type { InpatientRequest, MaternalWardViewContext, WardPatient } from '../../types';
+import AdmissionRequestCardActions from './admission-request-card-actions.component';
+import AdmissionRequestCardHeader from './admission-request-card-header.component';
+import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
+import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
+import MotherOrChild from '../../ward-patient-card/row-elements/ward-mother-or-child.component';
+import styles from './admission-request-card.scss';
 
 interface MaternalAdmissionRequestCardProps {
   wardPatient: WardPatient;
