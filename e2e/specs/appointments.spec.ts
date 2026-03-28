@@ -273,9 +273,7 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   });
 
   await test.step('And I click the "Change status" button', async () => {
-    const changeStatusButton = page.getByRole('button', { name: 'Change status' });
-    await changeStatusButton.scrollIntoViewIfNeeded();
-    await changeStatusButton.click();
+    await page.getByRole('button', { name: 'Change status' }).click();
   });
 
   await test.step('Then the bulk status change modal should appear', async () => {
@@ -294,20 +292,18 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
     await expect(page.getByText('Appointments for selected patients have been successfully updated')).toBeVisible();
   });
 
-  await test.step('And I click the "Completed" tab to view completed appointments', async () => {
-    await page.getByRole('tab', { name: 'Completed' }).click();
-  });
-
-  await test.step('Then the row should still be visible in the appointments table, but with status "Completed"', async () => {
+  await test.step('Then the row should still be visible in the appointments table, but with status "Checked out"', async () => {
     const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
     await expect(appointmentRow).toHaveCount(1);
+    await expect(appointmentRow.getByText('Checked out')).toBeVisible();
   });
 
-  await test.step("When I navigate back to the 'Expected' tab", async () => {
-    await page.getByRole('tab', { name: 'Expected' }).click();
+  await test.step("When I filter the appointments table by 'Missed' status", async () => {
+    await page.getByText('Filter appointments by status').click();
+    await page.getByRole('option', { name: 'Missed' }).locator('label').click();
   });
 
-  await test.step('Then the row should not be visible in the Expected appointments table', async () => {
+  await test.step('Then the row should not be visible in the appointments table', async () => {
     const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
     await expect(appointmentRow).toHaveCount(0);
   });
@@ -316,10 +312,9 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
     await page.reload();
   });
 
-  await test.step('Then the Expected tab should be active and completed appointment should not be visible', async () => {
-    await expect(page.getByRole('tab', { name: 'Expected' })).toBeVisible();
-    const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
-    await expect(appointmentRow).toHaveCount(0);
+  await test.step("Then the status filter should still be 'Missed'", async () => {
+    await page.getByText('Filter appointments by status').click();
+    await expect(page.getByRole('option', { name: 'Missed' }).getByRole('checkbox')).toBeChecked();
   });
 });
 
