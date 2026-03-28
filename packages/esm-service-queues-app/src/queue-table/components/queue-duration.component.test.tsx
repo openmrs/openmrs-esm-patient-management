@@ -4,6 +4,15 @@ import dayjs from 'dayjs';
 import QueueDuration from './queue-duration.component';
 
 describe('QueueDuration', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2025-01-01T12:00:00'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('displays positive wait time correctly', () => {
     const startedAt = dayjs().subtract(2, 'hours').subtract(30, 'minutes').toDate();
     render(<QueueDuration startedAt={startedAt} />);
@@ -16,11 +25,10 @@ describe('QueueDuration', () => {
     expect(screen.getByText(/45 minute\(s\)/i)).toBeInTheDocument();
   });
 
-  it('does not display negative wait time when startedAt is in the future', () => {
-    const startedAt = dayjs().add(2, 'hours').add(26, 'minutes').toDate();
+  it('displays 0 minutes when startedAt is in the future', () => {
+    const startedAt = dayjs().add(2, 'hours').toDate();
     render(<QueueDuration startedAt={startedAt} />);
-    // Should show absolute value (hours), not negative
-    expect(screen.getByText(/2 hour\(s\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/0 minute\(s\)/i)).toBeInTheDocument();
     expect(screen.queryByText(/-/)).not.toBeInTheDocument();
   });
 
