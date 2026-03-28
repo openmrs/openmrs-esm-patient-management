@@ -6,6 +6,7 @@ import { useAppointmentsStore } from '../../store';
 import { monthDays } from '../../helpers';
 import MonthlyViewWorkload from './monthly-workload-view.component';
 import MonthlyHeader from './monthly-header.component';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from '../appointments-calendar-view-view.scss';
 
 dayjs.extend(isBetween);

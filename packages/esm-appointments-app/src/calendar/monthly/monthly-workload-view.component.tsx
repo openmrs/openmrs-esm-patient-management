@@ -8,6 +8,7 @@ import { isSameMonth } from '../../helpers';
 import { type Appointment, type DailyAppointmentsCountByService, AppointmentStatus } from '../../types';
 import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -32,7 +33,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   showAllServices = false,
 }) => {
   const layout = useLayoutType();
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
 
   const currentData = useMemo(
     () =>
