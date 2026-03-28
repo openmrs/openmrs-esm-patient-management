@@ -464,7 +464,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           <div className={styles.illo}>
             <EmptyCardIllustration />
           </div>
-          <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
+          <p className={styles.content}>{t('noPatientsInList', 'No patients found. Try adjusting your filters')}</p>
           <Button
             kind="ghost"
             renderIcon={(props) => <AddIcon {...props} />}
