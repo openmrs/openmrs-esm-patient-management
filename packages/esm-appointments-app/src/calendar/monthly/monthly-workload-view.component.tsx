@@ -5,18 +5,32 @@ import { User } from '@carbon/react/icons';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import { isSameMonth } from '../../helpers';
-import { type DailyAppointmentsCountByService } from '../../types';
+import { type Appointment, type DailyAppointmentsCountByService, AppointmentStatus } from '../../types';
 import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
+  appointments: Array<Appointment>;
   dateTime: Dayjs;
   showAllServices?: boolean;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+const statusColorMap: Record<AppointmentStatus, string> = {
+  [AppointmentStatus.SCHEDULED]: '#005D5D',
+  [AppointmentStatus.CANCELLED]: '#DA1E28',
+  [AppointmentStatus.MISSED]: '#FF832B',
+  [AppointmentStatus.CHECKEDIN]: '#0043CE',
+  [AppointmentStatus.COMPLETED]: '#198038',
+};
+
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
+  dateTime,
+  events,
+  appointments,
+  showAllServices = false,
+}) => {
   const layout = useLayoutType();
   const { selectedDate } = useAppointmentsStore();
 
@@ -28,25 +42,20 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     [dateTime, events],
   );
 
-  const visibleServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return currentData.services;
-      return currentData.services.slice(0, layout === 'small-desktop' ? 2 : 4);
-    }
-    return [];
-  }, [currentData, showAllServices, layout]);
-
-  const hasHiddenServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return false;
-      return layout === 'small-desktop' ? currentData.services.length > 2 : currentData.services.length > 4;
-    }
-    return false;
-  }, [currentData?.services, layout, showAllServices]);
-
   const navigateToAppointmentsByDate = (serviceUuid: string) => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
   };
+
+  const dayAppointments = useMemo(
+    () =>
+      appointments?.filter((apt) => dayjs(apt.startDateTime).format('YYYY-MM-DD') === dateTime.format('YYYY-MM-DD')) ??
+      [],
+    [appointments, dateTime],
+  );
+
+  const maxVisible = layout === 'small-desktop' ? 2 : 3;
+  const visibleAppointments = showAllServices ? dayAppointments : dayAppointments.slice(0, maxVisible);
+  const hiddenCount = dayAppointments.length - visibleAppointments.length;
 
   return (
     <div
@@ -73,33 +82,38 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
             )}
             <b className={styles.calendarDate}>{dateTime.format('D')}</b>
           </span>
-          {currentData?.services && (
-            <div className={styles.currentData}>
-              {visibleServices.map(({ serviceName, serviceUuid, count }, i) => (
-                <div
-                  key={`${serviceUuid}-${count}-${i}`}
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateToAppointmentsByDate(serviceUuid);
-                  }}
-                  className={styles.serviceArea}>
-                  <span>{serviceName}</span>
-                  <span>{count}</span>
-                </div>
-              ))}
-              {hasHiddenServices ? (
-                <MonthlyWorkloadViewExpanded
-                  count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
-                  events={events}
-                  dateTime={dateTime}
-                />
-              ) : (
-                ''
-              )}
-            </div>
-          )}
+
+          <div className={styles.currentData}>
+            {visibleAppointments.map((apt) => (
+              <div
+                key={apt.uuid}
+                className={styles.serviceArea}
+                style={{
+                  borderLeft: `3px solid ${statusColorMap[apt.status] ?? '#005D5D'}`,
+                  paddingLeft: '4px',
+                }}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateToAppointmentsByDate('');
+                }}>
+                <span>{dayjs(apt.startDateTime).format('h:mm a')}</span>
+                <span>{apt.patient.name}</span>
+              </div>
+            ))}
+
+            {hiddenCount > 0 ? (
+              <MonthlyWorkloadViewExpanded
+                count={hiddenCount}
+                events={events}
+                dateTime={dateTime}
+                appointments={appointments}
+              />
+            ) : (
+              ''
+            )}
+          </div>
         </div>
       )}
     </div>
