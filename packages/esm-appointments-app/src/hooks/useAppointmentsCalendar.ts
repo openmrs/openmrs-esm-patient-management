@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
 import { type DailyAppointmentsCountByService } from '../types';
+import { useMemo } from 'react';
 
 interface AppointmentCountMapEntry {
   allAppointmentsCount: number;
@@ -25,22 +26,32 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     openmrsFetch,
     { errorRetryCount: 2 },
   );
-  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
-    const serviceName = service.appointmentService.name;
-    const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).forEach(([key, value]) => {
-      const existingEntry = acc.find((entry) => entry.appointmentDate === key);
-      if (existingEntry) {
-        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
-      } else {
-        acc.push({
-          appointmentDate: key,
-          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
+
+  const results: Array<DailyAppointmentsCountByService> = useMemo(() => {
+    if (!data?.data) return [];
+    const map = new Map<string, DailyAppointmentsCountByService>();
+    for (const service of data.data) {
+      const { name: serviceName, uuid: serviceUuid } = service.appointmentService;
+
+      for (const [date, value] of Object.entries(service.appointmentCountMap)) {
+        if (!map.has(date)) {
+          map.set(date, {
+            appointmentDate: date,
+            services: [],
+          });
+        }
+
+        map.get(date)?.services.push({
+          serviceName,
+          serviceUuid,
+          count: value.allAppointmentsCount,
         });
       }
-    });
-    return acc;
-  }, []);
+    }
+
+    return Array.from(map.values());
+  }, [data]);
+
   return { isLoading, calendarEvents: results, error };
 };
 
