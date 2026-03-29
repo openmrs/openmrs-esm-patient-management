@@ -1,11 +1,11 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch, Button } from '@carbon/react';
+import { Button, ContentSwitcher, Switch } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
-import { useAppointmentsStore } from '../../store';
+import { useSelectedDate } from '../../hooks/useSelectedDate';
 import { type CalendarView } from '../appointments-calendar-view.component';
 import styles from './calendar-header.scss';
 
