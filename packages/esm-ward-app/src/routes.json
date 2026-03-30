@@ -64,6 +64,12 @@
       "component": "wardPatientWorkspaceBanner",
       "name": "ward-patient-workspace-banner",
       "slot": "ward-workspace-patient-banner-slot"
+    },
+    {
+      "component": "admitToWardFromSearchButton",
+      "name": "admit-to-ward-from-search-button",
+      "slot": "active-visit-patient-search-actions-slot",
+      "offline": true
     }
   ],
   "modals": [
