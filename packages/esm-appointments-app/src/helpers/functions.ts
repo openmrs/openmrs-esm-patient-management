@@ -4,43 +4,42 @@ import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-f
 import { AppointmentStatus } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
 
+/* Format a Date object into 12-hour time with AM/PM */
 export const formatAMPM = (date: Date): string => {
   const hours24 = date.getHours();
   const minutes = date.getMinutes();
+
   const ampm = hours24 >= 12 ? 'PM' : 'AM';
-  const hours12 = hours24 % 12 || 12; // Convert 0 to 12
-  const minutesStr = minutes < 10 ? `0${minutes}` : minutes.toString();
+  const hours12 = hours24 % 12 || 12;
+
+  const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+
   return `${hours12}:${minutesStr} ${ampm}`;
 };
 
-export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs) => {
+/* Check if two dates fall within the same calendar month */
+export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs): boolean => {
   return cellDate.isSame(currentDate, 'month');
 };
 
-export const monthDays = (currentDate: Dayjs) => {
-  const monthStart = dayjs(currentDate).startOf('month');
-  const monthEnd = dayjs(currentDate).endOf('month');
-  const monthDays = dayjs(currentDate).daysInMonth();
-  const lastMonth = dayjs(currentDate).subtract(1, 'month');
-  const nextMonth = dayjs(currentDate).add(1, 'month');
-  let days: Dayjs[] = [];
+/* Generate full calendar grid including leading/trailing days for alignment */
+export const monthDays = (currentDate: Dayjs): Dayjs[] => {
+  const start = dayjs(currentDate).startOf('month').startOf('week');
+  const end = dayjs(currentDate).endOf('month').endOf('week');
 
-  for (let i = lastMonth.daysInMonth() - monthStart.day() + 1; i <= lastMonth.daysInMonth(); i++) {
-    days.push(lastMonth.date(i));
+  const days: Dayjs[] = [];
+  let current = start.clone();
+
+  /* Iterate through each day in the grid range */
+  while (current.isBefore(end) || current.isSame(end, 'day')) {
+    days.push(current);
+    current = current.add(1, 'day');
   }
 
-  for (let i = 1; i <= monthDays; i++) {
-    days.push(currentDate.date(i));
-  }
-
-  const dayLen = days.length > 30 ? 7 : 14;
-
-  for (let i = 1; i < dayLen - monthEnd.day(); i++) {
-    days.push(nextMonth.date(i));
-  }
   return days;
 };
 
+/* Map gender codes to translated display values */
 export const getGender = (gender: string | undefined, t: TFunction<'translation', undefined>): string => {
   switch (gender) {
     case 'M':
@@ -52,10 +51,11 @@ export const getGender = (gender: string | undefined, t: TFunction<'translation'
     case 'U':
       return t('unknown', 'Unknown');
     default:
-      return gender;
+      return gender ?? '';
   }
 };
 
+/* Launch appointment creation workflow with patient selection */
 export const launchCreateAppointmentForm = (t: TFunction<'translation', undefined>) => {
   launchWorkspace2(
     'appointments-patient-search-workspace',
@@ -66,8 +66,8 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
         patientUuid: string,
         patient: fhir.Patient,
         launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
       ) {
+        /* Open appointment form workspace for selected patient */
         launchChildWorkspace(appointmentsFormWorkspace, {
           patientUuid: patient.id,
         });
@@ -79,14 +79,9 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
   );
 };
 
-/**
- * Return whether we can transition from one appointment status to another,
- * based on logic in backend. See:
- * https://github.com/Bahmni/openmrs-module-appointments/blob/master/api/src/main/java/org/openmrs/module/appointments/model/AppointmentStatus.java
- * https://github.com/Bahmni/openmrs-module-appointments/blob/master/api/src/main/java/org/openmrs/module/appointments/validator/impl/DefaultAppointmentStatusChangeValidator.java
- */
+/* Validate if status transition follows allowed progression rules */
 export const canTransition = (fromStatus: AppointmentStatus, toStatus: AppointmentStatus): boolean => {
-  const sequences = {
+  const sequences: Record<AppointmentStatus, number> = {
     [AppointmentStatus.SCHEDULED]: 1,
     [AppointmentStatus.CHECKEDIN]: 3,
     [AppointmentStatus.COMPLETED]: 4,

@@ -9,16 +9,23 @@ interface MonthlyWorkloadViewExpandedProps extends MonthlyWorkloadViewProps {
 }
 
 const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({ count, events, dateTime }) => {
+  /* Enable translation for dynamic UI text */
   const { t } = useTranslation();
+
+  /* Control popover visibility state */
   const [isOpen, setIsOpen] = useState(false);
+
+  /* Reference to popover container for outside click detection */
   const popoverRef = useRef(null);
 
+  /* Close popover when clicking outside of it */
   const handleClickOutside = useCallback((event) => {
     if (popoverRef.current && !popoverRef.current.contains(event.target)) {
       setIsOpen(false);
     }
   }, []);
 
+  /* Attach and clean up global click listener */
   useEffect(() => {
     document.addEventListener('click', handleClickOutside);
 
@@ -32,12 +39,14 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
       <button
         className={styles.showMoreItems}
         onClick={(e) => {
+          /* Prevent parent click handlers and toggle popover */
           e.stopPropagation();
           setIsOpen((prev) => !prev);
         }}>
         {t('countMore', '{{count}} more', { count })}
       </button>
       <PopoverContent>
+        {/* Expand to show all services for the selected date */}
         <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
       </PopoverContent>
     </Popover>

@@ -5,28 +5,26 @@ import { User } from '@carbon/react/icons';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import { type DailyAppointmentsCountByService } from '../../types';
+import styles from '../monthly/monthly-view-workload.scss';
 import { useSelectedDate } from '../../hooks/useSelectedDate';
-import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
-import styles from './monthly-view-workload.scss';
 
-export interface MonthlyWorkloadViewProps {
+export interface WeeklyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
-  showAllServices?: boolean;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
-  /* Shared selected date used to determine current month context */
-  const selectedDate = useSelectedDate();
+const WeeklyWorkloadView: React.FC<WeeklyWorkloadViewProps> = ({ dateTime, events }) => {
+  /* Detect layout size for responsive rendering */
+  const layout = useLayoutType();
 
   /* Check if this cell represents today's date */
   const isToday = dayjs(dateTime).isSame(dayjs(), 'day');
 
-  /* Check if this cell belongs to the currently selected month */
-  const isCurrentMonth = dayjs(dateTime).isSame(dayjs(selectedDate), 'month');
+  /* Get selected date to determine current month context */
+  const selectedDate = useSelectedDate();
 
-  /* Detect layout size for responsive rendering */
-  const layout = useLayoutType();
+  /* Check if this date belongs to the selected month */
+  const isCurrentMonth = dayjs(dateTime).isSame(dayjs(selectedDate), 'month');
 
   /* Build a date-indexed map for efficient event lookup */
   const eventMap = useMemo(() => {
@@ -40,23 +38,13 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   /* Retrieve data for the current date cell */
   const currentData = eventMap.get(dayjs(dateTime).format('YYYY-MM-DD'));
 
-  /* Determine visible services based on layout and expansion state */
+  /* Limit visible services based on layout constraints */
   const visibleServices = useMemo(() => {
     if (!currentData?.services) return [];
 
-    if (showAllServices) return currentData.services;
-
     const limit = layout === 'small-desktop' ? 2 : 4;
     return currentData.services.slice(0, limit);
-  }, [currentData, showAllServices, layout]);
-
-  /* Check if there are hidden services beyond the visible limit */
-  const hasHiddenServices = useMemo(() => {
-    if (!currentData?.services || showAllServices) return false;
-
-    const limit = layout === 'small-desktop' ? 2 : 4;
-    return currentData.services.length > limit;
-  }, [currentData, layout, showAllServices]);
+  }, [currentData, layout]);
 
   /* Navigate to appointments filtered by date and optional service */
   const navigateToAppointmentsByDate = (serviceUuid: string) => {
@@ -69,17 +57,12 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     <div
       /* Default click navigates to all appointments for this date */
       onClick={() => navigateToAppointmentsByDate('')}
-      className={classNames(
-        styles['monthly-cell'],
-        {
-          [styles.todayCell]: isToday,
-          [styles.disabledCell]: !isCurrentMonth && !isToday,
-        },
-        !showAllServices && {
-          [styles.smallDesktop]: layout === 'small-desktop',
-          [styles.largeDesktop]: layout !== 'small-desktop',
-        },
-      )}>
+      className={classNames(styles['monthly-cell'], {
+        [styles.todayCell]: isToday,
+        [styles.smallDesktop]: layout === 'small-desktop',
+        [styles.largeDesktop]: layout !== 'small-desktop',
+        [styles.disabledCell]: !isCurrentMonth && !isToday,
+      })}>
       <div>
         <span className={styles.totals}>
           {/* Display total appointment count across all services */}
@@ -100,7 +83,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
           </b>
         </span>
 
-        {/* Render visible services and optionally expandable overflow */}
+        {/* Render visible services for the selected day */}
         {currentData?.services && (
           <div className={styles.currentData}>
             {visibleServices.map(({ serviceName, serviceUuid, count }) => (
@@ -118,15 +101,6 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                 <span>{count}</span>
               </div>
             ))}
-
-            {/* Show expandable popover when additional services are hidden */}
-            {hasHiddenServices && (
-              <MonthlyWorkloadViewExpanded
-                count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
-                events={events}
-                dateTime={dateTime}
-              />
-            )}
           </div>
         )}
       </div>
@@ -134,4 +108,4 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   );
 };
 
-export default MonthlyWorkloadView;
+export default WeeklyWorkloadView;

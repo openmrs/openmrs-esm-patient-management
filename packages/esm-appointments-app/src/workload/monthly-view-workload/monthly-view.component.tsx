@@ -14,57 +14,70 @@ interface MonthlyCalendarViewProps {
   onDateClick?: (pickedDate: Date) => void;
 }
 
+/* Static weekday labels for header rendering */
+const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   calendarWorkload,
   dateToDisplay = '',
   onDateClick,
 }) => {
+  /* Enable translation support */
   const { t } = useTranslation();
-  const selectedDate = useSelectedDate();
-  const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-  const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
-  const daysInWeeks = daysInWeek.map((day) => t(day));
 
+  /* Get selected date from global state */
+  const selectedDate = useSelectedDate();
+
+  /* Resolve which date should drive the month view */
+  const monthViewDate = dateToDisplay || selectedDate;
+
+  /* Handle user clicking on a specific date */
   const handleClick = (date: Date) => {
-    if (onDateClick) {
-      onDateClick(date);
-    }
+    onDateClick?.(date);
   };
 
   return (
     <div className={styles.calendarViewContainer}>
       <>
         <div className={styles.container}></div>
+
+        {/* Display formatted month/year header */}
         <span className={styles.headerContainer}>
-          {formatDate(new Date(monthViewDate), { day: false, time: false, noToday: true })}
+          {formatDate(new Date(monthViewDate), {
+            day: false,
+            time: false,
+            noToday: true,
+          })}
         </span>
+
+        {/* Render weekday headers */}
         <div className={styles.workLoadCard}>
-          {daysInWeeks?.map((day, i) => (
-            <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />
+          {DAYS_IN_WEEK.map((day) => (
+            <DaysOfWeekCard key={day} dayOfWeek={day} />
           ))}
         </div>
+
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
-            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
-              <div
-                onClick={() => handleClick(dayjs(dateTime).toDate())}
-                key={i}
-                className={`${styles.monthlyWorkloadCard} ${
-                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
-                    ? styles.selectedDate
-                    : ''
-                }`}>
-                <MonthlyWorkloadCard
-                  key={i}
-                  date={dateTime}
-                  isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
-                  count={
-                    calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
-                      ?.count ?? 0
-                  }
-                />
-              </div>
-            ))}
+            {/* Render full calendar grid including overflow days */}
+            {monthDays(dayjs(monthViewDate)).map((dateTime) => {
+              const formatted = dayjs(dateTime).format('YYYY-MM-DD');
+
+              /* Check if this date is currently selected */
+              const isSelected = formatted === dayjs(monthViewDate).format('YYYY-MM-DD');
+
+              /* Lookup workload count for the given date */
+              const count = calendarWorkload.find((c) => c.date === formatted)?.count ?? 0;
+
+              return (
+                <div
+                  key={formatted} /* Ensure stable rendering key */
+                  onClick={() => handleClick(dayjs(dateTime).toDate())}
+                  className={`${styles.monthlyWorkloadCard} ${isSelected ? styles.selectedDate : ''}`}>
+                  <MonthlyWorkloadCard date={dateTime} isActive={isSelected} count={count} />
+                </div>
+              );
+            })}
           </div>
         </div>
       </>

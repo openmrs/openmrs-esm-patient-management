@@ -1,23 +1,56 @@
-@use '@carbon/colors';
+@use '@carbon/colors' as colors;
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .wrapper {
   position: relative;
 }
+
 .monthlyCalendar {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0px, 1fr));
-  grid-template-rows: repeat(6, minmax(0px, 1fr));
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
 }
 
 .calendarViewContainer {
   margin: layout.$spacing-05;
+  background-color: #f4f4f4;
+  min-height: 100vh;
 }
+
 .backgroundColor {
   margin: 1px 0 0;
   transition: width 0.24s ease-in-out;
   position: relative;
   min-height: calc(100vh - 80px);
   background-color: colors.$white;
+}
+
+.calendarShell {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.loadingContainer {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 10px;
+  left: 1120px;
+  width: 100vw;
+  height: 100vh;
+}
+
+.loadingContainer :global(.cds--inline-loading__text) {
+  font-size: 34px;
+  font-weight: 600;
+  color: #0f5d5d;
+}
+
+.loadingContainer :global(.cds--loading) {
+  width: 28px;
+  height: 28px;
 }

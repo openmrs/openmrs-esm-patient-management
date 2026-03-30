@@ -3,12 +3,38 @@
 
 .container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  height: layout.$spacing-10;
+  justify-content: space-between;
+  height: 55px;
+  position: relative;
 }
+
 .workLoadCard {
   display: flex;
   color: colors.$black;
+  margin-top: 8px;
+}
+
+.headerTitle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10%;
+  background-color: #0f5d5d;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.container button {
+  color: #525252;
+  border-radius: 4px;
+}
+
+.dayWrapper {
+  width: 245px;
 }

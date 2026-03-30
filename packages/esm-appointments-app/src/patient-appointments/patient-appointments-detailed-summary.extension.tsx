@@ -68,7 +68,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
   );
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {
