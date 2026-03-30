@@ -12,7 +12,7 @@ const EmptyBed: React.FC<EmptyBedProps> = ({ bed }) => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.emptyBed}>
+    <div id={`bed-${bed.bedNumber}`} className={styles.emptyBed}>
       <span className={`${wardPatientCardStyles.wardPatientBedNumber} ${wardPatientCardStyles.empty}`}>
         {bed.bedNumber}
       </span>
