@@ -9,9 +9,15 @@ import { type Workspace2DefinitionProps } from '@openmrs/esm-framework/src';
  */
 const CancelAdmissionRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
   closeWorkspace,
-  workspaceProps: { wardPatient },
+  workspaceProps: { wardPatient, relatedTransferPatients },
 }) => {
-  return <CancelAdmissionRequest closeWorkspace={closeWorkspace} wardPatient={wardPatient} />;
+  return (
+    <CancelAdmissionRequest
+      closeWorkspace={closeWorkspace}
+      wardPatient={wardPatient}
+      relatedTransferPatients={relatedTransferPatients}
+    />
+  );
 };
 
 export default CancelAdmissionRequestWorkspace;

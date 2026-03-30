@@ -11,7 +11,7 @@ import styles from './patient-transfer-request.scss';
  * button on a pending request patient card is clicked on
  */
 const PatientTransferRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}>> = ({
-  workspaceProps: { wardPatient },
+  workspaceProps: { wardPatient, relatedTransferPatients },
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
@@ -22,13 +22,18 @@ const PatientTransferRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPa
       title={isTransfer ? t('transferElsewhere', 'Transfer elsewhere') : t('admitElsewhere', 'Admit elsewhere')}>
       <div className={styles.patientTransferRequestWorkspace}>
         <WardPatientWorkspaceBanner {...{ wardPatient }} />
+        {relatedTransferPatients?.map((rp) => (
+          <WardPatientWorkspaceBanner key={rp.patient.uuid} wardPatient={rp} />
+        ))}
         <PatientAdmitOrTransferForm
           wardPatient={wardPatient}
+          relatedTransferPatients={relatedTransferPatients}
           onSuccess={async () => {
             await closeWorkspace({ discardUnsavedChanges: true });
             closeWorkspaceGroup2();
           }}
           onCancel={() => closeWorkspace()}
+          preSelectRelatedPatients
         />
       </div>
     </Workspace2>

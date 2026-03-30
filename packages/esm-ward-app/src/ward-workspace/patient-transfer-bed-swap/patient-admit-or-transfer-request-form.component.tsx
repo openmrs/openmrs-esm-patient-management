@@ -35,6 +35,7 @@ export interface PatientAdmitOrTransferFormProps {
 
   onSuccess(): void;
   onCancel(): void;
+  preSelectRelatedPatients?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export default function PatientAdmitOrTransferForm({
   relatedTransferPatients = [],
   onSuccess,
   onCancel,
+  preSelectRelatedPatients,
 }: PatientAdmitOrTransferFormProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
@@ -61,7 +63,9 @@ export default function PatientAdmitOrTransferForm({
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
-  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
+  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>(() =>
+    preSelectRelatedPatients ? relatedTransferPatients.map((rp) => rp.patient.uuid) : [],
+  );
 
   const zodSchema = useMemo(
     () =>
@@ -130,7 +134,7 @@ export default function PatientAdmitOrTransferForm({
         ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
       ];
 
-      Promise.all(
+      Promise.allSettled(
         wardPatientsToTransfer.map(async (wardPatientToTransfer) => {
           const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToTransfer;
 
@@ -147,19 +151,30 @@ export default function PatientAdmitOrTransferForm({
           );
         }),
       )
-        .then(() => {
-          showSnackbar({
-            title: t('patientTransferRequestCreated', 'Patient transfer request created'),
-            kind: 'success',
+        .then((results) => {
+          results.forEach((result, i) => {
+            const patientName = wardPatientsToTransfer[i].patient.person.preferredName.display;
+            if (result.status === 'fulfilled') {
+              showSnackbar({
+                title: t('patientTransferRequestCreatedForPatient', 'Transfer request created for {{patientName}}', {
+                  patientName,
+                }),
+                kind: 'success',
+              });
+            } else {
+              showSnackbar({
+                title: t('errorCreatingTransferRequest', 'Error creating transfer request for {{patientName}}', {
+                  patientName,
+                }),
+                subtitle: (result.reason as Error)?.message,
+                kind: 'error',
+              });
+            }
           });
-          onSuccess();
-        })
-        .catch((err: Error) => {
-          showSnackbar({
-            title: t('errorCreatingTransferRequest', 'Error creating transfer request'),
-            subtitle: err.message,
-            kind: 'error',
-          });
+
+          if (results.some((r) => r.status === 'fulfilled')) {
+            onSuccess();
+          }
         })
         .finally(() => {
           setIsSubmitting(false);

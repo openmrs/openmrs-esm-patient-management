@@ -6,7 +6,7 @@ import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
 import MotherChildRow from '../../ward-patient-card/card-rows/mother-child-row.component';
 import WardPatientSkeletonText from '../../ward-patient-card/row-elements/ward-patient-skeleton-text.component';
-import AdmissionRequestCard from '../../ward-workspace/admission-request-card/admission-request-card.component';
+import MaternalAdmissionRequestCard from '../../ward-workspace/admission-request-card/maternal-admission-request-card.component';
 
 function MaternalWardPendingPatients() {
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
@@ -17,6 +17,15 @@ function MaternalWardPendingPatients() {
     isLoading: isLoadingInpatientRequests,
     error: errorFetchingInpatientRequests,
   } = inpatientRequestResponse ?? {};
+
+  const inpatientRequestsOfWardByPatientUuid = inpatientRequests?.reduce(
+    (map, inpatientRequest) => {
+      const patientUuid = inpatientRequest.patient.uuid;
+      map[patientUuid] = inpatientRequest;
+      return map;
+    },
+    {} as Record<string, InpatientRequest>,
+  );
 
   return isLoadingInpatientRequests ? (
     <WardPatientSkeletonText />
@@ -34,11 +43,10 @@ function MaternalWardPendingPatients() {
         };
 
         return (
-          <AdmissionRequestCard key={`admission-request-card-${i}`} wardPatient={wardPatient}>
-            <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
-            <MotherChildRow wardPatient={wardPatient} childrenOfWardPatientInSameBed={[]} />
-            <AdmissionRequestNoteRow id={'admission-request-note'} wardPatient={wardPatient} />
-          </AdmissionRequestCard>
+          <MaternalAdmissionRequestCard
+            key={`admission-request-card-${i}`}
+            wardPatient={wardPatient}
+            inpatientRequestsOfWardByPatientUuid={inpatientRequestsOfWardByPatientUuid}></MaternalAdmissionRequestCard>
         );
       })}
     </>
