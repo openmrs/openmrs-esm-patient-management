@@ -13,6 +13,12 @@ type QueueEntryResponse = FetchResponse<{
   }>;
   totalCount: number;
 }>;
+// // TODO (GSoC 2026 - Performance): This repString causes severe over-fetching.
+// For each patient, it fetches full concept objects for status/priority (including
+// names, descriptions, mappings), full encounter arrays with obs/diagnoses, and
+// a duplicated previousQueueEntry — none of which the queue table renders.
+// The queue table only needs ~9 flat fields (see cells/columns.resource.ts).
+// Fix: Replace with a new QueueEntryListingRestController returning a flat DTO.
 
 const queueEntryBaseUrl = `${restBaseUrl}/queue-entry`;
 
