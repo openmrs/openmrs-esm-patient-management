@@ -226,6 +226,19 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   // non-null if the selected date+time is invalid
   const timeInvalidMessage = useMemo(() => {
+    const timeRegex12h = /^(0?[1-9]|1[0-2]):[0-5][0-9]$/;
+    const timeRegex24h = /^(1[3-9]|2[0-3]):[0-5][0-9]$/;
+    const timeRegexZeroHour = /^00:[0-5][0-9]$/;
+
+    if (!timeRegex12h.test(formState.transitionTime)) {
+      if (timeRegex24h.test(formState.transitionTime)) {
+        return t('use12HourFormat', 'Please use 12-hour format with AM/PM (01–12)');
+      }
+      if (timeRegexZeroHour.test(formState.transitionTime)) {
+        return t('useMidnightFormat', 'For midnight use 12:00 AM, for noon use 12:00 PM');
+      }
+      return t('invalidTimeFormat', 'Invalid time format');
+    }
     const now = new Date();
     const startAtDate = new Date(formState.transitionDate);
     const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
@@ -419,7 +432,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   <TimePicker
                     id="transitionTime"
                     labelText={t('time', 'Time')}
-                    onChange={(event) => setTransitionTime(event.target.value)}
+                    onChange={(event) => {
+                      const sanitized = event.target.value.replace(/[^0-9:]/g, '');
+                      setTransitionTime(sanitized); // ← sanitized, not raw value
+                    }}
                     pattern={time12HourFormatRegexPattern}
                     value={formState.transitionTime}
                     invalid={timeInvalidMessage !== null}
