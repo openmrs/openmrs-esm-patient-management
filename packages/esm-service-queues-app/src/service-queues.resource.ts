@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isEmpty from 'lodash-es/isEmpty';
 import useSWR from 'swr';
+import type { Diagnosis } from '@openmrs/esm-framework';
 import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from './types';
 
 dayjs.extend(isToday);
@@ -48,7 +49,7 @@ export interface MappedVisitQueueEntry {
 }
 
 interface Encounter {
-  diagnoses?: Array<any>;
+  diagnoses?: Array<Diagnosis>;
   encounterDatetime?: string;
   encounterProviders?: Array<{ provider?: { person?: { display?: string } } }>;
   encounterType?: { display: string; uuid: string };
@@ -67,20 +68,36 @@ const mapEncounterProperties = (encounter: CoreEncounter): MappedEncounter => ({
   encounterDatetime: encounter.encounterDatetime,
   encounterType: encounter.encounterType.display,
   obs: encounter.obs,
-  provider: encounter.encounterProviders[0]?.provider?.person?.display,
+  provider: encounter.encounterProviders?.[0]?.provider?.person?.display ?? '--',
   uuid: encounter.uuid,
   voided: encounter.voided,
 });
+type Queue = {
+  uuid: string;
+  location?: {
+    uuid: string;
+  };
+};
 
+type VisitAttribute = {
+  attributeType?: {
+    uuid?: string;
+  };
+  value?: string;
+};
+
+patient: {
+  identifiers ?: Identifer[];
+}
 export const mapVisitQueueEntryProperties = (
   queueEntry: QueueEntry,
   visitQueueNumberAttributeUuid: string,
 ): MappedVisitQueueEntry => ({
   id: queueEntry.uuid,
-  encounters: queueEntry.visit?.encounters?.map(mapEncounterProperties),
+  encounters: queueEntry.visit?.encounters?.map(mapEncounterProperties) ?? [],
   name: queueEntry.display,
   patientUuid: queueEntry.patient.uuid,
-  patientAge: queueEntry.patient.person?.age + '',
+  patientAge: queueEntry.patient.person?.age?.toString(),
   patientDob: queueEntry?.patient?.person?.birthdate
     ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
     : '--',
@@ -92,18 +109,36 @@ export const mapVisitQueueEntryProperties = (
   startedAt: dayjs(queueEntry.startedAt).toDate(),
   endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,
-  queueLocation: (queueEntry?.queue as any)?.location?.uuid,
+  queueLocation: queueEntry.queue?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
   queueUuid: queueEntry.queue.uuid,
   queueEntryUuid: queueEntry.uuid,
   sortWeight: queueEntry.sortWeight,
-  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)
+  visitQueueNumber: queueEntry.visit?.attributes?.find((e: VisitAttribute) => e.attributeType?.uuid === visitQueueNumberAttributeUuid)
     ?.value,
-  identifiers: queueEntry.patient?.identifiers as Identifer[],
+  identifiers: queueEntry.patient?.identifiers ?? [],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
+interface UpdateQueueBody {
+  visit: { uuid: string };
+  queueEntry: {
+    status: { uuid: string };
+    priority: { uuid: string };
+    queue: { uuid: string };
+    patient: { uuid: string };
+    startedAt: Date;
+    sortWeight: number;
+    queueComingFrom: string;
+  };
+}
+type QueueResponse = {
+  data: {
+    results: VisitQueueEntry[];
+  };
+};
 
+useSWR<QueueResponse, Error>
 export async function updateQueueEntry(
   visitUuid: string,
   previousQueueUuid: string,
@@ -112,9 +147,9 @@ export async function updateQueueEntry(
   patientUuid: string,
   priority: string,
   status: string,
-  endedAt: Date,
+  endedAt: Date | null,
   sortWeight: number,
-) {
+): Promise<Response> {
   const abortController = new AbortController();
   const queueServiceUuid = isEmpty(newQueueUuid) ? previousQueueUuid : newQueueUuid;
 
@@ -126,7 +161,7 @@ export async function updateQueueEntry(
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
-    body: {
+    body: <UpdateQueueBody>{
       visit: { uuid: visitUuid },
       queueEntry: {
         status: {
@@ -165,7 +200,7 @@ export async function endPatientStatus(previousQueueUuid: string, queueEntryUuid
 
 export function useServiceQueueEntries(service: string, locationUuid: string) {
   const apiUrl = `${restBaseUrl}/visit-queue-entry?status=waiting&service=${service}&location=${locationUuid}&v=full`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<QueueResponse, Error>(
     service && locationUuid ? apiUrl : null,
     openmrsFetch,
   );
@@ -173,7 +208,7 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
   const mapServiceQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedServiceQueueEntry => ({
     id: visitQueueEntry.queueEntry.uuid,
     name: visitQueueEntry.queueEntry.display,
-    age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age + '' : '--',
+    age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age?.toString() : '--',
     returnDate: visitQueueEntry.queueEntry.startedAt,
     visitType: visitQueueEntry.visit?.visitType?.display,
     gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',

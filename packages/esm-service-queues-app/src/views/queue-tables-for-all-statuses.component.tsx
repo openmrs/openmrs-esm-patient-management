@@ -15,7 +15,7 @@ import AddPatientToQueueButton from '../queue-table/components/add-patient-to-qu
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
   isLoadingQueue: boolean; // whether the queue is still loading
-  errorFetchingQueue: Error;
+  errorFetchingQueue?: Error | null;
 }
 
 // displays the queue entries of a given queue by
@@ -35,7 +35,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
       <InlineNotification
         kind="error"
         title={t('invalidQueue', 'Invalid Queue')}
-        subtitle={errorFetchingQueue?.message}
+        subtitle={errorFetchingQueue?.message ?? 'Something went wrong'}
       />
     );
   }
@@ -52,7 +52,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
               <Search
                 labelText=""
                 placeholder={t('filterTable', 'Filter table')}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)} 
                 size={isDesktop(layout) ? 'sm' : 'lg'}
                 disabled={isLoadingQueue}
               />
@@ -77,8 +77,8 @@ interface QueueTablesByStatusProps {
 
 function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
-  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = [...selectedQueue.allowedStatuses].reverse();
+  const { queueEntries = [], isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const allowedStatuses = [...(selectedQueue.allowedStatuses ?? [])].reverse();
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;
@@ -125,7 +125,7 @@ function QueueTableForQueueAndStatus({
   status,
 }: QueueTableForQueueAndStatusProps) {
   const statusUuid = status.uuid;
-  const columns = useColumns(queue.uuid, statusUuid);
+  const columns = useColumns(queue.uuid, statusUuid) ?? [];
   const { t } = useTranslation();
 
   if (!columns) {
@@ -138,13 +138,15 @@ function QueueTableForQueueAndStatus({
 
   // filters queue entries based on which status table we want to show and search term inputted by user
   const filterQueueEntries = (queueEntries: QueueEntry[], searchTerm: string, statusUuid: string) => {
-    const searchTermLowercase = searchTerm.toLowerCase();
+    const columnSearchTerm = String(
+      column.getFilterableValue?.(queueEntry) ?? ''
+    ).toLowerCase();
     return queueEntries.filter((queueEntry) => {
       const match = columns?.some((column) => {
         const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });
-      return queueEntry.status.uuid == statusUuid && match;
+      return queueEntry.status.uuid === statusUuid && match;
     });
   };
 
