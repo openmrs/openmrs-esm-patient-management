@@ -28,6 +28,8 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
   const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
     const serviceName = service.appointmentService.name;
     const serviceUuid = service.appointmentService.uuid;
+    // Convert appointment count map into structured calendar data
+    if (!service.appointmentCountMap) return;
     Object.entries(service.appointmentCountMap).forEach(([key, value]) => {
       const existingEntry = acc.find((entry) => entry.appointmentDate === key);
       if (existingEntry) {
