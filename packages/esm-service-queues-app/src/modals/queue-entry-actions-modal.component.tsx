@@ -34,6 +34,19 @@ import { type ConfigObject } from '../config-schema';
 import { type Queue, type QueueEntry } from '../types';
 import QueuePriority from '../queue-table/components/queue-priority.component';
 import styles from './queue-entry-actions.scss';
+const TIME_REGEX_12H = /^(0?[1-9]|1[0-2]):[0-5][0-9]$/;
+const TIME_REGEX_24H = /^(1[3-9]|2[0-3]):[0-5][0-9]$/;
+const TIME_REGEX_ZERO_HOUR = /^00:[0-5][0-9]$/;
+
+const getTimeFormatError = (timeStr: string, t: (key: string, defaultValue: string) => string) => {
+  if (TIME_REGEX_24H.test(timeStr)) {
+    return t('use12HourFormat', 'Please use 12-hour format with AM/PM (01–12)');
+  }
+  if (TIME_REGEX_ZERO_HOUR.test(timeStr)) {
+    return t('useMidnightFormat', 'For midnight use 12:00 AM, for noon use 12:00 PM');
+  }
+  return t('invalidTimeFormat', 'Invalid time format');
+};
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -226,18 +239,8 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   // non-null if the selected date+time is invalid
   const timeInvalidMessage = useMemo(() => {
-    const timeRegex12h = /^(0?[1-9]|1[0-2]):[0-5][0-9]$/;
-    const timeRegex24h = /^(1[3-9]|2[0-3]):[0-5][0-9]$/;
-    const timeRegexZeroHour = /^00:[0-5][0-9]$/;
-
-    if (!timeRegex12h.test(formState.transitionTime)) {
-      if (timeRegex24h.test(formState.transitionTime)) {
-        return t('use12HourFormat', 'Please use 12-hour format with AM/PM (01–12)');
-      }
-      if (timeRegexZeroHour.test(formState.transitionTime)) {
-        return t('useMidnightFormat', 'For midnight use 12:00 AM, for noon use 12:00 PM');
-      }
-      return t('invalidTimeFormat', 'Invalid time format');
+    if (!TIME_REGEX_12H.test(formState.transitionTime)) {
+      return getTimeFormatError(formState.transitionTime, t);
     }
     const now = new Date();
     const startAtDate = new Date(formState.transitionDate);
