@@ -17,12 +17,12 @@ const MonthlyHeader: React.FC = () => {
 
   const handleSelectPrevMonth = useCallback(() => {
     const previousMonthDate = calendarSelectedDate.subtract(1, 'month');
-    navigate({ to: `${spaHomePage}/appointments/calendar/${previousMonthDate}` });
+    navigate({ to: `${spaHomePage}/appointments/calendar/${previousMonthDate.format('YYYY-MM-DD')}` });
   }, [calendarSelectedDate]);
 
   const handleSelectNextMonth = useCallback(() => {
     const nextMonthDate = calendarSelectedDate.add(1, 'month');
-    navigate({ to: `${spaHomePage}/appointments/calendar/${nextMonthDate}` });
+    navigate({ to: `${spaHomePage}/appointments/calendar/${nextMonthDate.format('YYYY-MM-DD')}` });
   }, [calendarSelectedDate]);
 
   return (
