@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type BedPostPayload, type BedTag, type BedTagMap } from '../../types';
 
-interface BedForm {
+export interface BedForm {
   bedNumber: string;
   bedType: string;
   row: number;

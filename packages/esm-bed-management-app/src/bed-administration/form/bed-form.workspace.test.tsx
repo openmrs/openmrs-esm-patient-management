@@ -1,11 +1,17 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showSnackbar, useSession, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type FetchResponse, showSnackbar, useSession, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
-import { type BedFormWorkspaceConfig, type BedWorkspaceData } from '../../types';
+import {
+  type BedFormWorkspaceConfig,
+  type Location as BedLocation,
+  type BedWorkspaceData,
+  type BedType,
+  type BedTagData,
+} from '../../types';
 import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.resource';
-import { editBed, saveBed, useBedType, useBedTagMappings } from './bed-form.resource';
+import { editBed, saveBed, useBedType, useBedTagMappings, type BedForm } from './bed-form.resource';
 import BedFormWorkspace from './bed-form.workspace';
 
 jest.mock('./bed-form.resource', () => ({
@@ -32,6 +38,33 @@ const mockEditBed = jest.mocked(editBed);
 const mockCloseWorkspace = jest.fn().mockResolvedValue(true);
 const mockMutateBeds = jest.fn();
 
+const createMockFetchResponse = <T,>(data: T): FetchResponse<T> => {
+  const response: Partial<FetchResponse<T>> = {
+    data,
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    headers: new Headers(),
+    redirected: false,
+    type: 'basic',
+    url: '',
+  };
+
+  response.clone = () => response as FetchResponse<T>;
+
+  return response as FetchResponse<T>;
+};
+
+const mockFetchResponseBedData: BedForm = {
+  uuid: 'new-bed-uuid',
+  bedNumber: 'BED-001',
+  bedType: 'Standard',
+  row: 1,
+  column: 1,
+  status: 'AVAILABLE',
+  locationUuid: 'location-uuid-123',
+};
+
 const mockBedData: BedWorkspaceData = {
   uuid: 'bed-uuid-123',
   bedNumber: 'BED-001',
@@ -43,17 +76,64 @@ const mockBedData: BedWorkspaceData = {
   bedTags: [{ uuid: 'tag-uuid-1', name: 'ICU' }],
 };
 
-const mockLocations = [
-  { display: 'Ward A', uuid: 'location-uuid-123', name: 'Ward A' },
-  { display: 'Ward B', uuid: 'location-uuid-456', name: 'Ward B' },
+const createMockLocation = (overrides: Partial<BedLocation> = {}): BedLocation => ({
+  uuid: 'location-uuid-default',
+  display: 'Default Ward',
+  name: 'Default Ward',
+  description: null,
+  address1: null,
+  address2: null,
+  cityVillage: null,
+  stateProvince: null,
+  country: null,
+  postalCode: null,
+  latitude: null,
+  longitude: null,
+  countyDistrict: null,
+  address3: null,
+  address4: null,
+  address5: null,
+  address6: null,
+  tags: [],
+  parentLocation: undefined as unknown as BedLocation, // or null if you relax the type later
+  childLocations: [],
+  retired: false,
+  auditInfo: {
+    creator: {
+      uuid: 'creator-uuid',
+      display: 'Creator',
+      links: [],
+    },
+    dateCreated: '2024-01-01T00:00:00.000Z',
+    changedBy: null,
+    dateChanged: null,
+  },
+  address7: null,
+  address8: null,
+  address9: null,
+  address10: null,
+  address11: null,
+  address12: null,
+  address13: null,
+  address14: null,
+  address15: null,
+  links: [],
+  resourceVersion: '1.0',
+  beds: [],
+  ...overrides,
+});
+
+const mockLocations: BedLocation[] = [
+  createMockLocation({ uuid: 'location-uuid-123', display: 'Ward A', name: 'Ward A' }),
+  createMockLocation({ uuid: 'location-uuid-456', display: 'Ward B', name: 'Ward B' }),
 ];
 
-const mockBedTypes = [
+const mockBedTypes: Pick<BedType, 'uuid' | 'name'>[] = [
   { name: 'Standard', uuid: 'bed-type-uuid-1' },
   { name: 'ICU', uuid: 'bed-type-uuid-2' },
 ];
 
-const mockBedTags = [
+const mockBedTags: Pick<BedTagData, 'uuid' | 'name'>[] = [
   { name: 'ICU', uuid: 'tag-uuid-1' },
   { name: 'Emergency', uuid: 'tag-uuid-2' },
 ];
@@ -68,6 +148,7 @@ const createWorkspaceProps = (config: BedFormWorkspaceConfig): Workspace2Definit
   workspaceName: 'bed-form-workspace',
   windowName: 'bed-management-window',
   isRootWorkspace: true,
+  showActionMenu: true,
 });
 
 // Helper to render workspace with default config
@@ -101,7 +182,7 @@ describe('BedFormWorkspace', () => {
     } as ReturnType<typeof useSession>);
 
     mockUseLocationsWithAdmissionTag.mockReturnValue({
-      admissionLocations: mockLocations as any,
+      admissionLocations: mockLocations,
       errorLoadingAdmissionLocations: null,
       isLoadingAdmissionLocations: false,
       isValidatingAdmissionLocations: false,
@@ -109,13 +190,13 @@ describe('BedFormWorkspace', () => {
     });
 
     mockUseBedType.mockReturnValue({
-      bedTypes: mockBedTypes as any,
+      bedTypes: mockBedTypes,
       isLoading: false,
       error: null,
     });
 
     mockUseBedTags.mockReturnValue({
-      bedTags: mockBedTags as any,
+      bedTags: mockBedTags,
       errorLoadingBedTags: null,
       isLoadingBedTags: false,
       isValidatingBedTags: false,
@@ -168,7 +249,17 @@ describe('BedFormWorkspace', () => {
 
   it('submits a new bed successfully', async () => {
     const user = userEvent.setup();
-    mockSaveBed.mockResolvedValue({ data: { uuid: 'new-bed-uuid' } } as any);
+    mockSaveBed.mockResolvedValue(
+      createMockFetchResponse({
+        uuid: 'new-bed-uuid',
+        bedNumber: 'BED-001',
+        bedType: 'Standard',
+        row: 1,
+        column: 1,
+        status: 'AVAILABLE',
+        locationUuid: 'location-uuid-123',
+      }),
+    );
 
     renderBedFormWorkspace();
     await fillBedForm(user, 'BED-001');
@@ -181,7 +272,7 @@ describe('BedFormWorkspace', () => {
 
   it('submits an edited bed successfully', async () => {
     const user = userEvent.setup();
-    mockEditBed.mockResolvedValue({ data: { uuid: 'bed-uuid-123' } } as any);
+    mockEditBed.mockResolvedValue(createMockFetchResponse(mockFetchResponseBedData));
 
     renderBedFormWorkspace({ bed: mockBedData });
 
@@ -215,7 +306,7 @@ describe('BedFormWorkspace', () => {
 
   it('prevents submission when form has not been modified', async () => {
     const user = userEvent.setup();
-    mockSaveBed.mockResolvedValue({ data: { uuid: 'new-bed-uuid' } } as any);
+    mockSaveBed.mockResolvedValue(createMockFetchResponse(mockFetchResponseBedData));
     renderBedFormWorkspace();
 
     const saveButton = screen.getByRole('button', { name: /save/i });
@@ -246,7 +337,7 @@ describe('BedFormWorkspace', () => {
 
   it('prevents user from submitting without required bed number', async () => {
     const user = userEvent.setup();
-    mockSaveBed.mockResolvedValue({ data: { uuid: 'new-bed-uuid' } } as any);
+    mockSaveBed.mockResolvedValue(createMockFetchResponse(mockFetchResponseBedData));
     renderBedFormWorkspace();
 
     // Fill only bed type (not bed number)
@@ -262,7 +353,7 @@ describe('BedFormWorkspace', () => {
 
   it('shows success message and refreshes data after creating bed', async () => {
     const user = userEvent.setup();
-    mockSaveBed.mockResolvedValue({ data: { uuid: 'new-bed-uuid' } } as any);
+    mockSaveBed.mockResolvedValue(createMockFetchResponse(mockFetchResponseBedData));
 
     renderBedFormWorkspace();
     await fillBedForm(user, 'BED-100');
@@ -282,7 +373,7 @@ describe('BedFormWorkspace', () => {
 
   it('shows success message with different text when updating existing bed', async () => {
     const user = userEvent.setup();
-    mockEditBed.mockResolvedValue({ data: { uuid: 'bed-uuid-123' } } as any);
+    mockEditBed.mockResolvedValue(createMockFetchResponse(mockFetchResponseBedData));
 
     renderBedFormWorkspace({ bed: mockBedData });
 
@@ -303,7 +394,7 @@ describe('BedFormWorkspace', () => {
 
   it('allows user to submit form after making changes', async () => {
     const user = userEvent.setup();
-    mockSaveBed.mockResolvedValue({ data: { uuid: 'new-bed-uuid' } } as any);
+    mockSaveBed.mockResolvedValue(createMockFetchResponse(mockFetchResponseBedData));
     renderBedFormWorkspace();
 
     // Make changes to the form
