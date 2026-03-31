@@ -182,12 +182,12 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const filteredPatients = useMemo(() => {
     if (!debouncedSearchTerm) {
-      return patients;
+      return patients || [];
     }
 
     return debouncedSearchTerm
       ? fuzzy
-          .filter(debouncedSearchTerm, patients, {
+          .filter(debouncedSearchTerm, patients || [], {
             extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
