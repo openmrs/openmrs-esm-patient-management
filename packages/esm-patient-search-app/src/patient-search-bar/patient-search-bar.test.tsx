@@ -1,6 +1,6 @@
-import React from 'react';
-import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import PatientSearchBar from './patient-search-bar.component';
 
 describe('PatientSearchBar', () => {
@@ -62,5 +62,28 @@ describe('PatientSearchBar', () => {
     await user.click(searchButton);
 
     expect(onSubmitMock).toHaveBeenCalledWith('Search Term');
+
+    
   });
+
+  it('custom clear button clears input and calls onClear', async () => {
+  const user = userEvent.setup();
+  const onClearMock = jest.fn();
+
+  render(<PatientSearchBar onClear={onClearMock} onSubmit={jest.fn()} />);
+
+  const searchInput = screen.getByPlaceholderText(
+    'Search for a patient by name or identifier number',
+  );
+
+  await user.type(searchInput, 'John');
+
+  // get all clear buttons (carbon + custom)
+  const clearButtons = screen.getAllByText('Clear');
+
+  // click last one (your custom button)
+  await user.click(clearButtons[clearButtons.length - 1]);
+
+  expect(onClearMock).toHaveBeenCalled();
+});
 });
