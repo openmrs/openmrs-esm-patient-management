@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type BedPostPayload, type BedTag, type BedTagMap } from '../../types';
+import { type BedPostPayload, type BedTag, type BedTagMap, type BedType } from '../../types';
 
 interface BedForm {
   bedNumber: string;
@@ -159,11 +159,11 @@ export function useBedTagMappings(bedUuid?: string) {
 
 export function useBedType() {
   const locationsUrl = `${restBaseUrl}/bedtype`;
-  const { data, error, isLoading } = useSWR<{ data }>(locationsUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<BedType> } }>(locationsUrl, openmrsFetch);
 
   const bedTypes = useMemo(() => {
     const rawData = data?.data?.results ?? [];
-    const uniqueBedTypes = [];
+    const uniqueBedTypes: Array<BedType> = [];
 
     rawData.forEach((response) => {
       if (!uniqueBedTypes.some((bedType) => bedType.name === response.name)) {
