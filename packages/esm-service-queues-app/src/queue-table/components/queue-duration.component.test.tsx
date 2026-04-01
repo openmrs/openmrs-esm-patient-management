@@ -38,4 +38,9 @@ describe('QueueDuration', () => {
     render(<QueueDuration startedAt={startedAt} endedAt={endedAt} />);
     expect(screen.getByText(/1 hour\(s\) and 0 minute\(s\)/i)).toBeInTheDocument();
   });
+
+  it('displays "--" when startedAt is not provided', () => {
+    render(<QueueDuration />);
+    expect(screen.getByText('--')).toBeInTheDocument();
+  });
 });

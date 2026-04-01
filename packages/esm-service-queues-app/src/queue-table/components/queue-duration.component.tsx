@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 
 interface QueueDurationProps {
-  startedAt: Date;
+  startedAt?: Date;
   endedAt?: Date;
 }
 
@@ -11,7 +11,7 @@ const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt }) => 
   return <DurationString startedAt={startedAt} endedAt={endedAt} />;
 };
 
-function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt?: Date }) {
+function DurationString({ startedAt, endedAt }: { startedAt?: Date; endedAt?: Date }) {
   const { t } = useTranslation();
 
   const endedTime = endedAt ? dayjs(endedAt) : dayjs();
@@ -21,6 +21,11 @@ function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt?: Dat
     const handle = setInterval(() => setCurrentTime(dayjs()), 60000);
     return () => clearInterval(handle);
   }, []);
+
+  // Guard for missing startedAt
+  if (!startedAt) {
+    return <span>--</span>;
+  }
 
   const totalMinutes = Math.max(0, dayjs(endedTime ?? currentTime).diff(startedAt, 'minutes'));
   const hours = Math.trunc(totalMinutes / 60);
