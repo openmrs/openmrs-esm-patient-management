@@ -83,7 +83,16 @@ export const configSchema = {
     _type: Type.Array,
     _description:
       'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
-    _default: ['patientName', 'identifier', 'location', 'serviceType', 'status', 'actions'],
+    _default: [
+      'patientName',
+      'identifier',
+      'location',
+      'serviceType',
+      'dateTime',
+      'visitStartTime',
+      'status',
+      'actions',
+    ],
     _elements: {
       _type: Type.String,
       _validators: [validators.oneOf(appointmentColumnTypes)],

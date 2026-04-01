@@ -112,7 +112,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
             ? (appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier)
             : appointment.patient.identifier,
           dateTime: formatDatetime(new Date(appointment.startDateTime)),
-          activeVisitStartTime: activeVisitsByPatientUuid.has(appointment.patient.uuid)
+          visitStartTime: activeVisitsByPatientUuid.has(appointment.patient.uuid)
             ? formatDatetime(new Date(activeVisitsByPatientUuid.get(appointment.patient.uuid).startDatetime))
             : '--',
           serviceType: appointment.service.name,

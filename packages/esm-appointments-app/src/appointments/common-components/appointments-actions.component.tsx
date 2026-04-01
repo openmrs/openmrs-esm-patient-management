@@ -36,6 +36,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment, 
     } else {
       const dispose = showModal('end-appointment-modal', {
         closeModal: () => {
+          mutateVisits();
           dispose();
         },
         patientUuid,
@@ -71,11 +72,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment, 
     return null;
   };
 
-  return (
-    <div className={styles.container}>
-      <>{renderActions()}</>
-    </div>
-  );
+  return <div className={styles.container}>{renderActions()}</div>;
 };
 
 export default AppointmentsActions;

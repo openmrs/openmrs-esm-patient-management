@@ -1,7 +1,6 @@
 {
   "action": "Action",
   "actions": "Actions",
-  "activeVisitStartTime": "Active visit start time",
   "add": "Add",
   "age": "Age",
   "allDay": "All day",
@@ -77,7 +76,7 @@
   "dateAppointmentScheduled": "Date appointment scheduled",
   "dateOfBirth": "Date of birth",
   "dateRange": "Set date range",
-  "dateTime": "Date & Time",
+  "dateTime": "Appointment time",
   "day": "Day",
   "daysOfWeek": "Days of the week",
   "discard": "Discard",
@@ -175,6 +174,7 @@
   "upcoming": "Upcoming",
   "upcomingAppointments": "Upcoming appointments",
   "updateError": "Error updating upcoming appointment",
+  "visitStartTime": "Visit start time",
   "WED": "WED",
   "week": "Week",
   "yes": "Yes"
