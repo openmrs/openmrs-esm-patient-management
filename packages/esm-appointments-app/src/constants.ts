@@ -69,4 +69,15 @@ export const appointmentColumnTypes = [
   'dateTime',
   // t('provider', 'Provider')
   'provider',
+  // t('actions', 'Actions')
+  'actions',
+  // t('activeVisitStartTime', 'Active visit start time')
+  'activeVisitStartTime',
 ] as const;
+
+// added to prevent auto-removal of translations for dynamic keys
+// t('Scheduled', 'Scheduled')
+// t('CheckedIn', 'Checked in')
+// t('Cancelled', 'Cancelled')
+// t('Missed', 'Missed')
+// t('Completed', 'Completed')
