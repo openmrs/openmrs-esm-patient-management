@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type BedPostPayload, type BedTag, type BedTagMap, type BedType } from '../../types';
+import { type AdmissionLocation, type BedPostPayload, type BedTag, type BedTagMap, type BedType } from '../../types';
 
 interface BedForm {
   bedNumber: string;
@@ -79,7 +79,9 @@ async function createBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise
 
 async function updateBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise<void> {
   try {
-    const existingMappingsResponse = await openmrsFetch(`${restBaseUrl}/admissionLocation?v=full`);
+    const existingMappingsResponse = await openmrsFetch<{ results: Array<AdmissionLocation> }>(
+      `${restBaseUrl}/admissionLocation?v=full`,
+    );
     const allBeds = existingMappingsResponse.data?.results?.flatMap((location) => location.bedLayouts || []) || [];
     const targetBed = allBeds.find((bed) => bed.bedUuid === bedUuid);
     const existingMappings = targetBed?.bedTagMaps || [];

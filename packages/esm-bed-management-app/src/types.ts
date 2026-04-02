@@ -168,6 +168,8 @@ export type MappedBedData = Array<{
 }>;
 
 export interface BedDetails extends Bed {
+  bedUuid: string;
+  bedTagMaps?: BedTagMap[];
   patient: null | {
     uuid: string;
     identifiers: Array<{ identifier: string }>;
