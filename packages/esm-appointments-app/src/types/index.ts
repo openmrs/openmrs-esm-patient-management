@@ -66,9 +66,9 @@ export interface Appointment {
 
 export interface AppointmentExcelInput {
   uuid: string;
-  name: string;
-  gender: string;
-  age: number;
+  name?: string;
+  gender?: string;
+  age?: number;
   identifier?: string;
   phoneNumber?: string;
   startDateTime?: string;
@@ -76,7 +76,7 @@ export interface AppointmentExcelInput {
     name: string;
   };
   patient?: {
-    uuid: string;
+    uuid?: string;
     identifier?: string;
   };
 }
