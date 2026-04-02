@@ -39,7 +39,7 @@ export interface Appointment {
   appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
-  endDateTime: Date | number | string;
+  endDateTime: string;
   location: AppointmentLocation;
   // note: this is not a standard OpenMRS Patient object
   patient: {
@@ -132,7 +132,7 @@ export interface Observation {
       display: string;
     };
   }>;
-  value: string | number | boolean | OpenmrsResource;
+  value: string | number | boolean | { uuid: string; display: string };
   obsDatetime: string;
 }
 
