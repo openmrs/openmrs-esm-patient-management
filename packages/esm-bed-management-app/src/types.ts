@@ -167,6 +167,8 @@ export type MappedBedData = Array<{
   uuid: string;
 }>;
 
+export type BedWithLocation = Bed & { location: Location };
+
 export interface BedDetails extends Bed {
   bedUuid: string;
   bedTagMaps?: BedTagMap[];

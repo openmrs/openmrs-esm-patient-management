@@ -9,6 +9,7 @@ import type {
   BedTagPayload,
   BedType,
   BedTypePayload,
+  BedWithLocation,
   Location,
   LocationFetchResponse,
   MappedBedData,
@@ -89,7 +90,7 @@ export function useBedsGroupedByLocation() {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(true);
-  const [result, setResult] = useState<Array<Array<Bed & { location: Location }>>>([]);
+  const [result, setResult] = useState<Array<Array<BedWithLocation>>>([]);
 
   useEffect(() => {
     let isSubscribed = true;
