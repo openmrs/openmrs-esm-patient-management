@@ -3,8 +3,9 @@
 ![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-management/actions/workflows/ci.yml/badge.svg)
 
 # OpenMRS Patient Management
+ This repository contains frontend modules for O3. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments.
 
-This repository contains frontend modules for O3. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
+
 
 - [Active visits app](packages/esm-active-visits-app/)
 - [Appointments app](packages/esm-appointments-app/)
