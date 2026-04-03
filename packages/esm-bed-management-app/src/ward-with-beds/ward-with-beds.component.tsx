@@ -28,8 +28,8 @@ type RouteParams = { location: string };
 const WardWithBeds: React.FC = () => {
   const { t } = useTranslation();
   const { location } = useParams<RouteParams>();
-  const { bedsData, isLoadingBeds, mutate, isValidating } = useBedsForLocation(location);
-  const { name } = useLocationName(location);
+  const { bedsData, isLoadingBeds, mutate, isValidating } = useBedsForLocation(location ?? '');
+  const { name } = useLocationName(location ?? '');
 
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, goTo, currentPage } = usePagination(bedsData, pageSize);
@@ -134,15 +134,13 @@ const WardWithBeds: React.FC = () => {
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
-                          <TableHeader key={header.key} {...getHeaderProps({ header })}>
-                            {header.header}
-                          </TableHeader>
+                          <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                         ))}
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {rows.map((row) => (
-                        <TableRow key={row.id} {...getRowProps({ row })}>
+                        <TableRow {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>
                               {typeof cell.value === 'object' && cell.value !== null && 'content' in cell.value
