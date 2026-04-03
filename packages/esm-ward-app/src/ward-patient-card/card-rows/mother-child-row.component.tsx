@@ -1,14 +1,8 @@
 import React from 'react';
-import classNames from 'classnames';
-import { BabyIcon, MotherIcon, type Patient, useAppContext } from '@openmrs/esm-framework';
-import { type InpatientAdmission, type MaternalWardViewContext } from '../../types';
+import { useAppContext } from '@openmrs/esm-framework';
+import { type MaternalWardViewContext } from '../../types';
 import { type MaternalWardPatientCardProps } from '../../ward-view/maternal-ward/maternal-ward-patient-card.component';
-import WardPatientAge from '../row-elements/ward-patient-age.component';
-import WardPatientIdentifier from '../row-elements/ward-patient-identifier.component';
-import WardPatientLocation from '../row-elements/ward-patient-location.component';
-import WardPatientName from '../row-elements/ward-patient-name.component';
-import wardPatientCardStyles from '../ward-patient-card.scss';
-import styles from './mother-child-row.scss';
+import MotherOrChild from '../row-elements/ward-mother-or-child.component';
 
 /**
  * This component displays the mother or children of the patient in the patient card. The patient's child is
@@ -48,36 +42,6 @@ const MotherChildRow: React.FC<MaternalWardPatientCardProps> = ({ wardPatient, c
         />
       ))}
     </>
-  );
-};
-
-interface MotherOrChildProp {
-  otherPatient: Patient;
-  otherPatientAdmission: InpatientAdmission;
-  isOtherPatientTheMother: boolean;
-}
-
-const MotherOrChild: React.FC<MotherOrChildProp> = ({
-  otherPatient,
-  otherPatientAdmission,
-  isOtherPatientTheMother,
-}) => {
-  const Icon = isOtherPatientTheMother ? MotherIcon : BabyIcon;
-
-  return (
-    <div
-      key={otherPatient.uuid}
-      className={classNames(styles.motherOrBabyRow, wardPatientCardStyles.wardPatientCardRow)}>
-      <div className={styles.motherOrBabyIconDiv}>
-        <Icon className={styles.motherOrBabyIcon} size={24} />
-      </div>
-      <div className={classNames(styles.motherOrBabyRowElementsDiv, wardPatientCardStyles.dotSeparatedChildren)}>
-        <WardPatientName patient={otherPatient} />
-        <WardPatientIdentifier id="patient-identifier" patient={otherPatient} />
-        <WardPatientAge patient={otherPatient} />
-        <WardPatientLocation inpatientAdmission={otherPatientAdmission} />
-      </div>
-    </div>
   );
 };
 
