@@ -16,6 +16,8 @@ import { useAdmitPatient } from '../ward.resource';
 interface AdmitPatientButtonProps {
   wardPatient: WardPatient;
 
+  relatedTransferPatients?: WardPatient[];
+
   /**
    * whether to create an admit or transfer encounter for the given patient
    */
@@ -26,6 +28,7 @@ interface AdmitPatientButtonProps {
 
 const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   wardPatient,
+  relatedTransferPatients,
   onAdmitPatientSuccess,
   disabled,
   dispositionType,
@@ -39,7 +42,8 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   const [isAdmitting, setIsAdmitting] = useState(false);
   const { launchChildWorkspace } = useWorkspace2Context();
 
-  const launchPatientAdmissionForm = () => launchChildWorkspace('admit-patient-form-workspace', { wardPatient });
+  const launchPatientAdmissionForm = () =>
+    launchChildWorkspace('admit-patient-form-workspace', { wardPatient, relatedTransferPatients });
 
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
@@ -51,45 +55,59 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
       launchPatientAdmissionForm();
     } else {
       setIsAdmitting(true);
-      try {
-        const response = await admitPatient(patient, dispositionType, visit.uuid);
-        await wardPatientGroupDetails?.mutate?.();
-        if (response && response?.ok) {
+      const allPatientsToAdmit = [wardPatient, ...(relatedTransferPatients ?? [])];
+      const results = await Promise.allSettled(
+        allPatientsToAdmit.map((wp) =>
+          admitPatient(wp.patient, wp.inpatientRequest?.dispositionType ?? dispositionType, wp.visit.uuid),
+        ),
+      );
+      await wardPatientGroupDetails?.mutate?.();
+
+      results.forEach((result, i) => {
+        const wp = allPatientsToAdmit[i];
+        const patientName = wp.patient.person.preferredName.display;
+        const wpDispositionType = wp.inpatientRequest?.dispositionType ?? dispositionType;
+        if (result.status === 'fulfilled') {
           showSnackbar({
             kind: 'success',
             title:
-              dispositionType === 'ADMIT'
+              wpDispositionType === 'ADMIT'
                 ? t('patientAdmittedSuccessfully', 'Patient admitted successfully')
                 : t('patientTransferredSuccessfully', 'Patient transferred successfully'),
             subtitle:
-              dispositionType === 'ADMIT'
-                ? t('patientAdmittedToLocation', 'Patient admitted successfully to {{location}}', {
+              wpDispositionType === 'ADMIT'
+                ? t('patientAdmittedToLocation', '{{patientName}} admitted successfully to {{location}}', {
+                    patientName,
                     location: location?.display,
                   })
-                : t('patientTransferredToLocation', 'Patient transferred successfully to {{location}}', {
+                : t('patientTransferredToLocation', '{{patientName}} transferred successfully to {{location}}', {
+                    patientName,
                     location: location?.display,
                   }),
           });
+        } else {
+          // TODO: better way to handle / display error messages
+          // https://openmrs.atlassian.net/browse/O3-5423
+          const err = result.reason;
+          const errorMessage =
+            err?.responseBody?.error?.globalErrors?.[0]?.message ??
+            err?.message ??
+            t('unknownError', 'An unknown error occurred');
+          showSnackbar({
+            kind: 'error',
+            title:
+              wpDispositionType === 'ADMIT'
+                ? t('errorAdmittingPatient', 'Failed to admit {{patientName}}', { patientName })
+                : t('errorTransferringPatient', 'Failed to transfer {{patientName}}', { patientName }),
+            subtitle: errorMessage,
+          });
         }
+      });
+
+      if (results.some((r) => r.status === 'fulfilled')) {
         onAdmitPatientSuccess();
-      } catch (err) {
-        // TODO: better way to handle / display error messages
-        // https://openmrs.atlassian.net/browse/O3-5423
-        const errorMessage =
-          err?.responseBody?.error?.globalErrors?.[0]?.message ??
-          err.message ??
-          t('unknownError', 'An unknown error occurred');
-        showSnackbar({
-          kind: 'error',
-          title:
-            dispositionType === 'ADMIT'
-              ? t('errrorAdmitingPatient', 'Failed to admit patient')
-              : t('errorTransferringPatient', 'Failed to transfer patient'),
-          subtitle: errorMessage,
-        });
-      } finally {
-        setIsAdmitting(false);
       }
+      setIsAdmitting(false);
     }
   };
 
