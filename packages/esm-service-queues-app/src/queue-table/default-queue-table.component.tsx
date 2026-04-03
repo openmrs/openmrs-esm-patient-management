@@ -98,7 +98,7 @@ function QueueTableSection() {
       statusUuid={null}
       tableFilters={
         <>
-          <ClearQueueEntries queueEntries={filteredQueueEntries} />
+          {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
           <StatusDropdownFilter />
           <TableToolbarSearch
             className={styles.search}

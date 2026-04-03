@@ -8,12 +8,12 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  MultiSelect,
   OverflowMenu,
   OverflowMenuItem,
   Pagination,
   Table,
   TableBatchAction,
-  TableBatchActions,
   TableBody,
   TableCell,
   TableContainer,
@@ -43,15 +43,17 @@ import {
   launchWorkspace2,
   usePagination,
   showModal,
+  TableBatchActions
 } from '@openmrs/esm-framework';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
-import { type Appointment } from '../../types';
+import { AppointmentStatus, type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import { launchCreateAppointmentForm } from '../../helpers';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
+import { useAppointmentsStore } from '../../store';
 import styles from './appointments-table.scss';
 
 dayjs.extend(utc);
@@ -61,21 +63,16 @@ interface AppointmentsTableProps {
   appointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
-  hasActiveFilters?: boolean;
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
-  appointments,
-  isLoading,
-  tableHeading,
-  hasActiveFilters,
-}) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
+  const { selectedAppointmentStatuses, setSelectedAppointmentStatuses } = useAppointmentsStore();
   const config = useConfig<ConfigObject>();
   const { appointmentsTableColumns } = config;
-  const searchResults = useAppointmentSearchResults(appointments, searchString);
+  const searchResults = useAppointmentSearchResults(appointments, searchString, selectedAppointmentStatuses);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
   const { visits } = useTodaysVisits();
@@ -136,43 +133,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
 
-  if (hasActiveFilters && !appointments?.length) {
-    return (
-      <div className={styles.filterEmptyState}>
-        <Layer level={0}>
-          <Tile className={styles.filterEmptyStateTile}>
-            <p className={styles.filterEmptyStateContent}>
-              {t('noMatchingAppointments', 'No matching appointments found')}
-            </p>
-            <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-          </Tile>
-        </Layer>
-      </div>
-    );
-  }
-
-  if (!appointments?.length) {
-    const translatedHeading = t(tableHeading);
-    return (
-      <EmptyCard
-        headerTitle={`${translatedHeading} ${t('appointments_lower', 'appointments')}`}
-        displayText={
-          tableHeading === t('todays', "Today's")
-            ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
-            : t('appointments_lower', 'appointments')
-        }
-        launchForm={() => launchCreateAppointmentForm(t)}
-      />
-    );
-  }
-
   return (
     <Layer className={styles.container}>
-      <Tile className={styles.headerContainer}>
+      <div className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h2>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h2>
+          <h2>{tableHeading}</h2>
         </div>
-      </Tile>
+      </div>
       <DataTable
         aria-label={t('appointmentsTable', 'Appointments table')}
         data-floating-menu-container
@@ -221,6 +188,18 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     onChange={(event) => setSearchString((event as React.ChangeEvent<HTMLInputElement>).target.value)}
                     persistent
                     size={responsiveSize}
+                  />
+                  <MultiSelect
+                    id="statusMultiSelect"
+                    size={responsiveSize}
+                    items={Object.values(AppointmentStatus).map((status) => ({ id: status, label: t(status) }))}
+                    itemToString={(item) => (item ? item.label : '')}
+                    label={t('filterAppointmentsByStatus', 'Filter appointments by status')}
+                    onChange={({ selectedItems }) =>
+                      setSelectedAppointmentStatuses([...new Set(selectedItems.map((item) => item.id))])
+                    }
+                    type="inline"
+                    selectedItems={selectedAppointmentStatuses.map((status) => ({ id: status, label: t(status) }))}
                   />
                   <Button
                     size={responsiveSize}
@@ -338,24 +317,25 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                   </Tile>
                 </Layer>
               </div>
-            ) : null}
+            ) : (
+              <Pagination
+                backwardText={t('previousPage', 'Previous page')}
+                forwardText={t('nextPage', 'Next page')}
+                itemsPerPageText={t('itemsPerPage', 'Items per page') + ':'}
+                page={currentPage}
+                pageNumberText={t('pageNumber', 'Page number')}
+                pageSize={pageSize}
+                pageSizes={getPageSizes(appointments, pageSize) ?? []}
+                onChange={({ page, pageSize }) => {
+                  goTo(page);
+                  setPageSize(pageSize);
+                }}
+                totalItems={appointments.length ?? 0}
+              />
+            )}
           </>
         )}
       </DataTable>
-      <Pagination
-        backwardText={t('previousPage', 'Previous page')}
-        forwardText={t('nextPage', 'Next page')}
-        itemsPerPageText={t('itemsPerPage', 'Items per page') + ':'}
-        page={currentPage}
-        pageNumberText={t('pageNumber', 'Page number')}
-        pageSize={pageSize}
-        pageSizes={getPageSizes(appointments, pageSize) ?? []}
-        onChange={({ page, pageSize }) => {
-          goTo(page);
-          setPageSize(pageSize);
-        }}
-        totalItems={appointments.length ?? 0}
-      />
     </Layer>
   );
 };
