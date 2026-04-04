@@ -105,7 +105,7 @@ export const mapVisitQueueEntryProperties = (
   queue: queueEntry.queue,
   priority: queueEntry.priority,
   priorityComment: queueEntry.priorityComment,
-  status: queueEntry.status,
+  status: queueEntry?.status,
   startedAt: dayjs(queueEntry.startedAt).toDate(),
   endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,

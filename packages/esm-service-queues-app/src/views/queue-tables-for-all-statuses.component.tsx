@@ -35,7 +35,10 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
       <InlineNotification
         kind="error"
         title={t('invalidQueue', 'Invalid Queue')}
-        subtitle={errorFetchingQueue?.message ?? 'Something went wrong'}
+        subtitle={
+          errorFetchingQueue?.message ??
+          t('somethingWentWrong', 'Something went wrong')
+        }
       />
     );
   }
@@ -125,7 +128,17 @@ function QueueTableForQueueAndStatus({
   status,
 }: QueueTableForQueueAndStatusProps) {
   const statusUuid = status.uuid;
-  const columns = useColumns(queue.uuid, statusUuid) ?? [];
+  const columns = useColumns(queue.uuid, statusUuid);
+
+  if (columns.length === 0) {
+    return (
+      <InlineNotification
+        kind="warning"
+        title={t('invalidtableConfig', 'Invalid table configuration')}
+        subtitle={t('noColumnsDefined', 'No columns configured for this table')}
+      />
+    );
+  }
   const { t } = useTranslation();
 
   if (!columns) {
@@ -137,34 +150,26 @@ function QueueTableForQueueAndStatus({
   }
 
   // filters queue entries based on which status table we want to show and search term inputted by user
-  const filterQueueEntries = (queueEntries: QueueEntry[], searchTerm: string, statusUuid: string) => {
-    const columnSearchTerm = String(
-      column.getFilterableValue?.(queueEntry) ?? ''
-    ).toLowerCase();
+  const filterQueueEntries = (
+    queueEntries: QueueEntry[],
+    searchTerm: string,
+    statusUuid: string
+  ) => {
+    const searchTermLowercase = searchTerm.toLowerCase();
+
     return queueEntries.filter((queueEntry) => {
-      const match = columns?.some((column) => {
-        const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
-        return columnSearchTerm?.includes(searchTermLowercase);
+      if (queueEntry.status?.uuid !== statusUuid) return false;
+
+      if (!searchTermLowercase) return true;
+
+      return columns.some((column) => {
+        const value = column.getFilterableValue?.(queueEntry);
+
+        return String(value ?? '')
+          .toLowerCase()
+          .includes(searchTermLowercase);
       });
-      return queueEntry.status.uuid === statusUuid && match;
     });
   };
-
-  const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
-  return (
-    <div className={styles.statusTableContainer}>
-      <h5 className={styles.statusTableHeader}>{status.display}</h5>
-      <div className={styles.container}>
-        <QueueTable
-          key={statusUuid}
-          queueEntries={filteredQueueEntries}
-          isValidating={isValidating}
-          queueUuid={queue.uuid}
-          statusUuid={statusUuid}
-        />
-      </div>
-    </div>
-  );
-}
 
 export default QueueTablesForAllStatuses;
