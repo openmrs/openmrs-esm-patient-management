@@ -340,9 +340,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     // Check if a duplicate response occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
-    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+    if (Object.hasOwn(response?.data ?? {}, 'SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
-    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+    } else if (Object.hasOwn(response?.data ?? {}, 'PATIENT_DOUBLE_BOOKING')) {
       errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
 
