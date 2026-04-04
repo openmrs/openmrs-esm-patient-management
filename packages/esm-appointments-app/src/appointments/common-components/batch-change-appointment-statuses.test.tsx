@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
@@ -118,7 +118,7 @@ describe('BatchChangeAppointmentStatusesModal', () => {
 
   it('successfully changes status of multiple appointments', async () => {
     const user = userEvent.setup();
-    mockChangeAppointmentStatus.mockResolvedValue({} as any);
+    mockChangeAppointmentStatus.mockResolvedValue({} as FetchResponse);
 
     render(
       <BatchChangeAppointmentStatusesModal

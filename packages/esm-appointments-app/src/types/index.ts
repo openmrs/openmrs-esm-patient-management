@@ -54,7 +54,7 @@ export interface Appointment {
   recurring: boolean;
   service: AppointmentService;
   startDateTime: string | number;
-  dateAppointmentScheduled: string;
+  dateAppointmentScheduled: string | null;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -70,9 +70,9 @@ export interface AppointmentsFetchResponse {
 
 export interface AppointmentService {
   appointmentServiceId: number;
-  creatorName: string;
-  description: string;
-  durationMins?: number;
+  creatorName: string | null;
+  description: string | null;
+  durationMins?: number | null;
   endTime: string;
   initialAppointmentStatus: string;
   location?: OpenmrsResource;
@@ -195,5 +195,13 @@ export interface PatientDetails {
 export interface AppointmentsAppContext {
   appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
   isLoading: boolean;
-  error: any;
+  error: Error;
+}
+
+export interface UnscheduledAppointment {
+  name: string;
+  gender: string;
+  age: number;
+  phoneNumber?: string;
+  identifier?: string;
 }

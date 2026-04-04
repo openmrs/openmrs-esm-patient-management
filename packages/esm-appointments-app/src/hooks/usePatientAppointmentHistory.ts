@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type AppointmentsFetchResponse } from '../types';
+import type { Appointment, AppointmentsFetchResponse } from '../types';
 import { useSelectedDate } from './useSelectedDate';
 
 export function usePatientAppointmentHistory(patientUuid: string) {
@@ -38,7 +38,9 @@ export function usePatientAppointmentHistory(patientUuid: string) {
     ? data.data.filter((appointment) => appointment.status === 'Cancelled').length
     : 0;
   const upcomingAppointments = data?.data?.length
-    ? data.data?.filter((appointment: any) => dayjs((appointment.startDateTime / 1000) * 1000).isAfter(dayjs())).length
+    ? data.data?.filter((appointment: Appointment) =>
+        dayjs((Number(appointment.startDateTime) / 1000) * 1000).isAfter(dayjs()),
+      ).length
     : 0;
 
   return {

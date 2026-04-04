@@ -6,13 +6,14 @@ import { isEmpty } from 'lodash-es';
 import { useAppointmentsStore } from '../../store';
 import styles from './metrics-card.scss';
 import { useSelectedDate } from '../../hooks/useSelectedDate';
+import type { Appointment } from '../../types';
 dayjs.extend(isSameOrBefore);
 
 interface MetricsCardProps {
   label: string;
   value: number | string;
   headerLabel: string;
-  count?: { pendingAppointments: Array<any>; arrivedAppointments: Array<any> };
+  count?: { pendingAppointments: Array<Appointment>; arrivedAppointments: Array<any> };
 }
 
 const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, count }) => {

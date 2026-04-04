@@ -18,7 +18,7 @@ import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import styles from './patient-upcoming-appointments-card.scss';
 
 interface VisitFormCallbacks {
-  onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
+  onVisitCreatedOrUpdated: (visit: Visit) => Promise<void>;
 }
 
 // See VisitFormExtensionState in esm-patient-chart-app
