@@ -1,7 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
-import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -34,24 +30,35 @@ import {
   usePatient,
   useSession,
   Workspace2,
-  type Workspace2DefinitionProps,
   type FetchResponse,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+import React, { useEffect, useState } from 'react';
+import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
+import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
+import { useProviders } from '../hooks/useProviders';
+import { useSelectedDate } from '../hooks/useSelectedDate';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
+import Workload from '../workload/workload.component';
 import {
   checkAppointmentConflict,
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
 } from './appointments-form.resource';
-import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
-import { useProviders } from '../hooks/useProviders';
-import { useMutateAppointments } from '../hooks/useMutateAppointments';
-import Workload from '../workload/workload.component';
-import { useSelectedDate } from '../hooks/useSelectedDate';
 import styles from './appointments-form.scss';
+
+const buildAppointmentDateTime = (baseDate: string | Date, timeString: string, timeFormat: string) => {
+  const hoursAndMinutes = timeString.split(':').map(Number);
+  const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+  const minutes = hoursAndMinutes[1];
+  return dayjs(baseDate).hour(hours).minute(minutes).second(0).millisecond(0);
+};
 
 interface AppointmentsFormProps {
   appointment?: Appointment;
@@ -71,6 +78,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   workspaceProps: { appointment, recurringPattern, patientUuid },
   closeWorkspace,
 }) => {
+  const isEditing = Boolean(appointment);
   const { patient } = usePatient(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
@@ -197,7 +205,6 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       },
     )
     .superRefine((data, ctx) => {
-      // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
       if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
         ctx.addIssue({
           path: ['duration'],
@@ -205,6 +212,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
           message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
         });
       }
+
       if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
         ctx.addIssue({
           path: ['duration'],
@@ -215,6 +223,32 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             'Duration cannot exceed 1440 minutes (24 hours)',
           ),
         });
+      }
+
+      // Note: We intentionally bypass past-time validation for "All Day" appointments
+      // to support retrospective data entry (a common pattern in low-resource clinics).
+      if (!data.isAllDayAppointment && data.appointmentDateTime?.startDate && data.startTime && data.timeFormat) {
+        const selectedDateTime = buildAppointmentDateTime(
+          data.appointmentDateTime.startDate,
+          data.startTime,
+          data.timeFormat,
+        );
+
+        if (selectedDateTime) {
+          let isStartDateTimeChanged = true;
+          if (isEditing && appointment?.startDateTime) {
+            const originalDateTime = dayjs(appointment.startDateTime);
+            isStartDateTimeChanged = !selectedDateTime.isSame(originalDateTime, 'minute');
+          }
+
+          if ((!isEditing || isStartDateTimeChanged) && selectedDateTime.isBefore(dayjs(), 'minute')) {
+            ctx.addIssue({
+              path: ['startTime'],
+              code: z.ZodIssueCode.custom,
+              message: translateFrom(moduleName, 'pastTimeErrorMessage', 'Time cannot be in the past'),
+            });
+          }
+        }
       }
     });
 
@@ -329,8 +363,6 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     }
   })();
 
-  const isEditing = Boolean(appointment);
-
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
@@ -425,10 +457,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
-    const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
-    const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
-    const minutes = hoursAndMinutes[1];
-    const startDatetime = startDate.setHours(hours, minutes);
+
+    const startDatetime = buildAppointmentDateTime(startDate, startTime, timeFormat).toDate();
+
     const endDatetime = isAllDayAppointment
       ? dayjs(startDate).endOf('day').toDate()
       : dayjs(startDatetime).add(duration, 'minutes').toDate();

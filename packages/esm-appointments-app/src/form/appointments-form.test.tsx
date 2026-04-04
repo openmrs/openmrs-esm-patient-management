@@ -92,7 +92,15 @@ jest.mock('../workload/workload.resource', () => ({
 
 describe('AppointmentForm', () => {
   const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3}Z|\+00:00)$/;
+  beforeAll(() => {
+    // Freeze time to a date BEFORE the hardcoded test appointments (Jan 1, 2023)
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2023-01-01T00:00:00Z'));
+  });
 
+  afterAll(() => {
+    jest.useRealTimers(); // Restore time after tests finish
+  });
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
