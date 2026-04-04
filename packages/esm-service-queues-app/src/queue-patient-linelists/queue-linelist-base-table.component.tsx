@@ -156,7 +156,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
         useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
           <TableContainer className={styles.tableContainer}>
-            <TableToolbar style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+            <TableToolbar style={{ position: 'static', height: '3rem', overflow: 'visible' }}>
               <TableToolbarContent className={styles.toolbarContent}>
                 <TableToolbarSearch
                   className={styles.search}
