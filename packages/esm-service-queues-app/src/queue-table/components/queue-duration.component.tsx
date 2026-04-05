@@ -11,7 +11,7 @@ const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt }) => 
   return <DurationString startedAt={startedAt} endedAt={endedAt} />;
 };
 
-function DurationString({ startedAt, endedAt }: { startedAt?: Date; endedAt?: Date }) {
+function DurationString({ startedAt, endedAt }: QueueDurationProps) {
   const { t } = useTranslation();
 
   const endedTime = endedAt ? dayjs(endedAt) : dayjs();
