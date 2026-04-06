@@ -7,6 +7,6 @@ export function useAppointmentServices() {
     `${restBaseUrl}/appointmentService/all/default`,
     openmrsFetch,
   );
-  const sortedServices = data?.data ? [...data.data].sort((a, b) => a.name.localeCompare(b.name)) : [];
+  const sortedServices = data?.data ? [...data.data].sort((a, b) => a?.name?.localeCompare(b?.name)) : [];
   return { serviceTypes: sortedServices, isLoading, error };
 }
