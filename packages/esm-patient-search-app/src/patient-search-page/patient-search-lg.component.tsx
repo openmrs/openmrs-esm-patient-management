@@ -6,7 +6,12 @@ import type { SearchedPatient } from '../types';
 import { EmptyState, ErrorState, LoadingState, PatientSearchResults } from './patient-search-views.component';
 import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
-
+/**
+ * PatientSearchLgComponent renders the full-page, advanced search results view.
+ *
+ * Used primarily by the PatientSearchPageComponent (e.g., at `/search`), it handles
+ * pagination, displaying loading/error states, and rendering the full PatientSearchResults table.
+ */
 interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
@@ -14,6 +19,16 @@ interface PatientSearchComponentProps {
   searchResults: Array<SearchedPatient>;
   isLoading: boolean;
   fetchError: Error | null;
+  patientClickSideEffect?: (patientUuid: string, patient: fhir.Patient) => void;
+  onPatientSelected?(
+    patientUuid: string,
+    patient: fhir.Patient,
+    launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
+    closeWorkspace: () => void,
+  ): void;
+  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
+  closeWorkspace?(): void;
+  startVisitWorkspaceName?: string;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -23,6 +38,11 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   searchResults,
   isLoading,
   fetchError,
+  patientClickSideEffect,
+  onPatientSelected,
+  launchChildWorkspace,
+  closeWorkspace,
+  startVisitWorkspaceName,
 }) => {
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
@@ -50,8 +70,26 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       return <EmptyState />;
     }
 
-    return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+    return (
+      <PatientSearchResults
+        searchResults={results}
+        patientClickSideEffect={patientClickSideEffect}
+        onPatientSelected={onPatientSelected}
+        launchChildWorkspace={launchChildWorkspace}
+        closeWorkspace={closeWorkspace}
+        startVisitWorkspaceName={startVisitWorkspaceName}
+      />
+    );
+  }, [
+    fetchError,
+    isLoading,
+    results,
+    patientClickSideEffect,
+    onPatientSelected,
+    launchChildWorkspace,
+    closeWorkspace,
+    startVisitWorkspaceName,
+  ]);
 
   return (
     <div

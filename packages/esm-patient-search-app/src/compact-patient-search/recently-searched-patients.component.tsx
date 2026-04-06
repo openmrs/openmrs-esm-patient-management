@@ -6,9 +6,18 @@ import type { PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
+/**
+ * RecentlySearchedPatients displays a list of patients the user has interacted with recently.
+ *
+ * It is rendered below the search bar (before a query is typed) to provide quick
+ * access to recent contexts without needing to perform a full search.
+ */
+interface RecentlySearchedPatientsProps extends PatientSearchResponse {
+  patientClickSideEffect?: (patientUuid: string, patient: fhir.Patient) => void;
+}
 
-const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchResponse>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
+const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentlySearchedPatientsProps>(
+  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, patientClickSideEffect }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
 
@@ -92,7 +101,7 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchR
                 </span>
               )}
             </div>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
+            <CompactPatientBanner patients={searchResults} ref={ref} patientClickSideEffect={patientClickSideEffect} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />

@@ -8,6 +8,16 @@ import styles from './patient-search-lg.scss';
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
+  patientClickSideEffect?: (patientUuid: string, patient: fhir.Patient) => void;
+  onPatientSelected?(
+    patientUuid: string,
+    patient: fhir.Patient,
+    launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
+    closeWorkspace: () => void,
+  ): void;
+  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
+  closeWorkspace?(): void;
+  startVisitWorkspaceName?: string;
 }
 
 export const EmptyState: React.FC = () => {
@@ -59,11 +69,27 @@ export const ErrorState: React.FC = () => {
   );
 };
 
-export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
+export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
+  searchResults,
+  patientClickSideEffect,
+  onPatientSelected,
+  launchChildWorkspace,
+  closeWorkspace,
+  startVisitWorkspaceName,
+}) => {
   return (
     <div data-openmrs-role="Search Results">
       {searchResults.map((patient) => (
-        <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
+        <PatientBanner
+          key={patient.uuid}
+          patientUuid={patient.uuid}
+          patient={patient}
+          patientClickSideEffect={patientClickSideEffect}
+          onPatientSelected={onPatientSelected}
+          launchChildWorkspace={launchChildWorkspace}
+          closeWorkspace={closeWorkspace}
+          startVisitWorkspaceName={startVisitWorkspaceName}
+        />
       ))}
     </div>
   );

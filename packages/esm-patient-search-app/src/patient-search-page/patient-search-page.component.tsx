@@ -1,11 +1,15 @@
 import React, { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { PatientSearchContextProvider } from '../patient-search-context';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-page.scss';
-
+/**
+ * PatientSearchPageComponent is the main route component for the standalone `/search` page.
+ *
+ * In desktop mode, it renders the PatientSearchLgComponent. In tablet mode, it triggers
+ * the PatientSearchOverlay instead to save space.
+ */
 interface PatientSearchPageComponentProps {}
 
 const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = () => {
@@ -30,9 +34,7 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
   return (
     <div className={styles.patientSearchPage}>
       <div className={styles.patientSearchComponent}>
-        <PatientSearchContextProvider value={{}}>
-          <AdvancedPatientSearchComponent inTabletOrOverlay={isTablet} query={searchQuery} stickyPagination />
-        </PatientSearchContextProvider>
+        <AdvancedPatientSearchComponent inTabletOrOverlay={isTablet} query={searchQuery} stickyPagination />
       </div>
     </div>
   );

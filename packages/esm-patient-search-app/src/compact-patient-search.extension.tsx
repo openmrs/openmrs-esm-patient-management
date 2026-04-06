@@ -4,10 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from './config-schema';
 import { useInfinitePatientSearch } from './patient-search.resource';
-import { PatientSearchContextProvider } from './patient-search-context';
 import useArrowNavigation from './hooks/useArrowNavigation';
 import PatientSearch from './compact-patient-search/patient-search.component';
 import styles from './compact-patient-search.scss';
+/**
+ * CompactPatientSearchExtension renders the inline search bar used in the top navigation menu.
+ *
+ * It is primarily used in desktop views. In tablet/mobile views, the search bar is hidden
+ * behind a magnifying glass icon (PatientSearchButton) that opens the PatientSearchOverlay instead.
+ */
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;
@@ -104,15 +109,15 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         </Button>
       </form>
       {showSearchResults && (
-        <PatientSearchContextProvider
-          value={{
-            nonNavigationSelectPatientAction: selectPatientAction,
-            patientClickSideEffect: handleClear,
-          }}>
-          <div className={styles.floatingSearchResultsContainer}>
-            <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
-          </div>
-        </PatientSearchContextProvider>
+        <div className={styles.floatingSearchResultsContainer}>
+          <PatientSearch
+            query={searchTerm}
+            ref={bannerContainerRef}
+            nonNavigationSelectPatientAction={selectPatientAction}
+            patientClickSideEffect={handleClear}
+            {...patientSearchResponse}
+          />
+        </div>
       )}
     </div>
   );

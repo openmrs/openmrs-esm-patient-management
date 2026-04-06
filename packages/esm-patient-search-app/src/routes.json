@@ -17,12 +17,6 @@
       "order": 10
     },
     {
-      "name": "patient-search-button",
-      "component": "patientSearchButton",
-      "slot": "patient-search-button-slot",
-      "offline": true
-    },
-    {
       "name": "patient-search-bar",
       "component": "patientSearchBar",
       "slot": "patient-search-bar-slot",
@@ -33,16 +27,6 @@
       "component": "patientSearchStartVisitButton2",
       "slot": "start-visit-button-slot2",
       "offline": true
-    }
-  ],
-  "workspaces": [
-    {
-      "component": "patientSearchWorkspace",
-      "groups": ["ward-patient-admission-requests"],
-      "name": "patient-search-workspace",
-      "title": "searchPatient",
-      "type": "patient-search-workspace",
-      "width": "narrow"
     }
   ]
 }
