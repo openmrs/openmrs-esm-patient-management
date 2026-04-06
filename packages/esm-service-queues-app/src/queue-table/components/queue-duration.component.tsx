@@ -22,6 +22,14 @@ function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt: Date
     return () => clearInterval(handle);
   }, []);
 
+  // --- NEW GUARD CLAUSE START ---
+  // If startedAt is missing, we cannot calculate a duration.
+  // Returning a placeholder (--) prevents the 'diff' calculation from failing.
+  if (!startedAt) {
+    return <span>--</span>;
+  }
+  // --- NEW GUARD CLAUSE END ---
+
   const totalMinutes = dayjs(endedTime ?? currentTime).diff(startedAt, 'minutes');
   const hours = Math.trunc(totalMinutes / 60);
   const minutes = Math.trunc(totalMinutes % 60);
