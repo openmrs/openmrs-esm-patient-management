@@ -1,5 +1,5 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl, type Location } from '@openmrs/esm-framework';
-import { type Concept, type QueueEntry } from '../types';
+import { type Concept, type Provider, type QueueEntry } from '../types';
 
 // see QueueEntryTransition.java in openmrs-module-queue
 interface TransitionQueueEntryParams {
@@ -42,8 +42,8 @@ interface UpdateQueueEntryParams {
   sortWeight?: number;
   startedAt?: string;
   endedAt?: string;
-  loationWaitingFor?: Location;
-  providerWaitingFor?: Location;
+  locationWaitingFor?: Location;
+  providerWaitingFor?: Provider;
 }
 
 export function updateQueueEntry(
