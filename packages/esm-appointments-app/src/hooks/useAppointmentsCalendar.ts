@@ -26,23 +26,38 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     { errorRetryCount: 2 },
   );
   // Transform API response into daily appointment counts grouped by service
-  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
+  const safeData = data?.data ?? [];
+
+  const results: Array<DailyAppointmentsCountByService> = safeData.reduce((acc, service) => {
     const serviceName = service.appointmentService.name;
     const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).forEach(([key, value]) => {
+
+    Object.entries(service.appointmentCountMap ?? {}).forEach(([key, value]) => {
       const existingEntry = acc.find((entry) => entry.appointmentDate === key);
+
       if (existingEntry) {
-        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
+        existingEntry.services.push({
+          serviceName,
+          serviceUuid,
+          count: value?.allAppointmentsCount ?? 0,
+        });
       } else {
         acc.push({
           appointmentDate: key,
-          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
+          services: [
+            {
+              serviceName,
+              serviceUuid,
+              count: value?.allAppointmentsCount ?? 0,
+            },
+          ],
         });
       }
     });
+
     return acc;
   }, []);
-  return { isLoading, calendarEvents: results, error };
+  return { isLoading, calendarEvents: results ?? [], error };
 };
 
 function evaluateAppointmentCalendarDates(forDate: string, period: string) {
