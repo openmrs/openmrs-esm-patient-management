@@ -81,4 +81,10 @@ function evaluateAppointmentCalendarDates(forDate: string, period: string) {
       endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),
     };
   }
+
+  // Default fallback (THIS is the new part)
+  return {
+    startDate: dayjs(forDate).startOf('day').format(omrsDateFormat),
+    endDate: dayjs(forDate).endOf('day').format(omrsDateFormat),
+  };
 }
