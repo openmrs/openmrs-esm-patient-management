@@ -48,6 +48,9 @@
 .formContainer {
   display: flex;
   width: 100%;
+  align-items: flex-start;
+  height: calc(100vh - layout.$spacing-09); // subtract nav height
+  overflow-y: auto;
 }
 
 .stickyColumn {
