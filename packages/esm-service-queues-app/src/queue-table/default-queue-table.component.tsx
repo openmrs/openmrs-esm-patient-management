@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { updateSelectedQueueStatus, useServiceQueuesStore } from '../store/store';
 import { useColumns } from './cells/columns.resource';
-import { useQueueEntries } from '../hooks/useQueueEntries';
+import { useMutateQueueEntries, useQueueEntries } from '../hooks/useQueueEntries';
 import useQueueStatuses from '../hooks/useQueueStatuses';
 import AddPatientToQueueButton from './components/add-patient-to-queue-button.component';
 import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
@@ -49,12 +49,6 @@ function QueueTableSection() {
   }, [selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid]);
 
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
-
-  // When returning to this view via client-side navigation, force a refetch via the
-  // existing event mechanism used by the data hook.
-  useEffect(() => {
-    window.dispatchEvent(new CustomEvent('queue-entry-updated'));
-  }, []);
 
   useEffect(() => {
     if (error?.message) {
