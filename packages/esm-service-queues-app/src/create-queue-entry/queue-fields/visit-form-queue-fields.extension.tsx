@@ -14,7 +14,6 @@ export interface VisitFormQueueFieldsProps {
     showServiceQueueFields: boolean;
   };
   patientUuid: string;
-  visitStatus?: string;
 }
 
 /**
@@ -23,13 +22,8 @@ export interface VisitFormQueueFieldsProps {
  */
 const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
   const config = useConfig<ConfigObject>();
-  const { setVisitFormCallbacks, visitFormOpenedFrom, patientChartConfig, visitStatus } = props;
-
-  if (visitStatus === 'past') {
-    return null;
-  }
-
-  if (patientChartConfig?.showServiceQueueFields || visitFormOpenedFrom === 'service-queues-add-patient') {
+  const { setVisitFormCallbacks, visitFormOpenedFrom, patientChartConfig } = props;
+  if (patientChartConfig.showServiceQueueFields || visitFormOpenedFrom == 'service-queues-add-patient') {
     return (
       <QueueFields
         setOnSubmit={(onSubmit) => setVisitFormCallbacks({ onVisitCreatedOrUpdated: onSubmit })}
@@ -37,7 +31,7 @@ const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
       />
     );
   } else {
-    return null;
+    return <></>;
   }
 };
 
