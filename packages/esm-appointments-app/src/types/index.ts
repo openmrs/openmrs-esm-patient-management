@@ -53,8 +53,8 @@ export interface Appointment {
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: string | Date;
-  dateAppointmentScheduled: string | Date;
+  startDateTime: string ;
+  dateAppointmentScheduled: string ;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -78,7 +78,7 @@ export interface AppointmentService {
   location?: OpenmrsResource;
   maxAppointmentsLimit: number | null;
   name: string;
-  specialityUuid?: OpenmrsResource | {};
+  specialityUuid?: OpenmrsResource | Record<string, unknown>;
   startTime: string;
   uuid: string;
   serviceTypes?: Array<ServiceTypes>;
@@ -115,7 +115,7 @@ export interface Observation {
       display: string;
     };
   }>;
-  value: unknown;
+  value: string | number | boolean | null;
   obsDatetime: string;
 }
 
