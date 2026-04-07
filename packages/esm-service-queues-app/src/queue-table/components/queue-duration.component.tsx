@@ -13,7 +13,8 @@ const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt }) => 
 
 function DurationString({ startedAt, endedAt }: QueueDurationProps) {
   const { t } = useTranslation();
-
+  const referenceTime = endedAt ? dayjs(endedAt) : currentTime;
+  const totalMinutes = Math.max(0, referenceTime.diff(startedAt, 'minutes'));
   const endedTime = endedAt ? dayjs(endedAt) : dayjs();
   const [currentTime, setCurrentTime] = useState(dayjs());
 
