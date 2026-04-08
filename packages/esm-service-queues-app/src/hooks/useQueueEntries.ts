@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import useSWR from 'swr';
-import { useSWRConfig } from 'swr/_internal';
+import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 
