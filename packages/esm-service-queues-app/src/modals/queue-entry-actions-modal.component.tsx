@@ -453,7 +453,13 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         <Button kind="secondary" onClick={closeModal}>
           {getCoreTranslation('cancel')}
         </Button>
-        <Button disabled={isSubmitting || disableSubmit(queueEntry, formState)} onClick={submitForm}>
+        <Button
+          disabled={
+            isSubmitting ||
+            disableSubmit(queueEntry, formState) ||
+            (formState.modifyDefaultTransitionDateTime && timeInvalidMessage !== null)
+          }
+          onClick={submitForm}>
           {submitButtonText}
         </Button>
       </ModalFooter>
