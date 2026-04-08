@@ -24,8 +24,9 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   const { queueLocations, isLoading, error } = useQueueLocations();
   const { dashboardTitle } = useConfig<ConfigObject>();
   const userSession = useSession();
-  const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay } = useServiceQueuesStore();
-  const { queues } = useQueues();
+  const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceUuid, selectedServiceDisplay } =
+    useServiceQueuesStore();
+  const { queues, error: queueFetchError, isLoading: isLoadingQueues } = useQueues();
   const showLocationDropdown = showFilters && queueLocations.length > 1;
   const showServiceDropdown = showFilters && queues.length > 1;
 
@@ -40,6 +41,12 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
       }, []);
     return options.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...options] : options;
   }, [queues, t]);
+  const selectedServiceOption = serviceOptions.find((option) => option.id === (selectedServiceUuid ?? 'all')) ?? null;
+  const selectedServiceLabel = !selectedServiceUuid
+    ? t('all', 'All')
+    : (selectedServiceOption?.name ??
+      (isLoadingQueues || queueFetchError ? selectedServiceDisplay : null) ??
+      t('all', 'All'));
 
   const handleQueueLocationChange = useCallback(
     ({ selectedItem }) => {
@@ -97,6 +104,12 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
     userSession?.sessionLocation?.uuid,
   ]);
 
+  useEffect(() => {
+    if (!isLoadingQueues && !queueFetchError && !selectedServiceOption) {
+      updateSelectedService(null, t('all', 'All'));
+    }
+  }, [isLoadingQueues, queueFetchError, selectedServiceOption, t]);
+
   return (
     <PageHeader className={styles.header} data-testid="patient-queue-header">
       <PageHeaderContent
@@ -138,7 +151,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
             aria-label={t('selectService', 'Select a service')}
             className={styles.dropdown}
             id="serviceDropdown"
-            label={selectedServiceDisplay ?? t('all', 'All')}
+            label={selectedServiceLabel}
             items={serviceOptions}
             itemToString={(item) => item?.name}
             titleText={t('service', 'Service')}

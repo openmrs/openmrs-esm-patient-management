@@ -1,37 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@carbon/react';
-import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { MetricsCard, MetricsCardBody, MetricsCardHeader, MetricsCardItem } from './metrics-card.component';
 import { useServiceMetricsCount } from '../metrics.resource';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
 import useQueueServices from '../../hooks/useQueueService';
-import { type Service } from '../metrics-container.component';
-import { type Concept } from '../../types';
 import { type ConfigObject } from '../../config-schema';
-import { updateSelectedService, useServiceQueuesStore } from '../../store/store';
-
-type ServiceListItem = Service | Concept;
+import { useServiceQueuesStore } from '../../store/store';
+import styles from './metrics-card.scss';
 
 export default function WaitingPatientsExtension() {
   const { t } = useTranslation();
-  const layout = useLayoutType();
   const { selectedServiceUuid, selectedServiceDisplay, selectedQueueLocationUuid } = useServiceQueuesStore();
-  const { services } = useQueueServices();
+  const { services, queueServicesError, isLoadingQueueServices } = useQueueServices();
   const { serviceCount } = useServiceMetricsCount(selectedServiceUuid, selectedQueueLocationUuid);
   const {
     concepts: { defaultStatusConceptUuid },
   } = useConfig<ConfigObject>();
-
-  const defaultServiceItem: Service = {
-    display: `${t('all', 'All')}`,
-  };
-
-  const serviceItems: ServiceListItem[] = [defaultServiceItem, ...(services ?? [])];
-
-  const [initialSelectedItem, setInitialSelectItem] = useState(() => {
-    return !selectedServiceDisplay || !selectedServiceUuid;
-  });
+  const matchedService = services?.find((service) => service.uuid === selectedServiceUuid);
+  const selectedServiceLabel = !selectedServiceUuid
+    ? t('all', 'All')
+    : (matchedService?.display ??
+      (isLoadingQueueServices || queueServicesError ? selectedServiceDisplay : null) ??
+      t('all', 'All'));
 
   const { totalCount, queueEntries } = useQueueEntries({
     service: selectedServiceUuid,
@@ -42,38 +33,17 @@ export default function WaitingPatientsExtension() {
 
   const urgentCount = queueEntries.filter((entry) => entry.priority?.display?.toLowerCase() === 'urgent').length;
 
-  const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedService(selectedItem.uuid, selectedItem.display);
-    if (selectedItem.uuid === undefined) {
-      setInitialSelectItem(true);
-    } else {
-      setInitialSelectItem(false);
-    }
-  };
-
   return (
     <MetricsCard>
-      <MetricsCardHeader title={t('waitingFor', 'Waiting for') + ':'}>
-        <Dropdown
-          id="inline"
-          initialSelectedItem={defaultServiceItem}
-          items={serviceItems}
-          itemToString={(item) =>
-            item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
-          }
-          label=""
-          titleText=""
-          onChange={handleServiceChange}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
-          type="inline"
-        />
+      <MetricsCardHeader title={t('waitingFor', 'Waiting for')}>
+        <span className={styles.headerValue}>{selectedServiceLabel}</span>
       </MetricsCardHeader>
       <MetricsCardBody>
         <MetricsCardItem
           label={t('patients', 'Patients')}
-          value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
+          value={!selectedServiceUuid ? (totalCount ?? '--') : serviceCount}
         />
-        <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount > 0 ? urgentCount : null} color="red" small />
+        <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount} color="red" small />
       </MetricsCardBody>
     </MetricsCard>
   );

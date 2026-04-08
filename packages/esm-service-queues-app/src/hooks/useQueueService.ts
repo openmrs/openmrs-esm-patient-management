@@ -6,7 +6,7 @@ import { useServiceQueuesStore } from '../store/store';
 
 function useQueueServices() {
   const { selectedQueueLocationUuid } = useServiceQueuesStore();
-  const { queues, isLoading } = useQueues(selectedQueueLocationUuid);
+  const { queues, error, isLoading } = useQueues(selectedQueueLocationUuid);
 
   const results = useMemo(() => {
     const uniqueServices = uniqBy(
@@ -17,9 +17,10 @@ function useQueueServices() {
 
     return {
       services: sortedServices,
+      queueServicesError: error,
       isLoadingQueueServices: isLoading,
     };
-  }, [queues, isLoading]);
+  }, [error, queues, isLoading]);
 
   return results;
 }
