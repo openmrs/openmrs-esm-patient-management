@@ -61,6 +61,8 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
 
 function evaluateAppointmentCalendarDates(forDate: string, period: string) {
   if (period === 'daily') {
+   
+    console.warn(`Unhandled period value: ${period}, defaulting to daily`);
     return {
       startDate: dayjs(forDate).startOf('day').format(omrsDateFormat),
       endDate: dayjs(forDate).endOf('day').format(omrsDateFormat),
