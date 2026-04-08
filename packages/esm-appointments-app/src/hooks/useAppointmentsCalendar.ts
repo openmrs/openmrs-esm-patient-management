@@ -27,7 +27,7 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
   );
   // Transform API response into daily appointment counts grouped by service
 
-  const results: Array<DailyAppointmentsCountByService> = (data?.data ?? []).reduce((acc, service) => {
+   const results = (data?.data ?? []).reduce<DailyAppointmentsCountByService[]>((acc, service) => {
     const serviceName = service.appointmentService.name;
     const serviceUuid = service.appointmentService.uuid;
 
