@@ -602,7 +602,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </div>
           </FormGroup>
 
-          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Date & Time')}>
+          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Appointment time')}>
             <div className={styles.dateTimeFields}>
               {isRecurringAppointment && (
                 <div className={styles.inputContainer}>

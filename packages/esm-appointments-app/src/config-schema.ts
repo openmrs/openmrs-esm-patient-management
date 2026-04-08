@@ -31,11 +31,6 @@ export const configSchema = {
       _default: true,
       _description: 'Whether the check-in button on the "Appointments" list should be enabled',
     },
-    showIfActiveVisit: {
-      _type: Type.Boolean,
-      _default: false,
-      _description: 'Whether to show the check-in button if the patient currently has an active visit',
-    },
     customUrl: {
       _type: Type.String,
       _default: '',
@@ -88,7 +83,16 @@ export const configSchema = {
     _type: Type.Array,
     _description:
       'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
-    _default: ['patientName', 'identifier', 'location', 'serviceType', 'status'],
+    _default: [
+      'patientName',
+      'identifier',
+      'location',
+      'serviceType',
+      'dateTime',
+      'visitStartTime',
+      'status',
+      'actions',
+    ],
     _elements: {
       _type: Type.String,
       _validators: [validators.oneOf(appointmentColumnTypes)],
@@ -103,7 +107,6 @@ export interface ConfigObject {
   appointmentsTableColumns: Array<string>;
   checkInButton: {
     enabled: boolean;
-    showIfActiveVisit: boolean;
     customUrl: string;
   };
   checkOutButton: {
