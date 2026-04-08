@@ -57,7 +57,7 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
 
     return acc;
   }, []);
-  return { isLoading, calendarEvents: results ?? [], error };
+  return { isLoading, calendarEvents: results, error };
 };
 
 function evaluateAppointmentCalendarDates(forDate: string, period: string) {
