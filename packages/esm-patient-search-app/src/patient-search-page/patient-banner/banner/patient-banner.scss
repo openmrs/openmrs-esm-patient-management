@@ -144,3 +144,11 @@
     fill: $color-blue-60-2 !important;
   }
 }
+
+.selectionHoverState {
+  background-color: $ui-02;
+  transition: background-color 0.15s ease;
+  &:hover {
+    background-color: $ui-01;
+  }
+}
