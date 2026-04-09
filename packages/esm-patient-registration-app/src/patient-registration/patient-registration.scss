@@ -49,13 +49,17 @@
   display: flex;
   width: 100%;
   align-items: flex-start;
-  height: calc(100vh - layout.$spacing-09); // subtract nav height
+  height: calc(100dvh - var(--omrs-topnav-height, 3rem)); // subtract nav height
   overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .stickyColumn {
+  align-self: flex-start;
   position: sticky;
-  margin-top: layout.$spacing-05;
   // layout.$spacing-09 for the nav height and layout.$spacing-05 for top margin
   top: layout.$spacing-10;
 }
