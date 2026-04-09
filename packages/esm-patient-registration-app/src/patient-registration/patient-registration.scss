@@ -48,13 +48,18 @@
 .formContainer {
   display: flex;
   width: 100%;
+  align-items: flex-start;
+  height: calc(100dvh - var(--omrs-topnav-height, 3rem)); // subtract nav height
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .stickyColumn {
   position: sticky;
-  margin-top: layout.$spacing-05;
-  // layout.$spacing-09 for the nav height and layout.$spacing-05 for top margin
-  top: layout.$spacing-10;
+  top: layout.$spacing-05;
 }
 
 .touchTarget a:active {
