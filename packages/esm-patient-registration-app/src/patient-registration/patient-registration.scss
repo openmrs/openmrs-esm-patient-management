@@ -60,8 +60,7 @@
 .stickyColumn {
   align-self: flex-start;
   position: sticky;
-  // layout.$spacing-09 for the nav height and layout.$spacing-05 for top margin
-  top: layout.$spacing-10;
+  top: layout.$spacing-05;
 }
 
 .touchTarget a:active {
