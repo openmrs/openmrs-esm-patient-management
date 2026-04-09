@@ -219,6 +219,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   </Link>
                 </div>
               ))}
+              <hr className={styles.divider} />
               <Button
                 className={styles.submitButton}
                 type="submit"
