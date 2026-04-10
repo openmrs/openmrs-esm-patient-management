@@ -53,7 +53,7 @@ beforeEach(() => {
 });
 
 describe('WardView', () => {
-  let replacedProperty: jest.ReplaceProperty<any> | null = null;
+  let replacedProperty: { restore: () => void } | null = null;
 
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<DefaultWardView />);

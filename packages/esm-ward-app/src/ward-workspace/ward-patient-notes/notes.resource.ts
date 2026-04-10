@@ -44,7 +44,7 @@ export function usePatientNotes(patientUuid: string, visitUuid: string, conceptU
                   acc.push({
                     encounterUuid: encounter.uuid,
                     obsUuid: obs.uuid,
-                    encounterNote: obs ? obs.value : '',
+                    encounterNote: obs ? (typeof obs.value === 'string' ? obs.value : String(obs.value)) : '',
                     encounterNoteRecordedAt: obs ? obs.obsDatetime : '',
                     encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
                     conceptUuid: obs.concept.uuid,

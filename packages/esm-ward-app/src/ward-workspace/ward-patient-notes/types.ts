@@ -32,10 +32,10 @@ export interface UsePatientNotes {
 export interface ObsData {
   uuid: string;
   concept: Concept;
-  value?: string | any;
+  value?: string | number | boolean | OpenmrsResource;
   groupMembers?: Array<{
     concept: Concept;
-    value?: string | any;
+    value?: string | number | boolean | OpenmrsResource;
   }>;
   obsDatetime: string;
 }
