@@ -1,0 +1,20 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  release:
+    types:
+      - created
+
+jobs:
+  release:
+    uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/release-frontend-module.yml@main
+    with:
+      pre_release_version_command: 'yarn workspaces foreach --worktree --topological --exclude @openmrs/esm-patient-management version "$PRERELEASE_VERSION"'
+      pre_release_publish_command: 'yarn run ci:prepublish'
+      release_publish_command: 'yarn run ci:publish'
+      artifact_path: 'packages/**/dist'
+    secrets:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      BOT_PAT: ${{ secrets.BOT_PAT }}
