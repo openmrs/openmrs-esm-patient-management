@@ -55,7 +55,7 @@
         "columns": 1,
         "columnSpan": 1,
         "hideDashboardTitle": true,
-        "path": "Appointments",
+        "path": "appointments",
         "slot": "patient-chart-appointments-dashboard-slot",
         "title": "Appointments"
       }
