@@ -7,6 +7,10 @@ on:
     types:
       - created
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   release:
     uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/release-frontend-module.yml@main
