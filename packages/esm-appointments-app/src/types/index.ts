@@ -14,6 +14,7 @@ export interface AppointmentLocation {
 }
 
 // note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
+// Translation keys for these enum values are in src/constants.ts (scanned by extract-translations)
 export enum AppointmentStatus {
   SCHEDULED = 'Scheduled',
   CANCELLED = 'Cancelled',
@@ -183,4 +184,10 @@ export interface RecurringAppointmentsPayload {
 
 export interface PatientDetails {
   dateOfBirth: string;
+}
+
+export interface AppointmentsAppContext {
+  appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
+  isLoading: boolean;
+  error: any;
 }

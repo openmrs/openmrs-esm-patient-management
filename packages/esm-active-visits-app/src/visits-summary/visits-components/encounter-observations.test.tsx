@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { type Observation } from '../../types';
+import { type Obs } from '@openmrs/esm-framework';
 import EncounterObservations from './encounter-observations.component';
 
 describe('EncounterObservations', () => {
@@ -18,11 +18,11 @@ describe('EncounterObservations', () => {
   });
 
   test('renders observations list correctly', () => {
-    const observations = [
-      { display: 'Temperature: 98.6°F' },
-      { display: 'Blood Pressure: 120/80 mmHg' },
-      { display: 'Heart Rate: 72 bpm' },
-    ] as Array<Observation>;
+    const observations: Array<Obs> = [
+      { uuid: '1', display: 'Temperature: 98.6°F' },
+      { uuid: '2', display: 'Blood Pressure: 120/80 mmHg' },
+      { uuid: '3', display: 'Heart Rate: 72 bpm' },
+    ];
     render(<EncounterObservations observations={observations} />);
 
     expect(screen.getByText('Temperature:')).toBeInTheDocument();
