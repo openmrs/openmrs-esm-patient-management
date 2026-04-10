@@ -3,12 +3,19 @@ import { Popover, PopoverContent } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import MonthlyWorkloadView, { type MonthlyWorkloadViewProps } from './monthly-workload-view.component';
 import styles from './monthly-view-workload.scss';
+import { type Appointment } from '../../types';
 
 interface MonthlyWorkloadViewExpandedProps extends MonthlyWorkloadViewProps {
   count: number;
+  appointments: Appointment[];
 }
 
-const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({ count, events, dateTime }) => {
+const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({
+  count,
+  events,
+  dateTime,
+  appointments,
+}) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
@@ -38,7 +45,7 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
         {t('countMore', '{{count}} more', { count })}
       </button>
       <PopoverContent>
-        <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
+        <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} appointments={appointments} />
       </PopoverContent>
     </Popover>
   );

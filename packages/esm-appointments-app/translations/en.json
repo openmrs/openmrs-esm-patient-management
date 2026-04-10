@@ -71,6 +71,7 @@
   "countMore_one": "{{count}} more",
   "countMore_other": "{{count}} more",
   "createNewAppointment": "Create new appointment",
+  "daily": "Daily",
   "date": "Date",
   "dateAppointmentIssued": "Date appointment issued",
   "dateAppointmentIssuedCannotBeAfterAppointmentDate": "Date appointment issued cannot be after the appointment date",
@@ -113,6 +114,7 @@
   "missed": "Missed",
   "Missed": "Missed",
   "MON": "MON",
+  "monthly": "Monthly",
   "next": "Next",
   "nextMonth": "Next month",
   "nextPage": "Next page",
@@ -178,5 +180,6 @@
   "visitStartTime": "Visit start time",
   "WED": "WED",
   "week": "Week",
+  "weekly": "Weekly",
   "yes": "Yes"
 }
