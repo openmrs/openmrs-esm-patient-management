@@ -44,7 +44,7 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, configOverride, pat
 
     const obsNodes = obsToDisplay?.map((o) => {
       const { value } = o;
-      const display: any = (value as OpenmrsResource)?.display ?? o.value;
+      const display: string = (value as OpenmrsResource)?.display ?? String(o.value);
 
       const tooltipContent = getObsEncounterString(o, t);
       return (
