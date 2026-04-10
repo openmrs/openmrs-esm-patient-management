@@ -13,14 +13,8 @@ export interface AppointmentLocation {
   name: string;
 }
 
-// added to prevent auto-removal of translations for dynamic keys
-// t('Scheduled', 'Scheduled');
-// t('CheckedIn', 'Checked in');
-// t('Cancelled', 'Cancelled');
-// t('Missed', 'Missed');
-// t('Completed', 'Completed');
-
 // note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
+// Translation keys for these enum values are in src/constants.ts (scanned by extract-translations)
 export enum AppointmentStatus {
   SCHEDULED = 'Scheduled',
   CANCELLED = 'Cancelled',

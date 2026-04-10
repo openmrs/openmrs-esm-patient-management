@@ -40,12 +40,8 @@ import {
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
-import {
-  checkAppointmentConflict,
-  saveAppointment,
-  saveRecurringAppointments,
-  useAppointmentService,
-} from './appointments-form.resource';
+import { checkAppointmentConflict, saveAppointment, saveRecurringAppointments } from './appointments-form.resource';
+import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
 import { useProviders } from '../hooks/useProviders';
 import { useMutateAppointments } from '../hooks/useMutateAppointments';
@@ -86,7 +82,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   const session = useSession();
 
   const selectedDate = useSelectedDate();
-  const { data: services, isLoading } = useAppointmentService();
+  const { serviceTypes, isLoading } = useAppointmentServices();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
@@ -244,7 +240,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
       appointmentType: appointment?.appointmentKind || (appointmentTypes?.length === 1 ? appointmentTypes[0] : ''),
-      selectedService: appointment?.service?.name || (services?.length === 1 ? services[0].name : ''),
+      selectedService: appointment?.service?.name || (serviceTypes?.length === 1 ? serviceTypes[0].name : ''),
       recurringPatternType: defaultRecurringPatternType,
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
@@ -424,7 +420,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       isAllDayAppointment,
     } = data;
 
-    const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+    const serviceUuid = serviceTypes?.find((service) => service.name === selectedService)?.uuid;
     const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
@@ -536,13 +532,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       if (!isEditing) {
                         setValue(
                           'duration',
-                          services?.find((service) => service.name === event.target.value)?.durationMins,
+                          serviceTypes?.find((service) => service.name === event.target.value)?.durationMins,
                         );
                       } else {
-                        const previousServiceDuration = services?.find(
+                        const previousServiceDuration = serviceTypes?.find(
                           (service) => service.name === getValues('selectedService'),
                         )?.durationMins;
-                        const selectedServiceDuration = services?.find(
+                        const selectedServiceDuration = serviceTypes?.find(
                           (service) => service.name === event.target.value,
                         )?.durationMins;
                         if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
@@ -554,8 +550,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     ref={ref}
                     value={value}>
                     <SelectItem text={t('chooseService', 'Select service')} value="" />
-                    {services?.length > 0 &&
-                      services.map((service) => (
+                    {serviceTypes?.length > 0 &&
+                      serviceTypes.map((service) => (
                         <SelectItem key={service.uuid} text={service.name} value={service.name}>
                           {service.name}
                         </SelectItem>
@@ -606,7 +602,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </div>
           </FormGroup>
 
-          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Date & Time')}>
+          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Appointment time')}>
             <div className={styles.dateTimeFields}>
               {isRecurringAppointment && (
                 <div className={styles.inputContainer}>
