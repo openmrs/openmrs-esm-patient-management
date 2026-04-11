@@ -46,6 +46,7 @@ const testProps: WardPatientWorkspaceDefinition = {
   groupProps: { wardPatient: mockWardPatient },
   closeWorkspace: jest.fn(),
   launchChildWorkspace: jest.fn(),
+  showActionMenu: false,
   workspaceProps: null,
   windowProps: null,
   workspaceName: 'discharge',
@@ -76,6 +77,7 @@ describe('PatientDischargeWorkspace', () => {
   it('renders discharge workspace with note field and action buttons', () => {
     render(<PatientDischargeWorkspace {...testProps} />);
 
+    expect(screen.getByText(/discharge note \(optional\)/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write any notes here/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Confirm discharge/i })).toBeInTheDocument();
@@ -213,6 +215,25 @@ describe('PatientDischargeWorkspace', () => {
 
     await waitFor(() => {
       expect(testProps.closeWorkspace).toHaveBeenCalled();
+    });
+  });
+
+  it('shows globalErrors message when available in error response', async () => {
+    const user = userEvent.setup();
+    mockCreateEncounter.mockRejectedValueOnce({
+      responseBody: { error: { globalErrors: [{ message: 'Global validation error' }] } },
+    });
+
+    render(<PatientDischargeWorkspace {...testProps} />);
+
+    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        title: 'Error discharging patient',
+        subtitle: 'Global validation error',
+        kind: 'error',
+      });
     });
   });
 

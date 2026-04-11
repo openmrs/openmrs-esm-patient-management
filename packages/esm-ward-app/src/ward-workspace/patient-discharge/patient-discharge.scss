@@ -1,5 +1,3 @@
-@use '@carbon/colors';
-@use '@carbon/type';
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
@@ -15,19 +13,9 @@
   margin: (-(layout.$spacing-05)) (-(layout.$spacing-05)) layout.$spacing-05 (-(layout.$spacing-05));
 }
 
-.contentSwitcher {
-  margin-top: layout.$spacing-03;
-}
-
 .workspaceForm {
   margin-top: layout.$spacing-05;
   flex: 1;
-}
-
-.columnLabel {
-  @include type.type-style('heading-compact-02');
-  color: colors.$gray-70;
-  padding: layout.$spacing-02;
 }
 
 .buttonSet {
