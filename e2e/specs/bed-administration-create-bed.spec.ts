@@ -1,11 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Location } from '@openmrs/esm-framework';
 import { bedLocation, deleteBed, retireBedType } from '../commands';
-import {
-  resolveBedTagUuidByName,
-  resolveBedTypeUuidByName,
-  resolveBedUuidByNumberAndLocation,
-} from '../commands/bed-operations';
 import { test } from '../core';
 import { type BedTag, type Bed, type BedType } from '../commands/types';
 import { BedAdministrationPage } from '../pages/bed-administration-page';
@@ -19,7 +14,7 @@ test.beforeEach(async ({ api }) => {
   location = await bedLocation(api);
 });
 
-test('Create a bed with a type, tag and location', async ({ page, api }) => {
+test('Create a bed with a type, tag and location', async ({ page }) => {
   const bedAdministration = new BedAdministrationPage(page);
 
   await test.step('When I visit the Bed management page', async () => {
@@ -35,12 +30,15 @@ test('Create a bed with a type, tag and location', async ({ page, api }) => {
     const uniqueTagName = `Tag_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     await page.getByRole('button', { name: /create bed tag/i }).click();
     await bedAdministration.bedTagNameInput().fill(uniqueTagName);
+    const bedTagResponsePromise = page.waitForResponse(
+      (res) => res.url().includes('/bedTag') && res.request().method() === 'POST',
+    );
     await bedAdministration.saveButton().click();
+    const bedTagResponse = await bedTagResponsePromise;
+    const bedTagBody = await bedTagResponse.json();
+    expect(bedTagBody.uuid, 'Expected bed tag POST response to include UUID').toBeTruthy();
     await expect(page.getByText(uniqueTagName).first()).toBeVisible();
-    bedTag = { name: uniqueTagName } as BedTag;
-    const bedTagUuid = await resolveBedTagUuidByName(api, bedTag.name);
-    expect(bedTagUuid, 'Expected to resolve bed tag UUID after creating tag via UI').toBeTruthy();
-    (bedTag as any).uuid = bedTagUuid as string;
+    bedTag = { name: uniqueTagName, uuid: bedTagBody.uuid } as BedTag;
   });
 
   await test.step('And I open the Bed types page', async () => {
@@ -59,12 +57,15 @@ test('Create a bed with a type, tag and location', async ({ page, api }) => {
     await bedAdministration.bedNameInput().fill(uniqueTypeName);
     await bedAdministration.displayNameInput().fill(displayName);
     await bedAdministration.descriptionInput().fill(description);
+    const bedTypeResponsePromise = page.waitForResponse(
+      (res) => res.url().includes('/bedtype') && res.request().method() === 'POST',
+    );
     await bedAdministration.saveButton().click();
+    const bedTypeResponse = await bedTypeResponsePromise;
+    const bedTypeBody = await bedTypeResponse.json();
+    expect(bedTypeBody.uuid, 'Expected bed type POST response to include UUID').toBeTruthy();
     await expect(page.getByText(displayName).first()).toBeVisible();
-    bedType = { name: uniqueTypeName, displayName, description } as BedType;
-    const bedTypeUuid = await resolveBedTypeUuidByName(api, bedType.name);
-    expect(bedTypeUuid, 'Expected to resolve bed type UUID after creating type via UI').toBeTruthy();
-    (bedType as any).uuid = bedTypeUuid as string;
+    bedType = { name: uniqueTypeName, displayName, description, uuid: bedTypeBody.uuid } as BedType;
   });
 
   await test.step('And I open the Bed administration page', async () => {
@@ -108,12 +109,16 @@ test('Create a bed with a type, tag and location', async ({ page, api }) => {
   });
 
   await test.step('Then I should see the new bed listed with correct details', async () => {
+    const bedResponsePromise = page.waitForResponse(
+      (res) => res.url().includes('/bed') && res.request().method() === 'POST',
+    );
     await bedAdministration.saveAndCloseButton().click();
+    const bedResponse = await bedResponsePromise;
+    const bedBody = await bedResponse.json();
+    expect(bedBody.uuid, 'Expected bed POST response to include UUID').toBeTruthy();
     const table = page.getByRole('table');
     await expect(table).toContainText(bed.bedNumber);
-    const bedUuid = await resolveBedUuidByNumberAndLocation(api, bed.bedNumber, location.uuid);
-    expect(bedUuid, 'Expected to resolve bed UUID after creating bed via UI').toBeTruthy();
-    (bed as any).uuid = bedUuid as string;
+    (bed as any).uuid = bedBody.uuid as string;
   });
 });
 

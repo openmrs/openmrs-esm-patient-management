@@ -1,4 +1,27 @@
 @use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.errorState {
+  margin: layout.$spacing-05;
+}
+
+.emptyState {
+  border: 1px solid $ui-03;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: layout.$spacing-05;
+  padding: layout.$spacing-09;
+  text-align: center;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: var(--cds-text-secondary);
+  margin-top: layout.$spacing-05;
+}
 
 .gridFlow {
   display: flex;

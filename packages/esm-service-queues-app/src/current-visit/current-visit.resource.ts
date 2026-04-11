@@ -3,7 +3,7 @@ import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { type ConceptMetadata } from './hooks/useVitalsConceptMetadata';
 import { type ObsMetaInfo } from '../types/index';
 
-export function useVisit(visitUuid: string) {
+export function useVisit(visitUuid?: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
     // Use default representation for orders to safely include subclass-specific fields (e.g., DrugOrder)

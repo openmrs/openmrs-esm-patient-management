@@ -264,11 +264,64 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   await test.step('Then I should see a success message confirming the appointment was edited', async () => {
     await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
+
+  await test.step('When I select the appointment from the appointments table', async () => {
+    await page
+      .getByRole('row', { name: firstName + ' ' + lastName })
+      .locator('label')
+      .click();
+  });
+
+  await test.step('And I click the "Change status" button', async () => {
+    await page.getByRole('button', { name: 'Change status' }).click();
+  });
+
+  await test.step('Then the bulk status change modal should appear', async () => {
+    await expect(page.getByRole('heading', { name: 'Change appointments status' })).toBeVisible();
+  });
+  await test.step('When I select "Completed" as the new status', async () => {
+    await page.getByRole('combobox', { name: 'Select status' }).click();
+    await page.getByRole('option', { name: 'Completed' }).locator('div').click();
+  });
+
+  await test.step('And I click the "Save and close" button in the modal', async () => {
+    await page.getByRole('button', { name: 'Save and close' }).click();
+  });
+
+  await test.step('Then I should see a success message confirming the appointment status was changed', async () => {
+    await expect(page.getByText('Appointments for selected patients have been successfully updated')).toBeVisible();
+  });
+
+  await test.step('Then the row should still be visible in the appointments table, but with status "Completed"', async () => {
+    const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
+    await expect(appointmentRow).toHaveCount(1);
+    await expect(appointmentRow.getByText('Completed')).toBeVisible();
+  });
+
+  await test.step("When I filter the appointments table by 'Missed' status", async () => {
+    await page.getByText('Filter appointments by status').click();
+    await page.getByRole('option', { name: 'Missed' }).locator('label').click();
+  });
+
+  await test.step('Then the row should not be visible in the appointments table', async () => {
+    const appointmentRow = page.getByRole('row', { name: firstName + ' ' + lastName });
+    await expect(appointmentRow).toHaveCount(0);
+  });
+
+  await test.step('When I reload the page', async () => {
+    await page.reload();
+  });
+
+  await test.step("Then the status filter should still be 'Missed'", async () => {
+    await page.getByText('Filter appointments by status').click();
+    await expect(page.getByRole('option', { name: 'Missed' }).getByRole('checkbox')).toBeChecked();
+  });
 });
 
-test.afterEach(async ({ api }) => {
+test.afterEach(async ({ api, page }) => {
   if (visit) {
     await endVisit(api, visit.uuid);
     visit = undefined;
   }
+  await page.evaluate(() => window.sessionStorage.clear());
 });

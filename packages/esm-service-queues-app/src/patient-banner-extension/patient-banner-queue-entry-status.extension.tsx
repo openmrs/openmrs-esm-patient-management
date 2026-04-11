@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { type ConfigObject, isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -15,10 +15,12 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
+
+  const isPatientChart = renderedFrom === 'patient-chart';
+
   const queueEntry = queueEntries?.[0];
   const config = useConfig<ConfigObject>();
 
-  const isPatientChart = renderedFrom === 'patient-chart';
   if (!isPatientChart || !queueEntry) {
     return null;
   }

@@ -1,12 +1,10 @@
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { queueEntryCustomRepresentation } from '../../constants';
 import { type QueueEntry } from '../../types';
 
 export function useLatestQueueEntry(patientUuid: string) {
-  const customRepresentation =
-    'custom:(uuid,display,queue:(uuid,display,name,location:(uuid,display),service:(uuid,display),allowedPriorities:(uuid,display),allowedStatuses:(uuid,display)),status,patient:(uuid,display),visit:(uuid,display,startDatetime),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
-
-  const encodedRepresentation = encodeURIComponent(customRepresentation);
+  const encodedRepresentation = encodeURIComponent(queueEntryCustomRepresentation);
   const url = `${restBaseUrl}/queue-entry?v=${encodedRepresentation}&patient=${patientUuid}&isEnded=false`;
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: QueueEntry[] }>>(url, openmrsFetch);
 

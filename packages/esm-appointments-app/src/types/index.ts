@@ -14,6 +14,7 @@ export interface AppointmentLocation {
 }
 
 // note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
+// Translation keys for these enum values are in src/constants.ts (scanned by extract-translations)
 export enum AppointmentStatus {
   SCHEDULED = 'Scheduled',
   CANCELLED = 'Cancelled',
@@ -34,12 +35,12 @@ export interface Appointment {
   comments: string;
   endDateTime: Date | number | any;
   location: AppointmentLocation;
+  // note: this is not a standard OpenMRS Patient object
   patient: {
     identifier: string;
-    identifiers: Array<Identifier>;
     name: string;
     uuid: string;
-    age?: string;
+    age?: number;
     gender?: string;
   };
   provider: OpenmrsResource;
@@ -130,7 +131,7 @@ export interface AppointmentPayload {
 
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
-  missedAppointmentsCount;
+  missedAppointmentsCount: number;
   appointmentDate: number;
   appointmentServiceUuid: string;
 }
@@ -183,4 +184,10 @@ export interface RecurringAppointmentsPayload {
 
 export interface PatientDetails {
   dateOfBirth: string;
+}
+
+export interface AppointmentsAppContext {
+  appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
+  isLoading: boolean;
+  error: any;
 }
