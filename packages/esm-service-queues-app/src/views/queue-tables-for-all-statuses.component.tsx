@@ -132,7 +132,7 @@ function QueueTableForQueueAndStatus({
     showToast({
       title: t('invalidtableConfig', 'Invalid table configuration'),
       kind: 'warning',
-      description: 'No table columns defined by queue ' + queue.uuid + ' and status ' + statusUuid,
+      description: `No table columns defined by queue ${queue.uuid} and status ${statusUuid}`,
     });
   }
 
