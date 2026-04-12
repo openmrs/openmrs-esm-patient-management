@@ -114,7 +114,7 @@ export default function PatientDischargeWorkspace({
               <TextArea
                 value={dischargeNote}
                 onChange={(e) => setDischargeNote(e.target.value)}
-                labelText={t('dischargeNote', 'Discharge Note (optional)')}
+                labelText={t('dischargeNote', 'Discharge note (optional)')}
                 placeholder={t('dischargeNotePlaceholder', 'Write any notes here')}
               />
             </ResponsiveWrapper>
@@ -130,9 +130,9 @@ export default function PatientDischargeWorkspace({
                 isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient?.patient
               }>
               {isSubmitting ? (
-                <InlineLoading description={t('discharging', 'Discharging') + '...'} />
+                <InlineLoading description={t('discharging', 'discharging') + '...'} />
               ) : (
-                <span>{t('confirmDischarge', 'Confirm Discharge')}</span>
+                <span>{t('confirmDischarge', 'Confirm discharge')}</span>
               )}
             </Button>
           </ButtonSet>
