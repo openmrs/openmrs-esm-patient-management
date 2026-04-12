@@ -1,5 +1,5 @@
 import camelCase from 'lodash-es/camelCase';
-import { parseDate } from '@openmrs/esm-framework';
+import { parseDate , navigate } from '@openmrs/esm-framework';
 import {
   type Encounter,
   type FormValues,
@@ -16,7 +16,7 @@ export function scrollIntoView(viewId: string) {
 }
 
 export function cancelRegistration() {
-  window.history.back();
+  navigate({ to: `${window.getOpenmrsSpaBase()}home` });
 }
 
 export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
