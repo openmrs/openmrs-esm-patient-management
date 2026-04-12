@@ -77,7 +77,7 @@ describe('PatientDischargeWorkspace', () => {
   it('renders discharge workspace with note field and action buttons', () => {
     render(<PatientDischargeWorkspace {...testProps} />);
 
-    expect(screen.getByText(/discharge note \(optional\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Discharge note \(optional\)/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write any notes here/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Confirm discharge/i })).toBeInTheDocument();
