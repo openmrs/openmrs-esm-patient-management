@@ -114,3 +114,11 @@ html[dir='rtl'] {
     padding-right: layout.$spacing-07;
   }
 }
+
+/* Hide unselectable adjacent month padding dates in the React-Aria DatePicker */
+:global(td[data-outside-month]),
+:global([data-outside-month]) {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
