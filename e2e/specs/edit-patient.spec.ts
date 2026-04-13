@@ -78,7 +78,7 @@ test('Edit a patient', async ({ page, api, patient }) => {
   });
 
   await test.step("Then I should be redirected to the patient's chart page and the patient object should have updated information", async () => {
-    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`);
+    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`);
     const updatedPatient = await getPatient(api, patient.uuid);
     const { person } = updatedPatient;
     const { givenName, middleName, familyName, sex } = formValues;

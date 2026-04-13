@@ -92,6 +92,11 @@
   max-width: none;
 }
 
+.actionsCell {
+  display: flex;
+  align-items: center;
+}
+
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;

@@ -71,7 +71,7 @@ export default function WaitingPatientsExtension() {
       <MetricsCardBody>
         <MetricsCardItem
           label={t('patients', 'Patients')}
-          value={initialSelectedItem ? (totalCount ?? '--') : serviceCount}
+          value={initialSelectedItem ? (isNaN(totalCount) ? '--' : totalCount) : serviceCount}
         />
         <MetricsCardItem label={t('urgent', 'Urgent')} value={urgentCount > 0 ? urgentCount : null} color="red" small />
       </MetricsCardBody>
