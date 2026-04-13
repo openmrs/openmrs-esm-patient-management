@@ -62,7 +62,8 @@ const UnscheduledAppointments: React.FC = () => {
         {visit.name}
       </ConfigurableLink>
     ),
-    gender: visit.gender === 'F' ? 'Female' : 'Male',
+    gender:
+      visit.gender === 'F' ? t('female', 'Female') : visit.gender === 'M' ? t('male', 'Male') : t('other', 'Other'),
     phoneNumber: visit.phoneNumber === '' ? '--' : visit.phoneNumber,
     identifier: visit?.identifier,
   }));
