@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
@@ -11,10 +11,6 @@ const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-
-  useEffect(() => {
-    setCalendarSelectedDate(dayjs(selectedDate));
-  }, [selectedDate]);
 
   const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), 'monthly');
 
