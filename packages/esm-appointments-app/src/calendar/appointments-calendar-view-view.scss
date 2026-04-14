@@ -21,3 +21,9 @@
   min-height: calc(100vh - 80px);
   background-color: colors.$white;
 }
+
+.viewSwitcher {
+  padding: layout.$spacing-03 layout.$spacing-05;
+  display: flex;
+  justify-content: flex-end;
+}

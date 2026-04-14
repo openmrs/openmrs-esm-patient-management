@@ -1,0 +1,37 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+// Nav row — identical to monthly-header.scss .container
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-10;
+}
+
+// Day-name row — identical to monthly-header.scss .workLoadCard + days-of-week.scss .tileContainer
+.dayNames {
+  display: flex;
+  color: colors.$black;
+}
+
+.dayNameCell {
+  height: layout.$spacing-10;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+  border-right: none;
+
+  &:last-child {
+    border-right: 1px solid colors.$gray-20;
+  }
+
+  & > span {
+    font-size: layout.$spacing-05;
+    color: colors.$gray-70;
+  }
+}
