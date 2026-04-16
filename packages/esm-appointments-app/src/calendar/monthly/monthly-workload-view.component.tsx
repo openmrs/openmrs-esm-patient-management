@@ -1,13 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
+import { Modal } from '@carbon/react';
 import { User } from '@carbon/react/icons';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { spaHomePage } from '../../constants';
+import { useLayoutType } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
+import { useAppointmentsStore } from '../../store';
+import AppointmentsList from '../../appointments/scheduled/appointments-list.component';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
-import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -17,92 +20,116 @@ export interface MonthlyWorkloadViewProps {
 }
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
-  const selectedDate = useSelectedDate();
+  const { selectedDate } = useAppointmentsStore(); // ✅ replaces useSelectedDate()
 
-  const currentData = useMemo(
-    () =>
-      events?.find(
-        (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),
-      ),
-    [dateTime, events],
-  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const formattedDate = useMemo(() => dateTime.format('YYYY-MM-DD'), [dateTime]);
+  const formattedDisplayDate = useMemo(() => dateTime.format('DD MMM YYYY'), [dateTime]);
+
+  const isCurrentMonth = useMemo(() => isSameMonth(dateTime, dayjs(selectedDate)), [dateTime, selectedDate]);
+
+  const serviceLimit = layout === 'small-desktop' ? 2 : 4;
+
+  const currentData = useMemo(() => {
+    return events?.find((event) => dayjs(event.appointmentDate).format('YYYY-MM-DD') === formattedDate);
+  }, [events, formattedDate]);
+
+  const services = useMemo(() => currentData?.services ?? [], [currentData]);
 
   const visibleServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return currentData.services;
-      return currentData.services.slice(0, layout === 'small-desktop' ? 2 : 4);
-    }
-    return [];
-  }, [currentData, showAllServices, layout]);
+    if (showAllServices) return services;
+    return services.slice(0, serviceLimit);
+  }, [services, showAllServices, serviceLimit]);
 
   const hasHiddenServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return false;
-      return layout === 'small-desktop' ? currentData.services.length > 2 : currentData.services.length > 4;
-    }
-    return false;
-  }, [currentData?.services, layout, showAllServices]);
+    if (showAllServices) return false;
+    return services.length > serviceLimit;
+  }, [services.length, showAllServices, serviceLimit]);
 
-  const navigateToAppointmentsByDate = (serviceUuid: string) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
-  };
+  const totalAppointments = useMemo(() => {
+    return services.reduce((sum, { count = 0 }) => sum + count, 0);
+  }, [services]);
+
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        openModal();
+      }
+    },
+    [openModal],
+  );
 
   return (
-    <div
-      onClick={() => navigateToAppointmentsByDate('')}
-      className={classNames(
-        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
-        showAllServices
-          ? {}
-          : {
-              [styles.smallDesktop]: layout === 'small-desktop',
-              [styles.largeDesktop]: layout !== 'small-desktop',
-            },
-      )}>
-      {isSameMonth(dateTime, dayjs(selectedDate)) && (
-        <div>
-          <span className={classNames(styles.totals)}>
-            {currentData?.services ? (
-              <div role="button" tabIndex={0}>
-                <User size={16} />
-                <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
-              </div>
-            ) : (
-              <div />
-            )}
-            <b className={styles.calendarDate}>{dateTime.format('D')}</b>
-          </span>
-          {currentData?.services && (
-            <div className={styles.currentData}>
-              {visibleServices.map(({ serviceName, serviceUuid, count }, i) => (
-                <div
-                  key={`${serviceUuid}-${count}-${i}`}
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateToAppointmentsByDate(serviceUuid);
-                  }}
-                  className={styles.serviceArea}>
-                  <span>{serviceName}</span>
-                  <span>{count}</span>
+    <>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={openModal}
+        onKeyDown={handleKeyDown}
+        className={classNames(
+          styles[isCurrentMonth ? 'monthly-cell' : 'monthly-cell-disabled'],
+          !showAllServices && {
+            [styles.smallDesktop]: layout === 'small-desktop',
+            [styles.largeDesktop]: layout !== 'small-desktop',
+          },
+        )}>
+        {isCurrentMonth && (
+          <div>
+            <span className={styles.totals}>
+              {services.length > 0 ? (
+                <div role="button" tabIndex={0}>
+                  <User size={16} />
+                  <span>{totalAppointments}</span>
                 </div>
-              ))}
-              {hasHiddenServices ? (
-                <MonthlyWorkloadViewExpanded
-                  count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
-                  events={events}
-                  dateTime={dateTime}
-                />
               ) : (
-                ''
+                <div />
               )}
-            </div>
-          )}
-        </div>
+              <b className={styles.calendarDate}>{dateTime.format('D')}</b>
+            </span>
+
+            {services.length > 0 && (
+              <div className={styles.currentData}>
+                {visibleServices.map(({ serviceName, serviceUuid, count }, index) => (
+                  <div
+                    key={`${serviceUuid}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => e.stopPropagation()}
+                    className={styles.serviceArea}>
+                    <span>{serviceName}</span>
+                    <span>{count}</span>
+                  </div>
+                ))}
+
+                {hasHiddenServices && (
+                  <MonthlyWorkloadViewExpanded
+                    count={services.length - serviceLimit}
+                    events={events}
+                    dateTime={dateTime}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {isModalOpen && (
+        <Modal
+          open={isModalOpen}
+          modalHeading={t('appointmentsFor', 'Appointments for {{date}}', { date: formattedDisplayDate })}
+          passiveModal
+          onRequestClose={closeModal}>
+          <AppointmentsList date={dateTime.format('YYYY-MM-DDTHH:mm:ss.SSSZZ')} />
+        </Modal>
       )}
-    </div>
+    </>
   );
 };
 
