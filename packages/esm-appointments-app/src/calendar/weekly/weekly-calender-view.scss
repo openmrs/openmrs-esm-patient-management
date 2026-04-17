@@ -1,0 +1,7 @@
+@use '@carbon/colors';
+
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-top: 1px solid colors.$gray-20;
+}

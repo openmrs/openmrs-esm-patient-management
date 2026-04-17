@@ -1,0 +1,104 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// .container {
+//   margin: layout.$spacing-05 0;
+// }
+
+.summaryBar {
+  display: flex;
+  align-items: baseline;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-04 0;
+  border-bottom: 2px solid colors.$gray-20;
+  margin-bottom: layout.$spacing-03;
+}
+
+.totalCount {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+}
+
+.dateSubtitle {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.emptyNotice {
+  margin-top: layout.$spacing-05;
+}
+
+.appointmentsList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid colors.$gray-20;
+}
+
+// Each appointment row
+.appointmentRow {
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  border-bottom: 1px solid colors.$gray-20;
+  background-color: colors.$white;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+}
+
+// Time column — start and end time stacked
+.timeColumn {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+}
+
+.startTime {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-100;
+  font-weight: 600;
+}
+
+.endTime {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+// Patient name, service, provider stacked
+.detailsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+  min-width: 0; // needed for text-overflow to work inside a grid cell
+}
+
+.patientName {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-100;
+  font-weight: 600;
+}
+
+.serviceLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.providerLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+// Status tag sits on the right
+.statusColumn {
+  display: flex;
+  justify-content: flex-end;
+}
