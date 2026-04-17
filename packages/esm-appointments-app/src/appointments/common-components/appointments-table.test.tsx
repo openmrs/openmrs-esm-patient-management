@@ -76,17 +76,14 @@ describe('AppointmentsTable', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       customPatientChartUrl: 'url-to-patient-chart',
-      checkInButton: { enabled: false, showIfActiveVisit: false, customUrl: null },
+      checkInButton: { enabled: false, customUrl: null },
       checkOutButton: { enabled: false, customUrl: null },
     });
   });
 
   it('renders an empty state if appointments data is unavailable', async () => {
     renderAppointmentsTable();
-
-    await screen.findByRole('heading', { name: /scheduled appointment/i });
-
-    expect(getByTextWithMarkup('There are no appointments to display')).toBeInTheDocument();
+    expect(getByTextWithMarkup('No appointments to display')).toBeInTheDocument();
   });
 
   it('renders a loading state when fetching data', () => {
@@ -98,7 +95,6 @@ describe('AppointmentsTable', () => {
   it('renders a tabular overview of the scheduled appointments', async () => {
     renderAppointmentsTable({ appointments: mockAppointments });
 
-    await screen.findByRole('heading', { name: /scheduled appointment/i });
     expect(screen.getByRole('search', { name: /filter table/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download/i })).toBeInTheDocument();
     expect(screen.getByRole('row', { name: /john wilson 100gej hiv clinic outpatient/i })).toBeInTheDocument();
@@ -110,8 +106,6 @@ describe('AppointmentsTable', () => {
     const user = userEvent.setup();
 
     renderAppointmentsTable({ appointments: mockAppointments });
-
-    await screen.findByRole('heading', { name: /scheduled appointment/i });
     const searchInput = screen.getByRole('searchbox');
     await user.type(searchInput, 'John');
     expect(searchInput).toHaveValue('John');
@@ -122,7 +116,6 @@ describe('AppointmentsTable', () => {
 
     renderAppointmentsTable({ appointments: mockAppointments });
 
-    await screen.findByRole('heading', { name: /scheduled appointment/i });
     const downloadButton = screen.getByRole('button', { name: /download/i });
     await user.click(downloadButton);
     expect(downloadButton).toBeInTheDocument();
