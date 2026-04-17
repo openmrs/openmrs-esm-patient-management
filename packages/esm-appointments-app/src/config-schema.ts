@@ -10,7 +10,7 @@ export const configSchema = {
   allowPastTimeAppointments: {
     _type: Type.Boolean,
     _default: false,
-    _description: 'Allows bypassing past time validation for retrospective data entry.',
+    _description: 'Allows bypassing past time validation for retrospective data entry',
   },
   appointmentStatuses: {
     _type: Type.Array,
