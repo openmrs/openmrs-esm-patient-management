@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "labelColon": "{{label}}:",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "Male",
   "manage": "Manage",
   "minutes_one": "{{count}} minutes",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "No pending admission requests",
   "note": "Note",
   "noteDeletedSuccessfully": "Note deleted successfully",
+  "noteEditHistory": "Note edit history",
   "notes": "Notes",
   "notesRequiredForCancellingRequest": "Notes required for cancelling admission or transfer request",
   "orderBasket": "Order basket",
@@ -137,8 +139,10 @@
   "typeOfTransfer": "Type of transfer",
   "unknown": "Unknown",
   "unknownError": "An unknown error occurred",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "Patient note saved",
   "wardClinicalNotePlaceholder": "Write any notes here",
   "wardPatient": "Ward patient",
-  "wards": "Wards"
+  "wards": "Wards",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }

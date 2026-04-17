@@ -55,10 +55,6 @@ interface InPatientNoteProps {
  */
 const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes, promptBeforeClosing }) => {
   const { t } = useTranslation();
-  const formattedDate = note.encounterNoteRecordedAt
-    ? dayjs(note.encounterNoteRecordedAt).format('dddd, D MMM YYYY')
-    : '';
-  const formattedTime = note.encounterNoteRecordedAt ? dayjs(note.encounterNoteRecordedAt).format('HH:mm') : '';
   const [editMode, setEditMode] = useState(false);
   const [editedNote, setEditedNote] = useState(note.encounterNote);
   const isTablet = !isDesktop(useLayoutType());
@@ -98,9 +94,6 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
     <div className={styles.noteTile}>
       <Stack gap={4}>
         <div className={styles.noteHeader}>
-          <span className={styles.noteDateAndTime}>
-            {formattedDate}, {formattedTime}
-          </span>
           {isInpatientNoteEncounter && (
             <OverflowMenu className={styles.overflowMenu} flipped>
               {!editMode && note.obsUuid && (
@@ -112,6 +105,19 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                   itemText={getCoreTranslation('edit')}
                   onClick={() => {
                     setEditMode(true);
+                  }}
+                />
+              )}
+              {note.isEdited && (
+                <OverflowMenuItem
+                  id={'view-history-' + note.encounterUuid}
+                  className={styles.menuItem}
+                  itemText={t('viewEditHistory', 'View edit history')}
+                  onClick={() => {
+                    const dispose = showModal('note-history-modal', {
+                      close: () => dispose(),
+                      note,
+                    });
                   }}
                 />
               )}
@@ -161,7 +167,20 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
         ) : (
           <>
             <div className={styles.noteBody}>{note.encounterNote}</div>
-            <div className={styles.noteProviderName}>{note.encounterProvider}</div>
+            <div className={styles.noteProviderName}>
+              {t('writtenBy', 'Written by: {{name}}, {{date}}', {
+                name: note.encounterProvider,
+                date: dayjs(note.encounterNoteRecordedAt).format('D MMM YYYY, HH:mm'),
+              })}
+            </div>
+            {note.isEdited && note.lastEditedBy && (
+              <div className={styles.noteEditedBy}>
+                {t('lastEditedBy', 'Last edited by: {{name}}, {{date}}', {
+                  name: note.lastEditedBy,
+                  date: dayjs(note.lastEditedAt).format('D MMM YYYY, HH:mm'),
+                })}
+              </div>
+            )}
           </>
         )}
       </Stack>

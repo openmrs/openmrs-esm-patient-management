@@ -26,7 +26,7 @@ export function editPatientNote(obsUuid: string, note: string) {
 
 export function usePatientNotes(patientUuid: string, visitUuid: string, conceptUuids: Array<string>): UsePatientNotes {
   const customRepresentation =
-    'custom:(uuid,patient:(uuid),obs:(uuid,concept:(uuid),obsDatetime,value:(uuid)),encounterType,' +
+    'custom:(uuid,patient:(uuid),obs:(uuid,concept:(uuid),obsDatetime,value:(uuid),previousVersions:(value,obsDatetime,creator),creator),encounterType,' +
     'encounterProviders:(uuid,provider:(uuid,person:(uuid,display)))';
   const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&visit=${visitUuid}&v=${customRepresentation}`;
 
@@ -45,10 +45,20 @@ export function usePatientNotes(patientUuid: string, visitUuid: string, conceptU
                     encounterUuid: encounter.uuid,
                     obsUuid: obs.uuid,
                     encounterNote: obs ? obs.value : '',
-                    encounterNoteRecordedAt: obs ? obs.obsDatetime : '',
+                    encounterNoteRecordedAt: obs.previousVersions?.length
+                      ? obs.previousVersions[obs.previousVersions.length - 1].obsDatetime
+                      : obs.obsDatetime,
                     encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
                     conceptUuid: obs.concept.uuid,
                     encounterTypeUuid: encounter.encounterType.uuid,
+                    isEdited: (obs.previousVersions?.length ?? 0) > 0,
+                    lastEditedBy: obs.creator?.person?.display ?? obs.creator?.display ?? '',
+                    lastEditedAt: obs.obsDatetime,
+                    editHistory: (obs.previousVersions ?? []).map((v) => ({
+                      note: v.value as string,
+                      recordedAt: v.obsDatetime,
+                      recordedBy: v.creator?.person?.display ?? v.creator?.display ?? '',
+                    })),
                   });
                 }
                 return acc;

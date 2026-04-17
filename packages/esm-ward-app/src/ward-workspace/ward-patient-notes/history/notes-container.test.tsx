@@ -27,6 +27,10 @@ const mockPatientNotes: PatientNote[] = [
     obsUuid: 'obsUuid1',
     conceptUuid: 'concept1',
     encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
+    isEdited: false,
+    lastEditedBy: '',
+    lastEditedAt: '2024-08-01T12:34:56Z',
+    editHistory: [],
   },
   {
     encounterUuid: 'note-2',
@@ -36,8 +40,32 @@ const mockPatientNotes: PatientNote[] = [
     obsUuid: 'obsUuid2',
     conceptUuid: 'concept1',
     encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
+    isEdited: false,
+    lastEditedBy: '',
+    lastEditedAt: '2024-08-02T14:22:00Z',
+    editHistory: [],
   },
 ];
+
+const mockEditedPatientNote: PatientNote = {
+  encounterUuid: 'note-3',
+  encounterNote: 'Updated: Patient is recovering well.',
+  encounterNoteRecordedAt: '2024-08-03T09:00:00Z',
+  encounterProvider: 'Dr. John Doe',
+  obsUuid: 'obsUuid3',
+  conceptUuid: 'concept1',
+  encounterTypeUuid: 'inpatientNoteEncounterTypeUuid',
+  isEdited: true,
+  lastEditedBy: 'Dr. Jane Smith',
+  lastEditedAt: '2024-08-04T11:00:00Z',
+  editHistory: [
+    {
+      note: 'Original: Patient is stable.',
+      recordedAt: '2024-08-03T09:00:00Z',
+      recordedBy: 'Dr. John Doe',
+    },
+  ],
+};
 
 describe('PatientNotesHistory', () => {
   beforeEach(() => {
@@ -85,8 +113,29 @@ describe('PatientNotesHistory', () => {
     expect(screen.getByText('History')).toBeInTheDocument();
 
     expect(screen.getByText('Patient shows improvement with current medication.')).toBeInTheDocument();
-    expect(screen.getByText('Dr. John Doe')).toBeInTheDocument();
+    expect(screen.getByText(/Dr\. John Doe/)).toBeInTheDocument();
     expect(screen.getByText('Blood pressure is slightly elevated. Consider adjusting medication.')).toBeInTheDocument();
-    expect(screen.getByText('Dr. Jane Smith')).toBeInTheDocument();
+    expect(screen.getByText(/Dr\. Jane Smith/)).toBeInTheDocument();
+  });
+
+  test('displays "Last edited by" for an edited note', () => {
+    mockedUseEmrConfiguration.mockReturnValue({
+      emrConfiguration: emrConfigurationMock,
+      mutateEmrConfiguration: jest.fn(),
+      isLoadingEmrConfiguration: false,
+      errorFetchingEmrConfiguration: null,
+    });
+
+    mockedUsePatientNotes.mockReturnValue({
+      patientNotes: [mockEditedPatientNote],
+      isLoadingPatientNotes: false,
+      errorFetchingPatientNotes: undefined,
+      mutatePatientNotes: jest.fn(),
+    });
+
+    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
+
+    expect(screen.getByText('Updated: Patient is recovering well.')).toBeInTheDocument();
+    expect(screen.getByText(/Last edited by:.*Dr\. Jane Smith/)).toBeInTheDocument();
   });
 });
