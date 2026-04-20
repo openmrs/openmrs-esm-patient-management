@@ -21,7 +21,7 @@ const DaysOfWeekCard: React.FC<DaysOfWeekProps> = ({ dayOfWeek }) => {
   const { t } = useTranslation();
   const isToday = dayjs(new Date()).format('ddd').toUpperCase() === dayOfWeek;
   return (
-    <div tabIndex={0} role="button" className={styles.tileContainer}>
+    <div className={styles.tileContainer}>
       <span className={classNames({ [styles.bold]: isToday })}>{t(dayOfWeek)}</span>
     </div>
   );

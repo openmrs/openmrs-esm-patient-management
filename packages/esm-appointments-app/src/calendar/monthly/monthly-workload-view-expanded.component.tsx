@@ -12,6 +12,7 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = useCallback((event) => {
     if (popoverRef.current && !popoverRef.current.contains(event.target)) {
@@ -27,6 +28,12 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
     };
   }, [handleClickOutside]);
 
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      contentRef.current.focus();
+    }
+  }, [isOpen]);
+
   return (
     <Popover open={isOpen} align="top" ref={popoverRef}>
       <button
@@ -38,7 +45,9 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
         {t('countMore', '{{count}} more', { count })}
       </button>
       <PopoverContent>
-        <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
+        <div ref={contentRef} tabIndex={-1}>
+          <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
+        </div>
       </PopoverContent>
     </Popover>
   );
