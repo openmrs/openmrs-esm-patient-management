@@ -1,7 +1,7 @@
 # Appointment Entity Analysis
 
 **Updated Date:** 2026-04-17  
-**Analyzed By:** Technical Documentation Specialist (Paige)
+**Analyzed By:** Technical Documentation Specialist (TrangN)
 
 ---
 
