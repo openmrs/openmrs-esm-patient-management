@@ -69,6 +69,10 @@ export interface OpenmrsCohort {
   type?: string;
   size: number;
   cohortType?: CohortType;
+  creator?: {
+    uuid: string;
+    display: string;
+  };
 }
 
 export interface OpenmrsCohortRef {
