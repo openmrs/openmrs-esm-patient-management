@@ -59,7 +59,6 @@ export default function PatientDischargeWorkspace({
 
         closeWorkspace({ discardUnsavedChanges: true });
         closeWorkspaceGroup2();
-        wardPatientGroupDetails?.mutate?.();
       } catch (err) {
         const message =
           err?.responseBody?.error?.globalErrors?.[0]?.message ||
@@ -74,6 +73,7 @@ export default function PatientDischargeWorkspace({
         });
       } finally {
         setIsSubmitting(false);
+        wardPatientGroupDetails?.mutate?.();
       }
     },
     [createEncounter, wardPatient, emrConfiguration, dischargeNote, t, closeWorkspace, wardPatientGroupDetails],
@@ -84,7 +84,7 @@ export default function PatientDischargeWorkspace({
   }
 
   return (
-    <Workspace2 title={t('discharge', 'Discharge')}>
+    <Workspace2 title={t('discharge', 'Discharge')} hasUnsavedChanges={dischargeNote.length > 0}>
       <div className={styles.workspaceContent}>
         <div className={styles.patientWorkspaceBanner}>
           <WardPatientWorkspaceBanner wardPatient={wardPatient} />
@@ -130,7 +130,7 @@ export default function PatientDischargeWorkspace({
                 isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient?.patient
               }>
               {isSubmitting ? (
-                <InlineLoading description={t('discharging', 'discharging') + '...'} />
+                <InlineLoading description={t('discharging', 'Discharging...')} />
               ) : (
                 <span>{t('confirmDischarge', 'Confirm discharge')}</span>
               )}

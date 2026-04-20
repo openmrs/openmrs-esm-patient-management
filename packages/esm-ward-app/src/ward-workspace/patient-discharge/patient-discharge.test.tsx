@@ -182,7 +182,7 @@ describe('PatientDischargeWorkspace', () => {
 
     // Button should show loading state
     await waitFor(() => {
-      expect(screen.getByText(/discharging/i)).toBeInTheDocument();
+      expect(screen.getByText(/Discharging/i)).toBeInTheDocument();
     });
 
     await waitFor(() => {
@@ -207,7 +207,7 @@ describe('PatientDischargeWorkspace', () => {
 
     // Wait for loading state to appear, then check if cancel button is disabled
     await waitFor(() => {
-      expect(screen.getByText(/discharging/i)).toBeInTheDocument();
+      expect(screen.getByText(/Discharging/i)).toBeInTheDocument();
     });
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -276,7 +276,7 @@ describe('PatientDischargeWorkspace', () => {
     });
   });
 
-  it('does not call mutate when discharge fails', async () => {
+  it('calls mutate when discharge fails', async () => {
     const user = userEvent.setup();
     mockCreateEncounter.mockRejectedValueOnce({ message: 'Network issue' });
 
@@ -290,7 +290,7 @@ describe('PatientDischargeWorkspace', () => {
       expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
     });
 
-    expect(mockWardPatientMutate).not.toHaveBeenCalled();
+    expect(mockWardPatientMutate).toHaveBeenCalled();
   });
 
   it('re-enables buttons after failed discharge', async () => {
