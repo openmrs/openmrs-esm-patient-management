@@ -8,7 +8,12 @@ interface MonthlyWorkloadViewExpandedProps extends MonthlyWorkloadViewProps {
   count: number;
 }
 
-const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({ count, events, dateTime }) => {
+const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({
+  count,
+  events,
+  dateTime,
+  calendarSelectedDate,
+}) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
@@ -38,7 +43,12 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
         {t('countMore', '{{count}} more', { count })}
       </button>
       <PopoverContent>
-        <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
+        <MonthlyWorkloadView
+          events={events}
+          dateTime={dateTime}
+          calendarSelectedDate={calendarSelectedDate}
+          showAllServices={true}
+        />
       </PopoverContent>
     </Popover>
   );
