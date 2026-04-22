@@ -65,6 +65,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
       const notePayload: EncounterPayload = {
         patient: patientUuid,
         location: locationUuid,
+        visit: wardPatient.visit?.uuid,
         encounterType: emrConfiguration?.inpatientNoteEncounterType?.uuid,
         encounterProviders: [
           {
@@ -114,6 +115,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
       providerUuid,
       t,
       closeWorkspace,
+      wardPatient.visit?.uuid,
     ],
   );
 
