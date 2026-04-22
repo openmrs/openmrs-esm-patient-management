@@ -1,22 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { emrConfigurationMock } from '__mocks__';
-import { getDefaultsFromConfigSchema, useConfig, useEmrConfiguration } from '@openmrs/esm-framework';
-import { configSchema, type WardConfigObject } from '../../../config-schema';
+import { useEmrConfiguration } from '@openmrs/esm-framework';
 import { type PatientNote } from '../types';
-import { usePatientNotes } from '../notes.resource';
 import PatientNotesHistory from './notes-container.component';
 
-const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
-
 const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
-const mockedUsePatientNotes = jest.mocked(usePatientNotes);
-
-jest.mock('../notes.resource', () => ({
-  usePatientNotes: jest.fn(),
-}));
-
-const mockPatientUuid = 'sample-patient-uuid';
 
 const mockPatientNotes: PatientNote[] = [
   {
@@ -67,51 +56,34 @@ const mockEditedPatientNote: PatientNote = {
   ],
 };
 
+const defaultProps = {
+  patientNotes: [],
+  mutatePatientNotes: jest.fn(),
+  isLoading: false,
+  errorFetchingPatientNotes: null,
+  promptBeforeClosing: jest.fn(),
+};
+
 describe('PatientNotesHistory', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema<WardConfigObject>(configSchema));
-  });
-
-  test('displays loading skeletons when loading', () => {
     mockedUseEmrConfiguration.mockReturnValue({
       emrConfiguration: emrConfigurationMock,
       mutateEmrConfiguration: jest.fn(),
       isLoadingEmrConfiguration: false,
       errorFetchingEmrConfiguration: null,
     });
+  });
 
-    mockedUsePatientNotes.mockReturnValue({
-      patientNotes: [],
-      isLoadingPatientNotes: true,
-      errorFetchingPatientNotes: undefined,
-      mutatePatientNotes: jest.fn(),
-    });
-
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
-
+  test('displays loading skeletons when loading', () => {
+    render(<PatientNotesHistory {...defaultProps} isLoading={true} />);
     expect(screen.getAllByTestId('in-patient-note-skeleton')).toHaveLength(4);
   });
 
   test('displays patient notes when available', () => {
-    mockedUseEmrConfiguration.mockReturnValue({
-      emrConfiguration: emrConfigurationMock,
-      mutateEmrConfiguration: jest.fn(),
-      isLoadingEmrConfiguration: false,
-      errorFetchingEmrConfiguration: null,
-    });
-
-    mockedUsePatientNotes.mockReturnValue({
-      patientNotes: mockPatientNotes,
-      isLoadingPatientNotes: false,
-      errorFetchingPatientNotes: undefined,
-      mutatePatientNotes: jest.fn(),
-    });
-
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
+    render(<PatientNotesHistory {...defaultProps} patientNotes={mockPatientNotes} />);
 
     expect(screen.getByText('History')).toBeInTheDocument();
-
     expect(screen.getByText('Patient shows improvement with current medication.')).toBeInTheDocument();
     expect(screen.getByText(/Dr\. John Doe/)).toBeInTheDocument();
     expect(screen.getByText('Blood pressure is slightly elevated. Consider adjusting medication.')).toBeInTheDocument();
@@ -119,21 +91,7 @@ describe('PatientNotesHistory', () => {
   });
 
   test('displays "Last edited by" for an edited note', () => {
-    mockedUseEmrConfiguration.mockReturnValue({
-      emrConfiguration: emrConfigurationMock,
-      mutateEmrConfiguration: jest.fn(),
-      isLoadingEmrConfiguration: false,
-      errorFetchingEmrConfiguration: null,
-    });
-
-    mockedUsePatientNotes.mockReturnValue({
-      patientNotes: [mockEditedPatientNote],
-      isLoadingPatientNotes: false,
-      errorFetchingPatientNotes: undefined,
-      mutatePatientNotes: jest.fn(),
-    });
-
-    render(<PatientNotesHistory patientUuid={mockPatientUuid} promptBeforeClosing={jest.fn()} visitUuid={''} />);
+    render(<PatientNotesHistory {...defaultProps} patientNotes={[mockEditedPatientNote]} />);
 
     expect(screen.getByText('Updated: Patient is recovering well.')).toBeInTheDocument();
     expect(screen.getByText(/Last edited by:.*Dr\. Jane Smith/)).toBeInTheDocument();

@@ -108,19 +108,18 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                   }}
                 />
               )}
-              {note.isEdited && (
-                <OverflowMenuItem
-                  id={'view-history-' + note.encounterUuid}
-                  className={styles.menuItem}
-                  itemText={t('viewEditHistory', 'View edit history')}
-                  onClick={() => {
-                    const dispose = showModal('note-history-modal', {
-                      close: () => dispose(),
-                      note,
-                    });
-                  }}
-                />
-              )}
+              <OverflowMenuItem
+                aria-label={t('viewEditHistory', 'View edit history')}
+                id={'view-history-' + note.encounterUuid}
+                className={styles.menuItem}
+                itemText={t('viewEditHistory', 'View edit history')}
+                onClick={() => {
+                  const dispose = showModal('note-history-modal', {
+                    close: () => dispose(),
+                    note,
+                  });
+                }}
+              />
               <OverflowMenuItem
                 aria-label={getCoreTranslation('delete')}
                 id={'delete-note-' + note.encounterUuid}
@@ -143,6 +142,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
             <Stack gap={3}>
               <TextArea
                 className={styles.textArea}
+                id="editNote"
                 rows={6}
                 value={editedNote}
                 onChange={(e) => setEditedNote(e.target.value)}
@@ -159,7 +159,7 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                   {t('cancel', 'Cancel')}
                 </Button>
                 <Button onClick={onSave} kind={'primary'} size={isTablet ? 'lg' : 'sm'}>
-                  {isSaving ? <InlineLoading description={t('saving', 'Saving...')} /> : t('save', 'Save')}
+                  {isSaving ? <InlineLoading description={t('saving', 'Saving...')} /> : t('saveEdit', 'Save edit')}
                 </Button>
               </div>
             </Stack>
