@@ -30,6 +30,22 @@ jest.mock('../hooks/useWardLocation', () =>
   }),
 );
 
+jest.mock('../hooks/useEmrConfiguration', () =>
+  jest.fn().mockReturnValue({
+    emrConfiguration: {
+      supportsAdmissionLocationTag: { name: 'Admission Location' },
+    },
+    isLoadingEmrConfiguration: false,
+  }),
+);
+
+jest.mock('../hooks/useLocations', () =>
+  jest.fn().mockReturnValue({
+    data: [{ id: 'abcd', display: 'mock location' }],
+    isLoading: false,
+  }),
+);
+
 jest.mock('../hooks/useObs', () => ({
   useObs: jest.fn(),
 }));
@@ -66,6 +82,20 @@ describe('WardView', () => {
     renderWithSwr(<DefaultWardView />);
     const header = screen.getByRole('heading', { name: 'mock location' });
     expect(header).toBeInTheDocument();
+  });
+
+  it('renders a notification when the location does not allow admissions', () => {
+    mockUseWardLocation.mockReturnValueOnce({
+      location: { uuid: 'unsupported-location-uuid', display: 'Non-Admitting Ward' },
+      isLoadingLocation: false,
+      errorFetchingLocation: null,
+      invalidLocation: false,
+    });
+
+    renderWithSwr(<DefaultWardView />);
+
+    const notificationText = screen.getByText(/This location does not allow admissions/i);
+    expect(notificationText).toBeInTheDocument();
   });
 
   it('renders the correct number of occupied and empty beds', async () => {

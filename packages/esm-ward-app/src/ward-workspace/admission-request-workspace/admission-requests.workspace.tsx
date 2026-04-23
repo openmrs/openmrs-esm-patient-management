@@ -10,10 +10,11 @@ import { Add } from '@carbon/react/icons';
 
 export interface AdmissionRequestsWorkspaceProps {
   wardPendingPatients: ReactNode;
+  locationAllowsAdmissions?: boolean;
 }
 
 const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRequestsWorkspaceProps>> = ({
-  workspaceProps: { wardPendingPatients },
+  workspaceProps: { wardPendingPatients, locationAllowsAdmissions },
   launchChildWorkspace,
 }) => {
   const { t } = useTranslation();
@@ -55,14 +56,25 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
           </div>
         )}
         {!isLoading &&
-          (inpatientRequests?.length === 0 ? (
-            <AdmissionRequestsEmptyState />
+          (locationAllowsAdmissions ? (
+            inpatientRequests?.length === 0 ? (
+              <AdmissionRequestsEmptyState />
+            ) : (
+              locationAllowsAdmissions && (
+                <div className={styles.addPatientToWardButtonContainer}>
+                  <Button renderIcon={Add} kind="ghost" onClick={handleAddPatient} disabled={!locationAllowsAdmissions}>
+                    {t('addPatientToWard', 'Add patient to ward')}
+                  </Button>
+                </div>
+              )
+            )
           ) : (
-            <div className={styles.addPatientToWardButtonContainer}>
-              <Button renderIcon={Add} kind="ghost" onClick={handleAddPatient}>
-                {t('addPatientToWard', 'Add patient to ward')}
-              </Button>
-            </div>
+            <InlineNotification
+              kind="warning"
+              hideCloseButton={true}
+              lowContrast={true}
+              title={t('locationDoesNotAllowAdmissions', 'This location does not allow admissions.')}
+            />
           ))}
         <div className={styles.content}>{wardPendingPatients}</div>
       </div>
