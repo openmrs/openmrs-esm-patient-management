@@ -94,7 +94,7 @@ const ComboInput: React.FC<ComboInputProps> = ({
     return () => {
       window.removeEventListener('click', listener);
     };
-  });
+  }, []);
 
   return (
     <div className={styles.comboInput} ref={comboInputRef}>
