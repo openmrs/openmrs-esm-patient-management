@@ -1,0 +1,12 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.nonAdmissionView {
+  margin: layout.$spacing-05;
+}
+
+.nonAdmissionSubtitle {
+  @include type.type-style('body-compact-01');
+  color: var(--cds-text-secondary, #525252);
+  margin-top: layout.$spacing-02;
+}

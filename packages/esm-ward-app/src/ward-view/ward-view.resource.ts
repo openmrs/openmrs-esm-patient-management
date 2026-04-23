@@ -11,6 +11,7 @@ import {
   type WardDefinition,
   type AdmissionRequestNoteElementConfig,
 } from '../config-schema';
+import type { EmrApiConfigurationResponse } from '../hooks/useEmrConfiguration';
 import type {
   AdmissionLocationFetchResponse,
   Bed,
@@ -210,4 +211,15 @@ export function useWardConfig(locationUuid: string): WardDefinition {
   }
 
   return currentWardConfig;
+}
+
+/**
+ * Checks if a location is tagged as an Admission Location based on the
+ * `supportsAdmissionLocationTag` from the EMR configuration.
+ */
+export function isAdmissionLocation(location: Location, emrConfiguration: EmrApiConfigurationResponse): boolean {
+  if (!location?.tags || !emrConfiguration?.supportsAdmissionLocationTag) {
+    return false;
+  }
+  return location.tags.some((tag) => tag.uuid === emrConfiguration.supportsAdmissionLocationTag.uuid);
 }

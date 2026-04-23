@@ -23,10 +23,27 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('../hooks/useWardLocation', () =>
   jest.fn().mockReturnValue({
-    location: { uuid: 'abcd', display: 'mock location' },
+    location: {
+      uuid: 'abcd',
+      display: 'mock location',
+      tags: [{ uuid: '1c783dca-fd54-4ea8-a0fc-2875374e9cb6', display: 'Admission Location' }],
+    },
     isLoadingLocation: false,
     errorFetchingLocation: null,
     invalidLocation: false,
+  }),
+);
+
+jest.mock('../hooks/useEmrConfiguration', () =>
+  jest.fn().mockReturnValue({
+    emrConfiguration: {
+      supportsAdmissionLocationTag: {
+        uuid: '1c783dca-fd54-4ea8-a0fc-2875374e9cb6',
+        name: 'Admission Location',
+      },
+    },
+    isLoadingEmrConfiguration: false,
+    errorFetchingEmrConfiguration: null,
   }),
 );
 
@@ -85,6 +102,21 @@ describe('WardView', () => {
     renderWithSwr(<DefaultWardView />);
     const admittedPatientWithoutBed = screen.queryByText('Brian Johnson');
     expect(admittedPatientWithoutBed).toBeInTheDocument();
+  });
+
+  it('renders a message when the location does not allow admissions', () => {
+    mockUseWardLocation.mockReturnValueOnce({
+      location: { uuid: 'no-admission-uuid', display: 'Mobile Clinic' },
+      isLoadingLocation: false,
+      errorFetchingLocation: null,
+      invalidLocation: false,
+    });
+
+    renderWithSwr(<DefaultWardView />);
+    const header = screen.getByRole('heading', { name: 'Mobile Clinic' });
+    expect(header).toBeInTheDocument();
+    const message = screen.getByText(/This location does not allow admissions/i);
+    expect(message).toBeInTheDocument();
   });
 
   it('renders notification for invalid location uuid', () => {
