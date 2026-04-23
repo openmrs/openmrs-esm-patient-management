@@ -56,42 +56,42 @@ describe('convertTime12to24', () => {
 
     it('should convert 1:00 PM to 13:00', () => {
       const result = convertTime12to24('1:00', 'PM');
-      expect(result).toEqual([13, '00']);
+      expect(result).toEqual(['13', '00']);
     });
 
     it('should convert 1:15 PM to 13:15', () => {
       const result = convertTime12to24('1:15', 'PM');
-      expect(result).toEqual([13, '15']);
+      expect(result).toEqual(['13', '15']);
     });
 
     it('should convert 11:59 PM to 23:59', () => {
       const result = convertTime12to24('11:59', 'PM');
-      expect(result).toEqual([23, '59']);
+      expect(result).toEqual(['23', '59']);
     });
 
     it('should convert 6:30 PM to 18:30', () => {
       const result = convertTime12to24('6:30', 'PM');
-      expect(result).toEqual([18, '30']);
+      expect(result).toEqual(['18', '30']);
     });
 
     it('should convert 2:45 PM to 14:45', () => {
       const result = convertTime12to24('2:45', 'PM');
-      expect(result).toEqual([14, '45']);
+      expect(result).toEqual(['14', '45']);
     });
 
     it('should convert 10:00 PM to 22:00', () => {
       const result = convertTime12to24('10:00', 'PM');
-      expect(result).toEqual([22, '00']);
+      expect(result).toEqual(['22', '00']);
     });
 
     it('should handle single digit hour in PM', () => {
       const result = convertTime12to24('9:00', 'PM');
-      expect(result).toEqual([21, '00']);
+      expect(result).toEqual(['21', '00']);
     });
 
     it('should handle single digit minute in PM', () => {
       const result = convertTime12to24('3:5', 'PM');
-      expect(result).toEqual([15, '5']);
+      expect(result).toEqual(['15', '5']);
     });
   });
 
@@ -118,18 +118,18 @@ describe('convertTime12to24', () => {
 
     it('should convert all valid PM hours (1-11)', () => {
       const expectedResults = [
-        [13, '00'], // 1 PM
-        [14, '00'], // 2 PM
-        [15, '00'], // 3 PM
-        [16, '00'], // 4 PM
-        [17, '00'], // 5 PM
-        [18, '00'], // 6 PM
-        [19, '00'], // 7 PM
-        [20, '00'], // 8 PM
-        [21, '00'], // 9 PM
-        [22, '00'], // 10 PM
-        [23, '00'], // 11 PM
-      ];
+        ['13', '00'], // 1 PM
+        ['14', '00'], // 2 PM
+        ['15', '00'], // 3 PM
+        ['16', '00'], // 4 PM
+        ['17', '00'], // 5 PM
+        ['18', '00'], // 6 PM
+        ['19', '00'], // 7 PM
+        ['20', '00'], // 8 PM
+        ['21', '00'], // 9 PM
+        ['22', '00'], // 10 PM
+      ['23', '00'], // 11 PM
+    ];
 
       for (let i = 1; i <= 11; i++) {
         const result = convertTime12to24(`${i}:00`, 'PM');
@@ -216,13 +216,14 @@ describe('convertTime12to24', () => {
       expect(result[1]).toBe('59');
     });
 
-    it('should return hour as number after PM conversion (except for 12 PM)', () => {
+    it('should always return hour as string after PM conversion', () => {
       const result1 = convertTime12to24('5:00', 'PM');
-      expect(typeof result1[0]).toBe('number');
+      expect(result1[0]).toBe('17');
+      expect(typeof result1[0]).toBe('string');
 
       const result2 = convertTime12to24('12:00', 'PM');
-      // 12 PM returns the string '12', not a number
       expect(result2[0]).toBe('12');
+      expect(typeof result2[0]).toBe('string');
     });
 
     it('should return hour as string for AM times and non-12 values', () => {
