@@ -8,7 +8,7 @@ import styles from './days-of-week.scss';
 // t('MON', 'MON');
 // t('TUE', 'TUE');
 // t('WED', 'WED');
-// t('THUR', 'THUR');
+// t('THU', 'THU');
 // t('FRI', 'FRI');
 // t('SAT', 'SAT');
 // t('SUN', 'SUN');
