@@ -7,18 +7,22 @@ import { spaHomePage } from '../../constants';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
-import { useSelectedDate } from '../../hooks/useSelectedDate';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
+  calendarSelectedDate: Dayjs;
   showAllServices?: boolean;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
+  dateTime,
+  events,
+  calendarSelectedDate,
+  showAllServices = false,
+}) => {
   const layout = useLayoutType();
-  const selectedDate = useSelectedDate();
 
   const currentData = useMemo(
     () =>
@@ -52,7 +56,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     <div
       onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
-        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        styles[isSameMonth(dateTime, calendarSelectedDate) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
           ? {}
           : {
@@ -60,7 +64,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
               [styles.largeDesktop]: layout !== 'small-desktop',
             },
       )}>
-      {isSameMonth(dateTime, dayjs(selectedDate)) && (
+      {isSameMonth(dateTime, calendarSelectedDate) && (
         <div>
           <span className={classNames(styles.totals)}>
             {currentData?.services ? (
@@ -94,6 +98,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
                   events={events}
                   dateTime={dateTime}
+                  calendarSelectedDate={calendarSelectedDate}
                 />
               ) : (
                 ''

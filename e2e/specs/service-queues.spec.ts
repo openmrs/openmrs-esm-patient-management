@@ -62,4 +62,20 @@ test('Add patient with visit to queue', async ({ api, page, patient }) => {
     await expect(page.getByText(/Queue entry added successfully/i)).toBeVisible();
     await expect(page.getByRole('link', { name: `${firstName} ${lastName}` })).toBeVisible();
   });
+
+  await test.step('Then the row with the patient name should contain "Not Urgent"', async () => {
+    const patientRow = page
+      .getByRole('row')
+      .filter({ has: page.getByRole('link', { name: `${firstName} ${lastName}` }) });
+    await expect(patientRow).toContainText('Not Urgent');
+  });
+
+  await test.step("When I click on the patient's chart", async () => {
+    await page.getByRole('link', { name: `${firstName} ${lastName}` }).click();
+  });
+
+  await test.step('Then "Outpatient Consultation" and "Not Urgent" should be present on the page', async () => {
+    await expect(page.getByText('Outpatient Consultation')).toBeVisible();
+    await expect(page.getByText('Not Urgent')).toBeVisible();
+  });
 });
