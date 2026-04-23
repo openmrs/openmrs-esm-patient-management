@@ -1,4 +1,4 @@
-import { convertTime12to24, amPm } from '../time';
+import { convertTime12to24 } from '../time';
 
 describe('convertTime12to24', () => {
   describe('AM conversion', () => {
