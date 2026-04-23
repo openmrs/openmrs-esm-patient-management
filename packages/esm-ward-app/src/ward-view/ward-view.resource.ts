@@ -102,11 +102,11 @@ export function createAndGetWardPatientGrouping(
     patients.map((patient) => {
       const admission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
       allWardPatientUuids.add(patient.uuid);
-      if (admission?.currentInpatientLocation?.uuid == currentWardLocation.uuid) {
+      if (admission?.currentInpatientLocation?.uuid === currentWardLocation.uuid) {
         wardAdmittedPatientsWithBed.set(patient.uuid, admission);
         //count the pending metric
         const dispositionType = admission.currentInpatientRequest?.dispositionType;
-        if (dispositionType == 'TRANSFER' || dispositionType == 'DISCHARGE') wardPatientPendingCount++;
+        if (dispositionType === 'TRANSFER' || dispositionType === 'DISCHARGE') wardPatientPendingCount++;
       } else {
         wardUnadmittedPatientsWithBed.set(patient.uuid, patient);
       }
@@ -168,7 +168,7 @@ export function useElementConfig(elementType, id: string): object {
   const { t } = useTranslation();
 
   try {
-    return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig?.id == id);
+    return config?.patientCardElements?.[elementType]?.find((elementConfig) => elementConfig?.id === id);
   } catch (e) {
     showNotification({
       title: t('errorConfiguringPatientCard', 'Error configuring patient card'),
@@ -194,8 +194,8 @@ export function useWardConfig(locationUuid: string): WardDefinition {
     const cardDefinition = wards?.find((wardDef) => {
       return (
         wardDef.appliedTo == null ||
-        wardDef.appliedTo?.length == 0 ||
-        wardDef.appliedTo.some((criteria) => criteria.location == locationUuid)
+        wardDef.appliedTo?.length === 0 ||
+        wardDef.appliedTo.some((criteria) => criteria.location === locationUuid)
       );
     });
 
