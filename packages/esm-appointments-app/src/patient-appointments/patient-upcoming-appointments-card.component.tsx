@@ -11,7 +11,7 @@ import {
   StructuredListRow,
   StructuredListWrapper,
 } from '@carbon/react';
-import { ErrorCard, formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { ErrorCard, formatDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 import { type Appointment } from '../types';
 import { useMutateAppointments } from '../hooks/useMutateAppointments';
@@ -134,7 +134,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
             {appointments.map((appointment, index) => (
               <StructuredListRow key={index} className={styles.structuredList}>
                 <StructuredListCell>
-                  {formatDate(parseDate(appointment.startDateTime), { mode: 'wide' })}
+                  {formatDate(new Date(appointment.startDateTime), { mode: 'wide' })}
                 </StructuredListCell>
                 <StructuredListCell>{appointment.service ? appointment.service.name : '——'}</StructuredListCell>
                 <StructuredListCell>

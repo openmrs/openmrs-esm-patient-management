@@ -33,7 +33,6 @@ import {
   formatDate,
   formatDatetime,
   isDesktop,
-  parseDate,
   useConfig,
   useLayoutType,
   launchWorkspace2,
@@ -226,7 +225,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                     renderIcon={Download}
                     onClick={() => {
                       const date = appointments[0]?.startDateTime
-                        ? formatDate(parseDate(appointments[0]?.startDateTime), {
+                        ? formatDate(new Date(appointments[0]?.startDateTime), {
                             time: false,
                             noToday: true,
                           })
