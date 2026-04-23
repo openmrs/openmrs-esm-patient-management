@@ -1,7 +1,7 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const dischargeWorkspaceSiderailExtensionConfigSchema = {
-  onlyShowDischargeForLocations: {
+  allowedSessionLocationUuids: {
     _type: Type.Array,
     _default: [],
     _description:
@@ -13,5 +13,5 @@ export const dischargeWorkspaceSiderailExtensionConfigSchema = {
 };
 
 export interface DischargeWorkspaceSiderailConfig {
-  onlyShowDischargeForLocations: string[];
+  allowedSessionLocationUuids: string[];
 }

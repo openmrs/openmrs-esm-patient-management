@@ -7,19 +7,19 @@ import { type DischargeWorkspaceSiderailConfig } from './discharge-workspace-sid
 export default function PatientDischargeSideRailIcon() {
   const { t } = useTranslation();
   const { sessionLocation } = useSession();
-  const { onlyShowDischargeForLocations } = useConfig<DischargeWorkspaceSiderailConfig>();
+  const { allowedSessionLocationUuids } = useConfig<DischargeWorkspaceSiderailConfig>();
 
-  if (onlyShowDischargeForLocations.length === 0 || onlyShowDischargeForLocations.includes(sessionLocation?.uuid)) {
-    return (
-      <ActionMenuButton2
-        icon={(props) => <Exit {...props} />}
-        label={t('discharge', 'Discharge')}
-        workspaceToLaunch={{
-          workspaceName: 'patient-discharge-workspace',
-        }}
-      />
-    );
-  } else {
+  if (allowedSessionLocationUuids.length > 0 && !allowedSessionLocationUuids.includes(sessionLocation?.uuid)) {
     return null;
   }
+
+  return (
+    <ActionMenuButton2
+      icon={(props) => <Exit {...props} />}
+      label={t('discharge', 'Discharge')}
+      workspaceToLaunch={{
+        workspaceName: 'patient-discharge-workspace',
+      }}
+    />
+  );
 }
