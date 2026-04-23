@@ -5,6 +5,7 @@ import { ModalHeader, ModalBody } from '@carbon/react';
 import { type PatientNote } from '../types';
 import styles from './styles.scss';
 import modalStyles from './note-history.modal.scss';
+import classNames from 'classnames';
 
 interface NoteHistoryModalProps {
   close: () => void;
@@ -27,7 +28,7 @@ const NoteHistoryModal: React.FC<NoteHistoryModalProps> = ({ close, note }) => {
       <ModalBody>
         <div className={styles.notesContainer}>
           {versions.map((v, i) => (
-            <div key={i} className={`${styles.noteTile} ${modalStyles.versionTile}`}>
+            <div key={i} className={classNames(styles.noteTile, modalStyles.versionTile)}>
               <div className={styles.noteBody}>{v.note}</div>
               <div className={styles.noteProviderName}>
                 {t('writtenBy', 'Written by: {{name}}, {{date}}', {

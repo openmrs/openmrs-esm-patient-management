@@ -54,13 +54,3 @@ export interface ObsData {
   >;
   dateCreated: string;
 }
-
-export interface Provider {
-  uuid: string;
-  display: string;
-  comments: string;
-  response?: string;
-  person: OpenmrsResource;
-  location: string;
-  serviceType: string;
-}

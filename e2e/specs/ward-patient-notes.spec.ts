@@ -131,7 +131,7 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
 
   await test.step('Then I should see the modal showing the edit history with 2 versions', async () => {
     await expect(page.getByText('Note edit history')).toBeVisible();
-    // await expect(page.getByText('Sample patient note - edited')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Sample patient note - edited')).toBeVisible();
     await expect(page.getByText('Sample patient note', { exact: true })).toBeVisible();
   });
 });
