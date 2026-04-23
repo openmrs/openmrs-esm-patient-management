@@ -49,9 +49,10 @@ export interface ObsData {
   creator?: { display: string; person?: { display: string } };
   previousVersions?: Array<
     Obs & {
-      creator: Provider;
+      creator: { display: string; person?: { display: string } };
     }
   >;
+  dateCreated: string;
 }
 
 export interface Provider {
