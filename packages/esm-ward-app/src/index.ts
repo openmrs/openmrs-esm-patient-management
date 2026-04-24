@@ -1,5 +1,6 @@
 import {
   defineConfigSchema,
+  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
@@ -9,6 +10,7 @@ import { configSchema } from './config-schema';
 import { moduleName } from './constant';
 import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
+import { dischargeWorkspaceSiderailExtensionConfigSchema } from './action-menu-buttons/discharge-workspace-siderail-config-schema';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -142,6 +144,7 @@ export const noteHistoryModal = getAsyncLifecycle(
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('ward-patient-discharge', dischargeWorkspaceSiderailExtensionConfigSchema);
 
   registerFeatureFlag(
     'bedmanagement-module',

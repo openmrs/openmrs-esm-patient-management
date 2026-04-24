@@ -46,11 +46,6 @@
       "slot": "ward-patient-card-slot"
     },
     {
-      "name": "patient-discharge-siderail-button",
-      "slot": "action-menu-ward-patient-items-slot",
-      "component": "patientDischargeWorkspaceSideRailIcon"
-    },
-    {
       "component": "defaultWardView",
       "name": "default-ward",
       "slot": "default-ward"
