@@ -136,6 +136,11 @@ export const deleteNoteModal = getAsyncLifecycle(
   options,
 );
 
+export const noteHistoryModal = getAsyncLifecycle(
+  () => import('./ward-workspace/ward-patient-notes/history/note-history.modal'),
+  options,
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
