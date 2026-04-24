@@ -108,18 +108,20 @@ const InPatientNote: React.FC<InPatientNoteProps> = ({ note, mutatePatientNotes,
                   }}
                 />
               )}
-              <OverflowMenuItem
-                aria-label={t('viewEditHistory', 'View edit history')}
-                id={'view-history-' + note.encounterUuid}
-                className={styles.menuItem}
-                itemText={t('viewEditHistory', 'View edit history')}
-                onClick={() => {
-                  const dispose = showModal('note-history-modal', {
-                    close: () => dispose(),
-                    note,
-                  });
-                }}
-              />
+              {note.isEdited && (
+                <OverflowMenuItem
+                  aria-label={t('viewEditHistory', 'View edit history')}
+                  id={'view-history-' + note.encounterUuid}
+                  className={styles.menuItem}
+                  itemText={t('viewEditHistory', 'View edit history')}
+                  onClick={() => {
+                    const dispose = showModal('note-history-modal', {
+                      close: () => dispose(),
+                      note,
+                    });
+                  }}
+                />
+              )}
               <OverflowMenuItem
                 aria-label={getCoreTranslation('delete')}
                 id={'delete-note-' + note.encounterUuid}
