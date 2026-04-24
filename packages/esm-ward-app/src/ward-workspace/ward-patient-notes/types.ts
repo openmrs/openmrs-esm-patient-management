@@ -39,3 +39,7 @@ export interface ObsData {
   }>;
   obsDatetime: string;
 }
+
+export interface NoteObsData extends Omit<ObsData, 'value'> {
+  value: string;
+}
