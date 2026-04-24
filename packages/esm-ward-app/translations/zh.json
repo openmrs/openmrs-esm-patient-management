@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "指定的位置无效",
   "invalidWardLocation": "无效的病区位置",
   "labelColon": "{{label}}：",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "男",
   "manage": "管理",
   "minutes_one": "{{count}} 分钟",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "暂无待处理的入院申请",
   "note": "记录",
   "noteDeletedSuccessfully": "记录已成功删除",
+  "noteEditHistory": "Note edit history",
   "notes": "记录列表",
   "notesRequiredForCancellingRequest": "取消申请时必须填写备注",
   "orderBasket": "医嘱篮",
@@ -116,6 +118,7 @@
   "previousPage": "上一页",
   "proceedWithPatientDischarge": "继续办理患者出院",
   "save": "保存",
+  "saveEdit": "Save edit",
   "saving": "正在保存",
   "searchLocations": "搜索位置",
   "seconds_one": "{{count}} 秒",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "转科方式",
   "unknown": "未知",
   "unknownError": "未知错误",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "就诊记录已保存",
   "wardClinicalNotePlaceholder": "在此输入临床记录...",
   "wardPatient": "病区患者",
-  "wards": "病区"
+  "wards": "病区",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }
