@@ -315,7 +315,7 @@ function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) 
       : null,
     openmrsFetch,
   );
-  const obs = data?.data.results.sort(latestFirstEncounter)?.at(0)?.obs;
+  const obs = data?.data?.results.sort(latestFirstEncounter)?.at(0)?.obs;
   const encounters = obs
     ?.map(({ concept, value }) => ({
       [(concept as OpenmrsResource).uuid]: typeof value === 'object' ? value?.uuid : value,
