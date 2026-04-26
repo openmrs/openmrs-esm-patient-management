@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type EncounterPayload } from '../../types';
-import { type PatientNote, type RESTPatientNote, type UsePatientNotes } from './types';
+import { type PatientNote, type RESTPatientNote, type UsePatientNotes, type NoteObsData } from './types';
 
 export function createPatientNote(payload: EncounterPayload, abortController: AbortController = new AbortController()) {
   return openmrsFetch(`${restBaseUrl}/encounter`, {
@@ -39,12 +39,12 @@ export function usePatientNotes(patientUuid: string, visitUuid: string, conceptU
       data
         ? data
             .flatMap((encounter) => {
-              return encounter.obs?.reduce((acc, obs) => {
+              return (encounter.obs as Array<NoteObsData>)?.reduce((acc, obs) => {
                 if (conceptUuids.includes(obs.concept.uuid)) {
                   acc.push({
                     encounterUuid: encounter.uuid,
                     obsUuid: obs.uuid,
-                    encounterNote: obs ? obs.value : '',
+                    encounterNote: obs.value,
                     encounterNoteRecordedAt: encounter.encounterDatetime,
                     encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
                     conceptUuid: obs.concept.uuid,

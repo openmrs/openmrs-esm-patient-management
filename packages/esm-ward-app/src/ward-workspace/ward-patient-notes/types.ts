@@ -40,10 +40,10 @@ export interface UsePatientNotes {
 export interface ObsData {
   uuid: string;
   concept: Concept;
-  value?: string | any;
+  value?: string | number | boolean | OpenmrsResource;
   groupMembers?: Array<{
     concept: Concept;
-    value?: string | any;
+    value?: string | number | boolean | OpenmrsResource;
   }>;
   obsDatetime: string;
   creator?: { display: string; person?: { display: string } };
@@ -53,4 +53,8 @@ export interface ObsData {
     }
   >;
   dateCreated: string;
+}
+
+export interface NoteObsData extends Omit<ObsData, 'value'> {
+  value: string;
 }
