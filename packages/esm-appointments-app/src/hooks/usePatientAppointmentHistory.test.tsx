@@ -54,7 +54,7 @@ describe('usePatientAppointmentHistory', () => {
     );
     expect(result.current.appointmentsCount.missedAppointments).toBe(0);
 
-    mockUseSelectedDate.mockReturnValue('2026-04-15');
+  mockUseSelectedDate.mockReturnValue('2026-04-15');
     rerender({ patientUuid: 'patient-2' });
 
     await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
