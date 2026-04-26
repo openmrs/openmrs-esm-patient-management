@@ -23,11 +23,17 @@ describe('usePatientAppointments', () => {
 
   beforeEach(() => {
     abortController = new AbortController();
+    mockOpenmrsFetch.mockReset();
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as any);
   });
 
-  it('fetches separately when patient and date values change', async () => {
-    const { rerender } = renderHook(
+  it('fetches separately when both patientUuid and startDate change', async () => {
+    const pastDate = new Date('2020-01-01').getTime();
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: [] } as any)
+      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as any);
+
+    const { rerender, result } = renderHook(
       ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),
       {
         wrapper,
@@ -50,6 +56,7 @@ describe('usePatientAppointments', () => {
         }),
       }),
     );
+    expect(result.current.data?.pastAppointments).toBeUndefined();
 
     rerender({ patientUuid: 'patient-2', startDate: '2026-04-02' });
 
@@ -65,5 +72,99 @@ describe('usePatientAppointments', () => {
         }),
       }),
     );
+    // Data must reflect patient-2's response, not patient-1's cached empty data
+    await waitFor(() => expect(result.current.data?.pastAppointments).toHaveLength(1));
+  });
+
+  it('triggers a new fetch and returns fresh data when only patientUuid changes', async () => {
+    // patient-1 returns empty; patient-2 returns one past appointment
+    const pastDate = new Date('2020-01-01').getTime();
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: [] } as any)
+      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as any);
+
+    const { rerender, result } = renderHook(
+      ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),
+      {
+        wrapper,
+        initialProps: { patientUuid: 'patient-1', startDate: '2026-04-01' },
+      },
+    );
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    // patient-1 has no past appointments
+    expect(result.current.data?.pastAppointments).toBeUndefined();
+
+    // Change only the patient – startDate remains '2026-04-01'
+    rerender({ patientUuid: 'patient-2', startDate: '2026-04-01' });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
+    expect(mockOpenmrsFetch).toHaveBeenNthCalledWith(
+      2,
+      `${restBaseUrl}/appointments/search`,
+      expect.objectContaining({
+        body: expect.objectContaining({ patientUuid: 'patient-2', startDate: '2026-04-01' }),
+      }),
+    );
+    // Result must reflect patient-2's data, not patient-1's cached empty data
+    await waitFor(() => expect(result.current.data?.pastAppointments).toHaveLength(1));
+  });
+
+  it('triggers a new fetch when only startDate changes', async () => {
+    const pastDate = new Date('2020-01-01').getTime();
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: [] } as any)
+      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as any);
+
+    const { rerender, result } = renderHook(
+      ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),
+      {
+        wrapper,
+        initialProps: { patientUuid: 'patient-1', startDate: '2026-04-01' },
+      },
+    );
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    expect(mockOpenmrsFetch).toHaveBeenNthCalledWith(
+      1,
+      `${restBaseUrl}/appointments/search`,
+      expect.objectContaining({
+        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-01' }),
+      }),
+    );
+    expect(result.current.data?.pastAppointments).toBeUndefined();
+
+    // Change only the startDate – patientUuid remains 'patient-1'
+    rerender({ patientUuid: 'patient-1', startDate: '2026-04-15' });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
+    expect(mockOpenmrsFetch).toHaveBeenNthCalledWith(
+      2,
+      `${restBaseUrl}/appointments/search`,
+      expect.objectContaining({
+        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-15' }),
+      }),
+    );
+    // Data must reflect the new date's response, not the first date's cached data
+    await waitFor(() => expect(result.current.data?.pastAppointments).toHaveLength(1));
+  });
+
+  it('does not fetch again when patientUuid and startDate are unchanged (cache hit)', async () => {
+    const { rerender } = renderHook(
+      ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),
+      {
+        wrapper,
+        initialProps: { patientUuid: 'patient-1', startDate: '2026-04-01' },
+      },
+    );
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+
+    // Rerender with identical inputs – SWR key is unchanged, must serve from cache
+    rerender({ patientUuid: 'patient-1', startDate: '2026-04-01' });
+
+    // Flush pending microtasks then assert no second fetch was triggered
+    await waitFor(() => {});
+    expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1);
   });
 });
