@@ -177,7 +177,7 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
     returnDate: visitQueueEntry.queueEntry.startedAt,
     visitType: visitQueueEntry.visit?.visitType?.display,
     gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',
-    patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
+    patientUuid: visitQueueEntry.queueEntry?.patient?.uuid ?? '--',
   });
 
   const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
