@@ -15,9 +15,9 @@ export interface VisitType {
 export interface PatientIdentifier {
   uuid: string;
   identifier: string;
-  identifierType?: OpenmrsResource;
-  location?: OpenmrsResource;
-  preferred?: boolean;
+  identifierType: OpenmrsResource;
+  location: OpenmrsResource | null;
+  preferred: boolean;
 }
 
 export interface Patient {
