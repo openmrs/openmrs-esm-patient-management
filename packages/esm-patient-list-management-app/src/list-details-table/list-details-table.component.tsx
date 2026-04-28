@@ -182,12 +182,12 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const filteredPatients = useMemo(() => {
     if (!debouncedSearchTerm) {
-      return patients;
+      return patients || [];
     }
 
     return debouncedSearchTerm
       ? fuzzy
-          .filter(debouncedSearchTerm, patients, {
+          .filter(debouncedSearchTerm, patients || [], {
             extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
@@ -464,7 +464,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           <div className={styles.illo}>
             <EmptyCardIllustration />
           </div>
-          <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
+          <p className={styles.content}>{t('noPatientsInList', 'No patients found. Try adjusting your filters')}</p>
           <Button
             kind="ghost"
             renderIcon={(props) => <AddIcon {...props} />}
