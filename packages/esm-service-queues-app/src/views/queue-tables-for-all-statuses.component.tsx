@@ -15,7 +15,7 @@ import AddPatientToQueueButton from '../queue-table/components/add-patient-to-qu
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
   isLoadingQueue: boolean; // whether the queue is still loading
-  errorFetchingQueue: Error;
+  errorFetchingQueue?: Error | null;
 }
 
 // displays the queue entries of a given queue by
@@ -35,7 +35,10 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
       <InlineNotification
         kind="error"
         title={t('invalidQueue', 'Invalid Queue')}
-        subtitle={errorFetchingQueue?.message}
+        subtitle={
+          errorFetchingQueue?.message ??
+          t('somethingWentWrong', 'Something went wrong')
+        }
       />
     );
   }
@@ -52,7 +55,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
               <Search
                 labelText=""
                 placeholder={t('filterTable', 'Filter table')}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)} 
                 size={isDesktop(layout) ? 'sm' : 'lg'}
                 disabled={isLoadingQueue}
               />
@@ -77,8 +80,8 @@ interface QueueTablesByStatusProps {
 
 function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
-  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = [...selectedQueue.allowedStatuses].reverse();
+  const { queueEntries = [], isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const allowedStatuses = [...(selectedQueue.allowedStatuses ?? [])].reverse();
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;
@@ -126,6 +129,16 @@ function QueueTableForQueueAndStatus({
 }: QueueTableForQueueAndStatusProps) {
   const statusUuid = status.uuid;
   const columns = useColumns(queue.uuid, statusUuid);
+
+  if (columns.length === 0) {
+    return (
+      <InlineNotification
+        kind="warning"
+        title={t('invalidtableConfig', 'Invalid table configuration')}
+        subtitle={t('noColumnsDefined', 'No columns configured for this table')}
+      />
+    );
+  }
   const { t } = useTranslation();
 
   if (!columns) {
@@ -137,32 +150,26 @@ function QueueTableForQueueAndStatus({
   }
 
   // filters queue entries based on which status table we want to show and search term inputted by user
-  const filterQueueEntries = (queueEntries: QueueEntry[], searchTerm: string, statusUuid: string) => {
+  const filterQueueEntries = (
+    queueEntries: QueueEntry[],
+    searchTerm: string,
+    statusUuid: string
+  ) => {
     const searchTermLowercase = searchTerm.toLowerCase();
+
     return queueEntries.filter((queueEntry) => {
-      const match = columns?.some((column) => {
-        const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
-        return columnSearchTerm?.includes(searchTermLowercase);
+      if (queueEntry.status?.uuid !== statusUuid) return false;
+
+      if (!searchTermLowercase) return true;
+
+      return columns.some((column) => {
+        const value = column.getFilterableValue?.(queueEntry);
+
+        return String(value ?? '')
+          .toLowerCase()
+          .includes(searchTermLowercase);
       });
-      return queueEntry.status.uuid == statusUuid && match;
     });
   };
-
-  const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
-  return (
-    <div className={styles.statusTableContainer}>
-      <h5 className={styles.statusTableHeader}>{status.display}</h5>
-      <div className={styles.container}>
-        <QueueTable
-          key={statusUuid}
-          queueEntries={filteredQueueEntries}
-          isValidating={isValidating}
-          queueUuid={queue.uuid}
-          statusUuid={statusUuid}
-        />
-      </div>
-    </div>
-  );
-}
 
 export default QueueTablesForAllStatuses;
