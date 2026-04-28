@@ -13,14 +13,14 @@ export interface AppointmentLocation {
   name: string;
 }
 
-// note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
 // Translation keys for these enum values are in src/constants.ts (scanned by extract-translations)
 export enum AppointmentStatus {
+  REQUESTED = 'Requested',
   SCHEDULED = 'Scheduled',
-  CANCELLED = 'Cancelled',
-  MISSED = 'Missed',
   CHECKEDIN = 'CheckedIn',
   COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+  MISSED = 'Missed',
 }
 
 export enum AppointmentKind {
