@@ -1,9 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, InlineNotification } from '@carbon/react';
-import { Exit } from '@carbon/react/icons';
-import { closeWorkspaceGroup2, ExtensionSlot, showSnackbar, useAppContext, Workspace2 } from '@openmrs/esm-framework';
-import { type WardPatientWorkspaceDefinition, type WardPatientWorkspaceProps, type WardViewContext } from '../../types';
+import { Button, ButtonSet, Form, InlineNotification, InlineLoading, TextArea } from '@carbon/react';
+import {
+  closeWorkspaceGroup2,
+  ExtensionSlot,
+  ResponsiveWrapper,
+  showSnackbar,
+  useAppContext,
+  Workspace2,
+} from '@openmrs/esm-framework';
+import { type ObsPayload, type WardPatientWorkspaceDefinition, type WardViewContext } from '../../types';
 import { removePatientFromBed, useCreateEncounter } from '../../ward.resource';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import styles from './patient-discharge.scss';
@@ -14,62 +20,79 @@ export default function PatientDischargeWorkspace({
 }: WardPatientWorkspaceDefinition) {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dischargeNote, setDischargeNote] = useState('');
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
 
-  const submitDischarge = useCallback(() => {
-    setIsSubmitting(true);
+  const onSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsSubmitting(true);
 
-    createEncounter(wardPatient?.patient, emrConfiguration.exitFromInpatientEncounterType, wardPatient?.visit?.uuid)
-      .then((response) => {
-        if (response?.ok) {
-          if (wardPatient?.bed?.id) {
-            return removePatientFromBed(wardPatient.bed.id, wardPatient?.patient?.uuid);
-          }
-          return response;
-        }
-      })
-      .then((response) => {
-        if (response?.ok) {
-          showSnackbar({
-            title: t('patientWasDischarged', 'Patient was discharged'),
-            kind: 'success',
+      try {
+        const note = dischargeNote;
+        const obs: Array<ObsPayload> = [];
+
+        if (note) {
+          obs.push({
+            concept: emrConfiguration?.consultFreeTextCommentsConcept?.uuid,
+            value: note,
           });
-
-          closeWorkspace({ discardUnsavedChanges: true });
-          closeWorkspaceGroup2();
         }
-      })
-      .catch((err) => {
-        // TODO: better way to handle / display error messages
-        // https://openmrs.atlassian.net/browse/O3-5423
+
+        await createEncounter(
+          wardPatient?.patient,
+          emrConfiguration.exitFromInpatientEncounterType,
+          wardPatient?.visit?.uuid,
+          obs,
+        );
+
+        if (wardPatient?.bed?.id) {
+          await removePatientFromBed(wardPatient.bed.id, wardPatient?.patient?.uuid);
+        }
+
+        showSnackbar({
+          title: t('patientWasDischarged', 'Patient was discharged'),
+          kind: 'success',
+        });
+
+        closeWorkspace({ discardUnsavedChanges: true });
+        closeWorkspaceGroup2();
+      } catch (err) {
+        const message =
+          err?.responseBody?.error?.globalErrors?.[0]?.message ||
+          err?.responseBody?.error?.message ||
+          err?.message ||
+          t('unableToDischargePatient', 'Unable to discharge patient. Please try again.');
+
         showSnackbar({
           title: t('errorDischargingPatient', 'Error discharging patient'),
-          subtitle: err?.responseBody?.error?.globalErrors?.[0]?.message ?? err.message,
+          subtitle: message,
           kind: 'error',
         });
-      })
-      .finally(() => {
+      } finally {
         setIsSubmitting(false);
         wardPatientGroupDetails?.mutate?.();
-      });
-  }, [createEncounter, wardPatient, emrConfiguration, t, closeWorkspace, wardPatientGroupDetails]);
+      }
+    },
+    [createEncounter, wardPatient, emrConfiguration, dischargeNote, t, closeWorkspace, wardPatientGroupDetails],
+  );
 
   if (!wardPatientGroupDetails) {
     return null;
   }
 
   return (
-    <Workspace2 title={t('discharge', 'Discharge')}>
+    <Workspace2 title={t('discharge', 'Discharge')} hasUnsavedChanges={dischargeNote.length > 0}>
       <div className={styles.workspaceContent}>
         <div className={styles.patientWorkspaceBanner}>
           <WardPatientWorkspaceBanner wardPatient={wardPatient} />
         </div>
-        <div className={styles.workspaceForm}>
+        <Form className={styles.workspaceForm} onSubmit={onSubmit}>
           <div>
             {errorFetchingEmrConfiguration && (
-              <div className={styles.formError}>
+              <div>
                 <InlineNotification
                   kind="error"
                   title={t('somePartsOfTheFormDidntLoad', "Some parts of the form didn't load")}
@@ -83,20 +106,37 @@ export default function PatientDischargeWorkspace({
               </div>
             )}
           </div>
+
           <ExtensionSlot name="ward-patient-discharge-slot" />
+
+          <div>
+            <ResponsiveWrapper>
+              <TextArea
+                value={dischargeNote}
+                onChange={(e) => setDischargeNote(e.target.value)}
+                labelText={t('dischargeNote', 'Discharge note (optional)')}
+                placeholder={t('dischargeNotePlaceholder', 'Write any notes here')}
+              />
+            </ResponsiveWrapper>
+          </div>
           <ButtonSet className={styles.buttonSet}>
+            <Button size="xl" kind="secondary" onClick={() => closeWorkspace()} disabled={isSubmitting}>
+              {t('cancel', 'Cancel')}
+            </Button>
             <Button
-              size="sm"
-              kind="ghost"
-              renderIcon={(props) => <Exit size={16} {...props} />}
+              type="submit"
+              size="xl"
               disabled={
                 isLoadingEmrConfiguration || isSubmitting || errorFetchingEmrConfiguration || !wardPatient?.patient
-              }
-              onClick={submitDischarge}>
-              {t('proceedWithPatientDischarge', 'Proceed with patient discharge')}
+              }>
+              {isSubmitting ? (
+                <InlineLoading description={t('discharging', 'Discharging...')} />
+              ) : (
+                <span>{t('confirmDischarge', 'Confirm discharge')}</span>
+              )}
             </Button>
           </ButtonSet>
-        </div>
+        </Form>
       </div>
     </Workspace2>
   );
