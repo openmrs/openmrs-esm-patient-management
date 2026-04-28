@@ -60,6 +60,7 @@
   "infants": "Infants",
   "inpatientNotesWorkspaceTitle": "In-patient notes",
   "invalidLocationSpecified": "Invalid location specified",
+  "locationDoesNotAllowAdmissions": "This location does not allow admissions",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "labelColon": "{{label}}:",
   "lastEditedBy": "Last edited by: {{name}}, {{date}}",
