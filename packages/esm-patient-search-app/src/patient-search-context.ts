@@ -1,5 +1,5 @@
-import { type Workspace2DefinitionProps } from '@openmrs/esm-framework/src';
 import { createContext, useContext } from 'react';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 /**
  * @deprecated This context should be removed once the workspace v2 migration is completed,
