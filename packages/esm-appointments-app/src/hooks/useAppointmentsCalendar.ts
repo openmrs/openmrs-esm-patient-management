@@ -26,20 +26,34 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     { errorRetryCount: 2 },
   );
   // Transform API response into daily appointment counts grouped by service
-  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
+
+   const results = (data?.data ?? []).reduce<DailyAppointmentsCountByService[]>((acc, service) => {
     const serviceName = service.appointmentService.name;
     const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).forEach(([key, value]) => {
+
+    Object.entries(service.appointmentCountMap ?? {}).forEach(([key, value]) => {
       const existingEntry = acc.find((entry) => entry.appointmentDate === key);
+
       if (existingEntry) {
-        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
+        existingEntry.services.push({
+          serviceName,
+          serviceUuid,
+          count: value?.allAppointmentsCount ?? 0,
+        });
       } else {
         acc.push({
           appointmentDate: key,
-          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
+          services: [
+            {
+              serviceName,
+              serviceUuid,
+              count: value?.allAppointmentsCount ?? 0,
+            },
+          ],
         });
       }
     });
+
     return acc;
   }, []);
   return { isLoading, calendarEvents: results, error };
@@ -47,6 +61,8 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
 
 function evaluateAppointmentCalendarDates(forDate: string, period: string) {
   if (period === 'daily') {
+   
+    console.warn(`Unhandled period value: ${period}, defaulting to daily`);
     return {
       startDate: dayjs(forDate).startOf('day').format(omrsDateFormat),
       endDate: dayjs(forDate).endOf('day').format(omrsDateFormat),
@@ -66,4 +82,10 @@ function evaluateAppointmentCalendarDates(forDate: string, period: string) {
       endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),
     };
   }
+
+  // Default fallback (THIS is the new part)
+  return {
+    startDate: dayjs(forDate).startOf('day').format(omrsDateFormat),
+    endDate: dayjs(forDate).endOf('day').format(omrsDateFormat),
+  };
 }
