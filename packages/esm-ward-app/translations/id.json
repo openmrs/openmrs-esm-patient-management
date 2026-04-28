@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "Lokasi tidak valid",
   "invalidWardLocation": "Lokasi bangsal tidak valid: {{location}}",
   "labelColon": "{{label}}:",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "Laki-laki",
   "manage": "Kelola",
   "minutes_one": "{{count}} menit",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "No pending admission requests",
   "note": "Catatan",
   "noteDeletedSuccessfully": "Note deleted successfully",
+  "noteEditHistory": "Note edit history",
   "notes": "Catatan",
   "notesRequiredForCancellingRequest": "Catatan diperlukan untuk membatalkan permintaan penerimaan atau transfer",
   "orderBasket": "Order basket",
@@ -116,6 +118,7 @@
   "previousPage": "Halaman sebelumnya",
   "proceedWithPatientDischarge": "Lanjutkan dengan pemulangan pasien",
   "save": "Simpan",
+  "saveEdit": "Save edit",
   "saving": "Menyimpan...",
   "searchLocations": "Cari lokasi",
   "seconds_one": "{{count}} detik",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "Jenis transfer",
   "unknown": "Tidak diketahui",
   "unknownError": "An unknown error occurred",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "Catatan kunjungan disimpan",
   "wardClinicalNotePlaceholder": "Tulis catatan di sini",
   "wardPatient": "Ward patient",
-  "wards": "Bangsal"
+  "wards": "Bangsal",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }

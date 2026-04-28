@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "მითითებულია არასწორი მდებარეობა",
   "invalidWardLocation": "არასწორი პალატის მდებარეობა: {{location}}",
   "labelColon": "{{label}}:",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "მამრი",
   "manage": "მართვა",
   "minutes_one": "{{count}} წუთი",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "No pending admission requests",
   "note": "შენიშვნა",
   "noteDeletedSuccessfully": "Note deleted successfully",
+  "noteEditHistory": "Note edit history",
   "notes": "შენიშვნები",
   "notesRequiredForCancellingRequest": "Notes required for cancelling admission or transfer request",
   "orderBasket": "Order basket",
@@ -116,6 +118,7 @@
   "previousPage": "წინა გვერდი",
   "proceedWithPatientDischarge": "პაციენტის გაწერის გაგრძელება",
   "save": "შენახვა",
+  "saveEdit": "Save edit",
   "saving": "მიმდინარეობს შენახვა...",
   "searchLocations": "ძებნის მდებარეობები",
   "seconds_one": "{{count}} წამი",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "გადაყვანის ტიპი",
   "unknown": "უცნობი",
   "unknownError": "An unknown error occurred",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "პაციენტის შენიშვნა შენახულია",
   "wardClinicalNotePlaceholder": "დაწერეთ აქ ნებისმიერი შენიშვნა",
   "wardPatient": "Ward patient",
-  "wards": "პალატები"
+  "wards": "პალატები",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }
