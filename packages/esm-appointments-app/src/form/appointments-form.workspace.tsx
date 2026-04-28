@@ -67,6 +67,103 @@ const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
 /**
  * Workspace used to create or edit an appointment within the appointments app
  */
+const appointmentsFormSchema = z
+  .object({
+    duration: z.union([z.number(), z.null()]).optional(),
+    isAllDayAppointment: z.boolean(),
+    location: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
+    }),
+    provider: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
+    }),
+    appointmentStatus: z.string().optional(),
+    appointmentNote: z.string(),
+    appointmentType: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
+    }),
+    selectedService: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
+    }),
+    recurringPatternType: z.enum(['DAY', 'WEEK']),
+    recurringPatternPeriod: z.number(),
+    recurringPatternDaysOfWeek: z.array(z.string()),
+    selectedDaysOfWeekText: z.string().optional(),
+    startTime: z.string().refine((value) => isValidTime(value), {
+      message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
+    }),
+    timeFormat: z.enum(['AM', 'PM']),
+    appointmentDateTime: z.object({
+      startDate: z.date(),
+      startDateText: z.string(),
+      recurringPatternEndDate: z.date().nullable(),
+      recurringPatternEndDateText: z.string().nullable(),
+    }),
+    formIsRecurringAppointment: z.boolean(),
+    dateAppointmentScheduled: z.date().optional(),
+  })
+  .refine(
+    (formValues) => {
+      if (formValues.formIsRecurringAppointment === true) {
+        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+      }
+      return true;
+    },
+    {
+      path: ['appointmentDateTime.recurringPatternEndDate'],
+      message: translateFrom(
+        moduleName,
+        'recurringAppointmentShouldHaveEndDate',
+        'A recurring appointment should have an end date',
+      ),
+    },
+  )
+  .refine(
+    (formValues) => {
+      const { appointmentDateTime, dateAppointmentScheduled } = formValues;
+
+      const startDate = appointmentDateTime?.startDate;
+
+      if (!startDate || !dateAppointmentScheduled) return true;
+
+      const normalizeDate = (date: Date) => {
+        const normalizedDate = new Date(date);
+        normalizedDate.setHours(0, 0, 0, 0);
+        return normalizedDate;
+      };
+
+      const startDateObj = normalizeDate(startDate);
+      const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
+
+      return scheduledDateObj <= startDateObj;
+    },
+    {
+      path: ['dateAppointmentScheduled'],
+      message: translateFrom(
+        moduleName,
+        'dateAppointmentIssuedCannotBeAfterAppointmentDate',
+        'Date appointment issued cannot be after the appointment date',
+      ),
+    },
+  )
+  .superRefine((data, ctx) => {
+    // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
+    if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
+      ctx.addIssue({
+        path: ['duration'],
+        code: z.ZodIssueCode.custom,
+        message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+      });
+    }
+    if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
+      ctx.addIssue({
+        path: ['duration'],
+        code: z.ZodIssueCode.custom,
+        message: translateFrom(moduleName, 'durationMaxErrorMessage', 'Duration cannot exceed 1440 minutes (24 hours)'),
+      });
+    }
+  });
+type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps>> = ({
   workspaceProps: { appointment, recurringPattern, patientUuid },
   closeWorkspace,
@@ -122,103 +219,6 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       : undefined;
 
   // t('durationErrorMessage', 'Duration should be greater than zero')
-  const appointmentsFormSchema = z
-    .object({
-      duration: z.union([z.number(), z.null()]).optional(),
-      isAllDayAppointment: z.boolean(),
-      location: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
-      }),
-      provider: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
-      }),
-      appointmentStatus: z.string().optional(),
-      appointmentNote: z.string(),
-      appointmentType: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
-      }),
-      selectedService: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
-      }),
-      recurringPatternType: z.enum(['DAY', 'WEEK']),
-      recurringPatternPeriod: z.number(),
-      recurringPatternDaysOfWeek: z.array(z.string()),
-      selectedDaysOfWeekText: z.string().optional(),
-      startTime: z.string().refine((value) => isValidTime(value), {
-        message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
-      }),
-      timeFormat: z.enum(['AM', 'PM']),
-      appointmentDateTime: z.object({
-        startDate: z.date(),
-        startDateText: z.string(),
-        recurringPatternEndDate: z.date().nullable(),
-        recurringPatternEndDateText: z.string().nullable(),
-      }),
-      formIsRecurringAppointment: z.boolean(),
-      dateAppointmentScheduled: z.date().optional(),
-    })
-    .refine(
-      (formValues) => {
-        if (formValues.formIsRecurringAppointment === true) {
-          return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
-        }
-        return true;
-      },
-      {
-        path: ['appointmentDateTime.recurringPatternEndDate'],
-        message: t('recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
-      },
-    )
-    .refine(
-      (formValues) => {
-        const { appointmentDateTime, dateAppointmentScheduled } = formValues;
-
-        const startDate = appointmentDateTime?.startDate;
-
-        if (!startDate || !dateAppointmentScheduled) return true;
-
-        const normalizeDate = (date: Date) => {
-          const normalizedDate = new Date(date);
-          normalizedDate.setHours(0, 0, 0, 0);
-          return normalizedDate;
-        };
-
-        const startDateObj = normalizeDate(startDate);
-        const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
-
-        return scheduledDateObj <= startDateObj;
-      },
-      {
-        path: ['dateAppointmentScheduled'],
-        message: t(
-          'dateAppointmentIssuedCannotBeAfterAppointmentDate',
-          'Date appointment issued cannot be after the appointment date',
-        ),
-      },
-    )
-    .superRefine((data, ctx) => {
-      // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
-      if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
-        ctx.addIssue({
-          path: ['duration'],
-          code: z.ZodIssueCode.custom,
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-        });
-      }
-      if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
-        ctx.addIssue({
-          path: ['duration'],
-          code: z.ZodIssueCode.custom,
-          message: translateFrom(
-            moduleName,
-            'durationMaxErrorMessage',
-            'Duration cannot exceed 1440 minutes (24 hours)',
-          ),
-        });
-      }
-    });
-
-  type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
   const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
     ? new Date(appointment?.dateAppointmentScheduled)
@@ -925,8 +925,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
  */
 interface TimeAndDurationProps {
   t: ReturnType<typeof useTranslation>['t'];
-  control: Control<Record<string, any>>;
-  errors: FieldErrors<Record<string, any>>;
+  control: Control<AppointmentFormData>;
+  errors: FieldErrors<AppointmentFormData>;
 }
 
 function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {

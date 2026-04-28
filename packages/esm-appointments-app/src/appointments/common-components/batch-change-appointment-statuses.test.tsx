@@ -1,12 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import BatchChangeAppointmentStatusesModal from './batch-change-appointment-statuses.modal';
+import { type FetchResponse } from '@openmrs/esm-api';
 
 const mockCloseModal = jest.fn();
 const mockMutateAppointments = jest.fn();
@@ -40,17 +42,17 @@ const mockAppointment1: Appointment = {
   service: {
     appointmentServiceId: 1,
     name: 'Outpatient',
-    description: null,
+    description: '',
     startTime: '',
     endTime: '',
     maxAppointmentsLimit: null,
-    durationMins: null,
+    durationMins: 0,
     location: {
       uuid: 'location-1',
     },
     uuid: 'service-1',
     initialAppointmentStatus: 'Scheduled',
-    creatorName: null,
+    creatorName: '',
   },
   provider: {
     uuid: 'provider-1',
@@ -67,8 +69,8 @@ const mockAppointment1: Appointment = {
   voided: false,
   teleconsultationLink: null,
   extensions: {},
-  endDateTime: null,
-  dateAppointmentScheduled: null,
+  endDateTime: new Date().toISOString(),
+  dateAppointmentScheduled: new Date().toISOString(),
 };
 
 const mockAppointment2: Appointment = {
@@ -118,7 +120,7 @@ describe('BatchChangeAppointmentStatusesModal', () => {
 
   it('successfully changes status of multiple appointments', async () => {
     const user = userEvent.setup();
-    mockChangeAppointmentStatus.mockResolvedValue({} as any);
+    mockChangeAppointmentStatus.mockResolvedValue({} as FetchResponse);
 
     render(
       <BatchChangeAppointmentStatusesModal
