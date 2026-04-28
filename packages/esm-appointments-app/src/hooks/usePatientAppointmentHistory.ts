@@ -24,7 +24,7 @@ export function usePatientAppointmentHistory(patientUuid: string) {
     });
 
   const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
-    patientUuid ? appointmentsSearchUrl : null,
+    patientUuid ? [appointmentsSearchUrl, patientUuid, selectedDate] : null,
     fetcher,
   );
 
