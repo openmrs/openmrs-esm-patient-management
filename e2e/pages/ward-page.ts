@@ -116,4 +116,18 @@ export class WardPage {
       .getByText(new RegExp(`${patientName}\\s+has been successfully admitted and assigned to bed ${bedNumber}`, 'i'))
       .waitFor({ state: 'visible' });
   }
+
+  async clickAdmitButton() {
+    await this.page.getByRole('button', { name: 'Admit', exact: true }).click();
+  }
+
+  async selectBedByLabel(label: string) {
+    try {
+      await this.page.getByRole('radio', { name: label }).waitFor({ state: 'visible', timeout: 2000 });
+      await this.page.locator('label.cds--radio-button__label', { hasText: label }).click();
+    } catch {
+      await this.page.getByRole('combobox', { name: /choose an option|select a bed/i }).click();
+      await this.page.getByRole('option', { name: label }).click();
+    }
+  }
 }
