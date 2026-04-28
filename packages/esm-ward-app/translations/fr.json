@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "Unité sélectionnée invalide",
   "invalidWardLocation": "Unité invalide : {{location}}",
   "labelColon": "{{label}}:",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "Homme",
   "manage": "Gérer",
   "minutes_one": "{{count}} minutes",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "Aucune demande d'admission en attente",
   "note": "Note",
   "noteDeletedSuccessfully": "Note deleted successfully",
+  "noteEditHistory": "Note edit history",
   "notes": "Notes",
   "notesRequiredForCancellingRequest": "Les notes sont obligatoires pour annuler une admission ou un transfert",
   "orderBasket": "Order basket",
@@ -116,6 +118,7 @@
   "previousPage": "Page précédente",
   "proceedWithPatientDischarge": "Procéder à la sortie du patient",
   "save": "Enregistrer",
+  "saveEdit": "Save edit",
   "saving": "Enregistrement...",
   "searchLocations": "Chercher les unités",
   "seconds_one": "{{count}} seconde",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "Type de transfert",
   "unknown": "Inconnu",
   "unknownError": "Erreur inconnue",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "Note enregistrée",
   "wardClinicalNotePlaceholder": "Indiquez les notes ici",
   "wardPatient": "Ward patient",
-  "wards": "Admissions"
+  "wards": "Admissions",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }

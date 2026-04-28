@@ -76,7 +76,7 @@ describe('AppointmentsTable', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       customPatientChartUrl: 'url-to-patient-chart',
-      checkInButton: { enabled: false, showIfActiveVisit: false, customUrl: null },
+      checkInButton: { enabled: false, customUrl: null },
       checkOutButton: { enabled: false, customUrl: null },
     });
   });

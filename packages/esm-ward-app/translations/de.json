@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "Es wurde ein ungültiger Speicherort angegeben",
   "invalidWardLocation": "Ungültiger Standort der Station: {{location}}",
   "labelColon": "{{label}}:",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "männlich",
   "manage": "Verwalten",
   "minutes_one": "{{count}} Minuten",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "Keine ausstehenden Zulassungsanträge",
   "note": "Notiz",
   "noteDeletedSuccessfully": "Notiz erfolgreich gelöscht",
+  "noteEditHistory": "Note edit history",
   "notes": "Notizen",
   "notesRequiredForCancellingRequest": "Erforderliche Angaben für die Stornierung eines Zulassungs- oder Übertragungsantrags",
   "orderBasket": "Warenkorb",
@@ -116,6 +118,7 @@
   "previousPage": "Vorherige Seite",
   "proceedWithPatientDischarge": "Mit der Entlassung des Patienten fortfahren",
   "save": "Speichern",
+  "saveEdit": "Save edit",
   "saving": "Speichern",
   "searchLocations": "Standorte suchen",
   "seconds_one": "{{count}} Sekunde",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "Art der Überweisung",
   "unknown": "Unbekannt",
   "unknownError": "Es ist ein unbekannter Fehler aufgetreten",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "Patientennotiz gespeichert",
   "wardClinicalNotePlaceholder": "Trage hier deine Notizen ein",
   "wardPatient": "Stationärer Patient",
-  "wards": "Stationen"
+  "wards": "Stationen",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }
