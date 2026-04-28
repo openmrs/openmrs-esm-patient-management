@@ -12,7 +12,7 @@ interface QueuePriorityProps {
 }
 
 const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment, priorityConfigs }) => {
-  const priorityConfig = priorityConfigs.find((c) => c.conceptUuid === priority.uuid);
+  const priorityConfig = priorityConfigs.find((c) => c.conceptUuid === priority?.uuid);
 
   const tag = (
     <Tag
@@ -23,7 +23,7 @@ const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment
         priorityConfig?.color === 'orange' && styles.orange,
       )}
       type={priorityConfig?.color !== 'orange' ? priorityConfig?.color : null}>
-      {priority.display}
+      {priority?.display}
     </Tag>
   );
 
