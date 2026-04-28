@@ -1,6 +1,6 @@
+import { Button, Search } from '@carbon/react';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
 
 interface PatientSearchBarProps {
@@ -36,27 +36,45 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
       [onSubmit, searchTerm],
     );
 
-    return (
-      <form onSubmit={handleSubmit} className={styles.searchArea}>
-        <Search
-          autoFocus
-          className={styles.patientSearchInput}
-          closeButtonLabelText={t('clearSearch', 'Clear')}
-          data-testid="patientSearchBar"
-          data-tutorial-target="patient-search-bar"
-          labelText={t('searchForPatient', 'Search for a patient by name or identifier number')}
-          onChange={(event) => handleChange(event.target.value)}
-          onClear={onClear}
-          placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
-          ref={ref}
+   return (
+    <form onSubmit={handleSubmit} className={styles.searchArea}>
+      <Search
+        autoFocus
+        className={styles.patientSearchInput}
+        closeButtonLabelText={t('clearSearch', 'Clear')}
+        data-testid="patientSearchBar"
+        data-tutorial-target="patient-search-bar"
+        labelText={t('searchForPatient', 'Search for a patient by name or identifier number')}
+        onChange={(event) => handleChange(event.target.value)}
+        onClear={() => {
+          setSearchTerm('');
+          onClear();
+        }}
+        placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
+        ref={ref}
+        size={responsiveSize}
+        value={searchTerm}
+      />
+
+      {/* ✅ NEW CLEAR BUTTON */}
+      {searchTerm && (
+        <Button
+          kind="ghost"
           size={responsiveSize}
-          value={searchTerm}
-        />
-        <Button kind="secondary" {...buttonProps} size={responsiveSize} type="submit">
-          {t('search', 'Search')}
+          onClick={() => {
+            setSearchTerm('');
+            onClear();
+          }}
+        >
+          {t('clear', 'Clear')}
         </Button>
-      </form>
-    );
+      )}
+
+      <Button kind="secondary" {...buttonProps} size={responsiveSize} type="submit">
+        {t('search', 'Search')}
+      </Button>
+    </form>
+   );
   },
 );
 
