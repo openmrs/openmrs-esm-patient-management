@@ -672,7 +672,6 @@ describe('QueueEntryActionModal - time validation with minute precision', () => 
     const timeInput = screen.getByRole('textbox', { name: 'Time' });
     await user.clear(timeInput);
 
-    // Timezone-proof: Extragem ora locală direct din obiectul Date și o aducem la format 12-hour
     const prevDate = new Date('2024-01-02T05:31:59.000+0000');
     const hours = prevDate.getHours() % 12 || 12;
     const formattedHours = hours.toString().padStart(2, '0');
@@ -704,7 +703,6 @@ describe('QueueEntryActionModal - time validation with minute precision', () => 
     const timeInput = screen.getByRole('textbox', { name: 'Time' });
     await user.clear(timeInput);
 
-    // Timezone-proof: Setăm o dată clar înaintea limitei (ex: cu un minut înainte)
     const beforeDate = new Date('2024-01-02T05:30:00.000+0000');
     const hours = beforeDate.getHours() % 12 || 12;
     const formattedHours = hours.toString().padStart(2, '0');
