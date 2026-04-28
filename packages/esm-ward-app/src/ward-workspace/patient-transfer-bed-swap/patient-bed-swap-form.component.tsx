@@ -1,22 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, InlineNotification } from '@carbon/react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, ButtonSet, Form, InlineNotification, CheckboxGroup, Checkbox, Stack } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
-import type { WardPatientWorkspaceProps, WardViewContext } from '../../types';
-import { assignPatientToBed, useCreateEncounter, removePatientFromBed } from '../../ward.resource';
+import { assignPatientToBed, removePatientFromBed, useCreateEncounter } from '../../ward.resource';
+import { type PatientAdmitOrTransferFormProps } from './patient-admit-or-transfer-request-form.component';
+import { type WardViewContext } from '../../types';
 import BedSelector from '../bed-selector.component';
+import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
+import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import styles from './patient-transfer-swap.scss';
 
 export default function PatientBedSwapForm({
-  promptBeforeClosing,
-  closeWorkspaceWithSavedChanges,
   wardPatient,
-}: WardPatientWorkspaceProps) {
-  const { patient, visit } = wardPatient;
+  relatedTransferPatients = [],
+  onCancel,
+  onSuccess,
+}: PatientAdmitOrTransferFormProps) {
+  const { patient } = wardPatient;
   const { t } = useTranslation();
   const [showErrorNotifications, setShowErrorNotifications] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
@@ -24,6 +28,7 @@ export default function PatientBedSwapForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const { isLoading } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
+  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
 
   const zodSchema = useMemo(
     () =>
@@ -41,13 +46,7 @@ export default function PatientBedSwapForm({
     formState: { errors, isDirty },
     control,
     handleSubmit,
-    getValues,
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema) });
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-    return () => promptBeforeClosing(null);
-  }, [isDirty, promptBeforeClosing]);
 
   const beds = useMemo(() => wardPatientGroupDetails?.bedLayouts ?? [], [wardPatientGroupDetails]);
 
@@ -56,27 +55,41 @@ export default function PatientBedSwapForm({
       const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
       setIsSubmitting(true);
       setShowErrorNotifications(false);
-      createEncounter(patient, emrConfiguration.bedAssignmentEncounterType, visit.uuid)
-        .then(async (response) => {
+
+      const wardPatientsToSwap = [
+        wardPatient,
+        ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
+      ];
+
+      Promise.all(
+        wardPatientsToSwap.map(async (wardPatientToSwap) => {
+          const { patient: patientToSwap, visit: patientToSwapVisit } = wardPatientToSwap;
+
+          const response = await createEncounter(
+            patientToSwap,
+            emrConfiguration.bedAssignmentEncounterType,
+            patientToSwapVisit.uuid,
+          );
           if (response.ok) {
             if (bedSelected) {
-              return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
+              return assignPatientToBed(values.bedId, patientToSwap.uuid, response.data.uuid);
             } else {
               // get the bed that the patient is currently assigned to
               const bedAssignedToPatient = beds.find((bed) =>
-                bed.patients.some((bedPatient) => bedPatient.uuid == patient.uuid),
+                bed.patients.some((bedPatient) => bedPatient.uuid == patientToSwap.uuid),
               );
               if (bedAssignedToPatient) {
-                return removePatientFromBed(bedAssignedToPatient.bedId, patient.uuid);
+                return removePatientFromBed(bedAssignedToPatient.bedId, patientToSwap.uuid);
               } else {
                 // no-op
                 return Promise.resolve({ ok: true });
               }
             }
           }
-        })
-        .then((response) => {
-          if (response && response?.ok) {
+        }),
+      )
+        .then((responses) => {
+          if (responses.every((response) => response?.ok)) {
             if (bedSelected) {
               showSnackbar({
                 kind: 'success',
@@ -95,6 +108,7 @@ export default function PatientBedSwapForm({
                 }),
               });
             }
+            onSuccess();
           }
         })
         .catch((error: Error) => {
@@ -107,7 +121,6 @@ export default function PatientBedSwapForm({
         .finally(() => {
           setIsSubmitting(false);
           wardPatientGroupDetails.mutate();
-          closeWorkspaceWithSavedChanges();
         });
     },
     [
@@ -117,8 +130,10 @@ export default function PatientBedSwapForm({
       emrConfiguration,
       t,
       wardPatientGroupDetails,
-      closeWorkspaceWithSavedChanges,
-      visit.uuid,
+      onSuccess,
+      selectedRelatedPatient,
+      relatedTransferPatients,
+      wardPatient,
     ],
   );
 
@@ -126,12 +141,15 @@ export default function PatientBedSwapForm({
     setShowErrorNotifications(true);
   }, []);
 
-  if (!wardPatientGroupDetails) return <></>;
+  if (!wardPatientGroupDetails) {
+    return null;
+  }
+
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
       className={classNames(styles.formContainer, styles.workspaceContent)}>
-      <div>
+      <Stack gap={4}>
         {errorFetchingEmrConfiguration && (
           <div className={styles.formError}>
             <InlineNotification
@@ -146,22 +164,51 @@ export default function PatientBedSwapForm({
             />
           </div>
         )}
-        <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
-        <Controller
-          name="bedId"
-          control={control}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <BedSelector
-              beds={beds}
-              isLoadingBeds={isLoading}
-              currentPatient={patient}
-              selectedBedId={value}
-              error={error}
-              control={control}
-              onChange={onChange}
-            />
-          )}
-        />
+        {relatedTransferPatients?.length > 0 && (
+          <div>
+            <CheckboxGroup legendText={t('alsoSwap', 'Also swap:')}>
+              {relatedTransferPatients?.map(({ patient: relatedPatient }) => (
+                <div key={'also-swap-' + relatedPatient.uuid}>
+                  <Checkbox
+                    checked={selectedRelatedPatient.includes(relatedPatient.uuid)}
+                    className={styles.checkbox}
+                    id={relatedPatient.uuid}
+                    labelText={
+                      <div className={styles.relatedPatientTransferSwapOption}>
+                        <WardPatientName patient={relatedPatient} />
+                        <WardPatientIdentifier id="patient-identifier" patient={relatedPatient} />
+                      </div>
+                    }
+                    onChange={(_event, { checked, id }) => {
+                      const currentValue = selectedRelatedPatient;
+                      setCheckedRelatedPatient(
+                        checked ? [...currentValue, id] : currentValue.filter((item) => item !== id),
+                      );
+                    }}
+                  />
+                </div>
+              ))}
+            </CheckboxGroup>
+          </div>
+        )}
+        <div className={styles.field}>
+          <h2 className={styles.productiveHeading02}>{t('selectABed', 'Select a bed')}</h2>
+          <Controller
+            name="bedId"
+            control={control}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <BedSelector
+                beds={beds}
+                isLoadingBeds={isLoading}
+                currentPatient={patient}
+                selectedBedId={value}
+                error={error}
+                control={control}
+                onChange={onChange}
+              />
+            )}
+          />
+        </div>
         {showErrorNotifications && (
           <div className={styles.notifications}>
             {Object.values(errors).map((error) => (
@@ -169,9 +216,9 @@ export default function PatientBedSwapForm({
             ))}
           </div>
         )}
-      </div>
+      </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button size="xl" kind="secondary" onClick={closeWorkspaceWithSavedChanges}>
+        <Button size="xl" kind="secondary" onClick={onCancel}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button

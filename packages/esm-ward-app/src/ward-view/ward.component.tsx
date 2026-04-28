@@ -13,11 +13,9 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
   const { t } = useTranslation();
 
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
-  const { bedLayouts } = wardPatientGroupDetails ?? {};
-  const { isLoading: isLoadingAdmissionLocation, error: errorLoadingAdmissionLocation } =
-    wardPatientGroupDetails?.admissionLocationResponse ?? {};
+  const { bedLayouts, isLoading } = wardPatientGroupDetails ?? {};
+  const { error: errorLoadingAdmissionLocation } = wardPatientGroupDetails?.admissionLocationResponse ?? {};
   const {
-    isLoading: isLoadingInpatientAdmissions,
     error: errorLoadingInpatientAdmissions,
     hasMore: hasMoreInpatientAdmissions,
     loadMore: loadMoreInpatientAdmissions,
@@ -31,7 +29,7 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              if (hasMoreInpatientAdmissions && !errorLoadingInpatientAdmissions && !isLoadingInpatientAdmissions) {
+              if (hasMoreInpatientAdmissions && !errorLoadingInpatientAdmissions && !isLoading) {
                 loadMoreInpatientAdmissions();
               }
             }
@@ -55,9 +53,9 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
     [
       errorLoadingInpatientAdmissions,
       hasMoreInpatientAdmissions,
-      isLoadingInpatientAdmissions,
       loadMoreInpatientAdmissions,
       scrollToLoadMoreTrigger,
+      isLoading,
     ],
   );
 
@@ -65,7 +63,14 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
 
   return (
     <div className={classNames(styles.wardViewMain, styles.verticalTiling)}>
-      {wardBeds}
+      {isLoading ? (
+        <EmptyBeds />
+      ) : (
+        <>
+          {wardBeds}
+          {wardUnassignedPatients}
+        </>
+      )}
       {bedLayouts?.length == 0 && isBedManagementModuleInstalled && (
         <InlineNotification
           kind="warning"
@@ -73,8 +78,6 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
           title={t('noBedsConfigured', 'No beds configured for this location')}
         />
       )}
-      {wardUnassignedPatients}
-      {(isLoadingAdmissionLocation || isLoadingInpatientAdmissions) && <EmptyBeds />}
       {errorLoadingAdmissionLocation && (
         <InlineNotification
           kind="error"

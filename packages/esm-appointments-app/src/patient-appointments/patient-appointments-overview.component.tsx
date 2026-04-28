@@ -1,13 +1,9 @@
 import React from 'react';
 import { DataTableSkeleton } from '@carbon/react';
 import { useParams } from 'react-router-dom';
-import { usePatient, useLayoutType, isDesktop, WorkspaceContainer } from '@openmrs/esm-framework';
-import {
-  PatientAppointmentContextProvider,
-  PatientAppointmentContextTypes,
-} from '../hooks/patient-appointment-context';
-import PatientAppointmentsBase from './patient-appointments-base.component';
-import PatientAppointmentsHeader from './patient-appointments-header';
+import { usePatient, useLayoutType, isDesktop, WorkspaceContainer, launchWorkspace2 } from '@openmrs/esm-framework';
+import PatientAppointmentsDetailedSummary from './patient-appointments-detailed-summary.extension';
+import PatientAppointmentsHeader from './patient-appointments-header.component';
 import styles from './patient-appointments-overview.scss';
 
 /**
@@ -22,18 +18,19 @@ const PatientAppointmentsOverview: React.FC = () => {
   const response = usePatient(params.patientUuid);
   const layout = useLayoutType();
 
-  return (
-    <PatientAppointmentContextProvider value={PatientAppointmentContextTypes.APPOINTMENTS_APP}>
-      {response.isLoading ? (
-        <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />
-      ) : (
-        <div className={styles.patientAppointmentsOverview}>
-          <PatientAppointmentsHeader patient={response.patient} />
-          <PatientAppointmentsBase patientUuid={response.patient.id} />
-          <WorkspaceContainer overlay contextKey={`patient/${params.patientUuid}`} />
-        </div>
-      )}
-    </PatientAppointmentContextProvider>
+  return response.isLoading ? (
+    <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />
+  ) : (
+    <div className={styles.patientAppointmentsOverview}>
+      <PatientAppointmentsHeader patient={response.patient} />
+      <PatientAppointmentsDetailedSummary
+        patientUuid={response.patient.id}
+        launchAppointmentForm={(patientUuid, appointment) => {
+          launchWorkspace2('appointments-form-workspace', { patientUuid, appointment });
+        }}
+      />
+      <WorkspaceContainer overlay contextKey={`patient/${params.patientUuid}`} />
+    </div>
   );
 };
 

@@ -70,7 +70,44 @@ describe('CompactPatientBanner', () => {
     //   screen.getByRole('link', { name: new RegExp(`Smith, John Doe Male · ${age} yrs · OpenMRS ID 1000NLY`, 'i') }),
     // ).toBeInTheDocument();
     // expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${patients[0].uuid}/chart/`);
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText('Patient Photo')).toBeInTheDocument();
     // expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
+  });
+
+  it('handles an array of valid patients', () => {
+    const multiplePatients: Array<SearchedPatient> = [
+      ...patients,
+      {
+        ...patients[0],
+        uuid: 'test-patient-uuid-2',
+        person: {
+          ...patients[0].person,
+          personName: {
+            display: 'Doe, Jane',
+            givenName: 'Jane',
+            middleName: '',
+            familyName: 'Doe',
+          },
+        },
+      },
+    ];
+
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        <CompactPatientBanner patients={multiplePatients} />
+      </PatientSearchContext.Provider>,
+    );
+
+    expect(screen.getAllByText('Patient Photo')).toHaveLength(2);
+  });
+
+  it('renders empty state when patients array is empty', () => {
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        <CompactPatientBanner patients={[]} />
+      </PatientSearchContext.Provider>,
+    );
+
+    expect(screen.queryByText('Patient Photo')).not.toBeInTheDocument();
   });
 });

@@ -16,7 +16,7 @@ const WardPatientResponsiveTooltip: React.FC<WardPatientResponsiveTooltipProps> 
   if (isDesktop(layout)) {
     return (
       <Tooltip description={tooltipContent} className={styles.responsiveTooltip}>
-        {children}
+        <span>{children}</span>
       </Tooltip>
     );
   } else {

@@ -4,11 +4,11 @@ import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
 
 interface PatientSearchBarProps {
-  buttonProps?: Object;
+  buttonProps?: object;
   initialSearchTerm?: string;
-  onChange?: (searchTerm) => void;
+  onChange?: (searchTerm: string) => void;
   onClear: () => void;
-  onSubmit: (searchTerm) => void;
+  onSubmit: (searchTerm: string) => void;
   isCompact?: boolean;
 }
 
@@ -38,7 +38,6 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
 
     return (
       <form onSubmit={handleSubmit} className={styles.searchArea}>
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <Search
           autoFocus
           className={styles.patientSearchInput}
@@ -53,7 +52,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
           size={responsiveSize}
           value={searchTerm}
         />
-        <Button kind="secondary" onClick={handleSubmit} {...buttonProps} size={responsiveSize} type="submit">
+        <Button kind="secondary" {...buttonProps} size={responsiveSize} type="submit">
           {t('search', 'Search')}
         </Button>
       </form>

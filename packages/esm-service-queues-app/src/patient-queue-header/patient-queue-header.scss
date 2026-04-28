@@ -4,8 +4,7 @@
 
 .header {
   background-color: $ui-02;
-  border: 1px solid $ui-03;
-  border-left: 0px;
+  border-block: 1px solid $ui-03;
   display: flex;
   justify-content: space-between;
   padding-right: layout.$spacing-03;

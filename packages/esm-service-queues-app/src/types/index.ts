@@ -254,7 +254,7 @@ export interface PatientProgram {
 
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
-  missedAppointmentsCount;
+  missedAppointmentsCount: number;
   appointmentDate: number;
   appointmentServiceUuid: string;
 }
@@ -278,16 +278,6 @@ export interface QueueEntryPayload {
 
 export type AllowedPriority = OpenmrsResource;
 export type AllowedStatus = OpenmrsResource;
-
-// TODO: remove this in favor of Queue
-export interface QueueServiceInfo {
-  uuid: string;
-  display: string;
-  name: string;
-  description: string;
-  allowedPriorities: Array<AllowedPriority>;
-  allowedStatuses: Array<AllowedStatus>;
-}
 
 export interface MappedServiceQueueEntry {
   id: string;
@@ -401,6 +391,10 @@ export interface QueueRoom {
   display: string;
   name: string;
   description: string;
+  queue: {
+    uuid: string;
+    display: string;
+  };
 }
 
 export interface ProvidersQueueRoom {
@@ -469,7 +463,7 @@ export interface QueueEntry {
   queue: Queue;
   startedAt: string;
   status: Concept;
-  visit: Visit;
+  visit?: Visit | null;
   sortWeight: number;
   queueComingFrom: Queue;
   previousQueueEntry: QueueEntry;
@@ -490,5 +484,3 @@ export interface QueueEntrySearchCriteria {
 export interface Concept extends OpenmrsResource {
   setMembers?: Array<Concept>;
 }
-
-export interface Provider extends OpenmrsResource {}

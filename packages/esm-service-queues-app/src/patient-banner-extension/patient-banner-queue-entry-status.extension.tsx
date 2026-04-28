@@ -1,10 +1,10 @@
-import React from 'react';
-import { Button } from '@carbon/react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
 import { type ConfigObject, isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import styles from './patient-banner-queue-entry-status.scss';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import styles from './patient-banner-queue-entry-status.scss';
 
 interface PatientBannerQueueEntryStatusProps {
   patientUuid: string;
@@ -15,17 +15,18 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
+
+  const isPatientChart = renderedFrom === 'patient-chart';
+
   const queueEntry = queueEntries?.[0];
   const config = useConfig<ConfigObject>();
 
-  const isPatientChart = renderedFrom === 'patient-chart';
   if (!isPatientChart || !queueEntry) {
     return null;
   }
 
   return (
     <div className={styles.queueEntryStatusContainer}>
-      <span className={styles.separator}>&middot;</span>
       <span>{queueEntry.queue.name}</span>
       <QueuePriority
         priority={queueEntry.priority}

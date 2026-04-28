@@ -1,0 +1,73 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+@use './dashboard-container.scss';
+
+// 404 Not Found Styles
+.notFoundTile {
+  text-align: center;
+  margin: layout.$spacing-05;
+  padding: layout.$spacing-05;
+  border: 1px solid colors.$gray-20;
+}
+
+.desktopHeading {
+  h1 {
+    @include type.type-style('heading-compact-02');
+    color: colors.$gray-70;
+  }
+}
+
+.tabletHeading {
+  h1 {
+    @include type.type-style('heading-03');
+    color: colors.$gray-70;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  margin-bottom: layout.$spacing-05;
+
+  h1:after {
+    content: '';
+    display: block;
+    width: layout.$spacing-07;
+    padding-top: 0.188rem;
+    border-bottom: 0.375rem solid var(--brand-03);
+  }
+}
+
+.notFoundContent {
+  padding: layout.$spacing-07 0;
+}
+
+.errorCode {
+  font-size: 6rem;
+  font-weight: 300;
+  line-height: 1.2;
+  color: colors.$gray-60;
+  margin-bottom: layout.$spacing-05;
+}
+
+.errorMessage {
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
+  margin-bottom: layout.$spacing-05;
+}
+
+.errorDescription {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-04;
+}
+
+// RTL support
+html[dir='rtl'] {
+  .desktopHeading,
+  .tabletHeading {
+    text-align: right;
+  }
+}

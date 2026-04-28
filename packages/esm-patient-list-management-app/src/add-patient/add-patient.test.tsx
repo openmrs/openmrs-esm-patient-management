@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
-import { useAddablePatientLists } from '../api/api-remote';
+import { useAddablePatientLists } from '../api/patient-list.resource';
 import { mockPatient } from '__mocks__';
 import AddPatient from './add-patient.modal';
 
@@ -10,7 +10,7 @@ const mockNavigate = jest.mocked(navigate);
 const mockUseAddablePatientLists = jest.mocked(useAddablePatientLists);
 const mockCloseModal = jest.fn();
 
-jest.mock('../api/api-remote', () => ({
+jest.mock('../api/patient-list.resource', () => ({
   useAddablePatientLists: jest.fn(),
 }));
 

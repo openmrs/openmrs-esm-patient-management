@@ -1,11 +1,19 @@
 import { type Page } from '@playwright/test';
 
-export class AppointmentsPage {
+export class PatientChartAppointmentsPage {
   constructor(readonly page: Page) {}
 
   readonly appointmentsTable = () => this.page.getByTestId('table');
 
   async goto(uuid: string) {
-    await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/Appointments`);
+    await this.page.goto(`${process.env.E2E_BASE_URL}/spa/patient/${uuid}/chart/appointments`);
+  }
+}
+
+export class AppointmentsPage {
+  constructor(readonly page: Page) {}
+
+  async goto() {
+    await this.page.goto(`${process.env.E2E_BASE_URL}/spa/home/appointments`);
   }
 }

@@ -95,9 +95,9 @@ export const DobField: React.FC = () => {
           <div className={styles.dobContentSwitcherLabel}>
             <span className={styles.label01}>{t('dobToggleLabelText', 'Date of birth known?')}</span>
           </div>
-          <ContentSwitcher onChange={onToggle} selectedIndex={dobUnknown ? 1 : 0}>
-            <Switch name="known" text={t('yes', 'Yes')} />
-            <Switch name="unknown" text={t('no', 'No')} />
+          <ContentSwitcher size="md" onChange={onToggle} selectedIndex={dobUnknown ? 1 : 0}>
+            <Switch name="known">{t('yes', 'Yes')}</Switch>
+            <Switch name="unknown">{t('no', 'No')}</Switch>
           </ContentSwitcher>
         </div>
       )}

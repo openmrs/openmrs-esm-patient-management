@@ -1,5 +1,6 @@
 export const dashboardMeta = {
-  name: 'patient-lists',
+  path: 'patient-lists',
   slot: 'patient-lists-dashboard-slot',
-  title: 'Patient lists',
-};
+  title: 'patientLists',
+  basePath: `${window.spaBase}/home`,
+} as const;

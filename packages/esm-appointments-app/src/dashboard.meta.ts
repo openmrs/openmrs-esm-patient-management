@@ -1,22 +1,21 @@
-import { Calendar } from '@carbon/react/icons';
-
 export const dashboardMeta = {
-  name: 'appointments',
+  path: 'appointments',
   slot: 'clinical-appointments-dashboard-slot',
   title: 'Appointments',
-};
+  basePath: `${window.spaBase}/home`,
+} as const;
 
 export const appointmentCalendarDashboardMeta = {
-  name: 'calendar',
+  path: 'calendar',
   slot: 'clinical-appointments-dashboard-slot',
-  title: 'Appointments Calendar',
-  renderIcon: Calendar,
-};
+  title: 'Appointments calendar',
+  basePath: `${window.spaBase}/home`,
+} as const;
 
 export const patientChartDashboardMeta = {
   slot: 'patient-chart-appointments-dashboard-slot',
   columns: 1,
   title: 'Appointments',
-  path: 'Appointments',
+  path: 'appointments',
   icon: 'omrs-icon-event-schedule',
-};
+} as const;

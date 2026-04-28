@@ -51,6 +51,20 @@ describe('CompactPatientSearchComponent', () => {
     expect(searchResultsContainer).toBeInTheDocument();
   });
 
+  it('does not render recently searched patients when the feature is disabled', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      search: {
+        showRecentlySearchedPatients: false,
+        disableTabletSearchOnKeyUp: true,
+      } as PatientSearchConfig['search'],
+    });
+
+    renderWithRouter(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
+
+    expect(screen.queryByTestId('floatingSearchResultsContainer')).not.toBeInTheDocument();
+  });
+
   it('navigates to the advanced search page with the correct query string when the Search button is clicked', async () => {
     const user = userEvent.setup();
 

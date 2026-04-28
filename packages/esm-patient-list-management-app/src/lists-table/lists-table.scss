@@ -81,6 +81,11 @@
 }
 
 // Patient List Table
+.filterContainer {
+  display: flex;
+  align-items: center;
+}
+
 .searchContainer {
   display: grid;
   grid-template-columns: 1fr 1fr;

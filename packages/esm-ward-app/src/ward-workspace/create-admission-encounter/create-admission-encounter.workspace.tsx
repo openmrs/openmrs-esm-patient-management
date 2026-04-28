@@ -1,7 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineNotification, SkeletonText } from '@carbon/react';
-import { ArrowLeftIcon, type DefaultWorkspaceProps, useVisit } from '@openmrs/esm-framework';
+import {
+  ArrowLeftIcon,
+  closeWorkspaceGroup2,
+  type DefaultWorkspaceProps,
+  useVisit,
+  Workspace2,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import { useInpatientAdmissionByPatients } from '../../hooks/useInpatientAdmissionByPatients';
 import { useInpatientRequestByPatients } from '../../hooks/useInpatientRequestByPatients';
@@ -12,8 +19,7 @@ import AdmitPatientButton from '../admit-patient-button.component';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 
 export interface CreateAdmissionEncounterWorkspaceProps {
-  patientUuid: string;
-  handleReturnToSearchList?: () => void;
+  selectedPatientUuid: string;
 }
 
 /**
@@ -21,37 +27,46 @@ export interface CreateAdmissionEncounterWorkspaceProps {
  * from the workspace triggered by the "Add patient to ward" button.
  * It directly admits them to the current ward locations
  */
-const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorkspaceProps & DefaultWorkspaceProps> = ({
-  patientUuid,
-  handleReturnToSearchList,
-  closeWorkspaceWithSavedChanges,
-}) => {
+const CreateAdmissionEncounterWorkspace: React.FC<
+  Workspace2DefinitionProps<
+    CreateAdmissionEncounterWorkspaceProps,
+    {
+      startVisitWorkspaceName: string;
+    },
+    {}
+  >
+> = ({ closeWorkspace, workspaceProps: { selectedPatientUuid } }) => {
   const { location } = useWardLocation();
-  const { patient, isLoading: isLoadingPatient, error: errorLoadingPatient } = useRestPatient(patientUuid);
-  const { activeVisit, isLoading: isLoadingVisit, error: errorLoadingVisit } = useVisit(patientUuid);
+  const { patient, isLoading: isLoadingPatient, error: errorLoadingPatient } = useRestPatient(selectedPatientUuid);
+  const { activeVisit, isLoading: isLoadingVisit, error: errorLoadingVisit } = useVisit(selectedPatientUuid);
   const { t } = useTranslation();
-  const { data: bedData, isLoading: isLoadingBed, error: errorLoadingBed } = useAssignedBedByPatient(patientUuid);
+  const {
+    data: bedData,
+    isLoading: isLoadingBed,
+    error: errorLoadingBed,
+  } = useAssignedBedByPatient(selectedPatientUuid);
   const {
     data: inpatientAdmissions,
     isLoading: isLoadingInpatientAdmission,
     error: errorInpatientAdmission,
-  } = useInpatientAdmissionByPatients([patientUuid]);
+  } = useInpatientAdmissionByPatients([selectedPatientUuid]);
   const {
     inpatientRequests,
     isLoading: isLoadingInpatientRequest,
     error: errorInpatientRequests,
-  } = useInpatientRequestByPatients([patientUuid]);
+  } = useInpatientRequestByPatients([selectedPatientUuid]);
 
   const isLoading =
     isLoadingPatient || isLoadingVisit || isLoadingBed || isLoadingInpatientAdmission || isLoadingInpatientRequest;
   const hasError =
     errorLoadingPatient || errorLoadingVisit || errorLoadingBed || errorInpatientAdmission || errorInpatientRequests;
 
+  let content: JSX.Element = null;
   if (isLoading) {
-    return <SkeletonText />;
+    content = <SkeletonText />;
   } else if (hasError) {
-    return (
-      <div>
+    content = (
+      <>
         <InlineNotification
           kind="error"
           lowContrast={true}
@@ -62,10 +77,10 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
           renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription={t('backToSearchResults', 'Back to search results')}
           size="sm"
-          onClick={() => handleReturnToSearchList?.()}>
+          onClick={() => closeWorkspace()}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
-      </div>
+      </>
     );
   } else {
     const assignedBedDetail = bedData.data.results[0];
@@ -86,8 +101,8 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
       inpatientAdmission: inpatientAdmissions[0],
       inpatientRequest: null,
     };
-    return (
-      <div>
+    content = (
+      <>
         <WardPatientWorkspaceBanner wardPatient={wardPatient} />
         {activeVisit ? (
           <div>
@@ -126,7 +141,10 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
             <AdmitPatientButton
               wardPatient={wardPatient}
               dispositionType={inpatientAdmissions[0] ? 'TRANSFER' : 'ADMIT'}
-              onAdmitPatientSuccess={() => closeWorkspaceWithSavedChanges()}
+              onAdmitPatientSuccess={async () => {
+                await closeWorkspace({ discardUnsavedChanges: true });
+                closeWorkspaceGroup2();
+              }}
               disabled={isAdmittedToCurrentLocation}
             />
           </div>
@@ -141,12 +159,18 @@ const CreateAdmissionEncounterWorkspace: React.FC<CreateAdmissionEncounterWorksp
           renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription={t('backToSearchResults', 'Back to search results')}
           size="sm"
-          onClick={() => handleReturnToSearchList?.()}>
+          onClick={() => closeWorkspace()}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
-      </div>
+      </>
     );
   }
+
+  return (
+    <Workspace2 title={t('admitPatient', 'Admit patient')}>
+      <div id="create-admission-encounter-workspace">{content}</div>
+    </Workspace2>
+  );
 };
 
 export default CreateAdmissionEncounterWorkspace;

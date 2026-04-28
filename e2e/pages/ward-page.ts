@@ -9,6 +9,8 @@ export class WardPage {
   readonly clinicalNotesField = () => this.page.getByRole('textbox', { name: /clinical notes/i });
   readonly wardAdmissionNoteField = () => this.page.getByRole('textbox', { name: /write your notes/i });
   readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
+  readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
+  readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
 
   async clickPatientCard(patientName: string) {
     // Wait for patient to be loaded - use first() to avoid strict mode violation
@@ -29,12 +31,26 @@ export class WardPage {
     await this.manageAdmissionRequestsButton().click();
   }
 
+  async waitForAdmissionRequest(patientName: string) {
+    // Wait for the admission request to appear in the list
+    // Note: API polling in test setup ensures data is available, so shorter timeout is sufficient
+    await this.page
+      .locator('[class*="admissionRequestCard"]')
+      .filter({ hasText: patientName })
+      .first()
+      .waitFor({ state: 'visible', timeout: 5000 });
+  }
+
   async clickPatientNotesButton() {
     await this.page.getByRole('button', { name: 'Patient Note' }).click();
   }
 
-  async clickCancelButton() {
-    await this.cancelButton().click();
+  async clickCancelAdmissionButton(patientName: string) {
+    await this.page
+      .locator(`[class*="admissionRequestCard"]:has-text("${patientName}") button`)
+      .filter({ hasText: 'Cancel' })
+      .first()
+      .click();
   }
 
   async fillWardAdmissionNote(note: string) {
@@ -63,6 +79,37 @@ export class WardPage {
       .first()
       .click();
   }
+
+  async selectBedForAdmission(bedNumber: string) {
+    await this.page.getByText(`${bedNumber} · Empty`).click();
+  }
+
+  async confirmAdmission() {
+    await this.page.getByRole('button', { name: 'Admit', exact: true }).click();
+  }
+
+  ////////////////////////////////////////
+  // Edit inpatients notes / View edit history
+
+  async selectEditNoteOption() {
+    await this.page.getByRole('button', { name: 'Options' }).click();
+    await this.page.getByRole('menuitem', { name: /^edit$/i }).click();
+  }
+
+  async fillEditNote(note: string) {
+    await this.page.getByRole('textbox', { name: /edit note/i }).fill(note);
+  }
+
+  async clickSaveEditButton() {
+    await this.page.getByRole('button', { name: 'Save edit' }).click();
+  }
+
+  async selectViewEditHistoryOption() {
+    await this.page.getByRole('button', { name: 'Options' }).click();
+    await this.page.getByRole('menuitem', { name: /view edit history/i }).click();
+  }
+
+  ////////////////////////////////////////
 
   async expectAdmissionSuccessNotification(patientName: string, bedNumber: string) {
     await this.page

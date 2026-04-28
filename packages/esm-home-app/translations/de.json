@@ -1,1 +1,6 @@
-{}
+{
+  "contactAdministrator": "Bitte versuchen Sie es über die Links im linken Navigationsmenü. Sollte das Problem weiterhin bestehen, wenden Sie sich bitte an Ihren Systemadministrator.",
+  "dashboardNotFound": "Das gesuchte Dashboard existiert nicht.",
+  "dashboardNotFoundDescription": "Die von Ihnen angeforderte Seite konnte nicht gefunden werden. Möglicherweise wurde sie verschoben oder gelöscht, oder das konfigurierte Dashboard existiert nicht.",
+  "pageNotFound": "Seite nicht gefunden"
+}

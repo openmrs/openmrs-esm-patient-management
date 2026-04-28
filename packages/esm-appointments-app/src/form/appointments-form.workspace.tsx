@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Controller, useController, useForm } from 'react-hook-form';
+import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
+  FormGroup,
   InlineLoading,
   MultiSelect,
   NumberInput,
@@ -34,50 +33,39 @@ import {
   useLocations,
   usePatient,
   useSession,
-  type DefaultWorkspaceProps,
+  Workspace2,
+  type Workspace2DefinitionProps,
   type FetchResponse,
 } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
-import {
-  checkAppointmentConflict,
-  saveAppointment,
-  saveRecurringAppointments,
-  useAppointmentService,
-  useMutateAppointments,
-} from './appointments-form.resource';
-import {
-  appointmentLocationTagName,
-  dateFormat,
-  datePickerFormat,
-  datePickerPlaceHolder,
-  moduleName,
-  weekDays,
-} from '../constants';
-import { useProviders } from '../hooks/useProviders';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
-import { useAppointmentsStore } from '../store';
+import { checkAppointmentConflict, saveAppointment, saveRecurringAppointments } from './appointments-form.resource';
+import { useAppointmentServices } from '../hooks/useAppointmentService';
+import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
+import { useProviders } from '../hooks/useProviders';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
 import Workload from '../workload/workload.component';
+import { useSelectedDate } from '../hooks/useSelectedDate';
 import styles from './appointments-form.scss';
 
 interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
-  patientUuid?: string;
-  context: string;
+  patientUuid: string;
 }
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
-const isValidTime = (timeStr: string) => timeStr.match(new RegExp(time12HourFormatRegexPattern));
+const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
 
-const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> = ({
-  appointment,
-  recurringPattern,
-  patientUuid,
-  context,
+/**
+ * Workspace used to create or edit an appointment within the appointments app
+ */
+const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps>> = ({
+  workspaceProps: { appointment, recurringPattern, patientUuid },
   closeWorkspace,
-  promptBeforeClosing,
 }) => {
   const { patient } = usePatient(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
@@ -92,12 +80,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
-  const { selectedDate } = useAppointmentsStore();
-  const { data: services, isLoading } = useAppointmentService();
+
+  const selectedDate = useSelectedDate();
+  const { serviceTypes, isLoading } = useAppointmentServices();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
-  const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -132,12 +120,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   // t('durationErrorMessage', 'Duration should be greater than zero')
   const appointmentsFormSchema = z
     .object({
-      duration: z
-        .number()
-        .nullable()
-        .refine((duration) => (isAllDayAppointment ? true : duration > 0), {
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-        }),
+      duration: z.union([z.number(), z.null()]).optional(),
+      isAllDayAppointment: z.boolean(),
       location: z.string().refine((value) => value !== '', {
         message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
       }),
@@ -207,7 +191,28 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
           'Date appointment issued cannot be after the appointment date',
         ),
       },
-    );
+    )
+    .superRefine((data, ctx) => {
+      // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
+      if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
+        ctx.addIssue({
+          path: ['duration'],
+          code: z.ZodIssueCode.custom,
+          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+        });
+      }
+      if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
+        ctx.addIssue({
+          path: ['duration'],
+          code: z.ZodIssueCode.custom,
+          message: translateFrom(
+            moduleName,
+            'durationMaxErrorMessage',
+            'Duration cannot exceed 1440 minutes (24 hours)',
+          ),
+        });
+      }
+    });
 
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
@@ -235,7 +240,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
       appointmentType: appointment?.appointmentKind || (appointmentTypes?.length === 1 ? appointmentTypes[0] : ''),
-      selectedService: appointment?.service?.name || (services?.length === 1 ? services[0].name : ''),
+      selectedService: appointment?.service?.name || (serviceTypes?.length === 1 ? serviceTypes[0].name : ''),
       recurringPatternType: defaultRecurringPatternType,
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
@@ -250,12 +255,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       },
       formIsRecurringAppointment: isRecurringAppointment,
       dateAppointmentScheduled: defaultDateAppointmentScheduled,
+      isAllDayAppointment: allowAllDayAppointments,
     },
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
 
-  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
+  // Retrieve ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
     field: { ref: startDateRef },
   } = useController({ name: 'appointmentDateTime.startDate', control });
@@ -274,12 +280,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
   useEffect(() => {
     if (isSuccessful) {
       reset();
-      promptBeforeClosing(() => false);
-      closeWorkspace();
-      return;
+      closeWorkspace({ discardUnsavedChanges: true, closeWindow: true });
     }
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing, isSuccessful, reset, closeWorkspace]);
+  }, [isSuccessful, reset, closeWorkspace]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
@@ -322,23 +325,21 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     }
   })();
 
+  const isEditing = Boolean(appointment);
+
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
 
-    // check if Duplicate Response Occurs
+    // Check if a duplicate response occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      if (context !== 'editing') {
-        errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
-      } else {
-        errorMessage = null;
-      }
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
 
     if (response.status === 200 && errorMessage) {
@@ -372,19 +373,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             isLowContrast: true,
             kind: 'success',
             subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title:
-              context === 'editing'
-                ? t('appointmentEdited', 'Appointment edited')
-                : t('appointmentScheduled', 'Appointment scheduled'),
+            title: isEditing
+              ? t('appointmentEdited', 'Appointment edited')
+              : t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
         if (status === 204) {
           setIsSubmitting(false);
           showSnackbar({
-            title:
-              context === 'editing'
-                ? t('appointmentEditError', 'Error editing appointment')
-                : t('appointmentFormError', 'Error scheduling appointment'),
+            title: isEditing
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
             kind: 'error',
             isLowContrast: false,
             subtitle: t('noContent', 'No Content'),
@@ -394,10 +393,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       (error) => {
         setIsSubmitting(false);
         showSnackbar({
-          title:
-            context === 'editing'
-              ? t('appointmentEditError', 'Error editing appointment')
-              : t('appointmentFormError', 'Error scheduling appointment'),
+          title: isEditing
+            ? t('appointmentEditError', 'Error editing appointment')
+            : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           isLowContrast: false,
           subtitle: error?.message,
@@ -419,14 +417,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       appointmentNote,
       appointmentStatus,
       dateAppointmentScheduled,
+      isAllDayAppointment,
     } = data;
 
-    const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+    const serviceUuid = serviceTypes?.find((service) => service.name === selectedService)?.uuid;
     const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
-    const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
+    const endDatetime = isAllDayAppointment
+      ? dayjs(startDate).endOf('day').toDate()
+      : dayjs(startDatetime).add(duration, 'minutes').toDate();
 
     return {
       appointmentKind: selectedAppointmentType,
@@ -438,7 +439,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
       providers: [{ uuid: provider }],
       patientUuid: patientUuid,
       comments: appointmentNote,
-      uuid: context === 'editing' ? appointment.uuid : undefined,
+      uuid: isEditing ? appointment.uuid : undefined,
       dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
@@ -462,14 +463,21 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
     };
   };
 
-  if (isLoading)
+  const title = isEditing
+    ? t('editAppointment', 'Edit appointment')
+    : t('createNewAppointment', 'Create new appointment');
+
+  if (isLoading) {
     return (
-      <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      <Workspace2 title={title}>
+        <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+      </Workspace2>
     );
+  }
 
   return (
-    <Form onSubmit={handleSubmit(handleSaveAppointment)}>
-      <Stack gap={4}>
+    <Workspace2 title={title} hasUnsavedChanges={isDirty}>
+      <Form onSubmit={handleSubmit(handleSaveAppointment)}>
         {patient && (
           <ExtensionSlot
             name="patient-header-slot"
@@ -480,424 +488,444 @@ const AppointmentsForm: React.FC<AppointmentsFormProps & DefaultWorkspaceProps> 
             }}
           />
         )}
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('location', 'Location')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="location"
-              control={control}
-              render={({ field: { onChange, value, onBlur, ref } }) => (
-                <Select
-                  id="location"
-                  invalid={!!errors?.location}
-                  invalidText={errors?.location?.message}
-                  labelText={t('selectALocation', 'Select a location')}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  ref={ref}
-                  value={value}>
-                  <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
-                  {locations?.length > 0 &&
-                    locations.map((location) => (
-                      <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                        {location.display}
-                      </SelectItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('service', 'Service')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="selectedService"
-              control={control}
-              render={({ field: { onBlur, onChange, value, ref } }) => (
-                <Select
-                  id="service"
-                  invalid={!!errors?.selectedService}
-                  invalidText={errors?.selectedService?.message}
-                  labelText={t('selectService', 'Select a service')}
-                  onBlur={onBlur}
-                  onChange={(event) => {
-                    if (context === 'creating') {
-                      setValue(
-                        'duration',
-                        services?.find((service) => service.name === event.target.value)?.durationMins,
-                      );
-                    } else if (context === 'editing') {
-                      const previousServiceDuration = services?.find(
-                        (service) => service.name === getValues('selectedService'),
-                      )?.durationMins;
-                      const selectedServiceDuration = services?.find(
-                        (service) => service.name === event.target.value,
-                      )?.durationMins;
-                      if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
-                        setValue('duration', selectedServiceDuration);
-                      }
-                    }
-                    onChange(event);
-                  }}
-                  ref={ref}
-                  value={value}>
-                  <SelectItem text={t('chooseService', 'Select service')} value="" />
-                  {services?.length > 0 &&
-                    services.map((service) => (
-                      <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                        {service.name}
-                      </SelectItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('appointmentType_title', 'Appointment Type')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="appointmentType"
-              control={control}
-              render={({ field: { onBlur, onChange, value, ref } }) => (
-                <Select
-                  disabled={!appointmentTypes?.length}
-                  id="appointmentType"
-                  invalid={!!errors?.appointmentType}
-                  invalidText={errors?.appointmentType?.message}
-                  labelText={t('selectAppointmentType', 'Select the type of appointment')}
-                  onBlur={onBlur}
-                  onChange={onChange}
-                  ref={ref}
-                  value={value}>
-                  <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
-                  {appointmentTypes?.length > 0 &&
-                    appointmentTypes.map((appointmentType, index) => (
-                      <SelectItem key={index} text={appointmentType} value={appointmentType}>
-                        {appointmentType}
-                      </SelectItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </ResponsiveWrapper>
-        </section>
-
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('recurringAppointment', 'Recurring Appointment')}</span>
-          <Toggle
-            id="recurringToggle"
-            labelB={t('yes', 'Yes')}
-            labelA={t('no', 'No')}
-            labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
-            onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
-          />
-        </section>
-
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
-          <div className={styles.dateTimeFields}>
-            {isRecurringAppointment && (
-              <div className={styles.inputContainer}>
-                {allowAllDayAppointments && (
-                  <Toggle
-                    id="allDayToggle"
-                    labelB={t('yes', 'Yes')}
-                    labelA={t('no', 'No')}
-                    labelText={t('allDay', 'All day')}
-                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
-                    toggled={isAllDayAppointment}
-                  />
-                )}
-                <ResponsiveWrapper>
-                  <Controller
-                    name="appointmentDateTime"
-                    control={control}
-                    render={({ field: { onChange, value }, fieldState }) => (
-                      <OpenmrsDateRangePicker
-                        value={
-                          value.startDate && value.recurringPatternEndDate
-                            ? [value.startDate, value.recurringPatternEndDate]
-                            : null
-                        }
-                        onChange={(dateRange) => {
-                          const [startDate, endDate] = dateRange;
-                          onChange({
-                            ...value,
-                            startDate,
-                            startDateText: startDate ? dayjs(startDate).format(dateFormat) : '',
-                            recurringPatternEndDate: endDate,
-                            recurringPatternEndDateText: endDate ? dayjs(endDate).format(dateFormat) : '',
-                          });
-                        }}
-                        startName="start"
-                        endName="end"
-                        id="appointmentRecurringDateRangePicker"
-                        data-testid="appointmentRecurringDateRangePicker"
-                        labelText={t('dateRange', 'Set date range')}
-                        invalid={Boolean(fieldState?.error?.message)}
-                        invalidText={fieldState?.error?.message}
-                        isRequired
-                      />
-                    )}
-                  />
-                </ResponsiveWrapper>
-
-                {!isAllDayAppointment && (
-                  <TimeAndDuration control={control} errors={errors} services={services} watch={watch} t={t} />
-                )}
-
-                <ResponsiveWrapper>
-                  <Controller
-                    name="recurringPatternPeriod"
-                    control={control}
-                    render={({ field: { onBlur, onChange, value } }) => (
-                      <NumberInput
-                        hideSteppers
-                        id="repeatNumber"
-                        min={1}
-                        max={356}
-                        label={t('repeatEvery', 'Repeat every')}
-                        invalidText={t('invalidNumber', 'Number is not valid')}
-                        size="md"
-                        value={value}
-                        onBlur={onBlur}
-                        onChange={(e) => {
-                          onChange(Number(e.target.value));
-                        }}
-                      />
-                    )}
-                  />
-                </ResponsiveWrapper>
-
-                <ResponsiveWrapper>
-                  <Controller
-                    name="recurringPatternType"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <RadioButtonGroup
-                        legendText={t('period', 'Period')}
-                        name="radio-button-group"
-                        onChange={(type) => onChange(type)}
-                        valueSelected={value}>
-                        <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
-                        <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
-                      </RadioButtonGroup>
-                    )}
-                  />
-                </ResponsiveWrapper>
-
-                {watch('recurringPatternType') === 'WEEK' && (
-                  <div>
-                    <Controller
-                      name="selectedDaysOfWeekText"
-                      control={control}
-                      defaultValue={defaultSelectedDaysOfWeekText}
-                      render={({ field: { onChange } }) => (
-                        <MultiSelect
-                          className={styles.weekSelect}
-                          id="daysOfWeek"
-                          initialSelectedItems={weekDays.filter((i) =>
-                            getValues('recurringPatternDaysOfWeek').includes(i.id),
-                          )}
-                          items={weekDays}
-                          itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
-                          label={getValues('selectedDaysOfWeekText')}
-                          onChange={(e) => {
-                            onChange(e);
-                            handleSelectChange(e);
-                          }}
-                          selectionFeedback="top-after-reopen"
-                          sortItems={(items) => {
-                            return items.sort((a, b) => a.order > b.order);
-                          }}
-                        />
-                      )}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!isRecurringAppointment && (
-              <div className={styles.inputContainer}>
-                {allowAllDayAppointments && (
-                  <Toggle
-                    id="allDayToggle"
-                    labelB={t('yes', 'Yes')}
-                    labelA={t('no', 'No')}
-                    labelText={t('allDay', 'All day')}
-                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
-                    toggled={isAllDayAppointment}
-                  />
-                )}
-                <ResponsiveWrapper>
-                  <Controller
-                    name="appointmentDateTime"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <OpenmrsDatePicker
-                        {...field}
-                        value={field.value.startDate}
-                        onChange={(date) => {
-                          field.onChange({
-                            ...field.value,
-                            startDate: date,
-                          });
-                        }}
-                        id="datePickerInput"
-                        data-testid="datePickerInput"
-                        labelText={t('date', 'Date')}
-                        style={{ width: '100%' }}
-                        invalid={Boolean(fieldState?.error?.message)}
-                        invalidText={fieldState?.error?.message}
-                        // minDate={new Date()}
-                      />
-                    )}
-                  />
-                </ResponsiveWrapper>
-
-                {!isAllDayAppointment && (
-                  <TimeAndDuration control={control} services={services} watch={watch} t={t} errors={errors} />
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {getValues('selectedService') && (
-          <section className={styles.formGroup}>
-            <ResponsiveWrapper>
-              <Workload
-                appointmentDate={watch('appointmentDateTime').startDate}
-                onWorkloadDateChange={handleWorkloadDateChange}
-                selectedService={watch('selectedService')}
-              />
-            </ResponsiveWrapper>
-          </section>
-        )}
-
-        {context !== 'creating' ? (
-          <section className={styles.formGroup}>
-            <span className={styles.heading}>{t('appointmentStatus', 'Appointment Status')}</span>
+        <Stack className={styles.formWrapper} gap={6}>
+          <FormGroup className={styles.formGroup} legendText={t('location', 'Location')}>
             <ResponsiveWrapper>
               <Controller
-                name="appointmentStatus"
+                name="location"
                 control={control}
-                render={({ field: { onBlur, onChange, value, ref } }) => (
+                render={({ field: { onChange, value, onBlur, ref } }) => (
                   <Select
-                    id="appointmentStatus"
-                    invalid={!!errors?.appointmentStatus}
-                    invalidText={errors?.appointmentStatus?.message}
-                    labelText={t('selectAppointmentStatus', 'Select status')}
+                    id="location"
+                    invalid={!!errors?.location}
+                    invalidText={errors?.location?.message}
+                    labelText={t('selectALocation', 'Select a location')}
                     onChange={onChange}
-                    value={value}
+                    onBlur={onBlur}
                     ref={ref}
-                    onBlur={onBlur}>
-                    <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
-                    {appointmentStatuses?.length > 0 &&
-                      appointmentStatuses.map((appointmentStatus, index) => (
-                        <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>
-                          {appointmentStatus}
+                    value={value}>
+                    <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
+                    {locations?.length > 0 &&
+                      locations.map((location) => (
+                        <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                          {location.display}
                         </SelectItem>
                       ))}
                   </Select>
                 )}
               />
             </ResponsiveWrapper>
-          </section>
-        ) : null}
+          </FormGroup>
+          <FormGroup className={styles.formGroup} legendText={t('service', 'Service')}>
+            <ResponsiveWrapper>
+              <Controller
+                name="selectedService"
+                control={control}
+                render={({ field: { onBlur, onChange, value, ref } }) => (
+                  <Select
+                    id="service"
+                    invalid={!!errors?.selectedService}
+                    invalidText={errors?.selectedService?.message}
+                    labelText={t('selectService', 'Select a service')}
+                    onBlur={onBlur}
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+                      if (!isEditing) {
+                        setValue(
+                          'duration',
+                          serviceTypes?.find((service) => service.name === event.target.value)?.durationMins,
+                        );
+                      } else {
+                        const previousServiceDuration = serviceTypes?.find(
+                          (service) => service.name === getValues('selectedService'),
+                        )?.durationMins;
+                        const selectedServiceDuration = serviceTypes?.find(
+                          (service) => service.name === event.target.value,
+                        )?.durationMins;
+                        if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
+                          setValue('duration', selectedServiceDuration);
+                        }
+                      }
+                      onChange(event);
+                    }}
+                    ref={ref}
+                    value={value}>
+                    <SelectItem text={t('chooseService', 'Select service')} value="" />
+                    {serviceTypes?.length > 0 &&
+                      serviceTypes.map((service) => (
+                        <SelectItem key={service.uuid} text={service.name} value={service.name}>
+                          {service.name}
+                        </SelectItem>
+                      ))}
+                  </Select>
+                )}
+              />
+            </ResponsiveWrapper>
+          </FormGroup>
+          <FormGroup className={styles.formGroup} legendText={t('appointmentType_title', 'Appointment Type')}>
+            <ResponsiveWrapper>
+              <Controller
+                name="appointmentType"
+                control={control}
+                render={({ field: { onBlur, onChange, value, ref } }) => (
+                  <Select
+                    disabled={!appointmentTypes?.length}
+                    id="appointmentType"
+                    invalid={!!errors?.appointmentType}
+                    invalidText={errors?.appointmentType?.message}
+                    labelText={t('selectAppointmentType', 'Select the type of appointment')}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    ref={ref}
+                    value={value}>
+                    <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
+                    {appointmentTypes?.length > 0 &&
+                      appointmentTypes.map((appointmentType, index) => (
+                        <SelectItem key={index} text={appointmentType} value={appointmentType}>
+                          {appointmentType}
+                        </SelectItem>
+                      ))}
+                  </Select>
+                )}
+              />
+            </ResponsiveWrapper>
+          </FormGroup>
 
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('provider', 'Provider')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="provider"
-              control={control}
-              render={({ field: { onChange, value, onBlur, ref } }) => (
-                <Select
-                  id="provider"
-                  invalidText="Required"
-                  labelText={t('selectProvider', 'Select a provider')}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  ref={ref}>
-                  <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
-                  {providers?.providers?.length > 0 &&
-                    providers?.providers?.map((provider) => (
-                      <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
-                        {provider.display}
-                      </SelectItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </ResponsiveWrapper>
-        </section>
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="dateAppointmentScheduled"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div style={{ width: '100%' }}>
-                  <OpenmrsDatePicker
-                    {...field}
-                    invalid={Boolean(fieldState?.error?.message)}
-                    invalidText={fieldState?.error?.message}
-                    maxDate={new Date()}
-                    id="dateAppointmentScheduledPickerInput"
-                    data-testid="dateAppointmentScheduledPickerInput"
-                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
-                    style={{ width: '100%' }}
-                  />
+          <FormGroup className={styles.formGroup} legendText={t('recurringAppointment', 'Recurring Appointment')}>
+            <div>
+              <Toggle
+                id="recurringToggle"
+                labelB={t('yes', 'Yes')}
+                labelA={t('no', 'No')}
+                labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
+                onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
+              />
+            </div>
+          </FormGroup>
+
+          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Appointment time')}>
+            <div className={styles.dateTimeFields}>
+              {isRecurringAppointment && (
+                <div className={styles.inputContainer}>
+                  {allowAllDayAppointments && (
+                    <Controller
+                      name="isAllDayAppointment"
+                      control={control}
+                      render={({ field: { value, onChange } }) => (
+                        <Toggle
+                          id="allDayToggle"
+                          labelA={t('no', 'No')}
+                          labelB={t('yes', 'Yes')}
+                          labelText={t('allDay', 'All day')}
+                          toggled={value}
+                          onToggle={onChange}
+                        />
+                      )}
+                    />
+                  )}
+                  <ResponsiveWrapper>
+                    <Controller
+                      name="appointmentDateTime"
+                      control={control}
+                      render={({ field: { onChange, value }, fieldState }) => (
+                        <OpenmrsDateRangePicker
+                          value={
+                            value.startDate && value.recurringPatternEndDate
+                              ? [value.startDate, value.recurringPatternEndDate]
+                              : null
+                          }
+                          onChange={(dateRange) => {
+                            const [startDate, endDate] = dateRange;
+                            onChange({
+                              ...value,
+                              startDate,
+                              startDateText: startDate ? dayjs(startDate).format(dateFormat) : '',
+                              recurringPatternEndDate: endDate,
+                              recurringPatternEndDateText: endDate ? dayjs(endDate).format(dateFormat) : '',
+                            });
+                          }}
+                          startName="start"
+                          endName="end"
+                          id="appointmentRecurringDateRangePicker"
+                          data-testid="appointmentRecurringDateRangePicker"
+                          labelText={t('dateRange', 'Set date range')}
+                          invalid={!!fieldState?.error?.message}
+                          invalidText={fieldState?.error?.message}
+                          isRequired
+                        />
+                      )}
+                    />
+                  </ResponsiveWrapper>
+
+                  {!watch('isAllDayAppointment') && <TimeAndDuration t={t} control={control} errors={errors} />}
+
+                  <ResponsiveWrapper>
+                    <Controller
+                      name="recurringPatternPeriod"
+                      control={control}
+                      render={({ field: { onBlur, onChange, value } }) => (
+                        <NumberInput
+                          hideSteppers
+                          id="repeatNumber"
+                          min={1}
+                          max={356}
+                          label={t('repeatEvery', 'Repeat every')}
+                          invalidText={t('invalidNumber', 'Number is not valid')}
+                          value={value}
+                          onBlur={onBlur}
+                          onChange={(e, state) => {
+                            const value = state?.value ?? (e.target as HTMLInputElement).value;
+                            onChange(value === '' ? null : Number(value));
+                          }}
+                        />
+                      )}
+                    />
+                  </ResponsiveWrapper>
+
+                  <ResponsiveWrapper>
+                    <Controller
+                      name="recurringPatternType"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <RadioButtonGroup
+                          legendText={t('period', 'Period')}
+                          name="radio-button-group"
+                          onChange={(type) => onChange(type)}
+                          valueSelected={value}>
+                          <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
+                          <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
+                        </RadioButtonGroup>
+                      )}
+                    />
+                  </ResponsiveWrapper>
+
+                  {watch('recurringPatternType') === 'WEEK' && (
+                    <div>
+                      <Controller
+                        name="selectedDaysOfWeekText"
+                        control={control}
+                        defaultValue={defaultSelectedDaysOfWeekText}
+                        render={({ field: { onChange } }) => (
+                          <MultiSelect
+                            className={styles.weekSelect}
+                            id="daysOfWeek"
+                            initialSelectedItems={weekDays.filter((i) =>
+                              getValues('recurringPatternDaysOfWeek').includes(i.id),
+                            )}
+                            items={weekDays}
+                            itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
+                            label={getValues('selectedDaysOfWeekText')}
+                            onChange={(e) => {
+                              onChange(e);
+                              handleSelectChange(e);
+                            }}
+                            selectionFeedback="top-after-reopen"
+                            sortItems={(items) => {
+                              return [...items].sort((a, b) => a.order - b.order);
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
-            />
-          </ResponsiveWrapper>
-        </section>
 
-        <section className={styles.formGroup}>
-          <span className={styles.heading}>{t('note', 'Note')}</span>
-          <ResponsiveWrapper>
-            <Controller
-              name="appointmentNote"
-              control={control}
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <TextArea
-                  enableCounter
-                  id="appointmentNote"
-                  value={value}
-                  labelText={t('appointmentNoteLabel', 'Write an additional note')}
-                  placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-                  maxCount={255}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  ref={ref}
-                />
+              {!isRecurringAppointment && (
+                <div className={styles.inputContainer}>
+                  {allowAllDayAppointments && (
+                    <Controller
+                      name="isAllDayAppointment"
+                      control={control}
+                      render={({ field: { value, onChange } }) => (
+                        <Toggle
+                          id="allDayToggle"
+                          labelA={t('no', 'No')}
+                          labelB={t('yes', 'Yes')}
+                          labelText={t('allDay', 'All day')}
+                          toggled={value}
+                          onToggle={onChange}
+                        />
+                      )}
+                    />
+                  )}
+                  <ResponsiveWrapper>
+                    <Controller
+                      name="appointmentDateTime"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <OpenmrsDatePicker
+                          data-testid="datePickerInput"
+                          id="datePickerInput"
+                          invalid={!!fieldState?.error?.message}
+                          invalidText={fieldState?.error?.message}
+                          labelText={t('date', 'Date')}
+                          onBlur={field.onBlur}
+                          onChange={(date) => {
+                            field.onChange({
+                              ...field.value,
+                              startDate: date,
+                            });
+                          }}
+                          style={{ width: '100%' }}
+                          value={field.value.startDate}
+                        />
+                      )}
+                    />
+                  </ResponsiveWrapper>
+
+                  {!watch('isAllDayAppointment') && <TimeAndDuration t={t} control={control} errors={errors} />}
+                </div>
               )}
-            />
-          </ResponsiveWrapper>
-        </section>
-      </Stack>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
-          {t('discard', 'Discard')}
-        </Button>
-        <Button className={styles.button} disabled={isSubmitting} type="submit">
-          {t('saveAndClose', 'Save and close')}
-        </Button>
-      </ButtonSet>
-    </Form>
+            </div>
+          </FormGroup>
+
+          {getValues('selectedService') && (
+            <FormGroup className={styles.formGroup} legendText="">
+              <ResponsiveWrapper>
+                <Workload
+                  appointmentDate={watch('appointmentDateTime').startDate}
+                  onWorkloadDateChange={handleWorkloadDateChange}
+                  selectedService={watch('selectedService')}
+                />
+              </ResponsiveWrapper>
+            </FormGroup>
+          )}
+
+          {isEditing ? (
+            <FormGroup className={styles.formGroup} legendText={t('appointmentStatus', 'Appointment Status')}>
+              <ResponsiveWrapper>
+                <Controller
+                  name="appointmentStatus"
+                  control={control}
+                  render={({ field: { onBlur, onChange, value, ref } }) => (
+                    <Select
+                      id="appointmentStatus"
+                      invalid={!!errors?.appointmentStatus}
+                      invalidText={errors?.appointmentStatus?.message}
+                      labelText={t('selectAppointmentStatus', 'Select status')}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}>
+                      <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
+                      {appointmentStatuses?.length > 0 &&
+                        appointmentStatuses.map((appointmentStatus, index) => (
+                          <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>
+                            {appointmentStatus}
+                          </SelectItem>
+                        ))}
+                    </Select>
+                  )}
+                />
+              </ResponsiveWrapper>
+            </FormGroup>
+          ) : null}
+
+          <FormGroup className={styles.formGroup} legendText={t('provider', 'Provider')}>
+            <ResponsiveWrapper>
+              <Controller
+                name="provider"
+                control={control}
+                render={({ field: { onChange, value, onBlur, ref } }) => (
+                  <Select
+                    id="provider"
+                    invalidText="Required"
+                    labelText={t('selectProvider', 'Select a provider')}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    ref={ref}
+                    value={value}>
+                    <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
+                    {providers?.providers?.length > 0 &&
+                      providers?.providers?.map((provider) => (
+                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
+                          {provider.display}
+                        </SelectItem>
+                      ))}
+                  </Select>
+                )}
+              />
+            </ResponsiveWrapper>
+          </FormGroup>
+
+          <FormGroup
+            className={styles.formGroup}
+            legendText={t('dateAppointmentScheduled', 'Date appointment scheduled')}>
+            <ResponsiveWrapper>
+              <Controller
+                name="dateAppointmentScheduled"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div style={{ width: '100%' }}>
+                    <OpenmrsDatePicker
+                      data-testid="dateAppointmentScheduledPickerInput"
+                      id="dateAppointmentScheduledPickerInput"
+                      invalid={!!fieldState?.error?.message}
+                      invalidText={fieldState?.error?.message}
+                      labelText={t('dateAppointmentIssued', 'Date appointment issued')}
+                      maxDate={new Date()}
+                      onBlur={field.onBlur}
+                      onChange={field.onChange}
+                      style={{ width: '100%' }}
+                      value={field.value}
+                    />
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
+          </FormGroup>
+
+          <FormGroup className={styles.formGroup} legendText={t('note', 'Note')}>
+            <ResponsiveWrapper>
+              <Controller
+                name="appointmentNote"
+                control={control}
+                render={({ field: { onChange, onBlur, value, ref } }) => (
+                  <TextArea
+                    enableCounter
+                    id="appointmentNote"
+                    value={value}
+                    labelText={t('appointmentNoteLabel', 'Write an additional note')}
+                    placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+                    maxCount={255}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    ref={ref}
+                  />
+                )}
+              />
+            </ResponsiveWrapper>
+          </FormGroup>
+        </Stack>
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <Button
+            className={styles.button}
+            onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
+            kind="secondary">
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} disabled={isSubmitting} type="submit">
+            {t('saveAndClose', 'Save and close')}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 
-function TimeAndDuration({ t, watch, control, services, errors }) {
-  const defaultDuration = services?.find((service) => service.name === watch('selectedService'))?.durationMins || null;
+/**
+ * TimeAndDuration component for appointment form
+ * Uses Record<string, any> for control/errors types since AppointmentFormData
+ * is defined inside the parent component and cannot be referenced here.
+ * Type safety is maintained at the call site.
+ */
+interface TimeAndDurationProps {
+  t: ReturnType<typeof useTranslation>['t'];
+  control: Control<Record<string, any>>;
+  errors: FieldErrors<Record<string, any>>;
+}
 
+function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
   return (
     <>
       <ResponsiveWrapper>
@@ -909,9 +937,9 @@ function TimeAndDuration({ t, watch, control, services, errors }) {
               id="time-picker"
               pattern={time12HourFormatRegexPattern}
               invalid={!!errors?.startTime}
-              invalidText={errors?.startTime?.message}
+              invalidText={errors?.startTime?.message ? String(errors.startTime.message) : undefined}
               labelText={t('time', 'Time')}
-              onChange={(event) => {
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 onChange(event.target.value);
               }}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
@@ -922,7 +950,9 @@ function TimeAndDuration({ t, watch, control, services, errors }) {
                 render={({ field: { value, onChange } }) => (
                   <TimePickerSelect
                     id="time-picker-select-1"
-                    onChange={(event) => onChange(event.target.value as 'AM' | 'PM')}
+                    onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+                      onChange(event.target.value as 'AM' | 'PM')
+                    }
                     value={value}
                     aria-label={t('time', 'Time')}>
                     <SelectItem value="AM" text="AM" />
@@ -940,19 +970,20 @@ function TimeAndDuration({ t, watch, control, services, errors }) {
           control={control}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
+              allowEmpty
               disableWheel
               hideSteppers
               id="duration"
               invalid={!!errors?.duration}
-              invalidText={errors?.duration?.message}
+              invalidText={errors?.duration?.message ? String(errors.duration.message) : undefined}
               label={t('durationInMinutes', 'Duration (minutes)')}
-              max={1440}
-              min={0}
               onBlur={onBlur}
-              onChange={(event) => onChange(event.target.value === '' ? null : Number(event.target.value))}
+              onChange={(event, state) => {
+                const value = state?.value ?? (event.target as HTMLInputElement).value;
+                onChange(value === '' ? null : Number(value));
+              }}
               ref={ref}
-              size="md"
-              value={value}
+              value={value ?? ''}
             />
           )}
         />

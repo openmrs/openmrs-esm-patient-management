@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Hourglass } from '@carbon/react/icons';
 import { type WardPatient } from '../../types';
 import { useElementConfig } from '../../ward-view/ward-view.resource';
@@ -13,7 +13,7 @@ export interface PendingItemsRowProps {
 
 const PendingItemsRow: React.FC<PendingItemsRowProps> = ({ id, wardPatient }) => {
   const { orders, showPendingItems } = useElementConfig('pendingItems', id) || {};
-  const [hasPendingOrders, setHasPendingOrders] = React.useState(false);
+  const [hasPendingOrders, setHasPendingOrders] = useState(false);
 
   const hasPendingItems = !!wardPatient?.inpatientRequest || hasPendingOrders;
 

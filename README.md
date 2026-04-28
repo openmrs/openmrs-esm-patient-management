@@ -137,6 +137,35 @@ yarn test
 
 ### E2E tests
 
+#### Setup
+
+Before running the E2E tests, you need to set up the test environment.
+
+1.  **Install Playwright browsers:**
+
+    ```sh
+    npx playwright install
+    ```
+
+2.  **Set up environment variables:**
+
+    Copy the example environment file to a new `.env` file:
+
+    ```sh
+    cp example.env .env
+    ```
+
+    The `.env` file is used to configure the E2E tests.
+
+    *   If you are running against a local OpenMRS backend instance, modify the variables in this `.env` file to match your local development environment.
+    *   If you are *not* running a local OpenMRS backend instance, you should still create the `.env` file and set the `E2E_BASE_URL` variable within it to point to a remote instance. For example:
+
+        ```
+        E2E_BASE_URL=https://dev3.openmrs.org/openmrs
+        ```
+
+#### Running tests
+
 To run E2E tests, make sure the dev server is running by using:
 
 ```sh
@@ -189,13 +218,3 @@ should be the version number (e.g., `3.2.1`). The creation of the GitHub release
 will cause GitHub Actions to publish the packages, completing the release process.
 
 > Don't run `npm publish` or `yarn publish`. Use the above process.
-
-### Bumping the Common Lib version
-
-Make sure to bump the Common Lib version used here each time you cut a release of Patient Chart. Because Common Lib is marked as a peer dependency and a Webpack module federation shared dependency in the [Appointments app](packages/esm-appointments-app/package.json), the copy of the Common Lib that the framework loads is the first one that gets loaded at runtime when frontend modules are registered. If this happens to be a different version than what the Patient Chart expects, you might get some unexpected behavior in the Patient Chart. You can bump the Common Lib version by running the following command:
-
-```sh
-yarn up @openmrs/esm-patient-common-lib
-git checkout package.json
-yarn
-```

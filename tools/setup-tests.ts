@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
 
+// Prevent single-spa from emitting warnings / touching navigation during unit tests.
+jest.mock('single-spa', () => ({
+  navigateToUrl: jest.fn(),
+}));
+
 declare global {
   interface Window {
     openmrsBase: string;
@@ -19,3 +24,10 @@ window.matchMedia = jest.fn().mockImplementation(() => {
     removeEventListener: () => {},
   };
 });
+
+// Mock ResizeObserver for Carbon components
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));

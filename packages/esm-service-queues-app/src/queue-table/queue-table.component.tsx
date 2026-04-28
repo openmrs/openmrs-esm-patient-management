@@ -74,11 +74,11 @@ function QueueTable({
 
   useEffect(() => {
     goTo(1);
-  }, [goTo, queueEntries]);
+  }, [goTo, queueEntries?.length]);
 
   const rows =
     paginatedQueueEntries?.map((queueEntry) => {
-      const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
+      const row: { id: string; [key: string]: JSX.Element | string } = { id: queueEntry.uuid };
       columns.forEach(({ key, CellComponent }) => {
         row[key] = <CellComponent key={key} queueEntry={queueEntry} />;
       });
@@ -117,7 +117,7 @@ function QueueTable({
                 </TableToolbar>
               )}
             </div>
-            <Table {...getTableProps()} className={styles.queueTable}>
+            <Table {...getTableProps()} aria-label={t('queueTable', 'Queue table')} className={styles.queueTable}>
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
@@ -145,7 +145,7 @@ function QueueTable({
                           </TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && row.isExpanded ? (
+                      {ExpandedRow && row.isExpanded && paginatedQueueEntries[i] ? (
                         <TableExpandedRow
                           className={styles.expandedActiveVisitRow}
                           colSpan={headers.length + 2}

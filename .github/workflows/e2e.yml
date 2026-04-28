@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   TURBO_API: 'http://127.0.0.1:9080'
@@ -17,46 +18,26 @@ jobs:
   run_e2e_tests:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout repo
-        uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v6
 
       - name: 📋 Copy test environment variables
         run: cp example.env .env
 
-      - name: 🛠️ Setup node
-        uses: actions/setup-node@v4
+      - name: 🛠️ Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: "20"
-
-      - name: 💾 Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: '22.x'
+          cache: 'yarn'
 
       - name: 📦 Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install --immutable
-
-      - name: 🔍 Get installed Playwright version
-        id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(grep '@playwright/test@' yarn.lock | sed -n 's/.*npm:\([^":]*\).*/\1/p' | head -n 1)" >> $GITHUB_ENV
-
-      - name: 💾 Cache playwright binaries
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: 🎭 Install Playwright Browsers
         run: npx playwright install chromium --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: 🚀 Setup local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v3
+        uses: felixmosh/turborepo-gh-artifacts@v4
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
@@ -78,7 +59,7 @@ jobs:
         run: docker stop $(docker ps -a -q)
 
       - name: 📤 Upload Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dropdown, DropdownSkeleton, InlineNotification } from '@carbon/react';
+import { Dropdown, DropdownSkeleton, InlineNotification, type OnChangeData } from '@carbon/react';
 import { useConfig, useSession, PageHeader, PageHeaderContent, ServiceQueuesPictogram } from '@openmrs/esm-framework';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import {
@@ -9,9 +9,9 @@ import {
   updateSelectedService,
   useServiceQueuesStore,
 } from '../store/store';
+import { useQueues } from '../hooks/useQueues';
 import type { ConfigObject } from '../config-schema';
 import styles from './patient-queue-header.scss';
-import { useQueues } from '../hooks/useQueues';
 
 interface PatientQueueHeaderProps {
   title?: string | JSX.Element;
@@ -24,8 +24,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   const { queueLocations, isLoading, error } = useQueueLocations();
   const { dashboardTitle } = useConfig<ConfigObject>();
   const userSession = useSession();
-  const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay, selectedServiceUuid } =
-    useServiceQueuesStore();
+  const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay } = useServiceQueuesStore();
   const { queues } = useQueues();
   const showLocationDropdown = showFilters && queueLocations.length > 1;
   const showServiceDropdown = showFilters && queues.length > 1;
@@ -57,11 +56,14 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   );
 
   const handleServiceChange = useCallback(
-    ({ selectedItem }) => {
-      if (selectedItem.id === 'all') {
-        updateSelectedService(null, t('all', 'All'));
-      } else {
-        updateSelectedService(selectedItem.id, selectedItem.name);
+    (data: OnChangeData<{ id: string; name: string }>) => {
+      const selectedItem = data.selectedItem;
+      if (selectedItem) {
+        if (selectedItem.id === 'all') {
+          updateSelectedService(null, t('all', 'All'));
+        } else {
+          updateSelectedService(selectedItem.id, selectedItem.name);
+        }
       }
     },
     [t],
@@ -142,7 +144,6 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
             titleText={t('service', 'Service')}
             type="inline"
             onChange={handleServiceChange}
-            value={selectedServiceUuid}
           />
         )}
         {actions}

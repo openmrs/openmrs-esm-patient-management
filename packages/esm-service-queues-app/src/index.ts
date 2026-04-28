@@ -1,6 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createDashboardLink } from './createDashboardLink.component';
+import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -9,7 +9,7 @@ const moduleName = '@openmrs/esm-service-queues-app';
 const swrRefreshIntervalInMs = 60000;
 
 const options = {
-  featureName: 'service-queues',
+  featureName: 'serviceQueues',
   moduleName,
 };
 
@@ -40,6 +40,7 @@ export const queueList = getAsyncLifecycle(
 
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
+// t('serviceQueues', 'Service queues')
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const clearAllQueueEntriesModal = getAsyncLifecycle(
@@ -120,16 +121,11 @@ export const transitionOverflowMenuItem = getAsyncLifecycle(
   },
 );
 
-// t('addNewQueueService', 'Add New Queue Service')
-export const addNewQueueServiceWorkspace = getAsyncLifecycle(
-  () => import('./admin/queue-services/queue-service-form.workspace'),
-  {
-    featureName: 'service-queues-service-form',
-    moduleName,
-  },
-);
+export const addNewQueueWorkspace = getAsyncLifecycle(() => import('./admin/queues/queue-form.workspace'), {
+  featureName: 'service-queues-queue-form',
+  moduleName,
+});
 
-// t('addNewQueueServiceRoom', 'Add new queue service room')
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./admin/queue-rooms/queue-room-form.workspace'),
   {
@@ -171,6 +167,26 @@ export const adminPageCardLink = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const serviceQueuesAdminPage = getAsyncLifecycle(() => import('./admin/admin-page/admin-page.component'), {
+  featureName: 'service-queues-admin-page',
+  moduleName,
+});
+
+export const queueScreen = getAsyncLifecycle(() => import('./queue-screen/queue-screen.component'), {
+  featureName: 'queue-screen',
+  moduleName,
+});
+
+export const deleteQueueModal = getAsyncLifecycle(() => import('./admin/modals/delete-queue.modal'), {
+  featureName: 'delete-queue-modal',
+  moduleName,
+});
+
+export const deleteQueueRoomModal = getAsyncLifecycle(() => import('./admin/modals/delete-queue-room.modal'), {
+  featureName: 'delete-queue-room-modal',
+  moduleName,
+});
 
 export function startupApp() {
   registerBreadcrumbs([]);

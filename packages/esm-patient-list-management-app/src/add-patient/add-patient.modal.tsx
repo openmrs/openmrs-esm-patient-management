@@ -16,7 +16,7 @@ import {
 } from '@carbon/react';
 import { getCoreTranslation, navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { type AddablePatientListViewModel } from '../api/types';
-import { useAddablePatientLists } from '../api/api-remote';
+import { useAddablePatientLists } from '../api/patient-list.resource';
 import styles from './add-patient.scss';
 
 interface AddPatientProps {

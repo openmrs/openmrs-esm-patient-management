@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import {
   InlineLoading,
@@ -10,13 +11,11 @@ import {
   StructuredListRow,
   StructuredListWrapper,
 } from '@carbon/react';
-import { formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { ErrorCard, formatDate, parseDate, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import styles from './patient-upcoming-appointments-card.scss';
-import dayjs from 'dayjs';
 import { type Appointment } from '../types';
-import { useMutateAppointments } from '../form/appointments-form.resource';
+import { useMutateAppointments } from '../hooks/useMutateAppointments';
+import styles from './patient-upcoming-appointments-card.scss';
 
 interface VisitFormCallbacks {
   onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
@@ -44,11 +43,10 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   patientChartConfig,
 }) => {
   const { t } = useTranslation();
-  const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
+  const startDate = useMemo(() => dayjs().subtract(6, 'month').toISOString(), []);
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment>(null);
   const { mutateAppointments } = useMutateAppointments();
-  const memoMutateAppointments = useMemo(() => mutateAppointments, [mutateAppointments]);
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
@@ -60,7 +58,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
         if (selectedAppointment) {
           return changeAppointmentStatus('CheckedIn', selectedAppointment.uuid)
             .then(() => {
-              memoMutateAppointments();
+              mutateAppointments();
               showSnackbar({
                 isLowContrast: true,
                 kind: 'success',
@@ -81,7 +79,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
         }
       },
     }),
-    [selectedAppointment, memoMutateAppointments, t],
+    [selectedAppointment, mutateAppointments, t],
   );
 
   useEffect(() => {
@@ -102,12 +100,13 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   };
 
   if (!patientChartConfig.showUpcomingAppointments) {
-    return <></>;
+    return null;
   }
 
   if (error) {
-    return <ErrorState headerTitle={headerTitle} error={error} />;
+    return <ErrorCard headerTitle={headerTitle} error={error} />;
   }
+
   if (isLoading) {
     return (
       <span>
@@ -141,7 +140,8 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
                 <StructuredListCell>
                   <RadioButton
                     className={styles.radioButton}
-                    labelText=""
+                    hideLabel
+                    labelText={appointment.service?.name || t('appointment', 'Appointment')}
                     id={`radio-${index}`}
                     name="appointmentRadio"
                     value={appointment.uuid}
@@ -159,11 +159,11 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
 
   return (
     <InlineNotification
-      kind={'info'}
-      lowContrast
       className={styles.inlineNotification}
-      title={t('upcomingAppointments', 'Upcoming appointments')}
+      kind="info"
+      lowContrast
       subtitle={t('noUpcomingAppointments', 'No upcoming appointments found')}
+      title={t('upcomingAppointments', 'Upcoming appointments')}
     />
   );
 };
