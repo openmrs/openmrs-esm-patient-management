@@ -35,7 +35,7 @@ export interface PatientRegistrationProps {
 
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
   const { t } = useTranslation();
-  const { currentSession, identifierTypes } = useResourcesContext();
+  const { currentSession, identifierTypes, addressTemplate } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { search } = useLocation();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
@@ -66,7 +66,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   );
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
-  const validationSchema = getValidationSchema(config, t);
+  const validationSchema = getValidationSchema(config, t, addressTemplate);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
