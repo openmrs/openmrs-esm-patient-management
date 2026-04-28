@@ -12,6 +12,7 @@
   "appointmentCheckedIn": "Appointment Checked In",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
+  "appointmentConflict": "Appointment conflict",
   "appointmentDate": "Appointment date",
   "appointmentDisplay": "<0>{{patientName}}</0> - {{serviceName}} - {{currentStatus}}",
   "appointmentEdited": "Appointment edited",
