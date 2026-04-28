@@ -7,6 +7,11 @@ export const configSchema = {
     _default: false,
     _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
   },
+  allowPastTimeAppointments: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Allows bypassing past time validation for retrospective data entry',
+  },
   appointmentStatuses: {
     _type: Type.Array,
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
@@ -102,6 +107,7 @@ export const configSchema = {
 
 export interface ConfigObject {
   allowAllDayAppointments: boolean;
+  allowPastTimeAppointments: boolean;
   appointmentStatuses: Array<string>;
   appointmentTypes: Array<string>;
   appointmentsTableColumns: Array<string>;

@@ -83,7 +83,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
   const selectedDate = useSelectedDate();
   const { serviceTypes, isLoading } = useAppointmentServices();
-  const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
+  const { appointmentStatuses, appointmentTypes, allowAllDayAppointments, allowPastTimeAppointments } =
+    useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
@@ -117,104 +118,131 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
       : undefined;
 
+  const isEditing = Boolean(appointment);
+
   // t('durationErrorMessage', 'Duration should be greater than zero')
-  const appointmentsFormSchema = z
-    .object({
-      duration: z.union([z.number(), z.null()]).optional(),
-      isAllDayAppointment: z.boolean(),
-      location: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
-      }),
-      provider: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
-      }),
-      appointmentStatus: z.string().optional(),
-      appointmentNote: z.string(),
-      appointmentType: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
-      }),
-      selectedService: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
-      }),
-      recurringPatternType: z.enum(['DAY', 'WEEK']),
-      recurringPatternPeriod: z.number(),
-      recurringPatternDaysOfWeek: z.array(z.string()),
-      selectedDaysOfWeekText: z.string().optional(),
-      startTime: z.string().refine((value) => isValidTime(value), {
-        message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
-      }),
-      timeFormat: z.enum(['AM', 'PM']),
-      appointmentDateTime: z.object({
-        startDate: z.date(),
-        startDateText: z.string(),
-        recurringPatternEndDate: z.date().nullable(),
-        recurringPatternEndDateText: z.string().nullable(),
-      }),
-      formIsRecurringAppointment: z.boolean(),
-      dateAppointmentScheduled: z.date().optional(),
-    })
-    .refine(
-      (formValues) => {
-        if (formValues.formIsRecurringAppointment === true) {
-          return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
-        }
-        return true;
-      },
-      {
-        path: ['appointmentDateTime.recurringPatternEndDate'],
-        message: t('recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
-      },
-    )
-    .refine(
-      (formValues) => {
-        const { appointmentDateTime, dateAppointmentScheduled } = formValues;
+  const getAppointmentsFormSchema = (allowPastTime: boolean) =>
+    z
+      .object({
+        duration: z.union([z.number(), z.null()]).optional(),
+        isAllDayAppointment: z.boolean(),
+        location: z.string().refine((value) => value !== '', {
+          message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
+        }),
+        provider: z.string().refine((value) => value !== '', {
+          message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
+        }),
+        appointmentStatus: z.string().optional(),
+        appointmentNote: z.string(),
+        appointmentType: z.string().refine((value) => value !== '', {
+          message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
+        }),
+        selectedService: z.string().refine((value) => value !== '', {
+          message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
+        }),
+        recurringPatternType: z.enum(['DAY', 'WEEK']),
+        recurringPatternPeriod: z.number(),
+        recurringPatternDaysOfWeek: z.array(z.string()),
+        selectedDaysOfWeekText: z.string().optional(),
+        startTime: z.string().refine((value) => isValidTime(value), {
+          message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
+        }),
+        timeFormat: z.enum(['AM', 'PM']),
+        appointmentDateTime: z.object({
+          startDate: z.date(),
+          startDateText: z.string(),
+          recurringPatternEndDate: z.date().nullable(),
+          recurringPatternEndDateText: z.string().nullable(),
+        }),
+        formIsRecurringAppointment: z.boolean(),
+        dateAppointmentScheduled: z.date().optional(),
+      })
+      .refine(
+        (formValues) => {
+          if (formValues.formIsRecurringAppointment === true) {
+            return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+          }
+          return true;
+        },
+        {
+          path: ['appointmentDateTime.recurringPatternEndDate'],
+          message: t('recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
+        },
+      )
+      .refine(
+        (formValues) => {
+          const { appointmentDateTime, dateAppointmentScheduled } = formValues;
 
-        const startDate = appointmentDateTime?.startDate;
+          const startDate = appointmentDateTime?.startDate;
 
-        if (!startDate || !dateAppointmentScheduled) return true;
+          if (!startDate || !dateAppointmentScheduled) return true;
 
-        const normalizeDate = (date: Date) => {
-          const normalizedDate = new Date(date);
-          normalizedDate.setHours(0, 0, 0, 0);
-          return normalizedDate;
-        };
+          const normalizeDate = (date: Date) => {
+            const normalizedDate = new Date(date);
+            normalizedDate.setHours(0, 0, 0, 0);
+            return normalizedDate;
+          };
 
-        const startDateObj = normalizeDate(startDate);
-        const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
+          const startDateObj = normalizeDate(startDate);
+          const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
 
-        return scheduledDateObj <= startDateObj;
-      },
-      {
-        path: ['dateAppointmentScheduled'],
-        message: t(
-          'dateAppointmentIssuedCannotBeAfterAppointmentDate',
-          'Date appointment issued cannot be after the appointment date',
-        ),
-      },
-    )
-    .superRefine((data, ctx) => {
-      // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
-      if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
-        ctx.addIssue({
-          path: ['duration'],
-          code: z.ZodIssueCode.custom,
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-        });
-      }
-      if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
-        ctx.addIssue({
-          path: ['duration'],
-          code: z.ZodIssueCode.custom,
-          message: translateFrom(
-            moduleName,
-            'durationMaxErrorMessage',
-            'Duration cannot exceed 1440 minutes (24 hours)',
+          return scheduledDateObj <= startDateObj;
+        },
+        {
+          path: ['dateAppointmentScheduled'],
+          message: t(
+            'dateAppointmentIssuedCannotBeAfterAppointmentDate',
+            'Date appointment issued cannot be after the appointment date',
           ),
-        });
-      }
-    });
+        },
+      )
+      .superRefine((data, ctx) => {
+        // O3-5568: Smart Time Guard with configuration bypass
+        if (!data.isAllDayAppointment && data.appointmentDateTime?.startDate && data.startTime && data.timeFormat) {
+          const hoursAndMinutes = data.startTime.split(':').map((item) => parseInt(item, 10));
+          if (hoursAndMinutes.length === 2 && !isNaN(hoursAndMinutes[0]) && !isNaN(hoursAndMinutes[1])) {
+            const hours = (hoursAndMinutes[0] % 12) + (data.timeFormat === 'PM' ? 12 : 0);
+            const minutes = hoursAndMinutes[1];
+            const selectedDateTime = dayjs(data.appointmentDateTime.startDate).hour(hours).minute(minutes);
 
-  type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
+            let isTimeChanged = true;
+            if (isEditing && appointment?.startDateTime) {
+              const originalDateTime = dayjs(appointment.startDateTime);
+              isTimeChanged = !selectedDateTime.isSame(originalDateTime, 'minute');
+            }
+
+            if (!allowPastTime && (!isEditing || isTimeChanged) && selectedDateTime.isBefore(dayjs(), 'minute')) {
+              ctx.addIssue({
+                path: ['startTime'],
+                code: z.ZodIssueCode.custom,
+                message: translateFrom(moduleName, 'pastTimeErrorMessage', 'Time cannot be in the past'),
+              });
+            }
+          }
+        }
+
+        // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
+        if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
+          ctx.addIssue({
+            path: ['duration'],
+            code: z.ZodIssueCode.custom,
+            message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+          });
+        }
+        if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
+          ctx.addIssue({
+            path: ['duration'],
+            code: z.ZodIssueCode.custom,
+            message: translateFrom(
+              moduleName,
+              'durationMaxErrorMessage',
+              'Duration cannot exceed 1440 minutes (24 hours)',
+            ),
+          });
+        }
+      });
+
+  type AppointmentFormData = z.infer<ReturnType<typeof getAppointmentsFormSchema>>;
 
   const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
     ? new Date(appointment?.dateAppointmentScheduled)
@@ -230,7 +258,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     formState: { errors, isDirty },
   } = useForm<AppointmentFormData>({
     mode: 'all',
-    resolver: zodResolver(appointmentsFormSchema),
+    resolver: zodResolver(getAppointmentsFormSchema(allowPastTimeAppointments ?? false)),
     defaultValues: {
       location: appointment?.location?.uuid ?? session?.sessionLocation?.uuid ?? '',
       provider:
@@ -324,8 +352,6 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         .join(', ');
     }
   })();
-
-  const isEditing = Boolean(appointment);
 
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
