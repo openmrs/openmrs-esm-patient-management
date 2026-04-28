@@ -38,7 +38,7 @@ export interface PatientListFilter {
 export interface PatientListOption {
   type: string;
   name: string;
-  value: any;
+  value: string | number | boolean;
 }
 
 export interface PatientListMember {
@@ -57,8 +57,8 @@ export interface OpenmrsCohort {
   resourceVersion: string;
   name: string;
   description: string;
-  attributes: Array<any>;
-  links: Array<any>;
+  attributes: Array<OpenmrsResource>;
+  links: Array<{ rel: string; uri: string; resourceAlias?: string }>;
   location: Location | null;
   groupCohort: boolean | null;
   startDate: string | null;
@@ -76,7 +76,7 @@ export interface OpenmrsCohortRef {
 }
 
 export interface OpenmrsCohortMember {
-  attributes: Array<any>;
+  attributes: Array<OpenmrsResource>;
   description: string;
   endDate: string;
   startDate: string;
@@ -88,7 +88,7 @@ export interface OpenmrsCohortMember {
 
 export interface CohortResponse<T> {
   results: Array<T>;
-  error: any;
+  error: Error | null;
   totalCount: number;
 }
 

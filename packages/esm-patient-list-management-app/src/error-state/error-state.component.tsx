@@ -4,8 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './error-state.scss';
 
+interface FetchError extends Error {
+  response?: {
+    status?: number;
+    statusText?: string;
+  };
+}
+
 export interface ErrorStateProps {
-  error: any;
+  error: FetchError;
   headerTitle: string;
 }
 
