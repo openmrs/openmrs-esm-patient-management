@@ -1,5 +1,5 @@
 import React, { useCallback, type SyntheticEvent, useEffect, useId, useMemo, useState } from 'react';
-import { Button, ButtonSet, Dropdown, Layer, TextArea, TextInput } from '@carbon/react';
+import { Button, ButtonSet, ComboBox, Dropdown, InlineLoading, Layer, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type TFunction } from 'i18next';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import {
   useSession,
   Workspace2,
   type Workspace2DefinitionProps,
+  useLocations,
 } from '@openmrs/esm-framework';
 import type { NewCohortData, NewCohortDataPayload, OpenmrsCohort } from '../api/types';
 import {
@@ -32,6 +33,7 @@ const createCohortSchema = (t: TFunction) => {
       .min(1, t('cohortNameRequired', 'Cohort name is required')),
     cohortType: z.string().optional(),
     description: z.string().optional(),
+    location: z.string().optional(),
   });
 };
 
@@ -57,12 +59,14 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
   const cohortSchema = createCohortSchema(t);
   const { listCohortTypes = [] } =
     useCohortTypes() ?? ({} as { listCohortTypes?: Array<{ uuid: string; display: string }> });
+  const locations = useLocations('Login Location') ?? [];
   const { user } = session;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cohortDetails, setCohortDetails] = useState<CohortFormData>({
     name: '',
     description: '',
     cohortType: '',
+    location: '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
@@ -71,11 +75,13 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
       name: patientListDetails?.name || '',
       description: patientListDetails?.description || '',
       cohortType: patientListDetails?.cohortType?.uuid || '',
+      location: patientListDetails?.location?.uuid || '',
     };
     const dirty =
       cohortDetails.name !== initial.name ||
       cohortDetails.description !== initial.description ||
-      cohortDetails.cohortType !== initial.cohortType;
+      cohortDetails.cohortType !== initial.cohortType ||
+      cohortDetails.location !== initial.location;
     return { initialValues: initial, isDirty: dirty };
   }, [cohortDetails, patientListDetails]);
 
@@ -103,11 +109,12 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
         name: patientListDetails?.name || '',
         description: patientListDetails?.description || '',
         cohortType: patientListDetails?.cohortType?.uuid || '',
+        location: patientListDetails?.location?.uuid || '',
       });
     } else {
-      setCohortDetails({ name: '', description: '', cohortType: '' });
+      setCohortDetails({ name: '', description: '', cohortType: '', location: session?.sessionLocation?.uuid || '' });
     }
-  }, [user, patientListDetails]);
+  }, [user, patientListDetails, session?.sessionLocation?.uuid]);
 
   const handleSubmit = useCallback(() => {
     if (!validateForm(cohortDetails)) {
@@ -151,7 +158,7 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
     } else {
       createPatientList({
         ...cohortDetails,
-        location: session?.sessionLocation?.uuid,
+        location: cohortDetails.location || session?.sessionLocation?.uuid || '',
       } as NewCohortDataPayload)
         .then(() => {
           showSnackbar({
@@ -219,6 +226,28 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
                 titleText={t('selectCohortType', 'Select cohort type')}
                 type="default"
               />
+            </Layer>
+          </div>
+          <div className={styles.input}>
+            <Layer level={responsiveLevel}>
+              {locations?.length === 0 ? (
+                <InlineLoading description={t('loadingLocations', 'Loading locations')} />
+              ) : (
+                <ComboBox
+                  id="location"
+                  items={locations}
+                  itemToString={(item) => (item ? item.display : '')}
+                  placeholder={t('selectLocation', 'Select location')}
+                  onChange={({ selectedItem }) => {
+                    setCohortDetails((prev) => ({
+                      ...prev,
+                      location: selectedItem?.uuid || '',
+                    }));
+                  }}
+                  selectedItem={locations.find((item) => item.uuid === cohortDetails.location) || null}
+                  titleText={t('chooseLocation', 'Choose location')}
+                />
+              )}
             </Layer>
           </div>
           <div className={styles.input}>

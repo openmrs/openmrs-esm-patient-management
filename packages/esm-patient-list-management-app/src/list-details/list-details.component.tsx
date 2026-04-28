@@ -136,8 +136,12 @@ const ListDetails = () => {
           <h4 className={classNames(styles.bodyShort02, styles.marginTop)}>{listDetails?.description ?? '--'}</h4>
           <div className={classNames(styles.text02, styles.bodyShort01, styles.marginTop)}>
             {listDetails?.size} {t('patients', 'patients')} &middot;{' '}
-            <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
-            {listDetails?.startDate ? formatDate(parseDate(listDetails.startDate)) : null}
+            {listDetails?.startDate ? (
+              <span className={styles.label01}>
+                {t('createdOn', 'Created on')}: {formatDate(parseDate(listDetails.startDate))} &middot;{' '}
+              </span>
+            ) : null}{' '}
+            {listDetails?.location ? (listDetails.location as { uuid: string; display: string }).display : null}
           </div>
         </div>
         <div className={styles.overflowMenu}>
@@ -172,6 +176,7 @@ const ListDetails = () => {
             mutateListDetails={mutateListDetails}
             mutateListMembers={mutateListMembers}
             patients={patients}
+            listLocation={listDetails?.location}
             pagination={{
               usePagination: listDetails?.size > currentPageSize,
               currentPage,

@@ -31,9 +31,15 @@ import {
   TrashCanIcon,
   useDebounce,
   useLayoutType,
+  useConfig,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
+import {
+  addPatientToList,
+  removePatientFromList,
+  getPatientLocationFromIdentifiers,
+} from '../api/patient-list.resource';
+import { type PatientListManagementConfig } from '../config-schema';
 import styles from './list-details-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -148,6 +154,7 @@ interface ListDetailsTableProps {
   };
   patients;
   cohortUuid: string;
+  listLocation?: { uuid: string; display: string } | null;
   style?: CSSProperties;
 }
 
@@ -169,8 +176,10 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   pagination,
   patients,
   cohortUuid,
+  listLocation,
 }) => {
   const { t } = useTranslation();
+  const config = useConfig<PatientListManagementConfig>();
   const id = useId();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
@@ -258,8 +267,8 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   );
 
   const handleAddPatientToList = useCallback(
-    async (patient) => {
-      const alreadyInList = patients.some((p) => patient == p.uuid);
+    async (patientUuid) => {
+      const alreadyInList = patients.some((p) => patientUuid == p.uuid);
 
       if (alreadyInList) {
         showSnackbar({
@@ -271,10 +280,28 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         return;
       }
 
+      if (config.enforcePatientListLocationMatch) {
+        const patientLocation = await getPatientLocationFromIdentifiers(patientUuid);
+
+        if (config.enforcePatientListLocationMatch && listLocation) {
+          if (patientLocation && patientLocation.uuid !== listLocation.uuid) {
+            showSnackbar({
+              title: t('error', 'Error'),
+              kind: 'error',
+              subtitle: t(
+                'patientLocationMismatchError',
+                'Patient location does not match list location. Patient cannot be added.',
+              ),
+            });
+            return;
+          }
+        }
+      }
+
       try {
         await addPatientToList({
           cohort: cohortUuid,
-          patient,
+          patient: patientUuid,
           startDate: toOmrsIsoString(new Date()),
         });
 
@@ -295,7 +322,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
         });
       }
     },
-    [cohortUuid, mutateListDetails, mutateListMembers, patients, t],
+    [cohortUuid, mutateListDetails, mutateListMembers, patients, t, config, listLocation],
   );
 
   const BackButton = () => (

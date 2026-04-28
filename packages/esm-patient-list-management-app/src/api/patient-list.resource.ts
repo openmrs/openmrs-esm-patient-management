@@ -45,6 +45,40 @@ export type ErrorObject = {
 
 export const cohortUrl = `${restBaseUrl}/cohortm`;
 
+/**
+ * Extracts the location name or UUID from a patient's identifiers.
+ * A patient is considered to "match" a location if at least one of their identifiers
+ * has location data that matches the target location.
+ *
+ * @param patientUuid - The UUID of the patient
+ * @returns The location object (with uuid and display) if found, otherwise null
+ */
+export async function getPatientLocationFromIdentifiers(
+  patientUuid: string,
+  ac = new AbortController(),
+): Promise<{ uuid: string; display: string } | null> {
+  try {
+    const url = `${restBaseUrl}/patient/${patientUuid}?v=custom:(identifiers:(identifier,identifierType:(display),location:(uuid,display)))`;
+    const { data } = await openmrsFetch(url, { signal: ac.signal });
+
+    if (data?.identifiers && Array.isArray(data.identifiers)) {
+      for (const identifier of data.identifiers) {
+        if (identifier.location && identifier.location.uuid) {
+          return {
+            uuid: identifier.location.uuid,
+            display: identifier.location.display || identifier.location.uuid,
+          };
+        }
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching patient location from identifiers:', error);
+    return null;
+  }
+}
+
 async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
     signal: ac.signal,
@@ -97,7 +131,7 @@ export async function getAllPatientLists(
   systemListCohortTypeUUID,
   ac = new AbortController(),
 ) {
-  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
+  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType,location:(uuid,display))';
   const query: Array<[string, string]> = [['v', custom]];
 
   if (filter.name !== undefined && filter.name !== '') {
@@ -132,6 +166,7 @@ export async function getAllPatientLists(
     description: cohort.description,
     type: cohort.cohortType?.display,
     size: cohort.size,
+    location: cohort.location,
     isStarred: false, // TODO
   }));
 }
@@ -274,6 +309,7 @@ export async function findRealPatientListsWithoutPatient(
     id: list.id,
     displayName: list.display,
     checked: listsIdsOfThisPatient.includes(list.id),
+    location: list.location,
     async addPatient() {
       await addPatientToList({
         cohort: list.id,
