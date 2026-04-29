@@ -65,8 +65,19 @@ export const appointmentColumnTypes = [
   'serviceType',
   // t('status', 'Status')
   'status',
-  // t('dateTime', 'Date & time')
+  // t('dateTime', 'Appointment time')
   'dateTime',
   // t('provider', 'Provider')
   'provider',
+  // t('actions', 'Actions')
+  'actions',
+  // t('visitStartTime', 'Visit start time')
+  'visitStartTime',
 ] as const;
+
+// added to prevent auto-removal of translations for dynamic keys
+// t('Scheduled', 'Scheduled')
+// t('CheckedIn', 'Checked in')
+// t('Cancelled', 'Cancelled')
+// t('Missed', 'Missed')
+// t('Completed', 'Completed')

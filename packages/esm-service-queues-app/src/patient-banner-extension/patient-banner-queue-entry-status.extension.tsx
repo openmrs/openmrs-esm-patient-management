@@ -18,14 +18,6 @@ const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps
 
   const isPatientChart = renderedFrom === 'patient-chart';
 
-  // Force a refetch on mount so the banner shows up-to-date queue info
-  // after client-side navigation (e.g. from the "Serve" action).
-  useEffect(() => {
-    if (isPatientChart) {
-      window.dispatchEvent(new CustomEvent('queue-entry-updated'));
-    }
-  }, [isPatientChart]);
-
   const queueEntry = queueEntries?.[0];
   const config = useConfig<ConfigObject>();
 
