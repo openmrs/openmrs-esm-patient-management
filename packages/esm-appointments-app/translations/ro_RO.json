@@ -142,6 +142,7 @@
   "recurringAppointment": "Programare recurentă",
   "recurringAppointmentShouldHaveEndDate": "O programare recurentă trebuie să aibă dată de sfârșit",
   "repeatEvery": "Repetă la fiecare",
+  "Requested": "Requested",
   "SAT": "SAM",
   "saveAndClose": "Salvează și închide",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Viitoare",
   "upcomingAppointments": "Programări viitoare",
   "updateError": "Eroare la actualizarea programării viitoare",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "MIE",
   "week": "Săptămână",
   "yes": "Da"

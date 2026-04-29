@@ -142,6 +142,7 @@
   "recurringAppointment": "Cita Recurrente",
   "recurringAppointmentShouldHaveEndDate": "Una cita recurrente debe tener una fecha de finalización",
   "repeatEvery": "Repetir cada",
+  "Requested": "Requested",
   "SAT": "SAB",
   "saveAndClose": "Guardar y cerrar",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Próximas",
   "upcomingAppointments": "Próximas citas",
   "updateError": "Error al actualizar la próxima cita",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Semana",
   "yes": "Sí"

@@ -142,6 +142,7 @@
   "recurringAppointment": "Recurring Appointment",
   "recurringAppointmentShouldHaveEndDate": "A recurring appointment should have an end date",
   "repeatEvery": "Repeat every",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "Save and close",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Upcoming",
   "upcomingAppointments": "Upcoming appointments",
   "updateError": "Error updating upcoming appointment",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Week",
   "yes": "Yes"
