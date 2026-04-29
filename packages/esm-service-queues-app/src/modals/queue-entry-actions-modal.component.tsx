@@ -256,15 +256,20 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
       return t('timeCannotBeInFuture', 'Time cannot be in the future');
     }
 
-    if (startAtDate <= previousQueueEntryStartTime) {
-      return t(
-        'timeCannotBePriorToPreviousQueueEntry',
-        'Time cannot be before start of previous queue entry: {{time}}',
-        {
-          time: previousQueueEntryStartTime.toLocaleString(),
-          interpolation: { escapeValue: false },
-        },
-      );
+    if (previousQueueEntryStartTime) {
+      const previousMinutePrecision = new Date(previousQueueEntryStartTime);
+      previousMinutePrecision.setSeconds(0, 0);
+
+      if (startAtDate < previousMinutePrecision) {
+        return t(
+          'timeCannotBePriorToPreviousQueueEntry',
+          'Time cannot be before start of previous queue entry: {{time}}',
+          {
+            time: previousMinutePrecision.toLocaleString(),
+            interpolation: { escapeValue: false },
+          },
+        );
+      }
     }
     return null;
   }, [

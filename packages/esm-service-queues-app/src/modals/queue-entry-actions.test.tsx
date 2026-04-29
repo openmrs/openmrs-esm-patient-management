@@ -11,6 +11,8 @@ import { screen } from '@testing-library/react';
 import {
   mockQueueAltPriorities,
   mockQueueEntryAlice,
+  mockQueueEntryBrian,
+  mockPreviousQueueEntryAlice,
   mockQueueEntryNoPriorities,
   mockQueueEntryNoStatuses,
   mockQueues,
@@ -633,5 +635,97 @@ describe('QueueEntryActionModal - ComboBox behavior with many queues', () => {
     await user.type(combobox, 'RADIOLOGY');
 
     expect(screen.getByRole('option', { name: 'Radiology - Imaging Center' })).toBeInTheDocument();
+  });
+});
+describe('QueueEntryActionModal - time validation with minute precision', () => {
+  const baseModalParams = {
+    modalTitle: 'Edit Queue Entry',
+    submitButtonText: 'Submit',
+    submitSuccessTitle: 'Success',
+    submitSuccessText: 'Updated',
+    submitFailureTitle: 'Failed',
+    submitAction: jest.fn().mockResolvedValue({ status: 200 }),
+    disableSubmit: jest.fn().mockReturnValue(false),
+    isEdit: true,
+    showQueuePicker: true,
+    showStatusPicker: true,
+  };
+
+  it('should allow time entry matching previous entry minute when seconds are non-zero', async () => {
+    const queueEntryWithSeconds: typeof mockQueueEntryAlice = {
+      ...mockQueueEntryAlice,
+      startedAt: '2024-01-02T05:32:00.000+0000',
+      previousQueueEntry: {
+        ...mockPreviousQueueEntryAlice,
+        startedAt: '2024-01-02T05:31:59.000+0000',
+      },
+    };
+
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={jest.fn()} modalParams={baseModalParams} />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+
+    const timeInput = screen.getByRole('textbox', { name: 'Time' });
+    await user.clear(timeInput);
+
+    const prevDate = new Date('2024-01-02T05:31:59.000+0000');
+    const hours = prevDate.getHours() % 12 || 12;
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = prevDate.getMinutes().toString().padStart(2, '0');
+
+    await user.type(timeInput, `${formattedHours}:${formattedMinutes}`);
+
+    expect(screen.queryByText(/cannot be before start of previous queue entry/i)).not.toBeInTheDocument();
+  });
+
+  it('should show error when time is strictly before the truncated previous entry minute', async () => {
+    const queueEntryWithSeconds: typeof mockQueueEntryAlice = {
+      ...mockQueueEntryAlice,
+      startedAt: '2024-01-02T05:32:00.000+0000',
+      previousQueueEntry: {
+        ...mockPreviousQueueEntryAlice,
+        startedAt: '2024-01-02T05:31:59.000+0000',
+      },
+    };
+
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={jest.fn()} modalParams={baseModalParams} />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+
+    const timeInput = screen.getByRole('textbox', { name: 'Time' });
+    await user.clear(timeInput);
+
+    const beforeDate = new Date('2024-01-02T05:30:00.000+0000');
+    const hours = beforeDate.getHours() % 12 || 12;
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = beforeDate.getMinutes().toString().padStart(2, '0');
+
+    await user.type(timeInput, `${formattedHours}:${formattedMinutes}`);
+
+    expect(await screen.findByText(/cannot be before start of previous queue entry/i)).toBeInTheDocument();
+  });
+
+  it('should skip previous entry validation when previousQueueEntry is null', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal queueEntry={mockQueueEntryBrian} closeModal={jest.fn()} modalParams={baseModalParams} />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+
+    const timeInput = screen.getByRole('textbox', { name: 'Time' });
+    await user.clear(timeInput);
+    await user.type(timeInput, '12:00');
+
+    expect(screen.queryByText(/cannot be before start of previous queue entry/i)).not.toBeInTheDocument();
   });
 });
