@@ -1,12 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  StructuredListBody,
-  StructuredListCell,
-  StructuredListHead,
-  StructuredListRow,
-  StructuredListWrapper,
-} from '@carbon/react';
+import { StructuredListBody, StructuredListCell, StructuredListRow, StructuredListWrapper } from '@carbon/react';
 import { type OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
 import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
 import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
@@ -66,7 +60,6 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
     <div className={styles.wrapper}>
       <div className={styles.visitContainer}>
         <StructuredListWrapper className={styles.structuredList}>
-          <StructuredListHead />
           <StructuredListBody>
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('triageNote', 'Triage note')}</StructuredListCell>

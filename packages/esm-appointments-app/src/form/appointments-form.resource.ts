@@ -1,23 +1,8 @@
-import { useCallback } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type AppointmentPayload, type AppointmentService, type RecurringAppointmentsPayload } from '../types';
+import { type AppointmentPayload, type RecurringAppointmentsPayload } from '../types';
 dayjs.extend(isToday);
-
-export function useAppointmentService() {
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }, Error>(
-    `${restBaseUrl}/appointmentService/all/full`,
-    openmrsFetch,
-  );
-
-  return {
-    data: data ? data.data : null,
-    error,
-    isLoading,
-  };
-}
 
 export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
   return openmrsFetch(`${restBaseUrl}/appointment`, {
