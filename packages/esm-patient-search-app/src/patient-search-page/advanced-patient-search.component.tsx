@@ -12,12 +12,27 @@ interface AdvancedPatientSearchProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
+  patientClickSideEffect?: (patientUuid: string, patient: fhir.Patient) => void;
+  onPatientSelected?(
+    patientUuid: string,
+    patient: fhir.Patient,
+    launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
+    closeWorkspace: () => void,
+  ): void;
+  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
+  closeWorkspace?(): void;
+  startVisitWorkspaceName?: string;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   query,
   stickyPagination,
   inTabletOrOverlay,
+  patientClickSideEffect,
+  onPatientSelected,
+  launchChildWorkspace,
+  closeWorkspace,
+  startVisitWorkspaceName,
 }) => {
   const { includeDead } = useConfig<PatientSearchConfig>();
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialFilters);
@@ -151,6 +166,11 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           isLoading={isLoading}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}
+          patientClickSideEffect={patientClickSideEffect}
+          onPatientSelected={onPatientSelected}
+          launchChildWorkspace={launchChildWorkspace}
+          closeWorkspace={closeWorkspace}
+          startVisitWorkspaceName={startVisitWorkspaceName}
         />
       </div>
       {inTabletOrOverlay && (

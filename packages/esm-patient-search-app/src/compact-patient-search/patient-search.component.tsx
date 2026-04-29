@@ -6,13 +6,33 @@ import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
-
+/**
+ * PatientSearchComponent is the core logic and UI for the compact search bar.
+ *
+ * Used by the CompactPatientSearchExtension in the top nav in desktop mode, it handles input state,
+ * debouncing, and conditionally rendering the search results dropdown popover when active.
+ */
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
+  nonNavigationSelectPatientAction?: (patientUuid: string, patient: fhir.Patient) => void;
+  patientClickSideEffect?: (patientUuid: string, patient: fhir.Patient) => void;
 }
 
 const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isValidating,
+      setPage,
+      totalResults,
+      nonNavigationSelectPatientAction,
+      patientClickSideEffect,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
     const observer = useRef(null);
 
@@ -89,7 +109,12 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
+            <CompactPatientBanner
+              patients={searchResults}
+              ref={ref}
+              nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+              patientClickSideEffect={patientClickSideEffect}
+            />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
