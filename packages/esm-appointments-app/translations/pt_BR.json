@@ -142,6 +142,7 @@
   "recurringAppointment": "Consulta recorrente",
   "recurringAppointmentShouldHaveEndDate": "Uma consulta recorrente deve ter uma data de término",
   "repeatEvery": "Repetir a cada",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "Salvar e fechar",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Por vir",
   "upcomingAppointments": "Próximas consultas",
   "updateError": "Erro ao atualizar próxima consulta agendada",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Semana",
   "yes": "Sim"
