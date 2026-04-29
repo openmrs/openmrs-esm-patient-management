@@ -504,12 +504,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     onBlur={onBlur}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
+                    <SelectItem key="chooseLocation" text={t('chooseLocation', 'Choose a location')} value="" />
                     {locations?.length > 0 &&
                       locations.map((location) => (
-                        <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                          {location.display}
-                        </SelectItem>
+                        <SelectItem key={location.uuid} text={location.display} value={location.uuid} />
                       ))}
                   </Select>
                 )}
@@ -549,12 +547,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     }}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseService', 'Select service')} value="" />
+                    <SelectItem key="chooseService" text={t('chooseService', 'Select service')} value="" />
                     {serviceTypes?.length > 0 &&
                       serviceTypes.map((service) => (
-                        <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                          {service.name}
-                        </SelectItem>
+                        <SelectItem key={service.uuid} text={service.name} value={service.name} />
                       ))}
                   </Select>
                 )}
@@ -838,9 +834,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     <SelectItem key="chooseProvider" text={t('chooseProvider', 'Choose a provider')} value="" />
                     {providers?.providers?.length > 0 &&
                       providers?.providers?.map((provider) => (
-                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
-                          {provider.display}
-                        </SelectItem>
+                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid} />
                       ))}
                   </Select>
                 )}
