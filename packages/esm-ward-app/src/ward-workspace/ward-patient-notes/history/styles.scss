@@ -29,7 +29,7 @@
 
 .noteHeader {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -71,4 +71,17 @@
   display: flex;
   gap: layout.$spacing-02;
   justify-content: flex-end;
+}
+
+.noteEditedBy {
+  font-size: 0.75rem;
+  margin-top: layout.$spacing-02;
+  color: $text-02;
+}
+
+.menuItem {
+.menuItem {
+  max-width: none;
+  max-inline-size: none;
+}
 }

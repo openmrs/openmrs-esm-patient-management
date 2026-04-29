@@ -54,11 +54,11 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
   });
 
   await test.step('And I select the bed for admission', async () => {
-    await page.getByText(`${bed.bedNumber} · Empty`).click();
+    await wardPage.selectBedForAdmission(bed.bedNumber);
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
-    await page.getByRole('button', { name: 'Admit', exact: true }).click();
+    await wardPage.confirmAdmission();
   });
 
   await test.step('Then I should see a success message confirming the admission success', async () => {
@@ -91,6 +91,48 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
 
   await test.step('Then I should see a success message confirming the note was saved', async () => {
     await expect(page.getByText(/patient note saved/i)).toBeVisible();
+  });
+
+  await test.step('And when I click on the patient card to open the patient workspace', async () => {
+    await wardPage.clickPatientCard(fullName);
+  });
+
+  await test.step('Then I click the "Patient note" button in the siderail to open the patient note workspace again', async () => {
+    await wardPage.clickPatientNotesButton();
+  });
+
+  await test.step('Then I should see the note there', async () => {
+    await expect(page.getByText('Sample patient note')).toBeVisible();
+  });
+
+  await test.step('And when I click on the note overflow menu and select "Edit"', async () => {
+    await wardPage.selectEditNoteOption();
+  });
+
+  await test.step('Then I edit the note to "Sample patient note - edited"', async () => {
+    await wardPage.fillEditNote('Sample patient note - edited');
+  });
+
+  await test.step('And I save the edited note', async () => {
+    await wardPage.clickSaveEditButton();
+  });
+
+  await test.step('Then I should see a success message confirming the note was saved', async () => {
+    await expect(page.getByText(/patient note saved/i)).toBeVisible();
+  });
+
+  await test.step('Then I should see the note with a "Last edited by" line', async () => {
+    await expect(page.getByText(/last edited by/i)).toBeVisible();
+  });
+
+  await test.step('And when I click on the note overflow menu and select "View edit history"', async () => {
+    await wardPage.selectViewEditHistoryOption();
+  });
+
+  await test.step('Then I should see the modal showing the edit history with 2 versions', async () => {
+    await expect(page.getByText('Note edit history')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Sample patient note - edited')).toBeVisible();
+    await expect(page.getByText('Sample patient note', { exact: true })).toBeVisible();
   });
 });
 
