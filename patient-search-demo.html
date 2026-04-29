@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>Generalized Patient Selection</title>
+    <!-- React & Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { margin: 0; font-family: 'IBM Plex Sans', -apple-system, sans-serif; background: #f4f4f4; color: #161616; padding: 60px; display: flex; justify-content: center; }
+        .container { max-width: 900px; width: 100%; }
+        .h1 { font-size: 32px; font-weight: 600; margin-bottom: 16px; text-align: center; color: #161616;}
+        .desc { font-size: 16px; color: #525252; margin-bottom: 50px; text-align: center; max-width: 700px; margin-left: auto; margin-right: auto;}
+        
+        .section { background: #fff; padding: 40px; border-radius: 8px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e0e0e0;}
+        .sec-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;}
+        
+        .row { display: flex; align-items: center; justify-content: space-between; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px 24px; cursor: pointer; transition: background 0.2s; background: #fff;}
+        .row:hover { background: #fdfdfd; }
+        .row-proposed { transition: background-color 0.15s; background-color: #f4f4f4; }
+        .row-proposed:hover { background-color: #ffffff; }
+        
+        .left-col { display: flex; align-items: center; gap: 20px; }
+        .avatar { width: 48px; height: 48px; background: #007C89; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; color: #fff; }
+        .info { display: flex; flex-direction: column; gap: 4px; }
+        .info h3 { margin: 0; font-size: 18px; color: #0f62fe; font-weight: 600; }
+        .info p { margin: 0; font-size: 14px; color: #6f6f6f; }
+        
+        .right-col { display: flex; align-items: center; gap: 16px; }
+        
+        .btn-ghost { background: transparent; border: none; color: #0f62fe; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;}
+        .btn-select { background: #0f62fe; color: #fff; border: 2px solid transparent; padding: 10px 24px; font-size: 14px; cursor: pointer; font-family: 'IBM Plex Sans'; transition: 0.2s;}
+        .btn-select:hover { background: #0353e9; }
+        
+        .tag-red { background: #fff1f1; border: 1px solid #ffb3b8; color: #da1e28; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .tag-green { background: #defbe6; border: 1px solid #74e792; color: #198038; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        
+        .annot { background: #fdfdfd; border-left: 4px solid #da1e28; padding: 16px; margin-top: 24px; font-size: 15px; color: #393939; line-height: 1.5; }
+        .annot-green { border-left-color: #198038; background: #f6fbf6;}
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function App() {
+  return (
+    <div className="container">
+      <div className="h1">Generalized Patient Selection Demo</div>
+      <div className="desc">Demonstrating the architectural shift in <code>esm-patient-search-app</code> to inherently establish a universal selection affordance.</div>
+      
+      <div className="section">
+        <div className="sec-title"><span className="tag-red">❌ CURRENT UX</span> Implicit Selection Model</div>
+        <div className="row">
+          <div className="left-col">
+            <div className="avatar">JD</div>
+            <div className="info">
+              <h3>John Doe</h3>
+              <p>Male &nbsp;&bull;&nbsp; 35 years &nbsp;&bull;&nbsp; ID: 100293X</p>
+            </div>
+          </div>
+          <div className="right-col">
+            <button className="btn-ghost">View details &gt;</button>
+          </div>
+        </div>
+        <div className="annot">
+          <strong>Problem:</strong> When launched in "selection mode" (e.g. by the Ward or Appointments app to select a patient), the entire generic row acts as an invisible button. Because there is no explicit visual <code>Select</code> affordance, apps are currently forced to statically inject downstream-specific workflow buttons (like "Schedule Date" or "Admit Patient") into extension slots on the far right.
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="sec-title"><span className="tag-green">✅ PROPOSED UX</span> Context-Aware Affordance (Hover State)</div>
+        <div className="row row-proposed">
+          <div className="left-col">
+            <div className="avatar">JD</div>
+            <div className="info">
+              <h3>John Doe</h3>
+              <p>Male &nbsp;&bull;&nbsp; 35 years &nbsp;&bull;&nbsp; ID: 100293X</p>
+            </div>
+          </div>
+          <div className="right-col">
+            <button className="btn-ghost">View details &gt;</button>
+          </div>
+        </div>
+        <div className="annot annot-green">
+          <strong>Solution:</strong> The core <code>PatientBanner</code> now listens to its <code>PatientSearchContext</code>. If a selection action is active, the banner applies a dedicated hover state (following the standard Carbon Design System clickable tile behavior) indicating to the user that the entire row is a clickable action, rather than cluttering the UI with another explicit CTA button.
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
