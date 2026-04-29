@@ -162,3 +162,18 @@ export interface SearchFieldConfig {
   min?: number;
   max?: number;
 }
+
+export interface PatientSearchCallbackProps {
+  /**
+   * A function to execute instead of navigating the user to the patient
+   * dashboard. If null/undefined, patient results will be links to the
+   * patient dashboard.
+   */
+  onPatientSelected?: (patientUuid: string, patient: fhir.Patient, ...args: any[]) => void;
+  /**
+   * A function to execute when the user clicks on a patient result. Will
+   * be executed whether or not onPatientSelected is defined,
+   * just before navigation (or after onPatientSelected is called).
+   */
+  patientClickSideEffect?: (patientUuid: string, patient: fhir.Patient) => void;
+}

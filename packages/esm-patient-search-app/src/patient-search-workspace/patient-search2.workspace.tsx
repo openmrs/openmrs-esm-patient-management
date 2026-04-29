@@ -1,14 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { useConfig, useDebounce, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext2 } from '../patient-search-context';
+import { type PatientSearchCallbackProps } from '../types';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
-export interface PatientSearchWorkspaceProps {
+export interface PatientSearchWorkspaceProps extends PatientSearchCallbackProps {
   initialQuery?: string;
   workspaceTitle: string;
-  onPatientSelected(
+  onPatientSelected?(
     patientUuid: string,
     patient: fhir.Patient,
     launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
@@ -21,12 +21,15 @@ export interface PatientSearchWorkspaceWindowProps {
 }
 
 /**
- * This v2 workspace allows other apps to include patient search functionality.
+ * PatientSearchWorkspace2 is the modern (V2) workspace for patient search.
+ *
+ * It allows other apps (like Ward, Appointments, Service Queues) to embed the search
+ * functionality into their own slide-out or child workspaces using `launchChildWorkspace`.
  */
 const PatientSearchWorkspace2: React.FC<
   Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, {}>
 > = ({
-  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle },
+  workspaceProps: { initialQuery = '', onPatientSelected, patientClickSideEffect, workspaceTitle },
   windowProps: { startVisitWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
@@ -42,16 +45,23 @@ const PatientSearchWorkspace2: React.FC<
 
   return (
     <Workspace2 title={workspaceTitle}>
-      <PatientSearchContext2.Provider
-        value={{ onPatientSelected, launchChildWorkspace, closeWorkspace, startVisitWorkspaceName }}>
-        <PatientSearchBar
-          initialSearchTerm={initialQuery}
-          onChange={(value) => !disableTabletSearchOnKeyUp && setSearchTerm(value)}
-          onClear={handleClearSearchTerm}
-          onSubmit={setSearchTerm}
+      <PatientSearchBar
+        initialSearchTerm={initialQuery}
+        onChange={(value) => !disableTabletSearchOnKeyUp && setSearchTerm(value)}
+        onClear={handleClearSearchTerm}
+        onSubmit={setSearchTerm}
+      />
+      {showSearchResults && (
+        <AdvancedPatientSearchComponent
+          query={debouncedSearchTerm}
+          inTabletOrOverlay
+          onPatientSelected={onPatientSelected}
+          patientClickSideEffect={patientClickSideEffect}
+          launchChildWorkspace={launchChildWorkspace}
+          closeWorkspace={closeWorkspace}
+          startVisitWorkspaceName={startVisitWorkspaceName}
         />
-        {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
-      </PatientSearchContext2.Provider>
+      )}
     </Workspace2>
   );
 };

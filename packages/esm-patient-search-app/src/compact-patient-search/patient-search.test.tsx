@@ -3,7 +3,6 @@ import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
@@ -107,6 +106,7 @@ describe('PatientSearch', () => {
           },
         },
         uuid: 'test-patient-uuid',
+        voided: false,
       },
     ];
 
@@ -131,9 +131,5 @@ describe('PatientSearch', () => {
 });
 
 function renderPatientSearch(props = {}) {
-  render(
-    <PatientSearchContext.Provider value={{}}>
-      <PatientSearch {...defaultProps} {...props} />
-    </PatientSearchContext.Provider>,
-  );
+  render(<PatientSearch {...defaultProps} {...props} />);
 }
