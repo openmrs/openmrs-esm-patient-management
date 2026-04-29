@@ -87,6 +87,7 @@ export const launchCreateAppointmentForm = (t: TFunction<'translation', undefine
  */
 export const canTransition = (fromStatus: AppointmentStatus, toStatus: AppointmentStatus): boolean => {
   const sequences = {
+    [AppointmentStatus.REQUESTED]: 0,
     [AppointmentStatus.SCHEDULED]: 1,
     [AppointmentStatus.CHECKEDIN]: 3,
     [AppointmentStatus.COMPLETED]: 4,

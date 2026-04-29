@@ -1,5 +1,5 @@
 import { Type, validators } from '@openmrs/esm-framework';
-import { appointmentColumnTypes } from './constants';
+import { appointmentColumnTypes, appointmentStatuses, appointmentTypes } from './constants';
 
 export const configSchema = {
   allowAllDayAppointments: {
@@ -9,20 +9,22 @@ export const configSchema = {
   },
   appointmentStatuses: {
     _type: Type.Array,
-    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
-    _description: 'Configurable appointment status (status of appointments)',
+    _default: appointmentStatuses,
+    _description: `The selectable appointment statuses. Available options: ${appointmentStatuses.join(', ')}`,
     _elements: {
       _type: Type.String,
       _description: 'Status of an appointment',
+      _validators: [validators.oneOf(appointmentStatuses)],
     },
   },
   appointmentTypes: {
     _type: Type.Array,
     _default: ['Scheduled'],
-    _description: 'Configurable appointment types (types of appointments)',
+    _description: `Configurable appointment types. Available options: ${appointmentTypes.join(', ')}`,
     _elements: {
       _type: Type.String,
       _description: 'Type of an appointment',
+      _validators: [validators.oneOf(appointmentTypes)],
     },
   },
   checkInButton: {
@@ -81,8 +83,7 @@ export const configSchema = {
   },
   appointmentsTableColumns: {
     _type: Type.Array,
-    _description:
-      'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
+    _description: `Columns to display in the appointment table. Available options: ${appointmentColumnTypes.join(', ')}`,
     _default: [
       'patientName',
       'identifier',
