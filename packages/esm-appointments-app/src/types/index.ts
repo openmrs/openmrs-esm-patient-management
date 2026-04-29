@@ -33,7 +33,7 @@ export interface Appointment {
   appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
-  endDateTime: Date | number | any;
+  endDateTime: string;
   location: AppointmentLocation;
   // note: this is not a standard OpenMRS Patient object
   patient: {
@@ -47,8 +47,8 @@ export interface Appointment {
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: string | any;
-  dateAppointmentScheduled: string | any;
+  startDateTime: string;
+  dateAppointmentScheduled: string;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -56,6 +56,23 @@ export interface Appointment {
   voided: boolean;
   extensions: {};
   teleconsultationLink: string | null;
+}
+
+export interface AppointmentExcelInput {
+  uuid: string;
+  name?: string;
+  gender?: string;
+  age?: number;
+  identifier?: string;
+  phoneNumber?: string;
+  startDateTime?: string;
+  service?: {
+    name: string;
+  };
+  patient?: {
+    uuid?: string;
+    identifier?: string;
+  };
 }
 
 export interface AppointmentsFetchResponse {
@@ -109,7 +126,7 @@ export interface Observation {
       display: string;
     };
   }>;
-  value: any;
+  value: string | number | boolean | { uuid: string; display: string };
   obsDatetime: string;
 }
 
@@ -189,5 +206,5 @@ export interface PatientDetails {
 export interface AppointmentsAppContext {
   appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
   isLoading: boolean;
-  error: any;
+  error: Error | null;
 }
