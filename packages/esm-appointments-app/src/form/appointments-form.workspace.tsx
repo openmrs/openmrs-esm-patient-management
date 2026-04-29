@@ -336,9 +336,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     // Check if a duplicate response occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
-    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+    if (response.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
-    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+    } else if (response.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
       errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
 
@@ -504,12 +504,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     onBlur={onBlur}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
+                    <SelectItem key="chooseLocation" text={t('chooseLocation', 'Choose a location')} value="" />
                     {locations?.length > 0 &&
                       locations.map((location) => (
-                        <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                          {location.display}
-                        </SelectItem>
+                        <SelectItem key={location.uuid} text={location.display} value={location.uuid} />
                       ))}
                   </Select>
                 )}
@@ -549,12 +547,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     }}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseService', 'Select service')} value="" />
+                    <SelectItem key="chooseService" text={t('chooseService', 'Select service')} value="" />
                     {serviceTypes?.length > 0 &&
                       serviceTypes.map((service) => (
-                        <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                          {service.name}
-                        </SelectItem>
+                        <SelectItem key={service.uuid} text={service.name} value={service.name} />
                       ))}
                   </Select>
                 )}
@@ -579,10 +575,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     value={value}>
                     <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                     {appointmentTypes?.length > 0 &&
-                      appointmentTypes.map((appointmentType, index) => (
-                        <SelectItem key={index} text={appointmentType} value={appointmentType}>
-                          {appointmentType}
-                        </SelectItem>
+                      appointmentTypes.map((appointmentType) => (
+                        <SelectItem key={appointmentType} text={t(appointmentType)} value={appointmentType} />
                       ))}
                   </Select>
                 )}
@@ -807,12 +801,14 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       onChange={onChange}
                       ref={ref}
                       value={value}>
-                      <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
+                      <SelectItem
+                        key="selectAppointmentStatus"
+                        text={t('selectAppointmentStatus', 'Select status')}
+                        value=""
+                      />
                       {appointmentStatuses?.length > 0 &&
-                        appointmentStatuses.map((appointmentStatus, index) => (
-                          <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>
-                            {appointmentStatus}
-                          </SelectItem>
+                        appointmentStatuses.map((appointmentStatus) => (
+                          <SelectItem key={appointmentStatus} text={t(appointmentStatus)} value={appointmentStatus} />
                         ))}
                     </Select>
                   )}
@@ -835,12 +831,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     onBlur={onBlur}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
+                    <SelectItem key="chooseProvider" text={t('chooseProvider', 'Choose a provider')} value="" />
                     {providers?.providers?.length > 0 &&
                       providers?.providers?.map((provider) => (
-                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
-                          {provider.display}
-                        </SelectItem>
+                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid} />
                       ))}
                   </Select>
                 )}
