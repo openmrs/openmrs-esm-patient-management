@@ -142,6 +142,7 @@
   "recurringAppointment": "Rendez-vous Récurrent",
   "recurringAppointmentShouldHaveEndDate": "Un rendez-vous récurrent doit avoir une date de fin",
   "repeatEvery": "Répéter chaque",
+  "Requested": "Requested",
   "SAT": "SAM",
   "saveAndClose": "Sauvegarder et fermer",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "À venir",
   "upcomingAppointments": "À venir rendez-vous",
   "updateError": "Erreur lors de la mise à jour du prochain rendez-vous",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "MER",
   "week": "Semaine",
   "yes": "Oui"
