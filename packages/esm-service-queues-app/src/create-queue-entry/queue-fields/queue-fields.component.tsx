@@ -124,8 +124,16 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
         .catch((error) => {
           const errorMessage = error?.responseBody?.error?.message || error?.message || '';
           const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
-
-          if (isDuplicatePatientError) {
+          const globalErrors = error?.responseBody?.error?.globalErrors;
+          if (globalErrors?.find((error) => error.code === DUPLICATE_QUEUE_ENTRY_ERROR_CODE)) {
+            showSnackbar({
+              title: t('patientAlreadyInQueue', 'Patient already in queue'),
+              kind: 'warning',
+              isLowContrast: false,
+              subtitle: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
+            });
+            return;
+          } else if (isDuplicatePatientError) {
             showSnackbar({
               title: t('patientAlreadyInQueue', 'Patient already in queue'),
               kind: 'warning',
