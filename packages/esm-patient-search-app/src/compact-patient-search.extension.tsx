@@ -4,20 +4,24 @@ import { useTranslation } from 'react-i18next';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from './config-schema';
 import { useInfinitePatientSearch } from './patient-search.resource';
-import { PatientSearchContextProvider } from './patient-search-context';
+import { type PatientSearchCallbackProps } from './types';
 import useArrowNavigation from './hooks/useArrowNavigation';
 import PatientSearch from './compact-patient-search/patient-search.component';
 import styles from './compact-patient-search.scss';
 
-interface CompactPatientSearchProps {
+interface CompactPatientSearchProps extends PatientSearchCallbackProps {
   initialSearchTerm: string;
-  /** An action to take when the patient is selected, other than navigation. If not provided, navigation takes place. */
-  selectPatientAction?: (patientUuid: string) => undefined;
   buttonProps?: object;
 }
 
+/**
+ * CompactPatientSearchExtension renders the inline search bar used in the top navigation menu.
+ *
+ * It is primarily used in desktop views. In tablet/mobile views, the search bar is hidden
+ * behind a magnifying glass icon (PatientSearchButton) that opens the PatientSearchOverlay instead.
+ */
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
-  selectPatientAction,
+  onPatientSelected,
   initialSearchTerm = '',
   buttonProps,
 }) => {
@@ -43,8 +47,8 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handlePatientSelection = useCallback(
     (event, index: number) => {
       event.preventDefault();
-      if (selectPatientAction) {
-        selectPatientAction(patients[index].uuid);
+      if (onPatientSelected) {
+        onPatientSelected(patients[index].uuid, null);
       } else {
         navigate({
           to: interpolateString(config.search.patientChartUrl, {
@@ -54,7 +58,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       }
       handleClear();
     },
-    [config.search, selectPatientAction, patients, handleClear],
+    [config.search, onPatientSelected, patients, handleClear],
   );
 
   const handleFocusToInput = useCallback(() => {
@@ -104,15 +108,15 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         </Button>
       </form>
       {showSearchResults && (
-        <PatientSearchContextProvider
-          value={{
-            nonNavigationSelectPatientAction: selectPatientAction,
-            patientClickSideEffect: handleClear,
-          }}>
-          <div className={styles.floatingSearchResultsContainer}>
-            <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
-          </div>
-        </PatientSearchContextProvider>
+        <div className={styles.floatingSearchResultsContainer}>
+          <PatientSearch
+            query={searchTerm}
+            ref={bannerContainerRef}
+            onPatientSelected={onPatientSelected}
+            patientClickSideEffect={handleClear}
+            {...patientSearchResponse}
+          />
+        </div>
       )}
     </div>
   );

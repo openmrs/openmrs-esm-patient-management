@@ -2,17 +2,35 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
-import { type PatientSearchResponse } from '../types';
+import { type PatientSearchCallbackProps, type PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
-
-interface PatientSearchProps extends PatientSearchResponse {
+/**
+ * PatientSearchComponent is the core logic and UI for the compact search bar.
+ *
+ * Used by the CompactPatientSearchExtension in the top nav in desktop mode, it handles input state,
+ * debouncing, and conditionally rendering the search results dropdown popover when active.
+ */
+interface PatientSearchProps extends PatientSearchResponse, PatientSearchCallbackProps {
   query: string;
 }
 
 const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isValidating,
+      setPage,
+      totalResults,
+      onPatientSelected,
+      patientClickSideEffect,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
     const observer = useRef(null);
 
@@ -89,7 +107,12 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
+            <CompactPatientBanner
+              patients={searchResults}
+              ref={ref}
+              onPatientSelected={onPatientSelected}
+              patientClickSideEffect={patientClickSideEffect}
+            />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
