@@ -20,7 +20,7 @@ jest.mock('../../patient-appointments/patient-appointments.resource', () => ({
   changeAppointmentStatus: jest.fn().mockResolvedValue({}),
 }));
 
-jest.mock('../../form/appointments-form.resource', () => ({
+jest.mock('../../hooks/useMutateAppointments', () => ({
   useMutateAppointments: jest.fn().mockReturnValue({ mutateAppointments: jest.fn() }),
 }));
 

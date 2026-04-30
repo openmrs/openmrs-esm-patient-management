@@ -8,9 +8,9 @@ import {
 } from './patient-registration.types';
 
 export function scrollIntoView(viewId: string) {
-  document.getElementById(viewId).scrollIntoView({
+  document.getElementById(viewId)?.scrollIntoView({
     behavior: 'smooth',
-    block: 'center',
+    block: 'start',
     inline: 'center',
   });
 }
