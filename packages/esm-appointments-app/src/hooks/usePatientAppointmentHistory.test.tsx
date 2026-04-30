@@ -72,6 +72,7 @@ describe('usePatientAppointmentHistory', () => {
 
   it('triggers a new fetch and returns fresh data when only patientUuid changes', async () => {
     // patient-1 returns empty; patient-2 returns one Missed appointment
+    // TODO: Refactor these mock responses using a mock factory
     mockOpenmrsFetch
       .mockResolvedValueOnce({ data: [] } as FetchResponse)
       .mockResolvedValueOnce({ data: [{ status: 'Missed', startDateTime: Date.now() }] } as FetchResponse);

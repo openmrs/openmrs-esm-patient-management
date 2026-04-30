@@ -134,7 +134,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
             {appointments.map((appointment, index) => (
               <StructuredListRow key={index} className={styles.structuredList}>
                 <StructuredListCell>
-                  {formatDate(parseDate(appointment.startDateTime), { mode: 'wide' })}
+                  {formatDate(new Date(appointment.startDateTime as number), { mode: 'wide' })}
                 </StructuredListCell>
                 <StructuredListCell>{appointment.service ? appointment.service.name : '——'}</StructuredListCell>
                 <StructuredListCell>
