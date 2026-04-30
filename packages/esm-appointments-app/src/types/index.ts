@@ -13,20 +13,14 @@ export interface AppointmentLocation {
   name: string;
 }
 
-// added to prevent auto-removal of translations for dynamic keys
-// t('Scheduled', 'Scheduled');
-// t('CheckedIn', 'Checked in');
-// t('Cancelled', 'Cancelled');
-// t('Missed', 'Missed');
-// t('Completed', 'Completed');
-
-// note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
+// Translation keys for these enum values are in src/constants.ts (scanned by extract-translations)
 export enum AppointmentStatus {
+  REQUESTED = 'Requested',
   SCHEDULED = 'Scheduled',
-  CANCELLED = 'Cancelled',
-  MISSED = 'Missed',
   CHECKEDIN = 'CheckedIn',
   COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+  MISSED = 'Missed',
 }
 
 export enum AppointmentKind {
@@ -39,7 +33,7 @@ export interface Appointment {
   appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
-  endDateTime: Date | number | any;
+  endDateTime: number | null;
   location: AppointmentLocation;
   // note: this is not a standard OpenMRS Patient object
   patient: {
@@ -53,8 +47,8 @@ export interface Appointment {
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: string | any;
-  dateAppointmentScheduled: string | any;
+  startDateTime: number | null;
+  dateAppointmentScheduled: number | null;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -115,7 +109,7 @@ export interface Observation {
       display: string;
     };
   }>;
-  value: any;
+  value: string | number | boolean | OpenmrsResource;
   obsDatetime: string;
 }
 
@@ -195,5 +189,13 @@ export interface PatientDetails {
 export interface AppointmentsAppContext {
   appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
   isLoading: boolean;
-  error: any;
+  error: Error | undefined;
+}
+
+export interface UnscheduledAppointment {
+  name: string;
+  age: number;
+  gender: string;
+  identifier: string;
+  phoneNumber?: string;
 }

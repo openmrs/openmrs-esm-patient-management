@@ -32,7 +32,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
             render={({ field: { onChange, value } }) => (
               <>
                 <ContentSwitcher
-                  id="gender"
+                  id="gender-common"
                   size={isTablet ? 'lg' : 'md'}
                   onChange={({ name }) => onChange(name)}
                   selectedIndex={['any', 'male', 'female'].indexOf(value)}>
@@ -41,7 +41,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                   <Switch name="female">{t('female', 'Female')}</Switch>
                 </ContentSwitcher>
                 <ContentSwitcher
-                  id="gender"
+                  id="gender-other"
                   size={isTablet ? 'lg' : 'md'}
                   onChange={({ name }) => onChange(name)}
                   selectedIndex={['other', 'unknown'].indexOf(value)}>

@@ -1,6 +1,5 @@
-import React from 'react';
-import dayjs from 'dayjs';
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
@@ -11,13 +10,19 @@ import { useSelectedDate } from '../hooks/useSelectedDate';
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
-  const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
+  const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
+
+  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), 'monthly');
 
   return (
     <div data-testid="appointments-calendar">
       <AppointmentsHeader title={t('calendar', 'Calendar')} />
       <CalendarHeader />
-      <MonthlyCalendarView events={calendarEvents} />
+      <MonthlyCalendarView
+        events={calendarEvents}
+        calendarSelectedDate={calendarSelectedDate}
+        setCalendarSelectedDate={setCalendarSelectedDate}
+      />
     </div>
   );
 };

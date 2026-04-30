@@ -16,10 +16,9 @@
       "scripthost",
     ],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "paths": {
-      "@openmrs/*": ["./node_modules/@openmrs/*"],
       "__mocks__": ["./__mocks__"],
       "tools": ["./tools"],
     },

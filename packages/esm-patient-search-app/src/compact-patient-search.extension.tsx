@@ -23,6 +23,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 }) => {
   const { t } = useTranslation();
   const config = useConfig<PatientSearchConfig>();
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bannerContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -62,7 +63,13 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     inputRef.current.focus();
   }, [inputRef]);
 
-  const focusedResult = useArrowNavigation(patients?.length ?? 0, handlePatientSelection, handleFocusToInput, -1);
+  const focusedResult = useArrowNavigation(
+    patients?.length ?? 0,
+    handlePatientSelection,
+    handleFocusToInput,
+    -1,
+    searchContainerRef,
+  );
 
   useEffect(() => {
     if (bannerContainerRef.current && focusedResult > -1) {
@@ -78,7 +85,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   }, [focusedResult, bannerContainerRef, handleFocusToInput]);
 
   return (
-    <div className={styles.patientSearchBar}>
+    <div className={styles.patientSearchBar} ref={searchContainerRef}>
       <form onSubmit={(event) => event.preventDefault()} className={styles.searchArea}>
         <Search
           autoFocus

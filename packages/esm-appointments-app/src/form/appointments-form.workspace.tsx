@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
+import {
+  Controller,
+  useController,
+  useForm,
+  type Control,
+  type FieldErrors,
+  type FieldValues,
+  type Path,
+} from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -40,12 +48,8 @@ import {
 import { z } from 'zod';
 import { type ConfigObject } from '../config-schema';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
-import {
-  checkAppointmentConflict,
-  saveAppointment,
-  saveRecurringAppointments,
-  useAppointmentService,
-} from './appointments-form.resource';
+import { checkAppointmentConflict, saveAppointment, saveRecurringAppointments } from './appointments-form.resource';
+import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
 import { useProviders } from '../hooks/useProviders';
 import { useMutateAppointments } from '../hooks/useMutateAppointments';
@@ -63,6 +67,105 @@ const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
 const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
+
+export const appointmentsFormSchema = z
+  .object({
+    duration: z.union([z.number(), z.null()]).optional(),
+    isAllDayAppointment: z.boolean(),
+    location: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
+    }),
+    provider: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
+    }),
+    appointmentStatus: z.string().optional(),
+    appointmentNote: z.string(),
+    appointmentType: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
+    }),
+    selectedService: z.string().refine((value) => value !== '', {
+      message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
+    }),
+    recurringPatternType: z.enum(['DAY', 'WEEK']),
+    recurringPatternPeriod: z.number(),
+    recurringPatternDaysOfWeek: z.array(z.string()),
+    selectedDaysOfWeekText: z.string().optional(),
+    startTime: z.string().refine((value) => isValidTime(value), {
+      message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
+    }),
+    timeFormat: z.enum(['AM', 'PM']),
+    appointmentDateTime: z.object({
+      startDate: z.date(),
+      startDateText: z.string(),
+      recurringPatternEndDate: z.date().nullable(),
+      recurringPatternEndDateText: z.string().nullable(),
+    }),
+    formIsRecurringAppointment: z.boolean(),
+    dateAppointmentScheduled: z.date().optional(),
+  })
+  .refine(
+    (formValues) => {
+      if (formValues.formIsRecurringAppointment === true) {
+        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+      }
+      return true;
+    },
+    {
+      path: ['appointmentDateTime.recurringPatternEndDate'],
+      message: translateFrom(
+        moduleName,
+        'recurringAppointmentShouldHaveEndDate',
+        'A recurring appointment should have an end date',
+      ),
+    },
+  )
+  .refine(
+    (formValues) => {
+      const { appointmentDateTime, dateAppointmentScheduled } = formValues;
+
+      const startDate = appointmentDateTime?.startDate;
+
+      if (!startDate || !dateAppointmentScheduled) return true;
+
+      const normalizeDate = (date: Date) => {
+        const normalizedDate = new Date(date);
+        normalizedDate.setHours(0, 0, 0, 0);
+        return normalizedDate;
+      };
+
+      const startDateObj = normalizeDate(startDate);
+      const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
+
+      return scheduledDateObj <= startDateObj;
+    },
+    {
+      path: ['dateAppointmentScheduled'],
+      message: translateFrom(
+        moduleName,
+        'dateAppointmentIssuedCannotBeAfterAppointmentDate',
+        'Date appointment issued cannot be after the appointment date',
+      ),
+    },
+  )
+  .superRefine((data, ctx) => {
+    // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
+    if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
+      ctx.addIssue({
+        path: ['duration'],
+        code: z.ZodIssueCode.custom,
+        message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+      });
+    }
+    if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
+      ctx.addIssue({
+        path: ['duration'],
+        code: z.ZodIssueCode.custom,
+        message: translateFrom(moduleName, 'durationMaxErrorMessage', 'Duration cannot exceed 1440 minutes (24 hours)'),
+      });
+    }
+  });
+
+export type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
 /**
  * Workspace used to create or edit an appointment within the appointments app
@@ -86,7 +189,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   const session = useSession();
 
   const selectedDate = useSelectedDate();
-  const { data: services, isLoading } = useAppointmentService();
+  const { serviceTypes, isLoading } = useAppointmentServices();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
@@ -121,105 +224,6 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
       : undefined;
 
-  // t('durationErrorMessage', 'Duration should be greater than zero')
-  const appointmentsFormSchema = z
-    .object({
-      duration: z.union([z.number(), z.null()]).optional(),
-      isAllDayAppointment: z.boolean(),
-      location: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
-      }),
-      provider: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
-      }),
-      appointmentStatus: z.string().optional(),
-      appointmentNote: z.string(),
-      appointmentType: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'appointmentTypeRequired', 'Appointment type is required'),
-      }),
-      selectedService: z.string().refine((value) => value !== '', {
-        message: translateFrom(moduleName, 'serviceRequired', 'Service is required'),
-      }),
-      recurringPatternType: z.enum(['DAY', 'WEEK']),
-      recurringPatternPeriod: z.number(),
-      recurringPatternDaysOfWeek: z.array(z.string()),
-      selectedDaysOfWeekText: z.string().optional(),
-      startTime: z.string().refine((value) => isValidTime(value), {
-        message: translateFrom(moduleName, 'invalidTime', 'Invalid time'),
-      }),
-      timeFormat: z.enum(['AM', 'PM']),
-      appointmentDateTime: z.object({
-        startDate: z.date(),
-        startDateText: z.string(),
-        recurringPatternEndDate: z.date().nullable(),
-        recurringPatternEndDateText: z.string().nullable(),
-      }),
-      formIsRecurringAppointment: z.boolean(),
-      dateAppointmentScheduled: z.date().optional(),
-    })
-    .refine(
-      (formValues) => {
-        if (formValues.formIsRecurringAppointment === true) {
-          return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
-        }
-        return true;
-      },
-      {
-        path: ['appointmentDateTime.recurringPatternEndDate'],
-        message: t('recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
-      },
-    )
-    .refine(
-      (formValues) => {
-        const { appointmentDateTime, dateAppointmentScheduled } = formValues;
-
-        const startDate = appointmentDateTime?.startDate;
-
-        if (!startDate || !dateAppointmentScheduled) return true;
-
-        const normalizeDate = (date: Date) => {
-          const normalizedDate = new Date(date);
-          normalizedDate.setHours(0, 0, 0, 0);
-          return normalizedDate;
-        };
-
-        const startDateObj = normalizeDate(startDate);
-        const scheduledDateObj = normalizeDate(dateAppointmentScheduled);
-
-        return scheduledDateObj <= startDateObj;
-      },
-      {
-        path: ['dateAppointmentScheduled'],
-        message: t(
-          'dateAppointmentIssuedCannotBeAfterAppointmentDate',
-          'Date appointment issued cannot be after the appointment date',
-        ),
-      },
-    )
-    .superRefine((data, ctx) => {
-      // If not all-day, duration must be > 0 and <= 1440 minutes (24 hours)
-      if (!data.isAllDayAppointment && (!data.duration || data.duration <= 0)) {
-        ctx.addIssue({
-          path: ['duration'],
-          code: z.ZodIssueCode.custom,
-          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-        });
-      }
-      if (!data.isAllDayAppointment && data.duration && data.duration > 1440) {
-        ctx.addIssue({
-          path: ['duration'],
-          code: z.ZodIssueCode.custom,
-          message: translateFrom(
-            moduleName,
-            'durationMaxErrorMessage',
-            'Duration cannot exceed 1440 minutes (24 hours)',
-          ),
-        });
-      }
-    });
-
-  type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
-
   const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
     ? new Date(appointment?.dateAppointmentScheduled)
     : new Date();
@@ -244,7 +248,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
       appointmentType: appointment?.appointmentKind || (appointmentTypes?.length === 1 ? appointmentTypes[0] : ''),
-      selectedService: appointment?.service?.name || (services?.length === 1 ? services[0].name : ''),
+      selectedService: appointment?.service?.name || (serviceTypes?.length === 1 ? serviceTypes[0].name : ''),
       recurringPatternType: defaultRecurringPatternType,
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
@@ -340,9 +344,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     // Check if a duplicate response occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
-    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+    if (response.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
-    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+    } else if (response.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
       errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
 
@@ -424,7 +428,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       isAllDayAppointment,
     } = data;
 
-    const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+    const serviceUuid = serviceTypes?.find((service) => service.name === selectedService)?.uuid;
     const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
     const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
     const minutes = hoursAndMinutes[1];
@@ -508,12 +512,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     onBlur={onBlur}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
+                    <SelectItem key="chooseLocation" text={t('chooseLocation', 'Choose a location')} value="" />
                     {locations?.length > 0 &&
                       locations.map((location) => (
-                        <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                          {location.display}
-                        </SelectItem>
+                        <SelectItem key={location.uuid} text={location.display} value={location.uuid} />
                       ))}
                   </Select>
                 )}
@@ -536,13 +538,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       if (!isEditing) {
                         setValue(
                           'duration',
-                          services?.find((service) => service.name === event.target.value)?.durationMins,
+                          serviceTypes?.find((service) => service.name === event.target.value)?.durationMins,
                         );
                       } else {
-                        const previousServiceDuration = services?.find(
+                        const previousServiceDuration = serviceTypes?.find(
                           (service) => service.name === getValues('selectedService'),
                         )?.durationMins;
-                        const selectedServiceDuration = services?.find(
+                        const selectedServiceDuration = serviceTypes?.find(
                           (service) => service.name === event.target.value,
                         )?.durationMins;
                         if (selectedServiceDuration && previousServiceDuration === getValues('duration')) {
@@ -553,12 +555,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     }}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseService', 'Select service')} value="" />
-                    {services?.length > 0 &&
-                      services.map((service) => (
-                        <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                          {service.name}
-                        </SelectItem>
+                    <SelectItem key="chooseService" text={t('chooseService', 'Select service')} value="" />
+                    {serviceTypes?.length > 0 &&
+                      serviceTypes.map((service) => (
+                        <SelectItem key={service.uuid} text={service.name} value={service.name} />
                       ))}
                   </Select>
                 )}
@@ -583,10 +583,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     value={value}>
                     <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                     {appointmentTypes?.length > 0 &&
-                      appointmentTypes.map((appointmentType, index) => (
-                        <SelectItem key={index} text={appointmentType} value={appointmentType}>
-                          {appointmentType}
-                        </SelectItem>
+                      appointmentTypes.map((appointmentType) => (
+                        <SelectItem key={appointmentType} text={t(appointmentType)} value={appointmentType} />
                       ))}
                   </Select>
                 )}
@@ -606,7 +604,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </div>
           </FormGroup>
 
-          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Date & Time')}>
+          <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Appointment time')}>
             <div className={styles.dateTimeFields}>
               {isRecurringAppointment && (
                 <div className={styles.inputContainer}>
@@ -811,12 +809,14 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       onChange={onChange}
                       ref={ref}
                       value={value}>
-                      <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
+                      <SelectItem
+                        key="selectAppointmentStatus"
+                        text={t('selectAppointmentStatus', 'Select status')}
+                        value=""
+                      />
                       {appointmentStatuses?.length > 0 &&
-                        appointmentStatuses.map((appointmentStatus, index) => (
-                          <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>
-                            {appointmentStatus}
-                          </SelectItem>
+                        appointmentStatuses.map((appointmentStatus) => (
+                          <SelectItem key={appointmentStatus} text={t(appointmentStatus)} value={appointmentStatus} />
                         ))}
                     </Select>
                   )}
@@ -839,12 +839,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     onBlur={onBlur}
                     ref={ref}
                     value={value}>
-                    <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
+                    <SelectItem key="chooseProvider" text={t('chooseProvider', 'Choose a provider')} value="" />
                     {providers?.providers?.length > 0 &&
                       providers?.providers?.map((provider) => (
-                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
-                          {provider.display}
-                        </SelectItem>
+                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid} />
                       ))}
                   </Select>
                 )}
@@ -919,14 +917,12 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
 /**
  * TimeAndDuration component for appointment form
- * Uses Record<string, any> for control/errors types since AppointmentFormData
- * is defined inside the parent component and cannot be referenced here.
- * Type safety is maintained at the call site.
+ * Uses AppointmentFormData from module scope for strict typing.
  */
 interface TimeAndDurationProps {
   t: ReturnType<typeof useTranslation>['t'];
-  control: Control<Record<string, any>>;
-  errors: FieldErrors<Record<string, any>>;
+  control: Control<AppointmentFormData>;
+  errors: FieldErrors<AppointmentFormData>;
 }
 
 function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {

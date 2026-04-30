@@ -57,7 +57,7 @@ const mockAppointment1: Appointment = {
     person: { uuid: 'person-1', display: 'Dr James Cook' },
   },
   location: { name: 'HIV Clinic', uuid: 'location-1' },
-  startDateTime: new Date().toISOString(),
+  startDateTime: new Date().getTime(),
   appointmentKind: AppointmentKind.SCHEDULED,
   status: AppointmentStatus.SCHEDULED,
   comments: 'Some comments',
@@ -118,7 +118,7 @@ describe('BatchChangeAppointmentStatusesModal', () => {
 
   it('successfully changes status of multiple appointments', async () => {
     const user = userEvent.setup();
-    mockChangeAppointmentStatus.mockResolvedValue({} as any);
+    mockChangeAppointmentStatus.mockResolvedValue(undefined);
 
     render(
       <BatchChangeAppointmentStatusesModal
