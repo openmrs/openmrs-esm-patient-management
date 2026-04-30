@@ -2,6 +2,8 @@ import { type Location, useSession } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import useLocation from './useLocation';
 
+const locationRepWithTags = 'custom:(display,uuid,tags:(uuid,display,name))';
+
 export default function useWardLocation(): {
   location: Location;
   isLoadingLocation: boolean;
@@ -10,15 +12,16 @@ export default function useWardLocation(): {
 } {
   const { locationUuid: locationUuidFromUrl } = useParams();
   const { sessionLocation } = useSession();
+  const locationUuid = locationUuidFromUrl ?? sessionLocation?.uuid;
   const {
     data: locationResponse,
     isLoading: isLoadingLocation,
     error: errorFetchingLocation,
-  } = useLocation(locationUuidFromUrl ? locationUuidFromUrl : null);
+  } = useLocation(locationUuid ?? null, locationRepWithTags);
   const invalidLocation = locationUuidFromUrl && errorFetchingLocation;
 
   return {
-    location: locationUuidFromUrl ? locationResponse?.data : sessionLocation,
+    location: locationResponse?.data,
     isLoadingLocation,
     errorFetchingLocation,
     invalidLocation,

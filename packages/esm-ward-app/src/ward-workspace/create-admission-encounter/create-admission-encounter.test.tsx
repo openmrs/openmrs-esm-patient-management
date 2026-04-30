@@ -138,6 +138,11 @@ jest.mocked(useEmrConfiguration).mockReturnValue({
     clinicianEncounterRole: {
       uuid: 'clinician-encounter-role-uuid',
     },
+    supportsAdmissionLocationTag: {
+      uuid: 'admission-location-tag-uuid',
+      display: 'Admission Location',
+      name: 'Admission Location',
+    },
   },
   mutateEmrConfiguration: jest.fn(),
 });

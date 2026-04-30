@@ -25,9 +25,11 @@ describe('useWardLocation', () => {
   it('returns session location when locationUuidFromUrl is not provided', async () => {
     mockUseParams.mockReturnValue({});
     mockUseLocation.mockReturnValue({
-      data: null,
+      data: {
+        data: mockSession.data.sessionLocation,
+      },
       error: null,
-      isLoading: null,
+      isLoading: false,
       isValidating: null,
       mutate: jest.fn(),
     });

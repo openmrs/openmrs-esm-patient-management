@@ -1,4 +1,4 @@
-import { showNotification, useConfig, type Location, type Patient } from '@openmrs/esm-framework';
+import { showNotification, useConfig, type Location, type Patient, type OpenmrsResource } from '@openmrs/esm-framework';
 import type { TFunction } from 'i18next';
 import { useMemo } from 'react';
 import {
@@ -22,6 +22,13 @@ import type {
 } from '../types';
 import { useTranslation } from 'react-i18next';
 import { filterFemale, filterNewborns, filterReproductiveAge } from '../utils';
+
+export function isAdmissionLocation(location: Location, supportsAdmissionLocationTag: OpenmrsResource): boolean {
+  if (!location?.tags || !supportsAdmissionLocationTag?.uuid) {
+    return false;
+  }
+  return location.tags.some((tag) => tag.uuid === supportsAdmissionLocationTag.uuid);
+}
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
