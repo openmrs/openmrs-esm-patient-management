@@ -33,11 +33,6 @@ export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/qu
   },
 });
 
-export const queueList = getAsyncLifecycle(
-  () => import('./queue-patient-linelists/queue-services-table.component'),
-  options,
-);
-
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
 // t('serviceQueues', 'Service queues')
