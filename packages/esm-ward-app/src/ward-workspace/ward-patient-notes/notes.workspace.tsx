@@ -10,14 +10,16 @@ import {
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
+  useConfig,
   useSession,
   Workspace2,
 } from '@openmrs/esm-framework';
 import { moduleName } from '../../constant';
-import { createPatientNote } from './notes.resource';
+import { createPatientNote, usePatientNotes } from './notes.resource';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
 import styles from './notes.scss';
 import { type WardPatientWorkspaceDefinition, type EncounterPayload } from '../../types';
+import { type WardConfigObject } from '../../config-schema';
 import WardPatientWorkspaceBanner from '../patient-banner/patient-banner.component';
 import PatientNotesHistory from './history/notes-container.component';
 
@@ -35,9 +37,17 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
   closeWorkspace,
 }) => {
   const patientUuid = wardPatient.patient.uuid;
+  const visitUuid = wardPatient?.visit?.uuid;
   const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const config = useConfig<WardConfigObject>();
   const { t } = useTranslation();
   const session = useSession();
+
+  const { patientNotes, mutatePatientNotes, isLoadingPatientNotes, errorFetchingPatientNotes } = usePatientNotes(
+    patientUuid,
+    visitUuid,
+    [emrConfiguration?.consultFreeTextCommentsConcept?.uuid, ...config.additionalInpatientNotesConceptUuids],
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasEditChanges, setHasEditChanges] = useState(false);
@@ -65,7 +75,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
       const notePayload: EncounterPayload = {
         patient: patientUuid,
         location: locationUuid,
-        visit: wardPatient.visit?.uuid,
+        visit: visitUuid,
         encounterType: emrConfiguration?.inpatientNoteEncounterType?.uuid,
         encounterProviders: [
           {
@@ -93,6 +103,7 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
             subtitle: t('patientNoteNowVisible', 'It should be now visible in the notes history'),
             title: t('visitNoteSaved', 'Patient note saved'),
           });
+          mutatePatientNotes();
           await closeWorkspace({ discardUnsavedChanges: true });
           closeWorkspaceGroup2();
         })
@@ -111,11 +122,12 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
       emrConfiguration?.consultFreeTextCommentsConcept?.uuid,
       emrConfiguration?.inpatientNoteEncounterType?.uuid,
       locationUuid,
+      mutatePatientNotes,
       patientUuid,
       providerUuid,
       t,
       closeWorkspace,
-      wardPatient.visit?.uuid,
+      visitUuid,
     ],
   );
 
@@ -186,8 +198,10 @@ const WardPatientNotesWorkspace: React.FC<WardPatientWorkspaceDefinition> = ({
       </Form>
 
       <PatientNotesHistory
-        patientUuid={patientUuid}
-        visitUuid={wardPatient?.visit?.uuid}
+        patientNotes={patientNotes}
+        mutatePatientNotes={mutatePatientNotes}
+        isLoading={isLoadingPatientNotes || isLoadingEmrConfiguration}
+        errorFetchingPatientNotes={errorFetchingPatientNotes}
         promptBeforeClosing={setHasEditChanges}
       />
     </Workspace2>

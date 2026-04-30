@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "Ekifo ekirambikiddwa si kituufu",
   "invalidWardLocation": "Ekifo ky’awulirwa abalwadde si kituufu{{kiffo}}",
   "labelColon": "{{Nnyuguta}}",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "Musajja",
   "manage": "Fuba",
   "minutes_one": "{{count}} minutes",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "No pending admission requests",
   "note": "Ebigambo",
   "noteDeletedSuccessfully": "Note deleted successfully",
+  "noteEditHistory": "Note edit history",
   "notes": "Ebigambo",
   "notesRequiredForCancellingRequest": "Ebigambo byetaagibwa okusazaamu okusaba",
   "orderBasket": "Order basket",
@@ -116,6 +118,7 @@
   "previousPage": "Omuko ogwayita",
   "proceedWithPatientDischarge": "Weyongere n’okufulumya omulwadde",
   "save": "Tereka",
+  "saveEdit": "Save edit",
   "saving": "Okutereka...",
   "searchLocations": "Noonya ebifo",
   "seconds_one": "{{count}} second",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "Engeri y'okutwalibwa",
   "unknown": "Tekimanyiddwa",
   "unknownError": "An unknown error occurred",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "Ebigambo by’okulambula biterekeddwa",
   "wardClinicalNotePlaceholder": "Wandiia ebigambo wano",
   "wardPatient": "Ward patient",
-  "wards": "Ebifo omwawulirwa abalwadde"
+  "wards": "Ebifo omwawulirwa abalwadde",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }

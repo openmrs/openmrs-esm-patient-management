@@ -1,3 +1,5 @@
+import { AppointmentKind, AppointmentStatus } from './types';
+
 export const basePath = '/appointments';
 export const spaHomePage = `${window.spaBase}/home`;
 export const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
@@ -54,7 +56,7 @@ export const weekDays = [
 
 // Appointment table column types and their translations
 // These are used both in configuration and in the component for dynamic translation
-export const appointmentColumnTypes = [
+export const appointmentColumnTypes = Object.freeze([
   // t('patientName', 'Patient name')
   'patientName',
   // t('identifier', 'Identifier')
@@ -73,11 +75,32 @@ export const appointmentColumnTypes = [
   'actions',
   // t('visitStartTime', 'Visit start time')
   'visitStartTime',
-] as const;
+]);
 
-// added to prevent auto-removal of translations for dynamic keys
-// t('Scheduled', 'Scheduled')
-// t('CheckedIn', 'Checked in')
-// t('Cancelled', 'Cancelled')
-// t('Missed', 'Missed')
-// t('Completed', 'Completed')
+// Appointment statuses and their translations
+// This is an enum on the backend, so these values are not swappable
+export const appointmentStatuses = Object.freeze([
+  // t('Requested', 'Requested')
+  AppointmentStatus.REQUESTED,
+  // t('Scheduled', 'Scheduled')
+  AppointmentStatus.SCHEDULED,
+  // t('CheckedIn', 'Checked in')
+  AppointmentStatus.CHECKEDIN,
+  // t('Completed', 'Completed')
+  AppointmentStatus.COMPLETED,
+  // t('Cancelled', 'Cancelled')
+  AppointmentStatus.CANCELLED,
+  // t('Missed', 'Missed')
+  AppointmentStatus.MISSED,
+]);
+
+// Appointment types and their translations
+// This is an enum on the backend, so these values are not swappable
+export const appointmentTypes = Object.freeze([
+  // t('Scheduled', 'Scheduled')
+  AppointmentKind.SCHEDULED,
+  // t('WalkIn', 'Walk In')
+  AppointmentKind.WALKIN,
+  // t('Virtual', 'Virtual')
+  AppointmentKind.VIRTUAL,
+]);

@@ -62,6 +62,7 @@
   "invalidLocationSpecified": "Locație specificată invalidă",
   "invalidWardLocation": "Locație salon invalidă: {{location}}",
   "labelColon": "{{label}}:",
+  "lastEditedBy": "Last edited by: {{name}}, {{date}}",
   "male": "Bărbat",
   "manage": "Gestionează",
   "minutes_one": "{{count}} minut",
@@ -78,6 +79,7 @@
   "noPendingAdmissionRequests": "No pending admission requests",
   "note": "Notă",
   "noteDeletedSuccessfully": "Note deleted successfully",
+  "noteEditHistory": "Note edit history",
   "notes": "Note",
   "notesRequiredForCancellingRequest": "Este necesară o notă pentru anularea cererii de internare sau transfer",
   "orderBasket": "Order basket",
@@ -116,6 +118,7 @@
   "previousPage": "Pagina anterioară",
   "proceedWithPatientDischarge": "Continuă cu externarea pacientului",
   "save": "Salvează",
+  "saveEdit": "Save edit",
   "saving": "Se salvează...",
   "searchLocations": "Caută locații",
   "seconds_one": "{{count}} secundă",
@@ -137,8 +140,10 @@
   "typeOfTransfer": "Tipul transferului",
   "unknown": "Necunoscut",
   "unknownError": "An unknown error occurred",
+  "viewEditHistory": "View edit history",
   "visitNoteSaved": "Nota pacientului a fost salvată",
   "wardClinicalNotePlaceholder": "Scrie orice notițe aici",
   "wardPatient": "Ward patient",
-  "wards": "Salonae"
+  "wards": "Salonae",
+  "writtenBy": "Written by: {{name}}, {{date}}"
 }
