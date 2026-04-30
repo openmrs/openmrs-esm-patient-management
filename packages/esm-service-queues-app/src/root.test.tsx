@@ -7,11 +7,6 @@ jest.mock('./home.component', () => ({
   default: jest.fn(() => <div data-testid="home-component">Home Component</div>),
 }));
 
-jest.mock('./queue-patient-linelists/queue-services-table.component', () => ({
-  __esModule: true,
-  default: jest.fn(() => <div data-testid="services-table-component">Services Table Component</div>),
-}));
-
 jest.mock('./queue-screen/queue-screen.component', () => ({
   __esModule: true,
   default: jest.fn(() => <div data-testid="queue-screen-component">Queue Screen Component</div>),
@@ -38,16 +33,6 @@ describe('Root Component', () => {
     window.history.pushState({}, 'Home', '/openmrs/spa/home/service-queues/');
     render(<Root />);
     expect(screen.getByTestId('home-component')).toBeInTheDocument();
-  });
-
-  it('renders ServicesTable component for "/queue-list/:service/:serviceUuid/:locationUuid" route', () => {
-    window.history.pushState(
-      {},
-      'Queue List',
-      '/openmrs/spa/home/service-queues/queue-list/test-service/service-123/location-456',
-    );
-    render(<Root />);
-    expect(screen.getByTestId('services-table-component')).toBeInTheDocument();
   });
 
   it('renders QueueTableByStatusView component for "/queue-table-by-status/:queueUuid" route', () => {
