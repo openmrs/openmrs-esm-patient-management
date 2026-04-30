@@ -538,7 +538,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     placeholder={t('selectService', 'Select a service')}
                     selectedItem={value}
                     shouldFilterItem={({ inputValue = '', item = '' }) => {
-                      return item.toLowerCase().includes(inputValue.toLowerCase());
+                      return item?.toLowerCase()?.includes(inputValue?.toLowerCase());
                     }}
                     onChange={({ selectedItem }) => {
                       if (!isEditing) {
