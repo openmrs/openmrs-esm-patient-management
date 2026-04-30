@@ -142,6 +142,7 @@
   "recurringAppointment": "定期预约",
   "recurringAppointmentShouldHaveEndDate": "定期预约应该有一个结束日期",
   "repeatEvery": "重复每",
+  "Requested": "Requested",
   "SAT": "周六",
   "saveAndClose": "保存并关闭",
   "saving": "保存中",
@@ -175,7 +176,9 @@
   "upcoming": "即将到来",
   "upcomingAppointments": "即将到来的预约",
   "updateError": "更新即将到来的预约时出现错误",
+  "Virtual": "Virtual",
   "visitStartTime": "就诊开始时间",
+  "WalkIn": "Walk In",
   "WED": "周三",
   "week": "周",
   "yes": "是"
