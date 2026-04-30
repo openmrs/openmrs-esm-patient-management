@@ -5,8 +5,8 @@ import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext
 
 /**
  * This extension shows the metrics of the number of scheduled appointments for the selected date and services,
- * showing the total number of appointments (across all status), the number of checked in ones (status == CheckedIn),
- * and number of not arrived (status == Scheduled).
+ * showing the total number of appointments (across all status), the number of checked in ones (status === 'CheckedIn'),
+ * and number of not arrived (status === 'Scheduled').
  *
  */
 export default function ScheduledAppointmentsExtension() {
