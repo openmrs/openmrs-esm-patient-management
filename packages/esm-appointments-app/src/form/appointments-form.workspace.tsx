@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
+import {
+  Controller,
+  useController,
+  useForm,
+  type Control,
+  type FieldErrors,
+  type FieldValues,
+  type Path,
+} from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -909,22 +917,22 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
 /**
  * TimeAndDuration component for appointment form
- * Uses Record<string, any> for control/errors types since AppointmentFormData
+ * Uses generic T extends FieldValues for control/errors types since AppointmentFormData
  * is defined inside the parent component and cannot be referenced here.
  * Type safety is maintained at the call site.
  */
-interface TimeAndDurationProps {
+interface TimeAndDurationProps<T extends FieldValues> {
   t: ReturnType<typeof useTranslation>['t'];
-  control: Control<Record<string, any>>;
-  errors: FieldErrors<Record<string, any>>;
+  control: Control<T>;
+  errors: FieldErrors<T>;
 }
 
-function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
+function TimeAndDuration<T extends FieldValues>({ t, control, errors }: TimeAndDurationProps<T>) {
   return (
     <>
       <ResponsiveWrapper>
         <Controller
-          name="startTime"
+          name={'startTime' as Path<T>}
           control={control}
           render={({ field: { onChange, value } }) => (
             <TimePicker
@@ -937,9 +945,9 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
                 onChange(event.target.value);
               }}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
-              value={value}>
+              value={value as string}>
               <Controller
-                name="timeFormat"
+                name={'timeFormat' as Path<T>}
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <TimePickerSelect
@@ -947,7 +955,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
                       onChange(event.target.value as 'AM' | 'PM')
                     }
-                    value={value}
+                    value={value as string}
                     aria-label={t('time', 'Time')}>
                     <SelectItem value="AM" text="AM" />
                     <SelectItem value="PM" text="PM" />
@@ -960,7 +968,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
       </ResponsiveWrapper>
       <ResponsiveWrapper>
         <Controller
-          name="duration"
+          name={'duration' as Path<T>}
           control={control}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
@@ -977,7 +985,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
                 onChange(value === '' ? null : Number(value));
               }}
               ref={ref}
-              value={value ?? ''}
+              value={(value as number) ?? ''}
             />
           )}
         />

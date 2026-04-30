@@ -118,7 +118,7 @@ describe('BatchChangeAppointmentStatusesModal', () => {
 
   it('successfully changes status of multiple appointments', async () => {
     const user = userEvent.setup();
-    mockChangeAppointmentStatus.mockResolvedValue({} as any);
+    mockChangeAppointmentStatus.mockResolvedValue({} as never);
 
     render(
       <BatchChangeAppointmentStatusesModal
