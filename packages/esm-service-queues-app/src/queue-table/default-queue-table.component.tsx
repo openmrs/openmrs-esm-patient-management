@@ -50,12 +50,6 @@ function QueueTableSection() {
 
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 
-  // When returning to this view via client-side navigation, force a refetch via the
-  // existing event mechanism used by the data hook.
-  useEffect(() => {
-    window.dispatchEvent(new CustomEvent('queue-entry-updated'));
-  }, []);
-
   useEffect(() => {
     if (error?.message) {
       showSnackbar({
@@ -67,18 +61,20 @@ function QueueTableSection() {
   }, [error?.message, t]);
 
   const columns = useColumns(null, null);
-  if (!columns) {
-    showSnackbar({
-      kind: 'warning',
-      title: t('notableConfig', 'No table configuration'),
-      subtitle: 'No table configuration defined for queue: null and status: null',
-    });
-  }
+  useEffect(() => {
+    if (!columns) {
+      showSnackbar({
+        kind: 'warning',
+        title: t('notableConfig', 'No table configuration'),
+        subtitle: 'No table configuration defined for queue: null and status: null',
+      });
+    }
+  }, [columns, t]);
 
   const filteredQueueEntries = useMemo(() => {
     const searchTermLowercase = searchTerm.toLowerCase();
     return queueEntries?.filter((queueEntry) => {
-      return columns.some((column) => {
+      return columns?.some((column) => {
         const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });

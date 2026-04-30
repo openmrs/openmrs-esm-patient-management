@@ -24,7 +24,7 @@ import { changeAppointmentStatus } from '../../patient-appointments/patient-appo
 import { getActiveVisitsForPatient } from './batch-change-appointment-statuses.resources';
 import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
+import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import styles from './batch-change-appointment-statuses.scss';
 
 interface BatchChangeAppointmentStatusesModalProps {
@@ -144,9 +144,14 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
           <ul className={styles.appointmentsList}>
             {appointments.map((appointment) => (
               <li key={appointment.patient.uuid}>
-                <Trans i18nKey="appointmentDisplay">
-                  <strong>{{ patientName: appointment.patient.name } as any}</strong> -{' '}
-                  {{ serviceName: appointment.service.name } as any} - {{ currentStatus: appointment.status } as any}
+                <Trans
+                  i18nKey="appointmentDisplay"
+                  values={{
+                    patientName: appointment.patient.name,
+                    serviceName: appointment.service.name,
+                    currentStatus: appointment.status,
+                  }}>
+                  <strong>{appointment.patient.name}</strong> - {appointment.service.name} - {appointment.status}
                 </Trans>
               </li>
             ))}

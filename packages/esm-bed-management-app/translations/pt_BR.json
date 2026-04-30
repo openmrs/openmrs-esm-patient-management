@@ -16,7 +16,7 @@
   "bedNumber": "Número do Leito",
   "bedNumberMaxCharsHelper": "Maximum 10 characters",
   "bedNumberMaxLength": "Bed number must not exceed 10 characters",
-  "bedNumberPlaceholder": "e.g. CHA-201",
+  "bedNumberPlaceholder": "ex. CHA-201",
   "bedNumberRequired": "Bed number is required",
   "bedRow": "Linha da cama",
   "beds": "Leitos",
