@@ -3,41 +3,40 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile, Button } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { launchWorkspace2, useLayoutType, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
+import {
+  EmptyCardIllustration,
+  useLayoutType,
+  useWorkspace2Context,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import styles from './admission-requests-empty-state.scss';
 
 const AdmissionRequestsEmptyState: React.FC = () => {
   const { t } = useTranslation();
   const isDesktop = useLayoutType() !== 'tablet';
+  const { launchChildWorkspace } = useWorkspace2Context();
 
   const handleAddPatient = () => {
-    launchWorkspace2(
-      'ward-app-patient-search-workspace',
-      {
-        workspaceTitle: t('addPatientToWard', 'Add patient to ward'),
-        onPatientSelected(
-          patientUuid: string,
-          patient: fhir.Patient,
-          launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-          closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-        ) {
-          launchChildWorkspace('create-admission-encounter-workspace', {
-            selectedPatientUuid: patient.id,
-          });
-        },
+    launchChildWorkspace('ward-app-patient-search-workspace', {
+      workspaceTitle: t('addPatientToWard', 'Add patient to ward'),
+      onPatientSelected(
+        patientUuid: string,
+        patient: fhir.Patient,
+        launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+      ) {
+        launchChildWorkspace('create-admission-encounter-workspace', {
+          selectedPatientUuid: patient.id,
+        });
       },
-      {
-        startVisitWorkspaceName: 'ward-app-start-visit-workspace',
-      },
-    );
+    });
   };
 
   return (
     <Layer>
       <Tile className={classNames(styles.emptyStateTile, { [styles.desktopTile]: isDesktop })}>
         <div className={styles.illustration}>
-          <EmptyDataIllustration />
+          <EmptyCardIllustration />
         </div>
         <p className={styles.content}>{t('noPendingAdmissionRequests', 'No pending admission requests')}</p>
         <p className={styles.helperText}>

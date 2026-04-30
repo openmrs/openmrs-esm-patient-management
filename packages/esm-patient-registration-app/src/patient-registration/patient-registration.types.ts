@@ -85,7 +85,7 @@ export interface PatientRegistration {
     isNewPatient: boolean;
     formValues: FormValues;
     patientUuidMap: PatientUuidMapType;
-    initialAddressFieldValues: Record<string, any>;
+    initialAddressFieldValues: Partial<Record<AddressProperties, string>>;
     capturePhotoProps: CapturePhotoProps;
     currentLocation: string;
     initialIdentifierValues: FormValues['identifiers'];
@@ -201,22 +201,6 @@ export interface CapturePhotoProps {
   dateTime: string;
 }
 
-export interface AddressValidationSchemaType {
-  name: string;
-  label: string;
-  regex: RegExp;
-  regexFormat: string;
-}
-
-export interface CodedPersonAttributeConfig {
-  personAttributeUuid: string;
-  conceptUuid: string;
-}
-
-export interface TextBasedPersonAttributeConfig {
-  personAttributeUuid: string;
-  validationRegex: string;
-}
 export interface PatientIdentifierResponse {
   uuid: string;
   identifier: string;
@@ -251,6 +235,11 @@ export interface PersonAttributeResponse {
   };
 }
 
+export interface ConceptAnswers {
+  display: string;
+  uuid: string;
+}
+
 export interface ConceptResponse {
   uuid: string;
   display: string;
@@ -262,9 +251,18 @@ export interface ConceptResponse {
   setMembers: Array<ConceptAnswers>;
 }
 
-export interface ConceptAnswers {
-  display: string;
+export interface RelationshipType {
   uuid: string;
+  display: string;
+  aIsToB: string;
+  bIsToA: string;
+  displayAIsToB?: string;
+  displayBIsToA?: string;
+  description?: string;
+}
+
+export interface RelationshipTypesResponse {
+  results: Array<RelationshipType>;
 }
 
 export type AddressProperties =
@@ -310,13 +308,4 @@ export interface AddressTemplate {
   elementRegex: ExtensibleAddressProperties;
   elementRegexFormats: ExtensibleAddressProperties;
   requiredElements: Array<AddressProperties> | null;
-}
-
-// https://rest.openmrs.org/#address-template
-export interface RestAddressTemplate {
-  uuid: string;
-  description: string;
-  property: string;
-  display: string;
-  value: string;
 }

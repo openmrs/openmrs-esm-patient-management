@@ -14,6 +14,18 @@
       "rules": {
         "testing-library/prefer-screen-queries": "off"
       }
+    },
+    {
+      "files": [
+        "**/*.config.js",
+        "**/jest.config.js",
+        "**/webpack.config.js",
+        "tools/**/*.js",
+        "**/*.cjs"
+      ],
+      "rules": {
+        "@typescript-eslint/no-require-imports": "off"
+      }
     }
   ],
   "parser": "@typescript-eslint/parser",
@@ -26,6 +38,7 @@
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/triple-slash-reference": "off",
+    "@typescript-eslint/no-empty-object-type": ["error", { "allowInterfaces": "always", "allowObjectTypes": "always" }],
     // The following rules need `noImplicitAny` to be set to `true` in our tsconfig. They are too restrictive for now, but should be reconsidered in future
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",

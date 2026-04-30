@@ -1,9 +1,10 @@
 import type {
   Concept,
-  DefaultWorkspaceProps,
+  Diagnosis,
   Location,
   OpenmrsResource,
   OpenmrsResourceStrict,
+  Order,
   Patient,
   Person,
   Visit,
@@ -64,7 +65,14 @@ export interface WardPatientWorkspaceProps {
 /**
  * props type of workspaces in the 'ward-patient` workspace group.
  */
-export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<{}, {}, { wardPatient: WardPatient }>;
+export type WardPatientWorkspaceDefinition = Workspace2DefinitionProps<
+  {},
+  {},
+  {
+    wardPatient: WardPatient;
+    relatedTransferPatients?: WardPatient[];
+  }
+>;
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -202,11 +210,11 @@ export interface Encounter extends OpenmrsResourceStrict {
   form?: OpenmrsResource;
   encounterType?: EncounterType;
   obs?: Array<Observation>;
-  orders?: any;
+  orders?: Array<Order>;
   voided?: boolean;
   visit?: Visit;
   encounterProviders?: Array<EncounterProvider>;
-  diagnoses?: any;
+  diagnoses?: Array<Diagnosis>;
 }
 
 export interface EncounterProvider extends OpenmrsResourceStrict {
@@ -230,10 +238,22 @@ export interface EncounterRole extends OpenmrsResourceStrict {
 export interface WardMetrics {
   patients: string;
   freeBeds: string;
-  capacity: string;
+  totalBeds: string;
+  femalesOfReproductiveAge?: string; // used in Maternal Ward View
+  newborns?: string; // used in Maternal Ward View
+}
+
+export enum WardMetricType {
+  PATIENTS = 'patients',
+  FREE_BEDS = 'freeBeds',
+  TOTAL_BEDS = 'totalBeds',
+  PENDING_OUT = 'pendingOut',
+  FEMALES_OF_REPRODUCTIVE_AGE = 'femalesOfReproductiveAge',
+  NEWBORNS = 'newborns',
 }
 
 export interface EncounterPayload {
+  uuid?: string;
   encounterDatetime?: string;
   encounterType: string;
   patient: string;
@@ -241,13 +261,13 @@ export interface EncounterPayload {
   encounterProviders?: Array<{ encounterRole: string; provider: string }>;
   obs: Array<ObsPayload>;
   form?: string;
-  orders?: Array<any>;
+  orders?: Array<Order>;
   visit?: string;
 }
 
 export interface ObsPayload {
   concept: Concept | string;
-  value?: string | OpenmrsResource;
+  value?: string | number | boolean | OpenmrsResource;
   groupMembers?: Array<ObsPayload>;
 }
 
@@ -277,3 +297,18 @@ export interface MaternalWardViewContext {
   [key: number]: unknown;
   [key: symbol]: unknown;
 }
+
+// Carbon Tag color types
+export type CarbonTagType =
+  | 'red'
+  | 'magenta'
+  | 'purple'
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'green'
+  | 'gray'
+  | 'cool-gray'
+  | 'warm-gray'
+  | 'high-contrast'
+  | 'outline';

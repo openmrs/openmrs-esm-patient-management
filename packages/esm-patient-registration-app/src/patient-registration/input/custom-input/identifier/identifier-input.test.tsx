@@ -1,7 +1,6 @@
-/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
@@ -69,7 +68,7 @@ const mockResourcesContextValue: Resources = {
     sessionId: 'JSESSION',
     currentProvider: { uuid: 'provider-uuid', identifier: 'PRO-123' },
   },
-  relationshipTypes: [],
+  relationshipTypes: { results: [] },
   identifierTypes: [...mockIdentifierTypes],
 };
 
@@ -106,9 +105,32 @@ const mockContextValues: PatientRegistrationContextProps = {
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
-describe('identifier input', () => {
-  mockUseConfig.mockReturnValue({
-    ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+/**
+ * Helper to render IdentifierInput component with Formik.
+ */
+function renderIdentifierInput(
+  patientIdentifier: PatientIdentifierValue,
+  fieldName: string = 'openMrsId',
+  initialValues: Record<string, any> = {},
+) {
+  return renderWithContext(
+    <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+      <Form>
+        <PatientRegistrationContextProvider value={mockContextValues}>
+          <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
+        </PatientRegistrationContextProvider>
+      </Form>
+    </Formik>,
+    ResourcesContextProvider,
+    mockResourcesContextValue,
+  );
+}
+
+describe('IdentifierInput component', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+    });
   });
 
   const fieldName = 'openMrsId';
@@ -129,207 +151,248 @@ describe('identifier input', () => {
     required: true,
   } as PatientIdentifierValue;
 
-  const setupIdentifierInput = (patientIdentifier: PatientIdentifierValue, initialValues = {}) => {
-    renderWithContext(
-      <Formik initialValues={initialValues} onSubmit={jest.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={mockContextValues}>
-            <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
-    );
-  };
+  describe('Rendering', () => {
+    it('shows the identifier input', () => {
+      renderIdentifierInput({ ...openmrsID, autoGeneration: false });
+      expect(screen.getByLabelText(openmrsID.identifierName)).toBeInTheDocument();
+    });
 
-  it('shows the identifier input', () => {
-    openmrsID.autoGeneration = false;
-    setupIdentifierInput(openmrsID as PatientIdentifierValue);
-    expect(screen.getByLabelText(openmrsID.identifierName)).toBeInTheDocument();
+    it('displays an edit button when there is an initial value and field is not required', () => {
+      renderIdentifierInput({
+        ...openmrsID,
+        autoGeneration: false,
+        required: false,
+        initialValue: '1002UU9',
+        identifierValue: '1002UU9',
+      });
+      expect(screen.getByText('Edit')).toBeInTheDocument();
+    });
+
+    it('hides the edit button when the identifier is required', () => {
+      renderIdentifierInput({
+        ...openmrsID,
+        autoGeneration: false,
+        required: true,
+        initialValue: '1002UU9',
+        identifierValue: '1002UU9',
+      });
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+    });
+
+    it('displays a delete button when the identifier is not a default type', () => {
+      renderIdentifierInput({
+        ...openmrsID,
+        required: false,
+      });
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
   });
 
-  it('displays an edit button when there is an initial value', async () => {
-    // setup
-    openmrsID.autoGeneration = false;
-    openmrsID.required = false;
-    openmrsID.initialValue = '1002UU9';
-    openmrsID.identifierValue = '1002UU9';
-    // replay
-    setupIdentifierInput(openmrsID as PatientIdentifierValue);
-    expect(screen.getByText('Edit')).toBeInTheDocument();
-  });
-
-  it('hides the edit button when the identifier is required', async () => {
-    // setup
-    openmrsID.autoGeneration = false;
-    openmrsID.required = true;
-    openmrsID.initialValue = '1002UU9';
-    openmrsID.identifierValue = '1002UU9';
-    // replay
-    setupIdentifierInput(openmrsID);
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument();
-  });
-
-  it('displays a delete button when the identifier is not a default type', () => {
-    // setup
-    openmrsID.required = false;
-    // replay
-    setupIdentifierInput(openmrsID);
-    expect(screen.getByText('Delete')).toBeInTheDocument();
-  });
-
-  describe('auto-generated identifier', () => {
+  describe('Auto-generated identifier', () => {
     it('hides the input when the identifier is auto-generated', () => {
-      openmrsID.autoGeneration = true;
-      setupIdentifierInput(openmrsID);
+      renderIdentifierInput({
+        ...openmrsID,
+        autoGeneration: true,
+      });
       expect(screen.getByTestId('identifier-input')).toHaveAttribute('type', 'hidden');
     });
 
-    it("displays 'Auto-Generated' when the indentifier has auto generation", () => {
-      openmrsID.autoGeneration = true;
-      setupIdentifierInput(openmrsID);
-      expect(screen.getByTestId('identifier-placeholder').innerHTML).toBe('Auto-generated');
+    it("displays 'Auto-Generated' when the identifier has auto generation", () => {
+      renderIdentifierInput({
+        ...openmrsID,
+        autoGeneration: true,
+      });
+      const placeholder = screen.getByTestId('identifier-placeholder');
+      expect(placeholder).toHaveTextContent('Auto-generated');
       expect(screen.getByTestId('identifier-input')).toBeDisabled();
     });
 
-    describe('manual entry allowed', () => {
-      openmrsID.selectedSource = {
-        autoGenerationOption: {
-          manualEntryEnabled: true,
-        },
-      } as IdentifierSource;
-
-      it('shows the edit button', () => {
-        openmrsID.autoGeneration = true;
-        setupIdentifierInput(openmrsID);
+    describe('Manual entry allowed', () => {
+      it('shows the edit button when manual entry is enabled', () => {
+        renderIdentifierInput({
+          ...openmrsID,
+          autoGeneration: true,
+          required: false,
+          selectedSource: {
+            uuid: '01af8526-cea4-4175-aa90-340acb411771',
+            name: 'Generator 2 for OpenMRS ID',
+            autoGenerationOption: {
+              manualEntryEnabled: true,
+              automaticGenerationEnabled: true,
+            },
+          } as IdentifierSource,
+        });
         expect(screen.getByText('Edit')).toBeInTheDocument();
       });
 
-      describe('edit button clicked', () => {
-        it('displays an empty input field', async () => {
+      describe('Edit button interaction', () => {
+        it('displays an empty input field when edit button is clicked', async () => {
           const user = userEvent.setup();
-          openmrsID.autoGeneration = true;
-          openmrsID.required = false;
-          openmrsID.selectedSource = {
-            autoGenerationOption: {
-              manualEntryEnabled: true,
+          renderIdentifierInput(
+            {
+              ...openmrsID,
+              autoGeneration: true,
+              required: false,
+              selectedSource: {
+                ...openmrsID.selectedSource,
+                autoGenerationOption: {
+                  manualEntryEnabled: true,
+                  automaticGenerationEnabled: true,
+                },
+              } as IdentifierSource,
             },
-          } as IdentifierSource;
-          setupIdentifierInput(openmrsID);
+            fieldName,
+          );
+
           const editButton = screen.getByTestId('edit-button');
           await user.click(editButton);
-          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('');
+
+          await waitFor(() => {
+            expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('');
+          });
         });
 
         it('displays an input field with the identifier value if it exists', async () => {
           const user = userEvent.setup();
-          openmrsID.autoGeneration = true;
-          openmrsID.required = false;
-          openmrsID.selectedSource = {
-            autoGenerationOption: {
-              manualEntryEnabled: true,
+          renderIdentifierInput(
+            {
+              ...openmrsID,
+              autoGeneration: true,
+              required: false,
+              selectedSource: {
+                ...openmrsID.selectedSource,
+                autoGenerationOption: {
+                  manualEntryEnabled: true,
+                  automaticGenerationEnabled: true,
+                },
+              } as IdentifierSource,
             },
-          } as IdentifierSource;
-          setupIdentifierInput(openmrsID, { identifiers: { [fieldName]: { identifierValue: '10001V' } } });
+            fieldName,
+            { identifiers: { [fieldName]: { identifierValue: '10001V' } } },
+          );
+
           const editButton = screen.getByTestId('edit-button');
           await user.click(editButton);
-          expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('10001V');
+
+          await waitFor(() => {
+            expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('10001V');
+          });
         });
       });
     });
   });
 
-  it('validates identifier format correctly for identifier types with regex formats', async () => {
-    const user = userEvent.setup();
+  describe('Format validation', () => {
+    it('validates identifier format correctly for identifier types with regex formats', async () => {
+      const user = userEvent.setup();
 
-    const ssnIdentifier = {
-      ...openmrsID,
-      autoGeneration: false,
-      format: '^[A-Z]{1}-[0-9]{7}$',
-      identifierName: 'SSN',
-      identifierTypeUuid: 'a71403f3-8584-4289-ab41-2b4e5570bd45',
-      identifierValue: undefined,
-      initialValue: '',
-      required: true,
-      selectedSource: {
-        uuid: '01af8526-cea4-4175-aa90-340acb411771',
-        name: 'Generator 2 for SSN',
-        autoGenerationOption: {
-          manualEntryEnabled: true,
-          automaticGenerationEnabled: false,
+      const ssnIdentifier = {
+        ...openmrsID,
+        autoGeneration: false,
+        format: '^[A-Z]{1}-[0-9]{7}$',
+        identifierName: 'SSN',
+        identifierTypeUuid: 'a71403f3-8584-4289-ab41-2b4e5570bd45',
+        identifierValue: undefined,
+        initialValue: '',
+        required: true,
+        selectedSource: {
+          uuid: '01af8526-cea4-4175-aa90-340acb411771',
+          name: 'Generator 2 for SSN',
+          autoGenerationOption: {
+            manualEntryEnabled: true,
+            automaticGenerationEnabled: false,
+          },
+        } as IdentifierSource,
+      };
+
+      const mockSetFieldTouched = jest.fn();
+      const mockSetFieldValue = jest.fn();
+      const testContextValues = {
+        ...mockContextValues,
+        setFieldTouched: mockSetFieldTouched,
+        setFieldValue: mockSetFieldValue,
+        values: {
+          ...mockInitialFormValues,
+          identifiers: {
+            [fieldName]: ssnIdentifier,
+          },
         },
-      } as IdentifierSource,
-    };
+      };
 
-    const mockSetFieldTouched = jest.fn();
-    const mockSetFieldValue = jest.fn();
-    const testContextValues = {
-      ...mockContextValues,
-      setFieldTouched: mockSetFieldTouched,
-      setFieldValue: mockSetFieldValue,
-      values: {
-        ...mockInitialFormValues,
+      const initialValues = {
         identifiers: {
-          [fieldName]: ssnIdentifier,
+          [fieldName]: {
+            identifierValue: '',
+          },
         },
-      },
-    };
+      };
 
-    const initialValues = {
-      identifiers: {
-        [fieldName]: {
-          identifierValue: '',
-        },
-      },
-    };
+      renderWithContext(
+        <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+          <Form>
+            <PatientRegistrationContextProvider value={testContextValues}>
+              <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
+            </PatientRegistrationContextProvider>
+          </Form>
+        </Formik>,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
 
-    renderWithContext(
-      <Formik initialValues={initialValues} onSubmit={jest.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={testContextValues}>
-            <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
-    );
+      const input = screen.getByRole('textbox', {
+        name: /ssn/i,
+      });
 
-    const input = screen.getByRole('textbox', {
-      name: /ssn/i,
+      // Valid case
+      await user.type(input, 'A-1234567');
+      await user.tab();
+
+      await waitFor(() => {
+        expect(input).toHaveValue('A-1234567');
+      });
+
+      await waitFor(() => {
+        expect(input).not.toHaveClass('cds--text-input--invalid');
+      });
+
+      expect(screen.queryByText(/identifier should be/i)).not.toBeInTheDocument();
+
+      // Invalid cases
+      await user.clear(input);
+      await user.type(input, 'A-0010902aaa'); // Extra characters
+      await user.tab();
+
+      await waitFor(() => {
+        expect(input).toHaveClass('cds--text-input--invalid');
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
+      });
+
+      await user.clear(input);
+      await user.type(input, 'a-1234567'); // Lowercase letter
+      await user.tab();
+
+      await waitFor(() => {
+        expect(input).toHaveClass('cds--text-input--invalid');
+      });
+
+      await user.clear(input);
+      await user.type(input, 'AB-1234567'); // Two letters
+      await user.tab();
+
+      await waitFor(() => {
+        expect(input).toHaveClass('cds--text-input--invalid');
+      });
+
+      await user.clear(input);
+      await user.type(input, 'A-123456'); // Only 6 digits
+      await user.tab();
+
+      await waitFor(() => {
+        expect(input).toHaveClass('cds--text-input--invalid');
+      });
     });
-
-    // Valid cases
-    await user.type(input, 'A-1234567');
-    await user.tab();
-    expect(input).toHaveValue('A-1234567');
-    expect(input).not.toHaveClass('cds--text-input--invalid');
-    expect(screen.queryByText(/identifier should be/i)).not.toBeInTheDocument();
-
-    // Invalid cases
-    await user.clear(input);
-    await user.type(input, 'A-0010902aaa'); // Extra characters
-    await user.tab();
-    expect(input).toHaveClass('cds--text-input--invalid');
-    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
-
-    await user.clear(input);
-    await user.type(input, 'a-1234567'); // Lowercase letter
-    await user.tab();
-    expect(input).toHaveClass('cds--text-input--invalid');
-    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
-
-    await user.clear(input);
-    await user.type(input, 'AB-1234567'); // Two letters
-    await user.tab();
-    expect(input).toHaveClass('cds--text-input--invalid');
-    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
-
-    await user.clear(input);
-    await user.type(input, 'A-123456'); // Only 6 digits
-    await user.tab();
-    expect(input).toHaveClass('cds--text-input--invalid');
-    expect(screen.getByText(/identifier should be/i)).toBeInTheDocument();
   });
 });

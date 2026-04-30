@@ -55,14 +55,17 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             });
           } else if (obs.concept.display === 'Text of encounter note') {
             // Putting all notes in a single array.
-            notes.push({
-              note: obs.value,
-              provider: {
-                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-              },
-              time: formatTime(parseDate(obs.obsDatetime)),
-            });
+            if (obs.value != null) {
+              const noteText = typeof obs.value === 'object' ? obs.value.display : String(obs.value);
+              notes.push({
+                note: noteText,
+                provider: {
+                  name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+                  role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+                },
+                time: formatTime(parseDate(obs.obsDatetime)),
+              });
+            }
           }
         });
       }
@@ -87,30 +90,32 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
           </p>
         )}
       </div>
-      <Tabs className={styles.verticalTabs}>
-        <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab className={classNames(styles.tab, styles.bodyLong01)} onClick={() => setSelectedTab(0)} id="notes-tab">
-            {t('notes', 'Notes')}
-          </Tab>
-          <Tab className={styles.tab} onClick={() => setSelectedTab(1)} id="tests-tab">
-            {t('tests', 'Tests')}
-          </Tab>
-          <Tab className={styles.tab} onClick={() => setSelectedTab(2)} id="tab-3">
-            {t('medications', 'Medications')}
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <NotesSummary notes={notes} />
-          </TabPanel>
-          <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
-          </TabPanel>
-          <TabPanel>
-            <MedicationSummary medications={medications} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <div className={styles.verticalTabs}>
+        <Tabs>
+          <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+            <Tab className={classNames(styles.tab, styles.bodyLong01)} onClick={() => setSelectedTab(0)} id="notes-tab">
+              {t('notes', 'Notes')}
+            </Tab>
+            <Tab className={styles.tab} onClick={() => setSelectedTab(1)} id="tests-tab">
+              {t('tests', 'Tests')}
+            </Tab>
+            <Tab className={styles.tab} onClick={() => setSelectedTab(2)} id="tab-3">
+              {t('medications', 'Medications')}
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <NotesSummary notes={notes} />
+            </TabPanel>
+            <TabPanel>
+              <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
+            </TabPanel>
+            <TabPanel>
+              <MedicationSummary medications={medications} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </div>
     </div>
   );
 };

@@ -26,7 +26,6 @@
   "editNameDescription": "Editar nome ou descrição",
   "editPatientListHeader": "Edtar lista de utente",
   "emptyList": "Esta lista não tem utentes",
-  "emptyStateIllustration": "Ilustração de estado vazio",
   "emptyStateText": "Não há listas de utentes {{listType}} para visualizar",
   "error": "Erro",
   "errorAddingPatientToList": "Failed to add patient to list",

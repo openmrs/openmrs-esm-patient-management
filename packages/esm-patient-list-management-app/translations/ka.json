@@ -26,7 +26,6 @@
   "editNameDescription": "სახელის ან აღწერის ჩასწორება",
   "editPatientListHeader": "პაციენტების სიის ჩასწორება",
   "emptyList": "ეს სია პაციენტებს არ შეიცავს",
-  "emptyStateIllustration": "ცარიელი მდგომარეობის ილუსტრაცია",
   "emptyStateText": "There are no {{listType}} patient lists to display",
   "error": "შეცდომა",
   "errorAddingPatientToList": "Failed to add patient to list",

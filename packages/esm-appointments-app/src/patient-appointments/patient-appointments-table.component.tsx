@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-const utc = require('dayjs/plugin/utc');
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,8 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, Pagination, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { type Appointment } from '../types';
 import { PatientAppointmentsActionMenu } from './patient-appointments-action-menu.component';
 import styles from './patient-appointments-table.scss';
@@ -46,7 +45,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
     }
   }, [switchedView, goTo, currentPage]);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
+  const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
       { key: 'date', header: t('date', 'Date') },
       { key: 'location', header: t('location', 'Location') },
@@ -63,7 +62,9 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
       paginatedAppointments?.map((appointment) => {
         return {
           id: appointment.uuid,
-          date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
+          date: appointment.startDateTime
+            ? formatDatetime(new Date(appointment.startDateTime), { mode: 'wide' })
+            : '——',
           location: appointment?.location?.name ? appointment?.location?.name : '——',
           service: appointment.service.name,
           status: appointment.status,
@@ -87,9 +88,8 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
                       className={classNames(styles.productiveHeading01, styles.text02)}
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                   <TableHeader />
@@ -111,7 +111,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
           </TableContainer>
         )}
       </DataTable>
-      <PatientChartPagination
+      <Pagination
         currentItems={paginatedAppointments.length}
         totalItems={patientAppointments.length}
         onPageNumberChange={({ page }) => {

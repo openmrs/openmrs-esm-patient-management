@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -10,19 +11,18 @@ import {
   Stack,
   TextArea,
 } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext, Workspace2 } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import LocationSelector from '../../location-selector/location-selector.component';
-import type { ObsPayload, WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { useCreateEncounter } from '../../ward.resource';
-import styles from './patient-transfer-swap.scss';
+import type { ObsPayload, WardPatient, WardViewContext } from '../../types';
+import LocationSelector from '../../location-selector/location-selector.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
+import styles from './patient-transfer-swap.scss';
 
 export interface PatientAdmitOrTransferFormProps {
   wardPatient: WardPatient;
@@ -35,6 +35,7 @@ export interface PatientAdmitOrTransferFormProps {
 
   onSuccess(): void;
   onCancel(): void;
+  preSelectRelatedPatients?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export default function PatientAdmitOrTransferForm({
   relatedTransferPatients = [],
   onSuccess,
   onCancel,
+  preSelectRelatedPatients,
 }: PatientAdmitOrTransferFormProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
@@ -61,7 +63,9 @@ export default function PatientAdmitOrTransferForm({
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
-  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
+  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>(() =>
+    preSelectRelatedPatients ? relatedTransferPatients.map((rp) => rp.patient.uuid) : [],
+  );
 
   const zodSchema = useMemo(
     () =>
@@ -104,7 +108,7 @@ export default function PatientAdmitOrTransferForm({
   }, [dispositionsWithTypeTransfer, setValue]);
 
   const onSubmit = useCallback(
-    (values: FormValues) => {
+    async (values: FormValues) => {
       setIsSubmitting(true);
       setShowErrorNotifications(false);
       const obs: Array<ObsPayload> = [
@@ -130,41 +134,52 @@ export default function PatientAdmitOrTransferForm({
         ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
       ];
 
-      Promise.all(
-        wardPatientsToTransfer.map(async (wardPatientToTransfer) => {
-          const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToTransfer;
+      try {
+        const results = await Promise.allSettled(
+          wardPatientsToTransfer.map(async (wardPatientToTransfer) => {
+            const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToTransfer;
 
-          return createEncounter(
-            patientToTransfer,
-            emrConfiguration.transferRequestEncounterType,
-            patientToTransferVisit?.uuid,
-            [
-              {
-                concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
-                groupMembers: obs,
-              },
-            ],
-          );
-        }),
-      )
-        .then(() => {
-          showSnackbar({
-            title: t('patientTransferRequestCreated', 'Patient transfer request created'),
-            kind: 'success',
-          });
-          onSuccess();
-        })
-        .catch((err: Error) => {
-          showSnackbar({
-            title: t('errorCreatingTransferRequest', 'Error creating transfer request'),
-            subtitle: err.message,
-            kind: 'error',
-          });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-          wardPatientGroupDetails.mutate();
+            return createEncounter(
+              patientToTransfer,
+              emrConfiguration.transferRequestEncounterType,
+              patientToTransferVisit?.uuid,
+              [
+                {
+                  concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+                  groupMembers: obs,
+                },
+              ],
+            );
+          }),
+        );
+
+        results.forEach((result, i) => {
+          const patientName = wardPatientsToTransfer[i].patient.person.preferredName.display;
+          if (result.status === 'fulfilled') {
+            showSnackbar({
+              title: t('patientTransferRequestCreatedForPatient', 'Transfer request created for {{patientName}}', {
+                patientName,
+              }),
+              kind: 'success',
+            });
+          } else {
+            showSnackbar({
+              title: t('errorCreatingTransferRequest', 'Error creating transfer request for {{patientName}}', {
+                patientName,
+              }),
+              subtitle: (result.reason as Error)?.message,
+              kind: 'error',
+            });
+          }
         });
+
+        if (results.some((r) => r.status === 'fulfilled')) {
+          onSuccess();
+        }
+      } finally {
+        await wardPatientGroupDetails?.mutate?.();
+        setIsSubmitting(false);
+      }
     },
     [
       onSuccess,
@@ -297,7 +312,12 @@ export default function PatientAdmitOrTransferForm({
             control={control}
             render={({ field, fieldState: { error } }) => (
               <ResponsiveWrapper>
-                <TextArea {...field} invalid={!!error?.message} invalidText={error?.message} />
+                <TextArea
+                  {...field}
+                  labelText={t('notes', 'Notes')}
+                  invalid={!!error?.message}
+                  invalidText={error?.message}
+                />
               </ResponsiveWrapper>
             )}
           />

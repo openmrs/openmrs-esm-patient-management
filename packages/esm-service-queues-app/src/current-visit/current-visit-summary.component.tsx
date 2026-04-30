@@ -7,32 +7,41 @@ import styles from './current-visit.scss';
 
 interface CurrentVisitProps {
   patientUuid: string;
-  visitUuid: string;
+  visitUuid?: string;
 }
 
 const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
   const { visit, isLoading } = useVisit(visitUuid);
 
+  if (!visitUuid) {
+    return <p className={styles.bodyLong01}>{t('noActiveVisit', 'No active visit')}</p>;
+  }
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (visit) {
-    return (
-      <div className={styles.wrapper}>
-        <div className={styles.headingContainer}>
-          <p className={styles.heading}>{visit?.visitType?.display}</p>
-          <div className={styles.subHeading}>
-            {t('scheduledToday', 'Scheduled for today')} <Tag type="blue"> {t('onTime', 'On time')}</Tag>
-          </div>
-        </div>
-        <div className={styles.visitContainer}>
-          <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} />
+  if (!visit) {
+    return <p className={styles.bodyLong01}>{t('noActiveVisit', 'No active visit')}</p>;
+  }
+
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.headingContainer}>
+        <p className={styles.heading}>{visit.visitType?.display}</p>
+        <div className={styles.subHeading}>
+          {t('scheduledToday', 'Scheduled for today')}{' '}
+          <Tag size="sm" type="blue">
+            {t('onTime', 'On time')}
+          </Tag>
         </div>
       </div>
-    );
-  }
+      <div className={styles.visitContainer}>
+        <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} />
+      </div>
+    </div>
+  );
 };
 
 export default CurrentVisit;

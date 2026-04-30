@@ -90,7 +90,7 @@ const mockResourcesContextValue: Resources = {
     sessionId: 'JSESSION',
     currentProvider: { uuid: 'provider-uuid', identifier: 'PRO-123' },
   },
-  relationshipTypes: [],
+  relationshipTypes: { results: [] },
   identifierTypes: [...mockIdentifierTypes],
 };
 

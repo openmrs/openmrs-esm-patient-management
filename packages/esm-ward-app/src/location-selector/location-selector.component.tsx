@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { IconButton, RadioButton, RadioButtonGroup, RadioButtonSkeleton, Search } from '@carbon/react';
+import { type ControllerRenderProps } from 'react-hook-form';
 import { type RadioButtonGroupProps } from '@carbon/react/lib/components/RadioButtonGroup/RadioButtonGroup';
 import {
   ChevronLeftIcon,
@@ -15,7 +16,6 @@ import {
 import useEmrConfiguration from '../hooks/useEmrConfiguration';
 import useLocations from '../hooks/useLocations';
 import styles from './location-selector.scss';
-import { type ControllerRenderProps } from 'react-hook-form';
 
 interface LocationSelectorProps extends RadioButtonGroupProps {
   paginationSize?: number;
@@ -66,6 +66,7 @@ export default function LocationSelector({
     }
     return criteria;
   }, [debouncedSearchTerm, emrConfiguration, ancestorLocation]);
+
   const {
     data: locations,
     isLoading,
@@ -84,10 +85,12 @@ export default function LocationSelector({
     },
     [setSearchTerm],
   );
+
   return (
     <div className={styles.locationSelector}>
       <ResponsiveWrapper>
         <Search
+          labelText={t('searchLocations', 'Search locations')}
           onChange={handleSearch}
           value={searchTerm}
           placeholder={t('searchLocations', 'Search locations')}

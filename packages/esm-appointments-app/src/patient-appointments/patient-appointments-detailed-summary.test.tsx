@@ -79,7 +79,7 @@ describe('AppointmentsDetailedSummary', () => {
 
     expect(screen.getByRole('tablist')).toContainElement(upcomingAppointmentsTab);
     expect(screen.getByRole('tablist')).toContainElement(pastAppointmentsTab);
-    expect(screen.getByTitle(/Empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByTestId('empty-card-illustration')).toBeInTheDocument();
     expect(screen.getByText(/There are no upcoming appointments to display for this patient/i)).toBeInTheDocument();
 
     await user.click(pastAppointmentsTab);

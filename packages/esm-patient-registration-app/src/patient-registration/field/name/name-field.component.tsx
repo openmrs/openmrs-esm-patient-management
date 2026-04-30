@@ -119,10 +119,11 @@ export const NameField = () => {
               </div>
               <ContentSwitcher
                 className={styles.contentSwitcher}
+                size="md"
                 selectedIndex={isPatientUnknown ? 1 : 0}
                 onChange={toggleNameKnown}>
-                <Switch name="known" text={t('yes', 'Yes')} />
-                <Switch name="unknown" text={t('no', 'No')} />
+                <Switch name="known">{t('yes', 'Yes')}</Switch>
+                <Switch name="unknown">{t('no', 'No')}</Switch>
               </ContentSwitcher>
             </>
           )}

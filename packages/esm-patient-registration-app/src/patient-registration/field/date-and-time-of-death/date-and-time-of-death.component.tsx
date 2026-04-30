@@ -14,7 +14,7 @@ export const DateAndTimeOfDeathField: React.FC = () => {
 
   return (
     <div className={classNames(styles.dodField, styles.halfWidthInDesktopView)}>
-      <h4 className={styles.productiveHeading02Light}>{t('deathDateInputLabel', 'Date of Death')}</h4>
+      <h4 className={styles.productiveHeading02Light}>{t('deathDateInputLabel', 'Date of death')}</h4>
       <span>
         <DeathDateField />
         <DeathTimeField />
@@ -69,12 +69,7 @@ function DeathTimeField() {
         pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
         invalid={!!(deathTimeMeta.touched && deathTimeMeta.error)}
         invalidText={t(deathTimeMeta.error)}>
-        <TimePickerSelect
-          {...deathTimeFormatField}
-          id="time-format-picker"
-          aria-label={t('timeFormat', 'Time Format')}
-          invalid={!!deathTimeFormatMeta.touched && deathTimeFormatMeta.error}
-          invalidText={t(deathTimeFormatMeta.error)}>
+        <TimePickerSelect {...deathTimeFormatField} id="time-format-picker" aria-label={t('timeFormat', 'Time Format')}>
           <SelectItem value="AM" text="AM" />
           <SelectItem value="PM" text="PM" />
         </TimePickerSelect>

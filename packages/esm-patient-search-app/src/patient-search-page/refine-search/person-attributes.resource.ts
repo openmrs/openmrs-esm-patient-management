@@ -1,14 +1,14 @@
+import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 import {
-  type FetchResponse,
   fhirBaseUrl,
   openmrsFetch,
-  type OpenmrsResource,
   restBaseUrl,
+  type FetchResponse,
+  type OpenmrsResource,
   useDebounce,
 } from '@openmrs/esm-framework';
-import { useEffect, useMemo } from 'react';
-import useSWR from 'swr';
 import {
   type ConceptResponse,
   type LocationEntry,
@@ -38,7 +38,7 @@ export function useAttributeConceptAnswers(conceptUuid: string | undefined): {
     if (!data?.data) {
       return [];
     }
-    return data.data.answers?.length > 0 ? data.data.answers : data.data.setMembers ?? [];
+    return data.data.answers?.length > 0 ? data.data.answers : (data.data.setMembers ?? []);
   }, [data]);
 
   return {
@@ -55,7 +55,7 @@ export function useLocations(
   locations: Array<LocationEntry>;
   isLoading: boolean;
   loadingNewData: boolean;
-  error: any;
+  error: Error | undefined;
 } {
   const debouncedQuery = useDebounce(searchQuery);
 
@@ -98,9 +98,9 @@ export function useLocations(
 export function usePersonAttributeType(personAttributeTypeUuid: string): {
   data: PersonAttributeTypeResponse | undefined;
   isLoading: boolean;
-  error: any;
+  error: Error | undefined;
 } {
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>, Error>(
     `${restBaseUrl}/personattributetype/${personAttributeTypeUuid}`,
     openmrsFetch,
   );

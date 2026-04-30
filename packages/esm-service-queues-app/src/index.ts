@@ -33,11 +33,6 @@ export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/qu
   },
 });
 
-export const queueList = getAsyncLifecycle(
-  () => import('./queue-patient-linelists/queue-services-table.component'),
-  options,
-);
-
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
 // t('serviceQueues', 'Service queues')
@@ -121,13 +116,10 @@ export const transitionOverflowMenuItem = getAsyncLifecycle(
   },
 );
 
-export const addNewQueueServiceWorkspace = getAsyncLifecycle(
-  () => import('./admin/queue-services/queue-service-form.workspace'),
-  {
-    featureName: 'service-queues-service-form',
-    moduleName,
-  },
-);
+export const addNewQueueWorkspace = getAsyncLifecycle(() => import('./admin/queues/queue-form.workspace'), {
+  featureName: 'service-queues-queue-form',
+  moduleName,
+});
 
 export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./admin/queue-rooms/queue-room-form.workspace'),
@@ -178,6 +170,16 @@ export const serviceQueuesAdminPage = getAsyncLifecycle(() => import('./admin/ad
 
 export const queueScreen = getAsyncLifecycle(() => import('./queue-screen/queue-screen.component'), {
   featureName: 'queue-screen',
+  moduleName,
+});
+
+export const deleteQueueModal = getAsyncLifecycle(() => import('./admin/modals/delete-queue.modal'), {
+  featureName: 'delete-queue-modal',
+  moduleName,
+});
+
+export const deleteQueueRoomModal = getAsyncLifecycle(() => import('./admin/modals/delete-queue-room.modal'), {
+  featureName: 'delete-queue-room-modal',
   moduleName,
 });
 

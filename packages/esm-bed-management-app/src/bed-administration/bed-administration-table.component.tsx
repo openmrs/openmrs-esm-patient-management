@@ -124,7 +124,6 @@ const BedAdministrationTable: React.FC = () => {
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
         <Button
-          enterDelayMs={300}
           renderIcon={Edit}
           onClick={() => handleLaunchBedWorkspace('edit', bed)}
           kind={'ghost'}
@@ -195,7 +194,11 @@ const BedAdministrationTable: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
+                      <TableHeader key={header.key}>
+                        {typeof header.header === 'object' && header.header !== null && 'content' in header.header
+                          ? (header.header.content as React.ReactNode)
+                          : (header.header as React.ReactNode)}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -203,7 +206,11 @@ const BedAdministrationTable: React.FC = () => {
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell key={cell.id}>
+                          {typeof cell.value === 'object' && cell.value !== null && 'content' in cell.value
+                            ? (cell.value.content as React.ReactNode)
+                            : (cell.value as React.ReactNode)}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))}

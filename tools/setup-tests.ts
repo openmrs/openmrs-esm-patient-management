@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
 
+// Prevent single-spa from emitting warnings / touching navigation during unit tests.
+jest.mock('single-spa', () => ({
+  navigateToUrl: jest.fn(),
+}));
+
 declare global {
   interface Window {
     openmrsBase: string;

@@ -13,14 +13,14 @@
 }
 
 .desktopHeading {
-  h4 {
+  h1 {
     @include type.type-style('heading-compact-02');
     color: colors.$gray-70;
   }
 }
 
 .tabletHeading {
-  h4 {
+  h1 {
     @include type.type-style('heading-03');
     color: colors.$gray-70;
   }
@@ -31,7 +31,7 @@
   text-align: left;
   margin-bottom: layout.$spacing-05;
 
-  h4:after {
+  h1:after {
     content: '';
     display: block;
     width: layout.$spacing-07;
@@ -62,10 +62,6 @@
   @include type.type-style('body-01');
   color: colors.$gray-70;
   margin-bottom: layout.$spacing-04;
-}
-
-.homeButton {
-  margin-top: layout.$spacing-05;
 }
 
 // RTL support

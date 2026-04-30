@@ -59,7 +59,7 @@ export const CauseOfDeathField: React.FC = () => {
                     id="deathCause"
                     invalid={errors.deathCause && touched.deathCause}
                     invalidText={errors.deathCause?.message}
-                    labelText={t('causeOfDeathInputLabel', 'Cause of Death')}
+                    labelText={t('causeOfDeathInputLabel', 'Cause of death')}
                     name="deathCause"
                     required={required}>
                     <SelectItem id="empty-default-option" value={null} text={t('selectAnOption', 'Select an option')} />

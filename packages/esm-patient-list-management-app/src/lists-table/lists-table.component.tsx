@@ -119,6 +119,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
     setSortParams({ key, order: sortDirection });
+    return 0; // Return value is not used, actual sorting happens in useMemo
   }
 
   const filteredLists: Array<PatientList> = useMemo(() => {
@@ -303,7 +304,6 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
         hasIconOnly
         renderIcon={isStarred ? StarFilled : Star}
         tooltipPosition="left"
-        enterDelayMs={500}
         onClick={() => toggleStarredList(cohortUuid, !isStarred)}
       />
     </TableCell>

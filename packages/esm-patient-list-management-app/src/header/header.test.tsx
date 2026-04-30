@@ -4,11 +4,6 @@ import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
 import Header from './header.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  launchWorkspace2: jest.fn(),
-}));
-
 const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
 
 describe('Header', () => {

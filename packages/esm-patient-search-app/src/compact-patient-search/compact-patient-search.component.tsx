@@ -26,6 +26,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const bannerContainerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +47,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const {
     error: errorFetchingUserProperties,
+    isLoadingPatients,
     mutateUserProperties,
     recentlyViewedPatientUuids,
     updateRecentlyViewedPatients,
@@ -70,6 +72,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const addViewedPatientAndCloseSearchResults = useCallback(
     async (patientUuid: string) => {
       handleCloseSearchResults();
+      if (!showRecentlySearchedPatients) {
+        return;
+      }
       try {
         await updateRecentlyViewedPatients(patientUuid);
         await mutateUserProperties();
@@ -81,7 +86,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         });
       }
     },
-    [handleCloseSearchResults, mutateUserProperties, updateRecentlyViewedPatients, t],
+    [handleCloseSearchResults, mutateUserProperties, updateRecentlyViewedPatients, showRecentlySearchedPatients, t],
   );
 
   const handlePatientSelection = useCallback(
@@ -103,6 +108,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     handlePatientSelection,
     handleFocusToInput,
     -1,
+    searchContainerRef,
   );
 
   useEffect(() => {
@@ -137,17 +143,17 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   }, [fetchError, errorFetchingUserProperties, t]);
 
   const handleSubmit = useCallback(
-    (debouncedSearchTerm) => {
-      if (shouldNavigateToPatientSearchPage && hasSearchTerm) {
+    (searchTerm: string) => {
+      if (shouldNavigateToPatientSearchPage && searchTerm?.trim()) {
         if (!isSearchPage) {
           window.sessionStorage.setItem('searchReturnUrl', window.location.pathname);
         }
         navigate({
-          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(debouncedSearchTerm)}`,
+          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(searchTerm)}`,
         });
       }
     },
-    [isSearchPage, shouldNavigateToPatientSearchPage, hasSearchTerm],
+    [isSearchPage, shouldNavigateToPatientSearchPage],
   );
 
   const handleClear = useCallback(() => {
@@ -161,7 +167,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       value={{
         patientClickSideEffect: addViewedPatientAndCloseSearchResults,
       }}>
-      <div className={styles.patientSearchBar}>
+      <div className={styles.patientSearchBar} ref={searchContainerRef}>
         <PatientSearchBar
           isCompact
           initialSearchTerm={initialSearchTerm ?? ''}
@@ -170,8 +176,6 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           onClear={handleClear}
           ref={searchInputRef}
         />
-
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
 
         {!isSearchPage && hasSearchTerm && (
           <div
@@ -187,7 +191,11 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
             className={styles.floatingSearchResultsContainer}
             data-testid="floatingSearchResultsContainer"
             data-tutorial-target="floating-search-results-container">
-            <RecentlySearchedPatients ref={bannerContainerRef} {...recentPatientSearchResponse} />
+            <RecentlySearchedPatients
+              ref={bannerContainerRef}
+              {...recentPatientSearchResponse}
+              isLoading={recentPatientSearchResponse.isLoading || isLoadingPatients}
+            />
           </div>
         )}
       </div>

@@ -102,7 +102,7 @@ export const configSchema = {
   },
   includeDead: {
     _type: Type.Boolean,
-    _default: true,
+    _default: false,
     _description: 'Whether to include dead patients in search results',
   },
   contactAttributeType: {
@@ -130,8 +130,6 @@ export const configSchema = {
     },
   },
 };
-
-export type BuiltInFieldType = 'gender' | 'dateOfBirth' | 'age' | 'postcode';
 
 export interface PersonAttributeFieldConfig {
   attributeTypeUuid: string;

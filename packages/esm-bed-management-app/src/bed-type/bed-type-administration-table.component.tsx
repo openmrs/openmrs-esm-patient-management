@@ -120,7 +120,6 @@ const BedTypeAdministrationTable: React.FC = () => {
           <>
             <IconButton
               align="top-start"
-              enterDelayMs={300}
               kind="ghost"
               label={t('editBedType', 'Edit bed type')}
               onClick={(e) => {
@@ -132,7 +131,6 @@ const BedTypeAdministrationTable: React.FC = () => {
             </IconButton>
             <IconButton
               align="top-start"
-              enterDelayMs={300}
               kind="ghost"
               label={t('deleteBedType', 'Delete bed type')}
               onClick={(e) => {
@@ -191,7 +189,11 @@ const BedTypeAdministrationTable: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader key={header.key}>{header.header?.content ?? header.header}</TableHeader>
+                      <TableHeader key={header.key}>
+                        {typeof header.header === 'object' && header.header !== null && 'content' in header.header
+                          ? (header.header.content as React.ReactNode)
+                          : (header.header as React.ReactNode)}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -199,7 +201,11 @@ const BedTypeAdministrationTable: React.FC = () => {
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell key={cell.id}>
+                          {typeof cell.value === 'object' && cell.value !== null && 'content' in cell.value
+                            ? (cell.value.content as React.ReactNode)
+                            : (cell.value as React.ReactNode)}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))}

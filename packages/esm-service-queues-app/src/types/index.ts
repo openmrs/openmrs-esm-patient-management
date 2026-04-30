@@ -9,56 +9,6 @@ export interface Attribute {
   value: string | number;
 }
 
-export interface AppointmentsFetchResponse {
-  data: Array<Appointment>;
-}
-
-export interface Appointment {
-  appointmentKind: string;
-  appointmentNumber: string;
-  comments: string;
-  endDateTime: Date | number;
-  location: OpenmrsResource;
-  patient: {
-    uuid: string;
-    name: string;
-    identifier: string;
-    gender: string;
-    age: string;
-    phoneNumber: string;
-  };
-  provider: OpenmrsResource;
-  providers: Array<OpenmrsResource>;
-  // recurring: boolean;
-  service: AppointmentService;
-  startDateTime: number | any;
-  status: string;
-  uuid: string;
-}
-
-export interface ServiceTypes {
-  duration: number;
-  name: string;
-  uuid: string;
-}
-
-export interface AppointmentService {
-  appointmentServiceId: number;
-  color: string;
-  creatorName: string;
-  description: string;
-  durationMins: string;
-  endTime: string;
-  initialAppointmentStatus: string;
-  location: OpenmrsResource;
-  maxAppointmentsLimit: number | null;
-  name: string;
-  speciality: OpenmrsResource;
-  startTime: string;
-  uuid: string;
-  serviceTypes: Array<ServiceTypes>;
-}
-
 export interface Note {
   concept: OpenmrsResource;
   note: string;
@@ -252,18 +202,6 @@ export interface PatientProgram {
   location: OpenmrsResource;
 }
 
-export interface AppointmentCountMap {
-  allAppointmentsCount: number;
-  missedAppointmentsCount;
-  appointmentDate: number;
-  appointmentServiceUuid: string;
-}
-
-export interface AppointmentSummary {
-  appointmentService: { name: string };
-  appointmentCountMap: Record<string, AppointmentCountMap>;
-}
-
 export interface QueueEntryPayload {
   visit: { uuid: string };
   queueEntry: {
@@ -278,31 +216,6 @@ export interface QueueEntryPayload {
 
 export type AllowedPriority = OpenmrsResource;
 export type AllowedStatus = OpenmrsResource;
-
-// TODO: remove this in favor of Queue
-export interface QueueServiceInfo {
-  uuid: string;
-  display: string;
-  name: string;
-  description: string;
-  allowedPriorities: Array<AllowedPriority>;
-  allowedStatuses: Array<AllowedStatus>;
-}
-
-export interface MappedServiceQueueEntry {
-  id: string;
-  name: string;
-  age: string;
-  gender: string;
-  visitType: string;
-  returnDate: string;
-  patientUuid: string;
-}
-
-export enum FilterTypes {
-  SHOW,
-  HIDE,
-}
 
 export interface Provider {
   uuid: string;
@@ -401,6 +314,10 @@ export interface QueueRoom {
   display: string;
   name: string;
   description: string;
+  queue: {
+    uuid: string;
+    display: string;
+  };
 }
 
 export interface ProvidersQueueRoom {
@@ -469,7 +386,7 @@ export interface QueueEntry {
   queue: Queue;
   startedAt: string;
   status: Concept;
-  visit: Visit;
+  visit?: Visit | null;
   sortWeight: number;
   queueComingFrom: Queue;
   previousQueueEntry: QueueEntry;
@@ -490,5 +407,3 @@ export interface QueueEntrySearchCriteria {
 export interface Concept extends OpenmrsResource {
   setMembers?: Array<Concept>;
 }
-
-export interface Provider extends OpenmrsResource {}

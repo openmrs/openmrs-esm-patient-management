@@ -1,7 +1,5 @@
 import { Type, validators } from '@openmrs/esm-framework';
-import { appointmentColumnTypes } from './constants';
-
-type AppointmentColumnType = (typeof appointmentColumnTypes)[number];
+import { appointmentColumnTypes, appointmentStatuses, appointmentTypes } from './constants';
 
 export const configSchema = {
   allowAllDayAppointments: {
@@ -11,20 +9,22 @@ export const configSchema = {
   },
   appointmentStatuses: {
     _type: Type.Array,
-    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
-    _description: 'Configurable appointment status (status of appointments)',
+    _default: appointmentStatuses,
+    _description: `The selectable appointment statuses. Available options: ${appointmentStatuses.join(', ')}`,
     _elements: {
       _type: Type.String,
       _description: 'Status of an appointment',
+      _validators: [validators.oneOf(appointmentStatuses)],
     },
   },
   appointmentTypes: {
     _type: Type.Array,
     _default: ['Scheduled'],
-    _description: 'Configurable appointment types (types of appointments)',
+    _description: `Configurable appointment types. Available options: ${appointmentTypes.join(', ')}`,
     _elements: {
       _type: Type.String,
       _description: 'Type of an appointment',
+      _validators: [validators.oneOf(appointmentTypes)],
     },
   },
   checkInButton: {
@@ -33,22 +33,17 @@ export const configSchema = {
       _default: true,
       _description: 'Whether the check-in button on the "Appointments" list should be enabled',
     },
-    showIfActiveVisit: {
-      _type: Type.Boolean,
-      _default: false,
-      _description: 'Whether to show the check-in button if the patient currently has an active visit',
-    },
     customUrl: {
       _type: Type.String,
       _default: '',
-      _description: 'Custom URL to open when clicking the check-in button (instead of thes start visit form)',
+      _description: 'Custom URL to open when clicking the check-in button (instead of the start visit form)',
     },
   },
   checkOutButton: {
     enabled: {
       _type: Type.Boolean,
       _default: true,
-      _description: 'Whether the check-out button on the "Appointments" list should be disabled',
+      _description: 'Whether the check-out button on the "Appointments" list should be enabled',
     },
     customUrl: {
       _type: Type.String,
@@ -80,11 +75,25 @@ export const configSchema = {
     _description:
       'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
   },
+  showEarlyAppointmentsTab: {
+    _type: Type.Boolean,
+    _default: false,
+    _description:
+      'Whether to show the Early Appointments tab. Note that configuring this to true requires a custom earlyAppointment endpoint not currently available',
+  },
   appointmentsTableColumns: {
     _type: Type.Array,
-    _description:
-      'Columns to display in the appointment table. Available options: ' + appointmentColumnTypes.join(', '),
-    _default: ['patientName', 'identifier', 'location', 'serviceType', 'status'],
+    _description: `Columns to display in the appointment table. Available options: ${appointmentColumnTypes.join(', ')}`,
+    _default: [
+      'patientName',
+      'identifier',
+      'location',
+      'serviceType',
+      'dateTime',
+      'visitStartTime',
+      'status',
+      'actions',
+    ],
     _elements: {
       _type: Type.String,
       _validators: [validators.oneOf(appointmentColumnTypes)],
@@ -99,7 +108,6 @@ export interface ConfigObject {
   appointmentsTableColumns: Array<string>;
   checkInButton: {
     enabled: boolean;
-    showIfActiveVisit: boolean;
     customUrl: string;
   };
   checkOutButton: {
@@ -110,9 +118,5 @@ export interface ConfigObject {
   includePhoneNumberInExcelSpreadsheet: boolean;
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
+  showEarlyAppointmentsTab: boolean;
 }
-
-export type AppointmentTableColumn = {
-  header: string;
-  key: string;
-};
