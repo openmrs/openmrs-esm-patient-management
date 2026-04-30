@@ -320,7 +320,7 @@ export const configSchema = {
         _validators: [
           validator(
             (columnDfn: ColumnDefinition) =>
-              Boolean(columnDfn.columnType || columnTypes.some((c) => c == columnDfn.id)),
+              Boolean(columnDfn.columnType || columnTypes.some((c) => c === columnDfn.id)),
             (columnDfn) =>
               `No columnType provided for column with ID '${
                 columnDfn.id
@@ -329,7 +329,7 @@ export const configSchema = {
           validator(
             (columnDfn: ColumnDefinition) => {
               return (
-                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid ||
+                columnDfn.config.identifierTypeUuid === defaultIdentifierTypeUuid ||
                 columnHasType(columnDfn, 'patient-identifier')
               );
             },
@@ -343,7 +343,7 @@ export const configSchema = {
             (columnDfn: ColumnDefinition) => {
               return (
                 !columnDfn.config.statusConfigs ||
-                columnDfn.config.statusConfigs.length == 0 ||
+                columnDfn.config.statusConfigs.length === 0 ||
                 columnHasType(columnDfn, 'status')
               );
             },
@@ -433,7 +433,7 @@ export const configSchema = {
       return Boolean(
         config.visitQueueNumberAttributeUuid ||
           queueNumberColumnsUsed.every(
-            (columnId) => queueNumberColumnDefs.find((d) => d.id == columnId).config.visitQueueNumberAttributeUuid,
+            (columnId) => queueNumberColumnDefs.find((d) => d.id === columnId).config.visitQueueNumberAttributeUuid,
           ),
       );
     }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),

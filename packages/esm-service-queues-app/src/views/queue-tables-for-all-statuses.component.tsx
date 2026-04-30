@@ -146,7 +146,7 @@ function QueueTableForQueueAndStatus({
         const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });
-      return queueEntry.status.uuid == statusUuid && match;
+      return queueEntry.status.uuid === statusUuid && match;
     });
   };
 

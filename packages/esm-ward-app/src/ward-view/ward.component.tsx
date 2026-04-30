@@ -71,7 +71,7 @@ const Ward = ({ wardBeds, wardUnassignedPatients }: { wardBeds: ReactNode; wardU
           {wardUnassignedPatients}
         </>
       )}
-      {bedLayouts?.length == 0 && isBedManagementModuleInstalled && (
+      {bedLayouts?.length === 0 && isBedManagementModuleInstalled && (
         <InlineNotification
           kind="warning"
           lowContrast={true}
