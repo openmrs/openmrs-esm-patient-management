@@ -111,7 +111,7 @@ describe('PatientDischargeWorkspace', () => {
     await waitFor(() => {
       expect(mockCreateEncounter).toHaveBeenCalledWith(
         mockWardPatient.patient,
-        { uuid: 'exit-encounter' },
+        { uuid: 'exit-encounter', display: '' },
         mockWardPatient.visit.uuid,
         [
           {
@@ -146,7 +146,7 @@ describe('PatientDischargeWorkspace', () => {
     await waitFor(() => {
       expect(mockCreateEncounter).toHaveBeenCalledWith(
         mockWardPatient.patient,
-        { uuid: 'exit-encounter' },
+        { uuid: 'exit-encounter', display: '' },
         mockWardPatient.visit.uuid,
         [],
       );
