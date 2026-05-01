@@ -1,11 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { closeWorkspaceGroup2, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { closeWorkspaceGroup2, showSnackbar, useAppContext, type FetchResponse } from '@openmrs/esm-framework';
 import { useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import PatientDischargeWorkspace from './patient-discharge.workspace';
 import { mockInpatientRequestAlice, mockPatientAlice, mockVisitAlice } from '__mocks__';
-import type { WardPatient, WardPatientWorkspaceDefinition } from '../../types';
+import type { WardPatient, WardPatientWorkspaceDefinition, WardViewContext } from '../../types';
+import type { EmrApiConfigurationResponse } from '../../hooks/useEmrConfiguration';
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseCreateEncounter = jest.mocked(useCreateEncounter);
@@ -38,8 +39,8 @@ const mockWardPatient: WardPatient = {
     column: 1,
     status: 'OCCUPIED',
   },
-  inpatientAdmission: null as any,
-  inpatientRequest: mockInpatientRequestAlice as any,
+  inpatientAdmission: null,
+  inpatientRequest: mockInpatientRequestAlice,
 };
 
 const testProps: WardPatientWorkspaceDefinition = {
@@ -62,16 +63,16 @@ describe('PatientDischargeWorkspace', () => {
     mockUseCreateEncounter.mockReturnValue({
       createEncounter: mockCreateEncounter,
       emrConfiguration: {
-        consultFreeTextCommentsConcept: { uuid: 'consult-concept' },
-        exitFromInpatientEncounterType: { uuid: 'exit-encounter' } as any,
-      } as any,
+        consultFreeTextCommentsConcept: { uuid: 'consult-concept', display: '' },
+        exitFromInpatientEncounterType: { uuid: 'exit-encounter', display: '' },
+      } as EmrApiConfigurationResponse,
       isLoadingEmrConfiguration: false,
       errorFetchingEmrConfiguration: null,
     });
 
     mockUseAppContext.mockReturnValue({
       wardPatientGroupDetails: { mutate: mockWardPatientMutate },
-    } as any);
+    } as unknown as WardViewContext);
   });
 
   it('renders discharge workspace with note field and action buttons', () => {
@@ -96,8 +97,8 @@ describe('PatientDischargeWorkspace', () => {
   it('submits discharge with note, removes patient from bed, and shows success snackbar', async () => {
     const user = userEvent.setup();
 
-    mockCreateEncounter.mockResolvedValueOnce({ ok: true } as any);
-    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as any);
+    mockCreateEncounter.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
+    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
 
     render(<PatientDischargeWorkspace {...testProps} />);
 
@@ -135,8 +136,8 @@ describe('PatientDischargeWorkspace', () => {
   it('submits discharge without note, removes patient from bed, and shows success snackbar', async () => {
     const user = userEvent.setup();
 
-    mockCreateEncounter.mockResolvedValueOnce({ ok: true } as any);
-    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as any);
+    mockCreateEncounter.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
+    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
 
     render(<PatientDischargeWorkspace {...testProps} />);
 
@@ -168,7 +169,7 @@ describe('PatientDischargeWorkspace', () => {
     mockCreateEncounter.mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 100)),
     );
-    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as any);
+    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
 
     render(<PatientDischargeWorkspace {...testProps} />);
 
@@ -196,7 +197,7 @@ describe('PatientDischargeWorkspace', () => {
     mockCreateEncounter.mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 100)),
     );
-    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as any);
+    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
 
     render(<PatientDischargeWorkspace {...testProps} />);
 
