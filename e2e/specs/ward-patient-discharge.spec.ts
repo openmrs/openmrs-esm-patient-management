@@ -92,6 +92,11 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
     await wardPage.clickPatientCard(patientName);
   });
 
+  await test.step("Then I click the 'Discharge' siderail button to open the discharge workspace", async () => {
+    await expect(page.getByRole('button', { name: 'Discharge' })).toBeVisible({ timeout: 10000 });
+    await page.getByRole('button', { name: 'Discharge' }).click();
+  });
+
   await test.step("Then I see the discharge form with a 'Confirm discharge' button", async () => {
     await expect(page.getByRole('button', { name: /Confirm discharge/i })).toBeVisible({ timeout: 10000 });
   });
