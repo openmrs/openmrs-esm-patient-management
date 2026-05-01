@@ -4,6 +4,7 @@ import { type Visit } from '@openmrs/esm-framework';
 import { startVisit, endVisit, getPatientIdentifierStr } from '../commands';
 import { test } from '../core';
 import { AppointmentsPage, PatientChartAppointmentsPage } from '../pages';
+import type { Page } from '@playwright/test';
 
 /**
  * Returns a business day (Mon-Fri) for scheduling appointments.
@@ -25,6 +26,21 @@ const getBusinessDay = (daysFromToday: number, hour: number): dayjs.Dayjs => {
   return targetDate.hour(hour).minute(0).second(0).millisecond(0);
 };
 
+const selectService = async (page: Page, serviceName: string) => {
+  const serviceCombo = page.getByRole('combobox', { name: /select a service/i });
+  await expect(serviceCombo).toBeVisible();
+  const tagName = await serviceCombo.evaluate((element) => element.tagName.toLowerCase());
+
+  if (tagName === 'select') {
+    await serviceCombo.selectOption({ label: serviceName });
+    return;
+  }
+
+  await serviceCombo.click();
+  await serviceCombo.fill(serviceName);
+  await page.getByText(serviceName, { exact: true }).click();
+};
+
 let visit: Visit;
 
 test('Add, edit and cancel an appointment from patient chart', async ({ api, page, patient }) => {
@@ -40,12 +56,7 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
   });
 
   await test.step('And I select "Outpatient Department" as the service', async () => {
-    const serviceCombo = page.getByRole('combobox', { name: /select a service/i });
-    await expect(serviceCombo).toBeVisible();
-    await serviceCombo.click();
-    const outpatientOption = page.getByRole('option', { name: 'Outpatient Department' });
-    await expect(outpatientOption).toBeVisible();
-    await outpatientOption.click();
+    await selectService(page, 'Outpatient Department');
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -96,12 +107,7 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
   });
 
   await test.step('And I change the service to "General Medicine"', async () => {
-    const serviceCombo = page.getByRole('combobox', { name: /select a service/i });
-    await expect(serviceCombo).toBeVisible();
-    await serviceCombo.click();
-    const generalMedicineOption = page.getByRole('option', { name: 'General Medicine service' });
-    await expect(generalMedicineOption).toBeVisible();
-    await generalMedicineOption.click();
+    await selectService(page, 'General Medicine');
   });
 
   await test.step('And I change the appointment time to 2:00 PM', async () => {
@@ -183,12 +189,7 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   });
 
   await test.step('And I select “Outpatient Department” service', async () => {
-    const serviceCombo = page.getByRole('combobox', { name: /select a service/i });
-    await expect(serviceCombo).toBeVisible();
-    await serviceCombo.click();
-    const outpatientOption = page.getByRole('option', { name: 'Outpatient Department' });
-    await expect(outpatientOption).toBeVisible();
-    await outpatientOption.click();
+    await selectService(page, 'Outpatient Department');
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -245,12 +246,7 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   });
 
   await test.step('And I change the service to "General Medicine"', async () => {
-    const serviceCombo = page.getByRole('combobox', { name: /select a service/i });
-    await expect(serviceCombo).toBeVisible();
-    await serviceCombo.click();
-    const generalMedicineOption = page.getByRole('option', { name: 'General Medicine service' });
-    await expect(generalMedicineOption).toBeVisible();
-    await generalMedicineOption.click();
+    await selectService(page, 'General Medicine');
   });
 
   await test.step('And I change the appointment time to 2:00 PM', async () => {
