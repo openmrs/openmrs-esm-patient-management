@@ -142,6 +142,7 @@
   "recurringAppointment": "Recurring Appointment",
   "recurringAppointmentShouldHaveEndDate": "A recurring appointment should have an end date",
   "repeatEvery": "Repeat every",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "সেভ ও বন্ধ করুন",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "আসন্ন",
   "upcomingAppointments": "আসন্ন অ্যাপয়েন্টমেন্ট সমূহ",
   "updateError": "Error updating upcoming appointment",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "সপ্তাহ",
   "yes": "হ্যা"

@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientAppointments } from './patient-appointments.resource';
 
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
@@ -24,14 +24,14 @@ describe('usePatientAppointments', () => {
   beforeEach(() => {
     abortController = new AbortController();
     mockOpenmrsFetch.mockReset();
-    mockOpenmrsFetch.mockResolvedValue({ data: [] } as any);
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
   });
 
   it('fetches separately when both patientUuid and startDate change', async () => {
     const pastDate = new Date('2020-01-01').getTime();
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [] } as any)
-      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as any);
+      .mockResolvedValueOnce({ data: [] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as FetchResponse);
 
     const { rerender, result } = renderHook(
       ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),
@@ -80,8 +80,8 @@ describe('usePatientAppointments', () => {
     // patient-1 returns empty; patient-2 returns one past appointment
     const pastDate = new Date('2020-01-01').getTime();
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [] } as any)
-      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as any);
+      .mockResolvedValueOnce({ data: [] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as FetchResponse);
 
     const { rerender, result } = renderHook(
       ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),
@@ -113,8 +113,8 @@ describe('usePatientAppointments', () => {
   it('triggers a new fetch when only startDate changes', async () => {
     const pastDate = new Date('2020-01-01').getTime();
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [] } as any)
-      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as any);
+      .mockResolvedValueOnce({ data: [] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [{ status: 'Scheduled', startDateTime: pastDate }] } as FetchResponse);
 
     const { rerender, result } = renderHook(
       ({ patientUuid, startDate }) => usePatientAppointments(patientUuid, startDate, abortController),

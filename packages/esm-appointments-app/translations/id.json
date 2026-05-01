@@ -142,6 +142,7 @@
   "recurringAppointment": "Janji Temu Berulang",
   "recurringAppointmentShouldHaveEndDate": "Janji temu berulang harus memiliki tanggal berakhir",
   "repeatEvery": "Ulangi setiap",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "Simpan dan tutup",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Mendatang",
   "upcomingAppointments": "Janji temu mendatang",
   "updateError": "Gagal memperbarui janji temu berikutnya",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Minggu",
   "yes": "Ya"
