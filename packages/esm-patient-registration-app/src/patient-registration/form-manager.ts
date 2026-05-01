@@ -90,7 +90,7 @@ export class FormManager {
       dependencies: [],
     });
 
-    return null;
+    return;
   };
 
   static savePatientFormOnline: SavePatientForm = async (
@@ -123,9 +123,22 @@ export class FormManager {
       config,
     );
 
-    FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
-      await deletePersonName(name.nameUuid, name.personUuid);
-    });
+    await Promise.all(
+      FormManager.getDeletedNames(values.patientUuid, patientUuidMap).map((name) =>
+        deletePersonName(name.nameUuid, name.personUuid),
+      ),
+    );
+
+    await Promise.all(
+      Object.entries(values.attributes || {})
+        .filter(([, value]) => !value)
+        .map(([key]) => {
+          const attributeUuid = patientUuidMap[`attribute.${key}` as keyof typeof patientUuidMap];
+          return openmrsFetch(`${restBaseUrl}/person/${values.patientUuid}/attribute/${attributeUuid}`, {
+            method: 'DELETE',
+          }).catch((err) => console.error(err));
+        }),
+    );
 
     const savePatientResponse = await savePatient(
       createdPatient,
@@ -136,7 +149,7 @@ export class FormManager {
       savePatientTransactionManager.patientSaved = true;
       await this.saveRelationships(values.relationships, savePatientResponse);
 
-      await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
+      await this.saveObservations(values.obs || {}, savePatientResponse, currentLocation, currentUser, config);
 
       const { patientPhotoConceptUuid } = await getConfig<StyleguideConfigObject>('@openmrs/esm-styleguide');
 
@@ -280,11 +293,13 @@ export class FormManager {
     */
 
     if (patientUuid) {
-      Object.keys(initialIdentifierValues)
-        .filter((identifierFieldName) => !patientIdentifiers[identifierFieldName])
-        .forEach(async (identifierFieldName) => {
-          await deletePatientIdentifier(patientUuid, initialIdentifierValues[identifierFieldName].identifierUuid);
-        });
+      await Promise.all(
+        Object.keys(initialIdentifierValues)
+          .filter((identifierFieldName) => !patientIdentifiers[identifierFieldName])
+          .map((identifierFieldName) =>
+            deletePatientIdentifier(patientUuid, initialIdentifierValues[identifierFieldName].identifierUuid),
+          ),
+      );
     }
 
     return Promise.all(identifierTypeRequests);
@@ -370,19 +385,6 @@ export class FormManager {
             value,
           });
         });
-
-      if (!isNewPatient && values.patientUuid) {
-        Object.entries(values.attributes)
-          .filter(([, value]) => !value)
-          .forEach(async ([key]) => {
-            const attributeUuid = patientUuidMap[`attribute.${key}`];
-            await openmrsFetch(`${restBaseUrl}/person/${values.patientUuid}/attribute/${attributeUuid}`, {
-              method: 'DELETE',
-            }).catch((err) => {
-              console.error(err);
-            });
-          });
-      }
     }
 
     return attributes;
