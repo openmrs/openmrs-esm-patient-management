@@ -72,7 +72,7 @@ export interface OpenmrsCohort {
   creator?: {
     uuid: string;
     display: string;
-  };
+  } | null;
 }
 
 export interface OpenmrsCohortRef {

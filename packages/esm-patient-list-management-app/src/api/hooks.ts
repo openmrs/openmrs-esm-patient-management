@@ -76,7 +76,7 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     type: cohort.cohortType?.display,
     size: cohort.size,
     location: cohort.location,
-    creatorUuid: cohort?.creator?.uuid,
+    creatorUuid: cohort.creator?.uuid,
   }));
   const { user } = useSession();
 
@@ -110,7 +110,7 @@ export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: str
   const config = useConfig<PatientListManagementConfig>();
   return useSWR(['patientListWithoutPatient', patientUuid], async () => {
     const [allLists, listsIdsOfThisPatient] = await Promise.all([
-      getAllPatientLists({}, config?.myListCohortTypeUUID, config?.systemListCohortTypeUUID),
+      getAllPatientLists({}, config?.systemListCohortTypeUUID),
       getPatientListIdsForPatient(patientUuid),
     ]);
 
