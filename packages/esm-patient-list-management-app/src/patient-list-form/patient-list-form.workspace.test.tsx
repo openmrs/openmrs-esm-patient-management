@@ -5,6 +5,7 @@ import {
   getCoreTranslation,
   showSnackbar,
   useLayoutType,
+  useLocations,
   useSession,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
@@ -31,6 +32,7 @@ jest.mock('../api/hooks', () => ({
 
 const mockUseSession = jest.mocked(useSession);
 const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseLocations = jest.mocked(useLocations);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockGetCoreTranslation = jest.mocked(getCoreTranslation);
 
@@ -42,6 +44,12 @@ const mockCohortTypes: CohortType[] = [
   { uuid: 'type-2', display: 'System List' },
 ];
 
+const mockLocations = [
+  { uuid: 'location-1', display: 'Location One', name: 'Location One' },
+  { uuid: 'location-2', display: 'Location Two', name: 'Location Two' },
+  { uuid: 'location-3', display: 'Location Three', name: 'Location Three' },
+];
+
 const mockPatientListDetails: OpenmrsCohort = {
   uuid: 'test-list-uuid',
   name: 'Test Patient List',
@@ -50,7 +58,7 @@ const mockPatientListDetails: OpenmrsCohort = {
   resourceVersion: '1.0',
   attributes: [],
   links: [],
-  location: null,
+  location: { uuid: 'location-1', display: 'Location One' },
   groupCohort: false,
   startDate: '2023-01-01',
   endDate: null,
@@ -83,6 +91,7 @@ describe('PatientListFormWorkspace', () => {
       error: null,
       mutate: jest.fn(),
     });
+    mockUseLocations.mockReturnValue(mockLocations);
     mockGetCoreTranslation.mockImplementation((key) => {
       const translations: Record<string, string> = {
         cancel: 'Cancel',
@@ -206,6 +215,90 @@ describe('PatientListFormWorkspace', () => {
       expect.objectContaining({
         kind: 'error',
         title: expect.stringMatching(/error creating list/i),
+      }),
+    );
+  });
+
+  it('renders the location field with available locations', () => {
+    const props = createMockWorkspace2Props({ onSuccess: mockOnSuccess });
+
+    render(<PatientListFormWorkspace {...props} />);
+
+    expect(screen.getByText(/choose location/i)).toBeInTheDocument();
+  });
+
+  it('shows loading spinner while locations are being fetched', () => {
+    mockUseLocations.mockReturnValue([]);
+
+    const props = createMockWorkspace2Props({ onSuccess: mockOnSuccess });
+
+    render(<PatientListFormWorkspace {...props} />);
+
+    expect(screen.getByText(/loading locations/i)).toBeInTheDocument();
+  });
+
+  it('creates a new patient list with selected location', async () => {
+    const user = userEvent.setup();
+    const props = createMockWorkspace2Props({ onSuccess: mockOnSuccess });
+
+    render(<PatientListFormWorkspace {...props} />);
+
+    await user.type(screen.getByLabelText(/list name/i), 'My New Patient List');
+    await user.type(screen.getByLabelText(/describe the purpose of this list/i), 'A description for testing');
+
+    expect(screen.getByText(/choose location/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /create list/i }));
+
+    expect(mockCreatePatientList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'My New Patient List',
+        description: 'A description for testing',
+      }),
+    );
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+        title: 'Created',
+      }),
+    );
+  });
+
+  it('edits an existing patient list and updates location', async () => {
+    const user = userEvent.setup();
+    const props = createMockWorkspace2Props({
+      patientListDetails: mockPatientListDetails,
+      onSuccess: mockOnSuccess,
+    });
+
+    render(<PatientListFormWorkspace {...props} />);
+
+    expect(screen.getByDisplayValue('Location One')).toBeInTheDocument();
+
+    const nameInput = screen.getByLabelText(/list name/i);
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Updated List Name');
+
+    const locationInputs = screen.getAllByRole('combobox');
+    const locationComboBox = locationInputs[locationInputs.length - 1];
+    await user.click(locationComboBox);
+    await user.click(screen.getByText('Location Two'));
+
+    await user.click(screen.getByRole('button', { name: /edit list/i }));
+
+    expect(mockEditPatientList).toHaveBeenCalledWith(
+      'test-list-uuid',
+      expect.objectContaining({
+        name: 'Updated List Name',
+        location: 'location-2',
+      }),
+    );
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+        title: 'Updated',
       }),
     );
   });

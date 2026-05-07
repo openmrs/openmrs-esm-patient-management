@@ -13,10 +13,19 @@ import {
   Pagination,
   Search,
   Tile,
+  InlineNotification,
 } from '@carbon/react';
-import { getCoreTranslation, navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
+import {
+  getCoreTranslation,
+  navigate,
+  restBaseUrl,
+  showSnackbar,
+  usePagination,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { type AddablePatientListViewModel } from '../api/types';
-import { useAddablePatientLists } from '../api/patient-list.resource';
+import { useAddablePatientLists, getPatientLocationFromIdentifiers } from '../api/patient-list.resource';
+import { type PatientListManagementConfig } from '../config-schema';
 import styles from './add-patient.scss';
 
 interface AddPatientProps {
@@ -26,10 +35,29 @@ interface AddPatientProps {
 
 const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
+  const config = useConfig<PatientListManagementConfig>();
   const { data, isLoading } = useAddablePatientLists(patientUuid);
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [patientLocation, setPatientLocation] = useState<{ uuid: string; display: string } | null>(null);
+  const [locationFetchError, setLocationFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (config.enforcePatientListLocationMatch) {
+      getPatientLocationFromIdentifiers(patientUuid).then((location) => {
+        setPatientLocation(location);
+        if (!location && config.enforcePatientListLocationMatch) {
+          setLocationFetchError(
+            t(
+              'patientLocationNotFound',
+              'Could not determine patient location from identifiers. Location validation may fail.',
+            ),
+          );
+        }
+      });
+    }
+  }, [patientUuid, config.enforcePatientListLocationMatch, t]);
 
   const handleCreateNewList = useCallback(() => {
     navigate({
@@ -60,6 +88,26 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
         const patientList = data.find((list) => list.id === selectedId);
         if (!patientList) return Promise.resolve();
 
+        if (config.enforcePatientListLocationMatch) {
+          if (patientList.location) {
+            const patientLocationUuid = patientLocation?.uuid;
+            const listLocationUuid = patientList.location.uuid;
+
+            if (patientLocationUuid && patientLocationUuid !== listLocationUuid) {
+              showSnackbar({
+                title: t('error', 'Error'),
+                kind: 'error',
+                subtitle: t(
+                  'patientLocationMismatchWithListNameError',
+                  `Patient location does not match list location. Patient cannot be added to: {{listName}}`,
+                  { listName: patientList.displayName }
+                ),
+              });
+              return Promise.resolve();
+            }
+          }
+        }
+
         return patientList
           .addPatient()
           .then(async () => {
@@ -83,7 +131,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       setIsSubmitting(false);
       closeModal();
     });
-  }, [selected, closeModal, data, mutateCohortMembers, t]);
+  }, [selected, closeModal, data, mutateCohortMembers, t, config.enforcePatientListLocationMatch, patientLocation]);
 
   const searchResults = useMemo(() => {
     if (!data) {
@@ -125,6 +173,15 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           size="lg"
           value={searchValue}
         />
+        {locationFetchError && (
+          <InlineNotification
+            kind="warning"
+            title={t('warning', 'Warning')}
+            subtitle={locationFetchError}
+            hideCloseButton={true}
+            style={{ marginBottom: '1rem' }}
+          />
+        )}
         <fieldset className={classNames('cds--fieldset', styles.fieldset)}>
           {!isLoading && results ? (
             results.length > 0 ? (

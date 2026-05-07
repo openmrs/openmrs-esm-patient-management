@@ -1,31 +1,66 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { navigate } from '@openmrs/esm-framework';
-import { useAddablePatientLists } from '../api/patient-list.resource';
+import { render, screen, waitFor } from '@testing-library/react';
+import { navigate, useConfig, showSnackbar } from '@openmrs/esm-framework';
+import { useAddablePatientLists, getPatientLocationFromIdentifiers } from '../api/patient-list.resource';
 import { mockPatient } from '__mocks__';
 import AddPatient from './add-patient.modal';
 
-const mockNavigate = jest.mocked(navigate);
-const mockUseAddablePatientLists = jest.mocked(useAddablePatientLists);
-const mockCloseModal = jest.fn();
+jest.mock('@openmrs/esm-framework', () => ({
+  navigate: jest.fn(),
+  useConfig: jest.fn(),
+  showSnackbar: jest.fn(),
+  usePagination: jest.fn((items, pageSize) => ({
+    results: items,
+    goTo: jest.fn(),
+    currentPage: 1,
+    paginated: false,
+  })),
+  getCoreTranslation: jest.fn((key) => key),
+  restBaseUrl: '/openmrs/ws/rest/v1',
+}));
 
 jest.mock('../api/patient-list.resource', () => ({
   useAddablePatientLists: jest.fn(),
+  getPatientLocationFromIdentifiers: jest.fn(),
 }));
+
+const mockNavigate = jest.mocked(navigate);
+const mockUseAddablePatientLists = jest.mocked(useAddablePatientLists);
+const mockUseConfig = jest.mocked(useConfig);
+const mockGetPatientLocationFromIdentifiers = jest.mocked(getPatientLocationFromIdentifiers);
+const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockCloseModal = jest.fn();
 
 describe('AddPatientModal', () => {
   beforeEach(() => {
     mockUseAddablePatientLists.mockReturnValue({
       data: [
-        { id: 'list1', displayName: 'List 1', addPatient: jest.fn() },
-        { id: 'list2', displayName: 'List 2', addPatient: jest.fn() },
+        {
+          id: 'list1',
+          displayName: 'List 1',
+          addPatient: jest.fn(),
+          location: { uuid: 'loc-1', display: 'Location 1' },
+        },
+        {
+          id: 'list2',
+          displayName: 'List 2',
+          addPatient: jest.fn(),
+          location: { uuid: 'loc-2', display: 'Location 2' },
+        },
+        { id: 'list3', displayName: 'List 3', addPatient: jest.fn(), location: null },
       ],
       isLoading: false,
       error: null,
       mutate: jest.fn(),
       isValidating: false,
     });
+    mockUseConfig.mockReturnValue({
+      enforcePatientListLocationMatch: false,
+    });
+    mockGetPatientLocationFromIdentifiers.mockResolvedValue(null);
+    mockShowSnackbar.mockImplementation(() => {});
+    jest.clearAllMocks();
   });
 
   it('renders the Add Patient to List modal', () => {
@@ -96,5 +131,249 @@ describe('AddPatientModal', () => {
     await user.click(cancelButton);
 
     expect(mockCloseModal).toHaveBeenCalled();
+  });
+
+  describe('Location match enforcement', () => {
+    it('fetches patient location when enforcePatientListLocationMatch is enabled', async () => {
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-1', display: 'Location 1' });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalledWith(mockPatient.uuid);
+      });
+    });
+
+    it('blocks adding patient when location mismatch is detected', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = jest.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'patient-loc', display: 'Patient Location' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: { uuid: 'different-loc', display: 'Different Location' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'Error',
+            kind: 'error',
+            subtitle: expect.stringContaining('Patient location does not match list location'),
+          }),
+        );
+      });
+      expect(addPatientMock).not.toHaveBeenCalled();
+    });
+
+    it('allows adding patient when location matches', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = jest.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-1', display: 'Location 1' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: { uuid: 'loc-1', display: 'Location 1' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'Successfully added',
+            kind: 'success',
+          }),
+        );
+      });
+      expect(addPatientMock).toHaveBeenCalled();
+    });
+
+    it('allows adding patient when enforcePatientListLocationMatch is disabled even with location mismatch', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = jest.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: false,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-A', display: 'Location A' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: { uuid: 'loc-B', display: 'Location B' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            kind: 'success',
+          }),
+        );
+      });
+      expect(addPatientMock).toHaveBeenCalled();
+    });
+
+    it('allows adding patient when list has no location even with enforcePatientListLocationMatch enabled', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = jest.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'patient-loc', display: 'Patient Location' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: null,
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            kind: 'success',
+          }),
+        );
+      });
+      expect(addPatientMock).toHaveBeenCalled();
+    });
+
+    it('allows adding to multiple lists with correct location matches', async () => {
+      const user = userEvent.setup();
+      const addPatientMock1 = jest.fn().mockResolvedValue({});
+      const addPatientMock2 = jest.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-1', display: 'Location 1' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock1,
+            location: { uuid: 'loc-1', display: 'Location 1' },
+          },
+          {
+            id: 'list2',
+            displayName: 'List 2',
+            addPatient: addPatientMock2,
+            location: { uuid: 'loc-1', display: 'Location 1' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox1 = screen.getByRole('checkbox', { name: /list 1/i });
+      const checkbox2 = screen.getByRole('checkbox', { name: /list 2/i });
+      await user.click(checkbox1);
+      await user.click(checkbox2);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(addPatientMock1).toHaveBeenCalled();
+      });
+      expect(addPatientMock2).toHaveBeenCalled();
+    });
   });
 });
