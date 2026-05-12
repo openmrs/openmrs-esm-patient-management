@@ -12,6 +12,17 @@ export default defineConfig({
     clearMocks: true,
     setupFiles: [new URL('./tools/setup-tests.ts', import.meta.url).pathname],
     exclude: ['**/node_modules/**', '**/e2e/**', '**/dist/**'],
+    coverage: {
+      provider: 'v8',
+      include: ['**/src/**/*.component.tsx'],
+      exclude: ['**/node_modules/**', '**/vendor/**', '**/src/**/*.test.*', '**/src/declarations.d.ts', '**/e2e/**'],
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+      },
+    },
     server: {
       deps: {
         inline: [/@openmrs/],
