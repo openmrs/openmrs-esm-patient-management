@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
@@ -7,11 +8,11 @@ import { renderWithSwr } from 'tools';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
 import DeleteQueueEntryModal from './delete-queue-entry.modal';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-jest.mock('../hooks/useQueues', () => {
+vi.mock('../hooks/useQueues', () => {
   return {
-    useQueues: jest.fn().mockReturnValue({
+    useQueues: vi.fn().mockReturnValue({
       queues: mockQueues,
     }),
   };
@@ -21,7 +22,7 @@ describe('UndoTransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -53,7 +54,7 @@ describe('VoidQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);

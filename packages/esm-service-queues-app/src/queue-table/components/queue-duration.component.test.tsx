@@ -1,16 +1,17 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import dayjs from 'dayjs';
 import QueueDuration from './queue-duration.component';
 
 describe('QueueDuration', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2025-01-01T12:00:00'));
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-01-01T12:00:00'));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('displays positive wait time correctly', () => {
@@ -38,5 +39,4 @@ describe('QueueDuration', () => {
     render(<QueueDuration startedAt={startedAt} endedAt={endedAt} />);
     expect(screen.getByText(/1 hour\(s\) and 0 minute\(s\)/i)).toBeInTheDocument();
   });
-
 });

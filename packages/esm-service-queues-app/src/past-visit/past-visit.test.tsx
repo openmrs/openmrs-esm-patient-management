@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -8,11 +9,11 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { usePastVisits } from './past-visit.resource';
 import PastVisitSummary from './past-visit-details/past-visit-summary.component';
 
-const mockUsePastVisits = jest.mocked(usePastVisits);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUsePastVisits = vi.mocked(usePastVisits);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-jest.mock('./past-visit.resource', () => ({
-  usePastVisits: jest.fn(),
+vi.mock('./past-visit.resource', () => ({
+  usePastVisits: vi.fn(),
 }));
 
 describe('PastVisit', () => {

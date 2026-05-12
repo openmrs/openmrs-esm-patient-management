@@ -1,10 +1,11 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientAppointments } from './patient-appointments.resource';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SWRConfig

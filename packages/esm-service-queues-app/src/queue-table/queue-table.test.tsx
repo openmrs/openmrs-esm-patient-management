@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
+import { vi, describe, it, expect, beforeEach, type MockInstance } from 'vitest';
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
@@ -7,8 +8,8 @@ import { type ConfigObject, configSchema } from '../config-schema';
 import { mockPriorityNonUrgent, mockPriorityUrgent, mockQueueEntries, mockSession } from '__mocks__';
 import QueueTable from './queue-table.component';
 
-const mockUseSession = jest.mocked(useSession);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseSession = vi.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 
 const configWithCustomColumns = {
@@ -66,12 +67,12 @@ const defaultProps = {
 };
 
 describe('QueueTable', () => {
-  let consoleSpy: jest.SpyInstance;
+  let consoleSpy: MockInstance;
 
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession.data);
     mockUseConfig.mockReturnValue(configDefaults);
-    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('renders an empty table with default columns when there are no queue entries', () => {
