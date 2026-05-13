@@ -1,32 +1,33 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Root from './root.component';
 
-jest.mock('./home.component', () => ({
+vi.mock('./home.component', () => ({
   __esModule: true,
-  default: jest.fn(() => <div data-testid="home-component">Home Component</div>),
+  default: vi.fn(() => <div data-testid="home-component">Home Component</div>),
 }));
 
-jest.mock('./queue-screen/queue-screen.component', () => ({
+vi.mock('./queue-screen/queue-screen.component', () => ({
   __esModule: true,
-  default: jest.fn(() => <div data-testid="queue-screen-component">Queue Screen Component</div>),
+  default: vi.fn(() => <div data-testid="queue-screen-component">Queue Screen Component</div>),
 }));
 
-jest.mock('./views/queue-table-by-status-view.component', () => ({
+vi.mock('./views/queue-table-by-status-view.component', () => ({
   __esModule: true,
-  default: jest.fn(({ queueUuid }) => (
+  default: vi.fn(({ queueUuid }) => (
     <div data-testid="queue-table-by-status-component">Queue Table By Status: {queueUuid}</div>
   )),
 }));
 
-jest.mock('./admin/admin-page/admin-page.component', () => ({
+vi.mock('./admin/admin-page/admin-page.component', () => ({
   __esModule: true,
-  default: jest.fn(() => <div data-testid="admin-page-component">Admin Page Component</div>),
+  default: vi.fn(() => <div data-testid="admin-page-component">Admin Page Component</div>),
 }));
 
 describe('Root Component', () => {
   beforeEach(() => {
-    window.getOpenmrsSpaBase = jest.fn().mockReturnValue('/openmrs/spa/');
+    window.getOpenmrsSpaBase = vi.fn().mockReturnValue('/openmrs/spa/');
   });
 
   it('renders Home component for "/" route', () => {

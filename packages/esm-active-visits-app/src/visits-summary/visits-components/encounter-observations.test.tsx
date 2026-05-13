@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { type Obs } from '@openmrs/esm-framework';
 import EncounterObservations from './encounter-observations.component';

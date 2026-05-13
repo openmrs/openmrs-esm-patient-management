@@ -1,4 +1,5 @@
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import {
   mockLocationSurgery,
@@ -15,25 +16,25 @@ import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseQueueEntries = jest.mocked(useQueueEntries);
-const mockQueueLocations = jest.mocked(useQueueLocations);
-const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseQueueEntries = vi.mocked(useQueueEntries);
+const mockQueueLocations = vi.mocked(useQueueLocations);
+const mockUseSession = vi.mocked(useSession);
 
-jest.mock('../hooks/useQueues', () => {
+vi.mock('../hooks/useQueues', () => {
   return {
-    useQueues: jest.fn().mockReturnValue({ queues: mockServices }),
+    useQueues: vi.fn().mockReturnValue({ queues: mockServices }),
   };
 });
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
-  ...jest.requireActual('../create-queue-entry/hooks/useQueueLocations'),
-  useQueueLocations: jest.fn(),
+vi.mock('../create-queue-entry/hooks/useQueueLocations', async () => ({
+  ...((await vi.importActual('../create-queue-entry/hooks/useQueueLocations')) as object),
+  useQueueLocations: vi.fn(),
 }));
 
-jest.mock('../hooks/useQueueEntries', () => ({
-  ...jest.requireActual('../hooks/useQueueEntries'),
-  useQueueEntries: jest.fn(),
+vi.mock('../hooks/useQueueEntries', async () => ({
+  ...((await vi.importActual('../hooks/useQueueEntries')) as object),
+  useQueueEntries: vi.fn(),
 }));
 
 describe('DefaultQueueTable', () => {
@@ -54,7 +55,7 @@ describe('DefaultQueueTable', () => {
       error: undefined,
       totalCount: 0,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     rendeDefaultQueueTable();
@@ -77,7 +78,7 @@ describe('DefaultQueueTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       totalCount: 2,
     });
 

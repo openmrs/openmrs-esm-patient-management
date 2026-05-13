@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
@@ -6,11 +7,11 @@ import { BrowserRouter } from 'react-router-dom';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 
-jest.mock('../hooks/useAppointmentsCalendar', () => ({
-  useAppointmentsCalendar: jest.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
+vi.mock('../hooks/useAppointmentsCalendar', () => ({
+  useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
 }));
 
-const mockUseAppointmentsCalendar = jest.mocked(useAppointmentsCalendar);
+const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
 
 function renderCalendar() {
   return render(

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -9,18 +10,18 @@ import { PersonAttributeField } from './person-attribute-field.component';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-jest.mock('./person-attributes.resource', () => ({
-  ...jest.requireActual('./person-attributes.resource'),
-  usePersonAttributeType: jest.fn(),
+vi.mock('./person-attributes.resource', async () => ({
+  ...((await vi.importActual('./person-attributes.resource')) as object),
+  usePersonAttributeType: vi.fn(),
 }));
 
-jest.mock('../field.resource', () => ({
-  ...jest.requireActual('../field.resource'),
-  useConceptAnswers: jest.fn(),
+vi.mock('../field.resource', async () => ({
+  ...((await vi.importActual('../field.resource')) as object),
+  useConceptAnswers: vi.fn(),
 }));
 
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
-const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
+const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
+const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
 
 const mockPersonAttributeType = {
   format: 'java.lang.String',

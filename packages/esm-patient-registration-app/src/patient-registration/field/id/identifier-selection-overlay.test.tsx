@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import { Form, Formik } from 'formik';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -15,9 +16,9 @@ import PatientIdentifierOverlay from './identifier-selection-overlay.component';
 import type { AddressTemplate, FormValues, PatientIdentifierType } from '../../patient-registration.types';
 import type { Resources } from '../../../offline.resources';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockIsDesktop = jest.mocked(isDesktop);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
 
 // Mock identifier types
 const mockIdentifierTypes: PatientIdentifierType[] = [
@@ -111,9 +112,9 @@ const mockContextValues: PatientRegistrationContextProps = {
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
   isOffline: false,
-  setCapturePhotoProps: jest.fn(),
-  setFieldValue: jest.fn(),
-  setInitialFormValues: jest.fn(),
+  setCapturePhotoProps: vi.fn(),
+  setFieldValue: vi.fn(),
+  setInitialFormValues: vi.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
 } as unknown as PatientRegistrationContextProps;
@@ -125,8 +126,8 @@ function renderIdentifierSelectionOverlay(
   contextValues: PatientRegistrationContextProps = mockContextValues,
   resourcesContextValue: Resources = mockResourcesContextValue,
 ) {
-  const mockSetFieldValue = jest.fn();
-  const mockCloseOverlay = jest.fn();
+  const mockSetFieldValue = vi.fn();
+  const mockCloseOverlay = vi.fn();
 
   const utils = renderWithContext(
     <Formik initialValues={{}} onSubmit={() => {}}>
