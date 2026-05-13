@@ -47,6 +47,7 @@
     "eslint-plugin-playwright": "^2.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-testing-library": "^6.2.2",
+    "happy-dom": "^20.0.0",
     "husky": "^8.0.3",
     "i18next": "^25.0.0",
     "i18next-parser": "^9.3.0",
