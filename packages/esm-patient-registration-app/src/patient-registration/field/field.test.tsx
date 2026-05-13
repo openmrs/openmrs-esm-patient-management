@@ -188,6 +188,9 @@ describe('Field', () => {
     expect(screen.getByText('Birth')).toBeInTheDocument();
   });
 
+  // TODO: Re-enable after migrating the in-test `vi.mock` of `address-hierarchy.resource`
+  // to a top-level mock with `mockReturnValue` set. The current setup leaves
+  // `useOrderedAddressHierarchyLevels` returning undefined and the component crashes.
   it.skip('should render AddressComponent component when name prop is "address"', () => {
     vi.mock('./address/address-hierarchy.resource', async () => ({
       ...((await vi.importActual('./address/address-hierarchy.resource')) as object),
