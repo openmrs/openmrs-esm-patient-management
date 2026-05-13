@@ -14,9 +14,9 @@
     "build": "rspack --mode production",
     "analyze": "rspack --mode=production --env.analyze=true",
     "lint": "cross-env eslint src --ext ts,tsx",
-    "test": "yarn run -T vitest run --passWithNoTests",
-    "test:watch": "yarn run -T vitest watch",
-    "coverage": "yarn run -T vitest run --coverage --passWithNoTests",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest watch",
+    "coverage": "vitest run --coverage --passWithNoTests",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*modal.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
@@ -50,6 +50,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "openmrs": "next"
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }
