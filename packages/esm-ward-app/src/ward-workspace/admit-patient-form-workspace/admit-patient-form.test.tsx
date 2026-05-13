@@ -10,7 +10,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
-import { renderWithSwr } from 'tools';
+import { renderWithSwr, replaceProperty } from 'tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
@@ -22,16 +22,6 @@ import {
 } from '../../ward.resource';
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import useWardLocation from '../../hooks/useWardLocation';
-
-function replaceProperty<T, K extends keyof T>(obj: T, prop: K, value: T[K]) {
-  const original = obj[prop];
-  obj[prop] = value;
-  return {
-    restore() {
-      obj[prop] = original;
-    },
-  };
-}
 
 vi.mock('../../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: vi.fn(),

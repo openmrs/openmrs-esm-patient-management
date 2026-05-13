@@ -5,22 +5,12 @@ import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useAppContext, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { configSchema, type WardConfigObject } from '../config-schema';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../mock';
-import { renderWithSwr } from 'tools';
+import { renderWithSwr, replaceProperty } from 'tools';
 import { type WardViewContext } from '../types';
 import { useObs } from '../hooks/useObs';
 import useWardLocation from '../hooks/useWardLocation';
 import DefaultWardView from './default-ward/default-ward-view.component';
 import WardView from './ward-view.component';
-
-function replaceProperty<T, K extends keyof T>(obj: T, prop: K, value: T[K]) {
-  const original = obj[prop];
-  obj[prop] = value;
-  return {
-    restore() {
-      obj[prop] = original;
-    },
-  };
-}
 
 const mockUseConfig = vi.mocked(useConfig<WardConfigObject>);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
