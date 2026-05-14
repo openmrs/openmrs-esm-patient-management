@@ -1,3 +1,9 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
