@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DropdownSkeleton, InlineNotification, type OnChangeData } from '@carbon/react';
 import { useConfig, useSession, PageHeader, PageHeaderContent, ServiceQueuesPictogram } from '@openmrs/esm-framework';
@@ -25,9 +25,14 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   const { dashboardTitle } = useConfig<ConfigObject>();
   const userSession = useSession();
   const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay } = useServiceQueuesStore();
+  const hasInitializedDefaultLocation = useRef(false);
   const { queues } = useQueues();
   const showLocationDropdown = showFilters && queueLocations.length > 1;
   const showServiceDropdown = showFilters && queues.length > 1;
+  const sessionQueueLocation = useMemo(
+    () => queueLocations.find((location) => location.id === userSession?.sessionLocation?.uuid),
+    [queueLocations, userSession?.sessionLocation?.uuid],
+  );
 
   const serviceOptions = useMemo(() => {
     const options = queues
@@ -70,32 +75,30 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   );
 
   useEffect(() => {
-    if (!isLoading && !error && !selectedQueueLocationUuid) {
-      if (queueLocations.length === 1) {
-        handleQueueLocationChange({ selectedItem: queueLocations[0] });
-      }
-      if (
-        queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid) &&
-        selectedQueueLocationUuid
-      ) {
+    if (isLoading || error || hasInitializedDefaultLocation.current) {
+      return;
+    }
+
+    if (sessionQueueLocation) {
+      if (selectedQueueLocationUuid !== sessionQueueLocation.id) {
         handleQueueLocationChange({
-          selectedItem: {
-            id: userSession?.sessionLocation?.uuid,
-            name: userSession?.sessionLocation?.display,
-          },
+          selectedItem: sessionQueueLocation,
         });
       }
+      hasInitializedDefaultLocation.current = true;
+      return;
     }
-  }, [
-    selectedQueueLocationName,
-    selectedQueueLocationUuid,
-    error,
-    handleQueueLocationChange,
-    isLoading,
-    queueLocations,
-    userSession?.sessionLocation?.display,
-    userSession?.sessionLocation?.uuid,
-  ]);
+
+    if (!selectedQueueLocationUuid && queueLocations.length === 1) {
+      handleQueueLocationChange({ selectedItem: queueLocations[0] });
+      hasInitializedDefaultLocation.current = true;
+      return;
+    }
+
+    if (queueLocations.length > 0) {
+      hasInitializedDefaultLocation.current = true;
+    }
+  }, [selectedQueueLocationUuid, error, handleQueueLocationChange, isLoading, queueLocations, sessionQueueLocation]);
 
   return (
     <PageHeader className={styles.header} data-testid="patient-queue-header">
