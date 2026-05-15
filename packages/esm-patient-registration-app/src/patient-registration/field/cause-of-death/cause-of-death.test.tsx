@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -10,12 +11,12 @@ import { PatientRegistrationContextProvider } from '../../patient-registration-c
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
 
-jest.mock('../field.resource', () => ({
-  ...jest.requireActual('../field.resource'),
-  useConceptAnswers: jest.fn(),
+vi.mock('../field.resource', async () => ({
+  ...((await vi.importActual('../field.resource')) as object),
+  useConceptAnswers: vi.fn(),
 }));
 
 const mockConceptAnswers = [
@@ -52,7 +53,7 @@ const renderCauseOfDeathFieldWithFormik = (
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
+                setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
                 isOffline: false,

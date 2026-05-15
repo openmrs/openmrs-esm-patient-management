@@ -1,9 +1,10 @@
 import dayjs from 'dayjs';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { getConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../config-schema';
 import { getValidationSchema } from './patient-registration-validation';
 
-const mockGetConfig = jest.mocked(getConfig);
+const mockGetConfig = vi.mocked(getConfig);
 
 describe('Patient registration validation', () => {
   beforeEach(() => {

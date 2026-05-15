@@ -1,18 +1,19 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientAppointmentHistory } from './usePatientAppointmentHistory';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-jest.mock('./useSelectedDate', () => ({
-  useSelectedDate: jest.fn(),
+vi.mock('./useSelectedDate', () => ({
+  useSelectedDate: vi.fn(),
 }));
 
 import { useSelectedDate } from './useSelectedDate';
 
-const mockUseSelectedDate = jest.mocked(useSelectedDate);
+const mockUseSelectedDate = vi.mocked(useSelectedDate);
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SWRConfig
@@ -29,14 +30,14 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('usePatientAppointmentHistory', () => {
   beforeEach(() => {
     mockOpenmrsFetch.mockReset();
-    mockOpenmrsFetch.mockResolvedValue({ data: [] } as any);
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
     mockUseSelectedDate.mockReturnValue('2026-04-01');
   });
 
   it('fetches separately when both patientUuid and selectedDate change', async () => {
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [] } as any)
-      .mockResolvedValueOnce({ data: [{ status: 'Missed', startDateTime: Date.now() }] } as any);
+      .mockResolvedValueOnce({ data: [] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [{ status: 'Missed', startDateTime: Date.now() }] } as FetchResponse);
 
     const { rerender, result } = renderHook(({ patientUuid }) => usePatientAppointmentHistory(patientUuid), {
       wrapper,
@@ -54,7 +55,7 @@ describe('usePatientAppointmentHistory', () => {
     );
     expect(result.current.appointmentsCount.missedAppointments).toBe(0);
 
-  mockUseSelectedDate.mockReturnValue('2026-04-15');
+    mockUseSelectedDate.mockReturnValue('2026-04-15');
     rerender({ patientUuid: 'patient-2' });
 
     await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
@@ -72,9 +73,10 @@ describe('usePatientAppointmentHistory', () => {
 
   it('triggers a new fetch and returns fresh data when only patientUuid changes', async () => {
     // patient-1 returns empty; patient-2 returns one Missed appointment
+    // TODO: Refactor these mock responses using a mock factory
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [] } as any)
-      .mockResolvedValueOnce({ data: [{ status: 'Missed', startDateTime: Date.now() }] } as any);
+      .mockResolvedValueOnce({ data: [] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [{ status: 'Missed', startDateTime: Date.now() }] } as FetchResponse);
 
     const { rerender, result } = renderHook(({ patientUuid }) => usePatientAppointmentHistory(patientUuid), {
       wrapper,
@@ -102,8 +104,8 @@ describe('usePatientAppointmentHistory', () => {
 
   it('triggers a new fetch when only selectedDate changes', async () => {
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [] } as any)
-      .mockResolvedValueOnce({ data: [{ status: 'Completed', startDateTime: Date.now() }] } as any);
+      .mockResolvedValueOnce({ data: [] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [{ status: 'Completed', startDateTime: Date.now() }] } as FetchResponse);
 
     const { rerender, result } = renderHook(({ patientUuid }) => usePatientAppointmentHistory(patientUuid), {
       wrapper,

@@ -142,6 +142,7 @@
   "recurringAppointment": "תור חוזר",
   "recurringAppointmentShouldHaveEndDate": "לתור חוזר צריך להיות תאריך סיום",
   "repeatEvery": "חוזר כל",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "שמירה וסגירה",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "בקרוב",
   "upcomingAppointments": "תורים עתידיים",
   "updateError": "Error updating upcoming appointment",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Week",
   "yes": "כן"

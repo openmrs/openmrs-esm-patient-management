@@ -78,7 +78,7 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
       showToast({
         title: t('invalidColumnConfig', 'Invalid column config'),
         kind: 'warning',
-        description: 'Unknown column id: ' + columnId,
+        description: `Unknown column id: ${columnId}`,
       });
     }
     return column;
@@ -133,7 +133,7 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
       return queueTableExtensionColumn(id, translatedHeader);
     }
     default: {
-      throw new Error('Unknown column type from configuration: ' + columnType);
+      throw new Error(`Unknown column type from configuration: ${columnType}`);
     }
   }
 }

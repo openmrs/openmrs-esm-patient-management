@@ -142,6 +142,7 @@
   "recurringAppointment": "გამეორებადი მიღება",
   "recurringAppointmentShouldHaveEndDate": "A recurring appointment should have an end date",
   "repeatEvery": "მეორდება ყოველ",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "შენახვა და დახურვა",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "მოახლოებული",
   "upcomingAppointments": "მომავალი მიღებები",
   "updateError": "მომავალი მიღების ჩასწორების შეცდომა",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "კვირა",
   "yes": "დიახ"

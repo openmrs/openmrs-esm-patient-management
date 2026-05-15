@@ -142,6 +142,7 @@
   "recurringAppointment": "Cuộc hẹn định kỳ",
   "recurringAppointmentShouldHaveEndDate": "Một cuộc hẹn định kỳ phải có ngày kết thúc",
   "repeatEvery": "Lặp lại mỗi",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "Lưu và đóng",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Sắp tới",
   "upcomingAppointments": "Cuộc hẹn sắp tới",
   "updateError": "Error updating upcoming appointment",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Tuần",
   "yes": "Có"

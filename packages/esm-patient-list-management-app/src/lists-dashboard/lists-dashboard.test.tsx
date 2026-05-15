@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
@@ -6,13 +7,13 @@ import { type FetchResponse, openmrsFetch, restBaseUrl, useSession } from '@open
 import { mockSession } from '__mocks__';
 import ListsDashboard from './lists-dashboard.component';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockUseLocation = jest.mocked(useLocation);
-const mockUseSession = jest.mocked(useSession);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockUseLocation = vi.mocked(useLocation);
+const mockUseSession = vi.mocked(useSession);
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as object),
+  useLocation: vi.fn(),
 }));
 
 describe('ListsDashboard', () => {

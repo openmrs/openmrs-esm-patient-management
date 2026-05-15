@@ -142,6 +142,7 @@
   "recurringAppointment": "Recurring Takim",
   "recurringAppointmentShouldHaveEndDate": "A recurring takim duhet keni an përfundo data",
   "repeatEvery": "Repeat every",
+  "Requested": "Requested",
   "SAT": "SAT",
   "saveAndClose": "Ruaj dhe mbyll",
   "saving": "Saving",
@@ -175,7 +176,9 @@
   "upcoming": "Upcoming",
   "upcomingAppointments": "Upcoming takime",
   "updateError": "Gabim duke përditësuar upcoming takim",
+  "Virtual": "Virtual",
   "visitStartTime": "Visit start time",
+  "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Javë",
   "yes": "Po"
