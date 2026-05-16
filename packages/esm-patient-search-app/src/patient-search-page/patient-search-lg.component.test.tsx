@@ -6,7 +6,7 @@ import PatientSearchComponent from './patient-search-lg.component';
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback: string, options?: any) => {
+    t: (key: string, fallback: string, options?: Record<string, unknown>) => {
       if (key === 'searchResultsCount' && options) {
         return `${options.count} search result`;
       }

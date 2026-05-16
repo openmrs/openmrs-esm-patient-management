@@ -12,8 +12,8 @@ interface AdvancedPatientSearchProps extends PatientSearchCallbackProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
-  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
-  closeWorkspace?(): void;
+  launchChildWorkspace?: (workspaceName: string, workspaceProps?: object) => Promise<void>;
+  closeWorkspace?: () => Promise<boolean>;
   startVisitWorkspaceName?: string;
 }
 

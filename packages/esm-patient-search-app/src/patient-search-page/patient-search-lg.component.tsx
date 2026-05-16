@@ -19,8 +19,8 @@ interface PatientSearchComponentProps extends PatientSearchCallbackProps {
   searchResults: Array<SearchedPatient>;
   isLoading: boolean;
   fetchError: Error | null;
-  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
-  closeWorkspace?(): void;
+  launchChildWorkspace?: (workspaceName: string, workspaceProps?: object) => Promise<void>;
+  closeWorkspace?: () => Promise<boolean>;
   startVisitWorkspaceName?: string;
 }
 

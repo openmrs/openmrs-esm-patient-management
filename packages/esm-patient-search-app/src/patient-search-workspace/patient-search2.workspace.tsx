@@ -8,12 +8,6 @@ import AdvancedPatientSearchComponent from '../patient-search-page/advanced-pati
 export interface PatientSearchWorkspaceProps extends PatientSearchCallbackProps {
   initialQuery?: string;
   workspaceTitle: string;
-  onPatientSelected?(
-    patientUuid: string,
-    patient: fhir.Patient,
-    launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
-    closeWorkspace: () => void,
-  ): void;
 }
 
 export interface PatientSearchWorkspaceWindowProps {

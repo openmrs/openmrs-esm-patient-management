@@ -98,7 +98,7 @@ export function useLocations(
 export function usePersonAttributeType(personAttributeTypeUuid: string): {
   data: PersonAttributeTypeResponse | undefined;
   isLoading: boolean;
-  error: Error | undefined;
+  error: Error;
 } {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>, Error>(
     `${restBaseUrl}/personattributetype/${personAttributeTypeUuid}`,

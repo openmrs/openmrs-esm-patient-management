@@ -21,16 +21,16 @@ import styles from './patient-banner.scss';
 interface ClickablePatientContainerProps extends PatientSearchCallbackProps {
   children: React.ReactNode;
   patient: fhir.Patient;
-  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
-  closeWorkspace?(): void;
+  launchChildWorkspace?: (workspaceName: string, workspaceProps?: object) => Promise<void>;
+  closeWorkspace?: () => Promise<boolean>;
 }
 
 interface PatientBannerProps extends PatientSearchCallbackProps {
   patient: SearchedPatient;
   patientUuid: string;
   hideActionsOverflow?: boolean;
-  launchChildWorkspace?(workspaceName: string, workspaceProps?: object): void;
-  closeWorkspace?(): void;
+  launchChildWorkspace?: (workspaceName: string, workspaceProps?: object) => Promise<void>;
+  closeWorkspace?: () => Promise<boolean>;
   startVisitWorkspaceName?: string;
 }
 

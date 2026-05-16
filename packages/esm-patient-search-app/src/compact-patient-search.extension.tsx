@@ -5,6 +5,7 @@ import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from './config-schema';
 import { useInfinitePatientSearch } from './patient-search.resource';
 import { type PatientSearchCallbackProps } from './types';
+import { mapToFhirPatient } from './utils/fhir-mapper';
 import useArrowNavigation from './hooks/useArrowNavigation';
 import PatientSearch from './compact-patient-search/patient-search.component';
 import styles from './compact-patient-search.scss';
@@ -18,7 +19,7 @@ interface CompactPatientSearchProps extends PatientSearchCallbackProps {
  * CompactPatientSearchExtension renders the inline search bar used in the top navigation menu.
  *
  * It is primarily used in desktop views. In tablet/mobile views, the search bar is hidden
- * behind a magnifying glass icon (PatientSearchButton) that opens the PatientSearchOverlay instead.
+ * behind a magnifying glass icon (PatientSearchIcon) that opens the PatientSearchOverlay instead.
  */
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   onPatientSelected,
@@ -47,14 +48,16 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handlePatientSelection = useCallback(
     (event, index: number) => {
       event.preventDefault();
-      if (onPatientSelected) {
-        onPatientSelected(patients[index].uuid, null);
-      } else {
-        navigate({
-          to: interpolateString(config.search.patientChartUrl, {
-            patientUuid: patients[index].uuid,
-          }),
-        });
+      if (patients?.[index]) {
+        if (onPatientSelected) {
+          onPatientSelected(patients[index].uuid, mapToFhirPatient(patients[index]));
+        } else {
+          navigate({
+            to: interpolateString(config.search.patientChartUrl, {
+              patientUuid: patients[index].uuid,
+            }),
+          });
+        }
       }
       handleClear();
     },
