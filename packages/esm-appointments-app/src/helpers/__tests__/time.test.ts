@@ -1,4 +1,5 @@
 import { convertTime12to24 } from '../time';
+import { vi, describe, it, expect } from 'vitest';
 
 describe('convertTime12to24', () => {
   describe('AM conversion', () => {

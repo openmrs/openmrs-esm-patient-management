@@ -16,8 +16,8 @@
     "typescript": "tsc",
     "verify": "turbo lint typescript test --color",
     "extract-translations": "i18next 'src/**/*.{component.tsx,tsx}' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "coverage": "yarn test --coverage"
+    "test": "vitest run --passWithNoTests",
+    "coverage": "vitest run --coverage --passWithNoTests"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -43,6 +43,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "openmrs": "next"
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }

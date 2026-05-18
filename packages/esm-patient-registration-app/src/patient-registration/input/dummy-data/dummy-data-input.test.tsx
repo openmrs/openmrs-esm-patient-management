@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DummyDataInput, dummyFormValues } from './dummy-data-input.component';
@@ -38,7 +39,7 @@ describe('DummyDataInput component', () => {
   describe('User interaction', () => {
     it('populates form values with dummy data when button is clicked', async () => {
       const user = userEvent.setup();
-      const mockSetValues = jest.fn();
+      const mockSetValues = vi.fn();
       renderDummyDataInput(mockSetValues);
 
       const button = screen.getByLabelText('Input Dummy Data');
@@ -50,7 +51,7 @@ describe('DummyDataInput component', () => {
 
     it('can be clicked multiple times', async () => {
       const user = userEvent.setup();
-      const mockSetValues = jest.fn();
+      const mockSetValues = vi.fn();
       renderDummyDataInput(mockSetValues);
 
       const button = screen.getByLabelText('Input Dummy Data');

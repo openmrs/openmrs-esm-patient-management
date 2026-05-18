@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockQueueEntryAlice, mockQueues } from '__mocks__';
@@ -6,26 +7,26 @@ import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import MoveQueueEntryModal from './move-queue-entry.modal';
 
-const mockMutateQueueEntries = jest.fn();
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockMutateQueueEntries = vi.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-jest.mock('../hooks/useQueues', () => ({
-  useQueues: jest.fn().mockReturnValue({ queues: mockQueues }),
+vi.mock('../hooks/useQueues', () => ({
+  useQueues: vi.fn().mockReturnValue({ queues: mockQueues }),
 }));
 
-jest.mock('../hooks/useQueueEntries', () => ({
+vi.mock('../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({
     mutateQueueEntries: mockMutateQueueEntries,
   }),
 }));
 
-const mockUseQueueEntry = jest.fn();
-jest.mock('../hooks/useQueueEntry', () => ({
+const mockUseQueueEntry = vi.fn();
+vi.mock('../hooks/useQueueEntry', () => ({
   useQueueEntry: (...args: unknown[]) => mockUseQueueEntry(...args),
 }));
 
 describe('MoveQueueEntryModal', () => {
-  const closeModal = jest.fn();
+  const closeModal = vi.fn();
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue({

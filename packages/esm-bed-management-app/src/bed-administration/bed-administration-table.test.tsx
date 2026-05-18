@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
@@ -6,14 +7,14 @@ import { renderWithSwr } from 'tools';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import BedAdministrationTable from './bed-administration-table.component';
 
-jest.mock('../summary/summary.resource', () => ({
-  useBedsGroupedByLocation: jest.fn(),
+vi.mock('../summary/summary.resource', () => ({
+  useBedsGroupedByLocation: vi.fn(),
 }));
 
-const mockUseBedsGroupedByLocation = jest.mocked(useBedsGroupedByLocation);
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+const mockUseBedsGroupedByLocation = vi.mocked(useBedsGroupedByLocation);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
-const mockMutateBeds = jest.fn();
+const mockMutateBeds = vi.fn();
 
 const mockBeds = [
   [
