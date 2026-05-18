@@ -89,7 +89,7 @@ export default function PatientDischargeWorkspace({
         <div className={styles.patientWorkspaceBanner}>
           <WardPatientWorkspaceBanner wardPatient={wardPatient} />
         </div>
-        <Form className={styles.workspaceForm} onSubmit={onSubmit}>
+        <Form aria-label={t('discharge', 'Discharge')} className={styles.workspaceForm} onSubmit={onSubmit}>
           <div>
             {errorFetchingEmrConfiguration && (
               <div>

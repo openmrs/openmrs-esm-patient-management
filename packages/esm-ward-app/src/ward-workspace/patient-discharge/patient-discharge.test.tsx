@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { closeWorkspaceGroup2, showSnackbar, useAppContext, type FetchResponse } from '@openmrs/esm-framework';
 import { useCreateEncounter, removePatientFromBed } from '../../ward.resource';
 import PatientDischargeWorkspace from './patient-discharge.workspace';
@@ -8,18 +8,24 @@ import { mockInpatientRequestAlice, mockPatientAlice, mockVisitAlice } from '__m
 import type { WardPatient, WardPatientWorkspaceDefinition, WardViewContext } from '../../types';
 import type { EmrApiConfigurationResponse } from '../../hooks/useEmrConfiguration';
 
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseCreateEncounter = jest.mocked(useCreateEncounter);
-const mockRemovePatientFromBed = jest.mocked(removePatientFromBed);
-const mockUseAppContext = jest.mocked(useAppContext);
-const mockCloseWorkspaceGroup2 = jest.mocked(closeWorkspaceGroup2);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseCreateEncounter = vi.mocked(useCreateEncounter);
+const mockRemovePatientFromBed = vi.mocked(removePatientFromBed);
+const mockUseAppContext = vi.mocked(useAppContext);
+const mockCloseWorkspaceGroup2 = vi.mocked(closeWorkspaceGroup2);
 
-jest.mock('../../ward.resource', () => ({
-  useCreateEncounter: jest.fn(),
-  removePatientFromBed: jest.fn(),
+vi.mock('../../ward.resource', () => ({
+  useCreateEncounter: vi.fn(),
+  removePatientFromBed: vi.fn(),
 }));
 
-jest.mock('../patient-banner/patient-banner.component', () => () => <div>patient-banner</div>);
+vi.mock('../patient-banner/patient-banner.component', () => ({
+  default: () => <div>patient-banner</div>,
+}));
+
+function submitDischargeForm() {
+  fireEvent.submit(screen.getByRole('form', { name: /discharge/i }));
+}
 
 const mockWardPatient: WardPatient = {
   patient: mockPatientAlice,
@@ -45,8 +51,8 @@ const mockWardPatient: WardPatient = {
 
 const testProps: WardPatientWorkspaceDefinition = {
   groupProps: { wardPatient: mockWardPatient },
-  closeWorkspace: jest.fn(),
-  launchChildWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
+  launchChildWorkspace: vi.fn(),
   showActionMenu: false,
   workspaceProps: null,
   windowProps: null,
@@ -56,8 +62,8 @@ const testProps: WardPatientWorkspaceDefinition = {
 };
 
 describe('PatientDischargeWorkspace', () => {
-  const mockCreateEncounter = jest.fn();
-  const mockWardPatientMutate = jest.fn();
+  const mockCreateEncounter = vi.fn();
+  const mockWardPatientMutate = vi.fn();
 
   beforeEach(() => {
     mockUseCreateEncounter.mockReturnValue({
@@ -106,7 +112,7 @@ describe('PatientDischargeWorkspace', () => {
     await user.clear(noteInput);
     await user.type(noteInput, 'Patient recovered');
 
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockCreateEncounter).toHaveBeenCalledWith(
@@ -134,14 +140,12 @@ describe('PatientDischargeWorkspace', () => {
   });
 
   it('submits discharge without note, removes patient from bed, and shows success snackbar', async () => {
-    const user = userEvent.setup();
-
     mockCreateEncounter.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
     mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
 
     render(<PatientDischargeWorkspace {...testProps} />);
 
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockCreateEncounter).toHaveBeenCalledWith(
@@ -176,10 +180,9 @@ describe('PatientDischargeWorkspace', () => {
     const noteInput = screen.getByPlaceholderText(/write any notes here/i);
     await user.type(noteInput, 'Patient recovered');
 
-    const dischargeButton = screen.getByRole('button', { name: /Confirm discharge/i });
-    expect(dischargeButton).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Confirm discharge/i })).toBeEnabled();
 
-    await user.click(dischargeButton);
+    submitDischargeForm();
 
     // Button should show loading state
     await waitFor(() => {
@@ -204,7 +207,7 @@ describe('PatientDischargeWorkspace', () => {
     const noteInput = screen.getByPlaceholderText(/write any notes here/i);
     await user.type(noteInput, 'Patient recovered');
 
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     // Wait for loading state to appear, then check if cancel button is disabled
     await waitFor(() => {
@@ -220,14 +223,13 @@ describe('PatientDischargeWorkspace', () => {
   });
 
   it('shows globalErrors message when available in error response', async () => {
-    const user = userEvent.setup();
     mockCreateEncounter.mockRejectedValueOnce({
       responseBody: { error: { globalErrors: [{ message: 'Global validation error' }] } },
     });
 
     render(<PatientDischargeWorkspace {...testProps} />);
 
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -246,7 +248,7 @@ describe('PatientDischargeWorkspace', () => {
 
     const noteInput = screen.getByPlaceholderText(/write any notes here/i);
     await user.type(noteInput, 'Patient recovered');
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -266,7 +268,7 @@ describe('PatientDischargeWorkspace', () => {
 
     const noteInput = screen.getByPlaceholderText(/write any notes here/i);
     await user.type(noteInput, 'Patient recovered');
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -285,7 +287,7 @@ describe('PatientDischargeWorkspace', () => {
 
     const noteInput = screen.getByPlaceholderText(/write any notes here/i);
     await user.type(noteInput, 'Patient recovered');
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
@@ -304,7 +306,7 @@ describe('PatientDischargeWorkspace', () => {
     await user.type(noteInput, 'Patient recovered');
 
     const dischargeButton = screen.getByRole('button', { name: /Confirm discharge/i });
-    await user.click(dischargeButton);
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
