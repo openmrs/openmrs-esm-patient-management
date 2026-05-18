@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -7,6 +10,7 @@ import PatientDischargeWorkspace from './patient-discharge.workspace';
 import { mockInpatientRequestAlice, mockPatientAlice, mockVisitAlice } from '__mocks__';
 import type { WardPatient, WardPatientWorkspaceDefinition, WardViewContext } from '../../types';
 import type { EmrApiConfigurationResponse } from '../../hooks/useEmrConfiguration';
+import { expect, vi, describe, it, beforeEach } from 'vitest';
 
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseCreateEncounter = vi.mocked(useCreateEncounter);
