@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import {
@@ -9,7 +16,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
-import { renderWithSwr } from 'tools';
+import { renderWithSwr, replaceProperty } from 'tools';
 import { mockWardPatientGroupDetails, mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
 import type { WardPatient, WardPatientWorkspaceProps, WardViewContext } from '../../types';
@@ -22,54 +29,54 @@ import {
 import AdmitPatientFormWorkspace from './admit-patient-form.workspace';
 import useWardLocation from '../../hooks/useWardLocation';
 
-jest.mock('../../hooks/useAdmissionLocation', () => ({
-  useAdmissionLocation: jest.fn(),
+vi.mock('../../hooks/useAdmissionLocation', () => ({
+  useAdmissionLocation: vi.fn(),
 }));
 
-jest.mock('../../hooks/useWardLocation', () => jest.fn());
+vi.mock('../../hooks/useWardLocation', () => ({ default: vi.fn() }));
 
-jest.mock('../../hooks/useInpatientRequest', () => ({
-  useInpatientRequest: jest.fn(),
+vi.mock('../../hooks/useInpatientRequest', () => ({
+  useInpatientRequest: vi.fn(),
 }));
 
-jest.mock('../../hooks/useWardPatientGrouping', () => ({
-  useWardPatientGrouping: jest.fn(),
+vi.mock('../../hooks/useWardPatientGrouping', () => ({
+  useWardPatientGrouping: vi.fn(),
 }));
 
-jest.mock('../../hooks/useInpatientAdmission', () => ({
-  useInpatientAdmission: jest.fn(),
+vi.mock('../../hooks/useInpatientAdmission', () => ({
+  useInpatientAdmission: vi.fn(),
 }));
 
-jest.mock('../../hooks/useAssignedBedByPatient', () => ({
-  useAssignedBedByPatient: jest.fn(),
+vi.mock('../../hooks/useAssignedBedByPatient', () => ({
+  useAssignedBedByPatient: vi.fn(),
 }));
 
-jest.mock('../../ward.resource', () => ({
-  useAdmitPatient: jest.fn(),
-  assignPatientToBed: jest.fn(),
-  removePatientFromBed: jest.fn(),
-  getAssignedBedByPatient: jest.fn(),
+vi.mock('../../ward.resource', () => ({
+  useAdmitPatient: vi.fn(),
+  assignPatientToBed: vi.fn(),
+  removePatientFromBed: vi.fn(),
+  getAssignedBedByPatient: vi.fn(),
 }));
 
-const mockedUseWardLocation = jest.mocked(useWardLocation);
-const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
-const mockedShowSnackbar = jest.mocked(showSnackbar);
-const mockedUseSession = jest.mocked(useSession);
-const mockedUseAssignedBedByPatient = jest.mocked(useAssignedBedByPatient);
-const mockedAssignPatientToBed = jest.mocked(assignPatientToBed);
-const mockedRemovePatientFromBed = jest.mocked(removePatientFromBed);
-const mockedUseAdmitPatient = jest.mocked(useAdmitPatient);
-const mockedGetAssignedBedByPatient = jest.mocked(getAssignedBedByPatient);
+const mockedUseWardLocation = vi.mocked(useWardLocation);
+const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
+const mockedShowSnackbar = vi.mocked(showSnackbar);
+const mockedUseSession = vi.mocked(useSession);
+const mockedUseAssignedBedByPatient = vi.mocked(useAssignedBedByPatient);
+const mockedAssignPatientToBed = vi.mocked(assignPatientToBed);
+const mockedRemovePatientFromBed = vi.mocked(removePatientFromBed);
+const mockedUseAdmitPatient = vi.mocked(useAdmitPatient);
+const mockedGetAssignedBedByPatient = vi.mocked(getAssignedBedByPatient);
 
-jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+vi.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
-const mockedAdmitPatient = jest.fn();
+const mockedAdmitPatient = vi.fn();
 const mockUseAdmitPatientObj: ReturnType<typeof useAdmitPatient> = {
   admitPatient: mockedAdmitPatient,
   isLoadingEmrConfiguration: false,
   errorFetchingEmrConfiguration: false,
 };
-jest.mocked(useAdmitPatient).mockReturnValue(mockUseAdmitPatientObj);
+vi.mocked(useAdmitPatient).mockReturnValue(mockUseAdmitPatientObj);
 
 const mockWardPatientAliceProps: WardPatient = {
   visit: mockInpatientRequestAlice.visit,
@@ -80,8 +87,8 @@ const mockWardPatientAliceProps: WardPatient = {
 };
 
 const mockWorkspaceProps: Workspace2DefinitionProps<WardPatientWorkspaceProps, {}, {}> = {
-  closeWorkspace: jest.fn(),
-  launchChildWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {
     wardPatient: mockWardPatientAliceProps,
   },
@@ -193,7 +200,7 @@ describe('Testing AdmitPatientForm', () => {
 
   it('should render admit patient form if bed management module is present, but no beds are configured', () => {
     mockedUseFeatureFlag.mockReturnValue(true);
-    const replacedProperty = jest.replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
+    const replacedProperty = replaceProperty(mockWardPatientGroupDetails(), 'bedLayouts', []);
     renderAdmissionForm();
     expect(screen.getByText('Select a bed')).toBeInTheDocument();
     expect(screen.getByText(/No beds configured/i)).toBeInTheDocument();

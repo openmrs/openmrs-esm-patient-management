@@ -1,23 +1,24 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { batchClearQueueEntries } from './clear-queue-entries.resource';
 import ClearQueueEntriesModal from './clear-queue-entries.modal';
 
-const mockBatchClearQueueEntries = jest.mocked(batchClearQueueEntries);
-const mockCloseModal = jest.fn();
+const mockBatchClearQueueEntries = vi.mocked(batchClearQueueEntries);
+const mockCloseModal = vi.fn();
 
 const defaultProps = {
   queueEntries: [],
   closeModal: mockCloseModal,
 };
 
-jest.mock('./clear-queue-entries.resource', () => ({
-  batchClearQueueEntries: jest.fn(),
+vi.mock('./clear-queue-entries.resource', () => ({
+  batchClearQueueEntries: vi.fn(),
 }));
 
-jest.mock('../../hooks/useQueueEntries', () => ({
-  useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
+vi.mock('../../hooks/useQueueEntries', () => ({
+  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
 
 describe('ClearQueueEntriesModal Component', () => {

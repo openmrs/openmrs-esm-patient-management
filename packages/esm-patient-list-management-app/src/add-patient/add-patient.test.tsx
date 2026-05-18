@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
@@ -6,24 +7,24 @@ import { useAddablePatientLists } from '../api/patient-list.resource';
 import { mockPatient } from '__mocks__';
 import AddPatient from './add-patient.modal';
 
-const mockNavigate = jest.mocked(navigate);
-const mockUseAddablePatientLists = jest.mocked(useAddablePatientLists);
-const mockCloseModal = jest.fn();
+const mockNavigate = vi.mocked(navigate);
+const mockUseAddablePatientLists = vi.mocked(useAddablePatientLists);
+const mockCloseModal = vi.fn();
 
-jest.mock('../api/patient-list.resource', () => ({
-  useAddablePatientLists: jest.fn(),
+vi.mock('../api/patient-list.resource', () => ({
+  useAddablePatientLists: vi.fn(),
 }));
 
 describe('AddPatientModal', () => {
   beforeEach(() => {
     mockUseAddablePatientLists.mockReturnValue({
       data: [
-        { id: 'list1', displayName: 'List 1', addPatient: jest.fn() },
-        { id: 'list2', displayName: 'List 2', addPatient: jest.fn() },
+        { id: 'list1', displayName: 'List 1', addPatient: vi.fn() },
+        { id: 'list2', displayName: 'List 2', addPatient: vi.fn() },
       ],
       isLoading: false,
       error: null,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       isValidating: false,
     });
   });
