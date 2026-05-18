@@ -31,7 +31,7 @@ export default function PatientDischargeWorkspace({
       setIsSubmitting(true);
 
       try {
-        const note = dischargeNote;
+        const note = dischargeNote.trim();
         const obs: Array<ObsPayload> = [];
 
         if (note) {

@@ -167,6 +167,40 @@ describe('PatientDischargeWorkspace', () => {
     expect(mockCloseWorkspaceGroup2).toHaveBeenCalled();
   });
 
+  it('submits discharge with whitespace-only note as empty obs, removes patient from bed, and shows success snackbar', async () => {
+    const user = userEvent.setup();
+
+    mockCreateEncounter.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
+    mockRemovePatientFromBed.mockResolvedValueOnce({ ok: true } as unknown as FetchResponse);
+
+    render(<PatientDischargeWorkspace {...testProps} />);
+
+    const noteInput = screen.getByPlaceholderText(/write any notes here/i);
+    await user.clear(noteInput);
+    await user.type(noteInput, '   ');
+
+    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+
+    await waitFor(() => {
+      expect(mockCreateEncounter).toHaveBeenCalledWith(
+        mockWardPatient.patient,
+        { uuid: 'exit-encounter', display: '' },
+        mockWardPatient.visit.uuid,
+        [],
+      );
+    });
+
+    // Then verify all other calls happened
+    expect(mockRemovePatientFromBed).toHaveBeenCalledWith(mockWardPatient.bed.id, mockWardPatient.patient.uuid);
+    expect(mockWardPatientMutate).toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      title: 'Patient was discharged',
+      kind: 'success',
+    });
+    expect(testProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
+    expect(mockCloseWorkspaceGroup2).toHaveBeenCalled();
+  });
+
   it('disables discharge button during submission', async () => {
     const user = userEvent.setup();
 
