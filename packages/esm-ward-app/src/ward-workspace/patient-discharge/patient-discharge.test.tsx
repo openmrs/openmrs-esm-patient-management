@@ -1,6 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -183,7 +180,7 @@ describe('PatientDischargeWorkspace', () => {
     await user.clear(noteInput);
     await user.type(noteInput, '   ');
 
-    await user.click(screen.getByRole('button', { name: /Confirm discharge/i }));
+    submitDischargeForm();
 
     await waitFor(() => {
       expect(mockCreateEncounter).toHaveBeenCalledWith(
