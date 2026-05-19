@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { showSnackbar, useLayoutType, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
@@ -6,33 +13,33 @@ import { useSWRConfig } from 'swr';
 import { saveQueue } from './queue.resource';
 import QueueForm from './queue-form.workspace';
 
-jest.mock('swr', () => ({
-  useSWRConfig: jest.fn(),
+vi.mock('swr', () => ({
+  useSWRConfig: vi.fn(),
 }));
 
 const defaultProps = {
-  closeWorkspace: jest.fn(),
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  launchChildWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
+  promptBeforeClosing: vi.fn(),
+  setTitle: vi.fn(),
+  launchChildWorkspace: vi.fn(),
 };
 
-const mockSaveQueue = jest.mocked(saveQueue);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockMutate = jest.fn();
+const mockSaveQueue = vi.mocked(saveQueue);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockMutate = vi.fn();
 
-jest.mock('./queue.resource', () => ({
+vi.mock('./queue.resource', () => ({
   useServiceConcepts: () => ({
     queueConcepts: [
       { uuid: '6f017eb0-b035-4acd-b284-da45f5067502', display: 'Concept 1' },
       { uuid: '5f017eb0-b035-4acd-b284-da45f5067502', display: 'Concept 2' },
     ],
   }),
-  saveQueue: jest.fn().mockResolvedValue({ status: 201 }),
+  saveQueue: vi.fn().mockResolvedValue({ status: 201 }),
 }));
 
-jest.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
+vi.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
   useQueueLocations: () => ({
     queueLocations: [
       { id: '34567eb0-b035-4acd-b284-da45f5067502', name: 'Location 1' },
@@ -43,14 +50,14 @@ jest.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
   }),
 }));
 
-jest.mock('../../hooks/useQueues', () => ({
-  useQueues: jest.fn(() => ({ queues: [] })),
+vi.mock('../../hooks/useQueues', () => ({
+  useQueues: vi.fn(() => ({ queues: [] })),
 }));
 
 describe('QueueForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
-    (useSWRConfig as jest.Mock).mockReturnValue({ mutate: mockMutate });
+    (useSWRConfig as Mock).mockReturnValue({ mutate: mockMutate });
   });
 
   it('renders validation errors when form is submitted with missing fields', async () => {

@@ -13,6 +13,7 @@ type InfinitePatientSearchResponse = FetchResponse<{
 const patientProperties = [
   'patientId',
   'uuid',
+  'voided',
   'identifiers',
   'display',
   'patientIdentifier:(uuid,identifier)',
@@ -138,6 +139,10 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 
   const updateRecentlyViewedPatients = useCallback(
     (patientUuid: string) => {
+      if (!url) {
+        return Promise.resolve();
+      }
+
       const uniquePatients = Array.from(new Set([patientUuid, ...patientsVisited]));
       const mostRecentPatients = uniquePatients.slice(0, 10);
       const newUserProperties = { ...userProperties, patientsVisited: mostRecentPatients.join(',') };
@@ -214,13 +219,15 @@ export function useRestPatients(
     },
   );
 
-  // Filter out null patients and patients with null person property to prevent errors
+  // Filter out null, voided, and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
   // (in the hook) to ensure all consumers receive clean, valid data.
   const mappedData =
     data
       ?.flatMap((res) => res.data)
-      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
+      ?.filter(
+        (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
+      ) ?? null;
 
   return useMemo(
     () => ({

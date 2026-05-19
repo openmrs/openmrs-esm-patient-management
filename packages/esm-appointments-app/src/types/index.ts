@@ -13,13 +13,14 @@ export interface AppointmentLocation {
   name: string;
 }
 
-// note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
+// Translation keys for these enum values are in src/constants.ts (scanned by extract-translations)
 export enum AppointmentStatus {
+  REQUESTED = 'Requested',
   SCHEDULED = 'Scheduled',
-  CANCELLED = 'Cancelled',
-  MISSED = 'Missed',
   CHECKEDIN = 'CheckedIn',
   COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+  MISSED = 'Missed',
 }
 
 export enum AppointmentKind {
@@ -32,22 +33,22 @@ export interface Appointment {
   appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
-  endDateTime: Date | number | any;
+  endDateTime: number | null;
   location: AppointmentLocation;
+  // note: this is not a standard OpenMRS Patient object
   patient: {
     identifier: string;
-    identifiers: Array<Identifier>;
     name: string;
     uuid: string;
-    age?: string;
+    age?: number;
     gender?: string;
   };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: string | any;
-  dateAppointmentScheduled: string | any;
+  startDateTime: number | null;
+  dateAppointmentScheduled: number | null;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -108,7 +109,7 @@ export interface Observation {
       display: string;
     };
   }>;
-  value: any;
+  value: string | number | boolean | OpenmrsResource;
   obsDatetime: string;
 }
 
@@ -130,7 +131,7 @@ export interface AppointmentPayload {
 
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
-  missedAppointmentsCount;
+  missedAppointmentsCount: number;
   appointmentDate: number;
   appointmentServiceUuid: string;
 }
@@ -183,4 +184,18 @@ export interface RecurringAppointmentsPayload {
 
 export interface PatientDetails {
   dateOfBirth: string;
+}
+
+export interface AppointmentsAppContext {
+  appointmentForSelectedDateFilteredByServiceTypes: Array<Appointment>;
+  isLoading: boolean;
+  error: Error | undefined;
+}
+
+export interface UnscheduledAppointment {
+  name: string;
+  age: number;
+  gender: string;
+  identifier: string;
+  phoneNumber?: string;
 }

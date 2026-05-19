@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
@@ -8,21 +9,21 @@ import { serveQueueEntry, updateQueueEntry } from '../../service-queues.resource
 import { requeueQueueEntry } from './call-queue-entry.resource';
 import CallQueueEntryModal from './call-queue-entry.modal';
 
-const mockNavigate = jest.mocked(navigate);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockNavigate = vi.mocked(navigate);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-jest.mock('../../service-queues.resource', () => ({
-  ...jest.requireActual('../../service-queues.resource'),
-  serveQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
-  updateQueueEntry: jest.fn().mockResolvedValue({ status: 201 }),
+vi.mock('../../service-queues.resource', async () => ({
+  ...((await vi.importActual('../../service-queues.resource')) as object),
+  serveQueueEntry: vi.fn().mockResolvedValue({ status: 200 }),
+  updateQueueEntry: vi.fn().mockResolvedValue({ status: 201 }),
 }));
 
-jest.mock('../../hooks/useQueueEntries', () => ({
-  useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
+vi.mock('../../hooks/useQueueEntries', () => ({
+  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
 
-jest.mock('./call-queue-entry.resource', () => ({
-  requeueQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
+vi.mock('./call-queue-entry.resource', () => ({
+  requeueQueueEntry: vi.fn().mockResolvedValue({ status: 200 }),
 }));
 
 describe('MoveQueueEntryModal', () => {
@@ -37,7 +38,7 @@ describe('MoveQueueEntryModal', () => {
   });
 
   it('renders modal content', () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     expect(screen.getByText(/Serve patient/i)).toBeInTheDocument();
@@ -47,7 +48,7 @@ describe('MoveQueueEntryModal', () => {
   it('handles requeueing patient', async () => {
     const user = userEvent.setup();
 
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Requeue'));
@@ -62,7 +63,7 @@ describe('MoveQueueEntryModal', () => {
   it('handles serving patient', async () => {
     const user = userEvent.setup();
 
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
 
     await user.click(screen.getByText('Serve'));

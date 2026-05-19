@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import {
@@ -13,29 +14,29 @@ import type { OpenmrsCohort, CohortType } from '../api/types';
 import PatientListFormWorkspace from './patient-list-form.workspace';
 import type { PatientListFormWorkspaceProps } from './patient-list-form.workspace';
 
-const mockCreatePatientList = jest.fn();
-const mockEditPatientList = jest.fn();
-const mockExtractErrorMessagesFromResponse = jest.fn();
+const mockCreatePatientList = vi.fn();
+const mockEditPatientList = vi.fn();
+const mockExtractErrorMessagesFromResponse = vi.fn();
 
-jest.mock('../api/patient-list.resource', () => ({
+vi.mock('../api/patient-list.resource', () => ({
   createPatientList: (...args: unknown[]) => mockCreatePatientList(...args),
   editPatientList: (...args: unknown[]) => mockEditPatientList(...args),
   extractErrorMessagesFromResponse: (...args: unknown[]) => mockExtractErrorMessagesFromResponse(...args),
 }));
 
-const mockUseCohortTypes = jest.fn();
+const mockUseCohortTypes = vi.fn();
 
-jest.mock('../api/hooks', () => ({
+vi.mock('../api/hooks', () => ({
   useCohortTypes: () => mockUseCohortTypes(),
 }));
 
-const mockUseSession = jest.mocked(useSession);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockGetCoreTranslation = jest.mocked(getCoreTranslation);
+const mockUseSession = vi.mocked(useSession);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockGetCoreTranslation = vi.mocked(getCoreTranslation);
 
-const mockCloseWorkspace = jest.fn();
-const mockOnSuccess = jest.fn();
+const mockCloseWorkspace = vi.fn();
+const mockOnSuccess = vi.fn();
 
 const mockCohortTypes: CohortType[] = [
   { uuid: 'type-1', display: 'My List' },
@@ -69,7 +70,7 @@ function createMockWorkspace2Props(
     groupProps: null,
     workspaceName: 'patient-list-form-workspace',
     isRootWorkspace: true,
-    launchChildWorkspace: jest.fn(),
+    launchChildWorkspace: vi.fn(),
   } as unknown as Workspace2DefinitionProps<PatientListFormWorkspaceProps>;
 }
 
@@ -81,7 +82,7 @@ describe('PatientListFormWorkspace', () => {
       listCohortTypes: mockCohortTypes,
       isLoading: false,
       error: null,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockGetCoreTranslation.mockImplementation((key) => {
       const translations: Record<string, string> = {

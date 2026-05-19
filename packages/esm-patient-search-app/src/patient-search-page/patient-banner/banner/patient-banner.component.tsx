@@ -31,7 +31,11 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({
+  patient,
+  patientUuid,
+  hideActionsOverflow: hideActionsOverflowProp,
+}) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { activeVisit } = useVisit(patientUuid);
@@ -41,6 +45,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
   const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+
+  const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;

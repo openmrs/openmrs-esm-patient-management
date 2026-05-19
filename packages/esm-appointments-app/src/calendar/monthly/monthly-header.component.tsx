@@ -1,39 +1,34 @@
-import React, { useCallback } from 'react';
-import dayjs from 'dayjs';
+import React from 'react';
+import { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { omrsDateFormat } from '../../constants';
-import { useAppointmentsStore, setSelectedDate } from '../../store';
 import DaysOfWeekCard from './days-of-week.component';
 import styles from './monthly-header.scss';
 
-const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
+const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-const MonthlyHeader: React.FC = () => {
+interface MonthlyHeaderProps {
+  calendarSelectedDate: Dayjs;
+  onSelectPrevMonth: () => void;
+  onSelectNextMonth: () => void;
+}
+
+const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({
+  calendarSelectedDate,
+  onSelectPrevMonth,
+  onSelectNextMonth,
+}) => {
   const { t } = useTranslation();
-  const { selectedDate } = useAppointmentsStore();
-
-  const handleSelectPrevMonth = useCallback(() => {
-    setSelectedDate(dayjs(selectedDate).subtract(1, 'month').format(omrsDateFormat));
-  }, [selectedDate]);
-
-  const handleSelectNextMonth = useCallback(() => {
-    setSelectedDate(dayjs(selectedDate).add(1, 'month').format(omrsDateFormat));
-  }, [selectedDate]);
 
   return (
     <>
       <div className={styles.container}>
-        <Button
-          aria-label={t('previousMonth', 'Previous month')}
-          kind="tertiary"
-          onClick={handleSelectPrevMonth}
-          size="sm">
+        <Button aria-label={t('previousMonth', 'Previous month')} kind="tertiary" onClick={onSelectPrevMonth} size="sm">
           {t('prev', 'Prev')}
         </Button>
-        <span>{formatDate(new Date(selectedDate), { day: false, time: false, noToday: true })}</span>
-        <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={handleSelectNextMonth} size="sm">
+        <span>{formatDate(calendarSelectedDate.toDate(), { day: false, time: false, noToday: true })}</span>
+        <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={onSelectNextMonth} size="sm">
           {t('next', 'Next')}
         </Button>
       </div>
