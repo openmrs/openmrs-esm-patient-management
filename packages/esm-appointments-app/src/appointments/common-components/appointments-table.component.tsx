@@ -276,7 +276,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                             onSelect={() => {
                               if (selectedAppointmentUuids.has(row.id)) {
                                 setSelectedAppointmentUuids(
-                                  new Set([...selectedAppointmentUuids].filter((uuid) => uuid != row.id)),
+                                  new Set([...selectedAppointmentUuids].filter((uuid) => uuid !== row.id)),
                                 );
                               } else {
                                 setSelectedAppointmentUuids(new Set([...selectedAppointmentUuids, row.id]));

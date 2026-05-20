@@ -84,8 +84,8 @@ const CreateAdmissionEncounterWorkspace: React.FC<
     );
   } else {
     const assignedBedDetail = bedData.data.results[0];
-    const isAssignedBedAtCurrentLocation = assignedBedDetail?.physicalLocation?.uuid == location.uuid;
-    const isAdmittedToCurrentLocation = inpatientAdmissions[0]?.currentInpatientLocation?.uuid == location.uuid;
+    const isAssignedBedAtCurrentLocation = assignedBedDetail?.physicalLocation?.uuid === location.uuid;
+    const isAdmittedToCurrentLocation = inpatientAdmissions[0]?.currentInpatientLocation?.uuid === location.uuid;
     const isAdmittedToOtherLocation = inpatientAdmissions[0] && !isAdmittedToCurrentLocation;
 
     const wardPatient: WardPatient = {
