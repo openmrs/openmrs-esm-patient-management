@@ -118,7 +118,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
           });
         },
         disableSubmit: (queueEntry, formState) =>
-          formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid,
+          formState.selectedQueue === queueEntry.queue.uuid && formState.selectedStatus === queueEntry.status.uuid,
         isEdit: false,
         showQueuePicker: false,
         showStatusPicker: true,

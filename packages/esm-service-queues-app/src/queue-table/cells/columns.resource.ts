@@ -49,7 +49,8 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
           appliedTo == null ||
           appliedTo.some(
             (criteria) =>
-              (criteria.queue == '' || criteria.queue == queue) && (criteria.status == '' || criteria.status == status),
+              (criteria.queue === '' || criteria.queue === queue) &&
+              (criteria.status === '' || criteria.status === status),
           )
         );
       }),
@@ -63,7 +64,7 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
       map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
     }
     for (const columnDef of columnDefinitions) {
-      if (columnDef.columnType == 'queue-number' || columnDef.id == 'queue-number') {
+      if (columnDef.columnType === 'queue-number' || columnDef.id === 'queue-number') {
         columnDef.config.visitQueueNumberAttributeUuid =
           columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
       }
