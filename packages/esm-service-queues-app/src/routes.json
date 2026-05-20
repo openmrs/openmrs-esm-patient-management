@@ -182,6 +182,21 @@
       "name": "service-queues-room-workspace",
       "component": "addNewQueueServiceRoomWorkspace",
       "window": "add-queue-room"
+    },
+    {
+      "name": "service-queues-patient-vitals-workspace",
+      "component": "@openmrs/esm-patient-vitals-app#exportedVitalsBiometricsFormWorkspace",
+      "window": "service-queues-patient-vitals"
+    },
+    {
+      "name": "service-queues-patient-clinical-forms-workspace",
+      "component": "@openmrs/esm-patient-forms-app#exportedClinicalFormsWorkspace",
+      "window": "service-queues-patient-clinical-forms"
+    },
+    {
+      "name": "service-queues-patient-form-entry-workspace",
+      "component": "@openmrs/esm-patient-forms-app#exportedPatientFormEntryWorkspace",
+      "window": "service-queues-patient-clinical-forms"
     }
   ],
   "workspaceWindows2": [
@@ -195,6 +210,14 @@
     },
     {
       "name": "add-queue-room",
+      "group": "service-queues"
+    },
+    {
+      "name": "service-queues-patient-vitals",
+      "group": "service-queues"
+    },
+    {
+      "name": "service-queues-patient-clinical-forms",
       "group": "service-queues"
     }
   ],

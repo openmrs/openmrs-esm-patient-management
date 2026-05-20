@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListBody, StructuredListCell, StructuredListRow, StructuredListWrapper } from '@carbon/react';
-import { type OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
+import { type OpenmrsResource, type Visit, formatTime, parseDate } from '@openmrs/esm-framework';
 import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
 import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
 import TriageNote from './triage-note.component';
@@ -11,6 +11,7 @@ import styles from '../current-visit.scss';
 interface CurrentVisitProps {
   patientUuid: string;
   encounters: Array<Encounter | OpenmrsResource>;
+  visit?: Visit;
 }
 
 enum visitTypes {
@@ -18,7 +19,7 @@ enum visitTypes {
   PAST = 'pastVisit',
 }
 
-const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters }) => {
+const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters, visit }) => {
   const { t } = useTranslation();
 
   const [diagnoses, notes, vitalsToRetrieve]: [Array<DiagnosisItem>, Array<Note>, Array<Encounter>] = useMemo(() => {
@@ -64,7 +65,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('triageNote', 'Triage note')}</StructuredListCell>
               <StructuredListCell>
-                <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
+                <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} visit={visit} />
               </StructuredListCell>
             </StructuredListRow>
             <StructuredListRow className={styles.structuredListRow}>
@@ -75,6 +76,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
                   vitals={useVitalsFromObs(vitalsToRetrieve)}
                   patientUuid={patientUuid}
                   visitType={visitTypes.CURRENT}
+                  visit={visit}
                 />
               </StructuredListCell>
             </StructuredListRow>
