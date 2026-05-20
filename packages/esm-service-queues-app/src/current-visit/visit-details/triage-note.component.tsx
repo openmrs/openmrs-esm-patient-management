@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { navigate } from '@openmrs/esm-framework';
+import { type Visit, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
 import { type DiagnosisItem, type Note } from '../../types/index';
 import styles from './triage-note.scss';
 
@@ -10,10 +10,12 @@ interface TriageNoteProps {
   notes: Array<Note>;
   diagnoses: Array<DiagnosisItem>;
   patientUuid: string;
+  visit?: Visit;
 }
 
-const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }) => {
+const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses, visit }) => {
   const { t } = useTranslation();
+  const { patient } = usePatient(patientUuid);
 
   return (
     <div>
@@ -42,8 +44,20 @@ const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }
           <Button
             size="sm"
             kind="ghost"
+            disabled={!patient}
             renderIcon={(props) => <ArrowRight size={16} {...props} />}
-            onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
+            onClick={() =>
+              launchWorkspace2(
+                'service-queues-patient-clinical-forms-workspace',
+                {},
+                {
+                  formEntryWorkspaceName: 'service-queues-patient-form-entry-workspace',
+                  patient,
+                  patientUuid,
+                  visitContext: visit,
+                },
+              )
+            }
             iconDescription={t('triageForm', 'Triage form')}>
             {t('triageForm', 'Triage form')}
           </Button>
