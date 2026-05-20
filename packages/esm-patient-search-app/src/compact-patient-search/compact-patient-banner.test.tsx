@@ -5,7 +5,6 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext } from '../patient-search-context';
 import CompactPatientBanner from './compact-patient-banner.component';
 
 const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
@@ -53,6 +52,7 @@ const patients: Array<SearchedPatient> = [
       },
     },
     uuid: 'test-patient-uuid',
+    voided: false,
   },
 ];
 
@@ -60,11 +60,7 @@ describe('CompactPatientBanner', () => {
   beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a compact patient banner', () => {
-    render(
-      <PatientSearchContext.Provider value={{}}>
-        <CompactPatientBanner patients={patients} />
-      </PatientSearchContext.Provider>,
-    );
+    render(<CompactPatientBanner patients={patients} />);
 
     // TODO: Restore these tests once we improve the patient banner test stubs
     // expect(
@@ -93,21 +89,13 @@ describe('CompactPatientBanner', () => {
       },
     ];
 
-    render(
-      <PatientSearchContext.Provider value={{}}>
-        <CompactPatientBanner patients={multiplePatients} />
-      </PatientSearchContext.Provider>,
-    );
+    render(<CompactPatientBanner patients={multiplePatients} />);
 
     expect(screen.getAllByText('Patient Photo')).toHaveLength(2);
   });
 
   it('renders empty state when patients array is empty', () => {
-    render(
-      <PatientSearchContext.Provider value={{}}>
-        <CompactPatientBanner patients={[]} />
-      </PatientSearchContext.Provider>,
-    );
+    render(<CompactPatientBanner patients={[]} />);
 
     expect(screen.queryByText('Patient Photo')).not.toBeInTheDocument();
   });

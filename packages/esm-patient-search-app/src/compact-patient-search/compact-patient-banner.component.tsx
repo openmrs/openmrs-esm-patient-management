@@ -8,48 +8,63 @@ import {
   PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
-import type { SearchedPatient } from '../types';
+import type { PatientSearchCallbackProps, SearchedPatient } from '../types';
 import { type PatientSearchConfig } from '../config-schema';
-import { usePatientSearchContext } from '../patient-search-context';
 import { mapToFhirPatient } from '../utils/fhir-mapper';
 import styles from './compact-patient-banner.scss';
 
-interface ClickablePatientContainerProps {
+interface ClickablePatientContainerProps extends PatientSearchCallbackProps {
   children: React.ReactNode;
   patient: fhir.Patient;
 }
 
-interface CompactPatientBannerProps {
+interface CompactPatientBannerProps extends PatientSearchCallbackProps {
   patients: Array<SearchedPatient>;
 }
+/**
+ * CompactPatientBanner displays a minimized summary of the currently active patient.
+ *
+ * It is used within the top navigation bar in desktop mode to display search results,
+ * allowing quick visibility of the patient's name and ID without taking up much space.
+ */
+const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(
+  ({ patients, onPatientSelected, patientClickSideEffect }, ref) => {
+    const renderedPatients = useMemo(
+      () =>
+        patients.map((patient) => {
+          const fhirPatient = mapToFhirPatient(patient);
+          const patientName = getPatientName(fhirPatient);
 
-const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
-  const fhirMappedPatients: Array<fhir.Patient> = useMemo(() => {
-    return patients.map(mapToFhirPatient);
-  }, [patients]);
-
-  const renderPatient = useCallback((patient: fhir.Patient) => {
-    const patientName = getPatientName(patient);
-
-    return (
-      <ClickablePatientContainer key={patient.id} patient={patient}>
-        <div className={styles.patientAvatar}>
-          <PatientPhoto patientUuid={patient.id} patientName={patientName} />
-        </div>
-        <PatientBannerPatientInfo patient={patient} />
-      </ClickablePatientContainer>
+          return (
+            <ClickablePatientContainer
+              key={fhirPatient.id}
+              patient={fhirPatient}
+              onPatientSelected={onPatientSelected}
+              patientClickSideEffect={patientClickSideEffect}>
+              <div className={styles.patientAvatar}>
+                <PatientPhoto patientUuid={fhirPatient.id} patientName={patientName} />
+              </div>
+              <PatientBannerPatientInfo patient={fhirPatient} />
+            </ClickablePatientContainer>
+          );
+        }),
+      [patients, onPatientSelected, patientClickSideEffect],
     );
-  }, []);
 
-  return <div ref={ref}>{fhirMappedPatients.map(renderPatient)}</div>;
-});
+    return <div ref={ref}>{renderedPatients}</div>;
+  },
+);
 
-const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
-  const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
+const ClickablePatientContainer = ({
+  patient,
+  children,
+  onPatientSelected,
+  patientClickSideEffect,
+}: ClickablePatientContainerProps) => {
   const config = useConfig<PatientSearchConfig>();
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
-  if (nonNavigationSelectPatientAction) {
+  if (onPatientSelected) {
     return (
       <button
         className={classNames(styles.patientSearchResult, styles.patientSearchResultButton, {
@@ -57,7 +72,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
         })}
         key={patient.id}
         onClick={() => {
-          nonNavigationSelectPatientAction(patient.id, patient);
+          onPatientSelected(patient.id, patient);
           patientClickSideEffect?.(patient.id, patient);
         }}>
         {children}

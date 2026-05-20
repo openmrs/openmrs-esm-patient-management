@@ -3,21 +3,29 @@ import classNames from 'classnames';
 import { useConfig, type OpenmrsResource } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
 import { useInfinitePatientSearch } from '../patient-search.resource';
-import { type AdvancedPatientSearchState } from '../types';
+import { type AdvancedPatientSearchState, type PatientSearchCallbackProps } from '../types';
 import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch, { initialFilters } from './refine-search/refine-search.component';
 import styles from './advanced-patient-search.scss';
 
-interface AdvancedPatientSearchProps {
+interface AdvancedPatientSearchProps extends PatientSearchCallbackProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
+  launchChildWorkspace?: (workspaceName: string, workspaceProps?: object) => Promise<void>;
+  closeWorkspace?: () => Promise<boolean>;
+  startVisitWorkspaceName?: string;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   query,
   stickyPagination,
   inTabletOrOverlay,
+  patientClickSideEffect,
+  onPatientSelected,
+  launchChildWorkspace,
+  closeWorkspace,
+  startVisitWorkspaceName,
 }) => {
   const { includeDead } = useConfig<PatientSearchConfig>();
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialFilters);
@@ -151,6 +159,11 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           isLoading={isLoading}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}
+          patientClickSideEffect={patientClickSideEffect}
+          onPatientSelected={onPatientSelected}
+          launchChildWorkspace={launchChildWorkspace}
+          closeWorkspace={closeWorkspace}
+          startVisitWorkspaceName={startVisitWorkspaceName}
         />
       </div>
       {inTabletOrOverlay && (
