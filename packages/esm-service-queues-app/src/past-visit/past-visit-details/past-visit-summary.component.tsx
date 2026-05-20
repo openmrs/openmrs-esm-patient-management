@@ -108,14 +108,8 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
         });
       };
 
-      // Process general observations
       if (encounter?.obs) {
-        processObservations(encounter.obs);
-      }
-
-      // Process Visit Note observations with obs-specific timing
-      if (encounter.encounterType?.display === 'Visit Note' && encounter.obs) {
-        processObservations(encounter.obs, true);
+        processObservations(encounter.obs, encounter.encounterType?.display === 'Visit Note');
       }
 
       vitalsToRetrieve.push(encounter);
