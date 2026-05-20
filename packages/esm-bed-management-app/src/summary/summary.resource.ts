@@ -95,10 +95,12 @@ export function useBedsGroupedByLocation() {
     if (!isLoadingAdmissionLocations && admissionLocations && isValidating) {
       const fetchData = async () => {
         const promises = admissionLocations.map(async (location) => {
+          if (!isSubscribed) return null;
           const bedsUrl = `${restBaseUrl}/bed?locationUuid=${location.uuid}`;
           const bedsFetchResult = await openmrsFetch<BedFetchResponse>(bedsUrl, {
             method: 'GET',
           });
+          if (!isSubscribed) return null;
           if (bedsFetchResult.data.results.length) {
             return bedsFetchResult.data.results.map((bed) => ({
               ...bed,
@@ -109,21 +111,18 @@ export function useBedsGroupedByLocation() {
         });
 
         const updatedWards = (await Promise.all(promises)).filter(Boolean);
-        if (isSubscribed) {
-          setResult(updatedWards);
-        }
+        if (!isSubscribed) return;
+        setResult(updatedWards);
       };
       fetchData()
         .catch((error) => {
-          if (isSubscribed) {
-            setError(error);
-          }
+          if (!isSubscribed) return;
+          setError(error);
         })
         .finally(() => {
-          if (isSubscribed) {
-            setIsLoading(false);
-            setIsValidating(false);
-          }
+          if (!isSubscribed) return;
+          setIsLoading(false);
+          setIsValidating(false);
         });
     }
     return () => {
