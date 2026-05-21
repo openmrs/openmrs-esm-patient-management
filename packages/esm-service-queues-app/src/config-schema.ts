@@ -411,7 +411,7 @@ export const configSchema = {
   },
   visitQueueNumberAttributeUuid: {
     _type: Type.String,
-    _default: null,
+    _default: 'c0c579b0-8e59-401d-8a4a-976a0b183519',
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
   },
   visitTypeResourceUrl: {
