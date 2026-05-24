@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,17 @@ const ClearQueueEntriesModal: React.FC<ClearQueueEntriesModalProps> = ({ queueEn
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  useEffect(() => {
+    const modalContainer = document.querySelector('.cds--modal-container');
+    if (modalContainer) {
+      modalContainer.classList.add('clear-queue-modal-container');
+    }
+    return () => {
+      if (modalContainer) {
+        modalContainer.classList.remove('clear-queue-modal-container');
+      }
+    };
+  }, []);
   const handleClearQueueBatchRequest = useCallback(() => {
     setIsSubmitting(true);
     batchClearQueueEntries(queueEntries).then(
