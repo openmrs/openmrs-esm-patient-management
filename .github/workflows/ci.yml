@@ -21,6 +21,7 @@ jobs:
       verify_command: yarn verify
 
   release:
+    if: github.event_name != 'workflow_dispatch'
     needs: build
     uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/release-frontend-module.yml@main
     with:
