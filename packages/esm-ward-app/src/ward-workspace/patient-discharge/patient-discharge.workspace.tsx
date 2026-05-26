@@ -84,7 +84,7 @@ export default function PatientDischargeWorkspace({
   }
 
   return (
-    <Workspace2 title={t('discharge', 'Discharge')} hasUnsavedChanges={dischargeNote.length > 0}>
+    <Workspace2 title={t('discharge', 'Discharge')} hasUnsavedChanges={dischargeNote.trim().length > 0}>
       <div className={styles.workspaceContent}>
         <div className={styles.patientWorkspaceBanner}>
           <WardPatientWorkspaceBanner wardPatient={wardPatient} />
