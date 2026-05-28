@@ -23,7 +23,7 @@ import styles from './past-visit-summary.scss';
 interface PastVisitSummaryProps {
   encounters: Array<Encounter & { orders?: Array<Order> }>;
   patientUuid: string;
-  visit?: Visit;
+  visit: Visit;
 }
 
 const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patientUuid, visit }) => {

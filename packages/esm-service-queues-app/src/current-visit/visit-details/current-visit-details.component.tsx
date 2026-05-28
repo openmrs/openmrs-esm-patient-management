@@ -17,7 +17,7 @@ import styles from '../current-visit.scss';
 interface CurrentVisitProps {
   patientUuid: string;
   encounters: Array<Encounter | OpenmrsResource>;
-  visit?: Visit;
+  visit: Visit;
 }
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters, visit }) => {

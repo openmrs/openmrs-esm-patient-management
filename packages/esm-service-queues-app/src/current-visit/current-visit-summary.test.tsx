@@ -1,11 +1,13 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { usePatient } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { useVisit } from './current-visit.resource';
 import CurrentVisit from './current-visit-summary.component';
 
 const useVisitMock = vi.mocked(useVisit);
+const mockUsePatient = vi.mocked(usePatient);
 
 vi.mock('./current-visit.resource', () => ({
   useVisit: vi.fn().mockReturnValue({
@@ -22,6 +24,15 @@ const patientUuid = mockPastVisit.data.results[0].patient.uuid;
 const visitUuid = mockPastVisit.data.results[0].uuid;
 
 describe('CurrentVisit', () => {
+  beforeEach(() => {
+    mockUsePatient.mockReturnValue({
+      patient: { id: patientUuid } as fhir.Patient,
+      patientUuid,
+      isLoading: false,
+      error: null,
+    });
+  });
+
   it('renders visit details correctly', async () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 

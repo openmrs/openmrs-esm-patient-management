@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, usePatient, type Visit } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { mockPatient, renderWithSwr } from 'tools';
 import { configSchema, type ConfigObject } from '../config-schema';
@@ -11,6 +11,7 @@ import PastVisitSummary from './past-visit-details/past-visit-summary.component'
 
 const mockUsePastVisits = vi.mocked(usePastVisits);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUsePatient = vi.mocked(usePatient);
 
 vi.mock('./past-visit.resource', () => ({
   usePastVisits: vi.fn(),
@@ -20,6 +21,12 @@ describe('PastVisit', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
+    });
+    mockUsePatient.mockReturnValue({
+      patient: { id: mockPatient.id } as fhir.Patient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
     });
   });
 
@@ -33,7 +40,13 @@ describe('PastVisit', () => {
       isValidating: false,
     });
 
-    renderWithSwr(<PastVisitSummary patientUuid={mockPatient.id} encounters={[]} />);
+    renderWithSwr(
+      <PastVisitSummary
+        patientUuid={mockPatient.id}
+        encounters={[]}
+        visit={mockPastVisit.data.results[0] as unknown as Visit}
+      />,
+    );
 
     expect(screen.queryAllByText(/vitals/i));
     const vitalsTab = screen.getByRole('tab', { name: /vitals/i });
