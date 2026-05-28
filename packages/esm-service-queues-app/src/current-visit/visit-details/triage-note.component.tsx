@@ -47,19 +47,14 @@ const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses, 
             disabled={!patient}
             renderIcon={(props) => <ArrowRight size={16} {...props} />}
             onClick={() =>
-              launchWorkspace2(
-                'service-queues-patient-clinical-forms-workspace',
-                {},
-                {
-                  formEntryWorkspaceName: 'service-queues-patient-form-entry-workspace',
-                  patient,
-                  patientUuid,
-                  visitContext: visit,
-                },
-              )
+              launchWorkspace2('service-queues-visit-notes-workspace', { formContext: 'creating' }, null, {
+                patient,
+                patientUuid,
+                visitContext: visit,
+              })
             }
-            iconDescription={t('triageForm', 'Triage form')}>
-            {t('triageForm', 'Triage form')}
+            iconDescription={t('visitNoteForm', 'Visit note form')}>
+            {t('visitNoteForm', 'Visit note form')}
           </Button>
         </div>
       )}

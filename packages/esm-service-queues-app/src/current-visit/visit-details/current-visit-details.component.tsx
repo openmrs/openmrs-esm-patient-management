@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListBody, StructuredListCell, StructuredListRow, StructuredListWrapper } from '@carbon/react';
-import { type OpenmrsResource, type Visit, formatTime, parseDate } from '@openmrs/esm-framework';
+import { type OpenmrsResource, type Visit, formatTime, parseDate, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
 import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
 import TriageNote from './triage-note.component';
@@ -21,6 +22,7 @@ enum visitTypes {
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters, visit }) => {
   const { t } = useTranslation();
+  const { concepts } = useConfig<ConfigObject>();
 
   const [diagnoses, notes, vitalsToRetrieve]: [Array<DiagnosisItem>, Array<Note>, Array<Encounter>] = useMemo(() => {
     const notes: Array<Note> = [];
@@ -29,33 +31,29 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
 
     // Iterating through every Encounter
     encounters?.forEach((enc: Encounter) => {
-      // Check for Visit Diagnoses and Notes
-      if (enc.encounterType?.display === 'Visit Note') {
-        enc.obs.forEach((obs: Observation) => {
-          if (obs.concept && obs.concept.display === 'Visit Diagnoses') {
-            // // Putting all the diagnoses in a single array.
-            diagnoses.push({
-              diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
-            });
-          } else if (obs.concept && obs.concept.display === 'General patient note') {
-            // Putting all notes in a single array.
-            notes.push({
-              note: obs.value,
-              provider: {
-                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-              },
-              time: formatTime(parseDate(obs.obsDatetime)),
-              concept: obs.concept,
-            });
+      enc.obs?.forEach((obs: Observation) => {
+        if (obs.concept?.uuid === concepts.visitDiagnosesConceptUuid) {
+          const problemList = obs.groupMembers?.find((mem) => mem.concept.display === 'PROBLEM LIST');
+          if (problemList?.value?.display) {
+            diagnoses.push({ diagnosis: problemList.value.display });
           }
-        });
-      }
+        } else if (obs.concept?.uuid === concepts.generalPatientNoteConceptUuid) {
+          notes.push({
+            note: obs.value,
+            provider: {
+              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+            },
+            time: formatTime(parseDate(obs.obsDatetime)),
+            concept: obs.concept,
+          });
+        }
+      });
 
       vitalsToRetrieve.push(enc);
     });
     return [diagnoses, notes, vitalsToRetrieve];
-  }, [encounters]);
+  }, [encounters, concepts.generalPatientNoteConceptUuid, concepts.visitDiagnosesConceptUuid]);
 
   return (
     <div className={styles.wrapper}>
