@@ -1,31 +1,44 @@
-import React, { useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
-import { formatTime, parseDate, type Encounter, type Obs, useConfig } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  formatTime,
+  launchWorkspace2,
+  parseDate,
+  useConfig,
+  usePatient,
+  type Encounter,
+  type Obs,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type OrderItem, type Order, type Note, type DiagnosisItem } from '../../types/index';
-import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
 import EncounterList from './encounter-list.component';
 import Medications from './medications-list.component';
 import Notes from './notes-list.component';
-import Vitals from '../../current-visit/visit-details/vitals.component';
 import styles from './past-visit-summary.scss';
 
 interface PastVisitSummaryProps {
   encounters: Array<Encounter & { orders?: Array<Order> }>;
   patientUuid: string;
+  visit?: Visit;
 }
 
-enum visitTypes {
-  CURRENT = 'currentVisit',
-  PAST = 'pastVisit',
-}
-
-const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patientUuid }) => {
+const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patientUuid, visit }) => {
   const { t } = useTranslation();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const config = useConfig<ConfigObject>();
+  const { patient } = usePatient(patientUuid);
+
+  const launchCustomVitalsForm = useCallback(() => {
+    launchWorkspace2('service-queues-vitals-form-workspace', {
+      patientUuid,
+      patient,
+      visitContext: visit,
+    });
+  }, [patient, patientUuid, visit]);
 
   const encountersToDisplay = useMemo(
     () =>
@@ -45,19 +58,11 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     [encounters],
   );
 
-  const [medications, notes, diagnoses, vitalsToRetrieve]: [
-    Array<OrderItem>,
-    Array<Note>,
-    Array<DiagnosisItem>,
-    Array<Encounter>,
-  ] = useMemo(() => {
-    // Medication Tab
+  const [medications, notes, diagnoses]: [Array<OrderItem>, Array<Note>, Array<DiagnosisItem>] = useMemo(() => {
     const medications: Array<OrderItem> = [];
     const notes: Array<Note> = [];
     const diagnoses: Array<DiagnosisItem> = [];
-    const vitalsToRetrieve: Array<Encounter> = [];
 
-    // Iterating through every Encounter
     encounters?.forEach((encounter) => {
       if (encounter.orders) {
         medications.push(
@@ -117,10 +122,8 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
       if (encounter.encounterType?.display === 'Visit Note' && encounter.obs) {
         processObservations(encounter.obs, true);
       }
-
-      vitalsToRetrieve.push(encounter);
     });
-    return [medications, notes, diagnoses, vitalsToRetrieve];
+    return [medications, notes, diagnoses];
   }, [
     config.concepts.generalPatientNoteConceptUuid,
     config.concepts.problemListConceptUuid,
@@ -152,7 +155,10 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Vitals vitals={useVitalsFromObs(vitalsToRetrieve)} patientUuid={patientUuid} visitType={visitTypes.PAST} />
+            <ExtensionSlot
+              name="service-queues-patient-vitals-slot"
+              state={{ patient, patientUuid, visitContext: visit, launchCustomVitalsForm }}
+            />
           </TabPanel>
           <TabPanel>
             <Notes notes={notes} diagnoses={diagnoses} />

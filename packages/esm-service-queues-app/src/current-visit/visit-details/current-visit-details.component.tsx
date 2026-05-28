@@ -1,43 +1,49 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListBody, StructuredListCell, StructuredListRow, StructuredListWrapper } from '@carbon/react';
-import { type OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  formatTime,
+  launchWorkspace2,
+  parseDate,
+  usePatient,
+  type OpenmrsResource,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
-import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
 import TriageNote from './triage-note.component';
-import Vitals from './vitals.component';
 import styles from '../current-visit.scss';
 
 interface CurrentVisitProps {
   patientUuid: string;
   encounters: Array<Encounter | OpenmrsResource>;
+  visit?: Visit;
 }
 
-enum visitTypes {
-  CURRENT = 'currentVisit',
-  PAST = 'pastVisit',
-}
-
-const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters }) => {
+const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters, visit }) => {
   const { t } = useTranslation();
+  const { patient } = usePatient(patientUuid);
 
-  const [diagnoses, notes, vitalsToRetrieve]: [Array<DiagnosisItem>, Array<Note>, Array<Encounter>] = useMemo(() => {
+  const launchCustomVitalsForm = useCallback(() => {
+    launchWorkspace2('service-queues-vitals-form-workspace', {
+      patientUuid,
+      patient,
+      visitContext: visit,
+    });
+  }, [patient, patientUuid, visit]);
+
+  const [diagnoses, notes]: [Array<DiagnosisItem>, Array<Note>] = useMemo(() => {
     const notes: Array<Note> = [];
-    const vitalsToRetrieve: Array<Encounter> = [];
     const diagnoses: Array<DiagnosisItem> = [];
 
-    // Iterating through every Encounter
     encounters?.forEach((enc: Encounter) => {
-      // Check for Visit Diagnoses and Notes
       if (enc.encounterType?.display === 'Visit Note') {
         enc.obs.forEach((obs: Observation) => {
           if (obs.concept && obs.concept.display === 'Visit Diagnoses') {
-            // // Putting all the diagnoses in a single array.
             diagnoses.push({
               diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
             });
           } else if (obs.concept && obs.concept.display === 'General patient note') {
-            // Putting all notes in a single array.
             notes.push({
               note: obs.value,
               provider: {
@@ -50,10 +56,8 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
           }
         });
       }
-
-      vitalsToRetrieve.push(enc);
     });
-    return [diagnoses, notes, vitalsToRetrieve];
+    return [diagnoses, notes];
   }, [encounters]);
 
   return (
@@ -70,11 +74,9 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('vitals', 'Vitals')}</StructuredListCell>
               <StructuredListCell>
-                {' '}
-                <Vitals
-                  vitals={useVitalsFromObs(vitalsToRetrieve)}
-                  patientUuid={patientUuid}
-                  visitType={visitTypes.CURRENT}
+                <ExtensionSlot
+                  name="service-queues-patient-vitals-slot"
+                  state={{ patient, patientUuid, visitContext: visit, launchCustomVitalsForm }}
                 />
               </StructuredListCell>
             </StructuredListRow>

@@ -32,7 +32,7 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
               : '--'}
           </p>
         </div>
-        <PastVisitSummary encounters={visits.encounters} patientUuid={patientUuid} />
+        <PastVisitSummary encounters={visits.encounters} patientUuid={patientUuid} visit={visits} />
       </div>
     );
   }

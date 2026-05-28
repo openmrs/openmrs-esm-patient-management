@@ -38,7 +38,7 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
         </div>
       </div>
       <div className={styles.visitContainer}>
-        <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} />
+        <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} visit={visit} />
       </div>
     </div>
   );

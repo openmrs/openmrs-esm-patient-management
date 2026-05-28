@@ -182,6 +182,11 @@
       "name": "service-queues-room-workspace",
       "component": "addNewQueueServiceRoomWorkspace",
       "window": "add-queue-room"
+    },
+    {
+      "name": "service-queues-vitals-form-workspace",
+      "component": "@openmrs/esm-patient-vitals-app#exportedVitalsBiometricsFormWorkspace",
+      "window": "service-queues-vitals-form"
     }
   ],
   "workspaceWindows2": [
@@ -195,6 +200,10 @@
     },
     {
       "name": "add-queue-room",
+      "group": "service-queues"
+    },
+    {
+      "name": "service-queues-vitals-form",
       "group": "service-queues"
     }
   ],
