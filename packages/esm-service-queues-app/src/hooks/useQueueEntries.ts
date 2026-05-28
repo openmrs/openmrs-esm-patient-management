@@ -41,7 +41,8 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     }
   }
 
-  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(`${queueEntryBaseUrl}?${searchParam.toString()}`);
+  const apiUrl = searchCriteria?.location ? `${queueEntryBaseUrl}?${searchParam.toString()}` : null;
+  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(apiUrl);
 
   return {
     queueEntries: data ?? [],
