@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -61,13 +62,13 @@ const mockAppointments = [
   },
 ] as unknown as Array<Appointment>;
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockExportAppointmentsToSpreadsheet = jest.mocked(exportAppointmentsToSpreadsheet);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockExportAppointmentsToSpreadsheet = vi.mocked(exportAppointmentsToSpreadsheet);
 
-jest.mock('../../helpers/excel', () => {
+vi.mock('../../helpers/excel', async () => {
   return {
-    ...jest.requireActual('../../helpers/excel'),
-    exportAppointmentsToSpreadsheet: jest.fn(),
+    ...((await vi.importActual('../../helpers/excel')) as object),
+    exportAppointmentsToSpreadsheet: vi.fn(),
   };
 });
 

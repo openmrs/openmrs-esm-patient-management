@@ -1,18 +1,19 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientAppointmentHistory } from './usePatientAppointmentHistory';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-jest.mock('./useSelectedDate', () => ({
-  useSelectedDate: jest.fn(),
+vi.mock('./useSelectedDate', () => ({
+  useSelectedDate: vi.fn(),
 }));
 
 import { useSelectedDate } from './useSelectedDate';
 
-const mockUseSelectedDate = jest.mocked(useSelectedDate);
+const mockUseSelectedDate = vi.mocked(useSelectedDate);
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SWRConfig

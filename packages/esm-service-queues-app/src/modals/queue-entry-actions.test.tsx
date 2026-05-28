@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
@@ -26,23 +27,23 @@ import DeleteQueueEntryModal from './delete-queue-entry.modal';
 import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-const mockUseQueues = jest.fn().mockReturnValue({ queues: mockQueues });
+const mockUseQueues = vi.fn().mockReturnValue({ queues: mockQueues });
 
-jest.mock('../hooks/useQueues', () => ({
+vi.mock('../hooks/useQueues', () => ({
   useQueues: () => mockUseQueues(),
 }));
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+vi.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: vi.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
 }));
 
-jest.mock('../hooks/useQueueEntries', () => {
+vi.mock('../hooks/useQueueEntries', () => {
   return {
-    useMutateQueueEntries: jest.fn().mockReturnValue({
-      mutateQueueEntries: jest.fn(),
+    useMutateQueueEntries: vi.fn().mockReturnValue({
+      mutateQueueEntries: vi.fn(),
     }),
   };
 });
@@ -78,7 +79,7 @@ describe('UndoTransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -111,7 +112,7 @@ describe('VoidQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -142,7 +143,7 @@ describe('VoidQueueEntryModal', () => {
 describe('QueueEntryActionModal', () => {
   const defaultProps = {
     queueEntry: mockQueueEntryAlice,
-    closeModal: jest.fn(),
+    closeModal: vi.fn(),
     modalParams: {
       modalTitle: 'Test Modal',
       modalInstruction: 'Test instruction',
@@ -150,8 +151,8 @@ describe('QueueEntryActionModal', () => {
       submitSuccessTitle: 'Success',
       submitSuccessText: 'Operation completed',
       submitFailureTitle: 'Submission Failed',
-      submitAction: jest.fn(),
-      disableSubmit: jest.fn().mockReturnValue(false),
+      submitAction: vi.fn(),
+      disableSubmit: vi.fn().mockReturnValue(false),
       isEdit: false,
       showQueuePicker: true,
       showStatusPicker: true,
@@ -167,7 +168,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('closes modal and shows warning snackbar when submission fails with already-ended error', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       responseBody: {
         error: {
           message: 'Cannot transition a queue entry that has already ended',
@@ -175,7 +176,7 @@ describe('QueueEntryActionModal', () => {
       },
     });
 
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
     renderWithSwr(
       <QueueEntryActionModal
@@ -201,7 +202,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('shows inline error notification when submission fails with duplicate error', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       responseBody: {
         error: {
           message: '[queue.entry.duplicate.patient]',
@@ -228,7 +229,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('shows inline error notification when submission fails with generic error', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Network error occurred',
     });
 
@@ -251,7 +252,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('clears error when user changes queue selection', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -278,7 +279,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('clears error when user changes priority', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -305,7 +306,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('clears error when user changes status', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -332,8 +333,8 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('submits form successfully without errors', async () => {
-    const mockSubmitAction = jest.fn().mockResolvedValue({ status: 200 });
-    const closeModal = jest.fn();
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
+    const closeModal = vi.fn();
 
     const user = userEvent.setup();
     renderWithSwr(
@@ -355,7 +356,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('closes modal when cancel button is clicked', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<QueueEntryActionModal {...defaultProps} closeModal={closeModal} />);
@@ -367,7 +368,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('allows user to close error notification', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -395,7 +396,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('shows error when server returns non-200 status', async () => {
-    const mockSubmitAction = jest.fn().mockResolvedValue({ status: 201 });
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 201 });
     const user = userEvent.setup();
     renderWithSwr(
       <QueueEntryActionModal
@@ -412,7 +413,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('initializes transition date from queue entry when isEdit is true', async () => {
-    const mockSubmitAction = jest.fn().mockResolvedValue({ status: 200 });
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
     const user = userEvent.setup();
 
     renderWithSwr(
@@ -464,7 +465,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('passes updated comment to submitAction', async () => {
-    const mockSubmitAction = jest.fn().mockResolvedValue({ status: 200 });
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
     const user = userEvent.setup();
 
     renderWithSwr(
@@ -491,7 +492,7 @@ describe('QueueEntryActionModal', () => {
 describe('QueueEntryActionModal - ComboBox behavior with many queues', () => {
   const defaultProps = {
     queueEntry: mockQueueEntryAlice,
-    closeModal: jest.fn(),
+    closeModal: vi.fn(),
     modalParams: {
       modalTitle: 'Test Modal',
       modalInstruction: 'Test instruction',
@@ -499,8 +500,8 @@ describe('QueueEntryActionModal - ComboBox behavior with many queues', () => {
       submitSuccessTitle: 'Success',
       submitSuccessText: 'Operation completed',
       submitFailureTitle: 'Submission Failed',
-      submitAction: jest.fn().mockResolvedValue({ status: 200 }),
-      disableSubmit: jest.fn().mockReturnValue(false),
+      submitAction: vi.fn().mockResolvedValue({ status: 200 }),
+      disableSubmit: vi.fn().mockReturnValue(false),
       isEdit: false,
       showQueuePicker: true,
       showStatusPicker: false,
@@ -566,7 +567,7 @@ describe('QueueEntryActionModal - ComboBox behavior with many queues', () => {
   });
 
   it('allows user to select a queue from filtered results', async () => {
-    const mockSubmitAction = jest.fn().mockResolvedValue({ status: 200 });
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
     const user = userEvent.setup();
 
     renderWithSwr(
@@ -597,7 +598,7 @@ describe('QueueEntryActionModal - ComboBox behavior with many queues', () => {
   });
 
   it('clears submission error when user selects a different queue via ComboBox', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValueOnce({ message: 'Test error' });
+    const mockSubmitAction = vi.fn().mockRejectedValueOnce({ message: 'Test error' });
     const user = userEvent.setup();
 
     renderWithSwr(
@@ -644,8 +645,8 @@ describe('QueueEntryActionModal - time validation with minute precision', () => 
     submitSuccessTitle: 'Success',
     submitSuccessText: 'Updated',
     submitFailureTitle: 'Failed',
-    submitAction: jest.fn().mockResolvedValue({ status: 200 }),
-    disableSubmit: jest.fn().mockReturnValue(false),
+    submitAction: vi.fn().mockResolvedValue({ status: 200 }),
+    disableSubmit: vi.fn().mockReturnValue(false),
     isEdit: true,
     showQueuePicker: true,
     showStatusPicker: true,
@@ -663,7 +664,7 @@ describe('QueueEntryActionModal - time validation with minute precision', () => 
 
     const user = userEvent.setup();
     renderWithSwr(
-      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={jest.fn()} modalParams={baseModalParams} />,
+      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={vi.fn()} modalParams={baseModalParams} />,
     );
 
     const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
@@ -694,7 +695,7 @@ describe('QueueEntryActionModal - time validation with minute precision', () => 
 
     const user = userEvent.setup();
     renderWithSwr(
-      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={jest.fn()} modalParams={baseModalParams} />,
+      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={vi.fn()} modalParams={baseModalParams} />,
     );
 
     const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
@@ -716,7 +717,7 @@ describe('QueueEntryActionModal - time validation with minute precision', () => 
   it('should skip previous entry validation when previousQueueEntry is null', async () => {
     const user = userEvent.setup();
     renderWithSwr(
-      <QueueEntryActionModal queueEntry={mockQueueEntryBrian} closeModal={jest.fn()} modalParams={baseModalParams} />,
+      <QueueEntryActionModal queueEntry={mockQueueEntryBrian} closeModal={vi.fn()} modalParams={baseModalParams} />,
     );
 
     const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });

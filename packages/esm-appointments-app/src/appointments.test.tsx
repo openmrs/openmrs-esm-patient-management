@@ -1,11 +1,12 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import Appointments from './appointments.component';
 import { type ConfigObject, configSchema } from './config-schema';
 import { BrowserRouter } from 'react-router-dom';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
 describe('Appointments', () => {
   beforeEach(() => {

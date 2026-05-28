@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -8,7 +9,7 @@ import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
  * Helper to render DemographicsSection with Formik for state-dependent tests.
@@ -37,8 +38,8 @@ function renderDemographicsSectionWithFormik(
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
-                setFieldTouched: jest.fn().mockResolvedValue(undefined),
+                setCapturePhotoProps: vi.fn(),
+                setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
                 isOffline: false,
                 initialFormValues: formValuesRef,

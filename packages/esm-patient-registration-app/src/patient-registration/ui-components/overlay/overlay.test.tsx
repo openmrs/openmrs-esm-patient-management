@@ -1,16 +1,17 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import Overlay from './overlay.component';
 
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockIsDesktop = jest.mocked(isDesktop);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
 /**
  * Helper to render Overlay component.
  */
 function renderOverlay(
-  close = jest.fn(),
+  close = vi.fn(),
   header = 'Test Header',
   buttonsGroup?: React.ReactElement,
   children?: React.ReactNode,
@@ -19,7 +20,7 @@ function renderOverlay(
 }
 
 describe('Overlay component', () => {
-  const mockClose = jest.fn();
+  const mockClose = vi.fn();
 
   beforeEach(() => {
     mockIsDesktop.mockReturnValue(true);

@@ -7,6 +7,7 @@ export {
   renderWithContext,
   renderWithSwr,
   renderWithRouter,
+  replaceProperty,
   waitForLoadingToFinish,
   withSwr,
 } from './test-utils';
