@@ -1,8 +1,32 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.patientSearchResult,
-.deceased.patientSearchResult {
+.virtualScrollContainer {
+  inline-size: 100%;
+  overflow-y: auto;
+}
+
+.virtualScrollContainer > div {
+  inline-size: 100%;
+  position: relative;
+}
+
+.virtualRow {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  overflow: hidden;
+}
+
+.loadingIcon {
+  padding: layout.$spacing-05 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.patientSearchResult {
   text-decoration: none;
   display: flex;
   align-items: center;

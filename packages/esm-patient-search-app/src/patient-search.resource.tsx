@@ -83,6 +83,7 @@ export function useInfinitePatientSearch(
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
     shouldFetch ? getUrl : null,
     openmrsFetch,
+    { keepPreviousData: true },
   );
 
   // Filter out null patients and patients with null person property to prevent errors
