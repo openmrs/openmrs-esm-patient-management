@@ -2,13 +2,33 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
-import type { PatientSearchResponse } from '../types';
+import type { PatientSearchCallbackProps, PatientSearchResponse } from '../types';
 import CompactPatientBanner from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
-const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchResponse>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
+interface RecentlySearchedPatientsProps extends PatientSearchResponse, PatientSearchCallbackProps {}
+
+/**
+ * RecentlySearchedPatients displays a list of patients the user has interacted with recently.
+ *
+ * It is rendered below the search bar (before a query is typed) to provide quick
+ * access to recent contexts without needing to perform a full search.
+ */
+const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentlySearchedPatientsProps>(
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isValidating,
+      setPage,
+      onPatientSelected,
+      patientClickSideEffect,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
     const observer = useRef(null);
 
@@ -92,7 +112,12 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchR
                 </span>
               )}
             </div>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
+            <CompactPatientBanner
+              patients={searchResults}
+              onPatientSelected={onPatientSelected}
+              patientClickSideEffect={patientClickSideEffect}
+              ref={ref}
+            />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />

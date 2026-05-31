@@ -12,7 +12,6 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { type PatientSearchResponse } from '../types';
 import { mockAdvancedSearchResults } from '__mocks__';
-import { PatientSearchContext } from '../patient-search-context';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import { usePersonAttributeType } from './refine-search/person-attributes.resource';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
@@ -42,11 +41,6 @@ vi.mock('react-router-dom', async () => ({
   ]),
 }));
 
-const mockPatientActionContextValue = {
-  nonNavigationSelectPatientAction: vi.fn(),
-  selectPatientAction: vi.fn(),
-};
-
 const mockSearchResults: PatientSearchResponse = {
   isValidating: false,
   totalResults: 2,
@@ -58,18 +52,16 @@ const mockSearchResults: PatientSearchResponse = {
   fetchError: null,
 };
 
-const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <PatientSearchContext.Provider value={mockPatientActionContextValue}>{children}</PatientSearchContext.Provider>
-);
-
 describe('AdvancedPatientSearchComponent', () => {
   const user = userEvent.setup();
 
   beforeEach(() => {
     mockUseInfinitePatientSearch.mockReturnValue(mockSearchResults);
+    const defaults = getDefaultsFromConfigSchema(configSchema);
     mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
+      ...defaults,
       search: {
+        ...defaults.search,
         disableTabletSearchOnKeyUp: false,
         showRecentlySearchedPatients: false,
         searchFilterFields: {
@@ -93,7 +85,7 @@ describe('AdvancedPatientSearchComponent', () => {
           ],
         },
       } as PatientSearchConfig['search'],
-    });
+    } as PatientSearchConfig);
     mockUsePersonAttributeType.mockReturnValue({
       isLoading: false,
       error: null,
@@ -106,11 +98,7 @@ describe('AdvancedPatientSearchComponent', () => {
   });
 
   const renderComponent = (props = {}) => {
-    return render(
-      <Wrapper>
-        <AdvancedPatientSearchComponent query="Jos" {...props} />
-      </Wrapper>,
-    );
+    return render(<AdvancedPatientSearchComponent query="Jos" {...props} />);
   };
 
   it('renders without crashing', () => {
