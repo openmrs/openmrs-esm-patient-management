@@ -1,14 +1,22 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+// Width varies by entry point:
+//   - top-nav icon variant uses a container that constrains to ~50vw
+//   - bar-slot extension is embedded in a panel that provides its own width
+// Both entry points wrap this component in their own sized container, so
+// 100% fills whatever the host provides without hard-coding viewport units here.
 .patientSearchBar {
-  width: 50vw;
+  width: 100%;
   position: relative;
 }
 
 .floatingSearchResultsContainer {
   position: absolute;
-  overflow-y: auto;
+  // overflow-y must NOT be set here — the virtualizer inside PatientSearch
+  // owns its own scroll element. Setting overflow-y: auto on this wrapper
+  // makes the wrapper scroll instead, which breaks infinite-scroll pagination
+  // (only the first page of results is ever visible).
   box-shadow: 0 layout.$spacing-03 layout.$spacing-05 $ui-03;
   z-index: 99;
   width: 100%;

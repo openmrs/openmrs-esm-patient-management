@@ -31,7 +31,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const { showRecentlySearchedPatients } = config.search;
   const isSearchPage = useMemo(() => page === 'search', [page]);
   const [searchParams] = useSearchParams();
-  const initialSearchTerm = isSearchPage ? searchParams.get('query') : '';
+  const initialSearchTerm = isSearchPage ? (searchParams.get('query') ?? undefined) : '';
 
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [canClickOutside, setCanClickOutside] = useState(false);
@@ -88,12 +88,14 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
         <>
           {isDesktop(layout) ? (
             /* CompactPatientSearchComponent provides the search context */
-            <CompactPatientSearchComponent
-              isSearchPage={isSearchPage}
-              initialSearchTerm={initialSearchTerm}
-              shouldNavigateToPatientSearchPage
-              onPatientSelect={resetToInitialState}
-            />
+            <div className={styles.searchBarContainer}>
+              <CompactPatientSearchComponent
+                isSearchPage={isSearchPage}
+                initialSearchTerm={initialSearchTerm}
+                shouldNavigateToPatientSearchPage
+                onPatientSelect={resetToInitialState}
+              />
+            </div>
           ) : (
             <PatientSearchOverlay
               onClose={closePatientSearch}

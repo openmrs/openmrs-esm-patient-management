@@ -13,3 +13,11 @@
 .activeSearchIconButton {
   @include brand-02(background-color);
 }
+
+// The icon variant renders CompactPatientSearch inside this wrapper.
+// The wrapper constrains the search bar to 50vw so it doesn't span the full
+// screen width — this was previously hard-coded inside compact-patient-search.scss
+// but belongs here since it's an icon-variant layout concern, not a component concern.
+.searchBarContainer {
+  width: 50vw;
+}

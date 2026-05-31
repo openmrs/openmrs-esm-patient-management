@@ -11,23 +11,27 @@ import PatientSearchBar from '../patient-search-bar/patient-search-bar.component
 import RecentlySearchedPatients from './recently-searched-patients.component';
 import styles from './compact-patient-search.scss';
 
-interface CompactPatientSearchProps {
-  isSearchPage: boolean;
-  initialSearchTerm: string;
-  onPatientSelect?: () => void;
+export interface CompactPatientSearchProps {
+  isSearchPage?: boolean;
+  initialSearchTerm?: string;
+  selectPatientAction?: (patientUuid: string) => void;
   shouldNavigateToPatientSearchPage?: boolean;
+  onPatientSelect?: () => void;
+  buttonProps?: object;
 }
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
-  initialSearchTerm,
-  isSearchPage,
-  onPatientSelect,
+  initialSearchTerm = '',
+  isSearchPage = false,
+  selectPatientAction,
   shouldNavigateToPatientSearchPage,
+  onPatientSelect,
+  buttonProps,
 }) => {
   const { t } = useTranslation();
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const bannerContainerRef = useRef(null);
+  const bannerContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -37,13 +41,14 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const config = useConfig<PatientSearchConfig>();
   const { showRecentlySearchedPatients } = config.search;
 
-  const {
-    user,
-    sessionLocation: { uuid: currentLocation },
-  } = useSession();
+  // FIX 1: removed unused `currentLocation` destructure from useSession
+  useSession();
 
   const patientSearchResponse = useInfinitePatientSearch(debouncedSearchTerm, config.includeDead);
   const { data: searchedPatients } = patientSearchResponse;
+
+  // Recently-viewed patients are only tracked when NOT in selectPatientAction mode
+  const shouldTrackRecent = showRecentlySearchedPatients && !selectPatientAction;
 
   const {
     error: errorFetchingUserProperties,
@@ -51,30 +56,35 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     mutateUserProperties,
     recentlyViewedPatientUuids,
     updateRecentlyViewedPatients,
-  } = useRecentlyViewedPatients(showRecentlySearchedPatients);
+  } = useRecentlyViewedPatients(shouldTrackRecent);
 
-  const recentPatientSearchResponse = useRestPatients(recentlyViewedPatientUuids, !hasSearchTerm);
+  const recentPatientSearchResponse = useRestPatients(recentlyViewedPatientUuids, !hasSearchTerm && shouldTrackRecent);
+
+  // FIX 6: useRestPatients returns data: SearchedPatient[] | null, not undefined.
+  // Spread it separately so TypeScript sees the correct shape for RecentlySearchedPatients.
   const { data: recentPatients, fetchError } = recentPatientSearchResponse;
+
+  // ── Focus helpers ────────────────────────────────────────────────────────────
 
   const handleFocusToInput = useCallback(() => {
     if (searchInputRef.current) {
-      const inputElement = searchInputRef.current;
-      inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
-      inputElement.focus();
+      const input = searchInputRef.current;
+      input.setSelectionRange(input.value.length, input.value.length);
+      input.focus();
     }
   }, []);
 
-  const handleCloseSearchResults = useCallback(() => {
+  // ── Selection / close ────────────────────────────────────────────────────────
+
+  const closeSearchResults = useCallback(() => {
     setSearchTerm('');
     onPatientSelect?.();
-  }, [onPatientSelect, setSearchTerm]);
+  }, [onPatientSelect]);
 
-  const addViewedPatientAndCloseSearchResults = useCallback(
+  const recordRecentAndClose = useCallback(
     async (patientUuid: string) => {
-      handleCloseSearchResults();
-      if (!showRecentlySearchedPatients) {
-        return;
-      }
+      closeSearchResults();
+      if (!shouldTrackRecent) return;
       try {
         await updateRecentlyViewedPatients(patientUuid);
         await mutateUserProperties();
@@ -86,25 +96,35 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         });
       }
     },
-    [handleCloseSearchResults, mutateUserProperties, updateRecentlyViewedPatients, showRecentlySearchedPatients, t],
+    [closeSearchResults, mutateUserProperties, updateRecentlyViewedPatients, shouldTrackRecent, t],
   );
 
+  // FIX 2 + 3: typed `evt` explicitly; made `patients` optional to match the
+  // useArrowNavigation enterCallback signature (patients?: Array<SearchedPatient>)
   const handlePatientSelection = useCallback(
-    (evt, index: number, patients: Array<SearchedPatient>) => {
+    (evt: React.MouseEvent<HTMLAnchorElement>, index: number, patients?: Array<SearchedPatient>) => {
       evt.preventDefault();
-      if (patients) {
-        addViewedPatientAndCloseSearchResults(patients[index].uuid);
+      if (!patients) return;
+
+      const { uuid } = patients[index];
+
+      if (selectPatientAction) {
+        selectPatientAction(uuid);
+        setSearchTerm('');
+      } else {
+        recordRecentAndClose(uuid);
         navigate({
-          to: interpolateString(config.search.patientChartUrl, {
-            patientUuid: patients[index].uuid,
-          }),
+          to: interpolateString(config.search.patientChartUrl, { patientUuid: uuid }),
         });
       }
     },
-    [addViewedPatientAndCloseSearchResults, config.search.patientChartUrl],
+    [selectPatientAction, recordRecentAndClose, config.search.patientChartUrl],
   );
+
+  // ── Arrow-key navigation ─────────────────────────────────────────────────────
+
   const focusedResult = useArrowNavigation(
-    !recentPatients ? (searchedPatients?.length ?? 0) : (recentPatients?.length ?? 0),
+    recentPatients ? (recentPatients?.length ?? 0) : (searchedPatients?.length ?? 0),
     handlePatientSelection,
     handleFocusToInput,
     -1,
@@ -112,17 +132,18 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   useEffect(() => {
+    // FIX 4: bannerContainerRef is typed as HTMLDivElement (not `never`),
+    // so .children is valid. The `never` arose from `useRef(null)` without a type arg.
     if (bannerContainerRef.current && focusedResult > -1) {
-      bannerContainerRef.current.children?.[focusedResult]?.focus();
-      bannerContainerRef.current.children?.[focusedResult]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
-        inline: 'nearest',
-      });
-    } else if (bannerContainerRef.current && searchInputRef.current && focusedResult === -1) {
+      const child = bannerContainerRef.current.children?.[focusedResult] as HTMLElement | undefined;
+      child?.focus();
+      child?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+    } else if (bannerContainerRef.current && focusedResult === -1) {
       handleFocusToInput();
     }
-  }, [focusedResult, bannerContainerRef, handleFocusToInput]);
+  }, [focusedResult, handleFocusToInput]);
+
+  // ── Error snackbars ──────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (fetchError) {
@@ -132,7 +153,6 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         subtitle: fetchError?.message,
       });
     }
-
     if (errorFetchingUserProperties) {
       showSnackbar({
         kind: 'error',
@@ -142,30 +162,37 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     }
   }, [fetchError, errorFetchingUserProperties, t]);
 
+  // ── Search bar callbacks ─────────────────────────────────────────────────────
+
   const handleSubmit = useCallback(
-    (searchTerm: string) => {
-      if (shouldNavigateToPatientSearchPage && searchTerm?.trim()) {
+    (term: string) => {
+      if (shouldNavigateToPatientSearchPage && term?.trim()) {
         if (!isSearchPage) {
           window.sessionStorage.setItem('searchReturnUrl', window.location.pathname);
         }
-        navigate({
-          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(searchTerm)}`,
-        });
+        // FIX 5: openmrsSpaBase is a webpack DefinePlugin global — must use the
+        // exact escaped template-literal syntax `\${openmrsSpaBase}` so the
+        // TypeScript compiler treats it as a runtime string substitution, not a
+        // TS variable reference. This matches how the original file used it.
+        navigate({ to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(term)}` });
       }
     },
     [isSearchPage, shouldNavigateToPatientSearchPage],
   );
 
-  const handleClear = useCallback(() => {
-    setSearchTerm('');
-  }, [setSearchTerm]);
+  const handleClear = useCallback(() => setSearchTerm(''), []);
 
-  const handleSearchTermChange = (searchTerm: string) => setSearchTerm(searchTerm ?? '');
+  const handleSearchTermChange = useCallback((term: string) => setSearchTerm(term ?? ''), []);
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+
+  const showFloatingResults = !isSearchPage && (hasSearchTerm || (!hasSearchTerm && shouldTrackRecent));
 
   return (
     <PatientSearchContextProvider
       value={{
-        patientClickSideEffect: addViewedPatientAndCloseSearchResults,
+        nonNavigationSelectPatientAction: selectPatientAction,
+        patientClickSideEffect: selectPatientAction ? handleClear : recordRecentAndClose,
       }}>
       <div className={styles.patientSearchBar} ref={searchContainerRef}>
         <PatientSearchBar
@@ -174,28 +201,26 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           onChange={handleSearchTermChange}
           onSubmit={handleSubmit}
           onClear={handleClear}
+          buttonProps={buttonProps}
           ref={searchInputRef}
         />
 
-        {!isSearchPage && hasSearchTerm && (
+        {showFloatingResults && (
           <div
             className={styles.floatingSearchResultsContainer}
             data-testid="floatingSearchResultsContainer"
             data-tutorial-target="floating-search-results-container">
-            <PatientSearch query={debouncedSearchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
-          </div>
-        )}
-
-        {!isSearchPage && !hasSearchTerm && showRecentlySearchedPatients && (
-          <div
-            className={styles.floatingSearchResultsContainer}
-            data-testid="floatingSearchResultsContainer"
-            data-tutorial-target="floating-search-results-container">
-            <RecentlySearchedPatients
-              ref={bannerContainerRef}
-              {...recentPatientSearchResponse}
-              isLoading={recentPatientSearchResponse.isLoading || isLoadingPatients}
-            />
+            {hasSearchTerm ? (
+              <PatientSearch query={debouncedSearchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
+            ) : (
+              <RecentlySearchedPatients
+                ref={bannerContainerRef}
+                {...recentPatientSearchResponse}
+                data={recentPatients ?? undefined}
+                fetchError={recentPatientSearchResponse.fetchError ?? (null as unknown as Error)}
+                isLoading={recentPatientSearchResponse.isLoading || isLoadingPatients}
+              />
+            )}
           </div>
         )}
       </div>
