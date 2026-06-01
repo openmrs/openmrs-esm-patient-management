@@ -221,7 +221,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
           nonNavigationSelectPatientAction(patient.id, patient);
           patientClickSideEffect?.(patient.id, patient);
         }}
-        {...(isDeceased ? { 'data-deceased': 'true' } : null)}>
+        {...(isDeceased ? { 'data-deceased': 'true' } : {})}>
         {children}
       </button>
     );
@@ -235,7 +235,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
       to={interpolateString(config.search.patientChartUrl, {
         patientUuid: patient.id,
       })}
-      {...(isDeceased ? { 'data-deceased': 'true' } : null)}>
+      {...(isDeceased ? { 'data-deceased': 'true' } : {})}>
       {children}
     </ConfigurableLink>
   );
