@@ -58,4 +58,28 @@ describe('useInfinitePatientSearch', () => {
     expect(result.current.data).toHaveLength(10);
     expect(result.current.data?.[0].uuid).toBe('Jo-0');
   });
+
+  // Once the search is cleared, `keepPreviousData` keeps the last query's results in the SWR cache,
+  // but the hook must not keep surfacing them: consumers size arrow-key navigation off `data`, so
+  // returning stale results would let a keypress select a patient that is no longer on screen.
+  it('stops surfacing results once the search is no longer active', async () => {
+    const { result, rerender } = renderHook(
+      ({ q, searching }: { q: string; searching: boolean }) => useInfinitePatientSearch(q, false, searching, 10),
+      { wrapper, initialProps: { q: 'Jo', searching: true } },
+    );
+
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+    expect(result.current.hasMore).toBe(true);
+    expect(result.current.totalResults).toBe(100);
+
+    rerender({ q: '', searching: false });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(result.current.data).toBeNull();
+    expect(result.current.hasMore).toBe(false);
+    expect(result.current.totalResults).toBe(0);
+  });
 });

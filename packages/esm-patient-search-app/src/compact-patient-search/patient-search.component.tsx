@@ -66,7 +66,6 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
                 revalidateOnFocus: false,
                 revalidateOnReconnect: false,
                 dedupingInterval: 180_000, // 3 minutes
-                keepPreviousData: true,
               }}>
               <CompactPatientBanner
                 ref={ref}

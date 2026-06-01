@@ -65,9 +65,9 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
   ({ patients, hasMore = false, isValidating = false, fetchMore, virtualize = true }, ref) => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [pendingFocusIndex, setPendingFocusIndex] = useState<number | null>(null);
-    // Rows we've already shown as real banners, so a resumed scroll doesn't replace the rows that
-    // are still on screen with skeletons
-    const seenIndices = useRef<Set<number>>(new Set());
+    // Patients we've already shown as real banners, so a resumed scroll doesn't replace rows still
+    // on screen with skeletons.
+    const seenPatientUuids = useRef<Set<string>>(new Set());
 
     // When not virtualizing, give the virtualizer no items so it stays inert (no scroll management,
     // no virtual rows) — the full list is rendered directly below instead.
@@ -76,6 +76,7 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
       getScrollElement: () => scrollContainerRef.current,
       estimateSize: () => estimatedRowHeight,
       overscan,
+      getItemKey: (index) => patients[index]?.uuid ?? index,
     });
 
     const virtualItems = virtualizer.getVirtualItems();
@@ -95,10 +96,13 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
     useEffect(() => {
       if (virtualize && !virtualizer.isScrolling) {
         for (const item of virtualItems) {
-          seenIndices.current.add(item.index);
+          const uuid = patients[item.index]?.uuid;
+          if (uuid) {
+            seenPatientUuids.current.add(uuid);
+          }
         }
       }
-    }, [virtualize, virtualizer.isScrolling, virtualItems]);
+    }, [virtualize, virtualizer.isScrolling, virtualItems, patients]);
 
     useImperativeHandle(
       ref,
@@ -125,7 +129,10 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
         // Keep this row a real banner so focus isn't lost when it would otherwise revert to a
         // skeleton. Use the native focus scroll (rather than the virtualizer's) to bring it into
         // view — the two fight each other and leave the row partly out of view.
-        seenIndices.current.add(pendingFocusIndex);
+        const uuid = patients[pendingFocusIndex]?.uuid;
+        if (uuid) {
+          seenPatientUuids.current.add(uuid);
+        }
         focusable.focus();
         setPendingFocusIndex(null);
       } else {
@@ -133,7 +140,7 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
         // let this effect retry when the rendered rows change.
         virtualizer.scrollToIndex(pendingFocusIndex, { align: 'auto' });
       }
-    }, [pendingFocusIndex, patients.length, virtualItems, virtualizer]);
+    }, [pendingFocusIndex, patients, virtualItems, virtualizer]);
 
     return (
       // The bounding height is also set inline so the virtualizer always measures a 22rem viewport.
@@ -142,10 +149,10 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
         {virtualize ? (
           <div style={{ blockSize: virtualizer.getTotalSize() }}>
             {virtualItems.map((virtualRow) => {
-              // Show the skeleton only for rows we haven't shown yet
+              // Show the skeleton only for patients we haven't shown yet
               const showSkeleton =
                 virtualizer.isScrolling &&
-                !seenIndices.current.has(virtualRow.index) &&
+                !seenPatientUuids.current.has(patients[virtualRow.index]?.uuid) &&
                 virtualRow.index !== pendingFocusIndex;
               return (
                 <div
