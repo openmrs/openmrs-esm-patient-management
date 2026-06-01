@@ -8,6 +8,7 @@ export interface ActiveVisitsConfigSchema {
     obs: Array<string>;
     attributes: Array<AttributeDefinition>;
   };
+  drugOrderTypeUuid: string;
 }
 
 export interface IdentifiersDefinition {
@@ -100,5 +101,10 @@ export const configSchema = {
         _description: 'UUID of an observation concept.',
       },
     },
+  },
+  drugOrderTypeUuid: {
+    _type: Type.UUID,
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+    _description: 'The UUID of the "Drug Order" order type, used to filter medications in the visit summary.',
   },
 };
