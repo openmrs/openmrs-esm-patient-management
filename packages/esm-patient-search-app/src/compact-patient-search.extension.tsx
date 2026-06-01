@@ -7,6 +7,7 @@ import { useInfinitePatientSearch } from './patient-search.resource';
 import { PatientSearchContextProvider } from './patient-search-context';
 import useArrowNavigation from './hooks/useArrowNavigation';
 import PatientSearch from './compact-patient-search/patient-search.component';
+import { type CompactPatientBannerHandle } from './compact-patient-search/compact-patient-banner.component';
 import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
@@ -25,7 +26,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const config = useConfig<PatientSearchConfig>();
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const bannerContainerRef = useRef(null);
+  const bannerRef = useRef<CompactPatientBannerHandle>(null);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
   const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
@@ -72,17 +73,12 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   useEffect(() => {
-    if (bannerContainerRef.current && focusedResult > -1) {
-      bannerContainerRef.current.children?.[focusedResult]?.focus();
-      bannerContainerRef.current.children?.[focusedResult]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
-        inline: 'nearest',
-      });
-    } else if (bannerContainerRef.current && inputRef.current && focusedResult === -1) {
+    if (focusedResult > -1) {
+      bannerRef.current?.focusSearchResult(focusedResult);
+    } else if (bannerRef.current && inputRef.current && focusedResult === -1) {
       handleFocusToInput();
     }
-  }, [focusedResult, bannerContainerRef, handleFocusToInput]);
+  }, [focusedResult, handleFocusToInput]);
 
   return (
     <div className={styles.patientSearchBar} ref={searchContainerRef}>
@@ -110,7 +106,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
             patientClickSideEffect: handleClear,
           }}>
           <div className={styles.floatingSearchResultsContainer}>
-            <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
+            <PatientSearch query={searchTerm} ref={bannerRef} {...patientSearchResponse} />
           </div>
         </PatientSearchContextProvider>
       )}
