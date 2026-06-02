@@ -8,6 +8,19 @@ import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
 
+// The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
+// Stub it to render every row, letting the result assertions run.
+vi.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: ({ count }: { count: number }) => ({
+    getVirtualItems: () =>
+      Array.from({ length: count }, (_, index) => ({ index, key: index, start: index * 90, size: 90 })),
+    getTotalSize: () => count * 90,
+    scrollToIndex: () => {},
+    measureElement: () => {},
+    isScrolling: false,
+  }),
+}));
+
 const defaultProps = {
   currentPage: 0,
   data: [],
@@ -32,6 +45,31 @@ describe('PatientSearch', () => {
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps showing existing results (no skeleton) while a new query is loading', () => {
+    const birthdate = '1990-01-01T00:00:00.000+0000';
+    const existingResults: Array<SearchedPatient> = [
+      {
+        attributes: [],
+        identifiers: [],
+        person: {
+          age: dayjs().diff(birthdate, 'years'),
+          addresses: [],
+          birthdate,
+          dead: false,
+          deathDate: null,
+          gender: 'M',
+          personName: { display: 'Smith, John Doe', givenName: 'John', middleName: 'Doe', familyName: 'Smith' },
+        },
+        uuid: 'test-patient-uuid',
+      },
+    ];
+
+    renderPatientSearch({ isLoading: true, data: existingResults, totalResults: 1 });
+
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.getByText(/1 search result/i)).toBeInTheDocument();
   });
 
   it('renders an empty state when there are no matching search results', () => {
