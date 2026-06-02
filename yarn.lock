@@ -2565,6 +2565,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-search-app@workspace:packages/esm-patient-search-app"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
+    "@tanstack/react-virtual": "npm:^3.13.6"
     classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
     openmrs: "npm:next"
@@ -4429,6 +4430,25 @@ __metadata:
   dependencies:
     "@swc/counter": "npm:^0.1.3"
   checksum: 10/f6741450224892d12df43e5ca7f3cc0287df644dcd672626eb0cc2a3a8e3e875f4b29eb11336f37c7240cf6e010ba59eb3a79f4fb8bee5cbd168dfc1326ff369
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-virtual@npm:^3.13.6":
+  version: 3.13.26
+  resolution: "@tanstack/react-virtual@npm:3.13.26"
+  dependencies:
+    "@tanstack/virtual-core": "npm:3.16.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10/76373506b3ab0a7870299099f994398ab7ec06b889e27f056e6bcaf26984cbedb7b763f9d3965249f3699780c43c21fd245048a320e06fe1cdae48859a9c5f2f
+  languageName: node
+  linkType: hard
+
+"@tanstack/virtual-core@npm:3.16.0":
+  version: 3.16.0
+  resolution: "@tanstack/virtual-core@npm:3.16.0"
+  checksum: 10/e55c70b5d3f68894804f645fe67738bbcca5d5ced333f96c2bda0d4c6f3198e5f97a3a18021b1491e850a2b4a64bdaafab250a6ee8bb1f312e6d5179656c35d7
   languageName: node
   linkType: hard
 
