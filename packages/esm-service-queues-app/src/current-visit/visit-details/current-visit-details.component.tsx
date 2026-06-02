@@ -63,7 +63,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('triageNote', 'Triage note')}</StructuredListCell>
               <StructuredListCell>
-                <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} visit={visit} />
+                <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
               </StructuredListCell>
             </StructuredListRow>
             <StructuredListRow className={styles.structuredListRow}>
