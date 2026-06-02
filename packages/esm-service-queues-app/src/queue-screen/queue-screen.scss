@@ -32,7 +32,7 @@
 
 .card {
   border-radius: 0.9rem;
-  border: 1px solid #343332;
+  border: 1px solid $ui-05;
   margin: layout.$spacing-06;
   padding: 1.3rem;
   width: 30%;
@@ -43,13 +43,13 @@
 .header {
   font-size: layout.$spacing-07;
   font-weight: bold;
-  color: black;
+  color: $ui-05;
 }
 
 .headerBlinking {
   font-size: layout.$spacing-07;
   font-weight: bold;
-  color: red;
+  color: $danger;
   animation: blinker 1s linear infinite;
 }
 
