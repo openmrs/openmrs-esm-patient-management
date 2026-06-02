@@ -78,33 +78,35 @@ export function useInfinitePatientSearch(
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const shouldFetch = isSearching && searchQuery;
+  const shouldFetch = isSearching && Boolean(searchQuery);
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
     shouldFetch ? getUrl : null,
     openmrsFetch,
+    { keepPreviousData: true },
   );
 
   // Filter out null patients and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
   // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData =
-    data
-      ?.flatMap((res) => res.data?.results ?? [])
-      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
+  const mappedData = shouldFetch
+    ? (data
+        ?.flatMap((res) => res.data?.results ?? [])
+        ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
+    : null;
 
   return useMemo(
     () => ({
       data: mappedData,
       isLoading,
       fetchError: error,
-      hasMore: data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
+      hasMore: shouldFetch ? (data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false) : false,
       isValidating,
       setPage: setSize,
       currentPage: size,
-      totalResults: data?.[0]?.data?.totalCount ?? 0,
+      totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
     }),
-    [mappedData, isLoading, error, data, isValidating, setSize, size],
+    [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size],
   );
 }
 

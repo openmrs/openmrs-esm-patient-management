@@ -8,6 +8,19 @@ import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext } from '../patient-search-context';
 import CompactPatientBanner from './compact-patient-banner.component';
 
+// The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
+// Stub it to render every row, letting the result assertions run.
+vi.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: ({ count }: { count: number }) => ({
+    getVirtualItems: () =>
+      Array.from({ length: count }, (_, index) => ({ index, key: index, start: index * 90, size: 90 })),
+    getTotalSize: () => count * 90,
+    scrollToIndex: () => {},
+    measureElement: () => {},
+    isScrolling: false,
+  }),
+}));
+
 const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
 
 const birthdate = '1990-01-01T00:00:00.000+0000';
