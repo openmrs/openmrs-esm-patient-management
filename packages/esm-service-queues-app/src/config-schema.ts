@@ -410,7 +410,7 @@ export const configSchema = {
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
   },
   visitQueueNumberAttributeUuid: {
-    _type: Type.String,
+    _type: Type.UUID,
     _default: 'c0c579b0-8e59-401d-8a4a-976a0b183519',
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
   },
