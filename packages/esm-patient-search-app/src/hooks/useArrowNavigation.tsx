@@ -3,7 +3,7 @@ import { type SearchedPatient } from '../types';
 
 const useArrowNavigation = (
   totalResults: number,
-  enterCallback: (evt: React.MouseEvent<HTMLAnchorElement>, index: number, patients?: Array<SearchedPatient>) => void,
+  enterCallback: (evt: KeyboardEvent, index: number, patients?: Array<SearchedPatient>) => void,
   resetFocusCallback: () => void,
   initalFocusedResult: number = -1,
   containerRef?: RefObject<HTMLElement>,
@@ -11,7 +11,7 @@ const useArrowNavigation = (
   const [focusedResult, setFocusedResult] = useState(initalFocusedResult);
 
   const handleKeyPress = useCallback(
-    (e) => {
+    (e: KeyboardEvent) => {
       if (containerRef?.current && !containerRef.current.contains(document.activeElement)) {
         return;
       }
