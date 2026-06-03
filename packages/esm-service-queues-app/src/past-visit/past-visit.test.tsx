@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type Encounter, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
@@ -63,7 +63,6 @@ describe('PastVisit', () => {
       obs: [
         {
           uuid: 'obs-1',
-          obsDatetime: '2026-05-12T22:11:00.000+0000',
           concept: { uuid: generalPatientNoteConceptUuid, display: 'General patient note' },
           value: 'DNTBFGD',
         },
@@ -74,6 +73,8 @@ describe('PastVisit', () => {
 
     await user.click(screen.getByRole('tab', { name: /notes/i }));
 
-    expect(screen.getAllByText('DNTBFGD')).toHaveLength(1);
+    const notesPanel = screen.getByRole('tabpanel', { name: /notes/i });
+    expect(within(notesPanel).getAllByText('DNTBFGD')).toHaveLength(1);
+    expect(within(notesPanel).getByText(/10:11\s*PM/i)).toBeInTheDocument();
   });
 });

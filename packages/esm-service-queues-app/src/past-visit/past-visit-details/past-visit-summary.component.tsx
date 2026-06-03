@@ -58,7 +58,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     const vitalsToRetrieve: Array<Encounter> = [];
 
     // Extract diagnoses and notes from observations
-    const processObservations = (observations: Obs[], encounter: Encounter, useObsTime = false) => {
+    const processObservations = (observations: Obs[], encounter: Encounter) => {
       observations.forEach((obs: Obs) => {
         if (obs?.concept?.uuid === config.concepts.visitDiagnosesConceptUuid) {
           const problemListObs = obs.groupMembers?.find(
@@ -80,11 +80,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
               name: encounter.encounterProviders.length ? encounter.encounterProviders[0].provider.person.display : '',
               role: encounter.encounterProviders.length ? encounter.encounterProviders[0].encounterRole.display : '',
             },
-            time: useObsTime
-              ? formatTime(parseDate(obs.obsDatetime))
-              : encounter.encounterDatetime
-                ? formatTime(parseDate(encounter.encounterDatetime))
-                : '',
+            time: encounter.encounterDatetime ? formatTime(parseDate(encounter.encounterDatetime)) : '',
             concept: obs.concept,
           });
         }
@@ -107,7 +103,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
       }
 
       if (encounter?.obs) {
-        processObservations(encounter.obs, encounter, encounter.encounterType?.display === 'Visit Note');
+        processObservations(encounter.obs, encounter);
       }
 
       vitalsToRetrieve.push(encounter);
