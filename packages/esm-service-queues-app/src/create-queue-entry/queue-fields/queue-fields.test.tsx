@@ -84,7 +84,7 @@ describe('QueueFields', () => {
       '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
       0,
       '1',
-      null,
+      'c0c579b0-8e59-401d-8a4a-976a0b183519',
     );
   });
 });
