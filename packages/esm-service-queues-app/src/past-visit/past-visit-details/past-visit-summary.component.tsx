@@ -77,8 +77,8 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
           notes.push({
             note: String(obs.value || ''),
             provider: {
-              name: encounter.encounterProviders.length ? encounter.encounterProviders[0].provider.person.display : '',
-              role: encounter.encounterProviders.length ? encounter.encounterProviders[0].encounterRole.display : '',
+              name: encounter.encounterProviders?.[0]?.provider?.person?.display ?? '',
+              role: encounter.encounterProviders?.[0]?.encounterRole?.display ?? '',
             },
             time: encounter.encounterDatetime ? formatTime(parseDate(encounter.encounterDatetime)) : '',
             concept: obs.concept,
@@ -94,8 +94,8 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
           ...encounter.orders.map((order: Order) => ({
             order,
             provider: {
-              name: encounter.encounterProviders.length ? encounter.encounterProviders[0].provider.person.display : '',
-              role: encounter.encounterProviders.length ? encounter.encounterProviders[0].encounterRole.display : '',
+              name: encounter.encounterProviders?.[0]?.provider?.person?.display ?? '',
+              role: encounter.encounterProviders?.[0]?.encounterRole?.display ?? '',
             },
             time: encounter.encounterDatetime ? formatTime(parseDate(encounter.encounterDatetime)) : '',
           })),
