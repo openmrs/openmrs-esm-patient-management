@@ -63,64 +63,53 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     const notes: Array<Note> = [];
     const diagnoses: Array<DiagnosisItem> = [];
 
+    // Extract diagnoses and notes from observations
+    const processObservations = (observations: Obs[], encounter: Encounter) => {
+      observations.forEach((obs: Obs) => {
+        if (obs?.concept?.uuid === config.concepts.visitDiagnosesConceptUuid) {
+          const problemListObs = obs.groupMembers?.find(
+            (member) => member.concept?.uuid === config.concepts.problemListConceptUuid,
+          );
+          const diagnosisValue = problemListObs?.value;
+          const diagnosis =
+            typeof diagnosisValue === 'object' && diagnosisValue !== null && 'display' in diagnosisValue
+              ? diagnosisValue.display
+              : String(diagnosisValue || '');
+
+          diagnoses.push({
+            diagnosis,
+          });
+        } else if (config.concepts.generalPatientNoteConceptUuid === obs?.concept?.uuid) {
+          notes.push({
+            note: String(obs.value || ''),
+            provider: {
+              name: encounter.encounterProviders?.[0]?.provider?.person?.display ?? '',
+              role: encounter.encounterProviders?.[0]?.encounterRole?.display ?? '',
+            },
+            time: encounter.encounterDatetime ? formatTime(parseDate(encounter.encounterDatetime)) : '',
+            concept: obs.concept,
+          });
+        }
+      });
+    };
+
+    // Iterating through every Encounter
     encounters?.forEach((encounter) => {
       if (encounter.orders) {
         medications.push(
           ...encounter.orders.map((order: Order) => ({
             order,
             provider: {
-              name: encounter.encounterProviders.length ? encounter.encounterProviders[0].provider.person.display : '',
-              role: encounter.encounterProviders.length ? encounter.encounterProviders[0].encounterRole.display : '',
+              name: encounter.encounterProviders?.[0]?.provider?.person?.display ?? '',
+              role: encounter.encounterProviders?.[0]?.encounterRole?.display ?? '',
             },
             time: encounter.encounterDatetime ? formatTime(parseDate(encounter.encounterDatetime)) : '',
           })),
         );
       }
 
-      // Extract diagnoses and notes from observations
-      const processObservations = (observations: Obs[], useObsTime = false) => {
-        observations.forEach((obs: Obs) => {
-          if (obs?.concept?.uuid === config.concepts.visitDiagnosesConceptUuid) {
-            const problemListObs = obs.groupMembers?.find(
-              (member) => member.concept?.uuid === config.concepts.problemListConceptUuid,
-            );
-            const diagnosisValue = problemListObs?.value;
-            const diagnosis =
-              typeof diagnosisValue === 'object' && diagnosisValue !== null && 'display' in diagnosisValue
-                ? diagnosisValue.display
-                : String(diagnosisValue || '');
-
-            diagnoses.push({
-              diagnosis,
-            });
-          } else if (config.concepts.generalPatientNoteConceptUuid === obs?.concept?.uuid) {
-            notes.push({
-              note: String(obs.value || ''),
-              provider: {
-                name: encounter.encounterProviders.length
-                  ? encounter.encounterProviders[0].provider.person.display
-                  : '',
-                role: encounter.encounterProviders.length ? encounter.encounterProviders[0].encounterRole.display : '',
-              },
-              time: useObsTime
-                ? formatTime(parseDate(obs.obsDatetime))
-                : encounter.encounterDatetime
-                  ? formatTime(parseDate(encounter.encounterDatetime))
-                  : '',
-              concept: obs.concept,
-            });
-          }
-        });
-      };
-
-      // Process general observations
       if (encounter?.obs) {
-        processObservations(encounter.obs);
-      }
-
-      // Process Visit Note observations with obs-specific timing
-      if (encounter.encounterType?.display === 'Visit Note' && encounter.obs) {
-        processObservations(encounter.obs, true);
+        processObservations(encounter.obs, encounter);
       }
     });
     return [medications, notes, diagnoses];
