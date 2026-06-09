@@ -22,7 +22,7 @@ enum visitTypes {
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters, visit }) => {
   const { t } = useTranslation();
-  const { concepts } = useConfig<ConfigObject>();
+  const { concepts, visitNoteEncounterTypeUuid } = useConfig<ConfigObject>();
 
   const [diagnoses, notes, vitalsToRetrieve]: [Array<DiagnosisItem>, Array<Note>, Array<Encounter>] = useMemo(() => {
     const notes: Array<Note> = [];
@@ -31,30 +31,34 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
 
     // Iterating through every Encounter
     encounters?.forEach((enc: Encounter) => {
-      enc.obs?.forEach((obs: Observation) => {
-        if (obs.concept?.uuid === concepts.visitDiagnosesConceptUuid) {
-          const problemList = obs.groupMembers?.find((mem) => mem.concept?.uuid === concepts.problemListConceptUuid);
-          if (problemList?.value?.display) {
-            diagnoses.push({ diagnosis: problemList.value.display });
+      // Gate on encounter type so notes/diagnoses concepts reused elsewhere don't leak in here.
+      if (enc.encounterType?.uuid === visitNoteEncounterTypeUuid) {
+        enc.obs?.forEach((obs: Observation) => {
+          if (obs.concept?.uuid === concepts.visitDiagnosesConceptUuid) {
+            const problemList = obs.groupMembers?.find((mem) => mem.concept?.uuid === concepts.problemListConceptUuid);
+            if (problemList?.value?.display) {
+              diagnoses.push({ diagnosis: problemList.value.display });
+            }
+          } else if (obs.concept?.uuid === concepts.generalPatientNoteConceptUuid) {
+            notes.push({
+              note: obs.value,
+              provider: {
+                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+              },
+              time: formatTime(parseDate(obs.obsDatetime)),
+              concept: obs.concept,
+            });
           }
-        } else if (obs.concept?.uuid === concepts.generalPatientNoteConceptUuid) {
-          notes.push({
-            note: obs.value,
-            provider: {
-              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-            },
-            time: formatTime(parseDate(obs.obsDatetime)),
-            concept: obs.concept,
-          });
-        }
-      });
+        });
+      }
 
       vitalsToRetrieve.push(enc);
     });
     return [diagnoses, notes, vitalsToRetrieve];
   }, [
     encounters,
+    visitNoteEncounterTypeUuid,
     concepts.generalPatientNoteConceptUuid,
     concepts.problemListConceptUuid,
     concepts.visitDiagnosesConceptUuid,
