@@ -166,6 +166,11 @@
       "name": "ward-patient-order-basket-add-general-order-workspace",
       "component": "@openmrs/esm-patient-orders-app#exportedOrderBasketWorkspace",
       "window": "ward-patient-order-basket"
+    },
+    {
+      "name": "ward-patient-order-basket-add-allergy-workspace",
+      "component": "@openmrs/esm-patient-allergies-app#exportedAllergyFormWorkspace",
+      "window": "ward-patient-order-basket"
     }
   ],
   "workspaceWindows2": [
