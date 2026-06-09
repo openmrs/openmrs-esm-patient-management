@@ -5,7 +5,7 @@ import { type OpenmrsResource, type Visit, formatTime, parseDate, useConfig } fr
 import { type ConfigObject } from '../../config-schema';
 import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
 import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
-import TriageNote from './triage-note.component';
+import VisitNote from './visit-note.component';
 import Vitals from './vitals.component';
 import styles from '../current-visit.scss';
 
@@ -33,7 +33,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
     encounters?.forEach((enc: Encounter) => {
       enc.obs?.forEach((obs: Observation) => {
         if (obs.concept?.uuid === concepts.visitDiagnosesConceptUuid) {
-          const problemList = obs.groupMembers?.find((mem) => mem.concept.display === 'PROBLEM LIST');
+          const problemList = obs.groupMembers?.find((mem) => mem.concept?.uuid === concepts.problemListConceptUuid);
           if (problemList?.value?.display) {
             diagnoses.push({ diagnosis: problemList.value.display });
           }
@@ -53,7 +53,12 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
       vitalsToRetrieve.push(enc);
     });
     return [diagnoses, notes, vitalsToRetrieve];
-  }, [encounters, concepts.generalPatientNoteConceptUuid, concepts.visitDiagnosesConceptUuid]);
+  }, [
+    encounters,
+    concepts.generalPatientNoteConceptUuid,
+    concepts.problemListConceptUuid,
+    concepts.visitDiagnosesConceptUuid,
+  ]);
 
   return (
     <div className={styles.wrapper}>
@@ -63,7 +68,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
             <StructuredListRow className={styles.structuredListRow}>
               <StructuredListCell>{t('triageNote', 'Triage note')}</StructuredListCell>
               <StructuredListCell>
-                <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
+                <VisitNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
               </StructuredListCell>
             </StructuredListRow>
             <StructuredListRow className={styles.structuredListRow}>

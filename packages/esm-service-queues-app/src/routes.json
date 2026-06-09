@@ -209,16 +209,20 @@
     },
     {
       "name": "service-queues-patient-vitals",
-      "group": "service-queues"
+      "group": "service-queues-patient-context"
     },
     {
       "name": "service-queues-visit-note",
-      "group": "service-queues"
+      "group": "service-queues-patient-context"
     }
   ],
   "workspaceGroups2": [
     {
       "name": "service-queues",
+      "scopePattern": "/home/service-queues"
+    },
+    {
+      "name": "service-queues-patient-context",
       "scopePattern": "/home/service-queues"
     }
   ]

@@ -2,14 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, DataTableSkeleton } from '@carbon/react';
 import { getGlobalStore } from '@openmrs/esm-framework';
+import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
 import { useVisit } from './current-visit.resource';
 import CurrentVisitDetails from './visit-details/current-visit-details.component';
 import styles from './current-visit.scss';
 
-const VISIT_REFRESHING_WORKSPACES = new Set([
-  'service-queues-visit-notes-workspace',
-  'service-queues-patient-vitals-workspace',
-]);
+// External workspaces that don't share the useVisit SWR key, so we revalidate the visit when
+// they close rather than relying on the form to mutate it.
+const VISIT_REFRESHING_WORKSPACES = new Set([serviceQueuesVisitNotesWorkspace, serviceQueuesPatientVitalsWorkspace]);
 
 interface WorkspaceStoreState {
   openedWindows: Array<{ openedWorkspaces: Array<{ workspaceName: string }> }>;

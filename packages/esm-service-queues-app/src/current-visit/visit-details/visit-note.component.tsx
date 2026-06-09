@@ -3,16 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { launchWorkspace2, usePatient } from '@openmrs/esm-framework';
+import { serviceQueuesVisitNotesWorkspace } from '../../constants';
 import { type DiagnosisItem, type Note } from '../../types/index';
 import styles from './triage-note.scss';
 
-interface TriageNoteProps {
+interface VisitNoteProps {
   notes: Array<Note>;
   diagnoses: Array<DiagnosisItem>;
   patientUuid: string;
 }
 
-const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }) => {
+const VisitNote: React.FC<VisitNoteProps> = ({ notes, patientUuid, diagnoses }) => {
   const { t } = useTranslation();
   const { patient } = usePatient(patientUuid);
 
@@ -46,7 +47,7 @@ const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }
             disabled={!patient}
             renderIcon={(props) => <ArrowRight size={16} {...props} />}
             onClick={() =>
-              launchWorkspace2('service-queues-visit-notes-workspace', { formContext: 'creating' }, null, {
+              launchWorkspace2(serviceQueuesVisitNotesWorkspace, { formContext: 'creating' }, null, {
                 patient,
                 patientUuid,
               })
@@ -60,4 +61,4 @@ const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }
   );
 };
 
-export default TriageNote;
+export default VisitNote;

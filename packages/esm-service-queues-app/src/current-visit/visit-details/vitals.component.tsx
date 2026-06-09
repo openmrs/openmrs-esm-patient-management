@@ -6,6 +6,7 @@ import { ArrowRight, CircleFilled } from '@carbon/react/icons';
 import { type Visit, launchWorkspace2, useConfig, usePatient } from '@openmrs/esm-framework';
 import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
+import { serviceQueuesPatientVitalsWorkspace } from '../../constants';
 import { type ConfigObject } from '../../config-schema';
 import { type PatientVitals } from '../../types/index';
 import styles from './triage-note.scss';
@@ -149,7 +150,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                 disabled={!patient}
                 renderIcon={(props) => <ArrowRight size={16} {...props} />}
                 onClick={() =>
-                  launchWorkspace2('service-queues-patient-vitals-workspace', {
+                  launchWorkspace2(serviceQueuesPatientVitalsWorkspace, {
                     patient,
                     patientUuid,
                     visitContext: visit,
