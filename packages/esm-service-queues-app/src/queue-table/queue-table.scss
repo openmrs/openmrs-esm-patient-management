@@ -37,7 +37,7 @@
   flex: 0.25;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: $ui-02;
 
   :global(.cds--inline-loading) {
     justify-content: end;
@@ -190,7 +190,7 @@ html[dir='rtl'] {
 .tileContainer {
   border-top: 1px solid $ui-03;
   padding: layout.$spacing-07 layout.$spacing-05;
-  background: white;
+  background: $ui-02;
   margin: 0 layout.$spacing-05;
 }
 
