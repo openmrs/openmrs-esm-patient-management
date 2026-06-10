@@ -39,7 +39,7 @@ const VisitNote: React.FC<VisitNoteProps> = ({ notes, patientUuid, diagnoses }) 
       ) : (
         <div>
           <p className={styles.emptyText}>
-            {t('triageFormNotCompleted', 'Triage form has not been completed for this visit')}
+            {t('visitFormNotCompleted', 'Visit form has not been completed for this visit')}
           </p>
           <Button
             size="sm"
