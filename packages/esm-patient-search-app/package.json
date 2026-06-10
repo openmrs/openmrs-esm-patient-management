@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-search-app",
-  "version": "10.0.2",
+  "version": "11.0.0",
   "description": "Patient search microfrontend for O3",
   "browser": "dist/openmrs-esm-patient-search-app.js",
   "main": "src/index.ts",
@@ -38,12 +38,13 @@
   },
   "dependencies": {
     "@carbon/react": "^1.83.0",
+    "@tanstack/react-virtual": "^3.13.6",
     "classnames": "^2.3.2",
     "lodash-es": "^4.17.15",
     "react-hook-form": "^7.54.0"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-framework": "10.x",
     "react": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",

@@ -92,16 +92,23 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
     await wardPage.clickPatientCard(patientName);
   });
 
-  await test.step("Then I see the 'Discharge' button", async () => {
+  await test.step("Then I click the 'Discharge' siderail button to open the discharge workspace", async () => {
     await expect(page.getByRole('button', { name: 'Discharge' })).toBeVisible({ timeout: 10000 });
-  });
-
-  await test.step('And I discharge the patient', async () => {
     await page.getByRole('button', { name: 'Discharge' }).click();
   });
 
+  await test.step("Then I see the discharge form with a 'Confirm discharge' button", async () => {
+    await expect(page.getByRole('button', { name: /Confirm discharge/i })).toBeVisible({ timeout: 10000 });
+  });
+
+  await test.step('And I optionally add a discharge note', async () => {
+    const noteInput = page.getByPlaceholder(/Write any notes here/i);
+    await expect(noteInput).toBeVisible();
+    await noteInput.fill('Patient recovered and is ready to go home');
+  });
+
   await test.step('And I confirm the discharge', async () => {
-    await page.getByRole('button', { name: 'Proceed with patient discharge' }).click();
+    await page.getByRole('button', { name: /Confirm discharge/i }).click();
   });
 
   await test.step('Then I should see a success message confirming the patient was discharged', async () => {
