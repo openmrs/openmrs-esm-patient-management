@@ -14,6 +14,7 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
+import { serviceQueuesPatientVitalsWorkspace } from '../../constants';
 import { type OrderItem, type Order, type Note, type DiagnosisItem } from '../../types/index';
 import EncounterList from './encounter-list.component';
 import Medications from './medications-list.component';
@@ -33,7 +34,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
   const { patient } = usePatient(patientUuid);
 
   const launchCustomVitalsForm = useCallback(() => {
-    launchWorkspace2('service-queues-vitals-form-workspace', {
+    launchWorkspace2(serviceQueuesPatientVitalsWorkspace, {
       patientUuid,
       patient,
       visitContext: visit,

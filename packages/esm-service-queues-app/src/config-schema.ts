@@ -372,6 +372,12 @@ export const configSchema = {
     _default: false,
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
   },
+  visitNoteEncounterTypeUuid: {
+    _type: Type.UUID,
+    _default: 'd7151f82-c1f3-4152-a605-2f9ea7414a79',
+    _description:
+      'The UUID of the visit note encounter type, used to source diagnoses and notes shown in the visit summary.',
+  },
   visitQueueNumberAttributeUuid: {
     _type: Type.UUID,
     _default: 'c0c579b0-8e59-401d-8a4a-976a0b183519',
@@ -429,6 +435,7 @@ export interface ConfigObject {
   };
   queueTables: TablesConfig;
   showRecommendedVisitTypeTab: boolean;
+  visitNoteEncounterTypeUuid: string;
   visitQueueNumberAttributeUuid: string | null;
   visitTypeResourceUrl: string;
 }

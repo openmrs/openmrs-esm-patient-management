@@ -6,26 +6,30 @@ import {
   formatTime,
   launchWorkspace2,
   parseDate,
+  useConfig,
   usePatient,
   type OpenmrsResource,
   type Visit,
 } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
+import { serviceQueuesPatientVitalsWorkspace } from '../../constants';
 import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
-import TriageNote from './triage-note.component';
+import VisitNote from './visit-note.component';
 import styles from '../current-visit.scss';
 
 interface CurrentVisitProps {
   patientUuid: string;
   encounters: Array<Encounter | OpenmrsResource>;
-  visit: Visit;
+  visit?: Visit;
 }
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters, visit }) => {
   const { t } = useTranslation();
+  const { concepts, visitNoteEncounterTypeUuid } = useConfig<ConfigObject>();
   const { patient } = usePatient(patientUuid);
 
   const launchCustomVitalsForm = useCallback(() => {
-    launchWorkspace2('service-queues-vitals-form-workspace', {
+    launchWorkspace2(serviceQueuesPatientVitalsWorkspace, {
       patientUuid,
       patient,
       visitContext: visit,
@@ -36,14 +40,17 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
     const notes: Array<Note> = [];
     const diagnoses: Array<DiagnosisItem> = [];
 
+    // Iterating through every Encounter
     encounters?.forEach((enc: Encounter) => {
-      if (enc.encounterType?.display === 'Visit Note') {
-        enc.obs.forEach((obs: Observation) => {
-          if (obs.concept && obs.concept.display === 'Visit Diagnoses') {
-            diagnoses.push({
-              diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
-            });
-          } else if (obs.concept && obs.concept.display === 'General patient note') {
+      // Gate on encounter type so notes/diagnoses concepts reused elsewhere don't leak in here.
+      if (enc.encounterType?.uuid === visitNoteEncounterTypeUuid) {
+        enc.obs?.forEach((obs: Observation) => {
+          if (obs.concept?.uuid === concepts.visitDiagnosesConceptUuid) {
+            const problemList = obs.groupMembers?.find((mem) => mem.concept?.uuid === concepts.problemListConceptUuid);
+            if (problemList?.value?.display) {
+              diagnoses.push({ diagnosis: problemList.value.display });
+            }
+          } else if (obs.concept?.uuid === concepts.generalPatientNoteConceptUuid) {
             notes.push({
               note: obs.value,
               provider: {
@@ -58,7 +65,13 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
       }
     });
     return [diagnoses, notes];
-  }, [encounters]);
+  }, [
+    encounters,
+    visitNoteEncounterTypeUuid,
+    concepts.generalPatientNoteConceptUuid,
+    concepts.problemListConceptUuid,
+    concepts.visitDiagnosesConceptUuid,
+  ]);
 
   return (
     <div className={styles.wrapper}>
@@ -66,9 +79,9 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
         <StructuredListWrapper className={styles.structuredList}>
           <StructuredListBody>
             <StructuredListRow className={styles.structuredListRow}>
-              <StructuredListCell>{t('triageNote', 'Triage note')}</StructuredListCell>
+              <StructuredListCell>{t('visitNote', 'Visit note')}</StructuredListCell>
               <StructuredListCell>
-                <TriageNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
+                <VisitNote notes={notes} diagnoses={diagnoses} patientUuid={patientUuid} />
               </StructuredListCell>
             </StructuredListRow>
             <StructuredListRow className={styles.structuredListRow}>

@@ -15,7 +15,7 @@ export function useVisit(visitUuid?: string) {
 
   const apiUrl = `${restBaseUrl}/visit/${visitUuid}?v=${customRepresentation}`;
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: Visit }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Visit }, Error>(
     visitUuid ? apiUrl : null,
     openmrsFetch,
   );
@@ -25,5 +25,6 @@ export function useVisit(visitUuid?: string) {
     error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
