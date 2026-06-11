@@ -3,7 +3,10 @@ import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Appointment } from '../../types';
 import { navigate, useConfig, launchWorkspace2, showSnackbar } from '@openmrs/esm-framework';
-import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
+import {
+  changeAppointmentStatus,
+  getAppointmentStatus,
+} from '../../patient-appointments/patient-appointments.resource';
 import { useMutateAppointments } from '../../hooks/useMutateAppointments';
 import { type ConfigObject } from '../../config-schema';
 
@@ -68,8 +71,19 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid,
           patientUuid,
           showPatientHeader: true,
           openedFrom: 'appointments-check-in',
-          onVisitStarted: () => {
+          onVisitStarted: async () => {
             mutateVisits();
+            // The visit form's "upcoming appointments" card may have already checked this appointment
+            // in. The backend rejects a CheckedIn -> CheckedIn transition, so only check in if the
+            // appointment isn't already checked in. If the status can't be read, attempt the check-in
+            // anyway rather than silently skipping it.
+            try {
+              if ((await getAppointmentStatus(appointment.uuid)) === 'CheckedIn') {
+                return;
+              }
+            } catch (error) {
+              console.error('Could not verify appointment status before auto check-in:', error);
+            }
             checkIn(
               t('appointmentCheckedInAfterVisitStarted', 'The visit was started and the appointment was checked in'),
             );

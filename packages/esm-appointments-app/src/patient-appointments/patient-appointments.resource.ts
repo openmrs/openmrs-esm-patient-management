@@ -70,3 +70,10 @@ export const changeAppointmentStatus = async (toStatus: string, appointmentUuid:
     headers: { 'Content-Type': 'application/json' },
   });
 };
+
+// Reads the current status of a single appointment via GET /appointment?uuid={uuid}.
+export const getAppointmentStatus = async (appointmentUuid: string): Promise<string | undefined> => {
+  const url = `${restBaseUrl}/appointment?uuid=${appointmentUuid}`;
+  const { data } = await openmrsFetch<{ status?: string }>(url);
+  return data?.status;
+};

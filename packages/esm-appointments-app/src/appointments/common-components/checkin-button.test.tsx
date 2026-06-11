@@ -5,7 +5,10 @@ import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, launchWorkspace2, navigate, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
-import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
+import {
+  changeAppointmentStatus,
+  getAppointmentStatus,
+} from '../../patient-appointments/patient-appointments.resource';
 import CheckInButton from './checkin-button.component';
 
 vi.mock('../../patient-appointments/patient-appointments.resource');
@@ -14,6 +17,7 @@ vi.mock('../../hooks/useMutateAppointments', () => ({
 }));
 
 const mockChangeAppointmentStatus = changeAppointmentStatus as Mock;
+const mockGetAppointmentStatus = getAppointmentStatus as Mock;
 const mockLaunchWorkspace2 = launchWorkspace2 as Mock;
 const mockNavigate = navigate as Mock;
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -74,6 +78,7 @@ describe('CheckInButton', () => {
       checkInButton: { enabled: true, customUrl: '' },
     });
     mockChangeAppointmentStatus.mockResolvedValue({});
+    mockGetAppointmentStatus.mockResolvedValue('Scheduled');
   });
 
   it('navigates to the customUrl without changing status when one is configured', async () => {
@@ -129,6 +134,7 @@ describe('CheckInButton', () => {
   });
 
   it('automatically checks the patient in once the visit has been started', async () => {
+    mockGetAppointmentStatus.mockResolvedValue('Scheduled');
     render(<CheckInButton {...defaultProps} hasActiveVisit={false} />);
     await userEvent.click(screen.getByRole('button', { name: /check in/i }));
 
@@ -142,5 +148,35 @@ describe('CheckInButton', () => {
       expect(mockChangeAppointmentStatus).toHaveBeenCalledWith('CheckedIn', appointment.uuid);
     });
     expect(defaultProps.mutateVisits).toHaveBeenCalled();
+  });
+
+  it('does not re-check-in when the visit form already checked the appointment in', async () => {
+    // The visit form's "upcoming appointments" card checks the appointment in itself; re-sending
+    // CheckedIn would be rejected by the backend, so the auto check-in must be skipped.
+    mockGetAppointmentStatus.mockResolvedValue('CheckedIn');
+    render(<CheckInButton {...defaultProps} hasActiveVisit={false} />);
+    await userEvent.click(screen.getByRole('button', { name: /check in/i }));
+
+    const { onVisitStarted } = mockLaunchWorkspace2.mock.calls[0][1];
+    onVisitStarted();
+
+    await waitFor(() => {
+      expect(mockGetAppointmentStatus).toHaveBeenCalledWith(appointment.uuid);
+    });
+    expect(mockChangeAppointmentStatus).not.toHaveBeenCalled();
+    expect(defaultProps.mutateVisits).toHaveBeenCalled();
+  });
+
+  it('attempts the check-in anyway if the appointment status cannot be read', async () => {
+    mockGetAppointmentStatus.mockRejectedValue(new Error('network error'));
+    render(<CheckInButton {...defaultProps} hasActiveVisit={false} />);
+    await userEvent.click(screen.getByRole('button', { name: /check in/i }));
+
+    const { onVisitStarted } = mockLaunchWorkspace2.mock.calls[0][1];
+    onVisitStarted();
+
+    await waitFor(() => {
+      expect(mockChangeAppointmentStatus).toHaveBeenCalledWith('CheckedIn', appointment.uuid);
+    });
   });
 });
