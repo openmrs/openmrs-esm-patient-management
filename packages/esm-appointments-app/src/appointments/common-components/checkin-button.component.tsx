@@ -79,6 +79,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid,
             // anyway rather than silently skipping it.
             try {
               if ((await getAppointmentStatus(appointment.uuid)) === 'CheckedIn') {
+                mutateAppointments?.();
                 return;
               }
             } catch (error) {
