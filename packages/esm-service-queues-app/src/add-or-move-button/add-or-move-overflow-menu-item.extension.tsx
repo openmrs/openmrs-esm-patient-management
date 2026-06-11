@@ -26,7 +26,7 @@ const AddOrMoveOverflowMenuItem: React.FC<AddOrMoveOverflowMenuItemProps> = ({ p
     return <SkeletonText />;
   }
 
-  return <OverflowMenuItem itemText={t('transitionPatientAction', 'Transition patient')} onClick={handleLaunchModal} />;
+  return <OverflowMenuItem itemText={t('queuePatientButton', 'Queue patient')} onClick={handleLaunchModal} />;
 };
 
 export default AddOrMoveOverflowMenuItem;
