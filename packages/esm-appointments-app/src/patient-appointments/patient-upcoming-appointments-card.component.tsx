@@ -93,6 +93,9 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
 
   const appointments = todaysAppointments
     .concat(futureAppointments)
+    // An appointment later today satisfies both `isToday` and `isAfter(now)`, so it appears in
+    // both lists; dedupe by uuid to avoid rendering it twice.
+    .filter((appointment, index, self) => index === self.findIndex((a) => a.uuid === appointment.uuid))
     .filter((appointment) => appointment.status !== 'CheckedIn');
 
   const handleRadioChange = (appointment: Appointment) => {
