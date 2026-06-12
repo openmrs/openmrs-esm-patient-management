@@ -27,6 +27,15 @@
     position: relative;
     overflow: visible;
   }
+
+  :global(.cds--toolbar-content) {
+    align-items: center;
+
+    :global(.cds--btn) {
+      max-height: 2rem;
+      align-self: center;
+    }
+  }
 }
 
 .headerContainer {
@@ -135,6 +144,7 @@ html[dir='rtl'] {
       margin-left: 0;
       margin-right: layout.$spacing-03;
     }
+
     h2 {
       text-align: right;
     }
