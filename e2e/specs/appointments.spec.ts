@@ -318,6 +318,67 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   });
 });
 
+test('Newly created appointment displays on the correct date in both list and calendar views', async ({
+  page,
+  patient,
+}) => {
+  const appointmentsPage = new AppointmentsPage(page);
+
+  // Extract details from the created patient
+  const openmrsIdentifier = getPatientIdentifierStr(patient);
+  const firstName = patient.person.display.split(' ')[0];
+  const lastName = patient.person.display.split(' ')[1];
+
+  await test.step('Given I navigate to the Appointments dashboard', async () => {
+    await appointmentsPage.goto();
+  });
+
+  await test.step('When I create a new appointment for late evening', async () => {
+    await page.getByRole('button', { name: 'Create new appointment', exact: true }).click();
+    await page.getByTestId('patientSearchBar').fill(openmrsIdentifier);
+    await page.getByText(new RegExp(firstName)).click();
+    await page.selectOption('select#service', { label: 'Outpatient Department' });
+    await page.getByLabel('Select an appointment type').selectOption('Scheduled');
+
+    const now = dayjs();
+    const dateInput = page.getByTestId('datePickerInput');
+    const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
+    const dateMonthInput = dateInput.getByRole('spinbutton', { name: /month/i });
+    const dateYearInput = dateInput.getByRole('spinbutton', { name: /year/i });
+    await dateDayInput.fill(now.format('DD'));
+    await dateMonthInput.fill(now.format('MM'));
+    await dateYearInput.fill(now.format('YYYY'));
+
+    // Set time to a late time to expose timezone offset bugs (e.g., 11:30 PM)
+    await page.locator('#time-picker').clear();
+    await page.locator('#time-picker').fill('11:30');
+    await page.locator('#time-picker-select-1').selectOption('PM');
+
+    await page.getByLabel('Duration (minutes)').fill('30');
+    await page.getByPlaceholder(/write any additional points here/i).fill('Timezone boundary test appointment');
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a success message', async () => {
+    await expect(page.getByText('Appointment scheduled', { exact: true })).toBeVisible();
+  });
+
+  await test.step('And the appointment should appear in the daily List view on the correct date', async () => {
+    const appointmentRow = page.locator('table tr').filter({ hasText: openmrsIdentifier });
+    await expect(appointmentRow).toBeVisible();
+  });
+
+  // Switch to the Monthly Calendar view to verify the timezone aggregation fix
+  await test.step('When I switch to the Monthly Calendar view', async () => {
+    await page.getByRole('tab', { name: /Calendar/i }).click();
+  });
+
+  await test.step('Then the appointment should be visible on the SAME correct date in the Calendar', async () => {
+    // The calendar event should render with the patient's name visible, ensuring it wasn't pushed to the next/prev day UTC
+    await expect(page.getByText(new RegExp(firstName + ' ' + lastName, 'i')).first()).toBeVisible();
+  });
+});
+
 test.afterEach(async ({ api, page }) => {
   if (visit) {
     await endVisit(api, visit.uuid);
