@@ -27,15 +27,10 @@
     position: relative;
     overflow: visible;
   }
+}
 
-  :global(.cds--toolbar-content) {
-    align-items: center;
-
-    :global(.cds--btn) {
-      max-height: 2rem;
-      align-self: center;
-    }
-  }
+.toolbarContent {
+  align-items: center;
 }
 
 .headerContainer {
