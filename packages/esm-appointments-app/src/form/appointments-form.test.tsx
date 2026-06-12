@@ -127,7 +127,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByLabelText(/select a location/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/select a service/i)).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select a service/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write any additional points here/i)).toBeInTheDocument();
@@ -180,7 +180,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -258,7 +261,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -409,7 +415,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
     await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
     await user.selectOptions(providerSelect, ['doctor - James Cook']);
 
@@ -446,7 +455,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -476,7 +488,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -513,7 +528,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
 
     // Wait for service selection to update duration field
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -564,7 +582,10 @@ describe('AppointmentForm', () => {
     const saveButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.selectOptions(locationSelect, ['Inpatient Ward']);
-    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await user.click(serviceSelect);
+    await user.type(serviceSelect, 'Outpatient');
+    const outpatientOption = await screen.findByText('Outpatient');
+    await user.click(outpatientOption);
 
     // Set appointment date to today
     const appointmentDate = '2024-01-04';
@@ -604,7 +625,10 @@ describe('AppointmentForm', () => {
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
       await user.selectOptions(locationSelect, ['Inpatient Ward']);
-      await user.selectOptions(serviceSelect, ['Outpatient']);
+      await user.click(serviceSelect);
+      await user.type(serviceSelect, 'Outpatient');
+      const outpatientOption = await screen.findByText('Outpatient');
+      await user.click(outpatientOption);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -666,7 +690,10 @@ describe('AppointmentForm', () => {
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
       await user.selectOptions(locationSelect, ['Inpatient Ward']);
-      await user.selectOptions(serviceSelect, ['Outpatient']);
+      await user.click(serviceSelect);
+      await user.type(serviceSelect, 'Outpatient');
+      const outpatientOption = await screen.findByText('Outpatient');
+      await user.click(outpatientOption);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -705,7 +732,10 @@ describe('AppointmentForm', () => {
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
       await user.selectOptions(locationSelect, ['Inpatient Ward']);
-      await user.selectOptions(serviceSelect, ['Outpatient']);
+      await user.click(serviceSelect);
+      await user.type(serviceSelect, 'Outpatient');
+      const outpatientOption = await screen.findByText('Outpatient');
+      await user.click(outpatientOption);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -760,7 +790,10 @@ describe('AppointmentForm', () => {
       const saveButton = screen.getByRole('button', { name: /save and close/i });
 
       await user.selectOptions(locationSelect, ['Inpatient Ward']);
-      await user.selectOptions(serviceSelect, ['Outpatient']);
+      await user.click(serviceSelect);
+      await user.type(serviceSelect, 'Outpatient');
+      const outpatientOption = await screen.findByText('Outpatient');
+      await user.click(outpatientOption);
 
       // Wait for service selection to update duration field
       await new Promise((resolve) => setTimeout(resolve, 500));
