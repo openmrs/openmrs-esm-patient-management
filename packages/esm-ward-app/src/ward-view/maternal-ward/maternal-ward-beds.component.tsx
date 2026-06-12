@@ -39,7 +39,7 @@ const MaternalWardBeds: React.FC<MotherChildRelationships> = (motherChildRelatio
         // and put the child in childrenInSameBedByMotherUuid
         const patientUuid = wardPatient.patient.uuid;
         const { patient: mother } = motherByChildUuid?.get(patientUuid) ?? {};
-        const motherInSameBed = patientsInCurrentBed.some((p) => p.uuid == mother?.uuid);
+        const motherInSameBed = patientsInCurrentBed.some((p) => p.uuid === mother?.uuid);
         if (motherInSameBed) {
           if (!childrenInSameBedByMotherUuid.has(mother.uuid)) {
             childrenInSameBedByMotherUuid.set(mother.uuid, []);
