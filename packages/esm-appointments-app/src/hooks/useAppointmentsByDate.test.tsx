@@ -86,6 +86,21 @@ describe('useAppointmentsByDate', () => {
     expect(result.current.appointments[1].uuid).toBe('a2');
   });
 
+  it('sorts appointments by startDateTime ascending', async () => {
+    const early = mockAppointment({ uuid: 'early', startDateTime: new Date('2026-06-09T09:00:00').getTime() });
+    const late = mockAppointment({ uuid: 'late', startDateTime: new Date('2026-06-09T14:00:00').getTime() });
+    const noon = mockAppointment({ uuid: 'noon', startDateTime: new Date('2026-06-09T12:00:00').getTime() });
+    mockOpenmrsFetch.mockResolvedValue({ data: [late, early, noon] } as FetchResponse);
+
+    const { result } = renderHook(() => useAppointmentsByDate('2026-06-09'), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.appointments).toHaveLength(3);
+    expect(result.current.appointments[0].uuid).toBe('early');
+    expect(result.current.appointments[1].uuid).toBe('noon');
+    expect(result.current.appointments[2].uuid).toBe('late');
+  });
+
   it('falls back to an empty array when data is undefined (empty response)', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: undefined } as unknown as FetchResponse);
 

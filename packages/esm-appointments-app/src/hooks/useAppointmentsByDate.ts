@@ -14,5 +14,7 @@ export function useAppointmentsByDate(isoDate: string | null | undefined): {
     errorRetryCount: 2,
   });
 
-  return { appointments: data?.data ?? [], isLoading, error };
+  const appointments = (data?.data ?? []).sort((a, b) => (a.startDateTime ?? 0) - (b.startDateTime ?? 0));
+
+  return { appointments, isLoading, error };
 }
