@@ -1,0 +1,120 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  overflow-x: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 4rem repeat(7, 1fr);
+  grid-auto-rows: minmax(3rem, auto);
+}
+
+.cornerCell {
+  border-bottom: 1px solid colors.$gray-20;
+  background: colors.$gray-10;
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-02;
+  border-bottom: 1px solid colors.$gray-20;
+  border-right: 1px solid colors.$gray-20;
+  background: colors.$gray-10;
+  min-height: 4rem;
+}
+
+.dayHeaderToday {
+  background: colors.$blue-10;
+  border-bottom-color: colors.$blue-50;
+}
+
+.dowLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.dayNum {
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
+  line-height: 1.2;
+}
+
+.dayNumToday {
+  color: colors.$blue-60;
+  background: colors.$blue-20;
+  border-radius: 50%;
+  width: 1.625rem;
+  height: 1.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.monthLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-50;
+}
+
+.timeLabel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: layout.$spacing-02 layout.$spacing-03 0 0;
+  border-right: 1px solid colors.$gray-20;
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  font-size: 0.625rem;
+}
+
+.slotCell {
+  border-bottom: 1px solid colors.$gray-10;
+  border-right: 1px solid colors.$gray-10;
+  padding: layout.$spacing-01;
+  min-height: 2.5rem;
+  overflow: hidden;
+  cursor: default;
+}
+
+.slotCellToday {
+  background: rgba(colors.$blue-10, 0.4);
+}
+
+.slotCellHasAppts {
+  cursor: pointer;
+
+  &:hover {
+    background: colors.$gray-10;
+  }
+}
+
+.grid > :nth-child(8n) {
+  border-right: none;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  padding: 1px layout.$spacing-02;
+  margin-bottom: 1px;
+  border-left: 3px solid;
+  border-radius: 2px;
+  @include type.type-style('label-01');
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  color: colors.$gray-100;
+}
