@@ -139,24 +139,6 @@ export interface Observation {
   obsDatetime: string;
 }
 
-export interface PatientVitals {
-  systolic?: number;
-  diastolic?: number;
-  pulse?: number;
-  temperature?: number;
-  oxygenSaturation?: number;
-  height?: number;
-  weight?: number;
-  bmi?: number | null;
-  respiratoryRate?: number;
-  muac?: number;
-  provider?: {
-    name: string;
-    role: string;
-  };
-  time?: string;
-}
-
 export interface MappedEncounter {
   id: string;
   datetime: string;
@@ -175,22 +157,6 @@ export interface FormattedEncounter {
   obs: Array<Obs>;
   provider: string;
 }
-
-export interface ObsMetaInfo {
-  [_: string]: any;
-
-  assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
-}
-
-export type OBSERVATION_INTERPRETATION =
-  | 'NORMAL'
-  | 'HIGH'
-  | 'CRITICALLY_HIGH'
-  | 'OFF_SCALE_HIGH'
-  | 'LOW'
-  | 'CRITICALLY_LOW'
-  | 'OFF_SCALE_LOW'
-  | '--';
 
 export interface PatientProgram {
   uuid: string;
