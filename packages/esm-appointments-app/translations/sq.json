@@ -10,6 +10,7 @@
   "appointmentCancelled": "Takim I anuluar",
   "appointmentCancelledSuccessfully": "Takim i anuluar me sukses",
   "appointmentCheckedIn": "Takim Checked Në",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "Takim conflict",
