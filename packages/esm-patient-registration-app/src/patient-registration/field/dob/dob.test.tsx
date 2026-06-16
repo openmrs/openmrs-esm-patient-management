@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,7 +10,7 @@ import { initialFormValues } from '../../patient-registration.component';
 import { DobField } from './dob.component';
 import { type FormValues } from '../../patient-registration.types';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
  * Helper to render DobField with Formik render props for state-dependent tests.
@@ -42,7 +43,7 @@ const renderDobFieldWithFormik = (
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
+                setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
                 isOffline: false,
@@ -83,9 +84,9 @@ const renderDobField = (initialValues: Partial<FormValues> = {}) => {
             values: { ...initialFormValues, ...defaultValues } as FormValues,
             validationSchema: null,
             inEditMode: false,
-            setFieldValue: jest.fn().mockResolvedValue(undefined),
-            setCapturePhotoProps: jest.fn(),
-            setFieldTouched: jest.fn().mockResolvedValue(undefined),
+            setFieldValue: vi.fn().mockResolvedValue(undefined),
+            setCapturePhotoProps: vi.fn(),
+            setFieldTouched: vi.fn().mockResolvedValue(undefined),
             currentPhoto: '',
             isOffline: false,
             initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, afterAll, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
@@ -7,8 +8,8 @@ import AppointmentActions from './appointments-actions.component';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
 import userEvent from '@testing-library/user-event';
 
-jest.mock('../../patient-appointments/patient-appointments.resource');
-const mockChangeAppointmentStatus = changeAppointmentStatus as jest.Mock;
+vi.mock('../../patient-appointments/patient-appointments.resource');
+const mockChangeAppointmentStatus = changeAppointmentStatus as Mock;
 
 const appointment: Appointment = {
   uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
@@ -59,11 +60,11 @@ const defaultProps = {
   hasActiveVisit: false,
 };
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
 describe('AppointmentActions', () => {
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders the check in button when appointment is scheduled and check in button is enabled', () => {

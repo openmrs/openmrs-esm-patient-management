@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, DataTableSkeleton } from '@carbon/react';
+import { getGlobalStore } from '@openmrs/esm-framework';
+import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
 import { useVisit } from './current-visit.resource';
 import CurrentVisitDetails from './visit-details/current-visit-details.component';
 import styles from './current-visit.scss';
+
+// External workspaces that don't share the useVisit SWR key, so we revalidate the visit when
+// they close rather than relying on the form to mutate it.
+const VISIT_REFRESHING_WORKSPACES = new Set([serviceQueuesVisitNotesWorkspace, serviceQueuesPatientVitalsWorkspace]);
+
+interface WorkspaceStoreState {
+  openedWindows: Array<{ openedWorkspaces: Array<{ workspaceName: string }> }>;
+}
 
 interface CurrentVisitProps {
   patientUuid: string;
@@ -12,7 +22,32 @@ interface CurrentVisitProps {
 
 const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
-  const { visit, isLoading } = useVisit(visitUuid);
+  const { visit, isLoading, mutate } = useVisit(visitUuid);
+
+  const openRefreshingWorkspacesRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const store = getGlobalStore<WorkspaceStoreState>('workspace2');
+    const getOpenRefreshing = (state: WorkspaceStoreState) => {
+      const open = new Set<string>();
+      state?.openedWindows?.forEach((window) =>
+        window.openedWorkspaces?.forEach(({ workspaceName }) => {
+          if (VISIT_REFRESHING_WORKSPACES.has(workspaceName)) {
+            open.add(workspaceName);
+          }
+        }),
+      );
+      return open;
+    };
+    openRefreshingWorkspacesRef.current = getOpenRefreshing(store.getState());
+    return store.subscribe((state) => {
+      const nowOpen = getOpenRefreshing(state);
+      const didClose = [...openRefreshingWorkspacesRef.current].some((name) => !nowOpen.has(name));
+      openRefreshingWorkspacesRef.current = nowOpen;
+      if (didClose) {
+        mutate();
+      }
+    });
+  }, [mutate]);
 
   if (!visitUuid) {
     return <p className={styles.bodyLong01}>{t('noActiveVisit', 'No active visit')}</p>;
@@ -38,7 +73,7 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
         </div>
       </div>
       <div className={styles.visitContainer}>
-        <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} />
+        <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} visit={visit} />
       </div>
     </div>
   );

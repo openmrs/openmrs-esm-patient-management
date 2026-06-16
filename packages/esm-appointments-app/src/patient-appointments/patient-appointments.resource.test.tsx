@@ -1,10 +1,11 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { usePatientAppointments } from './patient-appointments.resource';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SWRConfig
@@ -147,6 +148,35 @@ describe('usePatientAppointments', () => {
     );
     // Data must reflect the new date's response, not the first date's cached data
     await waitFor(() => expect(result.current.data?.pastAppointments).toHaveLength(1));
+  });
+
+  it('places an appointment occurring later today in todaysAppointments only, not in upcomingAppointments', async () => {
+    // Later today is after `now` but still today, so it must not leak into the "upcoming" (future days) list.
+    const laterToday = new Date().setHours(23, 0, 0, 0);
+    mockOpenmrsFetch.mockResolvedValue({
+      data: [{ uuid: 'later-today', status: 'Scheduled', startDateTime: laterToday }],
+    } as FetchResponse);
+
+    const { result } = renderHook(() => usePatientAppointments('patient-1', '2026-04-01', abortController), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.data?.todaysAppointments).toHaveLength(1));
+    expect(result.current.data?.upcomingAppointments).toHaveLength(0);
+  });
+
+  it('places an appointment on a future day in upcomingAppointments', async () => {
+    const futureDate = new Date(new Date().setDate(new Date().getDate() + 2)).getTime();
+    mockOpenmrsFetch.mockResolvedValue({
+      data: [{ uuid: 'future', status: 'Scheduled', startDateTime: futureDate }],
+    } as FetchResponse);
+
+    const { result } = renderHook(() => usePatientAppointments('patient-1', '2026-04-01', abortController), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.data?.upcomingAppointments).toHaveLength(1));
+    expect(result.current.data?.todaysAppointments).toHaveLength(0);
   });
 
   it('does not fetch again when patientUuid and startDate are unchanged (cache hit)', async () => {
