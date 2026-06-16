@@ -199,7 +199,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                     {t('changeStatus', 'Change status')}
                   </TableBatchAction>
                 </TableBatchActions>
-                <TableToolbarContent>
+                <TableToolbarContent className={styles.toolbarContent}>
                   <TableToolbarSearch
                     className={styles.searchbar}
                     labelText={t('filterAppointments', 'Filter appointments')}

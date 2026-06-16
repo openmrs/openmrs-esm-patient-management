@@ -10,6 +10,7 @@
   "appointmentCancelled": "预约已取消",
   "appointmentCancelledSuccessfully": "预约已成功取消",
   "appointmentCheckedIn": "预约已签到",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "预约冲突",
