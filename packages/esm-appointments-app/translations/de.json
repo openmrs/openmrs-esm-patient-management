@@ -10,6 +10,7 @@
   "appointmentCancelled": "Termin storniert",
   "appointmentCancelledSuccessfully": "Termin erfogreich storniert",
   "appointmentCheckedIn": "Termin bestätigt",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Termin unter Verwendung eines bestehenden aktiven Aufenthalts eingecheckt",
   "appointmentCheckInFailed": "Beim Einchecken des Termins ist ein Fehler aufgetreten",
   "appointmentConflict": "Terminüberschneidung",
