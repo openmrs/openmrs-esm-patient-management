@@ -38,7 +38,6 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
 
     return (
       <form onSubmit={handleSubmit} className={styles.searchArea}>
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <Search
           autoFocus
           className={styles.patientSearchInput}

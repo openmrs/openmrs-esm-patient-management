@@ -20,8 +20,8 @@ import EncounterObservations from './encounter-observations.component';
 
 interface EncounterListProps {
   encounters: Array<{
-    id: any;
-    time: any;
+    id: string;
+    time: string;
     encounterType: string;
     provider: string;
     obs: Array<Obs>;

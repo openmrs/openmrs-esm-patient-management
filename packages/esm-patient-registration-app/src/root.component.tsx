@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import useSWRImmutable from 'swr/immutable';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Grid, Row } from '@carbon/react';
-import { ExtensionSlot, useConnectivity, useSession } from '@openmrs/esm-framework';
+import { Grid } from '@carbon/react';
+import { useConnectivity, useSession } from '@openmrs/esm-framework';
 import {
   fetchAddressTemplate,
   fetchAllRelationshipTypes,
@@ -34,9 +34,6 @@ export default function Root() {
   return (
     <main className={classNames('omrs-main-content', styles.root)}>
       <Grid className={styles.grid}>
-        <Row>
-          <ExtensionSlot name="breadcrumbs-slot" />
-        </Row>
         <ResourcesContextProvider
           value={{
             addressTemplate,

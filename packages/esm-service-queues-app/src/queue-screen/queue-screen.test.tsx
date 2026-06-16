@@ -1,21 +1,22 @@
 import React from 'react';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useActiveTickets } from './useActiveTickets';
 import { updateSelectedQueueLocationName, updateSelectedQueueLocationUuid } from '../store/store';
 import QueueScreen from './queue-screen.component';
 
-const mockUseActiveTickets = jest.mocked(useActiveTickets);
+const mockUseActiveTickets = vi.mocked(useActiveTickets);
 
-jest.mock('./useActiveTickets', () => ({
-  useActiveTickets: jest.fn(),
+vi.mock('./useActiveTickets', () => ({
+  useActiveTickets: vi.fn(),
 }));
 
-jest.mock('../hooks/useQueues', () => ({
-  useQueues: jest.fn(() => ({ queues: [] })),
+vi.mock('../hooks/useQueues', () => ({
+  useQueues: vi.fn(() => ({ queues: [] })),
 }));
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+vi.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: vi.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
 }));
 
 describe('QueueScreen component', () => {
@@ -25,7 +26,7 @@ describe('QueueScreen component', () => {
   });
 
   test('renders loading skeleton when data is loading', () => {
-    mockUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined, mutate: jest.fn() });
+    mockUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined, mutate: vi.fn() });
 
     render(<QueueScreen />);
 
@@ -37,7 +38,7 @@ describe('QueueScreen component', () => {
       error: new Error('Error'),
       isLoading: false,
       activeTickets: [],
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<QueueScreen />);
@@ -50,7 +51,7 @@ describe('QueueScreen component', () => {
       activeTickets: [],
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<QueueScreen />);
@@ -69,7 +70,7 @@ describe('QueueScreen component', () => {
       ],
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<QueueScreen />);

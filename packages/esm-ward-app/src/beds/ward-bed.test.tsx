@@ -1,4 +1,5 @@
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import {
@@ -17,23 +18,24 @@ import WardBed from './ward-bed.component';
 
 const defaultConfig: WardConfigObject = getDefaultsFromConfigSchema(configSchema);
 
-jest.mocked(useConfig).mockReturnValue(defaultConfig);
-jest.mock('../hooks/useObs', () => ({
-  useObs: jest.fn(),
+vi.mocked(useConfig).mockReturnValue(defaultConfig);
+vi.mock('../hooks/useObs', () => ({
+  useObs: vi.fn(),
 }));
-jest.mock('../ward-patient-card/row-elements/ward-patient-obs.resource', () => ({
-  useConceptToTagColorMap: jest.fn(),
+vi.mock('../ward-patient-card/row-elements/ward-patient-obs.resource', async (importOriginal) => ({
+  ...((await importOriginal()) as object),
+  useConceptToTagColorMap: vi.fn(),
 }));
 
 const mockBedLayouts = filterBeds(mockAdmissionLocation);
 
-jest.mock('../hooks/useWardLocation', () => jest.fn());
+vi.mock('../hooks/useWardLocation', () => ({ default: vi.fn() }));
 //@ts-ignore
-jest.mocked(useObs).mockReturnValue({
+vi.mocked(useObs).mockReturnValue({
   data: [],
 });
 
-const mockedUseWardLocation = useWardLocation as jest.Mock;
+const mockedUseWardLocation = useWardLocation as Mock;
 mockedUseWardLocation.mockReturnValue({
   location: mockLocationInpatientWard,
   isLoadingLocation: false,

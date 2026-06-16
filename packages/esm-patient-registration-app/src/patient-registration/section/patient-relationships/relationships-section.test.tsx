@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
@@ -10,8 +11,8 @@ import { ResourcesContextProvider } from '../../../resources-context';
 import { renderWithContext } from 'tools';
 import { initialFormValues } from '../../patient-registration.component';
 
-jest.mock('../../patient-registration.resource', () => ({
-  fetchPerson: jest.fn().mockResolvedValue({
+vi.mock('../../patient-registration.resource', () => ({
+  fetchPerson: vi.fn().mockResolvedValue({
     data: {
       results: [
         { uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd24', display: 'Person 1' },
@@ -68,8 +69,8 @@ function renderRelationshipsSectionWithFormik(
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
-                setFieldTouched: jest.fn().mockResolvedValue(undefined),
+                setCapturePhotoProps: vi.fn(),
+                setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
                 isOffline: false,
                 initialFormValues: formValuesRef,

@@ -55,7 +55,7 @@ export function useLocations(
   locations: Array<LocationEntry>;
   isLoading: boolean;
   loadingNewData: boolean;
-  error: any;
+  error: Error | undefined;
 } {
   const debouncedQuery = useDebounce(searchQuery);
 
@@ -98,9 +98,9 @@ export function useLocations(
 export function usePersonAttributeType(personAttributeTypeUuid: string): {
   data: PersonAttributeTypeResponse | undefined;
   isLoading: boolean;
-  error: any;
+  error: Error | undefined;
 } {
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>, Error>(
     `${restBaseUrl}/personattributetype/${personAttributeTypeUuid}`,
     openmrsFetch,
   );
