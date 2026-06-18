@@ -10,6 +10,7 @@
   "appointmentCancelled": "Cuộc hẹn dã hủy",
   "appointmentCancelledSuccessfully": "Hủy cuộc hẹn thành công",
   "appointmentCheckedIn": "Appointment Checked In",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "Xung đột cuộc hẹn",

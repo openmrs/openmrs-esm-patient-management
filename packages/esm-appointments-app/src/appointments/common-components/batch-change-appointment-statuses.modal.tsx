@@ -92,7 +92,7 @@ const BatchChangeAppointmentStatusesModal: React.FC<BatchChangeAppointmentStatus
     setIsSubmitting(true);
     Promise.allSettled(appointments.map(updateAppointment))
       .then(async (results) => {
-        const hasFailedResults = results.some((result) => result.status == 'rejected');
+        const hasFailedResults = results.some((result) => result.status === 'rejected');
         if (hasFailedResults) {
           for (let i = 0; i < results.length; i++) {
             const result = results[i];
