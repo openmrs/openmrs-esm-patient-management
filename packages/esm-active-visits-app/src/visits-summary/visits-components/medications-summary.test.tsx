@@ -39,7 +39,7 @@ describe('MedicationSummary', () => {
       />,
     );
 
-    expect(screen.getByText('Aspirin')).toBeInTheDocument();
-    expect(screen.queryByText('Complete-blood-count')).not.toBeInTheDocument();
+    expect(screen.getByText(/aspirin/i)).toBeInTheDocument();
+    expect(screen.queryByText(/complete-blood-count/i)).not.toBeInTheDocument();
   });
 });
