@@ -46,12 +46,14 @@ describe('PastVisit', () => {
 
   it('renders a Visit Note encounter note exactly once (no duplication)', async () => {
     const user = userEvent.setup();
-    const { generalPatientNoteConceptUuid } = getDefaultsFromConfigSchema(configSchema).concepts;
+    const defaults = getDefaultsFromConfigSchema(configSchema);
+    const { generalPatientNoteConceptUuid } = defaults.concepts;
+    const { visitNoteEncounterTypeUuid } = defaults;
 
     const encounter = {
       uuid: 'enc-1',
       encounterDatetime: '2026-05-12T22:11:00.000+0000',
-      encounterType: { uuid: 'visit-note-type', display: 'Visit Note' },
+      encounterType: { uuid: visitNoteEncounterTypeUuid, display: 'Visit Note' },
       encounterProviders: [
         {
           uuid: 'ep-1',

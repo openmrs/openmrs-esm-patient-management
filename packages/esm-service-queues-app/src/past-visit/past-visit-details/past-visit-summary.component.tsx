@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
-import { formatTime, parseDate, type Encounter, type Obs, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
-import { type OrderItem, type Order, type Note, type DiagnosisItem } from '../../types/index';
+import { formatTime, parseDate, type Encounter } from '@openmrs/esm-framework';
+import { type OrderItem, type Order, type Encounter as ServiceQueuesEncounter } from '../../types/index';
+import { useNotesAndDiagnoses } from '../../current-visit/hooks/useNotesAndDiagnoses';
 import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
 import EncounterList from './encounter-list.component';
 import Medications from './medications-list.component';
@@ -25,7 +25,7 @@ enum visitTypes {
 const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patientUuid }) => {
   const { t } = useTranslation();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const config = useConfig<ConfigObject>();
+  const { notes, diagnoses } = useNotesAndDiagnoses(encounters as Array<ServiceQueuesEncounter>);
 
   const encountersToDisplay = useMemo(
     () =>
@@ -45,49 +45,9 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     [encounters],
   );
 
-  const [medications, notes, diagnoses, vitalsToRetrieve]: [
-    Array<OrderItem>,
-    Array<Note>,
-    Array<DiagnosisItem>,
-    Array<Encounter>,
-  ] = useMemo(() => {
-    // Medication Tab
+  const medications: Array<OrderItem> = useMemo(() => {
     const medications: Array<OrderItem> = [];
-    const notes: Array<Note> = [];
-    const diagnoses: Array<DiagnosisItem> = [];
-    const vitalsToRetrieve: Array<Encounter> = [];
 
-    // Extract diagnoses and notes from observations
-    const processObservations = (observations: Obs[], encounter: Encounter) => {
-      observations.forEach((obs: Obs) => {
-        if (obs?.concept?.uuid === config.concepts.visitDiagnosesConceptUuid) {
-          const problemListObs = obs.groupMembers?.find(
-            (member) => member.concept?.uuid === config.concepts.problemListConceptUuid,
-          );
-          const diagnosisValue = problemListObs?.value;
-          const diagnosis =
-            typeof diagnosisValue === 'object' && diagnosisValue !== null && 'display' in diagnosisValue
-              ? diagnosisValue.display
-              : String(diagnosisValue || '');
-
-          diagnoses.push({
-            diagnosis,
-          });
-        } else if (config.concepts.generalPatientNoteConceptUuid === obs?.concept?.uuid) {
-          notes.push({
-            note: String(obs.value || ''),
-            provider: {
-              name: encounter.encounterProviders?.[0]?.provider?.person?.display ?? '',
-              role: encounter.encounterProviders?.[0]?.encounterRole?.display ?? '',
-            },
-            time: encounter.encounterDatetime ? formatTime(parseDate(encounter.encounterDatetime)) : '',
-            concept: obs.concept,
-          });
-        }
-      });
-    };
-
-    // Iterating through every Encounter
     encounters?.forEach((encounter) => {
       if (encounter.orders) {
         medications.push(
@@ -101,20 +61,10 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
           })),
         );
       }
-
-      if (encounter?.obs) {
-        processObservations(encounter.obs, encounter);
-      }
-
-      vitalsToRetrieve.push(encounter);
     });
-    return [medications, notes, diagnoses, vitalsToRetrieve];
-  }, [
-    config.concepts.generalPatientNoteConceptUuid,
-    config.concepts.problemListConceptUuid,
-    config.concepts.visitDiagnosesConceptUuid,
-    encounters,
-  ]);
+
+    return medications;
+  }, [encounters]);
 
   const tabClasses = (index: number) =>
     classNames(styles.tab, styles.bodyLong01, {
@@ -140,7 +90,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Vitals vitals={useVitalsFromObs(vitalsToRetrieve)} patientUuid={patientUuid} visitType={visitTypes.PAST} />
+            <Vitals vitals={useVitalsFromObs(encounters)} patientUuid={patientUuid} visitType={visitTypes.PAST} />
           </TabPanel>
           <TabPanel>
             <Notes notes={notes} diagnoses={diagnoses} />
