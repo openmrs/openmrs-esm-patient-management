@@ -57,6 +57,7 @@
 .search {
   max-width: 16rem;
   display: inline;
+
   input {
     background-color: $ui-02 !important;
   }
@@ -99,6 +100,7 @@
 
   .toolbarContent {
     display: flex;
+    align-items: center;
     z-index: 1; // prevent dropdown from getting covered by table elements
     column-gap: layout.$spacing-03;
   }
@@ -161,20 +163,25 @@ html[dir='rtl'] {
       margin-left: 0;
       margin-right: layout.$spacing-03;
     }
+
     h2 {
       text-align: right;
     }
   }
+
   .tableContainer {
     th > div {
       text-align: right;
     }
+
     td {
       text-align: right;
+
       .serviceColor {
         margin-right: 0;
         margin-left: layout.$spacing-03;
       }
+
       button {
         padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
         text-align: right;

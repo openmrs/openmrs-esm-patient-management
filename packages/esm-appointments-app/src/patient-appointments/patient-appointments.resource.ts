@@ -42,7 +42,9 @@ export function usePatientAppointments(patientUuid: string, startDate: string, a
   const upcomingAppointments = appointments
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
-    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()));
+    // "Upcoming" means strictly future days. Comparing against the end of today (rather than `now`)
+    // keeps appointments occurring later today out of this list, since they belong to `todaysAppointments`.
+    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(dayjs().endOf('day')));
 
   const todaysAppointments = appointments
     ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
@@ -69,4 +71,11 @@ export const changeAppointmentStatus = async (toStatus: string, appointmentUuid:
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   });
+};
+
+// Reads the current status of a single appointment via GET /appointment?uuid={uuid}.
+export const getAppointmentStatus = async (appointmentUuid: string): Promise<string | undefined> => {
+  const url = `${restBaseUrl}/appointment?uuid=${appointmentUuid}`;
+  const { data } = await openmrsFetch<{ status?: string }>(url);
+  return data?.status;
 };

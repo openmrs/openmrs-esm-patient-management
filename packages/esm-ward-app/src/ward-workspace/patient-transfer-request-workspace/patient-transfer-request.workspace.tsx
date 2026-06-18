@@ -15,7 +15,7 @@ const PatientTransferRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPa
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
-  const isTransfer = wardPatient.inpatientRequest.dispositionType == 'TRANSFER';
+  const isTransfer = wardPatient.inpatientRequest.dispositionType === 'TRANSFER';
 
   return (
     <Workspace2

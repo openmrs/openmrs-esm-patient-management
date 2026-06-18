@@ -27,7 +27,7 @@ const AdmissionRequestCardActions: React.FC<AdmissionRequestCardActionsProps> = 
     launchChildWorkspace('cancel-admission-request-workspace', { wardPatient, relatedTransferPatients });
   };
 
-  const isTransfer = wardPatient.inpatientRequest.dispositionType == 'TRANSFER';
+  const isTransfer = wardPatient.inpatientRequest.dispositionType === 'TRANSFER';
 
   return (
     <div className={styles.admissionRequestActionBar}>

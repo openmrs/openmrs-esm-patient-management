@@ -13,7 +13,7 @@ const UndoTransitionQueueEntryModal: React.FC<UndoTransitionQueueEntryModalProps
   const { t } = useTranslation();
   const { previousQueueEntry, queueComingFrom } = queueEntry;
 
-  const previousEntrySameQueue = queueComingFrom.uuid == queueEntry.queue.uuid;
+  const previousEntrySameQueue = queueComingFrom.uuid === queueEntry.queue.uuid;
   const modalInstruction = previousEntrySameQueue ? (
     <p>
       {t('confirmMoveBackStatus', 'Are you sure you want to move patient back to status "{{status}}"?', {
