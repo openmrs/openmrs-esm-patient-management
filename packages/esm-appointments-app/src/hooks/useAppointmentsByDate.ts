@@ -16,7 +16,7 @@ export const useAppointmentsByDate = (
     errorRetryCount: 2,
   });
 
-  const appointments = (data?.data ?? []).sort((a, b) => (a.startDateTime ?? 0) - (b.startDateTime ?? 0));
+  const appointments = [...(data?.data ?? [])].sort((a, b) => (a.startDateTime ?? 0) - (b.startDateTime ?? 0));
 
   return { appointments, isLoading, error };
 };
