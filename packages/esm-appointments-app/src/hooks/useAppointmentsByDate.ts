@@ -4,7 +4,7 @@ import { type Appointment, type AppointmentsFetchResponse } from '../types';
 import { buildAppointmentsUrl } from '../helpers';
 
 export const useAppointmentsByDate = (
-  isoDate: string | null | undefined,
+  isoDate: string | null,
 ): {
   appointments: Array<Appointment>;
   isLoading: boolean;
