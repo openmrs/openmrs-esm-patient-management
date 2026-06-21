@@ -49,17 +49,26 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
 
 export function getWardMetrics(wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   // pull all the patients out of the three constructs they are stored in: unadmitted but in a bed, admitted and in a bed, and admitted but not in a bed
-  const allPatients = [
-    ...(wardPatientGroup.wardUnadmittedPatientsWithBed?.values() ?? []),
-    ...[...(wardPatientGroup.wardAdmittedPatientsWithBed?.values() ?? [])].map((admission) => admission.patient),
-    ...(wardPatientGroup.wardUnassignedPatientsList?.map((admission) => admission.patient) ?? []),
-  ];
+  const unadmittedPatients = wardPatientGroup?.wardUnadmittedPatientsWithBed
+    ? Array.from(wardPatientGroup.wardUnadmittedPatientsWithBed.values())
+    : [];
 
-  const patientCount = allPatients?.length ?? 0;
+  const admittedPatients = wardPatientGroup?.wardAdmittedPatientsWithBed
+    ? Array.from(wardPatientGroup.wardAdmittedPatientsWithBed.values()).map((admission) => admission.patient)
+    : [];
+
+  const unassignedPatients = wardPatientGroup?.wardUnassignedPatientsList
+    ? wardPatientGroup.wardUnassignedPatientsList.map((admission) => admission.patient)
+    : [];
+
+  const allPatients = [...unadmittedPatients, ...admittedPatients, ...unassignedPatients].filter(Boolean);
+
+  const patientCount = allPatients.length;
   const newborns = filterNewborns(allPatients)?.length ?? 0;
   const femalesOfReproductiveAge = filterReproductiveAge(filterFemale(allPatients))?.length ?? 0;
-  const totalBeds = wardPatientGroup.bedLayouts?.length ?? 0;
-  const occupiedBeds = wardPatientGroup.bedLayouts?.filter((bed) => bed.patients?.length > 0).length ?? 0;
+  const totalBeds = wardPatientGroup?.bedLayouts?.length ?? 0;
+  const occupiedBeds = wardPatientGroup?.bedLayouts?.filter((bed) => bed.patients?.length > 0).length ?? 0;
+
   return {
     patients: patientCount.toString(),
     freeBeds: (totalBeds - occupiedBeds).toString(),
