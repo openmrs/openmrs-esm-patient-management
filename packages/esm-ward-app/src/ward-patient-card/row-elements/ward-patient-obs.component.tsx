@@ -32,19 +32,19 @@ const WardPatientObs: React.FC<WardPatientObsProps> = ({ id, configOverride, pat
   } else {
     const obsToDisplay = data
       ?.filter((o) => {
-        const matchVisit = !onlyWithinCurrentVisit || o.encounter.visit?.uuid == visit?.uuid;
+        const matchVisit = !onlyWithinCurrentVisit || o.encounter.visit?.uuid === visit?.uuid;
         return matchVisit;
       })
       ?.sort((obsA, obsB) => {
-        return (orderBy == 'descending' ? -1 : 1) * obsA.obsDatetime.localeCompare(obsB.obsDatetime);
+        return (orderBy === 'descending' ? -1 : 1) * obsA.obsDatetime.localeCompare(obsB.obsDatetime);
       })
-      ?.slice(0, limit == 0 ? Number.MAX_VALUE : limit);
+      ?.slice(0, limit === 0 ? Number.MAX_VALUE : limit);
 
     const labelToDisplay = label != null ? t(label) : obsToDisplay?.[0]?.concept?.display;
 
     const obsNodes = obsToDisplay?.map((o) => {
       const { value } = o;
-      const display: any = (value as OpenmrsResource)?.display ?? o.value;
+      const display = (value as OpenmrsResource)?.display ?? String(value);
 
       const tooltipContent = getObsEncounterString(o, t);
       return (

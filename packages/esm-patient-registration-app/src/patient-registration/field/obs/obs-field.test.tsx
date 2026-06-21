@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
@@ -10,15 +11,15 @@ import { PatientRegistrationContextProvider } from '../../patient-registration-c
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-const mockUseConcept = jest.mocked(useConcept);
-const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConcept = vi.mocked(useConcept);
+const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
-jest.mock('../field.resource');
+vi.mock('../field.resource');
 
 const useConceptMockImpl = (uuid: string) => {
   let data;
-  if (uuid == 'weight-uuid') {
+  if (uuid === 'weight-uuid') {
     data = {
       uuid: 'weight-uuid',
       display: 'Weight (kg)',
@@ -26,7 +27,7 @@ const useConceptMockImpl = (uuid: string) => {
       answers: [],
       setMembers: [],
     };
-  } else if (uuid == 'chief-complaint-uuid') {
+  } else if (uuid === 'chief-complaint-uuid') {
     data = {
       uuid: 'chief-complaint-uuid',
       display: 'Chief Complaint',
@@ -34,7 +35,7 @@ const useConceptMockImpl = (uuid: string) => {
       answers: [],
       setMembers: [],
     };
-  } else if (uuid == 'nationality-uuid') {
+  } else if (uuid === 'nationality-uuid') {
     data = {
       uuid: 'nationality-uuid',
       display: 'Nationality',
@@ -45,7 +46,7 @@ const useConceptMockImpl = (uuid: string) => {
       ],
       setMembers: [],
     };
-  } else if (uuid == 'vaccination-date-uuid') {
+  } else if (uuid === 'vaccination-date-uuid') {
     data = {
       uuid: 'vaccination-date-uuid',
       display: 'Vaccination Date',
@@ -63,7 +64,7 @@ const useConceptMockImpl = (uuid: string) => {
 };
 
 const useConceptAnswersMockImpl = (uuid: string) => {
-  if (uuid == 'nationality-uuid') {
+  if (uuid === 'nationality-uuid') {
     return {
       data: [
         { display: 'USA', uuid: 'usa' },
@@ -72,7 +73,7 @@ const useConceptAnswersMockImpl = (uuid: string) => {
       isLoading: false,
       error: null,
     };
-  } else if (uuid == 'other-countries-uuid') {
+  } else if (uuid === 'other-countries-uuid') {
     return {
       data: [
         { display: 'Kenya', uuid: 'ke' },
@@ -81,7 +82,7 @@ const useConceptAnswersMockImpl = (uuid: string) => {
       isLoading: false,
       error: null,
     };
-  } else if (uuid == '') {
+  } else if (uuid === '') {
     return {
       data: [],
       isLoading: false,
@@ -180,7 +181,7 @@ const renderObsFieldWithFormik = (
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
+                setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
                 isOffline: false,
@@ -211,7 +212,7 @@ describe('ObsField', () => {
   });
 
   it('does not render if no registration encounter type is provided', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       registrationObs: { encounterTypeUuid: null },

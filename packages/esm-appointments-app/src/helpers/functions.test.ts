@@ -1,4 +1,5 @@
 import { AppointmentStatus } from '../types';
+import { vi, describe, it, expect } from 'vitest';
 import { canTransition } from './functions';
 
 describe('canTransition', () => {

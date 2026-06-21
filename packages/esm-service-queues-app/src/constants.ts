@@ -7,6 +7,8 @@ export const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 export const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
 export const serviceQueuesPatientSearchWorkspace = 'create-queue-entry-workspace';
+export const serviceQueuesVisitNotesWorkspace = 'service-queues-visit-notes-workspace';
+export const serviceQueuesPatientVitalsWorkspace = 'service-queues-patient-vitals-workspace';
 
 export const queueEntryCustomRepresentation =
   'custom:(uuid,display,queue:(uuid,display,name,location:(uuid,display),service:(uuid,display),allowedPriorities:(uuid,display),allowedStatuses:(uuid,display)),status,patient:(uuid,display),visit:(uuid,display,startDatetime),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';

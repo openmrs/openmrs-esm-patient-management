@@ -18,6 +18,9 @@
 
 .subHeading {
   @include type.type-style('label-01');
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
   color: $text-02;
 }
 
@@ -30,5 +33,5 @@
 }
 
 .headingContainer {
-  margin: 0 layout.$spacing-05;
+  margin: layout.$spacing-05;
 }

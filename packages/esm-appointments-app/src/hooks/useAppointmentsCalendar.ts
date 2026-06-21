@@ -25,10 +25,11 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     openmrsFetch,
     { errorRetryCount: 2 },
   );
+  // Transform API response into daily appointment counts grouped by service
   const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
     const serviceName = service.appointmentService.name;
     const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).map(([key, value]) => {
+    Object.entries(service.appointmentCountMap).forEach(([key, value]) => {
       const existingEntry = acc.find((entry) => entry.appointmentDate === key);
       if (existingEntry) {
         existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });

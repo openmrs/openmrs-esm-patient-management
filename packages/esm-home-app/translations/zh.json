@@ -1,6 +1,6 @@
 {
-  "contactAdministrator": "Please try using the left navigation menu links. If the issue persists, contact your system administrator.",
-  "dashboardNotFound": "The dashboard you are looking for does not exist.",
-  "dashboardNotFoundDescription": "The page you requested could not be found. It may have been moved, deleted, or the configured dashboard does not exist.",
-  "pageNotFound": "Page not found"
+  "contactAdministrator": "请尝试使用左侧导航菜单链接。如果问题仍然存在，请联系您的系统管理员。",
+  "dashboardNotFound": "您要查找的仪表盘不存在。",
+  "dashboardNotFoundDescription": "您请求的页面无法找到。它可能已被移动、删除，或者配置的控制面板不存在。",
+  "pageNotFound": "页面未找到"
 }
