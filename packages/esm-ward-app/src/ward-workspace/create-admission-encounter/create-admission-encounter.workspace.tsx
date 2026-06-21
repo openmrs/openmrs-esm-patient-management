@@ -66,7 +66,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<
     content = <SkeletonText />;
   } else if (hasError) {
     content = (
-      <div>
+      <>
         <InlineNotification
           kind="error"
           lowContrast={true}
@@ -80,12 +80,12 @@ const CreateAdmissionEncounterWorkspace: React.FC<
           onClick={() => closeWorkspace()}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
-      </div>
+      </>
     );
   } else {
     const assignedBedDetail = bedData.data.results[0];
-    const isAssignedBedAtCurrentLocation = assignedBedDetail?.physicalLocation?.uuid == location.uuid;
-    const isAdmittedToCurrentLocation = inpatientAdmissions[0]?.currentInpatientLocation?.uuid == location.uuid;
+    const isAssignedBedAtCurrentLocation = assignedBedDetail?.physicalLocation?.uuid === location.uuid;
+    const isAdmittedToCurrentLocation = inpatientAdmissions[0]?.currentInpatientLocation?.uuid === location.uuid;
     const isAdmittedToOtherLocation = inpatientAdmissions[0] && !isAdmittedToCurrentLocation;
 
     const wardPatient: WardPatient = {
@@ -102,7 +102,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<
       inpatientRequest: null,
     };
     content = (
-      <div>
+      <>
         <WardPatientWorkspaceBanner wardPatient={wardPatient} />
         {activeVisit ? (
           <div>
@@ -162,11 +162,15 @@ const CreateAdmissionEncounterWorkspace: React.FC<
           onClick={() => closeWorkspace()}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
-      </div>
+      </>
     );
   }
 
-  return <Workspace2 title={t('admitPatient', 'Admit patient')}>{content}</Workspace2>;
+  return (
+    <Workspace2 title={t('admitPatient', 'Admit patient')}>
+      <div id="create-admission-encounter-workspace">{content}</div>
+    </Workspace2>
+  );
 };
 
 export default CreateAdmissionEncounterWorkspace;

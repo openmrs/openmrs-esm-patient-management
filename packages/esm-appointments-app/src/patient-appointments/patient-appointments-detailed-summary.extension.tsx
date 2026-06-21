@@ -100,7 +100,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
             <Button
               kind="ghost"
               renderIcon={(props) => <AddIcon size={16} {...props} />}
-              iconDescription="Add Appointments"
+              iconDescription={t('addAppointments', 'Add Appointments')}
               onClick={() => handleLaunchAppointmentForm(patientUuid)}>
               {t('add', 'Add')}
             </Button>

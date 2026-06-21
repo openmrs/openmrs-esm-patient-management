@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-home-app",
-  "version": "10.0.2",
+  "version": "11.0.0",
   "description": "Homepage microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-home-app.js",
   "main": "src/index.ts",
@@ -16,8 +16,8 @@
     "typescript": "tsc",
     "verify": "turbo lint typescript test --color",
     "extract-translations": "i18next 'src/**/*.{component.tsx,tsx}' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "coverage": "yarn test --coverage"
+    "test": "vitest run --passWithNoTests",
+    "coverage": "vitest run --coverage --passWithNoTests"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -36,13 +36,14 @@
     "url": "https://github.com/openmrs/openmrs-esm-home/issues"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-framework": "10.x",
     "react": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
-    "openmrs": "next"
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -8,21 +9,21 @@ import { getByTextWithMarkup } from 'tools';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import UnscheduledAppointments from './unscheduled-appointments.component';
 
-const mockExportUnscheduledAppointmentsToSpreadsheet = jest.mocked(exportUnscheduledAppointmentsToSpreadsheet);
-const mockUseUnscheduledAppointments = jest.mocked(useUnscheduledAppointments);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockExportUnscheduledAppointmentsToSpreadsheet = vi.mocked(exportUnscheduledAppointmentsToSpreadsheet);
+const mockUseUnscheduledAppointments = vi.mocked(useUnscheduledAppointments);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-jest.mock('../../helpers/excel', () => {
+vi.mock('../../helpers/excel', async () => {
   return {
-    ...jest.requireActual('../../helpers/excel'),
-    exportUnscheduledAppointmentsToSpreadsheet: jest.fn(),
+    ...((await vi.importActual('../../helpers/excel')) as object),
+    exportUnscheduledAppointmentsToSpreadsheet: vi.fn(),
   };
 });
 
-jest.mock('../../hooks/useUnscheduledAppointments', () => {
+vi.mock('../../hooks/useUnscheduledAppointments', async () => {
   return {
-    ...jest.requireActual('../../hooks/useUnscheduledAppointments'),
-    useUnscheduledAppointments: jest.fn(),
+    ...((await vi.importActual('../../hooks/useUnscheduledAppointments')) as object),
+    useUnscheduledAppointments: vi.fn(),
   };
 });
 

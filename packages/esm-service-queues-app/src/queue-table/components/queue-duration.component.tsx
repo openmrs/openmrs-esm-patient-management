@@ -11,10 +11,9 @@ const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt }) => 
   return <DurationString startedAt={startedAt} endedAt={endedAt} />;
 };
 
-function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt: Date }) {
+function DurationString({ startedAt, endedAt }: QueueDurationProps) {
   const { t } = useTranslation();
 
-  const endedTime = endedAt ? dayjs(endedAt) : dayjs();
   const [currentTime, setCurrentTime] = useState(dayjs());
 
   useEffect(() => {
@@ -22,16 +21,17 @@ function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt: Date
     return () => clearInterval(handle);
   }, []);
 
-  const totalMinutes = dayjs(endedTime ?? currentTime).diff(startedAt, 'minutes');
+  const referenceTime = endedAt ? dayjs(endedAt) : currentTime;
+  const totalMinutes = Math.max(0, referenceTime.diff(startedAt, 'minutes'));
   const hours = Math.trunc(totalMinutes / 60);
   const minutes = Math.trunc(totalMinutes % 60);
 
   return (
     <span>
-      {Math.abs(hours) > 0
+      {hours > 0
         ? t('hourAndMinuteFormatted', '{{hours}} hour(s) and {{minutes}} minute(s)', {
             hours,
-            minutes: Math.abs(minutes),
+            minutes,
           })
         : t('minuteFormatted', '{{minutes}} minute(s)', { minutes })}
     </span>

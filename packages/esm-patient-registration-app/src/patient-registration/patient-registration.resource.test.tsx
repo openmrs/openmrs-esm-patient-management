@@ -1,7 +1,8 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { vi, describe, it, expect } from 'vitest';
 import { savePatient } from './patient-registration.resource';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 describe('savePatient', () => {
   it('appends patient uuid in url if provided', () => {

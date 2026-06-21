@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isEmpty from 'lodash-es/isEmpty';
 import useSWR from 'swr';
-import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from './types';
+import { type Concept, type Identifer, type Queue, type QueueEntry } from './types';
 
 dayjs.extend(isToday);
 
@@ -92,7 +92,7 @@ export const mapVisitQueueEntryProperties = (
   startedAt: dayjs(queueEntry.startedAt).toDate(),
   endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,
-  queueLocation: (queueEntry?.queue as any)?.location?.uuid,
+  queueLocation: queueEntry?.queue?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
   queueUuid: queueEntry.queue.uuid,
@@ -161,33 +161,6 @@ export async function endPatientStatus(previousQueueUuid: string, queueEntryUuid
       endedAt: endedAt,
     },
   });
-}
-
-export function useServiceQueueEntries(service: string, locationUuid: string) {
-  const apiUrl = `${restBaseUrl}/visit-queue-entry?status=waiting&service=${service}&location=${locationUuid}&v=full`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
-    service && locationUuid ? apiUrl : null,
-    openmrsFetch,
-  );
-
-  const mapServiceQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedServiceQueueEntry => ({
-    id: visitQueueEntry.queueEntry.uuid,
-    name: visitQueueEntry.queueEntry.display,
-    age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age + '' : '--',
-    returnDate: visitQueueEntry.queueEntry.startedAt,
-    visitType: visitQueueEntry.visit?.visitType?.display,
-    gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',
-    patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
-  });
-
-  const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
-
-  return {
-    serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],
-    isLoading,
-    error,
-    isValidating,
-  };
 }
 
 export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {

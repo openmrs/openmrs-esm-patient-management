@@ -15,17 +15,21 @@ const WardBed: React.FC<WardBedProps> = (props) => {
   return patientCards?.length > 0 ? <OccupiedBed {...props} /> : <EmptyBed bed={bed} />;
 };
 
-const OccupiedBed: React.FC<WardBedProps> = ({ patientCards, isLoadingDivider }) => {
+const OccupiedBed: React.FC<WardBedProps> = ({ patientCards, isLoadingDivider, bed }) => {
   // interlace patient card with bed dividers between each of them
   const patientCardsWithDividers = patientCards.flatMap((patientCard, index) => {
-    if (index == 0) {
+    if (index === 0) {
       return [patientCard];
     } else {
-      return [<BedShareDivider key={'divider-' + index} isLoading={isLoadingDivider} />, patientCard];
+      return [<BedShareDivider key={`divider-${index}`} isLoading={isLoadingDivider} />, patientCard];
     }
   });
 
-  return <div className={styles.occupiedBed}>{patientCardsWithDividers}</div>;
+  return (
+    <div id={`bed-${bed.bedNumber}`} className={styles.occupiedBed}>
+      {patientCardsWithDividers}
+    </div>
+  );
 };
 
 export default WardBed;
