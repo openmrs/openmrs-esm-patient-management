@@ -1,0 +1,22 @@
+@use '@carbon/layout';
+
+.noActiveVisitContent {
+  inline-size: 100%;
+  padding: layout.$spacing-05;
+
+  :global(.cds--inline-notification) {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+}
+
+.backButton.backButton {
+  justify-content: flex-start;
+  padding-inline-end: layout.$spacing-05;
+
+  :global(.cds--btn__icon) {
+    order: -1;
+    margin-left: 0;
+    margin-right: layout.$spacing-03;
+  }
+}
