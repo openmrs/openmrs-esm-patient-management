@@ -1,8 +1,4 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
-import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
-import biometricsConfigSchema, {
-  type BiometricsConfigObject,
-} from './current-visit/visit-details/biometrics-config-schema';
 
 const columnTypes = [
   'actions',
@@ -120,7 +116,24 @@ export const configSchema = {
       _type: Type.String,
     },
   },
-  biometrics: biometricsConfigSchema,
+  disableEmptyTabs: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Disable the notes/tests/medications tabs in the visit summary when they have no data',
+  },
+  drugOrderTypeUUID: {
+    _type: Type.UUID,
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+    _description: "UUID for the 'Drug' order type used to filter medications in the visit summary",
+  },
+  notesConceptUuids: {
+    _type: Type.Array,
+    _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    _description: 'Concept UUIDs whose observations are rendered as visit notes in the visit summary',
+    _elements: {
+      _type: Type.ConceptUuid,
+    },
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -137,14 +150,6 @@ export const configSchema = {
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
     },
-    systolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    diastolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     emergencyPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _default: defaultEmergencyPriorityUuid,
@@ -156,10 +161,6 @@ export const configSchema = {
       _description:
         'The UUID of the free text note field intended to capture unstructured description of the patient encounter',
     },
-    heightUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     historicalObsConceptUuid: {
       _type: Type.Array,
       _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
@@ -168,33 +169,13 @@ export const configSchema = {
         _type: Type.ConceptUuid,
       },
     },
-    oxygenSaturationUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    pulseUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     problemListConceptUuid: {
       _type: Type.ConceptUuid,
       _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    respiratoryRateUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    temperatureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     visitDiagnosesConceptUuid: {
       _type: Type.ConceptUuid,
       _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    weightUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
   contactAttributeType: {
@@ -425,7 +406,6 @@ export const configSchema = {
     _default: '',
     _description: 'The `visitTypeResourceUrl`',
   },
-  vitals: vitalsConfigSchema,
   _validators: [
     validator((config: ConfigObject) => {
       const queueNumberColumnDefs = [
@@ -453,24 +433,18 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
   appointmentStatuses: Array<string>;
-  biometrics: BiometricsConfigObject;
+  disableEmptyTabs: boolean;
+  drugOrderTypeUUID: string;
+  notesConceptUuids: Array<string>;
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
     defaultTransitionStatus: string;
-    diastolicBloodPressureUuid: string;
     emergencyPriorityConceptUuid: string;
     generalPatientNoteConceptUuid: string;
-    heightUuid: string;
     historicalObsConceptUuid: Array<string>;
-    oxygenSaturationUuid: string;
-    pulseUuid: string;
     problemListConceptUuid: string;
-    respiratoryRateUuid: string;
-    systolicBloodPressureUuid: string;
-    temperatureUuid: string;
     visitDiagnosesConceptUuid: string;
-    weightUuid: string;
   };
   defaultInitialServiceQueue: string;
   contactAttributeType: string;
@@ -485,7 +459,6 @@ export interface ConfigObject {
   visitNoteEncounterTypeUuid: string;
   visitQueueNumberAttributeUuid: string | null;
   visitTypeResourceUrl: string;
-  vitals: VitalsConfigObject;
 }
 
 interface TablesConfig {

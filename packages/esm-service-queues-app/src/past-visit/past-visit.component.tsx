@@ -1,21 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListSkeleton } from '@carbon/react';
-import { parseDate, formatDatetime } from '@openmrs/esm-framework';
+import { parseDate, formatDatetime, useConfig, VisitSummary } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { usePastVisits } from './past-visit.resource';
-import PastVisitSummary from './past-visit-details/past-visit-summary.component';
 import styles from './past-visit.scss';
 
 interface PastVisitProps {
   patientUuid: string;
+  currentVisitUuid?: string;
 }
 
-const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
+const PastVisit: React.FC<PastVisitProps> = ({ patientUuid, currentVisitUuid }) => {
   const { t } = useTranslation();
-  const { visits, isLoading } = usePastVisits(patientUuid);
+  const { notesConceptUuids, drugOrderTypeUUID, disableEmptyTabs } = useConfig<ConfigObject>();
+  const { visits, isLoading } = usePastVisits(patientUuid, currentVisitUuid);
 
   if (isLoading) {
-    return <StructuredListSkeleton />;
+    return <StructuredListSkeleton role="progressbar" />;
   }
 
   if (visits) {
@@ -32,7 +34,13 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
               : '--'}
           </p>
         </div>
-        <PastVisitSummary encounters={visits.encounters} patientUuid={patientUuid} />
+        <VisitSummary
+          visit={visits}
+          patientUuid={patientUuid}
+          notesConceptUuids={notesConceptUuids}
+          drugOrderTypeUUID={drugOrderTypeUUID}
+          disableEmptyTabs={disableEmptyTabs}
+        />
       </div>
     );
   }

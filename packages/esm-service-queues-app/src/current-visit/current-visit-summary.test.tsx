@@ -1,13 +1,20 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { useVisit } from './current-visit.resource';
 import CurrentVisit from './current-visit-summary.component';
 
 const useVisitMock = vi.mocked(useVisit);
-vi.mocked(useConfig).mockReturnValue({ concepts: {} });
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+
+vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
+  ...((await importOriginal()) as object),
+  VisitSummary: () => <div data-testid="visit-summary" />,
+  usePatient: () => ({ patient: { id: 'patient-uuid' }, isLoading: false, error: null }),
+}));
 
 vi.mock('./current-visit.resource', () => ({
   useVisit: vi.fn().mockReturnValue({
@@ -24,6 +31,12 @@ const patientUuid = mockPastVisit.data.results[0].patient.uuid;
 const visitUuid = mockPastVisit.data.results[0].uuid;
 
 describe('CurrentVisit', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+    });
+  });
+
   it('renders visit details correctly', async () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 

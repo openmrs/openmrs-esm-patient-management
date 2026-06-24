@@ -1,11 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, DataTableSkeleton } from '@carbon/react';
-import { getGlobalStore } from '@openmrs/esm-framework';
+import {
+  attach,
+  ExtensionSlot,
+  getGlobalStore,
+  launchWorkspace2,
+  useConfig,
+  usePatient,
+  VisitSummary,
+} from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
 import { useVisit } from './current-visit.resource';
-import CurrentVisitDetails from './visit-details/current-visit-details.component';
 import styles from './current-visit.scss';
+
+const vitalsInfoSlot = 'service-queues-current-visit-vitals-slot';
+attach(vitalsInfoSlot, 'patient-vitals-info');
 
 // External workspaces that don't share the useVisit SWR key, so we revalidate the visit when
 // they close rather than relying on the form to mutate it.
@@ -22,7 +33,9 @@ interface CurrentVisitProps {
 
 const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) => {
   const { t } = useTranslation();
+  const { notesConceptUuids, drugOrderTypeUUID, disableEmptyTabs } = useConfig<ConfigObject>();
   const { visit, isLoading, mutate } = useVisit(visitUuid);
+  const { patient } = usePatient(patientUuid);
 
   const openRefreshingWorkspacesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -61,6 +74,14 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
     return <p className={styles.bodyLong01}>{t('noActiveVisit', 'No active visit')}</p>;
   }
 
+  const vitalsSlotState = {
+    patientUuid,
+    patient,
+    visitContext: visit,
+    launchCustomVitalsForm: () =>
+      launchWorkspace2(serviceQueuesPatientVitalsWorkspace, { patientUuid, patient, visitContext: visit }),
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.headingContainer}>
@@ -73,7 +94,14 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
         </div>
       </div>
       <div className={styles.visitContainer}>
-        <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} visit={visit} />
+        <ExtensionSlot name={vitalsInfoSlot} state={vitalsSlotState} />
+        <VisitSummary
+          visit={visit}
+          patientUuid={patientUuid}
+          notesConceptUuids={notesConceptUuids}
+          drugOrderTypeUUID={drugOrderTypeUUID}
+          disableEmptyTabs={disableEmptyTabs}
+        />
       </div>
     </div>
   );
