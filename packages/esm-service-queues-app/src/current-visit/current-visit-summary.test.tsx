@@ -1,13 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { useConfig } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { useVisit } from './current-visit.resource';
 import CurrentVisit from './current-visit-summary.component';
 
 const useVisitMock = vi.mocked(useVisit);
-vi.mocked(useConfig).mockReturnValue({ concepts: {} });
+
+vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
+  ...((await importOriginal()) as object),
+  usePatient: () => ({ patient: { id: 'patient-uuid' }, isLoading: false, error: null }),
+}));
 
 vi.mock('./current-visit.resource', () => ({
   useVisit: vi.fn().mockReturnValue({
