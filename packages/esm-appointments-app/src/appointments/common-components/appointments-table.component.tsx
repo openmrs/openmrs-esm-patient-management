@@ -199,7 +199,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                     {t('changeStatus', 'Change status')}
                   </TableBatchAction>
                 </TableBatchActions>
-                <TableToolbarContent>
+                <TableToolbarContent className={styles.toolbarContent}>
                   <TableToolbarSearch
                     className={styles.searchbar}
                     labelText={t('filterAppointments', 'Filter appointments')}
@@ -276,7 +276,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                             onSelect={() => {
                               if (selectedAppointmentUuids.has(row.id)) {
                                 setSelectedAppointmentUuids(
-                                  new Set([...selectedAppointmentUuids].filter((uuid) => uuid != row.id)),
+                                  new Set([...selectedAppointmentUuids].filter((uuid) => uuid !== row.id)),
                                 );
                               } else {
                                 setSelectedAppointmentUuids(new Set([...selectedAppointmentUuids, row.id]));

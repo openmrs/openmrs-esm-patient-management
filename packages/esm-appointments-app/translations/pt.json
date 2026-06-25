@@ -10,6 +10,7 @@
   "appointmentCancelled": "Agendamento cancelado",
   "appointmentCancelledSuccessfully": "Agendamento cancelado com sucesso",
   "appointmentCheckedIn": "Admissão registada",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "Conflito no agendamento",
