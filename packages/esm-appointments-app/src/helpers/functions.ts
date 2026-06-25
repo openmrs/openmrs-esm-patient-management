@@ -1,6 +1,6 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
-import { launchWorkspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { launchWorkspace2, getCoreTranslation, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { AppointmentStatus } from '../types';
 import { appointmentsFormWorkspace } from '../constants';
 
@@ -41,18 +41,18 @@ export const monthDays = (currentDate: Dayjs) => {
   return days;
 };
 
-export const getGender = (gender: string | undefined, t: TFunction<'translation', undefined>): string => {
+export const getGender = (gender: string | undefined): string => {
   switch (gender) {
     case 'M':
-      return t('male', 'Male');
+      return getCoreTranslation('male', 'Male');
     case 'F':
-      return t('female', 'Female');
+      return getCoreTranslation('female', 'Female');
     case 'O':
-      return t('other', 'Other');
+      return getCoreTranslation('other', 'Other');
     case 'U':
-      return t('unknown', 'Unknown');
+      return getCoreTranslation('unknown', 'Unknown');
     default:
-      return gender;
+      return gender || '';
   }
 };
 

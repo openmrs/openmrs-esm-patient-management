@@ -40,7 +40,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           </div>
           <div className={styles.labelContainer}>
             <p className={styles.labelBold}>{t('gender', 'Gender')}: </p>
-            <p className={styles.label}>{getGender(appointment.patient.gender, t)}</p>
+            <p className={styles.label}>{getGender(appointment.patient.gender)}</p>
           </div>
           {patient && patient?.birthDate ? (
             <div className={styles.labelContainer}>

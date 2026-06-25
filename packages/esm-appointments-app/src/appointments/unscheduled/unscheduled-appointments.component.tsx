@@ -20,6 +20,7 @@ import { Download } from '@carbon/react/icons';
 import { ConfigurableLink, EmptyCard, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { exportUnscheduledAppointmentsToSpreadsheet } from '../../helpers/excel';
+import { getGender } from '../../helpers';
 import { getPageSizes, useSearchResults } from '../utils';
 import { type ConfigObject } from '../../config-schema';
 
@@ -62,7 +63,7 @@ const UnscheduledAppointments: React.FC = () => {
         {visit.name}
       </ConfigurableLink>
     ),
-    gender: visit.gender === 'F' ? 'Female' : 'Male',
+    gender: getGender(visit.gender),
     phoneNumber: visit.phoneNumber === '' ? '--' : visit.phoneNumber,
     identifier: visit?.identifier,
   }));
