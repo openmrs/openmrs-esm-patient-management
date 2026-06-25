@@ -25,7 +25,7 @@ export function useLocations(locationTag: string | null, searchQuery: string = '
       urlSearchParameters.append('_tag', locationTag);
     }
 
-    if (typeof debouncedSearchQuery === 'string' && debouncedSearchQuery != '') {
+    if (typeof debouncedSearchQuery === 'string' && debouncedSearchQuery !== '') {
       urlSearchParameters.append('name:contains', debouncedSearchQuery);
     }
 

@@ -29,6 +29,10 @@
   }
 }
 
+.toolbarContent {
+  align-items: center;
+}
+
 .headerContainer {
   display: flex;
   justify-content: space-between;
@@ -135,6 +139,7 @@ html[dir='rtl'] {
       margin-left: 0;
       margin-right: layout.$spacing-03;
     }
+
     h2 {
       text-align: right;
     }

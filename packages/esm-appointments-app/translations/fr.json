@@ -10,6 +10,7 @@
   "appointmentCancelled": "Rendez-vous annulé",
   "appointmentCancelledSuccessfully": "Rendez-vous annulé avec succès",
   "appointmentCheckedIn": "Patient arrivé pour le rendez-vous",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "Conflit du rendez-vous",

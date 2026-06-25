@@ -3,9 +3,10 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { ArrowRight, CircleFilled } from '@carbon/react/icons';
-import { navigate, useConfig } from '@openmrs/esm-framework';
+import { type Visit, launchWorkspace2, useConfig, usePatient } from '@openmrs/esm-framework';
 import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
+import { serviceQueuesPatientVitalsWorkspace } from '../../constants';
 import { type ConfigObject } from '../../config-schema';
 import { type PatientVitals } from '../../types/index';
 import styles from './triage-note.scss';
@@ -14,11 +15,13 @@ interface VitalsComponentProps {
   vitals: Array<PatientVitals>;
   patientUuid: string;
   visitType: string;
+  visit?: Visit;
 }
 
-const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType }) => {
+const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType, visit }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
+  const { patient } = usePatient(patientUuid);
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
 
   const vitalsToDisplay = vitals.reduce(
@@ -144,8 +147,15 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               <Button
                 size="sm"
                 kind="ghost"
+                disabled={!patient}
                 renderIcon={(props) => <ArrowRight size={16} {...props} />}
-                onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
+                onClick={() =>
+                  launchWorkspace2(serviceQueuesPatientVitalsWorkspace, {
+                    patient,
+                    patientUuid,
+                    visitContext: visit,
+                  })
+                }
                 iconDescription={t('vitalsForm', 'Vitals form')}>
                 {t('vitalsForm', 'Vitals form')}
               </Button>
