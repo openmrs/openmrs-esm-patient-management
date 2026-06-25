@@ -240,6 +240,35 @@ export const configSchema = {
     _default: 'Outpatient Triage',
     _description: 'The name of the default service queue to be selected when the start visit form is opened',
   },
+  refreshIntervals: {
+    dashboard: {
+      active: {
+        _type: Type.Number,
+        _default: 30000,
+        _description:
+          'How often (in ms) the queue dashboards poll for updates while the user is actively interacting with a visible tab.',
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 60000,
+        _description: 'How often (in ms) the queue dashboards poll for updates once the tab is idle or hidden.',
+      },
+    },
+    queueScreen: {
+      active: {
+        _type: Type.Number,
+        _default: 5000,
+        _description:
+          'How often (in ms) the queue screen polls for updates while the user is actively interacting with a visible tab.',
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 10000,
+        _description:
+          'How often (in ms) the queue screen polls for updates once the tab is idle or hidden. Kept short so an unattended, wall-mounted board stays reasonably current.',
+      },
+    },
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -473,6 +502,10 @@ export interface ConfigObject {
     weightUuid: string;
   };
   defaultInitialServiceQueue: string;
+  refreshIntervals: {
+    dashboard: { active: number; idle: number };
+    queueScreen: { active: number; idle: number };
+  };
   contactAttributeType: string;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;

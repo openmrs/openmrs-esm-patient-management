@@ -2,17 +2,10 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadc
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
-import { getActivityAwareRefreshInterval } from './activityAwareRefreshInterval';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-service-queues-app';
-
-// Step the polling rate up while a user is actively interacting with the app and ease off when the
-// tab is idle or hidden, instead of polling at a fixed rate regardless of activity.
-const activeRefreshIntervalInMs = 30000;
-const idleRefreshIntervalInMs = 60000;
-const refreshInterval = getActivityAwareRefreshInterval(activeRefreshIntervalInMs, idleRefreshIntervalInMs);
 
 const options = {
   featureName: 'serviceQueues',
@@ -22,9 +15,6 @@ const options = {
 export const root = getAsyncLifecycle(() => import('./root.component'), {
   featureName: 'service-queues-app-root',
   moduleName,
-  swrConfig: {
-    refreshInterval,
-  },
 });
 
 export const queueTableByStatusMenu = getAsyncLifecycle(
@@ -34,9 +24,6 @@ export const queueTableByStatusMenu = getAsyncLifecycle(
 export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/queue-table-by-status-view.component'), {
   featureName: 'queue-table-by-status-view',
   moduleName,
-  swrConfig: {
-    refreshInterval,
-  },
 });
 
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);

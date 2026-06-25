@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQueue } from '../hooks/useQueue';
+import SwrConfig from '../swr-config.component';
 import QueueTablesForAllStatuses from './queue-tables-for-all-statuses.component';
 
 interface QueueTableByStatusViewProps {
@@ -12,7 +13,11 @@ interface QueueTableByStatusViewProps {
 const QueueTableByStatusView: React.FC<QueueTableByStatusViewProps> = ({ queueUuid }) => {
   const { queue, isLoading: isLoadingQueue, error } = useQueue(queueUuid);
 
-  return <QueueTablesForAllStatuses selectedQueue={queue} isLoadingQueue={isLoadingQueue} errorFetchingQueue={error} />;
+  return (
+    <SwrConfig>
+      <QueueTablesForAllStatuses selectedQueue={queue} isLoadingQueue={isLoadingQueue} errorFetchingQueue={error} />
+    </SwrConfig>
+  );
 };
 
 export default QueueTableByStatusView;

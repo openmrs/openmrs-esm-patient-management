@@ -30,7 +30,7 @@ const initialize = () => {
     return;
   }
   initialized = true;
-  interactionEvents.forEach((event) => window.addEventListener(event, markActive));
+  interactionEvents.forEach((event) => window.addEventListener(event, markActive, { passive: true }));
   document.addEventListener('visibilitychange', handleVisibilityChange);
   markActive();
 };

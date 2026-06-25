@@ -1,7 +1,11 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { configSchema, type ConfigObject } from './config-schema';
 import Root from './root.component';
+
+vi.mocked(useConfig<ConfigObject>).mockReturnValue(getDefaultsFromConfigSchema(configSchema));
 
 vi.mock('./home.component', () => ({
   __esModule: true,
