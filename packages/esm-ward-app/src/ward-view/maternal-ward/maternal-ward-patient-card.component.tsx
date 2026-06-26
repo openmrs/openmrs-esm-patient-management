@@ -4,6 +4,7 @@ import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type WardPatient } from '../../types';
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
+import InbornOutbornTagRow from '../../ward-patient-card/card-rows/inborn-outborn-tag-row.component';
 import MaternalWardPatientCardHeader from './maternal-ward-patient-card-header.component';
 import maternalWardPatientCardStyles from './maternal-ward-patient-card.scss';
 import MotherChildRow from '../../ward-patient-card/card-rows/mother-child-row.component';
@@ -45,6 +46,7 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
     <>
       <WardPatientCard wardPatient={wardPatient} relatedTransferPatients={childrenOfWardPatientInSameBed}>
         <MaternalWardPatientCardHeader {...{ wardPatient }} />
+        <InbornOutbornTagRow visit={visit} />
         <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
           <WardPatientTimeOnWard
             encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
@@ -67,6 +69,7 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
             <MotherChildBedShareDivider />
             <WardPatientCard wardPatient={childWardPatient} relatedTransferPatients={relatedTransferPatients}>
               <MaternalWardPatientCardHeader wardPatient={childWardPatient} />
+              <InbornOutbornTagRow visit={childWardPatient.visit} />
               <PendingItemsRow id={'pending-items'} wardPatient={childWardPatient} />
             </WardPatientCard>
           </React.Fragment>

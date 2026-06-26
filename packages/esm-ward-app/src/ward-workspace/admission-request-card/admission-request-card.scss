@@ -3,6 +3,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .admissionRequestCard {
+  position: relative; // anchors the absolutely-positioned Inborn/Outborn badge
   background-color: $ui-03;
   border: 1px solid $color-gray-30;
   height: fit-content;
@@ -17,6 +18,12 @@
 
 .admissionRequestCardHeaderContainer {
   padding: layout.$spacing-03;
+
+  // Reserve space for the absolutely-positioned Inborn/Outborn badge (top-right) when present,
+  // so header content never slides under it.
+  &:has(+ :global(.ward-inborn-outborn-badge)) {
+    padding-right: 5.5rem; // ~88px: badge width + its 14px right offset
+  }
 }
 
 .admissionRequestCardHeader {
