@@ -3,10 +3,10 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { type WaitTime } from '../types';
 
-export function useActiveVisits() {
+export function useActiveVisits(locationUuid?: string) {
   const currentUserSession = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
-  const sessionLocation = currentUserSession?.sessionLocation?.uuid;
+  const effectiveLocation = locationUuid ?? currentUserSession?.sessionLocation?.uuid;
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
@@ -14,10 +14,10 @@ export function useActiveVisits() {
     'stopDatetime)&fromStartDate=' +
     startDate +
     '&location=' +
-    sessionLocation;
+    effectiveLocation;
   const url = `${restBaseUrl}/visit?includeInactive=false&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    sessionLocation ? url : null,
+    effectiveLocation ? url : null,
     openmrsFetch,
   );
 
@@ -40,13 +40,14 @@ export function useActiveVisits() {
   };
 }
 
-export function useAverageWaitTime(serviceUuid: string, statusUuid: string) {
-  const apiUrl = `${restBaseUrl}/queue-metrics?queue=${serviceUuid}&status=${statusUuid}`;
+export function useAverageWaitTime(serviceUuid: string, locationUuid: string, statusUuid: string) {
+  const apiUrl =
+    `${restBaseUrl}/queue-entry-metrics?metric=averageWaitTime` +
+    (statusUuid ? `&status=${statusUuid}` : '') +
+    (serviceUuid ? `&service=${serviceUuid}` : '') +
+    (locationUuid ? `&location=${locationUuid}` : '');
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(
-    serviceUuid && statusUuid ? apiUrl : null,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(apiUrl, openmrsFetch);
 
   return {
     waitTime: data ? data?.data : null,

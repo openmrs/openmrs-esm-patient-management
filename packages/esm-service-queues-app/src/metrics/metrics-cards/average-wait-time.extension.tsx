@@ -8,17 +8,20 @@ import { type ConfigObject } from '../../config-schema';
 
 export default function AverageWaitTimeExtension() {
   const { t } = useTranslation();
-  const { selectedServiceUuid } = useServiceQueuesStore();
+  const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const {
     concepts: { defaultStatusConceptUuid },
   } = useConfig<ConfigObject>();
-  const { waitTime } = useAverageWaitTime(selectedServiceUuid, defaultStatusConceptUuid);
+  const { waitTime } = useAverageWaitTime(selectedServiceUuid, selectedQueueLocationUuid, defaultStatusConceptUuid);
 
   return (
     <MetricsCard>
       <MetricsCardHeader title={t('averageWaitTime', 'Average wait time today')} />
       <MetricsCardBody>
-        <MetricsCardItem label={t('minutes', 'Minutes')} value={waitTime ? waitTime.averageWaitTime : '--'} />
+        <MetricsCardItem
+          label={t('minutes', 'Minutes')}
+          value={waitTime ? Math.round(waitTime.averageWaitTime * 100) / 100 : '--'}
+        />
       </MetricsCardBody>
     </MetricsCard>
   );

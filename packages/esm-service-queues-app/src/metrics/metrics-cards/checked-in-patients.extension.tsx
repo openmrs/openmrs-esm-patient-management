@@ -2,10 +2,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MetricsCard, MetricsCardHeader, MetricsCardBody, MetricsCardItem } from './metrics-card.component';
 import { useActiveVisits } from '../metrics.resource';
+import { useServiceQueuesStore } from '../../store/store';
 
 export default function CheckedInPatientsExtension() {
   const { t } = useTranslation();
-  const { isLoading, activeVisitsCount } = useActiveVisits();
+  const { selectedQueueLocationUuid } = useServiceQueuesStore();
+  const { isLoading, activeVisitsCount } = useActiveVisits(selectedQueueLocationUuid);
 
   return (
     <MetricsCard>
