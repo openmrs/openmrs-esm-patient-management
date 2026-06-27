@@ -115,6 +115,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
                   patientUuid={patientUuid}
+                  launchAppointmentForm={handleLaunchAppointmentForm}
                 />
               );
             }
@@ -141,6 +142,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
                   patientUuid={patientUuid}
+                  launchAppointmentForm={handleLaunchAppointmentForm}
                 />
               );
             }
@@ -167,6 +169,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
                   patientUuid={patientUuid}
+                  launchAppointmentForm={handleLaunchAppointmentForm}
                 />
               );
             }
