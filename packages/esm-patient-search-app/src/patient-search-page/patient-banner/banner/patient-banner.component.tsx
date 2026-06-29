@@ -38,13 +38,19 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit, mutate } = useVisit(patientUuid);
   const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
     usePatientSearchContext() ?? {};
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+  const {
+    onPatientSelected,
+    launchChildWorkspace,
+    closeWorkspace,
+    startVisitWorkspaceName,
+    selectPatientOnVisitStarted,
+  } = context2 ?? {};
 
   const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
@@ -58,6 +64,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   }, []);
 
   const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
+
+  const handleVisitStarted = useCallback(() => {
+    mutate();
+    setTimeout(() => {
+      onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace);
+    }, 0);
+  }, [mutate, onPatientSelected, patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace]);
 
   return (
     <>
@@ -100,6 +113,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                     patientUuid,
                     launchChildWorkspace,
                     startVisitWorkspaceName,
+                    onVisitStarted: selectPatientOnVisitStarted ? handleVisitStarted : undefined,
                   }}
                 />
               ) : (

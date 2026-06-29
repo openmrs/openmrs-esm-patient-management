@@ -1,13 +1,14 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { showSnackbar, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { showSnackbar, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 interface StartVisitButtonProps {
   patientUuid: string;
   patient: fhir.Patient;
   startVisitWorkspaceName: string;
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+  onVisitStarted?: (visit: Visit) => void;
 }
 
 /**
@@ -18,6 +19,7 @@ const StartVisitButton2 = ({
   patient,
   startVisitWorkspaceName,
   launchChildWorkspace,
+  onVisitStarted,
 }: StartVisitButtonProps) => {
   const { t } = useTranslation();
 
@@ -27,6 +29,7 @@ const StartVisitButton2 = ({
         openedFrom: 'patient-search-results',
         patient,
         patientUuid,
+        onVisitStarted,
       });
     } catch (error) {
       console.error('Error launching visit form workspace:', error);
@@ -38,7 +41,7 @@ const StartVisitButton2 = ({
         subtitle: error.message ?? t('errorStartingVisitDescription', 'An error occurred while starting the visit'),
       });
     }
-  }, [patientUuid, t, launchChildWorkspace, patient, startVisitWorkspaceName]);
+  }, [patientUuid, t, launchChildWorkspace, patient, startVisitWorkspaceName, onVisitStarted]);
 
   return (
     <Button aria-label={t('startVisit', 'Start visit')} kind="primary" onClick={handleStartVisit}>

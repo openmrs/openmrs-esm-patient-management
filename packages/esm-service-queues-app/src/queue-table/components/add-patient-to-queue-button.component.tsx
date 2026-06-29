@@ -20,6 +20,7 @@ const AddPatientToQueueButton: React.FC = () => {
           {
             initialQuery: '',
             workspaceTitle: t('addPatientToQueue', 'Add patient to queue'),
+            selectPatientOnVisitStarted: true,
             onPatientSelected(
               patientUuid: string,
               patient: fhir.Patient,

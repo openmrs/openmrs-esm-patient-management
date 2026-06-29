@@ -37,6 +37,13 @@ export interface PatientSearchContext2Props {
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   startVisitWorkspaceName: string;
+  /**
+   * When true, starting a visit for a patient from the search results (via the inline
+   * "Start visit" button) will also run `onPatientSelected` for that patient once the visit
+   * has been created. Consumers like the "Add patient to queue" flow use this so the user lands
+   * directly on the selection form after starting a visit, instead of returning to the result list.
+   */
+  selectPatientOnVisitStarted?: boolean;
 }
 
 export const PatientSearchContext2 = createContext<PatientSearchContext2Props>(null);

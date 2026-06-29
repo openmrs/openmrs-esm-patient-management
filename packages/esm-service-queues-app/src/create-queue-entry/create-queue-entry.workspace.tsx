@@ -44,13 +44,17 @@ const CreateQueueEntryWorkspace: React.FC<
 }) => {
   const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
-  const { activeVisit, isLoading, error } = useVisit(selectedPatientUuid);
+  const { activeVisit, isLoading, error, mutate } = useVisit(selectedPatientUuid);
 
   const [showContactDetails, setShowContactDetails] = useState(false);
 
   const handleToggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
+
+  const handleVisitStarted = useCallback(() => {
+    mutate();
+  }, [mutate]);
 
   const patientName = patient && getPatientName(patient);
 
@@ -109,6 +113,7 @@ const CreateQueueEntryWorkspace: React.FC<
                   patientUuid: patient.id,
                   launchChildWorkspace,
                   startVisitWorkspaceName,
+                  onVisitStarted: handleVisitStarted,
                 }}
               />
             </Stack>

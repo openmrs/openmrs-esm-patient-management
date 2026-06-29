@@ -14,6 +14,7 @@ export interface PatientSearchWorkspaceProps {
     launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
     closeWorkspace: () => void,
   ): void;
+  selectPatientOnVisitStarted?: boolean;
 }
 
 export interface PatientSearchWorkspaceWindowProps {
@@ -26,7 +27,7 @@ export interface PatientSearchWorkspaceWindowProps {
 const PatientSearchWorkspace2: React.FC<
   Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, {}>
 > = ({
-  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle },
+  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle, selectPatientOnVisitStarted },
   windowProps: { startVisitWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
@@ -43,7 +44,13 @@ const PatientSearchWorkspace2: React.FC<
   return (
     <Workspace2 title={workspaceTitle}>
       <PatientSearchContext2.Provider
-        value={{ onPatientSelected, launchChildWorkspace, closeWorkspace, startVisitWorkspaceName }}>
+        value={{
+          onPatientSelected,
+          launchChildWorkspace,
+          closeWorkspace,
+          startVisitWorkspaceName,
+          selectPatientOnVisitStarted,
+        }}>
         <PatientSearchBar
           initialSearchTerm={initialQuery}
           onChange={(value) => !disableTabletSearchOnKeyUp && setSearchTerm(value)}
