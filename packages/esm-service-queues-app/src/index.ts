@@ -73,11 +73,6 @@ export const moveQueueEntryModal = getAsyncLifecycle(() => import('./modals/move
   moduleName,
 });
 
-export const transitionQueueEntryModal = getAsyncLifecycle(() => import('./modals/transition-queue-entry.modal'), {
-  featureName: 'transition queue entry',
-  moduleName,
-});
-
 export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit-queue-entry.modal'), {
   featureName: 'edit queue entry of a patient',
   moduleName,

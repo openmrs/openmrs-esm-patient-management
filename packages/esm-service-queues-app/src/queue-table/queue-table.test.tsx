@@ -187,7 +187,7 @@ describe('QueueTable', () => {
             id: 'priority',
             config: {
               actions: {
-                buttons: ['transition'],
+                buttons: ['move'],
                 overflowMenu: ['edit', 'remove', 'undo'],
               },
               identifierTypeUuid: 'ee3e7d1d-7f82-4f5a-8d3f-2f1b2d3d1e0e',

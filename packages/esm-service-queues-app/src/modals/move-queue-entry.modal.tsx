@@ -123,7 +123,7 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
           formState.selectedPriority === queueEntry.priority.uuid,
         isEdit: false,
         showQueuePicker: true,
-        showStatusPicker: false,
+        showStatusPicker: true,
       }}
     />
   );

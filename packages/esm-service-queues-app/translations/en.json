@@ -201,8 +201,6 @@
   "timeCannotBePriorToPreviousQueueEntry": "Time cannot be before start of previous queue entry: {{time}}",
   "timeOfTransition": "Time of transition",
   "totalPatients": "Total Patients",
-  "transition": "Transition",
-  "transitionPatient": "Transition {{patient}}",
   "transitionPatientAction": "Transition patient",
   "undoQueueEntryTransitionSuccess": "Undo transition success",
   "undoTransition": "Undo transition",

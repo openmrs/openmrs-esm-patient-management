@@ -105,4 +105,17 @@ describe('MoveQueueEntryModal', () => {
     expect(screen.getByRole('button', { name: 'Move' })).toBeInTheDocument();
     expect(screen.queryByText('Queue entry is no longer active')).not.toBeInTheDocument();
   });
+
+  it('shows both the queue and status pickers so queue and/or status can be changed in one dialog', () => {
+    mockUseQueueEntry.mockReturnValue({
+      queueEntry: mockQueueEntryAlice,
+      error: null,
+      isLoading: false,
+    });
+
+    renderWithSwr(<MoveQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
+
+    expect(screen.getByText('Service location')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
+  });
 });
