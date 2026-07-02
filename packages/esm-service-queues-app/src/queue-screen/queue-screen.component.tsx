@@ -23,7 +23,7 @@ const QueueScreen: React.FC = () => {
 
   return (
     <div>
-      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} showFilters />
+      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} />
       {error ? (
         <div className={styles.errorState}>
           <ErrorState error={error} headerTitle={t('queueScreen', 'Queue screen')} />

@@ -11,8 +11,7 @@ const AddPatientToQueueButton: React.FC = () => {
 
   return (
     <Button
-      kind="secondary"
-      renderIcon={(props) => <AddIcon size={16} {...props} />}
+      kind="ghost"
       size="sm"
       onClick={() =>
         launchWorkspace2(
@@ -37,7 +36,7 @@ const AddPatientToQueueButton: React.FC = () => {
           },
         )
       }>
-      {t('addPatientToQueue', 'Add patient to queue')}
+      {t('addAPatientToThisList', 'Add a patient to this list')}
     </Button>
   );
 };

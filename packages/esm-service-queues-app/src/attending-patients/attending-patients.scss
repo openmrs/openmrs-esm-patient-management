@@ -1,0 +1,71 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-05 layout.$spacing-05 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-03;
+}
+
+.heading {
+  @include type.type-style('heading-compact-02');
+  color: $ui-05;
+}
+
+.cards {
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+}
+
+.card {
+  flex: 0 1 22rem;
+  background-color: $ui-02;
+  border: 1px solid $ui-03;
+}
+
+.cardLink {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $ui-03;
+  }
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.name {
+  @include type.type-style('heading-compact-01');
+  color: $ui-05;
+}
+
+.gender {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  white-space: nowrap;
+}
+
+.demographics {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}

@@ -1,0 +1,20 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-07;
+  background-color: $ui-02;
+}
+
+.emptyStateTitle {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+.nameLink {
+  text-decoration: none;
+}
