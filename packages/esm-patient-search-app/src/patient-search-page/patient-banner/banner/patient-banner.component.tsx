@@ -99,6 +99,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   name="start-visit-button-slot2"
                   state={{
                     patientUuid,
+                    patient: fhirMappedPatient,
                     launchChildWorkspace,
                     startVisitWorkspaceName,
                   }}
