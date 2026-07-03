@@ -1,34 +1,31 @@
-import React, { useState } from 'react';
-import { InlineNotification, Search, SkeletonText } from '@carbon/react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showToast, useLayoutType } from '@openmrs/esm-framework';
-import type { Concept, Queue, QueueEntry } from '../types';
-import { useQueueEntries } from '../hooks/useQueueEntries';
-import { useColumns } from '../queue-table/cells/columns.resource';
-import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
-import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
-import QueueTable from '../queue-table/queue-table.component';
-import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
-import styles from '../queue-table/queue-table.scss';
+import { InlineNotification } from '@carbon/react';
+import QueueTable from './queue-table/queue-table.component';
+import QueueTableByStatusSkeleton from './queue-table/queue-table-by-status-skeleton.component';
+import { useColumns } from './queue-table/hooks/useColumns';
+import { useQueueEntries } from '../service-queues.resource';
+import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './queue-tables-for-all-statuses.scss';
 import AddPatientToQueueButton from '../queue-table/components/add-patient-to-queue-button.component';
+import { isDesktop } from '@openmrs/esm-framework';
+import { type Queue, type QueueEntry } from '../types';
+import { Search } from '@carbon/react';
 
 interface QueueTablesForAllStatusesProps {
-  selectedQueue: Queue; // the selected queue
-  isLoadingQueue: boolean; // whether the queue is still loading
+  selectedQueue: Queue;
+  isLoadingQueue: boolean;
   errorFetchingQueue?: Error | null;
 }
 
-// displays the queue entries of a given queue by
-// showing one table per status
 const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
   selectedQueue,
   isLoadingQueue,
   errorFetchingQueue,
 }) => {
-  const layout = useLayoutType();
   const { t } = useTranslation();
-
-  const [searchTerm, setSearchTerm] = useState('');
+  const layout = useLayoutType();
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   if (errorFetchingQueue) {
     return (
@@ -43,33 +40,28 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     );
   }
 
+  if (isLoadingQueue) {
+    return <QueueTableByStatusSkeleton />;
+  }
+
   return (
-    <>
-      <PatientQueueHeader
-        title={!isLoadingQueue ? selectedQueue?.display : <SkeletonText />}
-        showFilters={false}
-        actions={
-          <div className={styles.headerButtons}>
-            <AddPatientToQueueButton />
-            <div className={styles.filterSearch}>
-              <Search
-                labelText=""
-                placeholder={t('filterTable', 'Filter table')}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)} 
-                size={isDesktop(layout) ? 'sm' : 'lg'}
-                disabled={isLoadingQueue}
-              />
-            </div>
-          </div>
-        }
-      />
-      {!isLoadingQueue && <QueueTableMetrics selectedQueue={selectedQueue} />}
-      {!isLoadingQueue ? (
+    <div className={styles.container}>
+      <div className={styles.patientSearchBar}>
+        <div className={styles.searchBar}>
+          <Search
+            labelText=""
+            placeholder={t('filterTable', 'Filter table')}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            size={isDesktop(layout) ? 'sm' : 'lg'}
+            disabled={isLoadingQueue}
+          />
+        </div>
+        <AddPatientToQueueButton selectedQueue={selectedQueue} />
+      </div>
+      <div className={styles.queueTables}>
         <QueueTablesByStatus selectedQueue={selectedQueue} searchTerm={searchTerm} />
-      ) : (
-        <QueueTableByStatusSkeleton />
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 
@@ -83,28 +75,31 @@ function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusP
   const { queueEntries = [], isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
   const allowedStatuses = [...(selectedQueue.allowedStatuses ?? [])].reverse();
   const noStatuses = !allowedStatuses?.length;
+
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;
-  } else if (noStatuses) {
+  }
+
+  if (noStatuses) {
     return (
       <InlineNotification
-        kind={'error'}
-        lowContrast
-        subtitle={t('configureStatus', 'Please configure status to continue.')}
-        title={t('noStatusConfigured', 'No status configured')}
+        kind="warning"
+        title={t('invalidtableConfig', 'Invalid table configuration')}
+        subtitle={t('noColumnsDefined', 'No columns configured for this table')}
       />
     );
   }
+
   return (
-    <div className={styles.container}>
+    <div>
       {allowedStatuses?.map((status) => (
         <QueueTableForQueueAndStatus
-          isValidating={isValidating}
           key={status.uuid}
-          queueEntries={queueEntries}
-          searchTerm={searchTerm}
           queue={selectedQueue}
           status={status}
+          queueEntries={queueEntries}
+          isValidating={isValidating}
+          searchTerm={searchTerm}
         />
       ))}
     </div>
@@ -112,23 +107,23 @@ function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusP
 }
 
 interface QueueTableForQueueAndStatusProps {
+  queue: Queue;
+  status: { uuid: string; display: string };
   queueEntries: QueueEntry[];
   isValidating: boolean;
   searchTerm: string;
-  queue: Queue;
-  status: Concept;
 }
 
-// renders a table for a particular queue and status within the QueueTablesForAllStatuses view
 function QueueTableForQueueAndStatus({
+  queue,
+  status,
   queueEntries,
   isValidating,
   searchTerm,
-  queue,
-  status,
 }: QueueTableForQueueAndStatusProps) {
   const statusUuid = status.uuid;
   const columns = useColumns(queue.uuid, statusUuid);
+  const { t } = useTranslation();
 
   if (columns.length === 0) {
     return (
@@ -139,17 +134,17 @@ function QueueTableForQueueAndStatus({
       />
     );
   }
-  const { t } = useTranslation();
 
   if (!columns) {
-    showToast({
-      title: t('invalidtableConfig', 'Invalid table configuration'),
-      kind: 'warning',
-      description: 'No table columns defined by queue ' + queue.uuid + ' and status ' + statusUuid,
-    });
+    return (
+      <InlineNotification
+        kind="warning"
+        title={t('invalidtableConfig', 'Invalid table configuration')}
+        subtitle={t('noColumnsDefined', 'No columns configured for this table')}
+      />
+    );
   }
 
-  // filters queue entries based on which status table we want to show and search term inputted by user
   const filterQueueEntries = (
     queueEntries: QueueEntry[],
     searchTerm: string,
@@ -171,5 +166,23 @@ function QueueTableForQueueAndStatus({
       });
     });
   };
+
+  const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
+
+  return (
+    <div className={styles.statusTableContainer}>
+      <h5 className={styles.statusTableHeader}>{status.display}</h5>
+      <div className={styles.container}>
+        <QueueTable
+          key={statusUuid}
+          queueEntries={filteredQueueEntries}
+          isValidating={isValidating}
+          queueUuid={queue.uuid}
+          statusUuid={statusUuid}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default QueueTablesForAllStatuses;

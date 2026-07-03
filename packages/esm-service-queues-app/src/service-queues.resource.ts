@@ -1,12 +1,6 @@
-import {
-  formatDate,
-  openmrsFetch,
-  parseDate,
-  restBaseUrl,
-  type Visit,
-  type Encounter as CoreEncounter,
-  type Obs,
-} from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, fhirBaseUrl } from '@openmrs/esm-framework';
+import { type FHIRResource } from '@openmrs/esm-framework/src/types';
+import { type CareTeamMember } from './types';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isEmpty from 'lodash-es/isEmpty';
@@ -16,36 +10,45 @@ import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue,
 
 dayjs.extend(isToday);
 
-export interface VisitQueueEntry {
-  queueEntry: QueueEntry;
+export interface MappedEncounter {
+  diagnoses?: Array<Diagnosis>;
+  encounterDatetime: string;
+  encounterType: string;
+  obs: Array<{
+    concept: { display: string; uuid: string };
+    obsDatetime: string;
+    value: string | number | object;
+    voided: boolean;
+  }>;
+  provider?: string;
   uuid: string;
-  visit: Visit;
+  voided: boolean;
 }
 
 export interface MappedVisitQueueEntry {
   id: string;
-  encounters: Array<MappedEncounter>;
+  encounters?: Array<MappedEncounter>;
   name: string;
+  patientUuid: string;
   patientAge: string;
   patientDob: string;
   patientGender: string;
-  patientUuid: string;
   queue: Queue;
-  priority: Concept;
+  priority: string;
   priorityComment: string;
-  status: Concept;
+  status?: string;
   startedAt: Date;
-  endedAt: Date;
+  endedAt: Date | null;
   visitType: string;
-  visitUuid: string;
+  queueLocation: string;
   visitTypeUuid: string;
+  visitUuid: string;
   queueUuid: string;
   queueEntryUuid: string;
-  queueLocation: string;
   sortWeight: number;
-  visitQueueNumber: string;
+  visitQueueNumber?: string;
   identifiers: Array<Identifer>;
-  queueComingFrom: string;
+  queueComingFrom?: string;
 }
 
 interface Encounter {
@@ -53,15 +56,12 @@ interface Encounter {
   encounterDatetime?: string;
   encounterProviders?: Array<{ provider?: { person?: { display?: string } } }>;
   encounterType?: { display: string; uuid: string };
-  obs?: Array<Obs>;
-  uuid: string;
+  obs?: Array<any>;
+  uuid?: string;
   voided?: boolean;
 }
 
-interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> {
-  encounterType: string;
-  provider: string;
-}
+type CoreEncounter = Encounter;
 
 const mapEncounterProperties = (encounter: CoreEncounter): MappedEncounter => ({
   diagnoses: encounter.diagnoses,
@@ -72,12 +72,6 @@ const mapEncounterProperties = (encounter: CoreEncounter): MappedEncounter => ({
   uuid: encounter.uuid,
   voided: encounter.voided,
 });
-type Queue = {
-  uuid: string;
-  location?: {
-    uuid: string;
-  };
-};
 
 type VisitAttribute = {
   attributeType?: {
@@ -86,9 +80,25 @@ type VisitAttribute = {
   value?: string;
 };
 
-patient: {
-  identifiers ?: Identifer[];
+interface UpdateQueueBody {
+  visit: { uuid: string };
+  queueEntry: {
+    status: { uuid: string };
+    priority: { uuid: string };
+    queue: { uuid: string };
+    patient: { uuid: string };
+    startedAt: Date;
+    sortWeight: number;
+    queueComingFrom: string;
+  };
 }
+
+type QueueResponse = {
+  data: {
+    results: VisitQueueEntry[];
+  };
+};
+
 export const mapVisitQueueEntryProperties = (
   queueEntry: QueueEntry,
   visitQueueNumberAttributeUuid: string,
@@ -101,7 +111,7 @@ export const mapVisitQueueEntryProperties = (
   patientDob: queueEntry?.patient?.person?.birthdate
     ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
     : '--',
-  patientGender: queueEntry.patient.person.gender,
+  patientGender: queueEntry.patient.person?.gender,
   queue: queueEntry.queue,
   priority: queueEntry.priority,
   priorityComment: queueEntry.priorityComment,
@@ -120,30 +130,11 @@ export const mapVisitQueueEntryProperties = (
   identifiers: queueEntry.patient?.identifiers ?? [],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
-interface UpdateQueueBody {
-  visit: { uuid: string };
-  queueEntry: {
-    status: { uuid: string };
-    priority: { uuid: string };
-    queue: { uuid: string };
-    patient: { uuid: string };
-    startedAt: Date;
-    sortWeight: number;
-    queueComingFrom: string;
-  };
-}
-type QueueResponse = {
-  data: {
-    results: VisitQueueEntry[];
-  };
-};
 
-useSWR<QueueResponse, Error>
 export async function updateQueueEntry(
   visitUuid: string,
   previousQueueUuid: string,
   newQueueUuid: string,
-  queueEntryUuid: string,
   patientUuid: string,
   priority: string,
   status: string,
@@ -152,8 +143,6 @@ export async function updateQueueEntry(
 ): Promise<Response> {
   const abortController = new AbortController();
   const queueServiceUuid = isEmpty(newQueueUuid) ? previousQueueUuid : newQueueUuid;
-
-  await Promise.all([endPatientStatus(previousQueueUuid, queueEntryUuid, endedAt)]);
 
   return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
@@ -184,16 +173,21 @@ export async function updateQueueEntry(
   });
 }
 
-export async function endPatientStatus(previousQueueUuid: string, queueEntryUuid: string, endedAt: Date) {
+export async function endPatientStatus(previousQueueUuid: string, queueEntryUuid: string) {
   const abortController = new AbortController();
-  await openmrsFetch(`${restBaseUrl}/queue/${previousQueueUuid}/entry/${queueEntryUuid}`, {
+
+  return openmrsFetch(`${restBaseUrl}/visit-queue-entry/${queueEntryUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
     body: {
-      endedAt: endedAt,
+      status: {
+        uuid: 'completed',
+      },
+      endedAt: new Date(),
+      queueComingFrom: previousQueueUuid,
     },
   });
 }
@@ -212,32 +206,49 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
     returnDate: visitQueueEntry.queueEntry.startedAt,
     visitType: visitQueueEntry.visit?.visitType?.display,
     gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',
-    patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
+    patientUuid: visitQueueEntry.queueEntry.patient.uuid,
   });
 
-  const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
+  return useMemo(
+    () => ({
+      queueEntries: data?.data?.results?.map(mapServiceQueueEntryProperties),
+      isLoading,
+      isValidating,
+      error,
+    }),
+    [data, isLoading, isValidating, error],
+  );
+}
 
-  return {
-    serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],
-    isLoading,
-    error,
-    isValidating,
+export function useQueueEntries(filters: { queue: string; isEnded?: boolean }) {
+  const apiUrl = filters.queue
+    ? `${restBaseUrl}/visit-queue-entry?queue=${filters.queue}&isEnded=${filters.isEnded ?? false}&v=full`
+    : null;
+
+  const { data, error, isLoading, isValidating } = useSWR<QueueResponse, Error>(apiUrl, openmrsFetch);
+
+  return useMemo(
+    () => ({
+      queueEntries: data?.data?.results?.map((entry) => mapVisitQueueEntryProperties(entry, '')) ?? [],
+      isLoading,
+      isValidating,
+      error,
+    }),
+    [data, isLoading, isValidating, error],
+  );
+}
+
+interface VisitQueueEntry {
+  visit?: {
+    visitType?: { display: string; uuid: string };
+    encounters?: Array<Encounter>;
+    attributes?: Array<VisitAttribute>;
+    uuid?: string;
   };
+  queueEntry: QueueEntry;
 }
 
-export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
-  const abortController = new AbortController();
-
-  return openmrsFetch(`${restBaseUrl}/queueutil/assignticket`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: {
-      servicePointName,
-      ticketNumber,
-      status,
-    },
-  });
-}
+// Helper imports that might be missing
+const formatDate = (date: Date, options?: any) => date.toISOString();
+const parseDate = (dateString: string) => new Date(dateString);
+const { useMemo } = require('react');
