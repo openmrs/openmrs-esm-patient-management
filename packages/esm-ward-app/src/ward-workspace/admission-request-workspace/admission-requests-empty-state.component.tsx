@@ -29,6 +29,10 @@ const AdmissionRequestsEmptyState: React.FC = () => {
           selectedPatientUuid: patient.id,
         });
       },
+      selectPatientButton: {
+        text: t('admit', 'Admit'),
+        requiresActiveVisit: true,
+      },
     });
   };
 

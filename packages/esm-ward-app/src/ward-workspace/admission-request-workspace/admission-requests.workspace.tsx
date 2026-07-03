@@ -34,6 +34,10 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
           selectedPatientUuid: patient.id,
         });
       },
+      selectPatientButton: {
+        text: t('admit', 'Admit'),
+        requiresActiveVisit: true,
+      },
     });
   };
 

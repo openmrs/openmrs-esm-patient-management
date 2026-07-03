@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { Button, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ConfigurableLink,
   ExtensionSlot,
@@ -44,7 +44,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+  const { onPatientSelected, launchChildWorkspace, closeWorkspace, startVisitWorkspaceName, selectPatientButton } =
+    context2 ?? {};
 
   const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
@@ -112,6 +113,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   }}
                 />
               ))}
+            {!isDeceased && context2 && selectPatientButton && (
+              <Button
+                disabled={selectPatientButton.requiresActiveVisit && !activeVisit}
+                kind="primary"
+                onClick={() =>
+                  onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace)
+                }>
+                {selectPatientButton.text}
+              </Button>
+            )}
           </div>
         </div>
         <div>
@@ -147,6 +158,14 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
   }, [patientClickSideEffect, patientUuid, patient]);
 
   if (context2) {
+    if (context2.selectPatientButton) {
+      // Selecting a patient happens through a dedicated button on the card instead
+      return (
+        <div className={styles.patientBanner} key={patientUuid}>
+          {children}
+        </div>
+      );
+    }
     return (
       <button
         className={classNames(styles.patientBannerButton, styles.patientBanner, {

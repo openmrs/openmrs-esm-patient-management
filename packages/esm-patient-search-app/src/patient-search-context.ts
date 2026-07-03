@@ -27,6 +27,18 @@ export const PatientSearchContext = createContext<PatientSearchContextProps>(nul
 export const PatientSearchContextProvider = PatientSearchContext.Provider;
 export const usePatientSearchContext = () => useContext(PatientSearchContext);
 
+export interface SelectPatientButtonConfig {
+  /**
+   * The text shown on the select patient button.
+   */
+  text: string;
+  /**
+   * When true, the button is disabled for patients without an active visit. A start visit
+   * button is rendered alongside it so the user can start a visit first.
+   */
+  requiresActiveVisit?: boolean;
+}
+
 export interface PatientSearchContext2Props {
   onPatientSelected?(
     patientUuid: string,
@@ -37,6 +49,11 @@ export interface PatientSearchContext2Props {
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   startVisitWorkspaceName: string;
+  /**
+   * When provided, patient search result cards are not clickable. Instead, each card renders
+   * a button with this configuration that invokes onPatientSelected.
+   */
+  selectPatientButton?: SelectPatientButtonConfig;
 }
 
 export const PatientSearchContext2 = createContext<PatientSearchContext2Props>(null);
