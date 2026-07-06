@@ -12,7 +12,9 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
 
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), 'monthly');
+  const period = 'monthly';
+
+  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), period);
 
   return (
     <div data-testid="appointments-calendar">

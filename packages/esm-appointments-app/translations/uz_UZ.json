@@ -10,6 +10,7 @@
   "appointmentCancelled": "Appointment Cancelled",
   "appointmentCancelledSuccessfully": "Appointment cancelled successfully",
   "appointmentCheckedIn": "Appointment Checked In",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "Appointment conflict",
