@@ -94,8 +94,10 @@
   border-top: 0;
 
   // Reserve space for the absolutely-positioned Inborn/Outborn badge (top-right) when present,
-  // so header content never slides under it.
-  &:has(+ :global(.ward-inborn-outborn-badge)) {
+  // so header content never slides under it. The badge is contributed by an extension slot, so it
+  // renders nested inside the slot wrapper that immediately follows the header.
+  &:has(+ :global(.ward-inborn-outborn-badge)),
+  &:has(+ * :global(.ward-inborn-outborn-badge)) {
     padding-right: 5.5rem; // ~88px: badge width + its 14px right offset
   }
 }

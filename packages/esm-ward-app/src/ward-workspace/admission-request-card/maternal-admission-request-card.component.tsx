@@ -1,14 +1,13 @@
 import React, { useMemo, useState, type ReactNode } from 'react';
 import { Checkbox, CheckboxGroup } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useAppContext } from '@openmrs/esm-framework';
+import { ExtensionSlot, useAppContext } from '@openmrs/esm-framework';
 import { makeWardPatient } from './maternal-admission-request-card.resource';
 import type { InpatientRequest, MaternalWardViewContext, WardPatient } from '../../types';
 import AdmissionRequestCardActions from './admission-request-card-actions.component';
 import AdmissionRequestCardHeader from './admission-request-card-header.component';
 import AdmissionRequestNoteRow from '../../ward-patient-card/card-rows/admission-request-note-row.component';
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
-import InbornOutbornTagRow from '../../ward-patient-card/card-rows/inborn-outborn-tag-row.component';
 import MotherOrChild from '../../ward-patient-card/row-elements/ward-mother-or-child.component';
 import styles from './admission-request-card.scss';
 
@@ -65,7 +64,7 @@ const MaternalAdmissionRequestCard: React.FC<MaternalAdmissionRequestCardProps> 
   return (
     <div className={styles.admissionRequestCard}>
       <AdmissionRequestCardHeader {...{ wardPatient }} />
-      <InbornOutbornTagRow visit={wardPatient.visit} />
+      <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit: wardPatient.visit }} />
       <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
       {motherOfPatient && (
         <MotherOrChild
