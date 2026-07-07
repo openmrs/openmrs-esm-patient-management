@@ -64,7 +64,9 @@ const MaternalAdmissionRequestCard: React.FC<MaternalAdmissionRequestCardProps> 
   return (
     <div className={styles.admissionRequestCard}>
       <AdmissionRequestCardHeader {...{ wardPatient }} />
-      <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit: wardPatient.visit }} />
+      <div className={styles.admissionRequestCardHeaderBadge}>
+        <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit: wardPatient.visit }} />
+      </div>
       <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
       {motherOfPatient && (
         <MotherOrChild

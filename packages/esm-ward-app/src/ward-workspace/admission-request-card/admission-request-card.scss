@@ -20,12 +20,22 @@
   padding: layout.$spacing-03;
 
   // Reserve space for the absolutely-positioned Inborn/Outborn badge (top-right) when present,
-  // so header content never slides under it. The badge is contributed by an extension slot, so it
-  // renders nested inside the slot wrapper that immediately follows the header.
-  &:has(+ :global(.ward-inborn-outborn-badge)),
-  &:has(+ * :global(.ward-inborn-outborn-badge)) {
-    padding-right: 5.5rem; // ~88px: badge width + its 14px right offset
+  // so header content never slides under it. The badge is contributed by an extension slot wrapped
+  // in .admissionRequestCardHeaderBadge, which immediately follows the header.
+  &:has(+ .admissionRequestCardHeaderBadge div:not(:empty)) {
+    padding-right: 5.5rem; // ~88px: badge width + its right offset
   }
+}
+
+// Positions the Inborn/Outborn badge extension slot in the card's top-right corner.
+// Anchored to .admissionRequestCard, which is position: relative. The child combinator adds
+// specificity to override the generic `.admissionRequestCard > div` margin above.
+.admissionRequestCard > .admissionRequestCardHeaderBadge {
+  position: absolute;
+  top: layout.$spacing-03;
+  right: layout.$spacing-05;
+  z-index: 2;
+  margin: 0;
 }
 
 .admissionRequestCardHeader {

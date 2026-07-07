@@ -46,7 +46,9 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
     <>
       <WardPatientCard wardPatient={wardPatient} relatedTransferPatients={childrenOfWardPatientInSameBed}>
         <MaternalWardPatientCardHeader {...{ wardPatient }} />
-        <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit }} />
+        <div className={styles.wardPatientCardHeaderBadge}>
+          <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit }} />
+        </div>
         <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
           <WardPatientTimeOnWard
             encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
@@ -69,7 +71,12 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
             <MotherChildBedShareDivider />
             <WardPatientCard wardPatient={childWardPatient} relatedTransferPatients={relatedTransferPatients}>
               <MaternalWardPatientCardHeader wardPatient={childWardPatient} />
-              <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit: childWardPatient.visit }} />
+              <div className={styles.wardPatientCardHeaderBadge}>
+                <ExtensionSlot
+                  name="maternal-ward-patient-card-header-slot"
+                  state={{ visit: childWardPatient.visit }}
+                />
+              </div>
               <PendingItemsRow id={'pending-items'} wardPatient={childWardPatient} />
             </WardPatientCard>
           </React.Fragment>
