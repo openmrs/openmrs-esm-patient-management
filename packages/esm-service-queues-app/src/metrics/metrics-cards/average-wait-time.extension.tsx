@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { MetricsCard, MetricsCardBody, MetricsCardHeader, MetricsCardItem } from './metrics-card.component';
@@ -12,14 +12,28 @@ export default function AverageWaitTimeExtension() {
   const {
     concepts: { defaultStatusConceptUuid },
   } = useConfig<ConfigObject>();
-  const { waitTime } = useAverageWaitTime(selectedServiceUuid, selectedQueueLocationUuid, defaultStatusConceptUuid);
+  const { waitTime, isLoading, error } = useAverageWaitTime(
+    selectedServiceUuid,
+    selectedQueueLocationUuid,
+    defaultStatusConceptUuid,
+  );
+
+  useEffect(() => {
+    if (error) {
+      console.error('Failed to load the average wait time metric: ', error);
+    }
+  }, [error]);
 
   return (
     <MetricsCard>
       <MetricsCardHeader title={t('avgWaitTime', 'Avg. wait time')} />
       <MetricsCardBody>
         <MetricsCardItem
-          value={waitTime ? `${Math.round(waitTime.averageWaitTime * 100) / 100} ${t('minsUnit', 'mins')}` : '--'}
+          value={
+            isLoading || error || !waitTime
+              ? '--'
+              : `${Math.round(waitTime.averageWaitTime * 100) / 100} ${t('minsUnit', 'mins')}`
+          }
         />
       </MetricsCardBody>
     </MetricsCard>

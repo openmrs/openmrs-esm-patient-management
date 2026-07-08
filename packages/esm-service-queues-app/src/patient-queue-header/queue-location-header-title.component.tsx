@@ -24,7 +24,11 @@ const QueueLocationHeaderTitle: React.FC = () => {
   const { queueLocations, isLoading, error } = useQueueLocations();
   const userSession = useSession();
   const sessionLocationUuid = userSession?.sessionLocation?.uuid;
-  const { ancestry, isLoading: isLoadingAncestry } = useSessionLocationAncestry(sessionLocationUuid);
+  const {
+    ancestry,
+    isLoading: isLoadingAncestry,
+    error: ancestryError,
+  } = useSessionLocationAncestry(sessionLocationUuid);
   const { selectedQueueLocationName, selectedServiceUuid, selectedServiceDisplay } = useServiceQueuesStore();
 
   // The login location if queue-tagged, else its nearest queue-tagged ancestor, else "All".
@@ -36,7 +40,9 @@ const QueueLocationHeaderTitle: React.FC = () => {
   }, [ancestry, queueLocations]);
 
   useEffect(() => {
-    if (isLoading || isLoadingAncestry || error || !sessionLocationUuid) {
+    // Skip while anything is still loading or a fetch failed: a degraded resolution must not persist
+    // the "resolved" flag, otherwise the default stays stranded on "All" for the rest of the session.
+    if (isLoading || isLoadingAncestry || error || ancestryError || !sessionLocationUuid) {
       return;
     }
 
@@ -48,7 +54,15 @@ const QueueLocationHeaderTitle: React.FC = () => {
     updateValueInSessionStorage(LOGIN_LOCATION_STORAGE_KEY, sessionLocationUuid);
     updateSelectedQueueLocationUuid(resolvedDefault.uuid);
     updateSelectedQueueLocationName(resolvedDefault.name);
-  }, [isLoading, isLoadingAncestry, error, sessionLocationUuid, resolvedDefault.uuid, resolvedDefault.name]);
+  }, [
+    isLoading,
+    isLoadingAncestry,
+    error,
+    ancestryError,
+    sessionLocationUuid,
+    resolvedDefault.uuid,
+    resolvedDefault.name,
+  ]);
 
   const openChangeLocationModal = useCallback(() => {
     const dispose = showModal('change-queue-location-modal', {

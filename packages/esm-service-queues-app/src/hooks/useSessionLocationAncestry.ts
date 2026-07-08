@@ -13,8 +13,13 @@ export function useSessionLocationAncestry(locationUuid?: string) {
   const { data, isLoading, error } = useFhirFetchAll<fhir.Location>(url);
 
   const ancestry = useMemo(() => {
-    if (!locationUuid || !data?.length) {
+    if (!locationUuid) {
       return [] as Array<string>;
+    }
+    // No usable chain (empty response, or a server without `_include:iterate`): fall back to the
+    // location itself so it can still resolve as the default.
+    if (!data?.length) {
+      return [locationUuid];
     }
     const locationsById = new Map(data.map((location) => [location.id, location]));
     const chain: Array<string> = [];

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import uniqBy from 'lodash-es/uniqBy';
 import {
@@ -45,7 +45,18 @@ const ChangeQueueLocationModal: React.FC<ChangeQueueLocationModalProps> = ({ clo
   const [locationUuid, setLocationUuid] = useState(selectedQueueLocationUuid ?? ALL);
   const [serviceUuid, setServiceUuid] = useState(selectedServiceUuid ?? ALL);
 
-  const { queues, isLoading: isLoadingQueues } = useQueues(locationUuid === ALL ? undefined : locationUuid);
+  const {
+    queues,
+    isLoading: isLoadingQueues,
+    error: queuesError,
+  } = useQueues(locationUuid === ALL ? undefined : locationUuid);
+
+  useEffect(() => {
+    if (queuesError) {
+      console.error('Failed to load queues for the change-queue-location modal: ', queuesError);
+    }
+  }, [queuesError]);
+
   const services = useMemo(
     () =>
       uniqBy(
@@ -123,8 +134,17 @@ const ChangeQueueLocationModal: React.FC<ChangeQueueLocationModalProps> = ({ clo
               itemToString={(item: ServiceItem | null) => item?.display ?? ''}
               selectedItem={serviceItems.find(({ uuid }) => uuid === serviceUuid) ?? allService}
               onChange={({ selectedItem }: { selectedItem: ServiceItem }) => setServiceUuid(selectedItem?.uuid ?? ALL)}
-              disabled={isLoadingQueues}
+              disabled={isLoadingQueues || !!queuesError}
             />
+            {queuesError && (
+              <InlineNotification
+                hideCloseButton
+                kind="error"
+                lowContrast
+                title={t('failedToLoadServices', 'Failed to load services')}
+                subtitle={queuesError?.message}
+              />
+            )}
           </Stack>
         )}
       </ModalBody>

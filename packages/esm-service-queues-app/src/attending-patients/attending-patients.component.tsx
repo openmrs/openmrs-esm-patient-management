@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
-import { ConfigurableLink, PatientPhoto, useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDate, parseDate, PatientPhoto, useConfig } from '@openmrs/esm-framework';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
 import QueuePriority from '../queue-table/components/queue-priority.component';
@@ -51,7 +51,7 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
 
   const demographics = [
     age != null ? t('ageYearsOld', '{{age}} years old', { age }) : null,
-    person?.birthdate ? dayjs(person.birthdate).format('DD-MM-YYYY') : null,
+    person?.birthdate ? formatDate(parseDate(person.birthdate), { time: false }) : null,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -81,14 +81,23 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
 }
 
 function GenderIndicator({ gender }: { gender?: string }) {
+  const { t } = useTranslation();
   if (!gender) {
     return null;
   }
   const normalized = gender.charAt(0).toUpperCase();
   const symbol = normalized === 'F' ? '♀' : normalized === 'M' ? '♂' : '⚧';
+  const label =
+    normalized === 'F'
+      ? t('female', 'Female')
+      : normalized === 'M'
+        ? t('male', 'Male')
+        : normalized === 'O'
+          ? t('other', 'Other')
+          : t('unknown', 'Unknown');
   return (
     <span className={styles.gender}>
-      {symbol} {normalized.toLowerCase()}
+      {symbol} {label}
     </span>
   );
 }
