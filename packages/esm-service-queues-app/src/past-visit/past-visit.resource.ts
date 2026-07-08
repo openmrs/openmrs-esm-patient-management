@@ -4,7 +4,8 @@ import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 
 export function usePastVisits(patientUuid: string, currentVisitUuid?: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),form:(uuid,display),encounterDatetime,' +
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),' +
+    'form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,' +
     // Use default representation for orders to safely include subclass-specific fields (e.g., DrugOrder)
     // without requesting properties that are not present on other subclasses (e.g., TestOrder).
     'orders,' +
