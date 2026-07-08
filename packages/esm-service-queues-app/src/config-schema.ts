@@ -116,6 +116,15 @@ export const configSchema = {
       _type: Type.String,
     },
   },
+  callingStatus: {
+    _type: Type.String,
+    _default: 'calling',
+    _description:
+      'The status string sent to the queueutil/assignticket endpoint when a patient is called, ' +
+      'and matched on the queue screen to trigger the blinking ticket display. Change to match ' +
+      'what your digital signage expects (e.g. "Now serving"). ' +
+      'Avoid "completed", which the queue backend treats as a signal to remove the ticket.',
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -415,6 +424,7 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
   appointmentStatuses: Array<string>;
+  callingStatus: string;
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
