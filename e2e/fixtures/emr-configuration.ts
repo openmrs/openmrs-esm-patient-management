@@ -4,7 +4,11 @@ import type { EmrApiConfigurationResponse } from '../../packages/esm-ward-app/sr
 
 const emrConfigurationStatePath = 'e2e/.emr-configuration.json';
 
-export const emrConfiguration: WorkerFixture<EmrApiConfigurationResponse, PlaywrightWorkerArgs> = async (_, use) => {
+export const emrConfiguration: WorkerFixture<EmrApiConfigurationResponse, PlaywrightWorkerArgs> = async (
+  // eslint-disable-next-line no-empty-pattern
+  {},
+  use,
+) => {
   const stateContent = await readFile(emrConfigurationStatePath, 'utf8');
   const configuration = JSON.parse(stateContent) as EmrApiConfigurationResponse;
 

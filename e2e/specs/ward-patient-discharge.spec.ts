@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient } from '../commands/types';
 import {
   changeToWardLocation,
   changeToDefaultLocation,
