@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { SWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { AppointmentKind, AppointmentStatus } from './../../types';
 import WeeklyCalendarView from './weekly-calendar-view.component';
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
@@ -19,20 +20,39 @@ function ts(dayOffset: number, hour: number, minute = 0): number {
   return june09WeekStart.add(dayOffset, 'day').hour(hour).minute(minute).valueOf();
 }
 
+let apptCounter = 0;
+function nextApptUuid(): string {
+  apptCounter += 1;
+  const hex = apptCounter.toString(16).padStart(4, '0');
+  return `7cd38a6d-377e-491b-8284-b04cf8b8${hex}`;
+}
+
 const mockAppointment = (overrides = {}) => ({
-  uuid: 'test-uuid',
-  appointmentNumber: '0001',
-  appointmentKind: 'Scheduled',
+  uuid: nextApptUuid(),
+  appointmentNumber: '0000',
+  appointmentKind: AppointmentKind.SCHEDULED,
   comments: '',
+  dateAppointmentScheduled: null,
   endDateTime: null,
-  location: { uuid: 'loc-uuid', name: 'Test Clinic' },
-  patient: { identifier: 'PAT-001', name: 'Test Patient', uuid: 'pat-uuid' },
-  provider: { uuid: 'prov-uuid', display: 'Dr. Test' },
-  providers: [],
+  location: { uuid: 'b1a8b05e-3542-4037-bbd3-998ee9c40574', name: 'Inpatient Ward' },
+  patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+  provider: { uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'Dr James Cook' },
+  providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'Dr James Cook' }],
   recurring: false,
-  service: { appointmentServiceId: 1, name: 'Outpatient', uuid: 'svc-uuid', durationMins: 15 },
+  service: {
+    appointmentServiceId: 1,
+    name: 'Outpatient',
+    uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+    description: 'Outpatient service',
+    creatorName: null,
+    startTime: '08:00',
+    endTime: '17:00',
+    maxAppointmentsLimit: null,
+    initialAppointmentStatus: AppointmentStatus.SCHEDULED,
+    durationMins: 15,
+  },
   startDateTime: ts(0, 9),
-  status: 'Scheduled',
+  status: AppointmentStatus.SCHEDULED,
   voided: false,
   extensions: {},
   teleconsultationLink: null,
@@ -72,6 +92,7 @@ function renderWeekly(props = {}) {
 
 describe('WeeklyCalendarView', () => {
   beforeEach(() => {
+    apptCounter = 0;
     mockOpenmrsFetch.mockReset();
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
   });
@@ -98,14 +119,12 @@ describe('WeeklyCalendarView', () => {
   it('renders appointment previews with time and patient name', async () => {
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 14),
-        patient: { identifier: 'P1', name: 'Agnes Adams', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Agnes Adams', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
       mockAppointment({
-        uuid: 'a2',
         startDateTime: ts(1, 10, 42),
-        patient: { identifier: 'P2', name: 'Kevin Brown', uuid: 'p2' },
+        patient: { identifier: '100GEK', name: 'Kevin Brown', uuid: '5a1c0ab4-9b22-4c6f-84e5-b3e2c3fa5d69' },
       }),
     ]);
 
@@ -120,24 +139,20 @@ describe('WeeklyCalendarView', () => {
   it('shows +N more link when more than 2 appointments in a block', async () => {
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 0),
-        patient: { identifier: 'P1', name: 'Alice', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Alice', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
       mockAppointment({
-        uuid: 'a2',
         startDateTime: ts(1, 10, 0),
-        patient: { identifier: 'P2', name: 'Bob', uuid: 'p2' },
+        patient: { identifier: '100GEK', name: 'Bob', uuid: '5a1c0ab4-9b22-4c6f-84e5-b3e2c3fa5d69' },
       }),
       mockAppointment({
-        uuid: 'a3',
         startDateTime: ts(1, 11, 0),
-        patient: { identifier: 'P3', name: 'Carol', uuid: 'p3' },
+        patient: { identifier: '100GEL', name: 'Carol', uuid: 'c73b920a-4f12-4d8e-91c5-6e7d8f3a2b01' },
       }),
       mockAppointment({
-        uuid: 'a4',
         startDateTime: ts(1, 11, 30),
-        patient: { identifier: 'P4', name: 'Dave', uuid: 'p4' },
+        patient: { identifier: '100GEM', name: 'Dave', uuid: 'd94e031b-5023-5e9f-a2d6-7f8e9a4b3c12' },
       }),
     ]);
 
@@ -154,14 +169,12 @@ describe('WeeklyCalendarView', () => {
   it('does not show +N more link when exactly 2 or fewer appointments', async () => {
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 0),
-        patient: { identifier: 'P1', name: 'Alice', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Alice', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
       mockAppointment({
-        uuid: 'a2',
         startDateTime: ts(1, 10, 0),
-        patient: { identifier: 'P2', name: 'Bob', uuid: 'p2' },
+        patient: { identifier: '100GEK', name: 'Bob', uuid: '5a1c0ab4-9b22-4c6f-84e5-b3e2c3fa5d69' },
       }),
     ]);
 
@@ -179,9 +192,8 @@ describe('WeeklyCalendarView', () => {
 
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 0),
-        patient: { identifier: 'P1', name: 'Alice', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Alice', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
     ]);
 
@@ -199,9 +211,8 @@ describe('WeeklyCalendarView', () => {
 
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 0),
-        patient: { identifier: 'P1', name: 'Alice', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Alice', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
     ]);
 
@@ -220,9 +231,8 @@ describe('WeeklyCalendarView', () => {
 
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 0),
-        patient: { identifier: 'P1', name: 'Alice', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Alice', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
     ]);
 
@@ -240,9 +250,9 @@ describe('WeeklyCalendarView', () => {
     const onSelectDate = vi.fn();
 
     mockAppointmentsForDay(1, [
-      mockAppointment({ uuid: 'a1', startDateTime: ts(1, 9, 0) }),
-      mockAppointment({ uuid: 'a2', startDateTime: ts(1, 10, 0) }),
-      mockAppointment({ uuid: 'a3', startDateTime: ts(1, 11, 0) }),
+      mockAppointment({ startDateTime: ts(1, 9, 0) }),
+      mockAppointment({ startDateTime: ts(1, 10, 0) }),
+      mockAppointment({ startDateTime: ts(1, 11, 0) }),
     ]);
 
     renderWeekly({ onSelectDate });
@@ -256,9 +266,8 @@ describe('WeeklyCalendarView', () => {
   it('renders empty cells without content for blocks with no appointments', async () => {
     mockAppointmentsForDay(1, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(1, 9, 0),
-        patient: { identifier: 'P1', name: 'Alice', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'Alice', uuid: '3d13f51a-1eaf-4b62-b329-4c21cf95b9a7' },
       }),
     ]);
 
@@ -272,28 +281,26 @@ describe('WeeklyCalendarView', () => {
   it('renders without crashing (smoke test)', async () => {
     mockAppointmentsForDay(0, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(0, 9, 0),
-        patient: { identifier: 'P1', name: 'Test Patient', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
       }),
     ]);
 
     renderWeekly();
 
-    await screen.findByText('Test Patient');
+    await screen.findByText('John Wilson');
   });
 
   it('supports different calendar keys without crashing', async () => {
     mockAppointmentsForDay(0, [
       mockAppointment({
-        uuid: 'a1',
         startDateTime: ts(0, 9, 0),
-        patient: { identifier: 'P1', name: 'Test Patient', uuid: 'p1' },
+        patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
       }),
     ]);
 
     renderWeekly({ calKey: 'ethiopic' });
 
-    await screen.findByText('Test Patient');
+    await screen.findByText('John Wilson');
   });
 });
