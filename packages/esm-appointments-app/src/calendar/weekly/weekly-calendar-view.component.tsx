@@ -25,7 +25,7 @@ const LOCALE_MAP: Record<string, string> = {
   persian: 'fa-IR',
 };
 
-const DOW_LOCALE: Record<number, 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'> = {
+const DAY_OF_WEEK_KEY: Record<number, 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'> = {
   0: 'sun',
   1: 'mon',
   2: 'tue',
@@ -71,7 +71,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ calKey, calenda
   const weekDays: ReadonlyArray<WeekDay> = useMemo(() => {
     const pivot = parseDate(isoDate);
     const firstDay = calKey === 'persian' ? 6 : 0;
-    const weekStart = startOfWeek(pivot, 'en-US', DOW_LOCALE[firstDay]);
+    const weekStart = startOfWeek(pivot, 'en-US', DAY_OF_WEEK_KEY[firstDay]);
     return Array.from({ length: 7 }, (_, i) => {
       const gregDay = weekStart.add({ days: i });
       const calDay = toCalendar(gregDay, cal);
