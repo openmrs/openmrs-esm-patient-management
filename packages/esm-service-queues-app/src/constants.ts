@@ -16,3 +16,8 @@ export const queueEntryCustomRepresentation =
 // Error codes
 export const DUPLICATE_QUEUE_ENTRY_ERROR_CODE = '[queue.entry.duplicate.patient]';
 export const QUEUE_ENTRY_ALREADY_ENDED_ERROR = 'queue entry that has already ended';
+
+// Service queues app privileges
+export const CLINIC_ADMIN_PRIVILEGE = 'App: Service Queues Clinic Administrator';
+export const CLERK_PRIVILEGE = 'App: Service Queues Clerk';
+export const CLINICIAN_PRIVILEGE = 'App: Service Queues Clinician';
