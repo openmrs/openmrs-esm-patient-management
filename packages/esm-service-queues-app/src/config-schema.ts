@@ -47,6 +47,10 @@ type PriorityTagColor = (typeof priorityTagColors)[number];
 const tagStyles = ['bold'] as const;
 type TagStyle = (typeof tagStyles)[number];
 
+// Semantic colors used to highlight how long a patient has been waiting, mapped to Carbon color tokens in queue-duration.scss
+const waitTimeColors = ['red', 'orange', 'gray'] as const;
+type WaitTimeColor = (typeof waitTimeColors)[number];
+
 // equal to columnTypes but without extension
 export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
 const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
@@ -70,6 +74,13 @@ export const defaultPriorityConfig: PriorityConfig[] = [
     conceptUuid: defaultUrgentPriorityUuid,
     style: null,
     color: 'orange',
+  },
+];
+
+export const defaultWaitTimeThresholds: WaitTimeThresholdConfig[] = [
+  {
+    waitTimeInMinutes: 120,
+    color: 'red',
   },
 ];
 
@@ -110,6 +121,25 @@ export const configSchema = {
         _description: 'Style to apply to the tag',
         _validators: [validators.oneOf(tagStyles)],
         _default: null,
+      },
+    },
+  },
+  waitTimeThresholds: {
+    _type: Type.Array,
+    _default: defaultWaitTimeThresholds,
+    _description:
+      'Colour the wait-time value once a patient has waited at least the given number of minutes, ' +
+      'drawing attention to patients who have been in the queue a long time. The highest matching band wins.',
+    _elements: {
+      waitTimeInMinutes: {
+        _type: Type.Number,
+        _description: 'The minimum wait time in minutes for this colour to apply',
+      },
+      color: {
+        _type: Type.String,
+        _description: 'The colour to apply to the wait-time value once the threshold is reached',
+        _validators: [validators.oneOf(waitTimeColors)],
+        _default: 'red',
       },
     },
   },
@@ -467,6 +497,7 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 
 export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
+  waitTimeThresholds: Array<WaitTimeThresholdConfig>;
   appointmentStatuses: Array<string>;
   biometrics: BiometricsConfigObject;
   callingStatus: string;
@@ -539,6 +570,11 @@ export interface PriorityConfig {
   conceptUuid: string;
   color: PriorityTagColor;
   style: TagStyle | null;
+}
+
+export interface WaitTimeThresholdConfig {
+  waitTimeInMinutes: number;
+  color: WaitTimeColor;
 }
 
 export interface StatusConfig {

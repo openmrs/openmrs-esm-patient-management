@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { type WaitTimeThresholdConfig } from '../../config-schema';
+import styles from './queue-duration.scss';
 
 interface QueueDurationProps {
   startedAt: Date;
   endedAt?: Date;
+  thresholds?: WaitTimeThresholdConfig[];
 }
 
-const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt }) => {
-  return <DurationString startedAt={startedAt} endedAt={endedAt} />;
+const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt, thresholds }) => {
+  return <DurationString startedAt={startedAt} endedAt={endedAt} thresholds={thresholds} />;
 };
 
-function DurationString({ startedAt, endedAt }: QueueDurationProps) {
+// Returns the color of the highest threshold whose waitTimeInMinutes has been reached, or undefined if none apply.
+function getWaitTimeColor(totalMinutes: number, thresholds: WaitTimeThresholdConfig[] = []) {
+  return thresholds
+    .filter((threshold) => totalMinutes >= threshold.waitTimeInMinutes)
+    .sort((a, b) => b.waitTimeInMinutes - a.waitTimeInMinutes)[0]?.color;
+}
+
+function DurationString({ startedAt, endedAt, thresholds }: QueueDurationProps) {
   const { t } = useTranslation();
 
   const [currentTime, setCurrentTime] = useState(dayjs());
@@ -26,8 +37,10 @@ function DurationString({ startedAt, endedAt }: QueueDurationProps) {
   const hours = Math.trunc(totalMinutes / 60);
   const minutes = Math.trunc(totalMinutes % 60);
 
+  const color = getWaitTimeColor(totalMinutes, thresholds);
+
   return (
-    <span>
+    <span className={classNames(color && styles[color])}>
       {hours > 0
         ? t('hourAndMinuteFormatted', '{{hours}} hour(s) and {{minutes}} minute(s)', {
             hours,

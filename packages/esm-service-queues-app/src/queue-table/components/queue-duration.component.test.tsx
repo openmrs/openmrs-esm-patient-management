@@ -39,4 +39,32 @@ describe('QueueDuration', () => {
     render(<QueueDuration startedAt={startedAt} endedAt={endedAt} />);
     expect(screen.getByText(/1 hour\(s\) and 0 minute\(s\)/i)).toBeInTheDocument();
   });
+
+  it('does not apply a colour class when the wait is below the lowest threshold', () => {
+    const startedAt = dayjs().subtract(30, 'minutes').toDate();
+    render(<QueueDuration startedAt={startedAt} thresholds={[{ waitTimeInMinutes: 120, color: 'red' }]} />);
+    expect(screen.getByText(/30 minute\(s\)/i)).not.toHaveClass('red');
+  });
+
+  it('applies the threshold colour class once the wait exceeds the threshold', () => {
+    const startedAt = dayjs().subtract(3, 'hours').toDate();
+    render(<QueueDuration startedAt={startedAt} thresholds={[{ waitTimeInMinutes: 120, color: 'red' }]} />);
+    expect(screen.getByText(/3 hour\(s\) and 0 minute\(s\)/i)).toHaveClass('red');
+  });
+
+  it('applies the highest matching band when multiple thresholds are configured', () => {
+    const startedAt = dayjs().subtract(90, 'minutes').toDate();
+    render(
+      <QueueDuration
+        startedAt={startedAt}
+        thresholds={[
+          { waitTimeInMinutes: 60, color: 'orange' },
+          { waitTimeInMinutes: 120, color: 'red' },
+        ]}
+      />,
+    );
+    const value = screen.getByText(/1 hour\(s\) and 30 minute\(s\)/i);
+    expect(value).toHaveClass('orange');
+    expect(value).not.toHaveClass('red');
+  });
 });
