@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ExtensionSlot, getDefaultsFromConfigSchema, useConfig, useVisit } from '@openmrs/esm-framework';
+import { ExtensionSlot, getDefaultsFromConfigSchema, useConfig, useVisit, type Visit } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
 import { configSchema, type PatientSearchConfig } from '../../../config-schema';
 import { PatientSearchContext2, type PatientSearchContext2Props } from '../../../patient-search-context';
@@ -115,6 +115,27 @@ describe('PatientBanner with a select patient button', () => {
     expect(context.onPatientSelected).toHaveBeenCalledWith(
       patient.uuid,
       expect.objectContaining({ id: patient.uuid }),
+      context.launchChildWorkspace,
+      context.closeWorkspace,
+    );
+  });
+
+  it('passes a wrapped onVisitStarted callback to the start visit button slot', () => {
+    const context = makeContext2({
+      onVisitStarted: vi.fn(),
+      selectPatientButton: { text: 'Admit', requiresActiveVisit: true },
+    });
+    renderBanner(context);
+
+    const slotProps = mockExtensionSlot.mock.lastCall[0];
+    expect(slotProps.name).toBe('start-visit-button-slot2');
+
+    const visit = { uuid: 'visit-uuid' } as Visit;
+    (slotProps.state.onVisitStarted as (visit: Visit) => void)(visit);
+    expect(context.onVisitStarted).toHaveBeenCalledWith(
+      patient.uuid,
+      expect.objectContaining({ id: patient.uuid }),
+      visit,
       context.launchChildWorkspace,
       context.closeWorkspace,
     );

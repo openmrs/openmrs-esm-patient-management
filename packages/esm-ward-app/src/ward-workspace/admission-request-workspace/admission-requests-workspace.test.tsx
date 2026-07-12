@@ -2,7 +2,12 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useAppContext, useWorkspace2Context, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import {
+  useAppContext,
+  useWorkspace2Context,
+  type Visit,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { mockWardViewContext } from '../../../mock';
 import { type WardViewContext } from '../../types';
@@ -77,6 +82,28 @@ describe('Admission Requests Workspace', () => {
       'ward-app-patient-search-workspace',
       expect.objectContaining({
         selectPatientButton: { text: 'Admit', requiresActiveVisit: true },
+      }),
+    );
+  });
+
+  it('should auto-launch the admission workspace after a visit is started from the search', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(<AdmissionRequestsWorkspace {...workspaceProps} />);
+
+    await user.click(screen.getByRole('button', { name: /add patient to ward/i }));
+    const [, searchWorkspaceProps] = vi.mocked(workspaceProps.launchChildWorkspace).mock.lastCall;
+
+    const launchChildWorkspace = vi.fn();
+    searchWorkspaceProps.onVisitStarted(
+      'test-patient-uuid',
+      { id: 'test-patient-uuid' } as fhir.Patient,
+      { uuid: 'test-visit-uuid' } as Visit,
+      launchChildWorkspace,
+      vi.fn(),
+    );
+    await vi.waitFor(() =>
+      expect(launchChildWorkspace).toHaveBeenCalledWith('create-admission-encounter-workspace', {
+        selectedPatientUuid: 'test-patient-uuid',
       }),
     );
   });

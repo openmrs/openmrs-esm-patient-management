@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 /**
  * @deprecated This context should be removed once the workspace v2 migration is completed,
@@ -43,6 +43,17 @@ export interface PatientSearchContext2Props {
   onPatientSelected?(
     patientUuid: string,
     patient: fhir.Patient,
+    launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+    closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+  ): void;
+  /**
+   * An optional function invoked after a visit is successfully started from the start visit
+   * button on a patient search result card.
+   */
+  onVisitStarted?(
+    patientUuid: string,
+    patient: fhir.Patient,
+    visit: Visit,
     launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
     closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
   ): void;

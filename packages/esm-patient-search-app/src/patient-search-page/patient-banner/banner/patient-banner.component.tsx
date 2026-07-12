@@ -13,6 +13,7 @@ import {
   useLayoutType,
   useVisit,
   navigate,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
@@ -44,8 +45,14 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, closeWorkspace, startVisitWorkspaceName, selectPatientButton } =
-    context2 ?? {};
+  const {
+    onPatientSelected,
+    onVisitStarted,
+    launchChildWorkspace,
+    closeWorkspace,
+    startVisitWorkspaceName,
+    selectPatientButton,
+  } = context2 ?? {};
 
   const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
@@ -102,6 +109,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                     patient: fhirMappedPatient,
                     launchChildWorkspace,
                     startVisitWorkspaceName,
+                    onVisitStarted: onVisitStarted
+                      ? (visit: Visit) =>
+                          onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)
+                      : undefined,
                   }}
                 />
               ) : (

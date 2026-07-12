@@ -7,6 +7,7 @@ import {
   EmptyCardIllustration,
   useLayoutType,
   useWorkspace2Context,
+  type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import styles from './admission-requests-empty-state.scss';
@@ -27,6 +28,17 @@ const AdmissionRequestsEmptyState: React.FC = () => {
       ) {
         launchChildWorkspace('create-admission-encounter-workspace', {
           selectedPatientUuid: patient.id,
+        });
+      },
+      onVisitStarted(
+        patientUuid: string,
+        patient: fhir.Patient,
+        visit: Visit,
+        launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+      ) {
+        launchChildWorkspace('create-admission-encounter-workspace', {
+          selectedPatientUuid: patientUuid,
         });
       },
       selectPatientButton: {
