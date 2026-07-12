@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InlineNotification, SkeletonText } from '@carbon/react';
+import { Button, ButtonSet, InlineNotification, SkeletonText } from '@carbon/react';
 import {
-  ArrowLeftIcon,
   closeWorkspaceGroup2,
+  formatDatetime,
+  parseDate,
   useVisit,
   Workspace2,
   type Workspace2DefinitionProps,
@@ -68,26 +69,22 @@ const CreateAdmissionEncounterWorkspace: React.FC<
     errorLoadingPatient || errorLoadingVisit || errorLoadingBed || errorInpatientAdmission || errorInpatientRequests;
 
   let content: JSX.Element = null;
+  let showFooter = false;
+  let showAdmitAction = false;
+  let footerWardPatient: WardPatient = null;
+  let footerDispositionType: 'ADMIT' | 'TRANSFER' = 'ADMIT';
+  let footerAdmitDisabled = false;
+
   if (isLoading) {
     content = <SkeletonText />;
   } else if (hasError) {
+    showFooter = true;
     content = (
-      <>
-        <InlineNotification
-          kind="error"
-          lowContrast={true}
-          title={t('errorLoadingPatientInfo', 'Error loading patient info')}
-        />
-        <Button
-          className={styles.backButton}
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeftIcon size={16} {...props} />}
-          iconDescription={t('backToSearchResults', 'Back to search results')}
-          size="sm"
-          onClick={() => closeWorkspace()}>
-          <span>{t('backToSearchResults', 'Back to search results')}</span>
-        </Button>
-      </>
+      <InlineNotification
+        kind="error"
+        lowContrast={true}
+        title={t('errorLoadingPatientInfo', 'Error loading patient info')}
+      />
     );
   } else {
     const assignedBedDetail = bedData.data.results[0];
@@ -108,68 +105,63 @@ const CreateAdmissionEncounterWorkspace: React.FC<
       inpatientAdmission: inpatientAdmissions[0],
       inpatientRequest: null,
     };
-    const backToSearchResultsButton = (
-      <Button
-        className={styles.backButton}
-        kind="ghost"
-        renderIcon={(props) => <ArrowLeftIcon size={16} {...props} />}
-        iconDescription={t('backToSearchResults', 'Back to search results')}
-        size="sm"
-        onClick={() => closeWorkspace()}>
-        <span>{t('backToSearchResults', 'Back to search results')}</span>
-      </Button>
-    );
+    showFooter = Boolean(activeVisit);
+    showAdmitAction = Boolean(activeVisit);
+    footerWardPatient = wardPatient;
+    footerDispositionType = inpatientAdmissions[0] ? 'TRANSFER' : 'ADMIT';
+    footerAdmitDisabled = isAdmittedToCurrentLocation;
 
     content = (
       <>
         <WardPatientWorkspaceBanner wardPatient={wardPatient} />
         {activeVisit ? (
-          <>
-            <div>
-              {isAdmittedToCurrentLocation && (
-                <InlineNotification
-                  kind="warning"
-                  lowContrast={true}
-                  hideCloseButton={true}
-                  title={t('patientAlreadyAdmittedToCurrentLocation', 'Patient already admitted to current location')}
-                />
-              )}
-              {isAdmittedToOtherLocation && (
-                <InlineNotification
-                  kind="warning"
-                  lowContrast={true}
-                  hideCloseButton={true}
-                  title={t('patientCurrentlyAdmittedToWardLocation', 'Patient currently admitted to {{wardLocation}}', {
-                    wardLocation: inpatientAdmissions[0].currentInpatientLocation.display,
-                  })}
-                />
-              )}
-              {inpatientRequests[0] && (
-                <InlineNotification
-                  kind="warning"
-                  lowContrast={true}
-                  hideCloseButton={true}
-                  title={t(
-                    'patientHasPendingAdmissionRequest',
-                    'Patient already has a pending admission request to location {{location}}',
-                    {
-                      location: inpatientRequests[0].dispositionLocation.display,
-                    },
-                  )}
-                />
-              )}
-              <AdmitPatientButton
-                wardPatient={wardPatient}
-                dispositionType={inpatientAdmissions[0] ? 'TRANSFER' : 'ADMIT'}
-                onAdmitPatientSuccess={async () => {
-                  await closeWorkspace({ discardUnsavedChanges: true });
-                  closeWorkspaceGroup2();
-                }}
-                disabled={isAdmittedToCurrentLocation}
-              />
+          <div className={styles.visitContext}>
+            <div className={styles.visitDetails}>
+              <span className={styles.visitDetailsLabel}>{t('activeVisit', 'Active visit')}</span>
+              <span>
+                {activeVisit.visitType?.display}
+                {activeVisit.location?.display ? ` · ${activeVisit.location.display}` : ''}
+                {activeVisit.startDatetime
+                  ? ` · ${t('startedDatetime', 'Started {{datetime}}', {
+                      datetime: formatDatetime(parseDate(activeVisit.startDatetime)),
+                      interpolation: { escapeValue: false },
+                    })}`
+                  : ''}
+              </span>
             </div>
-            {backToSearchResultsButton}
-          </>
+            {isAdmittedToCurrentLocation && (
+              <InlineNotification
+                kind="warning"
+                lowContrast={true}
+                hideCloseButton={true}
+                title={t('patientAlreadyAdmittedToCurrentLocation', 'Patient already admitted to current location')}
+              />
+            )}
+            {isAdmittedToOtherLocation && (
+              <InlineNotification
+                kind="warning"
+                lowContrast={true}
+                hideCloseButton={true}
+                title={t('patientCurrentlyAdmittedToWardLocation', 'Patient currently admitted to {{wardLocation}}', {
+                  wardLocation: inpatientAdmissions[0].currentInpatientLocation.display,
+                })}
+              />
+            )}
+            {inpatientRequests[0] && (
+              <InlineNotification
+                kind="warning"
+                lowContrast={true}
+                hideCloseButton={true}
+                title={t(
+                  'patientHasPendingAdmissionRequest',
+                  'Patient already has a pending admission request to location {{location}}',
+                  {
+                    location: inpatientRequests[0].dispositionLocation.display,
+                  },
+                )}
+              />
+            )}
+          </div>
         ) : (
           <NoActiveVisitEmptyState
             patientUuid={selectedPatientUuid}
@@ -185,7 +177,29 @@ const CreateAdmissionEncounterWorkspace: React.FC<
 
   return (
     <Workspace2 title={t('admitPatient', 'Admit patient')}>
-      <div id="create-admission-encounter-workspace">{content}</div>
+      <div id="create-admission-encounter-workspace" className={styles.workspaceWrapper}>
+        <div className={styles.workspaceContent}>{content}</div>
+        {showFooter && (
+          <ButtonSet className={styles.buttonSet}>
+            <Button size="xl" kind="secondary" onClick={() => closeWorkspace()}>
+              {t('backToSearchResults', 'Back to search results')}
+            </Button>
+            {showAdmitAction && (
+              <AdmitPatientButton
+                wardPatient={footerWardPatient}
+                dispositionType={footerDispositionType}
+                onAdmitPatientSuccess={async () => {
+                  await closeWorkspace({ discardUnsavedChanges: true });
+                  closeWorkspaceGroup2();
+                }}
+                disabled={footerAdmitDisabled}
+                kind="primary"
+                size="xl"
+              />
+            )}
+          </ButtonSet>
+        )}
+      </div>
     </Workspace2>
   );
 };

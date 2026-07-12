@@ -24,6 +24,8 @@ interface AdmitPatientButtonProps {
   dispositionType: DispositionType;
   onAdmitPatientSuccess();
   disabled?: boolean;
+  kind?: React.ComponentProps<typeof Button>['kind'];
+  size?: React.ComponentProps<typeof Button>['size'];
 }
 
 const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
@@ -32,6 +34,8 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
   onAdmitPatientSuccess,
   disabled,
   dispositionType,
+  kind = 'ghost',
+  size,
 }) => {
   const { patient, visit, bed } = wardPatient ?? {};
   const { t } = useTranslation();
@@ -113,7 +117,12 @@ const AdmitPatientButton: React.FC<AdmitPatientButtonProps> = ({
 
   const disabledButton = isLoadingEmrConfiguration || errorFetchingEmrConfiguration || disabled || isAdmitting;
   return (
-    <Button kind="ghost" renderIcon={ArrowRightIcon} size={responsiveSize} disabled={disabledButton} onClick={onAdmit}>
+    <Button
+      kind={kind}
+      renderIcon={ArrowRightIcon}
+      size={size ?? responsiveSize}
+      disabled={disabledButton}
+      onClick={onAdmit}>
       {dispositionType === 'ADMIT' || disabledButton
         ? t('admitPatient', 'Admit patient')
         : t('transferPatient', 'Transfer patient')}

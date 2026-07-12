@@ -1,4 +1,43 @@
 @use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.workspaceWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.workspaceContent {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.visitContext {
+  padding: layout.$spacing-05;
+
+  :global(.cds--inline-notification) {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+}
+
+.visitDetails {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  margin-bottom: layout.$spacing-05;
+}
+
+.visitDetailsLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.buttonSet button {
+  max-width: unset !important;
+  width: 50% !important;
+}
 
 .noActiveVisitContent {
   inline-size: 100%;

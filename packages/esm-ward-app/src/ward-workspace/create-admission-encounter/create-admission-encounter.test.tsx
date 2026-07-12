@@ -178,6 +178,13 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     await user.click(admitPatientButton);
     expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT', 'mock-visit');
   });
+  it('should show active visit details and footer actions', () => {
+    renderCreateAdmissionEncounterWorkspace(mockPatientAlice.uuid);
+    expect(screen.getByText('Active visit')).toBeInTheDocument();
+    expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to search results/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /admit patient/i })).toBeInTheDocument();
+  });
   it('should have warning when patient has a pending admission request', async () => {
     mockedUseInpatientRequestByPatients.mockReturnValueOnce({
       inpatientRequests: mockInpatientRequests,

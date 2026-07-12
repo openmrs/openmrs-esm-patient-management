@@ -1,4 +1,5 @@
 {
+  "activeVisit": "Active visit",
   "addPatientToWard": "Add patient to ward",
   "admissionRequestCancelledForPatient": "Admission request cancelled for {{patientName}}",
   "admissionRequests": "Admission requests",
@@ -130,6 +131,7 @@
   "showingLocations_one": "{{start}}-{{end}} of {{count}} locations",
   "showingLocations_other": "{{start}}-{{end}} of {{count}} locations",
   "somePartsOfTheFormDidntLoad": "Some parts of the form didn't load",
+  "startedDatetime": "Started {{datetime}}",
   "timeOnWard": "Time on this ward: {{timeOnWard}}",
   "timeSinceAdmission": "Admitted: {{timeSinceAdmission}}",
   "totalBeds": "Total beds",
