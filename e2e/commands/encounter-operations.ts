@@ -85,29 +85,6 @@ export const generateWardAdmissionRequest = async (
   return encounter;
 };
 
-export const createBedAssignmentEncounter = async (
-  api: APIRequestContext,
-  patientId: string,
-  visit: string,
-): Promise<Encounter> => {
-  const formRes = await api.post('encounter', {
-    data: {
-      patient: patientId,
-      location: process.env.E2E_WARD_LOCATION_UUID,
-      encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
-      obs: [],
-      visit: visit,
-    },
-  });
-  expect(formRes.ok()).toBeTruthy();
-  const encounter = await formRes.json();
-  return encounter;
-};
-
-export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`encounter/${uuid}`);
-};
-
 /**
  * Waits for an admission encounter to be fully processed into an InpatientAdmission.
  * This is necessary because after creating an admission encounter, the backend needs
