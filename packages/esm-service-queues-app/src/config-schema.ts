@@ -53,6 +53,7 @@ const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // Ope
 const defaultPriorityUuid = 'f4620bfa-3625-4883-bd3f-84c2cce14470';
 const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
 const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
+const defaultDrugOrderTypeUuid = '131168f4-15f5-102d-96e4-000c29c2a5d7';
 
 export const defaultPriorityConfig: PriorityConfig[] = [
   {
@@ -121,6 +122,15 @@ export const configSchema = {
     },
   },
   biometrics: biometricsConfigSchema,
+  callingStatus: {
+    _type: Type.String,
+    _default: 'calling',
+    _description:
+      'The status string sent to the queueutil/assignticket endpoint when a patient is called, ' +
+      'and matched on the queue screen to trigger the blinking ticket display. Change to match ' +
+      'what your digital signage expects (e.g. "Now serving"). ' +
+      'Avoid "completed", which the queue backend treats as a signal to remove the ticket.',
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -240,6 +250,11 @@ export const configSchema = {
     _default: 'Outpatient Triage',
     _description: 'The name of the default service queue to be selected when the start visit form is opened',
   },
+  drugOrderTypeUuid: {
+    _type: Type.UUID,
+    _default: defaultDrugOrderTypeUuid,
+    _description: 'The UUID of the "Drug Order" order type, used to filter medications in the previous-visit view.',
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -320,7 +335,7 @@ export const configSchema = {
         _validators: [
           validator(
             (columnDfn: ColumnDefinition) =>
-              Boolean(columnDfn.columnType || columnTypes.some((c) => c == columnDfn.id)),
+              Boolean(columnDfn.columnType || columnTypes.some((c) => c === columnDfn.id)),
             (columnDfn) =>
               `No columnType provided for column with ID '${
                 columnDfn.id
@@ -329,7 +344,7 @@ export const configSchema = {
           validator(
             (columnDfn: ColumnDefinition) => {
               return (
-                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid ||
+                columnDfn.config.identifierTypeUuid === defaultIdentifierTypeUuid ||
                 columnHasType(columnDfn, 'patient-identifier')
               );
             },
@@ -343,7 +358,7 @@ export const configSchema = {
             (columnDfn: ColumnDefinition) => {
               return (
                 !columnDfn.config.statusConfigs ||
-                columnDfn.config.statusConfigs.length == 0 ||
+                columnDfn.config.statusConfigs.length === 0 ||
                 columnHasType(columnDfn, 'status')
               );
             },
@@ -439,7 +454,7 @@ export const configSchema = {
       return Boolean(
         config.visitQueueNumberAttributeUuid ||
           queueNumberColumnsUsed.every(
-            (columnId) => queueNumberColumnDefs.find((d) => d.id == columnId).config.visitQueueNumberAttributeUuid,
+            (columnId) => queueNumberColumnDefs.find((d) => d.id === columnId).config.visitQueueNumberAttributeUuid,
           ),
       );
     }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
@@ -454,6 +469,7 @@ export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
   appointmentStatuses: Array<string>;
   biometrics: BiometricsConfigObject;
+  callingStatus: string;
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
@@ -473,6 +489,7 @@ export interface ConfigObject {
     weightUuid: string;
   };
   defaultInitialServiceQueue: string;
+  drugOrderTypeUuid: string;
   contactAttributeType: string;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;

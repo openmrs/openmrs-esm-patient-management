@@ -10,6 +10,7 @@
   "appointmentCancelled": "Appuntamento annullato",
   "appointmentCancelledSuccessfully": "Appuntamento annullato con successo",
   "appointmentCheckedIn": "Paziente registrato all'appuntamento",
+  "appointmentCheckedInAfterVisitStarted": "The visit was started and the appointment was checked in",
   "appointmentCheckedInWithExistingVisit": "Appointment checked in using existing active visit",
   "appointmentCheckInFailed": "An error occurred while checking in the appointment",
   "appointmentConflict": "Conflitto di appuntamenti",

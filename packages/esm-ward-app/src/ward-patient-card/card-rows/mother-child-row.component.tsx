@@ -21,7 +21,9 @@ const MotherChildRow: React.FC<MaternalWardPatientCardProps> = ({ wardPatient, c
   const motherOfPatient = motherByChildUuid?.get(patient.uuid);
   const childrenOfPatient = childrenByMotherUuid?.get(patient.uuid);
   const childrenOfPatientNotInSameBed = childrenOfPatient?.filter((child) => {
-    return !childrenOfWardPatientInSameBed?.some((childInSameBed) => childInSameBed.patient.uuid == child.patient.uuid);
+    return !childrenOfWardPatientInSameBed?.some(
+      (childInSameBed) => childInSameBed.patient.uuid === child.patient.uuid,
+    );
   });
 
   return (
