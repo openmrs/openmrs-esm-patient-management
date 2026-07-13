@@ -81,7 +81,7 @@ export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit
 export const undoTransitionQueueEntryModal = getAsyncLifecycle(
   () => import('./modals/undo-transition-queue-entry.modal'),
   {
-    featureName: 'undo queue entry transiion of a patient',
+    featureName: 'undo queue entry transition of a patient',
     moduleName,
   },
 );
