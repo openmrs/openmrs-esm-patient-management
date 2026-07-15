@@ -1,6 +1,7 @@
 import { request } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 import * as dotenv from 'dotenv';
+import { type EMRConfiguration } from '../commands/types';
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ async function globalSetup() {
     },
   });
 
-  const emrConfigurationResponse = await requestContext.get(
+  const emrapiConfigurationResponse = await requestContext.get(
     `${process.env.E2E_BASE_URL}/ws/rest/v1/emrapi/configuration?v=custom:metadataSourceName:ref,orderingProviderEncounterRole:ref,supportsTransferLocationTag:(uuid,display,name,links),unknownLocation:ref,denyAdmissionConcept:ref,admissionForm:ref,exitFromInpatientEncounterType:ref,extraPatientIdentifierTypes:ref,consultFreeTextCommentsConcept:ref,sameAsConceptMapType:ref,testPatientPersonAttributeType:ref,admissionDecisionConcept:ref,supportsAdmissionLocationTag:(uuid,display,name,links),checkInEncounterType:ref,transferWithinHospitalEncounterType:ref,suppressedDiagnosisConcepts:ref,primaryIdentifierType:ref,nonDiagnosisConceptSets:ref,fullPrivilegeLevel:ref,unknownProvider:ref,diagnosisSets:ref,personImageDirectory:ref,visitNoteEncounterType:ref,inpatientNoteEncounterType:ref,transferRequestEncounterType:ref,consultEncounterType:ref,diagnosisMetadata:ref,narrowerThanConceptMapType:ref,clinicianEncounterRole:ref,conceptSourcesForDiagnosisSearch:ref,patientDiedConcept:ref,emrApiConceptSource:ref,lastViewedPatientSizeLimit:ref,identifierTypesToSearch:ref,telephoneAttributeType:ref,checkInClerkEncounterRole:ref,dischargeForm:ref,unknownCauseOfDeathConcept:ref,visitAssignmentHandlerAdjustEncounterTimeOfDayIfNecessary:ref,atFacilityVisitType:ref,visitExpireHours:ref,admissionEncounterType:ref,motherChildRelationshipType:ref,dispositions:ref,dispositionDescriptor:ref,highPrivilegeLevel:ref,supportsLoginLocationTag:(uuid,display,name,links),unknownPatientPersonAttributeType:ref,supportsVisitsLocationTag:(uuid,display,name,links),transferForm:ref,bedAssignmentEncounterType:ref,cancelADTRequestEncounterType:ref,admissionDecisionConcept:ref,denyAdmissionConcept:ref`,
     {
       headers: {
@@ -36,15 +37,30 @@ async function globalSetup() {
       },
     },
   );
-  if (!emrConfigurationResponse.ok()) {
-    throw new Error(`Failed to fetch the EMR configuration: ${emrConfigurationResponse.status()}`);
+  if (!emrapiConfigurationResponse.ok()) {
+    throw new Error(`Failed to fetch the EMR configuration: ${emrapiConfigurationResponse.status()}`);
   }
-
-  const emrConfigurationData = await emrConfigurationResponse.json();
-  await writeFile('e2e/.emr-configuration.json', JSON.stringify(emrConfigurationData ?? {}, null, 2));
+  const emrapiConfigurationData: EMRConfiguration = await emrapiConfigurationResponse.json();
+  verifyEMRAPIConfiguration(emrapiConfigurationData);
+  await writeFile('e2e/.emr-configuration.json', JSON.stringify(emrapiConfigurationData ?? {}, null, 2));
 
   await requestContext.storageState({ path: 'e2e/storageState.json' });
   await requestContext.dispose();
+}
+
+function verifyEMRAPIConfiguration(emrapiConfiguration: EMRConfiguration) {
+  if (
+    !emrapiConfiguration.dispositionDescriptor ||
+    !emrapiConfiguration.dispositionDescriptor.dispositionConcept ||
+    !emrapiConfiguration.dispositionDescriptor.admissionLocationConcept ||
+    !emrapiConfiguration.dispositionDescriptor.dispositionSetConcept ||
+    !emrapiConfiguration.dispositionDescriptor
+  ) {
+    throw new Error('EMRAPI configuration is missing concepts in dispositionDescriptor');
+  }
+  if (!emrapiConfiguration?.dispositions?.find((d) => d.type === 'ADMIT')?.conceptCode) {
+    throw new Error('EMRAPI configuration is missing concept code foradmit disposition');
+  }
 }
 
 export default globalSetup;

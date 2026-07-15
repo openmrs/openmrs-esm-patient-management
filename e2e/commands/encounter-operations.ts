@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { type APIRequestContext, type Page, expect } from '@playwright/test';
-import { type Encounter } from './types';
+import { type EMRConfiguration, type Encounter } from './types';
 
 export const createEncounter = async (
   api: APIRequestContext,
@@ -41,18 +41,7 @@ export const createEncounter = async (
 
 export const generateWardAdmissionRequest = async (
   api: APIRequestContext,
-  emrConfiguration: {
-    dispositionDescriptor?: {
-      dispositionConcept?: { uuid?: string };
-      admissionLocationConcept?: { uuid?: string };
-      dispositionSetConcept?: { uuid?: string };
-    };
-    dispositions?: Array<{
-      name: string;
-      type: string;
-      conceptCode: string;
-    }>;
-  },
+  emrConfiguration: EMRConfiguration,
   patientId: string,
 ): Promise<Encounter> => {
   const formRes = await api.post('encounter', {
