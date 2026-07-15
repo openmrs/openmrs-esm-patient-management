@@ -2,7 +2,8 @@
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
     "webservices.rest": ">=2.2.0",
-    "queue": ">=2.4.0 <4.0.0"
+    "queue": ">=2.4.0 <4.0.0",
+    "appointments": ">=2.0.0"
   },
   "extensions": [
     {

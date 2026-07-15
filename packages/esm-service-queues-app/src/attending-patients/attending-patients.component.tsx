@@ -2,7 +2,14 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
-import { ConfigurableLink, formatDate, parseDate, PatientPhoto, useConfig } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  formatDate,
+  getCoreTranslation,
+  parseDate,
+  PatientPhoto,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
 import QueuePriority from '../queue-table/components/queue-priority.component';
@@ -81,25 +88,19 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
 }
 
 function GenderIndicator({ gender }: { gender?: string }) {
-  const { t } = useTranslation();
   if (!gender) {
     return null;
   }
   const normalized = gender.charAt(0).toUpperCase();
-  const symbol = normalized === 'F' ? '♀' : normalized === 'M' ? '♂' : '⚧';
   const label =
     normalized === 'F'
-      ? t('female', 'Female')
+      ? getCoreTranslation('female', 'Female')
       : normalized === 'M'
-        ? t('male', 'Male')
+        ? getCoreTranslation('male', 'Male')
         : normalized === 'O'
-          ? t('other', 'Other')
-          : t('unknown', 'Unknown');
-  return (
-    <span className={styles.gender}>
-      {symbol} {label}
-    </span>
-  );
+          ? getCoreTranslation('other', 'Other')
+          : getCoreTranslation('unknown', 'Unknown');
+  return <span className={styles.gender}>{label}</span>;
 }
 
 export default AttendingPatients;

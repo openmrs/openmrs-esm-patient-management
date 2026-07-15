@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -13,7 +12,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatTime, useConfig } from '@openmrs/esm-framework';
 import { useExpectedAppointments } from '../hooks/useExpectedAppointments';
 import { useServiceQueuesStore } from '../store/store';
 import { type ConfigObject } from '../config-schema';
@@ -42,7 +41,7 @@ const ExpectedAppointments: React.FC = () => {
         patientUuid: appointment.patient.uuid,
         name: appointment.patient.name,
         service: appointment.service?.name ?? '--',
-        time: appointment.startDateTime ? dayjs(appointment.startDateTime).format('hh:mm A') : '--',
+        time: appointment.startDateTime ? formatTime(new Date(appointment.startDateTime)) : '--',
         status: appointment.status,
       })),
     [appointments],
