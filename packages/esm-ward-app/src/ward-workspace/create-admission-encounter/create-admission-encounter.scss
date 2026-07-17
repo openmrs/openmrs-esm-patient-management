@@ -34,9 +34,10 @@
   color: $text-02;
 }
 
-.buttonSet button {
-  max-width: unset !important;
-  width: 50% !important;
+// Doubled class to out-specify Carbon's `.cds--btn-set .cds--btn` max-width cap
+.buttonSet.buttonSet button {
+  max-width: unset;
+  flex: 1;
 }
 
 .noActiveVisitContent {
