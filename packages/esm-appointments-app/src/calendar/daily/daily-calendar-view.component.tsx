@@ -87,7 +87,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calKey, calendarS
 };
 
 const DailyCard: React.FC<{ appointment: Appointment }> = ({ appointment }) => {
-  const color = getServiceColor(appointment.service?.name ?? '');
+  const color = getServiceColor(appointment.service.name);
   const tagType = STATUS_TAG_TYPES[appointment.status] ?? DEFAULT_STATUS_TAG_TYPE;
   const time = useMemo(() => {
     if (appointment.startDateTime == null) return '—';
@@ -100,7 +100,7 @@ const DailyCard: React.FC<{ appointment: Appointment }> = ({ appointment }) => {
       <div className={styles.cardDetails}>
         <div className={styles.cardName}>{appointment.patient?.name ?? '—'}</div>
         <div className={styles.cardService} style={{ color }}>
-          {appointment.service?.name ?? '—'}
+          {appointment.service.name}
         </div>
       </div>
       <Tag type={tagType} size="sm">
