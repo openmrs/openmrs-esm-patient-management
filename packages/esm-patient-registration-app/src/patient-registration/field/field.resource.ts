@@ -27,7 +27,7 @@ export function useConceptAnswers(conceptUuid: string): {
 } {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
-    shouldFetch ? `${restBaseUrl}/concept/${conceptUuid}` : null,
+    shouldFetch ? `${restBaseUrl}/concept/${conceptUuid}?v=custom:(uuid,display,answers:(uuid,display))` : null,
     openmrsFetch,
   );
   if (error) {

@@ -1,7 +1,8 @@
 import { type APIRequestContext, type Page, test as base } from '@playwright/test';
-import { api } from '../fixtures';
+import { api, emrConfiguration } from '../fixtures';
 import { type Patient } from '../commands/types';
 import { generateRandomPatient, deletePatient } from '../commands';
+import type { EmrApiConfigurationResponse } from '../../packages/esm-ward-app/src/hooks/useEmrConfiguration';
 
 // This file sets up our custom test harness using the custom fixtures.
 // See https://playwright.dev/docs/test-fixtures#creating-a-fixture for details.
@@ -16,10 +17,12 @@ export interface CustomTestFixtures {
 
 export interface CustomWorkerFixtures {
   api: APIRequestContext;
+  emrConfiguration: EmrApiConfigurationResponse;
 }
 
 export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
   api: [api, { scope: 'worker' }],
+  emrConfiguration: [emrConfiguration, { scope: 'worker' }],
   patient: [
     async ({ api }, use) => {
       const patient = await generateRandomPatient(api);
