@@ -1,0 +1,67 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  padding: layout.$spacing-05 layout.$spacing-05 layout.$spacing-03;
+}
+
+.patientList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.patientRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 5.5rem 1fr; // Matches 3.5rem avatar + 2×1rem margins
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-top: 1px solid $ui-03;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background-color: $ui-01;
+  }
+}
+
+.patientPhoto {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: layout.$spacing-05;
+  border-radius: 1px;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.patientName {
+  @include type.type-style('body-compact-01');
+  color: var(--cds-text-primary);
+}
+
+.patientDetails {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.emptyState {
+  margin: 0 layout.$spacing-05;
+}
+
+.emptyStateText {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}

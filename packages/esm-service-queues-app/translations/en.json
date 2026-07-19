@@ -89,6 +89,7 @@
   "nextPage": "Next page",
   "noActiveTickets": "No active tickets to display",
   "noActiveVisit": "No active visit",
+  "noCheckedInPatients": "No checked-in patients waiting to be added to a queue",
   "noColumnsDefined": "No table columns defined. Check Configuration",
   "noEncountersFound": "No encounters found",
   "noMedicationsFound": "No medications found",

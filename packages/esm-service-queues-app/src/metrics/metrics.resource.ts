@@ -3,37 +3,45 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { type WaitTime } from '../types';
 
-export function useActiveVisits() {
+/**
+ * Fetches currently-active visits at a location (defaults to the session location), deduped by patient.
+ * By default only visits started today are included (for the "Checked in patients" metric); pass
+ * `restrictToToday: false` to include all open visits regardless of start date.
+ */
+export function useActiveVisits(locationUuid?: string, restrictToToday: boolean = true) {
   const currentUserSession = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
-  const sessionLocation = currentUserSession?.sessionLocation?.uuid;
+  const location = locationUuid ?? currentUserSession?.sessionLocation?.uuid;
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
-    'stopDatetime)&fromStartDate=' +
-    startDate +
+    'stopDatetime)' +
+    (restrictToToday ? '&fromStartDate=' + startDate : '') +
     '&location=' +
-    sessionLocation;
+    location;
   const url = `${restBaseUrl}/visit?includeInactive=false&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    sessionLocation ? url : null,
+    location ? url : null,
     openmrsFetch,
   );
 
-  // Create a Set to store unique patient UUIDs
-  const uniquePatientUUIDs = new Set();
+  // Dedupe by patient UUID (first visit per patient).
+  const activeVisitsByPatient = new Map<string, Visit>();
 
   data?.data?.results.forEach((visit) => {
     const patientUUID = visit.patient?.uuid;
     const isToday = dayjs(visit.startDatetime).isToday();
-    if (patientUUID && isToday) {
-      uniquePatientUUIDs.add(patientUUID);
+    if (patientUUID && (!restrictToToday || isToday) && !activeVisitsByPatient.has(patientUUID)) {
+      activeVisitsByPatient.set(patientUUID, visit);
     }
   });
 
+  const activeVisits = Array.from(activeVisitsByPatient.values());
+
   return {
-    activeVisitsCount: uniquePatientUUIDs.size,
+    activeVisits,
+    activeVisitsCount: activeVisits.length,
     isLoading,
     error,
     isValidating,
