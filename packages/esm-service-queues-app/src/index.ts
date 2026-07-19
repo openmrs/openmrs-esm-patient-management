@@ -38,14 +38,6 @@ export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/sid
 // t('serviceQueues', 'Service queues')
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const clearAllQueueEntriesModal = getAsyncLifecycle(
-  () => import('./modals/clear-queue-entries-modal/clear-queue-entries.modal'),
-  {
-    featureName: 'clear all queue entries and end visits',
-    moduleName,
-  },
-);
-
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
 export const metricsCardCheckedInPatients = getAsyncLifecycle(
