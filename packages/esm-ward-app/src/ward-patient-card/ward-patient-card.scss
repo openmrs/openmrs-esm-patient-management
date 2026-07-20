@@ -92,6 +92,22 @@
 .wardPatientCardHeader {
   @extend .dotSeparatedChildren;
   border-top: 0;
+
+  // Reserve space for the absolutely-positioned Inborn/Outborn badge (top-right) when present,
+  // so header content never slides under it. The badge is contributed by an extension slot wrapped
+  // in .wardPatientCardHeaderBadge, which immediately follows the header.
+  &:has(+ .wardPatientCardHeaderBadge div:not(:empty)) {
+    padding-right: 5.5rem; // ~88px: badge width + its right offset
+  }
+}
+
+// Positions the Inborn/Outborn badge extension slot in the card's top-right corner.
+// Anchored to .wardPatientCard, which is position: relative.
+.wardPatientCardHeaderBadge {
+  position: absolute;
+  top: layout.$spacing-03;
+  right: layout.$spacing-05;
+  z-index: 2;
 }
 
 .wardPatientCardDispositionTypeContainer {
@@ -176,6 +192,7 @@
 .dotSeparatedChildren {
   display: flex;
   flex-wrap: wrap;
+  row-gap: layout.$spacing-02;
 
   > *:not(*:first-of-type):not(:empty) {
     display: flex;

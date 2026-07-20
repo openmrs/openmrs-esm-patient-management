@@ -10,7 +10,7 @@ export const queueTablePatientIdentifierColumn: QueueTableColumnFunction = (
   const { identifierTypeUuid } = config;
 
   const getPatientIdentifier = (queueEntry: QueueEntry) =>
-    queueEntry.patient.identifiers.find((i) => i.identifierType?.uuid == identifierTypeUuid)?.identifier;
+    queueEntry.patient.identifiers.find((i) => i.identifierType?.uuid === identifierTypeUuid)?.identifier;
 
   const QueueTablePatientIdentifierCell = ({ queueEntry }: QueueTableCellComponentProps) => {
     return <span>{getPatientIdentifier(queueEntry)}</span>;
