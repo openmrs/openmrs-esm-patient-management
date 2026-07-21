@@ -2,9 +2,12 @@ import { type APIRequestContext, expect } from '@playwright/test';
 import { type Patient } from './types';
 
 export const generateRandomPatient = async (api: APIRequestContext, locationUuid?: string): Promise<Patient> => {
-  const identifierRes = await api.post('idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier', {
-    data: {},
-  });
+  const identifierRes = await api.post(
+    `idgen/identifiersource/${process.env.E2E_PATIENT_IDENTIFIER_SOURCE_UUID}/identifier`,
+    {
+      data: {},
+    },
+  );
   await expect(identifierRes.ok()).toBeTruthy();
   const { identifier } = await identifierRes.json();
 
@@ -14,7 +17,7 @@ export const generateRandomPatient = async (api: APIRequestContext, locationUuid
       identifiers: [
         {
           identifier,
-          identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+          identifierType: process.env.E2E_PATIENT_IDENTIFIER_TYPE_UUID,
           location: locationUuid || process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
           preferred: true,
         },
