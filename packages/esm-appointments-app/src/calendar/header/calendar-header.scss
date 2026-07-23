@@ -64,21 +64,21 @@
   flex-wrap: wrap;
 
   :global(.cds--content-switcher) {
-    --cds-layer-selected-inverse: #{colors.$teal-60};
+    --cds-layer-selected-inverse: var(--brand-03);
     --cds-text-inverse: #{colors.$white};
-    --cds-border-interactive: #{colors.$teal-60};
-    --cds-focus: #{colors.$teal-50};
-    --cds-border-subtle-00: #{colors.$teal-60};
-    border-color: colors.$teal-60 !important;
+    --cds-border-interactive: var(--brand-03);
+    --cds-focus: var(--brand-03);
+    --cds-border-subtle-00: var(--brand-03);
+    border-color: var(--brand-03) !important;
   }
 
   :global(.cds--content-switcher-btn) {
     white-space: nowrap;
     min-width: fit-content;
-    color: colors.$teal-60;
-    border-color: colors.$teal-60;
+    color: var(--brand-03);
+    border-color: var(--brand-03);
     &:focus {
-      box-shadow: inset 0 0 0 2px colors.$teal-50 !important;
+      box-shadow: inset 0 0 0 2px var(--brand-03) !important;
       outline: none !important;
     }
   }
@@ -86,8 +86,8 @@
   :global(.cds--content-switcher-btn.cds--content-switcher--selected),
   :global(.cds--content-switcher-btn.cds--content-switcher--selected:hover),
   :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus) {
-    background-color: colors.$teal-60 !important;
-    border-color: colors.$teal-60 !important;
+    background-color: var(--brand-03) !important;
+    border-color: var(--brand-03) !important;
     color: colors.$white !important;
     box-shadow: none !important;
   }
