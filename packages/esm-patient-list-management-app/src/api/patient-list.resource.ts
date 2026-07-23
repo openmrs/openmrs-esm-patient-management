@@ -104,11 +104,6 @@ export async function getAllPatientLists(
     query.push(['q', filter.name]);
   }
 
-  if (filter.isStarred !== undefined) {
-    // TODO: correct this; it definitely is "attributes", but then we'd get back a 500 right now.
-    query.push(['attribute', `starred:${filter.isStarred}`]);
-  }
-
   if (filter.type === PatientListType.USER) {
     query.push(['cohortType', myListCohortTypeUUID]);
   } else if (filter.type === PatientListType.SYSTEM) {
@@ -132,7 +127,7 @@ export async function getAllPatientLists(
     description: cohort.description,
     type: cohort.cohortType?.display,
     size: cohort.size,
-    isStarred: false, // TODO
+    isStarred: false,
   }));
 }
 
