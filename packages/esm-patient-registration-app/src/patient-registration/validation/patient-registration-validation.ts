@@ -1,15 +1,58 @@
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
-import type { ObjectSchema } from 'yup';
 import mapValues from 'lodash/mapValues';
 import { type RegistrationConfig } from '../../config-schema';
-import { type FormValues } from '../patient-registration.types';
+import { type AddressTemplate, type FormValues } from '../patient-registration.types';
 import { getDatetime } from '../patient-registration.resource';
+
+function getTemplateDrivenAddressValidationSchema(
+  addressTemplate: AddressTemplate | null,
+  t: (key: string, defaultValue: string) => string,
+) {
+  if (!addressTemplate) return Yup.object().optional();
+
+  const shapeEntries: Record<string, Yup.StringSchema> = {};
+  const fieldNames = Object.keys(addressTemplate.nameMappings ?? {});
+  const requiredElements = (addressTemplate.requiredElements ?? []) as Array<string>;
+
+  for (const fieldName of fieldNames) {
+    let fieldSchema = Yup.string();
+    const regex = addressTemplate.elementRegex?.[fieldName];
+    const regexFormat = addressTemplate.elementRegexFormats?.[fieldName];
+    const isRequired = requiredElements.includes(fieldName);
+
+    if (regex) {
+      try {
+        const compiledRegex = new RegExp(regex);
+        fieldSchema = fieldSchema.matches(compiledRegex, {
+          message: regexFormat || t('invalidFormat', 'Invalid format'),
+          excludeEmptyString: true,
+        });
+      } catch {
+        // If the regex from the address template is invalid/malformed,
+        // skip regex-based validation for this field to avoid crashing the form
+        console.warn(`Invalid regex pattern for address field "${fieldName}": ${regex}`);
+      }
+    }
+
+    if (isRequired) {
+      fieldSchema = fieldSchema.required(t('requiredField', 'This field is required'));
+    } else {
+      fieldSchema = fieldSchema.optional();
+    }
+
+    shapeEntries[fieldName] = fieldSchema;
+  }
+
+  return Yup.object(shapeEntries).optional();
+}
 
 export function getValidationSchema(
   config: RegistrationConfig,
   t: (key: string, defaultValue: string) => string,
-): ObjectSchema<any> {
+  addressTemplate: AddressTemplate | null,
+) {
+  const addressValidationSchema = getTemplateDrivenAddressValidationSchema(addressTemplate, t);
   return Yup.object({
     givenName: Yup.string().required(t('givenNameRequired', 'Given name is required')),
     familyName: Yup.string().required(t('familyNameRequired', 'Family name is required')),
@@ -125,5 +168,6 @@ export function getValidationSchema(
         relationshipType: Yup.string().required(),
       }),
     ),
+    address: addressValidationSchema ?? Yup.object().optional(),
   });
 }
