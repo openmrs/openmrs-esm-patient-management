@@ -1,11 +1,6 @@
 import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
-  myListCohortTypeUUID: {
-    _type: Type.UUID,
-    _default: 'e71857cb-33af-4f2c-86ab-7223bcfa37ad',
-    _description: 'UUID of the `My List` cohort type',
-  },
   systemListCohortTypeUUID: {
     _type: Type.UUID,
     _default: 'eee9970e-7ca0-4e8c-a280-c33e9d5f6a04',
@@ -25,7 +20,6 @@ export const configSchema = {
 };
 
 export interface PatientListManagementConfig {
-  myListCohortTypeUUID: string;
   systemListCohortTypeUUID: string;
   patientListsToShow: number;
   defaultToCurrentLocation: boolean;
