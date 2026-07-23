@@ -192,6 +192,7 @@
 .dotSeparatedChildren {
   display: flex;
   flex-wrap: wrap;
+  row-gap: layout.$spacing-02;
 
   > *:not(*:first-of-type):not(:empty) {
     display: flex;
