@@ -123,6 +123,72 @@ test('Register a new patient', async ({ page }) => {
   });
 });
 
+test('Register a new patient with a photo upload', async ({ page }) => {
+  test.slow();
+  const patientRegistrationPage = new RegistrationAndEditPage(page);
+
+  await test.step('When I visit the registration page', async () => {
+    await patientRegistrationPage.goto();
+    await patientRegistrationPage.waitUntilTheFormIsLoaded();
+  });
+
+  await test.step('And I fill in the required patient demographics', async () => {
+    await patientRegistrationPage.givenNameInput().fill('PhotoTest');
+    await patientRegistrationPage.middleNameInput().fill('Upload');
+    await patientRegistrationPage.familyNameInput().fill('Patient');
+    await patientRegistrationPage.sexRadioButton('female').check();
+    await patientRegistrationPage.birthdateDayInput().fill('15');
+    await patientRegistrationPage.birthdateMonthInput().fill('06');
+    await patientRegistrationPage.birthdateYearInput().fill('1990');
+  });
+
+  await test.step('When I click on the `Edit` button to open the photo capture modal', async () => {
+    await expect(page.getByText(/no image to display/i)).toBeVisible({ timeout: 30000 });
+    await page.getByRole('button', { name: /edit/i }).click();
+  });
+
+  await test.step('Then I should see the `Add image` modal', async () => {
+    await expect(page.getByText(/add image/i)).toBeVisible();
+  });
+
+  await test.step('When I click on the `Upload files` tab', async () => {
+    await page.getByRole('tab', { name: /upload files/i }).click();
+  });
+
+  await test.step('And I upload an image file', async () => {
+    await page.getByLabel(/drag and drop files here or/i).setInputFiles('./e2e/support/upload/test-image.jpeg');
+  });
+
+  await test.step('And I click the `Add image` button to confirm the upload', async () => {
+    await page.getByRole('button', { name: /add image/i }).click();
+  });
+
+  await test.step('Then I should see the uploaded photo preview in the registration form', async () => {
+    await expect(page.getByAltText(/image preview/i)).toBeVisible({ timeout: 10000 });
+  });
+
+  await test.step('And I click the `Register patient` button', async () => {
+    await patientRegistrationPage.createPatientButton().click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/new patient created/i)).toBeVisible();
+  });
+
+  await test.step("And I should be redirected to the new patient's chart page", async () => {
+    await page.waitForURL(PATIENT_CHART_URL);
+    const match = page.url().match(PATIENT_CHART_URL);
+    patientUuid = match!.groups!.uuid;
+  });
+
+  await test.step('And I should see the patient photo in the patient banner', async () => {
+    const patientBanner = page.locator('header[aria-label="patient banner"]');
+    await expect(patientBanner).toBeVisible();
+    const avatarImage = patientBanner.locator('img');
+    await expect(avatarImage).toBeVisible();
+  });
+});
+
 test('Register an unknown patient', async ({ page }) => {
   const patientRegistrationPage = new RegistrationAndEditPage(page);
 
