@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 /**
  * @deprecated This context should be removed once the workspace v2 migration is completed,
@@ -27,6 +27,18 @@ export const PatientSearchContext = createContext<PatientSearchContextProps>(nul
 export const PatientSearchContextProvider = PatientSearchContext.Provider;
 export const usePatientSearchContext = () => useContext(PatientSearchContext);
 
+export interface SelectPatientButtonConfig {
+  /**
+   * The text shown on the select patient button.
+   */
+  text: string;
+  /**
+   * When true, the button is disabled for patients without an active visit. A start visit
+   * button is rendered alongside it so the user can start a visit first.
+   */
+  requiresActiveVisit?: boolean;
+}
+
 export interface PatientSearchContext2Props {
   onPatientSelected?(
     patientUuid: string,
@@ -34,9 +46,25 @@ export interface PatientSearchContext2Props {
     launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
     closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
   ): void;
+  /**
+   * An optional function invoked after a visit is successfully started from the start visit
+   * button on a patient search result card.
+   */
+  onVisitStarted?(
+    patientUuid: string,
+    patient: fhir.Patient,
+    visit: Visit,
+    launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+    closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+  ): void;
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   startVisitWorkspaceName: string;
+  /**
+   * When provided, patient search result cards are not clickable. Instead, each card renders
+   * a button with this configuration that invokes onPatientSelected.
+   */
+  selectPatientButton?: SelectPatientButtonConfig;
 }
 
 export const PatientSearchContext2 = createContext<PatientSearchContext2Props>(null);

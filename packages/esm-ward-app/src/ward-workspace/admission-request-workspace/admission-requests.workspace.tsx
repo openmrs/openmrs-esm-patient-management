@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineNotification } from '@carbon/react';
-import { useAppContext, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { useAppContext, Workspace2, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type WardViewContext } from '../../types';
 import AdmissionRequestsEmptyState from './admission-requests-empty-state.component';
 import useEmrConfiguration from '../../hooks/useEmrConfiguration';
@@ -33,6 +33,21 @@ const AdmissionRequestsWorkspace: React.FC<Workspace2DefinitionProps<AdmissionRe
         launchChildWorkspace('create-admission-encounter-workspace', {
           selectedPatientUuid: patient.id,
         });
+      },
+      onVisitStarted(
+        patientUuid: string,
+        patient: fhir.Patient,
+        visit: Visit,
+        launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+      ) {
+        launchChildWorkspace('create-admission-encounter-workspace', {
+          selectedPatientUuid: patientUuid,
+        });
+      },
+      selectPatientButton: {
+        text: t('admit', 'Admit'),
+        requiresActiveVisit: true,
       },
     });
   };

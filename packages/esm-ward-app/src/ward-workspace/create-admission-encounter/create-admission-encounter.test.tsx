@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
+import { ExtensionSlot, useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
 import {
   mockInpatientAdmissions,
   mockInpatientRequests,
@@ -24,6 +24,7 @@ import CreateAdmissionEncounterWorkspace from './create-admission-encounter.work
 
 vi.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 const mockUseWorkspace2Context = vi.mocked(useWorkspace2Context);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 mockUseWorkspace2Context.mockReturnValue({
   closeWorkspace: vi.fn(),
   launchChildWorkspace: vi.fn(),
@@ -51,6 +52,9 @@ const mockUseVisit = vi.mocked(useVisit).mockReturnValue({
   isLoading: false,
   isValidating: false,
 });
+mockExtensionSlot.mockImplementation(({ name }) =>
+  name === 'start-visit-button-slot2' ? <button>Start visit</button> : null,
+);
 
 vi.mock('../../hooks/useWardLocation', () => ({ default: vi.fn() }));
 const mockedUseWardLocation = vi.mocked(useWardLocation);
@@ -174,6 +178,13 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     await user.click(admitPatientButton);
     expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT', 'mock-visit');
   });
+  it('should show active visit details and footer actions', () => {
+    renderCreateAdmissionEncounterWorkspace(mockPatientAlice.uuid);
+    expect(screen.getByText('Active visit')).toBeInTheDocument();
+    expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to search results/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /admit patient/i })).toBeInTheDocument();
+  });
   it('should have warning when patient has a pending admission request', async () => {
     mockedUseInpatientRequestByPatients.mockReturnValueOnce({
       inpatientRequests: mockInpatientRequests,
@@ -240,6 +251,35 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     expect(screen.getByText(mockPatientAlice.person?.preferredName?.display)).toBeInTheDocument();
     expect(screen.getByText('Patient already admitted to current location')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /admit patient/i })).toBeDisabled();
+  });
+
+  it('should prompt users to start a visit before admitting a patient with no active visit', () => {
+    mockUseVisit.mockReturnValueOnce({
+      activeVisit: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: null,
+      mutate: vi.fn(),
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+    });
+
+    renderCreateAdmissionEncounterWorkspace(mockPatientAlice.uuid);
+
+    expect(screen.getByText('A visit is required to admit this patient to the ward')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start visit/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to search results/i })).toBeInTheDocument();
+
+    const startVisitSlotProps = mockExtensionSlot.mock.calls.find(
+      ([props]) => props.name === 'start-visit-button-slot2',
+    )?.[0];
+    expect(startVisitSlotProps?.state).toEqual(
+      expect.objectContaining({
+        patientUuid: mockPatientAlice.uuid,
+        patient: mockPatientAlice,
+        startVisitWorkspaceName: '',
+      }),
+    );
   });
 });
 
