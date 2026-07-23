@@ -28,7 +28,7 @@ export function useMutateQueueEntries() {
   );
 }
 
-export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
+export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria | null, rep: string = repString) {
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
   searchParam.append('totalCount', 'true');
@@ -41,7 +41,8 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     }
   }
 
-  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(`${queueEntryBaseUrl}?${searchParam.toString()}`);
+  const apiUrl = searchCriteria === null ? null : `${queueEntryBaseUrl}?${searchParam.toString()}`;
+  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(apiUrl);
 
   return {
     queueEntries: data ?? [],

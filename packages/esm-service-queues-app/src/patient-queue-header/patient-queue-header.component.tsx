@@ -21,11 +21,11 @@ interface PatientQueueHeaderProps {
 
 const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilters, actions }) => {
   const { t } = useTranslation();
-  const { queueLocations, isLoading, error } = useQueueLocations();
-  const { dashboardTitle } = useConfig<ConfigObject>();
   const userSession = useSession();
+  const { queueLocations, isLoading, error } = useQueueLocations(userSession?.sessionLocation?.uuid);
+  const { dashboardTitle } = useConfig<ConfigObject>();
   const { selectedQueueLocationName, selectedQueueLocationUuid, selectedServiceDisplay } = useServiceQueuesStore();
-  const { queues } = useQueues();
+  const { queues } = useQueues(selectedQueueLocationUuid);
   const showLocationDropdown = showFilters && queueLocations.length > 1;
   const showServiceDropdown = showFilters && queues.length > 1;
 
@@ -70,30 +70,29 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showFilt
   );
 
   useEffect(() => {
-    if (!isLoading && !error && !selectedQueueLocationUuid) {
-      if (queueLocations.length === 1) {
-        handleQueueLocationChange({ selectedItem: queueLocations[0] });
-      }
-      if (
-        queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid) &&
-        selectedQueueLocationUuid
-      ) {
-        handleQueueLocationChange({
-          selectedItem: {
-            id: userSession?.sessionLocation?.uuid,
-            name: userSession?.sessionLocation?.display,
-          },
-        });
-      }
+    if (isLoading || error) {
+      return;
+    }
+    if (selectedQueueLocationUuid && !queueLocations.some((location) => location.id === selectedQueueLocationUuid)) {
+      updateSelectedQueueLocationUuid(null);
+      updateSelectedQueueLocationName(null);
+      return;
+    }
+    if (selectedQueueLocationUuid || queueLocations.length === 0) {
+      return;
+    }
+    const sessionMatch = queueLocations.find((location) => location.id === userSession?.sessionLocation?.uuid);
+    if (sessionMatch) {
+      handleQueueLocationChange({ selectedItem: { id: sessionMatch.id, name: sessionMatch.name } });
+    } else if (queueLocations.length === 1) {
+      handleQueueLocationChange({ selectedItem: queueLocations[0] });
     }
   }, [
-    selectedQueueLocationName,
     selectedQueueLocationUuid,
     error,
     handleQueueLocationChange,
     isLoading,
     queueLocations,
-    userSession?.sessionLocation?.display,
     userSession?.sessionLocation?.uuid,
   ]);
 
