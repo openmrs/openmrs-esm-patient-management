@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 
 .container {
   display: flex;
@@ -8,7 +9,30 @@
   width: 100%;
   height: layout.$spacing-10;
 }
+
+.monthTitle {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+}
+
 .workLoadCard {
   display: flex;
   color: colors.$black;
+}
+
+.dowCell {
+  flex: 1;
+  height: layout.$spacing-10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+  border-right: none;
+  font-size: layout.$spacing-05;
+  color: colors.$gray-70;
+  font-weight: 600;
+
+  &:last-child {
+    border-right: 1px solid colors.$gray-20;
+  }
 }

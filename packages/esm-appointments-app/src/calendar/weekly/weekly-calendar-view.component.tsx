@@ -16,14 +16,8 @@ import {
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
 import { TIME_BLOCKS } from '../utils/calendar-colors';
 import WeeklySlotCell from './weekly-slot-cell.component';
+import { LOCALE_MAP } from '../calendar-utils';
 import styles from './weekly-calendar-view.scss';
-
-const LOCALE_MAP: Record<string, string> = {
-  gregory: 'en-US',
-  ethiopic: 'am-ET',
-  islamic: 'ar-SA',
-  persian: 'fa-IR',
-};
 
 const DAY_OF_WEEK_KEY: Record<number, 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'> = {
   0: 'sun',

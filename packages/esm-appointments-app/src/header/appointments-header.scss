@@ -16,9 +16,18 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: flex-end;
-  margin: 0 layout.$spacing-03;
-  row-gap: layout.$spacing-01;
+  justify-content: center;
+  margin: 0 0.5rem 0 layout.$spacing-05;
+  gap: layout.$spacing-01;
+  :global(.cds--btn--primary) {
+    padding-left: layout.$spacing-05 !important;
+    padding-right: layout.$spacing-05 !important;
+  }
+  :global(.cds--btn--primary .cds--btn__icon) {
+    position: static !important;
+    margin-left: layout.$spacing-03 !important;
+    flex-shrink: 0;
+  }
 }
 
 // Overriding styles for RTL support

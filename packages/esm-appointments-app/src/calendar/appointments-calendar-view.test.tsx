@@ -30,8 +30,8 @@ describe('Appointment calendar view', () => {
   it('renders the calendar view with Prev and Next controls', () => {
     renderCalendar();
     expect(screen.getByTestId('appointments-calendar')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /previous month/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /next month/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 
   it('advances the calendar by one month when Next is clicked', async () => {
@@ -39,7 +39,7 @@ describe('Appointment calendar view', () => {
     renderCalendar();
     const initialDate = latestRequestedDate();
 
-    await user.click(screen.getByRole('button', { name: /next month/i }));
+    await user.click(screen.getByRole('button', { name: /next/i }));
 
     expect(latestRequestedDate().diff(initialDate, 'month')).toBe(1);
   });
@@ -49,7 +49,7 @@ describe('Appointment calendar view', () => {
     renderCalendar();
     const initialDate = latestRequestedDate();
 
-    await user.click(screen.getByRole('button', { name: /previous month/i }));
+    await user.click(screen.getByRole('button', { name: /previous/i }));
 
     expect(initialDate.diff(latestRequestedDate(), 'month')).toBe(1);
   });
