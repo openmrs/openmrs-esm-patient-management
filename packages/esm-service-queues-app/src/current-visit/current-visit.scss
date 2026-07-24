@@ -4,8 +4,9 @@
 
 .visitContainer {
   background-color: $ui-background;
-  display: grid;
-  grid-template-columns: max-content auto;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
 }
 
 .bodyLong01 {

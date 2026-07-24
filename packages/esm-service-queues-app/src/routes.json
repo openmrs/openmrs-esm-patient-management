@@ -187,11 +187,6 @@
       "name": "service-queues-patient-vitals-workspace",
       "component": "@openmrs/esm-patient-vitals-app#exportedVitalsBiometricsFormWorkspace",
       "window": "service-queues-patient-vitals"
-    },
-    {
-      "name": "service-queues-visit-notes-workspace",
-      "component": "@openmrs/esm-patient-notes-app#visitNotesFormWorkspace",
-      "window": "service-queues-visit-note"
     }
   ],
   "workspaceWindows2": [
@@ -209,10 +204,6 @@
     },
     {
       "name": "service-queues-patient-vitals",
-      "group": "service-queues-patient-context"
-    },
-    {
-      "name": "service-queues-visit-note",
       "group": "service-queues-patient-context"
     }
   ],

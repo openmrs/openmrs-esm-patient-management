@@ -1,11 +1,10 @@
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
-import { type ConceptMetadata } from './hooks/useVitalsConceptMetadata';
-import { type ObsMetaInfo } from '../types/index';
 
 export function useVisit(visitUuid?: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),' +
+    'form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,' +
     // Use default representation for orders to safely include subclass-specific fields (e.g., DrugOrder)
     // without requesting properties that are not present on other subclasses (e.g., TestOrder).
     'orders,' +
@@ -29,49 +28,4 @@ export function useVisit(visitUuid?: string) {
     isValidating,
     mutate,
   };
-}
-
-export function calculateBMI(weight: number, height: number): number {
-  if (!weight || !height) {
-    return;
-  }
-
-  if (weight > 0 && height > 0) {
-    return Number((weight / (height / 100) ** 2).toFixed(1));
-  }
-}
-
-export function assessValue(value: number | undefined, range?: ObsMetaInfo): ObservationInterpretation {
-  if (range && value) {
-    if (range.hiCritical && value >= range.hiCritical) {
-      return 'critically_high';
-    }
-
-    if (range.hiNormal && value > range.hiNormal) {
-      return 'high';
-    }
-
-    if (range.lowCritical && value <= range.lowCritical) {
-      return 'critically_low';
-    }
-
-    if (range.lowNormal && value < range.lowNormal) {
-      return 'low';
-    }
-  }
-
-  return 'normal';
-}
-
-export type ObservationInterpretation = 'critically_low' | 'critically_high' | 'high' | 'low' | 'normal';
-
-export function getReferenceRangesForConcept(
-  conceptUuid: string,
-  conceptMetadata: Array<ConceptMetadata>,
-): ConceptMetadata {
-  if (!conceptUuid || !conceptMetadata?.length) {
-    return null;
-  }
-
-  return conceptMetadata?.find((metadata) => metadata.uuid === conceptUuid);
 }
