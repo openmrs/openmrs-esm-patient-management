@@ -20,7 +20,7 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
-const queueEntryActions = ['move', 'call', 'edit', 'transition', 'remove', 'delete', 'undo'] as const;
+const queueEntryActions = ['move', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
 export type QueueEntryAction = (typeof queueEntryActions)[number];
 
 const statusIcons = ['Group', 'InProgress'] as const;
@@ -76,7 +76,7 @@ export const defaultPriorityConfig: PriorityConfig[] = [
 export const defaultColumnConfig: ColumnConfig = {
   actions: {
     buttons: ['call'],
-    overflowMenu: ['move', 'transition', 'edit', 'remove', 'undo'],
+    overflowMenu: ['move', 'edit', 'remove', 'undo'],
   },
   identifierTypeUuid: defaultIdentifierTypeUuid,
   statusConfigs: [],

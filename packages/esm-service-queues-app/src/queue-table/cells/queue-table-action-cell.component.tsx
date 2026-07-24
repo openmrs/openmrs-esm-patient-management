@@ -63,18 +63,6 @@ function useActionPropsByKey() {
           });
         },
       },
-      transition: {
-        // t('transition', 'Transition'),
-        label: 'transition',
-        text: 'Transition',
-        onClick: (queueEntry: QueueEntry) => {
-          const dispose = showModal('transition-queue-entry-modal', {
-            closeModal: () => dispose(),
-            queueEntry,
-            size: 'sm',
-          });
-        },
-      },
       edit: {
         // t('edit', 'Edit'),
         label: 'edit',
