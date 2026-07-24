@@ -2,43 +2,97 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.titleContainer {
+.calendarHeaderContainer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-left: layout.$spacing-05;
-
-  & > p {
-    @include type.type-style('heading-02');
-  }
-
-  & > button {
-    color: colors.$blue-60;
-    @include type.type-style('label-02');
-  }
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background: colors.$white;
+  border-bottom: 1px solid colors.$gray-20;
 }
 
-.titleContent {
+.leftGroup {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: layout.$spacing-03;
 }
 
-.backButton {
-  svg {
-    order: 1;
-    margin-right: layout.$spacing-03;
-    margin-left: 0 !important;
-  }
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+}
 
-  span {
-    order: 2;
+.navButtonGroup {
+  display: flex;
+  align-items: center;
+  border: 1px solid colors.$gray-30;
+
+  :global(.cds--btn--ghost.cds--btn--icon-only) {
+    border: none;
+    border-radius: 0;
+
+    &:hover {
+      background-color: colors.$gray-10;
+    }
+
+    &:focus:not(:focus-visible) {
+      box-shadow: none;
+      outline: none;
+    }
   }
 }
 
-// Overriding styles for RTL support
-html[dir='rtl'] {
-  .titleContent {
-    margin-left: layout.$spacing-05;
+.navDivider {
+  width: 0.5px;
+  height: 2rem;
+  background-color: colors.$gray-30;
+}
+
+.titleLabel {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+  white-space: nowrap;
+}
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-04;
+  flex-wrap: wrap;
+
+  :global(.cds--content-switcher) {
+    --cds-layer-selected-inverse: var(--brand-03);
+    --cds-text-inverse: #{colors.$white};
+    --cds-border-interactive: var(--brand-03);
+    --cds-focus: var(--brand-03);
+    --cds-border-subtle-00: var(--brand-03);
+    border-color: var(--brand-03) !important;
   }
+
+  :global(.cds--content-switcher-btn) {
+    white-space: nowrap;
+    min-width: fit-content;
+    color: var(--brand-03);
+    border-color: var(--brand-03);
+    &:focus {
+      box-shadow: inset 0 0 0 2px var(--brand-03) !important;
+      outline: none !important;
+    }
+  }
+
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected),
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:hover),
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus) {
+    background-color: var(--brand-03) !important;
+    border-color: var(--brand-03) !important;
+    color: colors.$white !important;
+    box-shadow: none !important;
+  }
+}
+
+.calendarSelect {
+  min-width: 11rem;
 }

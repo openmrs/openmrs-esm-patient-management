@@ -12,14 +12,8 @@ import {
   CALENDAR_HOURS,
   formatHourLabel,
 } from '../utils/calendar-colors';
+import { LOCALE_MAP } from '../calendar-utils';
 import styles from './daily-calendar-view.scss';
-
-const LOCALE_MAP: Record<string, string> = {
-  gregory: 'en-US',
-  ethiopic: 'am-ET',
-  islamic: 'ar-SA',
-  persian: 'fa-IR',
-};
 
 interface DailyCalendarViewProps {
   calKey: string;

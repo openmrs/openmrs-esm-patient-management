@@ -14,6 +14,12 @@
 .calendarViewContainer {
   margin: layout.$spacing-05;
 }
+
+.workLoadCard {
+  display: flex;
+  color: colors.$black;
+}
+
 .backgroundColor {
   margin: 1px 0 0;
   transition: width 0.24s ease-in-out;

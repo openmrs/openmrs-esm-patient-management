@@ -138,6 +138,12 @@
   }
 }
 
+.calendarDate {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  font-weight: 600;
+}
+
 .smallDesktop {
   height: 6.25rem;
 }
