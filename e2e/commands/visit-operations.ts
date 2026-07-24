@@ -8,7 +8,7 @@ export const startVisit = async (api: APIRequestContext, patientId: string, loca
       startDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
       patient: patientId,
       location: locationUuid || process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-      visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+      visitType: process.env.E2E_PATIENT_VISIT_TYPE_UUID,
       attributes: [],
     },
   });
@@ -22,7 +22,7 @@ export const endVisit = async (api: APIRequestContext, uuid: string, isWardTest 
     data: {
       location: isWardTest ? process.env.E2E_WARD_LOCATION_UUID : process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
       startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
-      visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+      visitType: process.env.E2E_PATIENT_VISIT_TYPE_UUID,
       stopDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
     },
   });
