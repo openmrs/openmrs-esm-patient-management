@@ -52,8 +52,8 @@ const CreateQueueEntryWorkspace: React.FC<
     setShowContactDetails((value) => !value);
   }, []);
 
-  const handleVisitStarted = useCallback(() => {
-    mutate();
+  const handleVisitStarted = useCallback(async () => {
+    await mutate();
   }, [mutate]);
 
   const patientName = patient && getPatientName(patient);

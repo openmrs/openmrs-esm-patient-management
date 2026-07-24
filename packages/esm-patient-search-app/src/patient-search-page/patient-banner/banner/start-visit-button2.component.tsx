@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { showSnackbar, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { showSnackbar, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 interface StartVisitButtonProps {
   patientUuid: string;
   patient: fhir.Patient;
   startVisitWorkspaceName: string;
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
-  onVisitStarted?: (visit: Visit) => void;
+  onVisitStarted?: () => void;
 }
 
 /**

@@ -65,11 +65,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
 
-  const handleVisitStarted = useCallback(() => {
-    mutate();
-    setTimeout(() => {
-      onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace);
-    }, 0);
+  const handleVisitStarted = useCallback(async () => {
+    await mutate();
+    onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace);
   }, [mutate, onPatientSelected, patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace]);
 
   return (
