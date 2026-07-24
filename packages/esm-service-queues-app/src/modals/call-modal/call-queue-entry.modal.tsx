@@ -130,7 +130,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
             </p>
             <div>
               {mappedQueueEntry.identifiers?.map((identifier) => (
-                <Tag key={identifier.uuid}>{identifier.display}</Tag>
+                <Tag key={identifier.uuid}>{identifier.identifier}</Tag>
               ))}
             </div>
           </section>
