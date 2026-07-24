@@ -1,19 +1,5 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
-@use '@carbon/type';
-
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: layout.$spacing-10;
-}
-
-.monthTitle {
-  @include type.type-style('heading-compact-02');
-  color: colors.$gray-100;
-}
 
 .workLoadCard {
   display: flex;
