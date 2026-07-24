@@ -1,5 +1,5 @@
 import React from 'react';
-import { LOCALE_MAP, CALENDAR_OPTIONS } from '../calendar-utils';
+import { LOCALE_MAP } from '../calendar-utils';
 import styles from './monthly-header.scss';
 
 interface MonthlyHeaderProps {
