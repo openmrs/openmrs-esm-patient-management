@@ -134,6 +134,7 @@ export const configSchema = {
       waitTimeInMinutes: {
         _type: Type.Number,
         _description: 'The minimum wait time in minutes for this colour to apply',
+        _validators: [validator((waitTime: number) => waitTime > 0, 'waitTimeInMinutes must be a positive number')],
       },
       color: {
         _type: Type.String,
