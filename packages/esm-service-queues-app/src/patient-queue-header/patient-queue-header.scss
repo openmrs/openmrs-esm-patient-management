@@ -10,45 +10,8 @@
   padding-right: layout.$spacing-03;
 }
 
-.dropdownSkeletonContainer {
-  width: 18.75rem;
-}
-
-.dropdownContainer {
+.actionsContainer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: layout.$spacing-03;
-}
-
-.view {
-  @include type.type-style('label-01');
-}
-
-.dropdown {
-  :global(.cds--list-box__field) {
-    width: 14rem;
-    overflow: hidden;
-  }
-
-  :global(.cds--dropdown--inline .cds--list-box__menu) {
-    left: -(layout.$spacing-10);
-  }
-}
-
-// Overriding styles for RTL support
-html[dir='rtl'] {
-  .date-and-location {
-    margin-right: unset;
-    margin-left: layout.$spacing-05;
-    & > svg:first-child {
-      order: -1;
-    }
-    & > svg:nth-child(4) {
-      order: 1;
-    }
-    & > span:nth-child(2) {
-      order: -2;
-    }
-  }
 }

@@ -334,8 +334,7 @@ export interface ProvidersQueueRoom {
 }
 
 export interface WaitTime {
-  metric: string;
-  averageWaitTime: string;
+  averageWaitTime: number;
 }
 
 export interface QueueTableCellComponentProps {
