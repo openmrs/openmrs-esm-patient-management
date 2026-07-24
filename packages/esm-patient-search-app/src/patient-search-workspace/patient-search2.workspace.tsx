@@ -8,12 +8,24 @@ import AdvancedPatientSearchComponent from '../patient-search-page/advanced-pati
 export interface PatientSearchWorkspaceProps {
   initialQuery?: string;
   workspaceTitle: string;
+  /**
+   * Optional content rendered below the search bar before the user types a search term (e.g. a
+   * shortlist of checked-in patients). It receives the same selection callbacks as search results,
+   * so consuming apps don't rely on React context across app boundaries.
+   */
+  preSearchContent?: (context: PreSearchContentContext) => React.ReactNode;
   onPatientSelected(
     patientUuid: string,
     patient: fhir.Patient,
     launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
     closeWorkspace: () => void,
   ): void;
+}
+
+export interface PreSearchContentContext {
+  onPatientSelected: PatientSearchWorkspaceProps['onPatientSelected'];
+  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
 export interface PatientSearchWorkspaceWindowProps {
@@ -26,7 +38,7 @@ export interface PatientSearchWorkspaceWindowProps {
 const PatientSearchWorkspace2: React.FC<
   Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, {}>
 > = ({
-  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle },
+  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle, preSearchContent },
   windowProps: { startVisitWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
@@ -50,7 +62,11 @@ const PatientSearchWorkspace2: React.FC<
           onClear={handleClearSearchTerm}
           onSubmit={setSearchTerm}
         />
-        {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
+        {showSearchResults ? (
+          <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />
+        ) : (
+          preSearchContent?.({ onPatientSelected, launchChildWorkspace, closeWorkspace })
+        )}
       </PatientSearchContext2.Provider>
     </Workspace2>
   );

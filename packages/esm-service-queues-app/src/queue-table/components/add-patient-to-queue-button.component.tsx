@@ -4,6 +4,7 @@ import { AddIcon, launchWorkspace2, type Workspace2DefinitionProps } from '@open
 import { serviceQueuesPatientSearchWorkspace } from '../../constants';
 import { useTranslation } from 'react-i18next';
 import { useServiceQueuesStore } from '../../store/store';
+import CheckedInPatients from '../../create-queue-entry/checked-in-patients/checked-in-patients.component';
 
 const AddPatientToQueueButton: React.FC = () => {
   const { t } = useTranslation();
@@ -31,6 +32,13 @@ const AddPatientToQueueButton: React.FC = () => {
                 selectedPatientUuid: patient.id,
               });
             },
+            preSearchContent: ({ onPatientSelected, launchChildWorkspace, closeWorkspace }) => (
+              <CheckedInPatients
+                onPatientSelected={onPatientSelected}
+                launchChildWorkspace={launchChildWorkspace}
+                closeWorkspace={closeWorkspace}
+              />
+            ),
           },
           {
             startVisitWorkspaceName: 'queue-patient-search-start-visit-workspace',
