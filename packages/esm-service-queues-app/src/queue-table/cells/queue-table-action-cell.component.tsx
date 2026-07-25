@@ -3,7 +3,13 @@ import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
-import { type ConfigObject, type ActionsColumnConfig, type QueueEntryAction } from '../../config-schema';
+import {
+  deprecatedQueueEntryActions,
+  type ActionsColumnConfig,
+  type ConfigObject,
+  type ConfigurableQueueEntryAction,
+  type QueueEntryAction,
+} from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './queue-table-action-cell.scss';
@@ -15,6 +21,25 @@ type ActionProps = {
   showIf?: (queueEntry: QueueEntry) => boolean;
   isDelete?: boolean;
 };
+
+// Resolves deprecated action names to the actions that replaced them, dropping duplicates in case a
+// configuration lists both a deprecated action and its replacement.
+function normalizeActions(actionKeys: ConfigurableQueueEntryAction[], configKey: string): QueueEntryAction[] {
+  const normalized: QueueEntryAction[] = [];
+  for (const actionKey of actionKeys) {
+    const replacement = deprecatedQueueEntryActions[actionKey as keyof typeof deprecatedQueueEntryActions];
+    if (replacement) {
+      console.warn(
+        `Service queue table configuration uses the deprecated action '${actionKey}' in '${configKey}'. Use '${replacement}' instead.`,
+      );
+    }
+    const resolved = replacement ?? (actionKey as QueueEntryAction);
+    if (!normalized.includes(resolved)) {
+      normalized.push(resolved);
+    }
+  }
+  return normalized;
+}
 
 function useActionPropsByKey() {
   const {
@@ -196,19 +221,19 @@ function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEnt
 }
 
 export const queueTableActionColumn: QueueTableColumnFunction = (key, header, config: ActionsColumnConfig) => {
+  const buttons = normalizeActions(config.actions.buttons, 'actions.buttons');
+  const overflowMenu = normalizeActions(config.actions.overflowMenu, 'actions.overflowMenu');
+
   const QueueTableActionCell = ({ queueEntry }: QueueTableCellComponentProps) => {
     const layout = useLayoutType();
     const actionPropsByKey = useActionPropsByKey();
-    const { buttons, overflowMenu } = config.actions;
 
     const [buttonComponents, overflowMenuComponents] = useMemo(() => {
       const declaredButtonComponents = buttons
         .map((actionKey) => {
           const actionProps = actionPropsByKey[actionKey];
           if (!actionProps) {
-            console.error(
-              `Service queue table configuration uses unknown action in 'action.overflowMenu': ${actionKey}`,
-            );
+            console.error(`Service queue table configuration uses unknown action in 'actions.buttons': ${actionKey}`);
             return null;
           }
 
@@ -222,11 +247,12 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
       let overflowMenuKeys: QueueEntryAction[] = [];
       if (declaredButtonComponents.length === 0) {
         const defaultAction = overflowMenu.find((actionKey) => {
-          const showIf = actionPropsByKey[actionKey].showIf;
-          if (!showIf) {
-            return true;
+          const actionProps = actionPropsByKey[actionKey];
+          if (!actionProps) {
+            // Logged by ActionOverflowMenuItem when it renders this key.
+            return false;
           }
-          return showIf(queueEntry);
+          return !actionProps.showIf || actionProps.showIf(queueEntry);
         });
         if (defaultAction) {
           fallbackActionComponent = (
@@ -245,7 +271,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
       ));
 
       return [[...declaredButtonComponents, fallbackActionComponent], overflowMenuComponents];
-    }, [buttons, overflowMenu, queueEntry, actionPropsByKey]);
+    }, [queueEntry, actionPropsByKey]);
 
     return (
       <div className={styles.actionsCell}>

@@ -85,7 +85,7 @@ interface ModalParams {
 
 /**
  * Modal for performing a queue entry action that requires additional form fields / inputs from user
- * Used by EditQueueEntryModal, MoveQueueEntryModal, and TransitionQueueEntryModal
+ * Used by EditQueueEntryModal and MoveQueueEntryModal
  */
 export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   queueEntry,
