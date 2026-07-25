@@ -56,6 +56,22 @@ describe('useExpectedAppointments', () => {
     expect(result.current.appointments.map((a) => a.uuid)).toEqual(['b', 'c', 'a']);
   });
 
+  it('excludes appointments in a terminal status', () => {
+    const terminal = ['Cancelled', 'Completed', 'Missed', 'cancelled'].map((status, index) => ({
+      ...appointments[0],
+      uuid: `terminal-${index}`,
+      status,
+    }));
+    mockUseSWR.mockReturnValue({
+      data: { data: [...appointments, ...terminal] },
+      error: undefined,
+      isLoading: false,
+    } as ReturnType<typeof useSWR>);
+
+    const { result } = renderHook(() => useExpectedAppointments('loc-1'));
+    expect(result.current.appointments.map((a) => a.uuid)).toEqual(['b', 'a']);
+  });
+
   it('passes through the error so callers can distinguish failure from an empty day', () => {
     const error = new Error('network');
     mockUseSWR.mockReturnValue({ data: undefined, error, isLoading: false } as ReturnType<typeof useSWR>);

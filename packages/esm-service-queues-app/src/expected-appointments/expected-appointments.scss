@@ -3,16 +3,19 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .emptyState {
+  border: 1px solid $ui-03;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: layout.$spacing-07;
-  background-color: $ui-02;
+  padding: layout.$spacing-09;
+  text-align: center;
 }
 
-.emptyStateTitle {
+.emptyStateContent {
   @include type.type-style('heading-compact-01');
-  color: $text-02;
+  color: var(--cds-text-secondary);
+  margin-top: layout.$spacing-05;
 }
 
 .nameLink {

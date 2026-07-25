@@ -12,6 +12,10 @@ export interface ExpectedAppointment {
   status: string;
 }
 
+// Terminal statuses are dropped so the count reflects what is still expected rather than everything that
+// was ever booked for the day.
+const excludedStatuses = new Set(['cancelled', 'completed', 'missed']);
+
 export function useExpectedAppointments(locationUuid?: string) {
   const startOfDay = dayjs().startOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   const url = `${restBaseUrl}/appointments?forDate=${encodeURIComponent(startOfDay)}`;
@@ -22,6 +26,7 @@ export function useExpectedAppointments(locationUuid?: string) {
 
   const appointments = (data?.data ?? [])
     .filter((appointment) => !locationUuid || appointment.location?.uuid === locationUuid)
+    .filter((appointment) => !excludedStatuses.has(appointment.status?.toLowerCase()))
     .sort((a, b) => (a.startDateTime ?? 0) - (b.startDateTime ?? 0));
 
   return { appointments, isLoading, error };

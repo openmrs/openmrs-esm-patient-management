@@ -39,7 +39,7 @@ describe('ExpectedAppointments', () => {
   it('shows an error state distinct from an empty day', () => {
     mockAppointments({ error: new Error('down') });
     render(<ExpectedAppointments />);
-    expect(screen.getByText('Error loading appointments')).toBeInTheDocument();
+    expect(screen.getByText('Error State')).toBeInTheDocument();
   });
 
   it('shows an empty state when there are no appointments', () => {

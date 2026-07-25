@@ -1,10 +1,18 @@
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type WaitTime } from '../types';
 
 export function useAverageWaitTime(serviceUuid: string, locationUuid: string, statusUuid: string) {
+  // Service queues are an outpatient concern, so the average is scoped to entries started today rather
+  // than to the whole history of the queue. The queue module parses this parameter with a strict
+  // `yyyy-MM-dd HH:mm:ss` SimpleDateFormat and errors on anything else, so don't switch to ISO 8601 here.
+  const startOfDay = useMemo(() => dayjs().startOf('day').format('YYYY-MM-DD HH:mm:ss'), []);
+
   const apiUrl =
     `${restBaseUrl}/queue-entry-metrics?metric=averageWaitTime` +
+    `&startedOnOrAfter=${encodeURIComponent(startOfDay)}` +
     (statusUuid ? `&status=${statusUuid}` : '') +
     (serviceUuid ? `&service=${serviceUuid}` : '') +
     (locationUuid ? `&location=${locationUuid}` : '');

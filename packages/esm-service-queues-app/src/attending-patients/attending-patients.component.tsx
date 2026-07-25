@@ -1,9 +1,11 @@
-import React from 'react';
-import dayjs from 'dayjs';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag } from '@carbon/react';
+import { Button, SkeletonPlaceholder, Tag, Tile } from '@carbon/react';
 import {
+  age,
   ConfigurableLink,
+  EmptyCardIllustration,
+  ErrorState,
   formatDate,
   getCoreTranslation,
   parseDate,
@@ -17,6 +19,8 @@ import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './attending-patients.scss';
 
+const collapsedCardCount = 3;
+
 // Renders patients currently being attended (queue entries with an "In Service" status) as cards.
 const AttendingPatients: React.FC = () => {
   const { t } = useTranslation();
@@ -24,40 +28,61 @@ const AttendingPatients: React.FC = () => {
     concepts: { defaultTransitionStatus },
   } = useConfig<ConfigObject>();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
-  const { queueEntries } = useQueueEntries({
+  const { queueEntries, isLoading, error } = useQueueEntries({
     service: selectedServiceUuid,
     location: selectedQueueLocationUuid,
     status: defaultTransitionStatus,
     isEnded: false,
   });
+  const [showAll, setShowAll] = useState(false);
 
-  if (!queueEntries?.length) {
-    return null;
-  }
+  const visibleEntries = showAll ? queueEntries : queueEntries.slice(0, collapsedCardCount);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h4 className={styles.heading}>{t('attending', 'Attending')}</h4>
-        <Tag type="gray">{queueEntries.length}</Tag>
+        {!isLoading && !error && <Tag type="gray">{queueEntries.length}</Tag>}
+        {queueEntries.length > collapsedCardCount && (
+          <Button
+            className={styles.viewAllButton}
+            kind="ghost"
+            onClick={() => setShowAll((current) => !current)}
+            size="sm">
+            {showAll ? t('showLess', 'Show less') : t('viewAll', 'View all')}
+          </Button>
+        )}
       </div>
-      <div className={styles.cards}>
-        {queueEntries.map((queueEntry) => (
-          <AttendingPatientCard key={queueEntry.uuid} queueEntry={queueEntry} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className={styles.cards}>
+          {Array.from({ length: collapsedCardCount }, (_, index) => (
+            <SkeletonPlaceholder className={styles.cardSkeleton} key={index} />
+          ))}
+        </div>
+      ) : error ? (
+        <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
+      ) : queueEntries.length === 0 ? (
+        <Tile className={styles.emptyState}>
+          <EmptyCardIllustration />
+          <p className={styles.emptyStateContent}>{t('noOneBeingAttended', 'No one is being attended')}</p>
+        </Tile>
+      ) : (
+        <div className={styles.cards}>
+          {visibleEntries.map((queueEntry) => (
+            <AttendingPatientCard key={queueEntry.uuid} queueEntry={queueEntry} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
-  const { t } = useTranslation();
   const { customPatientChartUrl, priorityConfigs } = useConfig<ConfigObject>();
   const { person } = queueEntry.patient;
-  const age = person?.birthdate ? dayjs().diff(dayjs(person.birthdate), 'years') : null;
 
   const demographics = [
-    age != null ? t('ageYearsOld', '{{age}} years old', { age }) : null,
+    person?.birthdate ? age(person.birthdate) : null,
     person?.birthdate ? formatDate(parseDate(person.birthdate), { time: false }) : null,
   ]
     .filter(Boolean)

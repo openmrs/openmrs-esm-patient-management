@@ -24,15 +24,19 @@ export default function AverageWaitTimeExtension() {
     }
   }, [error]);
 
+  // The queue module divides by zero when no matching entry has an `endedAt`, yielding "NaN" or null.
+  const averageWaitTime = Number(waitTime?.averageWaitTime);
+  const hasWaitTime = waitTime?.averageWaitTime != null && Number.isFinite(averageWaitTime);
+
   return (
     <MetricsCard>
       <MetricsCardHeader title={t('avgWaitTime', 'Avg. wait time')} />
       <MetricsCardBody>
         <MetricsCardItem
           value={
-            isLoading || error || !waitTime
+            isLoading || error || !hasWaitTime
               ? '--'
-              : `${Math.round(waitTime.averageWaitTime * 100) / 100} ${t('minsUnit', 'mins')}`
+              : `${Math.round(averageWaitTime * 100) / 100} ${t('minsUnit', 'mins')}`
           }
         />
       </MetricsCardBody>

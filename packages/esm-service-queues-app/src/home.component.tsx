@@ -27,7 +27,7 @@ const Home: React.FC = () => {
   });
   const waitingListLabel = isNaN(totalCount)
     ? t('waitingList', 'Waiting list')
-    : `${t('waitingList', 'Waiting list')} (${totalCount})`;
+    : t('waitingListWithCount', 'Waiting list ({{count}})', { count: totalCount });
 
   return (
     <>

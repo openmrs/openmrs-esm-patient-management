@@ -12,7 +12,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { ConfigurableLink, formatTime, useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink, EmptyCardIllustration, ErrorState, formatTime, useConfig } from '@openmrs/esm-framework';
 import { useExpectedAppointments } from '../hooks/useExpectedAppointments';
 import { useServiceQueuesStore } from '../store/store';
 import { type ConfigObject } from '../config-schema';
@@ -42,23 +42,24 @@ const ExpectedAppointments: React.FC = () => {
         name: appointment.patient.name,
         service: appointment.service?.name ?? '--',
         time: appointment.startDateTime ? formatTime(new Date(appointment.startDateTime)) : '--',
-        status: appointment.status,
+        status: t(appointment.status),
       })),
-    [appointments],
+    [appointments, t],
   );
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (error || !rows.length) {
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('expectedAppointments', 'Expected appointments')} />;
+  }
+
+  if (!rows.length) {
     return (
       <Tile className={styles.emptyState}>
-        <p className={styles.emptyStateTitle}>
-          {error
-            ? t('errorLoadingAppointments', 'Error loading appointments')
-            : t('noExpectedAppointments', 'No appointments expected today')}
-        </p>
+        <EmptyCardIllustration />
+        <p className={styles.emptyStateContent}>{t('noExpectedAppointments', 'No appointments expected today')}</p>
       </Tile>
     );
   }
