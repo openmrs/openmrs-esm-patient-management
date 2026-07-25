@@ -1,8 +1,23 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  omrsOfflineCachingStrategyHttpHeaderName,
+  openmrsFetch,
+  useSession,
+  type FetchResponse,
+  type OmrsOfflineHttpHeaders,
+  restBaseUrl,
+} from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
+
+const cachingStrategyHeaders: OmrsOfflineHttpHeaders = {
+  [omrsOfflineCachingStrategyHttpHeaderName]: 'network-only-or-cache-only',
+};
+
+function fetcher<T>(url: string) {
+  return openmrsFetch<T>(url, { headers: cachingStrategyHeaders });
+}
 
 type InfinitePatientSearchResponse = FetchResponse<{
   results: Array<SearchedPatient>;
@@ -82,7 +97,7 @@ export function useInfinitePatientSearch(
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
     shouldFetch ? getUrl : null,
-    openmrsFetch,
+    fetcher,
     { keepPreviousData: true },
   );
 
@@ -130,7 +145,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
   // This request will be loaded from the SWR cache as a preload request happens ahead  when the user hovers over the search icon.
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(
     shouldFetchRecentlyViewedPatients ? url : null,
-    openmrsFetch,
+    fetcher,
   );
 
   const userProperties = data?.data?.userProperties;
@@ -214,7 +229,7 @@ export function useRestPatients(
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<FetchResponse<SearchedPatient>, Error>(
     shouldFetch ? getPatientUrl : null,
-    openmrsFetch,
+    fetcher,
     {
       keepPreviousData: true,
       initialSize: patientUuids ? Math.min(resultsToFetch, patientUuids.length) : 0,
