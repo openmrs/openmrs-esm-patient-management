@@ -77,13 +77,6 @@ export const defaultPriorityConfig: PriorityConfig[] = [
   },
 ];
 
-export const defaultWaitTimeThresholds: WaitTimeThresholdConfig[] = [
-  {
-    waitTimeInMinutes: 120,
-    color: 'red',
-  },
-];
-
 export const defaultColumnConfig: ColumnConfig = {
   actions: {
     buttons: ['call'],
@@ -126,10 +119,12 @@ export const configSchema = {
   },
   waitTimeThresholds: {
     _type: Type.Array,
-    _default: defaultWaitTimeThresholds,
+    _default: [],
     _description:
-      'Colour the wait-time value once a patient has waited at least the given number of minutes, ' +
-      'drawing attention to patients who have been in the queue a long time. The highest matching band wins.',
+      'Optional. Colour the wait-time value once a patient has waited at least the given number of minutes, ' +
+      'drawing attention to patients who have been in the queue a long time. The highest matching band wins. ' +
+      'Empty by default, so wait times are not coloured unless this is configured. ' +
+      'A reasonable starting point could be [{ waitTimeInMinutes: 120, color: "red" }], which turns the value red after two hours.',
     _elements: {
       waitTimeInMinutes: {
         _type: Type.Number,

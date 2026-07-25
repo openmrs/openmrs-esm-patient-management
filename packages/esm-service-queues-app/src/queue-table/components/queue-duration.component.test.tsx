@@ -40,6 +40,12 @@ describe('QueueDuration', () => {
     expect(screen.getByText(/1 hour\(s\) and 0 minute\(s\)/i)).toBeInTheDocument();
   });
 
+  it('does not apply a colour class when no thresholds are configured', () => {
+    const startedAt = dayjs().subtract(5, 'hours').toDate();
+    render(<QueueDuration startedAt={startedAt} thresholds={[]} />);
+    expect(screen.getByText(/5 hour\(s\) and 0 minute\(s\)/i)).not.toHaveClass('red');
+  });
+
   it('does not apply a colour class when the wait is below the lowest threshold', () => {
     const startedAt = dayjs().subtract(30, 'minutes').toDate();
     render(<QueueDuration startedAt={startedAt} thresholds={[{ waitTimeInMinutes: 120, color: 'red' }]} />);
