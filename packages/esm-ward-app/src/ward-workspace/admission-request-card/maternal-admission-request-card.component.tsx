@@ -1,7 +1,7 @@
 import React, { useMemo, useState, type ReactNode } from 'react';
 import { Checkbox, CheckboxGroup } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useAppContext } from '@openmrs/esm-framework';
+import { ExtensionSlot, useAppContext } from '@openmrs/esm-framework';
 import { makeWardPatient } from './maternal-admission-request-card.resource';
 import type { InpatientRequest, MaternalWardViewContext, WardPatient } from '../../types';
 import AdmissionRequestCardActions from './admission-request-card-actions.component';
@@ -64,6 +64,9 @@ const MaternalAdmissionRequestCard: React.FC<MaternalAdmissionRequestCardProps> 
   return (
     <div className={styles.admissionRequestCard}>
       <AdmissionRequestCardHeader {...{ wardPatient }} />
+      <div className={styles.admissionRequestCardHeaderBadge}>
+        <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit: wardPatient.visit }} />
+      </div>
       <CodedObsTagsRow id="pregnancy-complications" {...wardPatient} />
       {motherOfPatient && (
         <MotherOrChild

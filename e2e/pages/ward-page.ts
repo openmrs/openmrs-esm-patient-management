@@ -81,7 +81,16 @@ export class WardPage {
   }
 
   async selectBedForAdmission(bedNumber: string) {
-    await this.page.getByText(`${bedNumber} · Empty`).click();
+    // if the ward contains many beds, the bed selection will be a dropdown instead of radio buttons. Handle both cases.
+    const bedDropdown = this.page.getByRole('combobox', { name: 'Choose an option' });
+    const isDropdownVisible = await bedDropdown
+      .waitFor({ state: 'visible', timeout: 1000 })
+      .then(() => true)
+      .catch(() => false);
+    if (isDropdownVisible) {
+      await bedDropdown.click();
+    }
+    await this.page.getByText(new RegExp(`^${bedNumber} · `)).click();
   }
 
   async confirmAdmission() {

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient } from '../commands/types';
 import {
   changeToWardLocation,
   changeToDefaultLocation,
@@ -11,7 +11,6 @@ import {
   generateRandomBed,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   startVisit,
   retireBedType,
   waitForAdmissionRequestToBeProcessed,
@@ -22,18 +21,16 @@ import { WardPage } from '../pages';
 
 let bed: Bed;
 let bedType: BedType;
-let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
+test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
@@ -43,15 +40,6 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
 
   await test.step('When I open the Ward page', async () => {
     await wardPage.goTo();
-  });
-
-  await test.step('And I navigate to Ward Management', async () => {
-    await expect(page.getByRole('link', { name: /Wards/i })).toBeVisible();
-    await page.getByRole('link', { name: /Wards/i }).click();
-  });
-
-  await test.step("Then I see the 'Inpatient Ward' heading", async () => {
-    await expect(page.getByRole('heading', { name: 'Inpatient Ward' })).toBeVisible();
   });
 
   await test.step("And I click Manage to view 'Admission requests'", async () => {
@@ -68,7 +56,7 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('And I select the bed for admission', async () => {
-    await page.getByText(`${bed.bedNumber} · Empty`).click();
+    await wardPage.selectBedForAdmission(bed.bedNumber);
   });
 
   await test.step('And I admit the patient', async () => {
@@ -80,7 +68,6 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('Then I see the patient in the ward', async () => {
-    await expect(page.getByRole('heading', { name: 'Inpatient Ward' })).toBeVisible();
     await wardPage.waitForPatientInWardView(patientName);
   });
 

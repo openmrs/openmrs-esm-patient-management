@@ -10,13 +10,12 @@ import {
   generateRandomBed,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   retireBedType,
   startVisit,
   waitForAdmissionRequestToBeProcessed,
   waitForAdmissionToBeProcessed,
 } from '../commands';
-import type { Bed, BedType, Patient, Provider } from '../commands/types';
+import type { Bed, BedType, Patient } from '../commands/types';
 import { test } from '../core';
 import { WardPage } from '../pages';
 
@@ -35,20 +34,18 @@ async function selectBedByLabel(page: Page, label: string) {
 
 let bed: Bed;
 let bedtype: BedType;
-let provider: Provider;
 let swapBed: Bed;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
+test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await changeToWardLocation(api);
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
   swapBed = await generateRandomBed(api, bedtype); // Generate the bed we'll swap to
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 

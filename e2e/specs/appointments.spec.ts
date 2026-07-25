@@ -6,6 +6,11 @@ import { test } from '../core';
 import { AppointmentsPage, PatientChartAppointmentsPage } from '../pages';
 
 /**
+ * Note: Tests in this file assumes that the server is configured with at least 2 appointment services
+ * and both of them have allow for start and end times between 9am and 3:30pm (or wider).
+ */
+
+/**
  * Returns a business day (Mon-Fri) for scheduling appointments.
  * If the target date falls on a weekend, advances to the next Monday.
  * Note: Does not account for public holidays.
@@ -39,11 +44,8 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
     await page.getByRole('button', { name: 'Add', exact: true }).click();
   });
 
-  await test.step('And I select "Outpatient Department" as the service', async () => {
-    // Wait for the service select to be visible before interacting
-    const serviceSelect = page.locator('select#service');
-    await serviceSelect.waitFor({ state: 'visible' });
-    await serviceSelect.selectOption({ label: 'Outpatient Department' });
+  await test.step('And I select the first service', async () => {
+    await page.selectOption('select#service', { index: 1 });
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -93,11 +95,8 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
     await page.getByRole('menuitem', { name: 'Edit' }).click();
   });
 
-  await test.step('And I change the service to "General Medicine"', async () => {
-    // Wait for the service select to be visible before interacting
-    const serviceSelect = page.locator('select#service');
-    await serviceSelect.waitFor({ state: 'visible' });
-    await serviceSelect.selectOption({ label: 'General Medicine service' });
+  await test.step('And I change the service to the second one', async () => {
+    await page.selectOption('select#service', { index: 2 });
   });
 
   await test.step('And I change the appointment time to 2:00 PM', async () => {
@@ -178,8 +177,8 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
     await page.getByText(new RegExp(firstName)).click();
   });
 
-  await test.step('And I select “Outpatient Department” service', async () => {
-    await page.selectOption('select#service', { label: 'Outpatient Department' });
+  await test.step('And I select the first service', async () => {
+    await page.selectOption('select#service', { index: 1 });
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -197,10 +196,10 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
     await dateYearInput.fill(now.format('YYYY'));
   });
 
-  await test.step('And I set the appointment time to the current time', async () => {
+  await test.step('And I set the appointment time to 9am', async () => {
     await page.locator('#time-picker').clear();
-    await page.locator('#time-picker').fill(now.format('hh:mm'));
-    await page.locator('#time-picker-select-1').selectOption(now.format('A'));
+    await page.locator('#time-picker').fill('09:00');
+    await page.locator('#time-picker-select-1').selectOption('AM');
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -235,10 +234,10 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
     await page.getByRole('menuitem', { name: 'Edit' }).click();
   });
 
-  await test.step('And I change the service to "General Medicine"', async () => {
+  await test.step('And I change to the second service', async () => {
     const serviceSelect = page.locator('select#service');
     await serviceSelect.waitFor({ state: 'visible' });
-    await serviceSelect.selectOption({ label: 'General Medicine service' });
+    await serviceSelect.selectOption({ index: 2 });
   });
 
   await test.step('And I change the appointment time to 2:00 PM', async () => {
@@ -315,6 +314,33 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   await test.step("Then the status filter should still be 'Missed'", async () => {
     await page.getByText('Filter appointments by status').click();
     await expect(page.getByRole('option', { name: 'Missed' }).getByRole('checkbox')).toBeChecked();
+  });
+
+  await test.step("When I uncheck the 'Missed' status filter", async () => {
+    await page.getByRole('option', { name: 'Missed' }).locator('label').click();
+  });
+
+  await test.step('And I click the options menu on the appointment row', async () => {
+    const appointmentRow = page.locator('table tr').filter({ hasText: openmrsIdentifier });
+    await appointmentRow.getByRole('button', { name: 'Options' }).click();
+  });
+
+  await test.step('And I select the "Edit" option from the menu', async () => {
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+  });
+
+  // Edit the appointment again, this time changing its status to Cancelled. We
+  // cannot roll this into the edit flow above because we cannot change the status of a Canceled appointment to Completed
+  await test.step('And I select "Cancelled" as the new status', async () => {
+    await page.getByLabel('Select status').selectOption('Cancelled');
+  });
+
+  await test.step('And I click the "Save and close" button', async () => {
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a success message confirming the appointment was edited', async () => {
+    await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
 });
 

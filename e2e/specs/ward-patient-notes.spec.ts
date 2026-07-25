@@ -7,29 +7,26 @@ import {
   endVisit,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   startVisit,
   waitForAdmissionRequestToBeProcessed,
   waitForAdmissionToBeProcessed,
 } from '../commands';
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient } from '../commands/types';
 import { WardPage } from '../pages';
 
 let bed: Bed;
 let bedType: BedType;
-let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
+test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient?.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient?.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient?.uuid);
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 

@@ -242,3 +242,16 @@ export interface BedTag {
   name: string;
   uuid?: string;
 }
+
+export interface EMRConfiguration {
+  dispositionDescriptor?: {
+    dispositionConcept?: { uuid?: string };
+    admissionLocationConcept?: { uuid?: string };
+    dispositionSetConcept?: { uuid?: string };
+  };
+  dispositions?: Array<{
+    name: string;
+    type: string;
+    conceptCode: string;
+  }>;
+}

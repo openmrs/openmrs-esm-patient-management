@@ -1,11 +1,15 @@
 import React from 'react';
 import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { useActiveTickets } from './useActiveTickets';
 import { updateSelectedQueueLocationName, updateSelectedQueueLocationUuid } from '../store/store';
 import QueueScreen from './queue-screen.component';
 
 const mockUseActiveTickets = vi.mocked(useActiveTickets);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 
 vi.mock('./useActiveTickets', () => ({
   useActiveTickets: vi.fn(),
@@ -23,6 +27,7 @@ describe('QueueScreen component', () => {
   beforeEach(() => {
     updateSelectedQueueLocationName('Room A');
     updateSelectedQueueLocationUuid('123');
+    mockUseConfig.mockReturnValue(configDefaults);
   });
 
   test('renders loading skeleton when data is loading', () => {
@@ -78,5 +83,23 @@ describe('QueueScreen component', () => {
     expect(screen.getByText('Room : Room A')).toBeInTheDocument();
     expect(screen.getByText('Ticket number')).toBeInTheDocument();
     expect(screen.getByText('123')).toBeInTheDocument();
+  });
+
+  test('applies the blinking style to a ticket whose status matches the configured callingStatus', () => {
+    mockUseConfig.mockReturnValue({ ...configDefaults, callingStatus: 'now-serving' });
+    mockUseActiveTickets.mockReturnValue({
+      activeTickets: [
+        { room: 'Room A', ticketNumber: '123', status: 'now-serving' },
+        { room: 'Room B', ticketNumber: '456', status: 'Pending' },
+      ],
+      isLoading: false,
+      error: undefined,
+      mutate: vi.fn(),
+    });
+
+    render(<QueueScreen />);
+
+    expect(screen.getByText('123')).toHaveClass('headerBlinking');
+    expect(screen.getByText('456')).not.toHaveClass('headerBlinking');
   });
 });

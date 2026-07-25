@@ -2,7 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import { type OrderItem } from '../../types/index';
 import styles from './past-visit-summary.scss';
 
@@ -12,6 +13,7 @@ interface MedicationProps {
 
 const Medications: React.FC<MedicationProps> = ({ medications }) => {
   const { t } = useTranslation();
+  const { drugOrderTypeUuid } = useConfig<ConfigObject>();
 
   if (medications.length === 0) {
     return (
@@ -20,7 +22,7 @@ const Medications: React.FC<MedicationProps> = ({ medications }) => {
   }
 
   const drugOrders = medications.filter(
-    (m) => m.order?.orderType?.display === 'Drug Order' && m.order?.action !== 'DISCONTINUE',
+    (m) => m.order?.orderType?.uuid === drugOrderTypeUuid && m.order?.action !== 'DISCONTINUE',
   );
 
   // Only keep leaf orders (those not referenced by another order's previousOrder)

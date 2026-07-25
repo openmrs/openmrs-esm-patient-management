@@ -18,6 +18,7 @@ type ActionProps = {
 
 function useActionPropsByKey() {
   const {
+    callingStatus,
     concepts: { defaultStatusConceptUuid },
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
@@ -35,7 +36,7 @@ function useActionPropsByKey() {
           const callingQueueResponse = await serveQueueEntry(
             mappedQueueEntry.queue.name,
             mappedQueueEntry.visitQueueNumber,
-            'calling',
+            callingStatus,
           );
           if (callingQueueResponse.ok) {
             await mutateQueueEntries();
@@ -131,7 +132,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
   return actionPropsByKey;
 }
 
