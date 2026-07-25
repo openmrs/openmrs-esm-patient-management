@@ -1,24 +1,17 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { mockPatient, renderWithSwr } from 'tools';
 import { usePastVisits } from './past-visit.resource';
 import PastVisit from './past-visit.component';
 
 const mockUsePastVisits = vi.mocked(usePastVisits);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 
 vi.mock('./past-visit.resource', () => ({
   usePastVisits: vi.fn(),
-}));
-
-vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
-  ...((await importOriginal()) as object),
-  ExtensionSlot: ({ name, state }: { name: string; state?: { visit?: { uuid?: string } } }) => (
-    <div data-testid="extension-slot" data-slot-name={name}>
-      visit-summary:{state?.visit?.uuid}
-    </div>
-  ),
 }));
 
 describe('PastVisit', () => {
@@ -34,10 +27,12 @@ describe('PastVisit', () => {
     renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
 
     expect(screen.getByText(pastVisit.visitType.display)).toBeInTheDocument();
-    const slot = screen.getByTestId('extension-slot');
-    expect(slot).toBeInTheDocument();
-    expect(slot).toHaveAttribute('data-slot-name', 'service-queues-past-visit-summary-slot');
-    expect(slot).toHaveTextContent(`visit-summary:${pastVisit.uuid}`);
+    expect(mockExtensionSlot.mock.calls.map(([props]) => props)).toContainEqual(
+      expect.objectContaining({
+        name: 'service-queues-past-visit-summary-slot',
+        state: { visit: pastVisit, patientUuid: mockPatient.id },
+      }),
+    );
   });
 
   it('renders a loading skeleton while fetching', () => {

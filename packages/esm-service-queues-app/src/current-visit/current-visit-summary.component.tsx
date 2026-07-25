@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, DataTableSkeleton } from '@carbon/react';
+import { Button, Tag, DataTableSkeleton } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
 import { attach, ExtensionSlot, getGlobalStore, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
-import { serviceQueuesPatientVitalsWorkspace } from '../constants';
+import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
 import { useVisit } from './current-visit.resource';
 import styles from './current-visit.scss';
 
@@ -14,7 +15,7 @@ attach(visitSummarySlot, 'visit-summary');
 
 // External workspaces that don't share the useVisit SWR key, so we revalidate the visit when
 // they close rather than relying on the form to mutate it.
-const VISIT_REFRESHING_WORKSPACES = new Set([serviceQueuesPatientVitalsWorkspace]);
+const VISIT_REFRESHING_WORKSPACES = new Set([serviceQueuesVisitNotesWorkspace, serviceQueuesPatientVitalsWorkspace]);
 
 interface WorkspaceStoreState {
   openedWindows: Array<{ openedWorkspaces: Array<{ workspaceName: string }> }>;
@@ -76,21 +77,38 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
   };
 
   return (
-    <div className={styles.wrapper}>
+    <>
       <div className={styles.headingContainer}>
-        <p className={styles.heading}>{visit.visitType?.display}</p>
-        <div className={styles.subHeading}>
-          {t('scheduledToday', 'Scheduled for today')}{' '}
-          <Tag size="sm" type="blue">
-            {t('onTime', 'On time')}
-          </Tag>
+        <div>
+          <p className={styles.heading}>{visit.visitType?.display}</p>
+          <div className={styles.subHeading}>
+            {t('scheduledToday', 'Scheduled for today')}{' '}
+            <Tag size="sm" type="blue">
+              {t('onTime', 'On time')}
+            </Tag>
+          </div>
         </div>
+        <Button
+          size="sm"
+          kind="ghost"
+          disabled={!patient}
+          renderIcon={ArrowRight}
+          onClick={() =>
+            launchWorkspace2(serviceQueuesVisitNotesWorkspace, {
+              formContext: 'creating',
+              patientUuid,
+              patient,
+              visitContext: visit,
+            })
+          }>
+          {t('visitNoteForm', 'Visit note form')}
+        </Button>
       </div>
       <div className={styles.visitContainer}>
         <ExtensionSlot name={vitalsInfoSlot} state={vitalsSlotState} />
         <ExtensionSlot name={visitSummarySlot} state={{ visit, patientUuid }} />
       </div>
-    </div>
+    </>
   );
 };
 

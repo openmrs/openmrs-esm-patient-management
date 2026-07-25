@@ -25,14 +25,9 @@
   color: $text-02;
 }
 
-.structuredListRow {
-  border-bottom: none;
-}
-
-.structuredList {
-  margin-bottom: 0;
-}
-
 .headingContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
   margin: layout.$spacing-05;
 }
