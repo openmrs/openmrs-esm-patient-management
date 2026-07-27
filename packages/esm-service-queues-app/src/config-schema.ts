@@ -419,7 +419,7 @@ export const configSchema = {
       ),
     ],
   },
-  showRecentlyCheckedInPatientsBeforeSearch: {
+  showCheckedInPatientsBeforeSearch: {
     _type: Type.Boolean,
     _default: true,
     _description:
@@ -505,7 +505,7 @@ export interface ConfigObject {
     value: string;
   };
   queueTables: TablesConfig;
-  showRecentlyCheckedInPatientsBeforeSearch: boolean;
+  showCheckedInPatientsBeforeSearch: boolean;
   showRecommendedVisitTypeTab: boolean;
   visitNoteEncounterTypeUuid: string;
   visitQueueNumberAttributeUuid: string | null;

@@ -1,11 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Layer, SkeletonText, Tile } from '@carbon/react';
-import { PatientPhoto, useConfig, useSession, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
+import {
+  ErrorState,
+  PatientBannerContactDetails,
+  PatientBannerPatientInfo,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
+  useSession,
+  type Visit,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import { useActiveVisits } from '../../metrics/metrics.resource';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../../store/store';
+import { mapActiveVisitPatientToFhir } from './checked-in-patients.resource';
 import styles from './checked-in-patients.scss';
 
 interface CheckedInPatientsProps {
@@ -19,6 +29,57 @@ interface CheckedInPatientsProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
+interface CheckedInPatientRowProps extends CheckedInPatientsProps {
+  visit: Visit;
+}
+
+/**
+ * A single checked-in patient row, rendered with the same framework patient-banner components used
+ * by patient-search results so the two lists look identical. Holds its own contact-details toggle
+ * state, mirroring the search app's `PatientBanner`.
+ */
+const CheckedInPatientRow: React.FC<CheckedInPatientRowProps> = ({
+  visit,
+  onPatientSelected,
+  launchChildWorkspace,
+  closeWorkspace,
+}) => {
+  const [showContactDetails, setShowContactDetails] = useState(false);
+  const patient = visit.patient;
+  const patientUuid = patient?.uuid;
+  const patientName = patient?.person?.display;
+  const isDeceased = Boolean(patient?.person?.dead || patient?.person?.deathDate);
+  const fhirPatient = useMemo(() => mapActiveVisitPatientToFhir(patient), [patient]);
+
+  return (
+    <li className={styles.patientRow}>
+      <div className={styles.banner}>
+        <button
+          type="button"
+          className={classNames(styles.patientBannerButton, styles.patientBanner)}
+          onClick={() => onPatientSelected(patientUuid, fhirPatient, launchChildWorkspace, closeWorkspace)}>
+          <div className={styles.patientAvatar}>
+            <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
+          </div>
+          <PatientBannerPatientInfo patient={fhirPatient} />
+        </button>
+        <div className={styles.actionButtons}>
+          <PatientBannerToggleContactDetailsButton
+            className={styles.toggleContactDetailsButton}
+            showContactDetails={showContactDetails}
+            toggleContactDetails={() => setShowContactDetails((value) => !value)}
+          />
+        </div>
+      </div>
+      {showContactDetails && (
+        <div className={styles.contactDetails}>
+          <PatientBannerContactDetails patientId={patientUuid} deceased={isDeceased} />
+        </div>
+      )}
+    </li>
+  );
+};
+
 /**
  * Rendered in the "Add patient to queue" workspace before the user types a search term. Lists
  * patients with an active visit at the selected queue location who are not yet in any queue, so a
@@ -30,20 +91,16 @@ const CheckedInPatients: React.FC<CheckedInPatientsProps> = ({
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
-  // Read this app's config explicitly: the component renders inside another app's (patient-search) workspace.
-  const { showRecentlyCheckedInPatientsBeforeSearch } = useConfig<ConfigObject>({
-    externalModuleName: '@openmrs/esm-service-queues-app',
-  });
   const session = useSession();
   const { selectedQueueLocationUuid } = useServiceQueuesStore();
   const locationUuid = selectedQueueLocationUuid ?? session?.sessionLocation?.uuid;
 
-  // restrictToToday=false: a visit that started on an earlier day and is still open counts as checked in.
-  const { activeVisits, isLoading: isLoadingVisits } = useActiveVisits(locationUuid, false);
-  const { queueEntries, isLoading: isLoadingQueueEntries } = useQueueEntries(
-    { location: locationUuid, isEnded: false },
-    'custom:(uuid,patient:(uuid))',
-  );
+  const { activeVisits, isLoading: isLoadingVisits, error: visitsError } = useActiveVisits(locationUuid);
+  const {
+    queueEntries,
+    isLoading: isLoadingQueueEntries,
+    error: queueEntriesError,
+  } = useQueueEntries({ location: locationUuid, isEnded: false }, 'custom:(uuid,patient:(uuid))');
 
   const queuedPatientUuids = useMemo(
     () => new Set((queueEntries ?? []).map((entry) => entry.patient?.uuid).filter(Boolean)),
@@ -55,17 +112,19 @@ const CheckedInPatients: React.FC<CheckedInPatientsProps> = ({
     [activeVisits, queuedPatientUuids],
   );
 
-  if (!showRecentlyCheckedInPatientsBeforeSearch) {
-    return null;
-  }
-
   const isLoading = isLoadingVisits || isLoadingQueueEntries;
+  const error = visitsError ?? queueEntriesError;
+  const heading = t('checkedInPatients', 'Checked in patients');
 
   return (
     <div className={styles.container}>
-      <p className={styles.heading}>{t('checkedInPatients', 'Checked in patients')}</p>
+      <p className={styles.heading}>{heading}</p>
       {isLoading ? (
-        <SkeletonText paragraph lineCount={3} />
+        <div className={styles.loading} data-testid="checked-in-patients-loading-skeleton">
+          <SkeletonText paragraph lineCount={3} />
+        </div>
+      ) : error ? (
+        <ErrorState error={error} headerTitle={heading} />
       ) : checkedInPatients.length === 0 ? (
         <Layer>
           <Tile className={styles.emptyState}>
@@ -76,39 +135,15 @@ const CheckedInPatients: React.FC<CheckedInPatientsProps> = ({
         </Layer>
       ) : (
         <ul className={styles.patientList}>
-          {checkedInPatients.map((visit) => {
-            const patient = visit.patient;
-            const patientUuid = patient.uuid;
-            const patientName = patient.person?.display;
-            const identifier = patient.identifiers?.[0]?.identifier;
-            const age = patient.person?.age;
-            const gender = patient.person?.gender;
-            const details = [identifier, age != null ? String(age) : null, gender].filter(Boolean).join(' · ');
-
-            return (
-              <li key={patientUuid}>
-                <button
-                  type="button"
-                  className={styles.patientRow}
-                  onClick={() =>
-                    onPatientSelected(
-                      patientUuid,
-                      { id: patientUuid } as fhir.Patient,
-                      launchChildWorkspace,
-                      closeWorkspace,
-                    )
-                  }>
-                  <span className={styles.patientPhoto}>
-                    <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
-                  </span>
-                  <span className={styles.patientInfo}>
-                    <span className={styles.patientName}>{patientName}</span>
-                    {details ? <span className={styles.patientDetails}>{details}</span> : null}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
+          {checkedInPatients.map((visit) => (
+            <CheckedInPatientRow
+              key={visit.patient?.uuid}
+              visit={visit}
+              onPatientSelected={onPatientSelected}
+              launchChildWorkspace={launchChildWorkspace}
+              closeWorkspace={closeWorkspace}
+            />
+          ))}
         </ul>
       )}
     </div>

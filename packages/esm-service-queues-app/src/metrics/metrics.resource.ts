@@ -1,43 +1,44 @@
-import { useSession, type Visit, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
+import { useOpenmrsFetchAll, useSession, type Visit, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { type WaitTime } from '../types';
 
 /**
- * Fetches currently-active visits at a location (defaults to the session location), deduped by patient.
- * By default only visits started today are included (for the "Checked in patients" metric); pass
- * `restrictToToday: false` to include all open visits regardless of start date.
+ * Fetches today's currently-active visits at a location (defaults to the session location), deduped
+ * by patient. Used both for the "Checked in patients" metric and for the pre-search shortlist in the
+ * "Add patient to queue" workspace. All pages are fetched, so the result is never truncated at the
+ * REST default page size.
  */
-export function useActiveVisits(locationUuid?: string, restrictToToday: boolean = true) {
+export function useActiveVisits(locationUuid?: string) {
   const currentUserSession = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
   const location = locationUuid ?? currentUserSession?.sessionLocation?.uuid;
 
   const customRepresentation =
-    'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
+    'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid,identifierType:(uuid,name)),' +
+    'person:(uuid,display,age,gender,birthdate,preferredName,dead,deathDate)),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)' +
-    (restrictToToday ? '&fromStartDate=' + startDate : '') +
+    '&fromStartDate=' +
+    startDate +
     '&location=' +
     location;
   const url = `${restBaseUrl}/visit?includeInactive=false&v=${customRepresentation}`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    location ? url : null,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating } = useOpenmrsFetchAll<Visit>(location ? url : null);
 
-  // Dedupe by patient UUID (first visit per patient).
-  const activeVisitsByPatient = new Map<string, Visit>();
-
-  data?.data?.results.forEach((visit) => {
-    const patientUUID = visit.patient?.uuid;
-    const isToday = dayjs(visit.startDatetime).isToday();
-    if (patientUUID && (!restrictToToday || isToday) && !activeVisitsByPatient.has(patientUUID)) {
-      activeVisitsByPatient.set(patientUUID, visit);
-    }
-  });
-
-  const activeVisits = Array.from(activeVisitsByPatient.values());
+  // Dedupe by patient UUID (first visit per patient). The server already restricts results to today
+  // via fromStartDate, so no client-side date filter is needed.
+  const activeVisits = useMemo(() => {
+    const activeVisitsByPatient = new Map<string, Visit>();
+    (data ?? []).forEach((visit) => {
+      const patientUuid = visit.patient?.uuid;
+      if (patientUuid && !activeVisitsByPatient.has(patientUuid)) {
+        activeVisitsByPatient.set(patientUuid, visit);
+      }
+    });
+    return Array.from(activeVisitsByPatient.values());
+  }, [data]);
 
   return {
     activeVisits,

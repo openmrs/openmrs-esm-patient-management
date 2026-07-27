@@ -20,13 +20,26 @@
 }
 
 .patientRow {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 5.5rem 1fr; // Matches 3.5rem avatar + 2×1rem margins
-  align-items: center;
-  background: transparent;
-  border: none;
   border-top: 1px solid $ui-03;
+  border-bottom: 1px solid $ui-03;
+  background-color: $ui-02;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+}
+
+.patientBanner {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: center;
+}
+
+.patientBannerButton {
+  width: 100%;
+  background: none;
+  border: none;
   cursor: pointer;
   text-align: left;
 
@@ -35,26 +48,27 @@
   }
 }
 
-.patientPhoto {
+.patientAvatar {
   width: 3.5rem;
   height: 3.5rem;
   margin: layout.$spacing-05;
-  border-radius: 1px;
+  overflow: hidden;
 }
 
-.patientInfo {
+.actionButtons {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  margin-right: layout.$spacing-05;
 }
 
-.patientName {
-  @include type.type-style('body-compact-01');
-  color: var(--cds-text-primary);
+.toggleContactDetailsButton {
+  > svg {
+    fill: $color-blue-60-2 !important;
+  }
 }
 
-.patientDetails {
-  @include type.type-style('label-01');
-  color: $text-02;
+.contactDetails {
+  padding: 0 layout.$spacing-05 layout.$spacing-05;
 }
 
 .emptyState {
@@ -64,4 +78,8 @@
 .emptyStateText {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.loading {
+  margin: layout.$spacing-05;
 }
