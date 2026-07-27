@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import {
   ConfigurableLink,
   ExtensionSlot,
@@ -39,12 +40,12 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { activeVisit } = useVisit(patientUuid);
-  const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
+  const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList, patientClickSideEffect } =
     usePatientSearchContext() ?? {};
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName, closeWorkspace } = context2 ?? {};
 
   const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
@@ -59,12 +60,38 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
 
+  const isSelectionMode = Boolean(nonNavigationSelectPatientAction || onPatientSelected);
+
+  const handleSelectClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (context2 && onPatientSelected) {
+        onPatientSelected(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace);
+      } else if (nonNavigationSelectPatientAction) {
+        nonNavigationSelectPatientAction(patientUuid, fhirMappedPatient);
+        patientClickSideEffect?.(patientUuid, fhirMappedPatient);
+      }
+    },
+    [
+      onPatientSelected,
+      nonNavigationSelectPatientAction,
+      patientClickSideEffect,
+      patientUuid,
+      fhirMappedPatient,
+      launchChildWorkspace,
+      closeWorkspace,
+      context2,
+    ],
+  );
+
   return (
     <>
       <div
         className={classNames(styles.container, {
           [styles.deceasedPatientContainer]: isDeceased,
           [styles.activePatientContainer]: !isDeceased,
+          [styles.selectionHoverState]: isSelectionMode,
         })}
         role="banner">
         <ClickablePatientContainer patient={fhirMappedPatient}>
@@ -129,6 +156,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     </>
   );
 };
+
+interface ClickablePatientContainerProps {
+  children: React.ReactNode;
+  patient: fhir.Patient;
+}
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext() ?? {};
