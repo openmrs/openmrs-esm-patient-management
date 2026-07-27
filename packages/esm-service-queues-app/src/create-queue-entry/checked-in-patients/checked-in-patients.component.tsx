@@ -82,8 +82,10 @@ const CheckedInPatientRow: React.FC<CheckedInPatientRowProps> = ({
 
 /**
  * Rendered in the "Add patient to queue" workspace before the user types a search term. Lists
- * patients with an active visit at the selected queue location who are not yet in any queue, so a
- * clerk can add them without searching. Selecting a row uses the same `onPatientSelected` as search.
+ * patients with an active visit at the selected queue location who are not yet in a queue at that
+ * location, so a clerk can add them without searching. Note that the exclusion is scoped to the
+ * selected location: a patient already queued at another location still appears here.
+ * Selecting a row uses the same `onPatientSelected` as search.
  */
 const CheckedInPatients: React.FC<CheckedInPatientsProps> = ({
   onPatientSelected,
@@ -129,7 +131,7 @@ const CheckedInPatients: React.FC<CheckedInPatientsProps> = ({
         <Layer>
           <Tile className={styles.emptyState}>
             <p className={styles.emptyStateText}>
-              {t('noCheckedInPatients', 'No checked-in patients waiting to be added to a queue')}
+              {t('noCheckedInPatients', 'No checked-in patients waiting to be added to a queue at this location')}
             </p>
           </Tile>
         </Layer>
