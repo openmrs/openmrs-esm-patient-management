@@ -8,11 +8,6 @@ import { type ConfigObject, configSchema } from '../config-schema';
 import { mockPriorityNonUrgent, mockPriorityUrgent, mockQueueEntries, mockSession } from '__mocks__';
 import QueueTable from './queue-table.component';
 
-vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
-  ...((await importOriginal()) as object),
-  formatDurationBetween: () => '2 hours',
-}));
-
 const mockUseSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
