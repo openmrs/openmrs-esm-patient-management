@@ -164,3 +164,24 @@ describe('PatientBanner with a select patient button', () => {
     );
   });
 });
+
+describe('PatientBanner without the workspace v2 context', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUseVisit.mockReturnValue(noVisitState);
+    mockExtensionSlot.mockImplementation(() => null);
+  });
+
+  it('passes patientUuid and the mapped FHIR patient to the legacy start visit button slot', () => {
+    render(<PatientBanner patient={patient} patientUuid={patient.uuid} />);
+
+    const legacySlotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot');
+    expect(legacySlotCall).toBeDefined();
+    expect(legacySlotCall[0].state).toEqual(
+      expect.objectContaining({
+        patientUuid: patient.uuid,
+        patient: expect.objectContaining({ id: patient.uuid }),
+      }),
+    );
+  });
+});
