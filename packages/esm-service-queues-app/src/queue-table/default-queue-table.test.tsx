@@ -21,6 +21,11 @@ const mockUseQueueEntries = vi.mocked(useQueueEntries);
 const mockQueueLocations = vi.mocked(useQueueLocations);
 const mockUseSession = vi.mocked(useSession);
 
+vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
+  ...((await importOriginal()) as object),
+  formatDurationBetween: () => '2 hours',
+}));
+
 vi.mock('../hooks/useQueues', () => {
   return {
     useQueues: vi.fn().mockReturnValue({ queues: mockServices }),
