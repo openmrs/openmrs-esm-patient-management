@@ -48,7 +48,7 @@ const tagStyles = ['bold'] as const;
 type TagStyle = (typeof tagStyles)[number];
 
 // Semantic colors used to highlight how long a patient has been waiting, mapped to Carbon color tokens in queue-duration.scss
-const waitTimeColors = ['red', 'orange', 'gray'] as const;
+const waitTimeColors = ['red', 'orange'] as const;
 type WaitTimeColor = (typeof waitTimeColors)[number];
 
 // equal to columnTypes but without extension
