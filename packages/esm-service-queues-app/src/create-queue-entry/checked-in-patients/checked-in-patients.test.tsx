@@ -171,6 +171,18 @@ describe('CheckedInPatients', () => {
     mockUseServiceQueuesStore.mockReturnValue({ selectedQueueLocationUuid: undefined, selectedQueueStatusDisplay: '' });
     renderComponent();
     expect(mockUseActiveVisits).toHaveBeenCalledWith(mockSession.data.sessionLocation.uuid);
+    expect(mockUseQueueEntries).toHaveBeenCalledWith(
+      expect.objectContaining({ location: mockSession.data.sessionLocation.uuid }),
+      expect.any(String),
+    );
+  });
+
+  it('scopes the queue-entry exclusion to the selected location', () => {
+    renderComponent();
+    expect(mockUseQueueEntries).toHaveBeenCalledWith(
+      { location: 'location-1', isEnded: false },
+      'custom:(uuid,patient:(uuid))',
+    );
   });
 
   it('renders a loading skeleton and no empty message while loading', () => {
