@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { getActivityAwareRefreshInterval } from '../activityAwareRefreshInterval';
+import { getActivityAwareRefreshInterval } from '../activity-aware-refresh-interval';
 import { type ConfigObject } from '../config-schema';
 
 export const useActiveTickets = () => {
@@ -15,7 +15,7 @@ export const useActiveTickets = () => {
   const { data, isLoading, error, mutate } = useSWR<{ data: Record<string, { status: string; ticketNumber: string }> }>(
     `${restBaseUrl}/queueutil/active-tickets`,
     openmrsFetch,
-    { refreshInterval, revalidateOnFocus: true },
+    { refreshInterval },
   );
   const activeTickets =
     Array.from(Object.entries(data?.data ?? {}).map(([key, value]) => ({ room: key, ...value }))) ?? [];

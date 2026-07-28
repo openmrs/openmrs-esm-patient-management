@@ -1,14 +1,12 @@
 import React, { useMemo, type PropsWithChildren } from 'react';
 import { SWRConfig } from 'swr';
 import { useConfig } from '@openmrs/esm-framework';
-import { getActivityAwareRefreshInterval } from './activityAwareRefreshInterval';
+import { getActivityAwareRefreshInterval } from './activity-aware-refresh-interval';
 import { type ConfigObject } from './config-schema';
 
 /**
- * Provides an activity-aware, configurable SWR `refreshInterval` to the queue data hooks rendered
- * beneath it: polling steps up while the user interacts with a visible tab and eases off when the
- * tab is idle or hidden. Wraps the views that previously received a fixed interval via their
- * lifecycle `swrConfig`, which cannot read configuration.
+ * Provides the configured, activity-aware SWR `refreshInterval` to the queue data hooks rendered
+ * beneath it. Needed because a lifecycle `swrConfig` cannot read configuration.
  */
 const SwrConfig: React.FC<PropsWithChildren> = ({ children }) => {
   const {

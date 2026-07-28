@@ -1,12 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  ACTIVE_REFRESH_INTERVAL,
-  IDLE_REFRESH_INTERVAL,
-  getActivityAwareRefreshInterval,
-} from './activityAwareRefreshInterval';
+import { getActivityAwareRefreshInterval } from './activity-aware-refresh-interval';
 
+const ACTIVE_REFRESH_INTERVAL = 5_000;
+const IDLE_REFRESH_INTERVAL = 30_000;
 const IDLE_TIMEOUT = 60_000;
-const refreshInterval = getActivityAwareRefreshInterval();
+const refreshInterval = getActivityAwareRefreshInterval(ACTIVE_REFRESH_INTERVAL, IDLE_REFRESH_INTERVAL);
 
 const setVisibility = (state: DocumentVisibilityState) => {
   Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
@@ -39,6 +37,14 @@ describe('getActivityAwareRefreshInterval', () => {
     expect(refreshInterval()).toBe(IDLE_REFRESH_INTERVAL);
 
     window.dispatchEvent(new Event('mousemove'));
+    expect(refreshInterval()).toBe(ACTIVE_REFRESH_INTERVAL);
+  });
+
+  it('keeps the active interval when interaction keeps resetting the idle countdown', () => {
+    vi.advanceTimersByTime(IDLE_TIMEOUT / 2);
+    window.dispatchEvent(new Event('mousemove'));
+    vi.advanceTimersByTime(IDLE_TIMEOUT / 2 + 1);
+
     expect(refreshInterval()).toBe(ACTIVE_REFRESH_INTERVAL);
   });
 

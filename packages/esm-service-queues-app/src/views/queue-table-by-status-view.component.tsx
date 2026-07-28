@@ -8,16 +8,19 @@ interface QueueTableByStatusViewProps {
 }
 
 /**
- * This component renders the several tables, one for each status, for a given queue.
+ * This component renders the several tables, one for each status, for a given queue. Fetching happens
+ * in a child so that it too sits under `SwrConfig` and picks up the configured refresh interval.
  */
-const QueueTableByStatusView: React.FC<QueueTableByStatusViewProps> = ({ queueUuid }) => {
+const QueueTableByStatusView: React.FC<QueueTableByStatusViewProps> = ({ queueUuid }) => (
+  <SwrConfig>
+    <QueueTablesByStatus queueUuid={queueUuid} />
+  </SwrConfig>
+);
+
+const QueueTablesByStatus: React.FC<QueueTableByStatusViewProps> = ({ queueUuid }) => {
   const { queue, isLoading: isLoadingQueue, error } = useQueue(queueUuid);
 
-  return (
-    <SwrConfig>
-      <QueueTablesForAllStatuses selectedQueue={queue} isLoadingQueue={isLoadingQueue} errorFetchingQueue={error} />
-    </SwrConfig>
-  );
+  return <QueueTablesForAllStatuses selectedQueue={queue} isLoadingQueue={isLoadingQueue} errorFetchingQueue={error} />;
 };
 
 export default QueueTableByStatusView;

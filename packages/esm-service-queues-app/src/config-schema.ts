@@ -259,14 +259,16 @@ export const configSchema = {
     dashboard: {
       active: {
         _type: Type.Number,
-        _default: 30000,
+        _default: 60000,
         _description:
-          'How often (in ms) the queue dashboards poll for updates while the user is actively interacting with a visible tab.',
+          'How often (in ms) the queue dashboards poll for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
       },
       idle: {
         _type: Type.Number,
-        _default: 60000,
-        _description: 'How often (in ms) the queue dashboards poll for updates once the tab is idle or hidden.',
+        _default: 120000,
+        _description: 'How often (in ms) the queue dashboards poll for updates once the user has gone idle.',
+        _validators: [validators.inRange(1000, 3600000)],
       },
     },
     queueScreen: {
@@ -274,13 +276,15 @@ export const configSchema = {
         _type: Type.Number,
         _default: 5000,
         _description:
-          'How often (in ms) the queue screen polls for updates while the user is actively interacting with a visible tab.',
+          'How often (in ms) the queue screen polls for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
       },
       idle: {
         _type: Type.Number,
         _default: 10000,
         _description:
-          'How often (in ms) the queue screen polls for updates once the tab is idle or hidden. Kept short so an unattended, wall-mounted board stays reasonably current.',
+          'How often (in ms) the queue screen polls for updates once the user has gone idle. Kept short so an unattended, wall-mounted board stays reasonably current.',
+        _validators: [validators.inRange(1000, 3600000)],
       },
     },
   },
