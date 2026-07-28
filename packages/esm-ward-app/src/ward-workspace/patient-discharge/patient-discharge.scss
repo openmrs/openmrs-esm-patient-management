@@ -14,6 +14,8 @@
 }
 
 .workspaceForm {
+  display: flex;
+  flex-direction: column;
   margin-top: layout.$spacing-05;
   flex: 1;
 }
@@ -21,7 +23,8 @@
 .buttonSet {
   display: flex;
   align-items: center;
-  margin: (layout.$spacing-05) (-(layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05));
+  margin: auto (-(layout.$spacing-05)) (-(layout.$spacing-05)) (-(layout.$spacing-05));
+  padding-top: layout.$spacing-05;
 
   button {
     max-width: unset !important;
