@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { formatDurationBetween } from '@openmrs/esm-framework';
 
 interface QueueDurationProps {
   startedAt: Date;
@@ -12,8 +12,6 @@ const QueueDuration: React.FC<QueueDurationProps> = ({ startedAt, endedAt }) => 
 };
 
 function DurationString({ startedAt, endedAt }: QueueDurationProps) {
-  const { t } = useTranslation();
-
   const [currentTime, setCurrentTime] = useState(dayjs());
 
   useEffect(() => {
@@ -21,19 +19,13 @@ function DurationString({ startedAt, endedAt }: QueueDurationProps) {
     return () => clearInterval(handle);
   }, []);
 
-  const referenceTime = endedAt ? dayjs(endedAt) : currentTime;
-  const totalMinutes = Math.max(0, referenceTime.diff(startedAt, 'minutes'));
-  const hours = Math.trunc(totalMinutes / 60);
-  const minutes = Math.trunc(totalMinutes % 60);
-
   return (
     <span>
-      {hours > 0
-        ? t('hourAndMinuteFormatted', '{{hours}} hour(s) and {{minutes}} minute(s)', {
-            hours,
-            minutes,
-          })
-        : t('minuteFormatted', '{{minutes}} minute(s)', { minutes })}
+      {formatDurationBetween(startedAt, endedAt ?? currentTime.toDate(), {
+        largestUnit: 'hour',
+        smallestUnit: 'minute',
+        formatOptions: { style: 'long', minutesDisplay: 'always' },
+      })}
     </span>
   );
 }

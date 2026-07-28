@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { useConfig, useDebounce, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { useConfig, useDebounce, Workspace2, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext2 } from '../patient-search-context';
+import { PatientSearchContext2, type SelectPatientButtonConfig } from '../patient-search-context';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
@@ -14,6 +14,22 @@ export interface PatientSearchWorkspaceProps {
     launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
     closeWorkspace: () => void,
   ): void;
+  /**
+   * An optional function invoked after a visit is successfully started from the start visit
+   * button on a patient search result card.
+   */
+  onVisitStarted?(
+    patientUuid: string,
+    patient: fhir.Patient,
+    visit: Visit,
+    launchChildWorkspace: (workspaceName: string, workspaceProps?: object) => void,
+    closeWorkspace: () => void,
+  ): void;
+  /**
+   * When provided, patient search result cards are not clickable. Instead, each card renders
+   * a button with this configuration that invokes onPatientSelected.
+   */
+  selectPatientButton?: SelectPatientButtonConfig;
 }
 
 export interface PatientSearchWorkspaceWindowProps {
@@ -26,7 +42,7 @@ export interface PatientSearchWorkspaceWindowProps {
 const PatientSearchWorkspace2: React.FC<
   Workspace2DefinitionProps<PatientSearchWorkspaceProps, PatientSearchWorkspaceWindowProps, {}>
 > = ({
-  workspaceProps: { initialQuery = '', onPatientSelected, workspaceTitle },
+  workspaceProps: { initialQuery = '', onPatientSelected, onVisitStarted, selectPatientButton, workspaceTitle },
   windowProps: { startVisitWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
@@ -43,7 +59,14 @@ const PatientSearchWorkspace2: React.FC<
   return (
     <Workspace2 title={workspaceTitle}>
       <PatientSearchContext2.Provider
-        value={{ onPatientSelected, launchChildWorkspace, closeWorkspace, startVisitWorkspaceName }}>
+        value={{
+          onPatientSelected,
+          onVisitStarted,
+          launchChildWorkspace,
+          closeWorkspace,
+          startVisitWorkspaceName,
+          selectPatientButton,
+        }}>
         <PatientSearchBar
           initialSearchTerm={initialQuery}
           onChange={(value) => !disableTabletSearchOnKeyUp && setSearchTerm(value)}
