@@ -122,6 +122,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                     handleReturnToSearchList,
                     hidePatientSearch,
                     patientUuid,
+                    patient: fhirMappedPatient,
                   }}
                 />
               ))}
