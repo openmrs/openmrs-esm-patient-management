@@ -16,7 +16,7 @@ import {
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
 import { TIME_BLOCKS } from '../utils/calendar-colors';
 import WeeklySlotCell from './weekly-slot-cell.component';
-import { LOCALE_MAP } from '../calendar-utils';
+import { getCalendarFormat } from '../calendar-utils';
 import styles from './weekly-calendar-view.scss';
 
 const DAY_OF_WEEK_KEY: Record<number, 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'> = {
@@ -29,8 +29,8 @@ const DAY_OF_WEEK_KEY: Record<number, 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'f
   6: 'sat',
 };
 
-function getCalendar(calKey: string): Calendar {
-  switch (calKey) {
+function getCalendar(calName: string): Calendar {
+  switch (calName) {
     case 'ethiopic':
       return new EthiopicCalendar();
     case 'islamic':
@@ -51,21 +51,20 @@ interface WeekDay {
 }
 
 interface WeeklyCalendarViewProps {
-  calKey: string;
   calendarSelectedDate: Dayjs;
   onSelectDate: (isoDate: string, startHour: number, endHour: number) => void;
 }
 
-const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ calKey, calendarSelectedDate, onSelectDate }) => {
+const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ calendarSelectedDate, onSelectDate }) => {
   const todayISO = today(getLocalTimeZone()).toString();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
-  const locale = LOCALE_MAP[calKey] ?? 'en-US';
-  const cal = useMemo(() => getCalendar(calKey), [calKey]);
+  const { locale, calendar } = getCalendarFormat();
+  const cal = useMemo(() => getCalendar(calendar), [calendar]);
 
   const weekDays: ReadonlyArray<WeekDay> = useMemo(() => {
     const pivot = parseDate(isoDate);
-    const firstDay = calKey === 'persian' ? 6 : 0;
-    const weekStart = startOfWeek(pivot, 'en-US', DAY_OF_WEEK_KEY[firstDay]);
+    const firstDay = calendar === 'persian' ? 6 : 0;
+    const weekStart = startOfWeek(pivot, locale, DAY_OF_WEEK_KEY[firstDay]);
     return Array.from({ length: 7 }, (_, i) => {
       const gregDay = weekStart.add({ days: i });
       const calDay = toCalendar(gregDay, cal);
@@ -77,7 +76,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ calKey, calenda
         dow: getDayOfWeek(gregDay, 'en-US', 'sun'),
       };
     });
-  }, [isoDate, cal, calKey]);
+  }, [isoDate, cal, calendar, locale]);
 
   const day0 = useAppointmentsByDate(weekDays[0].iso);
   const day1 = useAppointmentsByDate(weekDays[1].iso);
@@ -96,8 +95,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ calKey, calenda
           const isToday = wd.iso === todayISO;
           const [y, m, d] = wd.iso.split('-').map(Number);
           const jsDate = new Date(y, m - 1, d);
-          const dowLabel = new Intl.DateTimeFormat(locale, { weekday: 'short', calendar: calKey }).format(jsDate);
-          const monthName = new Intl.DateTimeFormat('en-US', { month: 'short', calendar: calKey }).format(jsDate);
+          const dowLabel = new Intl.DateTimeFormat(locale, { weekday: 'short', calendar }).format(jsDate);
+          const monthName = new Intl.DateTimeFormat(locale, { month: 'short', calendar }).format(jsDate);
           return (
             <div key={wd.iso} className={`${styles.dayHeader} ${isToday ? styles.dayHeaderToday : ''}`}>
               <div className={styles.dowLabel}>{dowLabel}</div>

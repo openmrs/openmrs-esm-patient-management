@@ -12,18 +12,17 @@ import {
   CALENDAR_HOURS,
   formatHourLabel,
 } from '../utils/calendar-colors';
-import { LOCALE_MAP } from '../calendar-utils';
+import { getCalendarFormat } from '../calendar-utils';
 import styles from './daily-calendar-view.scss';
 
 interface DailyCalendarViewProps {
-  calKey: string;
   calendarSelectedDate: Dayjs;
 }
 
-const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calKey, calendarSelectedDate }) => {
+const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate }) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
-  const locale = LOCALE_MAP[calKey] ?? 'en-US';
+  const { locale, calendar } = getCalendarFormat();
   const { appointments, isLoading } = useAppointmentsByDate(isoDate);
 
   const displayDate = useMemo(() => {
@@ -32,9 +31,9 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calKey, calendarS
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      calendar: calKey,
+      calendar,
     }).format(d);
-  }, [calendarSelectedDate, locale, calKey]);
+  }, [calendarSelectedDate, locale, calendar]);
 
   const hourSlots = useMemo(
     () =>

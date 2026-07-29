@@ -8,12 +8,10 @@ import CalendarHeader, { type CalendarViewMode } from './header/calendar-header.
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
-import { deriveCalKey } from './calendar-utils';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
-  const calSysKey = deriveCalKey();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
   const period = viewMode === 'weekly' ? 'weekly' : viewMode === 'daily' ? 'daily' : 'monthly';
@@ -46,12 +44,12 @@ const AppointmentsCalendarView: React.FC = () => {
         onNext={handleNext}
       />
       {viewMode === 'monthly' && (
-        <MonthlyCalendarView events={calendarEvents} calendarSelectedDate={calendarSelectedDate} calKey={calSysKey} />
+        <MonthlyCalendarView events={calendarEvents} calendarSelectedDate={calendarSelectedDate} />
       )}
       {viewMode === 'weekly' && (
-        <WeeklyCalendarView calKey={calSysKey} calendarSelectedDate={calendarSelectedDate} onSelectDate={() => {}} />
+        <WeeklyCalendarView calendarSelectedDate={calendarSelectedDate} onSelectDate={() => {}} />
       )}
-      {viewMode === 'daily' && <DailyCalendarView calKey={calSysKey} calendarSelectedDate={calendarSelectedDate} />}
+      {viewMode === 'daily' && <DailyCalendarView calendarSelectedDate={calendarSelectedDate} />}
     </div>
   );
 };

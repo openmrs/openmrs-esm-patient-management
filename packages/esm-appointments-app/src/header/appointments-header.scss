@@ -17,7 +17,7 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  margin: 0 0.5rem 0 layout.$spacing-05;
+  margin: 0 layout.$spacing-03 0 layout.$spacing-05;
   gap: layout.$spacing-01;
   :global(.cds--btn--primary) {
     padding-left: layout.$spacing-05 !important;
