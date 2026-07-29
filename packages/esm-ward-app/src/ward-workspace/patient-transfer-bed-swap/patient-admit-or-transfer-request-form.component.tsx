@@ -125,37 +125,60 @@ export default function PatientAdmitOrTransferForm({
       setShowErrorNotifications(false);
       const { dispositionDescriptor } = emrConfiguration;
 
+      /**
+       * A related patient can have a pending request of a different type than the primary patient's
+       * — a mother awaiting admission may have a child awaiting transfer — so each of them keeps
+       * their own request type. Anything else (no pending request, or a pending discharge) follows
+       * the type this form was opened for.
+       */
+      const requestTypeOf = ({ inpatientRequest }: WardPatient) =>
+        inpatientRequest?.dispositionType === 'ADMIT' || inpatientRequest?.dispositionType === 'TRANSFER'
+          ? inpatientRequest.dispositionType
+          : dispositionType;
+
       // The backend derives the request type from the disposition obs group: the disposition
       // concept determines whether it is an admission or a transfer request, and the location is
       // read from the concept matching that request type.
-      const obs: Array<ObsPayload> = [
-        {
-          concept: isAdmitRequest
-            ? dispositionDescriptor.admissionLocationConcept.uuid
-            : dispositionDescriptor.internalTransferLocationConcept.uuid,
-          value: values.location,
-        },
-        {
-          concept: dispositionDescriptor.dispositionConcept.uuid,
-          value: dispositionsOfRequestedType.find(({ uuid }) => uuid === values.disposition)?.conceptCode,
-        },
-      ];
+      const buildDispositionObs = (requestType: Extract<DispositionType, 'ADMIT' | 'TRANSFER'>) => {
+        const disposition =
+          requestType === dispositionType
+            ? dispositionsOfRequestedType.find(({ uuid }) => uuid === values.disposition)
+            : emrConfiguration.dispositions.find(({ type }) => type === requestType);
 
-      if (values.note) {
-        obs.push({
-          concept: emrConfiguration.consultFreeTextCommentsConcept.uuid,
-          value: values.note,
-        });
-      }
+        const obs: Array<ObsPayload> = [
+          {
+            concept:
+              requestType === 'ADMIT'
+                ? dispositionDescriptor.admissionLocationConcept.uuid
+                : dispositionDescriptor.internalTransferLocationConcept.uuid,
+            value: values.location,
+          },
+          {
+            concept: dispositionDescriptor.dispositionConcept.uuid,
+            value: disposition?.conceptCode,
+          },
+        ];
+
+        if (values.note) {
+          obs.push({
+            concept: emrConfiguration.consultFreeTextCommentsConcept.uuid,
+            value: values.note,
+          });
+        }
+
+        return obs;
+      };
 
       const wardPatientsInRequest = [
-        wardPatient,
-        ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
+        { wardPatient, requestType: dispositionType },
+        ...relatedTransferPatients
+          .filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid))
+          .map((rp) => ({ wardPatient: rp, requestType: requestTypeOf(rp) })),
       ];
 
       try {
         const results = await Promise.allSettled(
-          wardPatientsInRequest.map(async (wardPatientInRequest) => {
+          wardPatientsInRequest.map(async ({ wardPatient: wardPatientInRequest, requestType }) => {
             const { patient: patientInRequest, visit: patientInRequestVisit } = wardPatientInRequest;
 
             return createEncounter(
@@ -165,7 +188,7 @@ export default function PatientAdmitOrTransferForm({
               [
                 {
                   concept: dispositionDescriptor.dispositionSetConcept.uuid,
-                  groupMembers: obs,
+                  groupMembers: buildDispositionObs(requestType),
                 },
               ],
             );
@@ -173,10 +196,12 @@ export default function PatientAdmitOrTransferForm({
         );
 
         results.forEach((result, i) => {
-          const patientName = wardPatientsInRequest[i].patient.person.preferredName.display;
+          const { wardPatient: wardPatientInRequest, requestType } = wardPatientsInRequest[i];
+          const patientName = wardPatientInRequest.patient.person.preferredName.display;
+          const isAdmit = requestType === 'ADMIT';
           if (result.status === 'fulfilled') {
             showSnackbar({
-              title: isAdmitRequest
+              title: isAdmit
                 ? t('admissionRequestCreatedForPatient', 'Admission request created for {{patientName}}', {
                     patientName,
                   })
@@ -187,7 +212,7 @@ export default function PatientAdmitOrTransferForm({
             });
           } else {
             showSnackbar({
-              title: isAdmitRequest
+              title: isAdmit
                 ? t('errorCreatingAdmissionRequest', 'Error creating admission request for {{patientName}}', {
                     patientName,
                   })
@@ -211,9 +236,9 @@ export default function PatientAdmitOrTransferForm({
     [
       onSuccess,
       createEncounter,
+      dispositionType,
       dispositionsOfRequestedType,
       emrConfiguration,
-      isAdmitRequest,
       t,
       wardPatientGroupDetails,
       selectedRelatedPatient,

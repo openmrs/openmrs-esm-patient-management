@@ -15,6 +15,7 @@ import {
   mockLocationInpatientWard,
   mockLocationMosoriot,
   mockPatientAlice,
+  mockPatientBrian,
 } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { mockWardViewContext } from '../../../mock';
@@ -69,22 +70,25 @@ vi.mocked(useLocations).mockReturnValue({
 
 vi.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
-function makeWardPatient(dispositionType: DispositionType): WardPatient {
+function makeWardPatient(dispositionType: DispositionType, patient = mockPatientAlice): WardPatient {
   return {
     visit: mockInpatientRequestAlice.visit,
-    patient: mockPatientAlice,
+    patient,
     bed: null,
     inpatientAdmission: null,
-    inpatientRequest: { ...mockInpatientRequestAlice, dispositionType },
+    inpatientRequest: { ...mockInpatientRequestAlice, patient, dispositionType },
   };
 }
 
-function renderPatientTransferRequestWorkspace(dispositionType: DispositionType) {
+function renderPatientTransferRequestWorkspace(
+  dispositionType: DispositionType,
+  relatedTransferPatients?: WardPatient[],
+) {
   renderWithSwr(
     <PatientTransferRequestWorkspace
       launchChildWorkspace={vi.fn()}
       closeWorkspace={vi.fn()}
-      workspaceProps={{ wardPatient: makeWardPatient(dispositionType) }}
+      workspaceProps={{ wardPatient: makeWardPatient(dispositionType), relatedTransferPatients }}
       windowProps={undefined}
       groupProps={undefined}
       workspaceName={''}
@@ -154,5 +158,28 @@ describe('PatientTransferRequestWorkspace', () => {
         },
       ],
     );
+  });
+
+  it('keeps each related patient on their own request type', async () => {
+    // A mother awaiting admission can have a child awaiting transfer; the child must stay a
+    // transfer request rather than inheriting the mother's admission request.
+    const relatedTransferPatient = makeWardPatient('TRANSFER', mockPatientBrian);
+    renderPatientTransferRequestWorkspace('ADMIT', [relatedTransferPatient]);
+
+    await selectLocationAndSubmit();
+
+    expect(mockedCreateEncounter).toHaveBeenCalledTimes(2);
+
+    const payloadFor = (patientUuid: string) =>
+      mockedCreateEncounter.mock.calls.find(([patient]) => patient.uuid === patientUuid)?.[3][0].groupMembers;
+
+    expect(payloadFor(mockPatientAlice.uuid)).toEqual([
+      { concept: admissionLocationConcept.uuid, value: mockLocationMosoriot.uuid },
+      { concept: dispositionConcept.uuid, value: admitDisposition.conceptCode },
+    ]);
+    expect(payloadFor(mockPatientBrian.uuid)).toEqual([
+      { concept: internalTransferLocationConcept.uuid, value: mockLocationMosoriot.uuid },
+      { concept: dispositionConcept.uuid, value: transferDisposition.conceptCode },
+    ]);
   });
 });
