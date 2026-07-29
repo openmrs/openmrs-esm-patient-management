@@ -6,16 +6,17 @@ import { mockSession } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { type QueueEntry } from '../types';
+import { repString } from './useQueueEntries';
 import CallQueueEntryModal from '../modals/call-modal/call-queue-entry.modal';
 import UndoTransitionQueueEntryModal from '../modals/undo-transition-queue-entry.modal';
 import QueueTable from '../queue-table/queue-table.component';
 
-// `identifierTypeUuid` default of `defaultColumnConfig`, so the built-in patient-identifier column renders this identifier.
+// The `identifierTypeUuid` default of `defaultColumnConfig`, so the patient-identifier column renders this identifier.
 const openmrsIdTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 const visitQueueNumberAttributeUuid = 'queue-number-visit-attr-type-uuid';
 
-// Shaped exactly like the custom representation fetched by useQueueEntries: no fields beyond what it requests.
-// Rendering it through the columns and row actions fails if a future trim drops a field something still reads.
+// Shaped exactly like `repString`: asserted against it below, then rendered through the columns and row actions,
+// so a future trim that drops a field something still reads fails here.
 const repShapedQueueEntry = {
   uuid: 'queue-entry-uuid',
   display: 'Alice Johnson',
@@ -57,6 +58,31 @@ const repShapedQueueEntry = {
   },
 } as unknown as QueueEntry;
 
+type KeyTree = { [key: string]: KeyTree | true };
+
+// Turns `custom:(uuid,queue:(uuid,display))` into `{ uuid: true, queue: { uuid: true, display: true } }`.
+function parseRepresentation(rep: string): KeyTree {
+  return JSON.parse(
+    rep
+      .replace(/^custom:/, '')
+      .replace(/(\w+):/g, '"$1":')
+      .replace(/(\w+)(?=[,)])/g, '"$1":true')
+      .replace(/\(/g, '{')
+      .replace(/\)/g, '}'),
+  );
+}
+
+// Mirrors the fixture as the same kind of tree; arrays are represented by their first element.
+function toKeyTree(value: unknown): KeyTree | true {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? toKeyTree(value[0]) : true;
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, nested]) => [key, toKeyTree(nested)]));
+  }
+  return true;
+}
+
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseSession = vi.mocked(useSession);
 const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
@@ -67,7 +93,8 @@ vi.mock('../service-queues.resource', async () => ({
   updateQueueEntry: vi.fn().mockResolvedValue({ status: 201 }),
 }));
 
-vi.mock('../hooks/useQueueEntries', () => ({
+vi.mock('./useQueueEntries', async (importOriginal) => ({
+  ...((await importOriginal()) as object),
   useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
 
@@ -89,6 +116,10 @@ describe('Queue entry custom representation contract', () => {
       defaultIdentifierTypes: [openmrsIdTypeUuid],
       concepts: { ...configDefaults.concepts, defaultTransitionStatus: 'some-default-transition-status' },
     } as ConfigObject);
+  });
+
+  it('has a fixture shaped exactly like the representation useQueueEntries requests', () => {
+    expect(toKeyTree(repShapedQueueEntry)).toEqual(parseRepresentation(repString));
   });
 
   it('supplies every field read by the configured columns', () => {
