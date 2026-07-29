@@ -288,7 +288,7 @@ export interface Resource {
 
 export interface Identifer {
   identifier: string;
-  display: string;
+  display?: string;
   uuid: string;
   identifierType: {
     uuid: string;
