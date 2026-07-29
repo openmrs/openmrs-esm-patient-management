@@ -70,13 +70,17 @@ vi.mocked(useLocations).mockReturnValue({
 
 vi.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
-function makeWardPatient(dispositionType: DispositionType, patient = mockPatientAlice): WardPatient {
+function makeWardPatient(
+  dispositionType: DispositionType,
+  patient = mockPatientAlice,
+  disposition = mockInpatientRequestAlice.disposition,
+): WardPatient {
   return {
     visit: mockInpatientRequestAlice.visit,
     patient,
     bed: null,
     inpatientAdmission: null,
-    inpatientRequest: { ...mockInpatientRequestAlice, patient, dispositionType },
+    inpatientRequest: { ...mockInpatientRequestAlice, patient, dispositionType, disposition },
   };
 }
 
@@ -179,7 +183,28 @@ describe('PatientTransferRequestWorkspace', () => {
     ]);
     expect(payloadFor(mockPatientBrian.uuid)).toEqual([
       { concept: internalTransferLocationConcept.uuid, value: mockLocationMosoriot.uuid },
-      { concept: dispositionConcept.uuid, value: transferDisposition.conceptCode },
+      { concept: dispositionConcept.uuid, value: relatedTransferPatient.inpatientRequest.disposition.uuid },
+    ]);
+  });
+
+  it('preserves the specific disposition a related pending request was created with', async () => {
+    // An implementation can configure several dispositions per type, so a related patient must
+    // keep the disposition their own request used rather than the first one configured for it.
+    const secondTransferDisposition = {
+      ...mockInpatientRequestAlice.disposition,
+      uuid: 'second-transfer-concept-uuid',
+    };
+    const relatedTransferPatient = makeWardPatient('TRANSFER', mockPatientBrian, secondTransferDisposition);
+    renderPatientTransferRequestWorkspace('ADMIT', [relatedTransferPatient]);
+
+    await selectLocationAndSubmit();
+
+    const payloadFor = (patientUuid: string) =>
+      mockedCreateEncounter.mock.calls.find(([patient]) => patient.uuid === patientUuid)?.[3][0].groupMembers;
+
+    expect(payloadFor(mockPatientBrian.uuid)).toEqual([
+      { concept: internalTransferLocationConcept.uuid, value: mockLocationMosoriot.uuid },
+      { concept: dispositionConcept.uuid, value: 'second-transfer-concept-uuid' },
     ]);
   });
 });

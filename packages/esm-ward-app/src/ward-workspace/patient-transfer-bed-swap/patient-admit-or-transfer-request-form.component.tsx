@@ -136,15 +136,28 @@ export default function PatientAdmitOrTransferForm({
           ? inpatientRequest.dispositionType
           : dispositionType;
 
+      /**
+       * An implementation can configure several dispositions per type, so a related patient
+       * keeping their own request type also keeps the exact disposition their pending request was
+       * created with — only its location changes. Everyone on the type this form was opened for
+       * gets the disposition selected on the form.
+       */
+      const dispositionValueOf = (
+        { inpatientRequest }: WardPatient,
+        requestType: Extract<DispositionType, 'ADMIT' | 'TRANSFER'>,
+      ) =>
+        requestType === dispositionType
+          ? dispositionsOfRequestedType.find(({ uuid }) => uuid === values.disposition)?.conceptCode
+          : (inpatientRequest?.disposition?.uuid ??
+            emrConfiguration.dispositions.find(({ type }) => type === requestType)?.conceptCode);
+
       // The backend derives the request type from the disposition obs group: the disposition
       // concept determines whether it is an admission or a transfer request, and the location is
       // read from the concept matching that request type.
-      const buildDispositionObs = (requestType: Extract<DispositionType, 'ADMIT' | 'TRANSFER'>) => {
-        const disposition =
-          requestType === dispositionType
-            ? dispositionsOfRequestedType.find(({ uuid }) => uuid === values.disposition)
-            : emrConfiguration.dispositions.find(({ type }) => type === requestType);
-
+      const buildDispositionObs = (
+        wardPatientInRequest: WardPatient,
+        requestType: Extract<DispositionType, 'ADMIT' | 'TRANSFER'>,
+      ) => {
         const obs: Array<ObsPayload> = [
           {
             concept:
@@ -155,7 +168,7 @@ export default function PatientAdmitOrTransferForm({
           },
           {
             concept: dispositionDescriptor.dispositionConcept.uuid,
-            value: disposition?.conceptCode,
+            value: dispositionValueOf(wardPatientInRequest, requestType),
           },
         ];
 
@@ -188,7 +201,7 @@ export default function PatientAdmitOrTransferForm({
               [
                 {
                   concept: dispositionDescriptor.dispositionSetConcept.uuid,
-                  groupMembers: buildDispositionObs(requestType),
+                  groupMembers: buildDispositionObs(wardPatientInRequest, requestType),
                 },
               ],
             );
