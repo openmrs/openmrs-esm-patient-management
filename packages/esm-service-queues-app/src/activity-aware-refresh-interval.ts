@@ -42,8 +42,9 @@ const initialize = () => {
 /**
  * Returns a function for SWR's `refreshInterval` that polls at `activeRefreshInterval` while the user
  * is interacting with the tab and `idleRefreshInterval` once they have gone idle. SWR skips polling
- * entirely while the tab is hidden, so tracking visibility here only serves to resume the active rate
- * as soon as the user returns.
+ * entirely while the tab is hidden, so tracking visibility here only affects the rate SWR picks for
+ * the tick after the user returns, not the one already scheduled; `SwrConfig` revalidates on focus to
+ * cover that gap.
  */
 export const getActivityAwareRefreshInterval = (activeRefreshInterval: number, idleRefreshInterval: number) => () => {
   initialize();

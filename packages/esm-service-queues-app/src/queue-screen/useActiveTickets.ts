@@ -15,7 +15,7 @@ export const useActiveTickets = () => {
   const { data, isLoading, error, mutate } = useSWR<{ data: Record<string, { status: string; ticketNumber: string }> }>(
     `${restBaseUrl}/queueutil/active-tickets`,
     openmrsFetch,
-    { refreshInterval },
+    { refreshInterval, revalidateOnFocus: false },
   );
   const activeTickets =
     Array.from(Object.entries(data?.data ?? {}).map(([key, value]) => ({ room: key, ...value }))) ?? [];
