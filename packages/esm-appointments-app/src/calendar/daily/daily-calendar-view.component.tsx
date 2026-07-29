@@ -12,7 +12,6 @@ import {
   CALENDAR_HOURS,
   formatHourLabel,
 } from '../utils/calendar-colors';
-import { getCalendarFormat } from '../calendar-utils';
 import styles from './daily-calendar-view.scss';
 
 interface DailyCalendarViewProps {
@@ -22,18 +21,7 @@ interface DailyCalendarViewProps {
 const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate }) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
-  const { locale, calendar } = getCalendarFormat();
   const { appointments, isLoading } = useAppointmentsByDate(isoDate);
-
-  const displayDate = useMemo(() => {
-    const d = calendarSelectedDate.toDate();
-    return new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      calendar,
-    }).format(d);
-  }, [calendarSelectedDate, locale, calendar]);
 
   const hourSlots = useMemo(
     () =>
@@ -58,7 +46,6 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
   return (
     <div className={styles.container}>
       <div className={styles.heading}>
-        <h2 className={styles.title}>{displayDate}</h2>
         <p className={styles.subtitle}>
           {appointments.length === 0
             ? t('noAppointments', 'No appointments scheduled')
