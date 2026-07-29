@@ -46,6 +46,19 @@ function waitForLoadingToFinish() {
   });
 }
 
+// Vitest has no direct equivalent of jest.replaceProperty. This helper covers the
+// common case of swapping a writable own property and restoring it afterwards;
+// it does not handle getters or non-writable descriptors.
+function replaceProperty<T, K extends keyof T>(obj: T, prop: K, value: T[K]) {
+  const original = obj[prop];
+  obj[prop] = value;
+  return {
+    restore() {
+      obj[prop] = original;
+    },
+  };
+}
+
 // Custom matcher that queries elements split up by multiple HTML elements by text
 function getByTextWithMarkup(text: RegExp | string) {
   try {
@@ -139,6 +152,7 @@ export {
   renderWithContext,
   renderWithSwr,
   renderWithRouter,
+  replaceProperty,
   waitForLoadingToFinish,
   withSwr,
 };

@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, screen } from '@testing-library/react';
 import {
@@ -49,7 +56,7 @@ const existingAppointment = {
 };
 
 const defaultProps = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   workspaceProps: {
     patientUuid: mockPatient.id,
   },
@@ -58,36 +65,36 @@ const defaultProps = {
   workspaceName: 'appointments-form',
   windowName: 'test-window',
   isRootWorkspace: true,
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
 };
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockSaveAppointment = jest.mocked(saveAppointment);
-const mockCheckAppointmentConflict = jest.mocked(checkAppointmentConflict);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseLocations = jest.mocked(useLocations);
-const mockUseProviders = jest.mocked(useProviders);
-const mockUseSession = jest.mocked(useSession);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockSaveAppointment = vi.mocked(saveAppointment);
+const mockCheckAppointmentConflict = vi.mocked(checkAppointmentConflict);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseLocations = vi.mocked(useLocations);
+const mockUseProviders = vi.mocked(useProviders);
+const mockUseSession = vi.mocked(useSession);
 
-jest.mock('./appointments-form.resource', () => ({
-  ...jest.requireActual('./appointments-form.resource'),
-  saveAppointment: jest.fn(),
-  checkAppointmentConflict: jest.fn(),
+vi.mock('./appointments-form.resource', async () => ({
+  ...((await vi.importActual('./appointments-form.resource')) as object),
+  saveAppointment: vi.fn(),
+  checkAppointmentConflict: vi.fn(),
 }));
 
-jest.mock('../hooks/useProviders', () => ({
-  ...jest.requireActual('../hooks/useProviders'),
-  useProviders: jest.fn(),
+vi.mock('../hooks/useProviders', async () => ({
+  ...((await vi.importActual('../hooks/useProviders')) as object),
+  useProviders: vi.fn(),
 }));
 
-jest.mock('../workload/workload.resource', () => ({
-  ...jest.requireActual('../workload/workload.resource'),
-  getMonthlyCalendarDistribution: jest.fn(),
-  useAppointmentSummary: jest.fn(),
-  useCalendarDistribution: jest.fn(),
-  useMonthlyCalendarDistribution: jest.fn().mockReturnValue([]),
-  useMonthlyAppointmentSummary: jest.fn().mockReturnValue([]),
+vi.mock('../workload/workload.resource', async () => ({
+  ...((await vi.importActual('../workload/workload.resource')) as object),
+  getMonthlyCalendarDistribution: vi.fn(),
+  useAppointmentSummary: vi.fn(),
+  useCalendarDistribution: vi.fn(),
+  useMonthlyCalendarDistribution: vi.fn().mockReturnValue([]),
+  useMonthlyAppointmentSummary: vi.fn().mockReturnValue([]),
 }));
 
 describe('AppointmentForm', () => {

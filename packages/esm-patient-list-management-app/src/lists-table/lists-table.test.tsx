@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
@@ -7,8 +8,8 @@ import { type PatientListManagementConfig, configSchema } from '../config-schema
 import { mockSession } from '__mocks__';
 import ListsTable from './lists-table.component';
 
-const mockUseSession = jest.mocked(useSession);
-const mockUseConfig = jest.mocked(useConfig<PatientListManagementConfig>);
+const mockUseSession = vi.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<PatientListManagementConfig>);
 
 const tableHeaders = [
   { header: 'List name', key: '1' },
@@ -105,7 +106,7 @@ describe('ListsTable', () => {
         isLoading={false}
         listType={''}
         patientLists={[]}
-        refetch={jest.fn()}
+        refetch={vi.fn()}
       />,
     );
 
@@ -116,7 +117,6 @@ describe('ListsTable', () => {
   it('renders an empty state when there is no patient list data to display', () => {
     render(<ListsTable patientLists={[]} listType={''} />);
 
-    expect(screen.getByTitle(/empty state illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patient lists to display/i)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });

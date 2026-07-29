@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -10,34 +17,34 @@ import { useInfinitePatientSearch } from '../patient-search.resource';
 import { usePersonAttributeType } from './refine-search/person-attributes.resource';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 
-const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
-const mockUseInfinitePatientSearch = jest.mocked(useInfinitePatientSearch);
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
+const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
+const mockUseInfinitePatientSearch = vi.mocked(useInfinitePatientSearch);
+const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
 
-jest.mock('../patient-search.resource', () => ({
-  useInfinitePatientSearch: jest.fn(),
+vi.mock('../patient-search.resource', () => ({
+  useInfinitePatientSearch: vi.fn(),
 }));
 
-jest.mock('./refine-search/person-attributes.resource', () => ({
-  usePersonAttributeType: jest.fn(),
+vi.mock('./refine-search/person-attributes.resource', () => ({
+  usePersonAttributeType: vi.fn(),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn(() => ({
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as object),
+  useParams: vi.fn(() => ({
     page: 1,
   })),
-  useLocation: jest.fn(),
-  useSearchParams: jest.fn(() => [
+  useLocation: vi.fn(),
+  useSearchParams: vi.fn(() => [
     {
-      get: jest.fn(() => 'Jos'),
+      get: vi.fn(() => 'Jos'),
     },
   ]),
 }));
 
 const mockPatientActionContextValue = {
-  nonNavigationSelectPatientAction: jest.fn(),
-  selectPatientAction: jest.fn(),
+  nonNavigationSelectPatientAction: vi.fn(),
+  selectPatientAction: vi.fn(),
 };
 
 const mockSearchResults: PatientSearchResponse = {
@@ -45,7 +52,7 @@ const mockSearchResults: PatientSearchResponse = {
   totalResults: 2,
   data: mockAdvancedSearchResults as unknown as PatientSearchResponse['data'],
   currentPage: 1,
-  setPage: jest.fn(),
+  setPage: vi.fn(),
   hasMore: false,
   isLoading: false,
   fetchError: null,

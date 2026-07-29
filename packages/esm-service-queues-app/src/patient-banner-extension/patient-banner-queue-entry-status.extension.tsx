@@ -12,38 +12,53 @@ interface PatientBannerQueueEntryStatusProps {
 }
 
 const PatientBannerQueueEntryStatus: React.FC<PatientBannerQueueEntryStatusProps> = ({ patientUuid, renderedFrom }) => {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { queueEntries } = useQueueEntries({ patient: patientUuid, isEnded: false });
-  const queueEntry = queueEntries?.[0];
-  const config = useConfig<ConfigObject>();
-
   const isPatientChart = renderedFrom === 'patient-chart';
-  if (!isPatientChart || !queueEntry) {
+
+  if (!isPatientChart) {
     return null;
   }
 
-  return (
-    <div className={styles.queueEntryStatusContainer}>
-      <span>{queueEntry.queue.name}</span>
-      <QueuePriority
-        priority={queueEntry.priority}
-        priorityComment={queueEntry.priorityComment}
-        priorityConfigs={config?.priorityConfigs}
-      />
-      <Button
-        kind="ghost"
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        onClick={() => {
-          const dispose = showModal('move-queue-entry-modal', {
-            closeModal: () => dispose(),
-            queueEntry,
-          });
-        }}>
-        {t('move', 'Move')}
-      </Button>
-    </div>
-  );
+  return <PatientBannerQueueEntryStatusInner patientUuid={patientUuid} />;
 };
+
+const PatientBannerQueueEntryStatusInner: React.FC<Pick<PatientBannerQueueEntryStatusProps, 'patientUuid'>> =
+  React.memo(({ patientUuid }) => {
+    const { t } = useTranslation();
+    const layout = useLayoutType();
+    const { queueEntries } = useQueueEntries(
+      { patient: patientUuid, isEnded: false },
+      'custom:(uuid,display,priority,priorityComment,queue)',
+    );
+
+    const queueEntry = queueEntries?.[0];
+    const config = useConfig<ConfigObject>();
+
+    if (!queueEntry) {
+      return null;
+    }
+
+    return (
+      <div className={styles.queueEntryStatusContainer}>
+        <span>{queueEntry.queue.name}</span>
+        <QueuePriority
+          priority={queueEntry.priority}
+          priorityComment={queueEntry.priorityComment}
+          priorityConfigs={config?.priorityConfigs}
+        />
+        <Button
+          kind="ghost"
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          onClick={() => {
+            const dispose = showModal('move-queue-entry-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+            });
+          }}>
+          {t('move', 'Move')}
+        </Button>
+      </div>
+    );
+  });
+PatientBannerQueueEntryStatusInner.displayName = 'PatientBannerQueueEntryStatusInner';
 
 export default PatientBannerQueueEntryStatus;

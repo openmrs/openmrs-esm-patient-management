@@ -1,4 +1,5 @@
 import { isUniqueIdentifierTypeForOffline, shouldBlockPatientIdentifierInOfflineMode } from './utils';
+import { vi, describe, it, expect } from 'vitest';
 
 interface IdentifierTypeOptions {
   uniquenessBehavior?: 'UNIQUE' | 'LOCATION' | 'NON_UNIQUE';

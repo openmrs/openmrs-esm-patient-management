@@ -1,7 +1,8 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": ">=2.2.0"
+    "webservices.rest": ">=2.2.0",
+    "appointments": ">=2.0.0"
   },
   "extensions": [
     {
@@ -42,31 +43,6 @@
       "component": "homeAppointments"
     },
     {
-      "name": "expected-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "checked-in-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "completed-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "missed-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
-      "name": "cancelled-appointments-panel",
-      "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsList"
-    },
-    {
       "name": "early-appointments-panel",
       "component": "earlyAppointments"
     },
@@ -79,7 +55,7 @@
         "columns": 1,
         "columnSpan": 1,
         "hideDashboardTitle": true,
-        "path": "Appointments",
+        "path": "appointments",
         "slot": "patient-chart-appointments-dashboard-slot",
         "title": "Appointments"
       }
@@ -129,10 +105,16 @@
     {
       "name": "cancel-appointment-modal",
       "component": "cancelAppointmentModal"
+    },
+    {
+      "name": "batch-change-appointments-statuses-modal",
+      "component": "batchChangeAppointmentStatusesModal"
     }
   ],
-  "workspaceGroups2": [{
-      "name": "appointments-group"
+  "workspaceGroups2": [
+    {
+      "name": "appointments-group",
+      "scopePattern": "/home/appointments"
     }
   ],
   "workspaceWindows2": [

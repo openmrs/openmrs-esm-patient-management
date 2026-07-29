@@ -24,7 +24,7 @@ const AddPatientToQueueButton: React.FC = () => {
               patientUuid: string,
               patient: fhir.Patient,
               launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-              closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+              closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
             ) {
               launchChildWorkspace(serviceQueuesPatientSearchWorkspace, {
                 currentServiceQueueUuid: selectedServiceUuid,

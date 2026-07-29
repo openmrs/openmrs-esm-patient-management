@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showSnackbar, useSession, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
@@ -8,29 +15,29 @@ import { useBedTags, useLocationsWithAdmissionTag } from '../../summary/summary.
 import { editBed, saveBed, useBedType, useBedTagMappings } from './bed-form.resource';
 import BedFormWorkspace from './bed-form.workspace';
 
-jest.mock('./bed-form.resource', () => ({
-  saveBed: jest.fn(),
-  editBed: jest.fn(),
-  useBedType: jest.fn(),
-  useBedTagMappings: jest.fn(),
+vi.mock('./bed-form.resource', () => ({
+  saveBed: vi.fn(),
+  editBed: vi.fn(),
+  useBedType: vi.fn(),
+  useBedTagMappings: vi.fn(),
 }));
 
-jest.mock('../../summary/summary.resource', () => ({
-  useBedTags: jest.fn(),
-  useLocationsWithAdmissionTag: jest.fn(),
+vi.mock('../../summary/summary.resource', () => ({
+  useBedTags: vi.fn(),
+  useLocationsWithAdmissionTag: vi.fn(),
 }));
 
-const mockUseSession = jest.mocked(useSession);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseBedTags = jest.mocked(useBedTags);
-const mockUseLocationsWithAdmissionTag = jest.mocked(useLocationsWithAdmissionTag);
-const mockUseBedType = jest.mocked(useBedType);
-const mockUseBedTagMappings = jest.mocked(useBedTagMappings);
-const mockSaveBed = jest.mocked(saveBed);
-const mockEditBed = jest.mocked(editBed);
+const mockUseSession = vi.mocked(useSession);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseBedTags = vi.mocked(useBedTags);
+const mockUseLocationsWithAdmissionTag = vi.mocked(useLocationsWithAdmissionTag);
+const mockUseBedType = vi.mocked(useBedType);
+const mockUseBedTagMappings = vi.mocked(useBedTagMappings);
+const mockSaveBed = vi.mocked(saveBed);
+const mockEditBed = vi.mocked(editBed);
 
-const mockCloseWorkspace = jest.fn().mockResolvedValue(true);
-const mockMutateBeds = jest.fn();
+const mockCloseWorkspace = vi.fn().mockResolvedValue(true);
+const mockMutateBeds = vi.fn();
 
 const mockBedData: BedWorkspaceData = {
   uuid: 'bed-uuid-123',
@@ -62,7 +69,7 @@ const mockBedTags = [
 const createWorkspaceProps = (config: BedFormWorkspaceConfig): Workspace2DefinitionProps<BedFormWorkspaceConfig> => ({
   workspaceProps: config,
   closeWorkspace: mockCloseWorkspace,
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   windowProps: null,
   groupProps: null,
   workspaceName: 'bed-form-workspace',
@@ -105,7 +112,7 @@ describe('BedFormWorkspace', () => {
       errorLoadingAdmissionLocations: null,
       isLoadingAdmissionLocations: false,
       isValidatingAdmissionLocations: false,
-      mutateAdmissionLocations: jest.fn(),
+      mutateAdmissionLocations: vi.fn(),
     });
 
     mockUseBedType.mockReturnValue({
@@ -119,7 +126,7 @@ describe('BedFormWorkspace', () => {
       errorLoadingBedTags: null,
       isLoadingBedTags: false,
       isValidatingBedTags: false,
-      mutateBedTags: jest.fn(),
+      mutateBedTags: vi.fn(),
     });
 
     mockUseBedTagMappings.mockReturnValue({

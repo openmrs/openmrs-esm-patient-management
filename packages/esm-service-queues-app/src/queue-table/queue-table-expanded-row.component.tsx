@@ -8,6 +8,7 @@ import styles from './queue-table-expanded-row.scss';
 
 const QueueTableExpandedRow: FC<{ queueEntry: QueueEntry }> = ({ queueEntry }) => {
   const { t } = useTranslation();
+
   return (
     <Tabs>
       <TabList aria-label={t('visitTabs', 'Visit tabs')} className={styles.tabList}>
@@ -16,7 +17,7 @@ const QueueTableExpandedRow: FC<{ queueEntry: QueueEntry }> = ({ queueEntry }) =
       </TabList>
       <TabPanels>
         <TabPanel>
-          <CurrentVisit patientUuid={queueEntry.patient.uuid} visitUuid={queueEntry.visit.uuid} />
+          <CurrentVisit patientUuid={queueEntry.patient.uuid} visitUuid={queueEntry.visit?.uuid} />
         </TabPanel>
         <TabPanel>
           <PastVisit patientUuid={queueEntry.patient.uuid} />

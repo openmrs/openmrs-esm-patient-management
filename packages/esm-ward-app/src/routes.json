@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": ">=2.2.0",
+    "webservices.rest": ">3.3.0 <4.0.0",
     "emrapi": ">=2.0.0 <4.0.0"
   },
   "optionalBackendDependencies": {
@@ -46,11 +46,6 @@
       "slot": "ward-patient-card-slot"
     },
     {
-      "name": "patient-discharge-siderail-button",
-      "slot": "action-menu-ward-patient-items-slot",
-      "component": "patientDischargeWorkspaceSideRailIcon"
-    },
-    {
       "component": "defaultWardView",
       "name": "default-ward",
       "slot": "default-ward"
@@ -70,6 +65,10 @@
     {
       "name": "delete-note-modal",
       "component": "deleteNoteModal"
+    },
+    {
+      "name": "note-history-modal",
+      "component": "noteHistoryModal"
     }
   ],
   "workspaces2": [
@@ -93,7 +92,6 @@
       "component": "admitPatientFormWorkspace",
       "window": "ward-manage-admissions-window"
     },
-
     {
       "name": "ward-app-patient-search-workspace",
       "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
@@ -109,8 +107,6 @@
       "component": "createAdmissionEncounterWorkspace",
       "window": "ward-manage-admissions-window"
     },
-
-    
     {
       "name": "ward-patient-workspace",
       "component": "wardPatientWorkspace",
@@ -121,12 +117,10 @@
       "component": "@openmrs/esm-patient-vitals-app#exportedVitalsBiometricsFormWorkspace",
       "window": "ward-patient"
     },
-
     {
       "name": "ward-patient-notes-workspace",
       "component": "wardPatientNotesWorkspace",
       "window": "ward-patient-notes"
-
     },
     {
       "name": "ward-patient-transfer-swap-workspace",
@@ -171,6 +165,11 @@
     {
       "name": "ward-patient-order-basket-add-general-order-workspace",
       "component": "@openmrs/esm-patient-orders-app#exportedOrderBasketWorkspace",
+      "window": "ward-patient-order-basket"
+    },
+    {
+      "name": "ward-patient-order-basket-add-allergy-workspace",
+      "component": "@openmrs/esm-patient-allergies-app#exportedAllergyFormWorkspace",
       "window": "ward-patient-order-basket"
     }
   ],
@@ -219,10 +218,12 @@
   "workspaceGroups2": [
     {
       "name": "ward-manage-admissions",
+      "scopePattern": "/home/ward",
       "overlay": true
     },
     {
       "name": "ward-patient",
+      "scopePattern": "/home/ward",
       "overlay": true,
       "persistence": "closable"
     }

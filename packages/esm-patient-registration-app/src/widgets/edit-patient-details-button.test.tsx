@@ -1,65 +1,33 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
 import { mockPatient } from '__mocks__';
 import EditPatientDetailsButton from './edit-patient-details-button.component';
 
-const mockNavigate = jest.mocked(navigate);
-
-/**
- * Helper to render EditPatientDetailsButton.
- */
-function renderEditPatientDetailsButton(patientUuid: string, onTransition?: () => void) {
-  return render(<EditPatientDetailsButton patientUuid={patientUuid} onTransition={onTransition} />);
-}
+const mockNavigate = vi.mocked(navigate);
 
 describe('EditPatientDetailsButton', () => {
   const patientUuid = mockPatient.uuid;
 
-  describe('Rendering', () => {
-    it('renders button with correct text', () => {
-      renderEditPatientDetailsButton(patientUuid);
+  it('renders button with correct text', () => {
+    render(<EditPatientDetailsButton patientUuid={patientUuid} />);
 
-      expect(screen.getByRole('menuitem')).toBeInTheDocument();
-      expect(screen.getByText(/edit patient details/i)).toBeInTheDocument();
-    });
+    expect(screen.getByRole('menuitem')).toBeInTheDocument();
+    expect(screen.getByText(/edit patient details/i)).toBeInTheDocument();
   });
 
-  describe('User interaction', () => {
-    it('navigates to edit page when clicked', async () => {
-      const user = userEvent.setup();
-      renderEditPatientDetailsButton(patientUuid);
+  it('navigates to edit page when clicked', async () => {
+    const user = userEvent.setup();
+    render(<EditPatientDetailsButton patientUuid={patientUuid} />);
 
-      const button = screen.getByRole('menuitem');
-      await user.click(button);
+    const button = screen.getByRole('menuitem');
+    await user.click(button);
 
-      expect(mockNavigate).toHaveBeenCalledWith({
-        to: expect.stringContaining(`/patient/${patientUuid}/edit`),
-      });
-      expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: expect.stringContaining(`/patient/${patientUuid}/edit`),
     });
-
-    it('calls onTransition callback when provided and button is clicked', async () => {
-      const user = userEvent.setup();
-      const onTransitionMock = jest.fn();
-      renderEditPatientDetailsButton(patientUuid, onTransitionMock);
-
-      const button = screen.getByRole('menuitem');
-      await user.click(button);
-
-      expect(onTransitionMock).toHaveBeenCalledTimes(1);
-      expect(mockNavigate).toHaveBeenCalled();
-    });
-
-    it('navigates even when onTransition is not provided', async () => {
-      const user = userEvent.setup();
-      renderEditPatientDetailsButton(patientUuid);
-
-      const button = screen.getByRole('menuitem');
-      await user.click(button);
-
-      expect(mockNavigate).toHaveBeenCalled();
-    });
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
   });
 });

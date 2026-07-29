@@ -3,11 +3,7 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import MetricsHeader from './metrics-header.component';
 import styles from './metrics-container.scss';
 
-interface AppointmentMetricsProps {
-  appointmentServiceTypes: Array<string>;
-}
-
-const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceTypes }) => {
+const AppointmentsMetrics: React.FC<{}> = () => {
   return (
     <>
       <MetricsHeader />

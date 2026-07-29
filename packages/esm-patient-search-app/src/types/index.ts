@@ -2,6 +2,7 @@ import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface SearchedPatient {
   uuid: string;
+  voided: boolean;
   identifiers: Array<Identifier>;
   person: {
     addresses: Array<Address>;

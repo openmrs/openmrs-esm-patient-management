@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
@@ -15,17 +16,17 @@ import { mockSession, mockVisitAlice } from '__mocks__';
 import { postQueueEntry } from './queue-fields.resource';
 import QueueFields from './queue-fields.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUseSession = vi.mocked(useSession);
 
-jest.mock('../hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({ queueLocations: [{ id: '1', name: 'Location 1' }] })),
+vi.mock('../hooks/useQueueLocations', () => ({
+  useQueueLocations: vi.fn(() => ({ queueLocations: [{ id: '1', name: 'Location 1' }] })),
 }));
 
-jest.mock('../../hooks/useQueues', () => {
+vi.mock('../../hooks/useQueues', () => {
   return {
-    useQueues: jest.fn().mockReturnValue({
+    useQueues: vi.fn().mockReturnValue({
       queues: [
         {
           uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
@@ -38,11 +39,11 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-jest.mock('./queue-fields.resource', () => {
-  return { postQueueEntry: jest.fn() };
+vi.mock('./queue-fields.resource', () => {
+  return { postQueueEntry: vi.fn() };
 });
 
-const mockPostQueueEntry = jest.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
+const mockPostQueueEntry = vi.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
 
 describe('QueueFields', () => {
   beforeEach(() => {
@@ -83,7 +84,7 @@ describe('QueueFields', () => {
       '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
       0,
       '1',
-      null,
+      'c0c579b0-8e59-401d-8a4a-976a0b183519',
     );
   });
 });

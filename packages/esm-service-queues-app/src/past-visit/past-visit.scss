@@ -20,7 +20,7 @@
   background-color: $ui-background;
   width: 100%;
   min-height: layout.$spacing-13;
-  margin: 0 layout.$spacing-05;
+  margin: layout.$spacing-05;
 }
 
 .header::after {

@@ -3,8 +3,13 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile, Button } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { useLayoutType, useWorkspace2Context, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
+import {
+  EmptyCardIllustration,
+  useLayoutType,
+  useWorkspace2Context,
+  type Visit,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import styles from './admission-requests-empty-state.scss';
 
 const AdmissionRequestsEmptyState: React.FC = () => {
@@ -19,11 +24,26 @@ const AdmissionRequestsEmptyState: React.FC = () => {
         patientUuid: string,
         patient: fhir.Patient,
         launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
-        closeWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
       ) {
         launchChildWorkspace('create-admission-encounter-workspace', {
           selectedPatientUuid: patient.id,
         });
+      },
+      onVisitStarted(
+        patientUuid: string,
+        patient: fhir.Patient,
+        visit: Visit,
+        launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'],
+        closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
+      ) {
+        launchChildWorkspace('create-admission-encounter-workspace', {
+          selectedPatientUuid: patientUuid,
+        });
+      },
+      selectPatientButton: {
+        text: t('admit', 'Admit'),
+        requiresActiveVisit: true,
       },
     });
   };
@@ -32,7 +52,7 @@ const AdmissionRequestsEmptyState: React.FC = () => {
     <Layer>
       <Tile className={classNames(styles.emptyStateTile, { [styles.desktopTile]: isDesktop })}>
         <div className={styles.illustration}>
-          <EmptyDataIllustration />
+          <EmptyCardIllustration />
         </div>
         <p className={styles.content}>{t('noPendingAdmissionRequests', 'No pending admission requests')}</p>
         <p className={styles.helperText}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
@@ -7,6 +8,19 @@ import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext } from '../patient-search-context';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
+// The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
+// Stub it to render every row, letting the result assertions run.
+vi.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: ({ count }: { count: number }) => ({
+    getVirtualItems: () =>
+      Array.from({ length: count }, (_, index) => ({ index, key: index, start: index * 90, size: 90 })),
+    getTotalSize: () => count * 90,
+    scrollToIndex: () => {},
+    measureElement: () => {},
+    isScrolling: false,
+  }),
+}));
+
 const defaultProps = {
   currentPage: 0,
   data: [],
@@ -14,11 +28,11 @@ const defaultProps = {
   hasMore: false,
   isLoading: false,
   isValidating: false,
-  setPage: jest.fn(),
+  setPage: vi.fn(),
   totalResults: 0,
 };
 
-const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
+const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
 
 describe('RecentlySearchedPatients', () => {
   const birthdate = '1990-01-01T00:00:00.000+0000';
@@ -85,8 +99,19 @@ describe('RecentlySearchedPatients', () => {
       data: [],
     });
 
-    expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
-    expect(screen.getByText(/try to search again using the patient's unique ID number/i)).toBeInTheDocument();
+    expect(screen.getByText(/no recently viewed patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients you select will appear here for quick access/i)).toBeInTheDocument();
+    expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('renders an empty state when there is no recent data', () => {
+    renderRecentlySearchedPatients({
+      isLoading: false,
+      data: null,
+    });
+
+    expect(screen.getByText(/no recently viewed patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients you select will appear here for quick access/i)).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
   });
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
@@ -8,32 +9,41 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
-import { mockQueues, mockQueueEntryAlice } from '__mocks__';
+import {
+  mockQueueAltPriorities,
+  mockQueueEntryAlice,
+  mockQueueEntryBrian,
+  mockPreviousQueueEntryAlice,
+  mockQueueEntryNoPriorities,
+  mockQueueEntryNoStatuses,
+  mockQueues,
+  mockQueuesForComboBox,
+  mockQueueNoPriorities,
+  mockQueueNoStatuses,
+} from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import DeleteQueueEntryModal from './delete-queue-entry.modal';
 import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-jest.mock('../hooks/useQueues', () => {
-  return {
-    useQueues: jest.fn().mockReturnValue({
-      queues: mockQueues,
-    }),
-  };
-});
+const mockUseQueues = vi.fn().mockReturnValue({ queues: mockQueues });
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+vi.mock('../hooks/useQueues', () => ({
+  useQueues: () => mockUseQueues(),
 }));
 
-jest.mock('../hooks/useQueueEntries', () => {
+vi.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: vi.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+}));
+
+vi.mock('../hooks/useQueueEntries', () => {
   return {
-    useMutateQueueEntries: jest.fn().mockReturnValue({
-      mutateQueueEntries: jest.fn(),
+    useMutateQueueEntries: vi.fn().mockReturnValue({
+      mutateQueueEntries: vi.fn(),
     }),
   };
 });
@@ -69,7 +79,7 @@ describe('UndoTransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -102,7 +112,7 @@ describe('VoidQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -133,7 +143,7 @@ describe('VoidQueueEntryModal', () => {
 describe('QueueEntryActionModal', () => {
   const defaultProps = {
     queueEntry: mockQueueEntryAlice,
-    closeModal: jest.fn(),
+    closeModal: vi.fn(),
     modalParams: {
       modalTitle: 'Test Modal',
       modalInstruction: 'Test instruction',
@@ -141,8 +151,8 @@ describe('QueueEntryActionModal', () => {
       submitSuccessTitle: 'Success',
       submitSuccessText: 'Operation completed',
       submitFailureTitle: 'Submission Failed',
-      submitAction: jest.fn(),
-      disableSubmit: jest.fn().mockReturnValue(false),
+      submitAction: vi.fn(),
+      disableSubmit: vi.fn().mockReturnValue(false),
       isEdit: false,
       showQueuePicker: true,
       showStatusPicker: true,
@@ -157,8 +167,42 @@ describe('QueueEntryActionModal', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 
+  it('closes modal and shows warning snackbar when submission fails with already-ended error', async () => {
+    const mockSubmitAction = vi.fn().mockRejectedValue({
+      responseBody: {
+        error: {
+          message: 'Cannot transition a queue entry that has already ended',
+        },
+      },
+    });
+
+    const closeModal = vi.fn();
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        closeModal={closeModal}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+        }}
+      />,
+    );
+
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
+    await user.click(submitButton);
+
+    expect(showSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'warning',
+        title: 'Queue entry is no longer active',
+      }),
+    );
+    expect(closeModal).toHaveBeenCalled();
+  });
+
   it('shows inline error notification when submission fails with duplicate error', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       responseBody: {
         error: {
           message: '[queue.entry.duplicate.patient]',
@@ -185,7 +229,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('shows inline error notification when submission fails with generic error', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Network error occurred',
     });
 
@@ -208,7 +252,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('clears error when user changes queue selection', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -235,7 +279,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('clears error when user changes priority', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -262,7 +306,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('clears error when user changes status', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -289,8 +333,8 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('submits form successfully without errors', async () => {
-    const mockSubmitAction = jest.fn().mockResolvedValue({ status: 200 });
-    const closeModal = jest.fn();
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
+    const closeModal = vi.fn();
 
     const user = userEvent.setup();
     renderWithSwr(
@@ -312,7 +356,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('closes modal when cancel button is clicked', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<QueueEntryActionModal {...defaultProps} closeModal={closeModal} />);
@@ -324,7 +368,7 @@ describe('QueueEntryActionModal', () => {
   });
 
   it('allows user to close error notification', async () => {
-    const mockSubmitAction = jest.fn().mockRejectedValue({
+    const mockSubmitAction = vi.fn().mockRejectedValue({
       message: 'Test error',
     });
 
@@ -349,5 +393,340 @@ describe('QueueEntryActionModal', () => {
     await user.click(closeButton);
 
     expect(screen.queryByText('Test error')).not.toBeInTheDocument();
+  });
+
+  it('shows error when server returns non-200 status', async () => {
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 201 });
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+        }}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+    expect(await screen.findByText('Unexpected Server Response')).toBeInTheDocument();
+  });
+
+  it('initializes transition date from queue entry when isEdit is true', async () => {
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
+    const user = userEvent.setup();
+
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+          isEdit: true,
+        }}
+      />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    const [, formState] = mockSubmitAction.mock.calls[0];
+    expect(formState.transitionDate.getTime()).toBe(new Date(mockQueueEntryAlice.startedAt).getTime());
+  });
+
+  describe('empty configuration states', () => {
+    afterEach(() => {
+      mockUseQueues.mockReturnValue({ queues: mockQueues });
+    });
+
+    it('shows no-statuses configured notification when no statuses are configured', () => {
+      mockUseQueues.mockReturnValue({ queues: [mockQueueNoStatuses] });
+      renderWithSwr(<QueueEntryActionModal {...defaultProps} queueEntry={mockQueueEntryNoStatuses} />);
+      expect(screen.getByText(/no status configured/i)).toBeInTheDocument();
+    });
+
+    it('shows no-priorities configured notification when no priorities are configured', () => {
+      mockUseQueues.mockReturnValue({ queues: [mockQueueNoPriorities] });
+      renderWithSwr(<QueueEntryActionModal {...defaultProps} queueEntry={mockQueueEntryNoPriorities} />);
+      expect(screen.getByText(/no priorities configured/i)).toBeInTheDocument();
+    });
+
+    it('switching to a queue without current priority falls back to first allowed priority', async () => {
+      mockUseQueues.mockReturnValue({ queues: [mockQueueAltPriorities, ...mockQueues] });
+      const user = userEvent.setup();
+      renderWithSwr(<QueueEntryActionModal {...defaultProps} />);
+
+      const altQueueOption = screen.getByRole('radio', { name: /AltPriority/i });
+      await user.click(altQueueOption);
+
+      expect(screen.getByRole('radio', { name: /Urgent/i })).toBeChecked();
+    });
+  });
+
+  it('passes updated comment to submitAction', async () => {
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
+    const user = userEvent.setup();
+
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+        }}
+      />,
+    );
+
+    const comment = screen.getByPlaceholderText('Enter comment here');
+    await user.clear(comment);
+    await user.type(comment, 'New comment');
+
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    const [, formState] = mockSubmitAction.mock.calls[0];
+    expect(formState.priorityComment).toBe('New comment');
+  });
+});
+
+describe('QueueEntryActionModal - ComboBox behavior with many queues', () => {
+  const defaultProps = {
+    queueEntry: mockQueueEntryAlice,
+    closeModal: vi.fn(),
+    modalParams: {
+      modalTitle: 'Test Modal',
+      modalInstruction: 'Test instruction',
+      submitButtonText: 'Submit',
+      submitSuccessTitle: 'Success',
+      submitSuccessText: 'Operation completed',
+      submitFailureTitle: 'Submission Failed',
+      submitAction: vi.fn().mockResolvedValue({ status: 200 }),
+      disableSubmit: vi.fn().mockReturnValue(false),
+      isEdit: false,
+      showQueuePicker: true,
+      showStatusPicker: false,
+    },
+  };
+
+  beforeEach(() => {
+    mockUseQueues.mockReturnValue({ queues: mockQueuesForComboBox });
+  });
+
+  afterEach(() => {
+    mockUseQueues.mockReturnValue({ queues: mockQueues });
+  });
+
+  it('renders a searchable ComboBox instead of radio buttons when there are more than 8 queues', () => {
+    renderWithSwr(<QueueEntryActionModal {...defaultProps} />);
+
+    // Should render ComboBox for queue selection
+    expect(screen.getByRole('combobox', { name: /service location/i })).toBeInTheDocument();
+    expect(screen.getByText('Service location')).toBeInTheDocument();
+
+    // Should NOT render radio buttons for queue selection (no radiogroup with queue name)
+    expect(screen.queryByRole('radio', { name: /Triage - Main Hospital/i })).not.toBeInTheDocument();
+  });
+
+  it('displays the current queue with "(Current)" suffix in the ComboBox', () => {
+    renderWithSwr(<QueueEntryActionModal {...defaultProps} />);
+
+    const combobox = screen.getByRole('combobox', { name: /service location/i });
+    // mockQueueEntryAlice is in mockQueueSurgery
+    expect(combobox).toHaveValue('Surgery - Surgery (Current)');
+  });
+
+  it('filters queues by name when user types in the search box', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(<QueueEntryActionModal {...defaultProps} />);
+
+    const combobox = screen.getByRole('combobox', { name: /service location/i });
+    await user.clear(combobox);
+    await user.type(combobox, 'Cardio');
+
+    // Should show Cardiology option
+    expect(screen.getByRole('option', { name: 'Cardiology - Heart Center' })).toBeInTheDocument();
+
+    // Should not show unrelated queues
+    expect(screen.queryByRole('option', { name: /Pharmacy/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /Pediatrics/i })).not.toBeInTheDocument();
+  });
+
+  it('filters queues by location name when user types in the search box', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(<QueueEntryActionModal {...defaultProps} />);
+
+    const combobox = screen.getByRole('combobox', { name: /service location/i });
+    await user.clear(combobox);
+    await user.type(combobox, 'Heart Center');
+
+    // Should show queue at Heart Center location
+    expect(screen.getByRole('option', { name: 'Cardiology - Heart Center' })).toBeInTheDocument();
+
+    // Should not show queues at other locations
+    expect(screen.queryByRole('option', { name: /Main Hospital/i })).not.toBeInTheDocument();
+  });
+
+  it('allows user to select a queue from filtered results', async () => {
+    const mockSubmitAction = vi.fn().mockResolvedValue({ status: 200 });
+    const user = userEvent.setup();
+
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+        }}
+      />,
+    );
+
+    const combobox = screen.getByRole('combobox', { name: /service location/i });
+    await user.clear(combobox);
+    await user.type(combobox, 'Pediatrics');
+
+    const option = screen.getByRole('option', { name: 'Pediatrics - Children Wing' });
+    await user.click(option);
+
+    // Verify the selection is reflected in the combobox
+    expect(combobox).toHaveValue('Pediatrics - Children Wing');
+
+    // Submit and verify the selected queue is passed
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
+    await user.click(submitButton);
+
+    expect(mockSubmitAction).toHaveBeenCalled();
+  });
+
+  it('clears submission error when user selects a different queue via ComboBox', async () => {
+    const mockSubmitAction = vi.fn().mockRejectedValueOnce({ message: 'Test error' });
+    const user = userEvent.setup();
+
+    renderWithSwr(
+      <QueueEntryActionModal
+        {...defaultProps}
+        modalParams={{
+          ...defaultProps.modalParams,
+          submitAction: mockSubmitAction,
+        }}
+      />,
+    );
+
+    // Trigger an error
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
+    await user.click(submitButton);
+    expect(await screen.findByText('Test error')).toBeInTheDocument();
+
+    // Select a different queue
+    const combobox = screen.getByRole('combobox', { name: /service location/i });
+    await user.clear(combobox);
+    await user.type(combobox, 'Laboratory');
+    const option = screen.getByRole('option', { name: 'Laboratory - Main Hospital' });
+    await user.click(option);
+
+    // Error should be cleared
+    expect(screen.queryByText('Test error')).not.toBeInTheDocument();
+  });
+
+  it('performs case-insensitive search', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(<QueueEntryActionModal {...defaultProps} />);
+
+    const combobox = screen.getByRole('combobox', { name: /service location/i });
+    await user.clear(combobox);
+    await user.type(combobox, 'RADIOLOGY');
+
+    expect(screen.getByRole('option', { name: 'Radiology - Imaging Center' })).toBeInTheDocument();
+  });
+});
+describe('QueueEntryActionModal - time validation with minute precision', () => {
+  const baseModalParams = {
+    modalTitle: 'Edit Queue Entry',
+    submitButtonText: 'Submit',
+    submitSuccessTitle: 'Success',
+    submitSuccessText: 'Updated',
+    submitFailureTitle: 'Failed',
+    submitAction: vi.fn().mockResolvedValue({ status: 200 }),
+    disableSubmit: vi.fn().mockReturnValue(false),
+    isEdit: true,
+    showQueuePicker: true,
+    showStatusPicker: true,
+  };
+
+  it('should allow time entry matching previous entry minute when seconds are non-zero', async () => {
+    const queueEntryWithSeconds: typeof mockQueueEntryAlice = {
+      ...mockQueueEntryAlice,
+      startedAt: '2024-01-02T05:32:00.000+0000',
+      previousQueueEntry: {
+        ...mockPreviousQueueEntryAlice,
+        startedAt: '2024-01-02T05:31:59.000+0000',
+      },
+    };
+
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={vi.fn()} modalParams={baseModalParams} />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+
+    const timeInput = screen.getByRole('textbox', { name: 'Time' });
+    await user.clear(timeInput);
+
+    const prevDate = new Date('2024-01-02T05:31:59.000+0000');
+    const hours = prevDate.getHours() % 12 || 12;
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = prevDate.getMinutes().toString().padStart(2, '0');
+
+    await user.type(timeInput, `${formattedHours}:${formattedMinutes}`);
+
+    expect(screen.queryByText(/cannot be before start of previous queue entry/i)).not.toBeInTheDocument();
+  });
+
+  it('should show error when time is strictly before the truncated previous entry minute', async () => {
+    const queueEntryWithSeconds: typeof mockQueueEntryAlice = {
+      ...mockQueueEntryAlice,
+      startedAt: '2024-01-02T05:32:00.000+0000',
+      previousQueueEntry: {
+        ...mockPreviousQueueEntryAlice,
+        startedAt: '2024-01-02T05:31:59.000+0000',
+      },
+    };
+
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal queueEntry={queueEntryWithSeconds} closeModal={vi.fn()} modalParams={baseModalParams} />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+
+    const timeInput = screen.getByRole('textbox', { name: 'Time' });
+    await user.clear(timeInput);
+
+    const beforeDate = new Date('2024-01-02T05:30:00.000+0000');
+    const hours = beforeDate.getHours() % 12 || 12;
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = beforeDate.getMinutes().toString().padStart(2, '0');
+
+    await user.type(timeInput, `${formattedHours}:${formattedMinutes}`);
+
+    expect(await screen.findByText(/cannot be before start of previous queue entry/i)).toBeInTheDocument();
+  });
+
+  it('should skip previous entry validation when previousQueueEntry is null', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(
+      <QueueEntryActionModal queueEntry={mockQueueEntryBrian} closeModal={vi.fn()} modalParams={baseModalParams} />,
+    );
+
+    const nowCheckbox = screen.getByRole('checkbox', { name: 'Now' });
+    await user.click(nowCheckbox);
+
+    const timeInput = screen.getByRole('textbox', { name: 'Time' });
+    await user.clear(timeInput);
+    await user.type(timeInput, '12:00');
+
+    expect(screen.queryByText(/cannot be before start of previous queue entry/i)).not.toBeInTheDocument();
   });
 });

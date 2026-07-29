@@ -1,8 +1,9 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
 
 // Prevent single-spa from emitting warnings / touching navigation during unit tests.
-jest.mock('single-spa', () => ({
-  navigateToUrl: jest.fn(),
+vi.mock('single-spa', () => ({
+  navigateToUrl: vi.fn(),
 }));
 
 declare global {
@@ -15,9 +16,9 @@ declare global {
 window.openmrsBase = '/openmrs';
 window.spaBase = '/spa';
 window.getOpenmrsSpaBase = () => '/openmrs/spa/';
-window.HTMLElement.prototype.scrollIntoView = jest.fn();
-window.HTMLFormElement.prototype.requestSubmit = jest.fn();
-window.matchMedia = jest.fn().mockImplementation(() => {
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+window.HTMLFormElement.prototype.requestSubmit = vi.fn();
+window.matchMedia = vi.fn().mockImplementation(() => {
   return {
     matches: false,
     addEventListener: () => {},
@@ -26,8 +27,8 @@ window.matchMedia = jest.fn().mockImplementation(() => {
 });
 
 // Mock ResizeObserver for Carbon components
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+global.ResizeObserver = class ResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+};

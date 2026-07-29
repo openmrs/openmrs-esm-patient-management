@@ -1,18 +1,19 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, isDesktop, useConfig } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchLaunch from './patient-search-icon.component';
 
-const mockIsDesktop = jest.mocked(isDesktop);
-const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
+const mockIsDesktop = vi.mocked(isDesktop);
+const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useSearchParams: jest.fn(() => [
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as object),
+  useSearchParams: vi.fn(() => [
     {
-      get: jest.fn(() => 'John'),
+      get: vi.fn(() => 'John'),
     },
   ]),
 }));

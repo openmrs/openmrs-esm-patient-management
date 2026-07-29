@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Button, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
+import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import styles from './empty-state.scss';
 
 export interface EmptyStateProps {
@@ -17,7 +17,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ listType, launchForm }) => {
     <Layer>
       <Tile className={styles.tile}>
         <div className={styles.illo}>
-          <EmptyDataIllustration />
+          <EmptyCardIllustration />
         </div>
         <p className={styles.content}>
           {t('emptyStateText', 'There are no {{listType}} patient lists to display', {

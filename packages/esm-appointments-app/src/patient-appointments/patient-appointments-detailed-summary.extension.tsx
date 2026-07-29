@@ -92,15 +92,15 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                 setContentSwitcherValue(index);
                 setSwitchedView(true);
               }}>
-              <Switch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
-              <Switch name={'today'} text={t('today', 'Today')} />
-              <Switch name={'past'} text={t('past', 'Past')} />
+              <Switch name={'upcoming'}>{t('upcoming', 'Upcoming')}</Switch>
+              <Switch name={'today'}>{t('today', 'Today')}</Switch>
+              <Switch name={'past'}>{t('past', 'Past')}</Switch>
             </ContentSwitcher>
             <div className={styles.divider}>|</div>
             <Button
               kind="ghost"
               renderIcon={(props) => <AddIcon size={16} {...props} />}
-              iconDescription="Add Appointments"
+              iconDescription={t('addAppointments', 'Add Appointments')}
               onClick={() => handleLaunchAppointmentForm(patientUuid)}>
               {t('add', 'Add')}
             </Button>
@@ -115,6 +115,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
                   patientUuid={patientUuid}
+                  launchAppointmentForm={handleLaunchAppointmentForm}
                 />
               );
             }
@@ -141,6 +142,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
                   patientUuid={patientUuid}
+                  launchAppointmentForm={handleLaunchAppointmentForm}
                 />
               );
             }
@@ -167,6 +169,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
                   patientUuid={patientUuid}
+                  launchAppointmentForm={handleLaunchAppointmentForm}
                 />
               );
             }

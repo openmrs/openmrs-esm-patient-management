@@ -26,7 +26,6 @@
   "editNameDescription": "تعديل الاسم/ الوصف",
   "editPatientListHeader": "تعديل قائمة المرضى",
   "emptyList": "This list has no patients",
-  "emptyStateIllustration": "Empty state illustration",
   "emptyStateText": "لا توجد قوائم مرضى من نوع {{listType}} لعرضها",
   "error": "خطأ",
   "errorAddingPatientToList": "Failed to add patient to list",

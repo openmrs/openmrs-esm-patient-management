@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { useForm } from 'react-hook-form';
 import { render, screen } from '@testing-library/react';
 import { renderWithSwr } from 'tools';
@@ -6,19 +7,19 @@ import { usePersonAttributeType } from './person-attributes.resource';
 import { type AdvancedPatientSearchState, type SearchFieldConfig } from '../../types';
 import { SearchField } from './search-field.component';
 
-jest.mock('./person-attributes.resource', () => ({
-  usePersonAttributeType: jest.fn(),
+vi.mock('./person-attributes.resource', () => ({
+  usePersonAttributeType: vi.fn(),
 }));
 
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
+const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
 
-jest.mock('react-hook-form', () => ({
-  ...jest.requireActual('react-hook-form'),
-  useForm: jest.fn().mockReturnValue({
+vi.mock('react-hook-form', async () => ({
+  ...((await vi.importActual('react-hook-form')) as object),
+  useForm: vi.fn().mockReturnValue({
     control: {
-      register: jest.fn(),
-      unregister: jest.fn(),
-      getFieldState: jest.fn(),
+      register: vi.fn(),
+      unregister: vi.fn(),
+      getFieldState: vi.fn(),
       _names: {
         array: new Set(['test']),
         mount: new Set(['test']),
@@ -28,26 +29,26 @@ jest.mock('react-hook-form', () => ({
         watchAll: false,
       },
       _subjects: {
-        watch: jest.fn(),
-        array: jest.fn(),
-        state: jest.fn(),
+        watch: vi.fn(),
+        array: vi.fn(),
+        state: vi.fn(),
       },
-      _getWatch: jest.fn(),
+      _getWatch: vi.fn(),
       _formValues: {},
       _defaultValues: {},
     },
-    getValues: jest.fn(),
-    setValue: jest.fn(),
+    getValues: vi.fn(),
+    setValue: vi.fn(),
     formState: { errors: {} },
   }),
   Controller: ({ render, name, control }) =>
     render({
       field: {
-        onChange: jest.fn(),
-        onBlur: jest.fn(),
+        onChange: vi.fn(),
+        onBlur: vi.fn(),
         value: '',
         name,
-        ref: jest.fn(),
+        ref: vi.fn(),
       },
       formState: { errors: {} },
       fieldState: { error: undefined },

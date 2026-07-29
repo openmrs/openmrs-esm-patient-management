@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
@@ -17,10 +18,10 @@ import AppointmentsDetailedSummary from './patient-appointments-detailed-summary
 const testProps = {
   basePath: patientChartBasePath,
   patientUuid: mockPatient.id,
-  launchAppointmentForm: jest.fn(),
+  launchAppointmentForm: vi.fn(),
 };
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 describe('AppointmentsDetailedSummary', () => {
   it('renders an empty state if appointments data is unavailable', async () => {

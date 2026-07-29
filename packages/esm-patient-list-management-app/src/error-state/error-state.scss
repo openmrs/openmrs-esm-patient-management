@@ -16,14 +16,14 @@
 }
 
 .desktopHeading {
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     color: colors.$gray-70;
   }
 }
 
 .tabletHeading {
-  h4 {
+  h2 {
     @include type.type-style('heading-03');
     color: colors.$gray-70;
   }
@@ -35,7 +35,7 @@
   text-transform: capitalize;
   margin-bottom: layout.$spacing-05;
 
-  h4:after {
+  h2:after {
     content: '';
     display: block;
     width: layout.$spacing-07;

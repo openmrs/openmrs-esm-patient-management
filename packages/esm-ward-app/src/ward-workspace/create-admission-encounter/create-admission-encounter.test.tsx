@@ -1,6 +1,8 @@
-import { useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
+import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ExtensionSlot, useAppContext, useVisit, useWorkspace2Context } from '@openmrs/esm-framework';
 import {
   mockInpatientAdmissions,
   mockInpatientRequests,
@@ -8,7 +10,6 @@ import {
   mockLocationMosoriot,
   mockPatientAlice,
 } from '__mocks__';
-import React from 'react';
 import { renderWithSwr } from '../../../../../tools';
 import { mockWardViewContext } from '../../../mock';
 import { useAssignedBedByPatient } from '../../hooks/useAssignedBedByPatient';
@@ -21,11 +22,13 @@ import { type WardViewContext } from '../../types';
 import { useAdmitPatient } from '../../ward.resource';
 import CreateAdmissionEncounterWorkspace from './create-admission-encounter.workspace';
 
-jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
-const mockUseWorkspace2Context = jest.mocked(useWorkspace2Context);
+vi.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+const mockUseWorkspace2Context = vi.mocked(useWorkspace2Context);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 mockUseWorkspace2Context.mockReturnValue({
-  closeWorkspace: jest.fn(),
-  launchChildWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
+  launchChildWorkspace: vi.fn(),
+  showActionMenu: false,
   workspaceProps: undefined,
   windowProps: undefined,
   groupProps: undefined,
@@ -34,23 +37,27 @@ mockUseWorkspace2Context.mockReturnValue({
   isRootWorkspace: false,
 });
 
-const mockUseVisit = jest.mocked(useVisit).mockReturnValue({
+const mockUseVisit = vi.mocked(useVisit).mockReturnValue({
   activeVisit: {
     encounters: [],
     startDatetime: new Date().toISOString(),
     uuid: 'mock-visit',
     visitType: { display: 'Some Visit Type', uuid: 'some-visit-type-uuid' },
+    stopDatetime: null,
   },
   currentVisit: null,
   currentVisitIsRetrospective: null,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   error: undefined,
   isLoading: false,
   isValidating: false,
 });
+mockExtensionSlot.mockImplementation(({ name }) =>
+  name === 'start-visit-button-slot2' ? <button>Start visit</button> : null,
+);
 
-jest.mock('../../hooks/useWardLocation', () => jest.fn());
-const mockedUseWardLocation = jest.mocked(useWardLocation);
+vi.mock('../../hooks/useWardLocation', () => ({ default: vi.fn() }));
+const mockedUseWardLocation = vi.mocked(useWardLocation);
 mockedUseWardLocation.mockReturnValue({
   location: mockLocationInpatientWard,
   isLoadingLocation: false,
@@ -58,20 +65,21 @@ mockedUseWardLocation.mockReturnValue({
   invalidLocation: false,
 });
 
-jest.mock('../../hooks/useRestPatient', () => jest.fn());
-const mockUseRestPatient = jest.mocked(useRestPatient).mockReturnValue({
+vi.mock('../../hooks/useRestPatient', () => ({ default: vi.fn() }));
+const mockUseRestPatient = vi.mocked(useRestPatient).mockReturnValue({
   patient: mockPatientAlice,
   isLoading: false,
   error: null,
   isValidating: false,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
 });
 
-jest.mock('../../hooks/useAssignedBedByPatient', () => ({
-  useAssignedBedByPatient: jest.fn(),
+vi.mock('../../hooks/useAssignedBedByPatient', () => ({
+  useAssignedBedByPatient: vi.fn(),
 }));
+
 // @ts-ignore - we don't need to mock the entire object
-jest.mocked(useAssignedBedByPatient).mockReturnValue({
+vi.mocked(useAssignedBedByPatient).mockReturnValue({
   data: {
     data: {
       results: [
@@ -88,38 +96,38 @@ jest.mocked(useAssignedBedByPatient).mockReturnValue({
   isLoading: false,
 });
 
-jest.mock('../../hooks/useInpatientAdmissionByPatients', () => ({
-  useInpatientAdmissionByPatients: jest.fn(),
+vi.mock('../../hooks/useInpatientAdmissionByPatients', () => ({
+  useInpatientAdmissionByPatients: vi.fn(),
 }));
-const mockedUseInpatientAdmissionByPatients = jest.mocked(useInpatientAdmissionByPatients).mockReturnValue({
+const mockedUseInpatientAdmissionByPatients = vi.mocked(useInpatientAdmissionByPatients).mockReturnValue({
   data: [],
   hasMore: false,
-  loadMore: jest.fn(),
+  loadMore: vi.fn(),
   isValidating: false,
   isLoading: false,
   error: undefined,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   totalCount: mockInpatientAdmissions.length,
   nextUri: null,
 });
 
-jest.mock('../../hooks/useInpatientRequestByPatients', () => ({
-  useInpatientRequestByPatients: jest.fn(),
+vi.mock('../../hooks/useInpatientRequestByPatients', () => ({
+  useInpatientRequestByPatients: vi.fn(),
 }));
-const mockedUseInpatientRequestByPatients = jest.mocked(useInpatientRequestByPatients).mockReturnValue({
+const mockedUseInpatientRequestByPatients = vi.mocked(useInpatientRequestByPatients).mockReturnValue({
   inpatientRequests: [],
   hasMore: false,
-  loadMore: jest.fn(),
+  loadMore: vi.fn(),
   isValidating: false,
   isLoading: false,
   error: undefined,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   totalCount: mockInpatientAdmissions.length,
   nextUri: null,
 });
 
-jest.mock('../../hooks/useEmrConfiguration', () => jest.fn());
-jest.mocked(useEmrConfiguration).mockReturnValue({
+vi.mock('../../hooks/useEmrConfiguration', () => ({ default: vi.fn() }));
+vi.mocked(useEmrConfiguration).mockReturnValue({
   isLoadingEmrConfiguration: false,
   errorFetchingEmrConfiguration: null,
   // @ts-ignore - we only need these keys for now
@@ -136,20 +144,20 @@ jest.mocked(useEmrConfiguration).mockReturnValue({
       uuid: 'clinician-encounter-role-uuid',
     },
   },
-  mutateEmrConfiguration: jest.fn(),
+  mutateEmrConfiguration: vi.fn(),
 });
 
-jest.mock('../../ward.resource', () => ({
-  useAdmitPatient: jest.fn(),
-  assignPatientToBed: jest.fn(),
-  removePatientFromBed: jest.fn(),
+vi.mock('../../ward.resource', () => ({
+  useAdmitPatient: vi.fn(),
+  assignPatientToBed: vi.fn(),
+  removePatientFromBed: vi.fn(),
 }));
 const mockedUseAdmitPatient: ReturnType<typeof useAdmitPatient> = {
-  admitPatient: jest.fn(),
+  admitPatient: vi.fn(),
   isLoadingEmrConfiguration: false,
   errorFetchingEmrConfiguration: false,
 };
-jest.mocked(useAdmitPatient).mockReturnValue(mockedUseAdmitPatient);
+vi.mocked(useAdmitPatient).mockReturnValue(mockedUseAdmitPatient);
 const mockedAdmitPatient = mockedUseAdmitPatient.admitPatient;
 // @ts-ignore - we only need these two keys for now
 mockedAdmitPatient.mockResolvedValue({
@@ -170,15 +178,22 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     await user.click(admitPatientButton);
     expect(mockedAdmitPatient).toHaveBeenCalledWith(expect.any(Object), 'ADMIT', 'mock-visit');
   });
+  it('should show active visit details and footer actions', () => {
+    renderCreateAdmissionEncounterWorkspace(mockPatientAlice.uuid);
+    expect(screen.getByText('Active visit')).toBeInTheDocument();
+    expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to search results/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /admit patient/i })).toBeInTheDocument();
+  });
   it('should have warning when patient has a pending admission request', async () => {
     mockedUseInpatientRequestByPatients.mockReturnValueOnce({
       inpatientRequests: mockInpatientRequests,
       hasMore: false,
-      loadMore: jest.fn(),
+      loadMore: vi.fn(),
       isValidating: false,
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       totalCount: mockInpatientAdmissions.length,
       nextUri: null,
     });
@@ -201,11 +216,11 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     mockedUseInpatientAdmissionByPatients.mockReturnValueOnce({
       data: [{ ...mockInpatientAdmissions[0], currentInpatientLocation: mockLocationMosoriot }],
       hasMore: false,
-      loadMore: jest.fn(),
+      loadMore: vi.fn(),
       isValidating: false,
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       totalCount: mockInpatientAdmissions.length,
       nextUri: null,
     });
@@ -224,11 +239,11 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     mockedUseInpatientAdmissionByPatients.mockReturnValueOnce({
       data: mockInpatientAdmissions,
       hasMore: false,
-      loadMore: jest.fn(),
+      loadMore: vi.fn(),
       isValidating: false,
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       totalCount: mockInpatientAdmissions.length,
       nextUri: null,
     });
@@ -237,13 +252,45 @@ describe('CreateAdmissionEncounterWorkspace', () => {
     expect(screen.getByText('Patient already admitted to current location')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /admit patient/i })).toBeDisabled();
   });
+
+  it('should prompt users to start a visit before admitting a patient with no active visit', () => {
+    mockUseVisit.mockReturnValueOnce({
+      activeVisit: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: null,
+      mutate: vi.fn(),
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+    });
+
+    renderCreateAdmissionEncounterWorkspace(mockPatientAlice.uuid);
+
+    expect(screen.getByText('A visit is required to admit this patient to the ward')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start visit/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to search results/i })).toBeInTheDocument();
+
+    const startVisitSlotProps = mockExtensionSlot.mock.calls.find(
+      ([props]) => props.name === 'start-visit-button-slot2',
+    )?.[0];
+    expect(startVisitSlotProps?.state).toEqual(
+      expect.objectContaining({
+        patientUuid: mockPatientAlice.uuid,
+        patient: mockPatientAlice,
+        startVisitWorkspaceName: '',
+      }),
+    );
+  });
 });
 
 function renderCreateAdmissionEncounterWorkspace(patentUuid: string) {
   renderWithSwr(
     <CreateAdmissionEncounterWorkspace
-      closeWorkspace={jest.fn()}
-      launchChildWorkspace={jest.fn()}
+      windowName={''}
+      isRootWorkspace={false}
+      showActionMenu={false}
+      closeWorkspace={vi.fn()}
+      launchChildWorkspace={vi.fn()}
       workspaceProps={{
         selectedPatientUuid: patentUuid,
       }}

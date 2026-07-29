@@ -52,6 +52,10 @@
   }
 }
 
+.noVisitContainer {
+  margin: layout.$spacing-05;
+}
+
 .toggleContactDetailsButton {
   > svg {
     fill: $color-blue-60-2 !important;

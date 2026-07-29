@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { type TFunction } from 'i18next';
 import { Controller, useForm } from 'react-hook-form';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -17,6 +17,7 @@ import {
   SelectItem,
   Stack,
   TextInput,
+  TextArea,
 } from '@carbon/react';
 import {
   getCoreTranslation,
@@ -26,12 +27,12 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { saveQueueRoom } from './queue-room.resource';
+import { saveQueueRoom, updateQueueRoom } from './queue-room.resource';
 import { useQueueLocations } from '../../create-queue-entry/hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
 import styles from './queue-room-form.scss';
 
-const createQueueRoomSchema = (t: TFunction) =>
+const createQueueRoomSchema = (t: TFunction, isEditMode: boolean) =>
   z.object({
     queueRoomName: z
       .string({
@@ -41,67 +42,96 @@ const createQueueRoomSchema = (t: TFunction) =>
       .min(1, t('queueRoomNameIsRequired', 'Queue room name is required')),
     queueRoomService: z
       .string({
-        required_error: t('queueRoomServiceIsRequired', 'Queue room service is required'),
+        required_error: t('queueRequired', 'Queue is required'),
       })
       .trim()
-      .min(1, t('queueRoomServiceIsRequired', 'Queue room service is required')),
-    queueLocation: z
-      .string({
-        required_error: t('queueLocationRequired', 'Queue location is required'),
-      })
-      .trim()
-      .min(1, t('queueLocationRequired', 'Queue location is required')),
+      .min(1, t('queueRequired', 'Queue is required')),
+    queueLocation: isEditMode
+      ? z.string().optional()
+      : z
+          .string({
+            required_error: t('queueLocationRequired', 'Queue location is required'),
+          })
+          .trim()
+          .min(1, t('queueLocationRequired', 'Queue location is required')),
+    description: z.string().optional(),
   });
 
 type QueueRoomFormData = z.infer<ReturnType<typeof createQueueRoomSchema>>;
 
-const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) => {
+interface QueueRoomWorkspaceProps {
+  queueRoom?: {
+    uuid: string;
+    name: string;
+    description?: string;
+    queue: { uuid: string; display: string };
+  };
+}
+
+const QueueRoomForm: React.FC<Workspace2DefinitionProps<QueueRoomWorkspaceProps>> = ({
+  closeWorkspace,
+  workspaceProps,
+}) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const isTablet = useLayoutType() === 'tablet';
+  const queueRoomToEdit = workspaceProps?.queueRoom;
+  const isEditMode = !!queueRoomToEdit;
+
   const {
     control,
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<QueueRoomFormData>({
-    resolver: zodResolver(createQueueRoomSchema(t)),
+    resolver: zodResolver(createQueueRoomSchema(t, isEditMode)),
     defaultValues: {
-      queueRoomName: '',
-      queueRoomService: '',
+      queueRoomName: queueRoomToEdit?.name || '',
+      queueRoomService: queueRoomToEdit?.queue?.uuid || '',
       queueLocation: '',
+      description: queueRoomToEdit?.description || '',
     },
   });
 
   const watchedQueueLocationId = watch('queueLocation');
-  const { queues } = useQueues(watchedQueueLocationId);
+  const { queues } = useQueues(isEditMode ? undefined : watchedQueueLocationId);
   const { queueLocations } = useQueueLocations();
 
-  const onSubmit = async (data: QueueRoomFormData) => {
+  const handleSaveQueueRoom = async (data: QueueRoomFormData) => {
     try {
-      // FIXME: We should collect a queue room description and pass it as the second argument
-      await saveQueueRoom(data.queueRoomName, '', data.queueRoomService);
+      if (isEditMode) {
+        await updateQueueRoom(queueRoomToEdit.uuid, data.queueRoomName, data.description, data.queueRoomService);
+        showSnackbar({
+          title: t('queueRoomUpdated', 'Queue room updated'),
+          kind: 'success',
+          subtitle: `${data.queueRoomName}`,
+        });
+      } else {
+        await saveQueueRoom(data.queueRoomName, data.description, data.queueRoomService);
+        showSnackbar({
+          title: t('queueRoomCreated', 'Queue room created'),
+          kind: 'success',
+          subtitle: `${data.queueRoomName}`,
+        });
+      }
 
-      showSnackbar({
-        title: t('queueRoomAdded', 'Queue room added'),
-        kind: 'success',
-        subtitle: t('queueRoomCreatedSuccessfully', 'Queue room created successfully'),
-      });
-
-      await mutate(`${restBaseUrl}/queueroom`);
+      await mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-room?`));
       closeWorkspace();
     } catch (error) {
       showSnackbar({
-        title: t('errorCreatingQueueRoom', 'Error creating queue room'),
+        title: isEditMode
+          ? t('errorUpdatingQueueRoom', 'Error updating queue room')
+          : t('errorCreatingQueueRoom', 'Error creating queue room'),
         kind: 'error',
         isLowContrast: false,
-        subtitle: error?.message,
+        subtitle: error?.responseBody?.message || error?.message,
       });
     }
   };
 
   return (
-    <Workspace2 title={t('addNewQueueServiceRoom', 'Add new queue service room')}>
-      <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <Workspace2 title={isEditMode ? t('editQueueRoom', 'Edit queue room') : t('addNewQueueRoom', 'Add new queue room')}>
+      <Form onSubmit={handleSubmit(handleSaveQueueRoom)} className={styles.form}>
         <Stack gap={4} className={styles.grid}>
           <Column>
             <Layer className={styles.input}>
@@ -158,16 +188,34 @@ const QueueRoomForm: React.FC<Workspace2DefinitionProps> = ({ closeWorkspace }) 
                     id="queueRoomService"
                     invalid={!!errors.queueRoomService}
                     invalidText={errors.queueRoomService?.message}
-                    labelText={t('queueRoomService', 'Queue room service')}
+                    labelText={t('queue', 'Queue')}
                     onChange={(e) => onChange(e.target.value)}
                     value={value || ''}>
-                    <SelectItem text={t('selectQueueRoomService', 'Select a queue room service')} value="" />
+                    <SelectItem text={t('selectQueue', 'Select a queue')} value="" />
                     {queues?.map((service) => (
                       <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
                         {service.display}
                       </SelectItem>
                     ))}
                   </Select>
+                )}
+              />
+            </Layer>
+          </Column>
+
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <TextArea
+                    {...field}
+                    id="description"
+                    labelText={t('description', 'Description')}
+                    invalid={!!errors.description}
+                    invalidText={errors.description?.message}
+                  />
                 )}
               />
             </Layer>

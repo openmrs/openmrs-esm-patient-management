@@ -1,14 +1,15 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockAppointmentsData } from '__mocks__';
 import AppointmentTabs from './appointment-tabs.component';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 describe('AppointmentTabs', () => {
-  xit(`renders tabs showing different appointment lists`, async () => {
+  it.skip(`renders tabs showing different appointment lists`, async () => {
     mockOpenmrsFetch.mockResolvedValue({ ...mockAppointmentsData } as unknown as FetchResponse);
 
     renderWithSwr(<AppointmentTabs appointmentServiceTypes={['service-type-uuid']} />);

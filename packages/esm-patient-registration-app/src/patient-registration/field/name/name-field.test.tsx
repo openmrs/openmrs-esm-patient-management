@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -9,7 +10,7 @@ import { initialFormValues } from '../../patient-registration.component';
 import { NameField, unidentifiedPatientAttributeTypeUuid } from './name-field.component';
 import { type FormValues } from '../../patient-registration.types';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
  * Helper to render NameField with Formik render props for state-dependent tests.
@@ -44,7 +45,7 @@ const renderNameFieldWithFormik = (
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
+                setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
                 isOffline: false,

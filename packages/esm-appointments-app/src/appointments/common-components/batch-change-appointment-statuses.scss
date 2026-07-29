@@ -1,0 +1,16 @@
+@use '@carbon/layout';
+
+.modalBody {
+  overflow: visible; // make the dropdown pop-up not clip
+
+  .appointmentsList {
+    list-style-type: disc;
+    margin-inline-start: layout.$spacing-05;
+  }
+
+  .statusDropdown {
+    button {
+      background-color: #fff;
+    }
+  }
+}

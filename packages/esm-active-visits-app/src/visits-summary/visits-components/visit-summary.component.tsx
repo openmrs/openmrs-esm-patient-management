@@ -55,14 +55,17 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             });
           } else if (obs.concept.display === 'Text of encounter note') {
             // Putting all notes in a single array.
-            notes.push({
-              note: obs.value,
-              provider: {
-                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-              },
-              time: formatTime(parseDate(obs.obsDatetime)),
-            });
+            if (obs.value != null) {
+              const noteText = typeof obs.value === 'object' ? obs.value.display : String(obs.value);
+              notes.push({
+                note: noteText,
+                provider: {
+                  name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+                  role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+                },
+                time: formatTime(parseDate(obs.obsDatetime)),
+              });
+            }
           }
         });
       }

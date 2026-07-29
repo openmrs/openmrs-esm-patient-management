@@ -7,18 +7,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { assignPatientToBed, removePatientFromBed, useCreateEncounter } from '../../ward.resource';
-import type { WardViewContext } from '../../types';
+import { type PatientAdmitOrTransferFormProps } from './patient-admit-or-transfer-request-form.component';
+import { type WardViewContext } from '../../types';
 import BedSelector from '../bed-selector.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import styles from './patient-transfer-swap.scss';
-import { type PatientAdmitOrTransferFormProps } from './patient-admit-or-transfer-request-form.component';
 
 export default function PatientBedSwapForm({
   wardPatient,
   relatedTransferPatients = [],
   onCancel,
-  onSuccess
+  onSuccess,
 }: PatientAdmitOrTransferFormProps) {
   const { patient } = wardPatient;
   const { t } = useTranslation();
@@ -76,7 +76,7 @@ export default function PatientBedSwapForm({
             } else {
               // get the bed that the patient is currently assigned to
               const bedAssignedToPatient = beds.find((bed) =>
-                bed.patients.some((bedPatient) => bedPatient.uuid == patientToSwap.uuid),
+                bed.patients.some((bedPatient) => bedPatient.uuid === patientToSwap.uuid),
               );
               if (bedAssignedToPatient) {
                 return removePatientFromBed(bedAssignedToPatient.bedId, patientToSwap.uuid);

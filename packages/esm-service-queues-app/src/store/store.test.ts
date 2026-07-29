@@ -1,4 +1,5 @@
 import { updateValueInSessionStorage } from './store';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 describe('Testing updateValueInSessionStorage', () => {
   beforeEach(() => {

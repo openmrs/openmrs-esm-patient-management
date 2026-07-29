@@ -15,19 +15,19 @@ jobs:
 
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🛠️ Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'yarn'
 
       - name: 📦 Install dependencies
         run: yarn install --immutable
 
       - name: 🚀 Setup Turborepo cache server
-        uses: felixmosh/turborepo-gh-artifacts@v3
+        uses: felixmosh/turborepo-gh-artifacts@v4
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}

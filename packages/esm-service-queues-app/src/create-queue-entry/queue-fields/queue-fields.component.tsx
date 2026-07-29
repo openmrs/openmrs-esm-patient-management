@@ -31,9 +31,15 @@ export interface QueueFieldsProps {
 
 const createQueueServiceSchema = (t: TFunction) =>
   z.object({
-    queueLocation: z.string().trim(),
-    queueService: z.string().trim(),
-    priority: z.string().trim(),
+    queueLocation: z.string().refine((value) => value !== '', {
+      message: t('locationRequired', 'Location is required'),
+    }),
+    queueService: z.string().refine((value) => value !== '', {
+      message: t('serviceRequired', 'Service is required'),
+    }),
+    priority: z.string().refine((value) => value !== '', {
+      message: t('priorityRequired', 'Priority is required'),
+    }),
   });
 
 /**
@@ -58,7 +64,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
 
   const {
     control,
-    formState: { errors, touchedFields, isSubmitted },
+    formState: { errors },
     setValue,
     trigger,
     watch,
@@ -66,11 +72,11 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
     clearErrors,
   } = useForm({
     defaultValues: {
+      queueLocation: sessionLocation?.uuid ?? '',
+      queueService: selectedServiceUuid ?? '',
       priority: '',
-      queueLocation: '',
-      queueService: '',
     },
-    mode: 'onChange',
+    mode: 'all',
     resolver: zodResolver(schema),
   });
 
@@ -90,157 +96,59 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
   const isDataLoaded = !isLoadingQueueLocations && !isLoadingQueues;
 
-  const hasCompleteQueueEntry = queueLocation && queueService && priority;
-
   const onSubmit = useCallback(
     async (visit: Visit) => {
-      try {
-        if (!hasCompleteQueueEntry) {
-          if (!queueLocation) {
-            return Promise.resolve();
-          }
+      const isFormValid = await trigger();
+      if (!isFormValid) throw new Error('Form validation failed');
+      const formValues = getValues();
 
-          const isFormValid = await trigger(['queueLocation', 'queueService', 'priority']);
-          if (!isFormValid) {
-            const errorMessages = Object.entries(errors)
-              .map(([field, error]) => `${field}: ${error?.message ?? 'Invalid'}`)
-              .join('\n');
+      return postQueueEntry(
+        visit.uuid,
+        formValues.queueService,
+        visit.patient.uuid,
+        formValues.priority,
+        defaultStatusConceptUuid,
+        sortWeight,
+        formValues.queueLocation,
+        visitQueueNumberAttributeUuid,
+      )
+        .then(() => {
+          showSnackbar({
+            kind: 'success',
+            isLowContrast: true,
+            title: t('addedPatientToQueue', 'Added patient to queue'),
+            subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
+          });
+          mutateQueueEntries();
+        })
+        .catch((error) => {
+          const errorMessage = error?.responseBody?.error?.message || error?.message || '';
+          const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
+
+          if (isDuplicatePatientError) {
             showSnackbar({
-              title: t('formValidationFailed', 'Form validation failed'),
+              title: t('patientAlreadyInQueue', 'Patient already in queue'),
+              kind: 'warning',
+              isLowContrast: false,
+              subtitle: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
+            });
+          } else {
+            showSnackbar({
+              title: t('queueEntryError', 'Error adding patient to the queue'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: errorMessages,
+              subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
             });
-            throw new Error(`Form validation failed:\n${errorMessages}`);
           }
-        }
-
-        const formValues = getValues();
-
-        if (queueLocation && (!formValues.queueService || !formValues.priority)) {
-          const missingFields = [];
-          if (!formValues.queueService) {
-            missingFields.push(t('service', 'Service'));
-          }
-          if (!formValues.priority) {
-            missingFields.push(t('priority', 'Priority'));
-          }
-
-          const errorMessage = t('missingRequiredFields', 'Missing required fields: {{fields}}', {
-            fields: missingFields.join(', '),
-          });
-          showSnackbar({
-            title: t('incompleteForm', 'Incomplete form'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: errorMessage,
-          });
-          throw new Error(errorMessage);
-        }
-
-        if (formValues.queueLocation && formValues.queueService && formValues.priority) {
-          return postQueueEntry(
-            visit.uuid,
-            formValues.queueService,
-            visit.patient.uuid,
-            formValues.priority,
-            defaultStatusConceptUuid,
-            sortWeight,
-            formValues.queueLocation,
-            visitQueueNumberAttributeUuid,
-          )
-            .then(() => {
-              showSnackbar({
-                kind: 'success',
-                isLowContrast: true,
-                title: t('addedPatientToQueue', 'Added patient to queue'),
-                subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
-              });
-              mutateQueueEntries();
-            })
-            .catch((error) => {
-              const errorMessage = error?.responseBody?.error?.message || error?.message || '';
-              const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
-
-              if (isDuplicatePatientError) {
-                showSnackbar({
-                  title: t('patientAlreadyInQueue', 'Patient already in queue'),
-                  kind: 'warning',
-                  isLowContrast: false,
-                  subtitle: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
-                });
-              } else {
-                showSnackbar({
-                  title: t('queueEntryError', 'Error adding patient to the queue'),
-                  kind: 'error',
-                  isLowContrast: false,
-                  subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
-                });
-              }
-              throw error;
-            });
-        }
-
-        return Promise.resolve();
-      } catch (error) {
-        showSnackbar({
-          title: t('unexpectedError', 'Unexpected error'),
-          kind: 'error',
-          isLowContrast: false,
-          subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
+          throw error;
         });
-        throw error;
-      }
     },
-    [
-      defaultStatusConceptUuid,
-      mutateQueueEntries,
-      sortWeight,
-      t,
-      trigger,
-      visitQueueNumberAttributeUuid,
-      errors,
-      getValues,
-      hasCompleteQueueEntry,
-      queueLocation,
-    ],
+    [defaultStatusConceptUuid, mutateQueueEntries, sortWeight, t, trigger, visitQueueNumberAttributeUuid, getValues],
   );
 
   useEffect(() => {
     setOnSubmit?.(onSubmit);
   }, [onSubmit, setOnSubmit]);
-
-  useEffect(() => {
-    const currentQueueLocation = getValues('queueLocation');
-
-    if (
-      sessionLocation?.uuid &&
-      !currentQueueLocation &&
-      !touchedFields.queueLocation &&
-      memoizedQueueLocations.length > 0
-    ) {
-      const locationExists = memoizedQueueLocations.some((loc) => loc.id === sessionLocation.uuid);
-      if (locationExists) {
-        setValue('queueLocation', sessionLocation.uuid, { shouldValidate: isDataLoaded });
-      }
-    }
-  }, [sessionLocation, memoizedQueueLocations, getValues, touchedFields.queueLocation, setValue, isDataLoaded]);
-
-  useEffect(() => {
-    const service = getValues('queueService');
-    if (selectedServiceUuid && !service && !touchedFields.queueService) {
-      setValue('queueService', selectedServiceUuid, { shouldValidate: isDataLoaded });
-    }
-  }, [selectedServiceUuid, getValues, touchedFields.queueService, setValue, isDataLoaded]);
-
-  useEffect(() => {
-    if (defaultInitialServiceQueue && memoizedQueues.length > 0 && !queueService && queueLocation) {
-      const initialServiceQueue = memoizedQueues.find((queue) => queue.name === defaultInitialServiceQueue);
-      if (initialServiceQueue && queueService !== initialServiceQueue.uuid) {
-        setValue('queueService', initialServiceQueue.uuid, { shouldValidate: isDataLoaded });
-      }
-    }
-  }, [defaultInitialServiceQueue, memoizedQueues, queueService, setValue, isDataLoaded, queueLocation]);
 
   useEffect(() => {
     if (queueLocation && queueService) {
@@ -297,7 +205,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   {...field}
                   labelText=""
                   id="queueLocation"
-                  invalid={!!errors.queueLocation && (touchedFields.queueLocation || isSubmitted)}
+                  invalid={!!errors.queueLocation}
                   invalidText={errors.queueLocation?.message}
                   onChange={(event) => {
                     field.onChange(event.target.value);
@@ -340,7 +248,7 @@ const QueueFields = React.memo(({ setOnSubmit, defaultInitialServiceQueue }: Que
                   {...field}
                   labelText=""
                   id="queueService"
-                  invalid={!!errors.queueService && (touchedFields.queueService || isSubmitted)}
+                  invalid={!!errors.queueService}
                   invalidText={errors.queueService?.message}
                   onChange={(event) => {
                     field.onChange(event.target.value);

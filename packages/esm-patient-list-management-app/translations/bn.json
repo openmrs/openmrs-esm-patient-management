@@ -26,7 +26,6 @@
   "editNameDescription": "নাম অথবা বর্ণনা পরিবর্তন করুন",
   "editPatientListHeader": "রোগীতালিকা পরিবর্তন",
   "emptyList": "তালিকায় কোনো রোগী নেই",
-  "emptyStateIllustration": "Empty state illustration",
   "emptyStateText": "There are no {{listType}} patient lists to display",
   "error": "ত্রুটি",
   "errorAddingPatientToList": "Failed to add patient to list",

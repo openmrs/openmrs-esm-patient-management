@@ -22,6 +22,7 @@ import {
   AddIcon,
   ArrowLeftIcon,
   ConfigurableLink,
+  EmptyCardIllustration,
   isDesktop,
   launchWorkspace2,
   showSnackbar,
@@ -33,7 +34,6 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
-import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
 import styles from './list-details-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -259,7 +259,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const handleAddPatientToList = useCallback(
     async (patient) => {
-      const alreadyInList = patients.some((p) => patient == p.uuid);
+      const alreadyInList = patients.some((p) => patient === p.uuid);
 
       if (alreadyInList) {
         showSnackbar({
@@ -462,7 +462,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       <Layer>
         <Tile className={styles.tile} data-openmrs-role="Patient Empty tile">
           <div className={styles.illo}>
-            <EmptyDataIllustration />
+            <EmptyCardIllustration />
           </div>
           <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
           <Button
