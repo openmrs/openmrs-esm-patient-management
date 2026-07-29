@@ -34,7 +34,7 @@ interface LocationSelectorProps extends RadioButtonGroupProps {
     {
       note?: string;
       location?: string;
-      transferType?: string;
+      disposition?: string;
     },
     'location'
   >;

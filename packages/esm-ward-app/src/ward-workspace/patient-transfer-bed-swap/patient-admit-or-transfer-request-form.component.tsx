@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
 import { useCreateEncounter } from '../../ward.resource';
-import type { ObsPayload, WardPatient, WardViewContext } from '../../types';
+import type { DispositionType, ObsPayload, WardPatient, WardViewContext } from '../../types';
 import LocationSelector from '../../location-selector/location-selector.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
@@ -33,6 +33,12 @@ export interface PatientAdmitOrTransferFormProps {
    */
   relatedTransferPatients?: WardPatient[];
 
+  /**
+   * The type of request the form creates. 'ADMIT' records the disposition as an admission
+   * request, 'TRANSFER' (the default) records it as a transfer request.
+   */
+  dispositionType?: Extract<DispositionType, 'ADMIT' | 'TRANSFER'>;
+
   onSuccess(): void;
   onCancel(): void;
   preSelectRelatedPatients?: boolean;
@@ -42,11 +48,12 @@ export interface PatientAdmitOrTransferFormProps {
  * Form to fill out for:
  * - an admitted patient without pending transfer request, to initiate a transfer request for a patient
  * - an admitted patient with pending transfer request, to create a request to transfer elsewhere
- * - an un-admitted patient, to create a request to admit
+ * - an un-admitted patient with a pending admission request, to create a request to admit elsewhere
  */
 export default function PatientAdmitOrTransferForm({
   wardPatient,
   relatedTransferPatients = [],
+  dispositionType = 'TRANSFER',
   onSuccess,
   onCancel,
   preSelectRelatedPatients,
@@ -57,9 +64,10 @@ export default function PatientAdmitOrTransferForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
-  const dispositionsWithTypeTransfer = useMemo(
-    () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
-    [emrConfiguration],
+  const isAdmitRequest = dispositionType === 'ADMIT';
+  const dispositionsOfRequestedType = useMemo(
+    () => emrConfiguration?.dispositions.filter(({ type }) => type === dispositionType),
+    [emrConfiguration, dispositionType],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
@@ -71,28 +79,32 @@ export default function PatientAdmitOrTransferForm({
     () =>
       z.object({
         location: z.string({
-          required_error: t('pleaseSelectTransferLocation', 'Please select transfer location'),
+          required_error: isAdmitRequest
+            ? t('pleaseSelectAdmissionLocation', 'Please select admission location')
+            : t('pleaseSelectTransferLocation', 'Please select transfer location'),
         }),
         note: z.string().optional(),
-        transferType:
-          dispositionsWithTypeTransfer?.length > 1
+        disposition:
+          dispositionsOfRequestedType?.length > 1
             ? z.string({
-                required_error: t('pleaseSelectTransferType', 'Please select transfer type'),
+                required_error: isAdmitRequest
+                  ? t('pleaseSelectAdmissionType', 'Please select admission type')
+                  : t('pleaseSelectTransferType', 'Please select transfer type'),
               })
             : z.string().optional(),
       }),
-    [t, dispositionsWithTypeTransfer],
+    [t, dispositionsOfRequestedType, isAdmitRequest],
   );
 
   type FormValues = z.infer<typeof zodSchema>;
 
   const formDefaultValues: Partial<FormValues> = useMemo(() => {
     const defaultValues: FormValues = {};
-    if (dispositionsWithTypeTransfer?.length === 1) {
-      defaultValues.transferType = dispositionsWithTypeTransfer[0].uuid;
+    if (dispositionsOfRequestedType?.length === 1) {
+      defaultValues.disposition = dispositionsOfRequestedType[0].uuid;
     }
     return defaultValues;
-  }, [dispositionsWithTypeTransfer]);
+  }, [dispositionsOfRequestedType]);
 
   const {
     formState: { errors, isDirty },
@@ -102,23 +114,30 @@ export default function PatientAdmitOrTransferForm({
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema), defaultValues: formDefaultValues });
 
   useEffect(() => {
-    if (dispositionsWithTypeTransfer?.length === 1) {
-      setValue('transferType', dispositionsWithTypeTransfer[0].uuid);
+    if (dispositionsOfRequestedType?.length === 1) {
+      setValue('disposition', dispositionsOfRequestedType[0].uuid);
     }
-  }, [dispositionsWithTypeTransfer, setValue]);
+  }, [dispositionsOfRequestedType, setValue]);
 
   const onSubmit = useCallback(
     async (values: FormValues) => {
       setIsSubmitting(true);
       setShowErrorNotifications(false);
+      const { dispositionDescriptor } = emrConfiguration;
+
+      // The backend derives the request type from the disposition obs group: the disposition
+      // concept determines whether it is an admission or a transfer request, and the location is
+      // read from the concept matching that request type.
       const obs: Array<ObsPayload> = [
         {
-          concept: emrConfiguration.dispositionDescriptor.internalTransferLocationConcept.uuid,
+          concept: isAdmitRequest
+            ? dispositionDescriptor.admissionLocationConcept.uuid
+            : dispositionDescriptor.internalTransferLocationConcept.uuid,
           value: values.location,
         },
         {
-          concept: emrConfiguration.dispositionDescriptor.dispositionConcept.uuid,
-          value: dispositionsWithTypeTransfer.find(({ uuid }) => uuid === values.transferType)?.conceptCode,
+          concept: dispositionDescriptor.dispositionConcept.uuid,
+          value: dispositionsOfRequestedType.find(({ uuid }) => uuid === values.disposition)?.conceptCode,
         },
       ];
 
@@ -129,23 +148,23 @@ export default function PatientAdmitOrTransferForm({
         });
       }
 
-      const wardPatientsToTransfer = [
+      const wardPatientsInRequest = [
         wardPatient,
         ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
       ];
 
       try {
         const results = await Promise.allSettled(
-          wardPatientsToTransfer.map(async (wardPatientToTransfer) => {
-            const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToTransfer;
+          wardPatientsInRequest.map(async (wardPatientInRequest) => {
+            const { patient: patientInRequest, visit: patientInRequestVisit } = wardPatientInRequest;
 
             return createEncounter(
-              patientToTransfer,
+              patientInRequest,
               emrConfiguration.transferRequestEncounterType,
-              patientToTransferVisit?.uuid,
+              patientInRequestVisit?.uuid,
               [
                 {
-                  concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+                  concept: dispositionDescriptor.dispositionSetConcept.uuid,
                   groupMembers: obs,
                 },
               ],
@@ -154,19 +173,27 @@ export default function PatientAdmitOrTransferForm({
         );
 
         results.forEach((result, i) => {
-          const patientName = wardPatientsToTransfer[i].patient.person.preferredName.display;
+          const patientName = wardPatientsInRequest[i].patient.person.preferredName.display;
           if (result.status === 'fulfilled') {
             showSnackbar({
-              title: t('patientTransferRequestCreatedForPatient', 'Transfer request created for {{patientName}}', {
-                patientName,
-              }),
+              title: isAdmitRequest
+                ? t('admissionRequestCreatedForPatient', 'Admission request created for {{patientName}}', {
+                    patientName,
+                  })
+                : t('patientTransferRequestCreatedForPatient', 'Transfer request created for {{patientName}}', {
+                    patientName,
+                  }),
               kind: 'success',
             });
           } else {
             showSnackbar({
-              title: t('errorCreatingTransferRequest', 'Error creating transfer request for {{patientName}}', {
-                patientName,
-              }),
+              title: isAdmitRequest
+                ? t('errorCreatingAdmissionRequest', 'Error creating admission request for {{patientName}}', {
+                    patientName,
+                  })
+                : t('errorCreatingTransferRequest', 'Error creating transfer request for {{patientName}}', {
+                    patientName,
+                  }),
               subtitle: (result.reason as Error)?.message,
               kind: 'error',
             });
@@ -184,8 +211,9 @@ export default function PatientAdmitOrTransferForm({
     [
       onSuccess,
       createEncounter,
-      dispositionsWithTypeTransfer,
+      dispositionsOfRequestedType,
       emrConfiguration,
+      isAdmitRequest,
       t,
       wardPatientGroupDetails,
       selectedRelatedPatient,
@@ -242,7 +270,8 @@ export default function PatientAdmitOrTransferForm({
         )}
         {relatedTransferPatients?.length > 0 && (
           <div>
-            <CheckboxGroup legendText={t('alsoTransfer', 'Also transfer:')}>
+            <CheckboxGroup
+              legendText={isAdmitRequest ? t('alsoAdmit', 'Also admit:') : t('alsoTransfer', 'Also transfer:')}>
               {relatedTransferPatients?.map(({ patient: relatedPatient }) => (
                 <Checkbox
                   checked={selectedRelatedPatient.includes(relatedPatient.uuid)}
@@ -283,11 +312,13 @@ export default function PatientAdmitOrTransferForm({
             )}
           />
         </div>
-        {dispositionsWithTypeTransfer?.length > 1 && (
+        {dispositionsOfRequestedType?.length > 1 && (
           <div className={styles.field}>
-            <h2 className={styles.productiveHeading02}>{t('transferType', 'Transfer type')}</h2>
+            <h2 className={styles.productiveHeading02}>
+              {isAdmitRequest ? t('admissionType', 'Admission type') : t('transferType', 'Transfer type')}
+            </h2>
             <Controller
-              name="transferType"
+              name="disposition"
               control={control}
               render={({ field, fieldState: { error } }) => (
                 <ResponsiveWrapper>
@@ -296,8 +327,13 @@ export default function PatientAdmitOrTransferForm({
                     {...field}
                     invalid={!!error?.message}
                     invalidText={error?.message}>
-                    {dispositionsWithTypeTransfer.map((disposition) => (
-                      <RadioButton id={disposition.uuid} labelText={disposition.name} value={disposition.uuid} />
+                    {dispositionsOfRequestedType.map((disposition) => (
+                      <RadioButton
+                        key={disposition.uuid}
+                        id={disposition.uuid}
+                        labelText={disposition.name}
+                        value={disposition.uuid}
+                      />
                     ))}
                   </RadioButtonGroup>
                 </ResponsiveWrapper>

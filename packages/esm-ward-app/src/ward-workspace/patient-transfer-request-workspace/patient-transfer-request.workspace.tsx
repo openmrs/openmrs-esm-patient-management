@@ -28,6 +28,7 @@ const PatientTransferRequestWorkspace: React.FC<Workspace2DefinitionProps<WardPa
         <PatientAdmitOrTransferForm
           wardPatient={wardPatient}
           relatedTransferPatients={relatedTransferPatients}
+          dispositionType={isTransfer ? 'TRANSFER' : 'ADMIT'}
           onSuccess={async () => {
             await closeWorkspace({ discardUnsavedChanges: true });
             closeWorkspaceGroup2();
