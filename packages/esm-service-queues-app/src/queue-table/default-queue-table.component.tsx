@@ -27,7 +27,7 @@ function QueueTableSection() {
   const layout = useLayoutType();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const {
-    concepts: { defaultStatusConceptUuid },
+    concepts: { waitingStatusConceptUuid },
   } = useConfig<ConfigObject>();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -37,9 +37,9 @@ function QueueTableSection() {
       service: selectedServiceUuid,
       location: selectedQueueLocationUuid,
       isEnded: false,
-      status: defaultStatusConceptUuid,
+      status: waitingStatusConceptUuid,
     };
-  }, [selectedServiceUuid, selectedQueueLocationUuid, defaultStatusConceptUuid]);
+  }, [selectedServiceUuid, selectedQueueLocationUuid, waitingStatusConceptUuid]);
 
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 

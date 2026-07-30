@@ -17,7 +17,7 @@ export interface ExpectedAppointment {
 const excludedStatuses = new Set(['cancelled', 'completed', 'missed']);
 
 export function useExpectedAppointments(locationUuid?: string) {
-  const startOfDay = dayjs().startOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+  const startOfDay = dayjs().startOf('day').toISOString();
   const url = `${restBaseUrl}/appointments?forDate=${encodeURIComponent(startOfDay)}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<ExpectedAppointment> }, Error>(url, openmrsFetch, {

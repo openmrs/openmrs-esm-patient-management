@@ -8,7 +8,7 @@ import ClinicMetrics from './metrics/metrics-container.component';
 import AttendingPatients from './attending-patients/attending-patients.component';
 import DefaultQueueTable from './queue-table/default-queue-table.component';
 import ExpectedAppointments from './expected-appointments/expected-appointments.component';
-import { useQueueEntries } from './hooks/useQueueEntries';
+import { useQueueEntriesMetrics } from './hooks/useQueueEntries';
 import { useServiceQueuesStore } from './store/store';
 import { type ConfigObject } from './config-schema';
 import styles from './home.scss';
@@ -17,17 +17,18 @@ const Home: React.FC = () => {
   const { t } = useTranslation();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const {
-    concepts: { defaultStatusConceptUuid },
+    concepts: { waitingStatusConceptUuid },
   } = useConfig<ConfigObject>();
-  const { totalCount } = useQueueEntries({
+  const { count, error, isLoading } = useQueueEntriesMetrics({
     service: selectedServiceUuid,
     location: selectedQueueLocationUuid,
-    status: defaultStatusConceptUuid,
+    status: waitingStatusConceptUuid,
     isEnded: false,
   });
-  const waitingListLabel = isNaN(totalCount)
-    ? t('waitingList', 'Waiting list')
-    : t('waitingListWithCount', 'Waiting list ({{count}})', { count: totalCount });
+  const waitingListLabel =
+    isLoading || error
+      ? t('waitingList', 'Waiting list')
+      : t('waitingListWithCount', 'Waiting list ({{count}})', { count });
 
   return (
     <>

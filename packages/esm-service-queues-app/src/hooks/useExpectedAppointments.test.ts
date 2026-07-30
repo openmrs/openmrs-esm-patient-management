@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { useExpectedAppointments } from './useExpectedAppointments';
 
@@ -42,8 +43,8 @@ describe('useExpectedAppointments', () => {
 
   it("requests today's appointments via the appointment-scheduling endpoint", () => {
     renderHook(() => useExpectedAppointments('loc-1'));
-    const url = mockUseSWR.mock.calls[0][0] as string;
-    expect(url).toContain('/appointments?forDate=');
+    const url = decodeURIComponent(mockUseSWR.mock.calls[0][0] as string);
+    expect(url).toContain(`/appointments?forDate=${dayjs().startOf('day').toISOString()}`);
   });
 
   it('filters to the selected location and sorts by start time', () => {

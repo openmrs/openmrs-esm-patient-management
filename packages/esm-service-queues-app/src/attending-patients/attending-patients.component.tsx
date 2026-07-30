@@ -12,9 +12,9 @@ import {
   PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
+import QueuePriority from '../queue-table/components/queue-priority.component';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
-import QueuePriority from '../queue-table/components/queue-priority.component';
 import { type ConfigObject } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './attending-patients.scss';

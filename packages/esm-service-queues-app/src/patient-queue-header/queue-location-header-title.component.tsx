@@ -8,6 +8,7 @@ import {
   getValueFromSessionStorage,
   updateSelectedQueueLocationName,
   updateSelectedQueueLocationUuid,
+  updateSelectedService,
   updateValueInSessionStorage,
   useServiceQueuesStore,
 } from '../store/store';
@@ -54,6 +55,7 @@ const QueueLocationHeaderTitle: React.FC = () => {
     updateValueInSessionStorage(LOGIN_LOCATION_STORAGE_KEY, sessionLocationUuid);
     updateSelectedQueueLocationUuid(resolvedDefault.uuid);
     updateSelectedQueueLocationName(resolvedDefault.name);
+    updateSelectedService(null, t('all', 'All'));
   }, [
     isLoading,
     isLoadingAncestry,
@@ -62,6 +64,7 @@ const QueueLocationHeaderTitle: React.FC = () => {
     sessionLocationUuid,
     resolvedDefault.uuid,
     resolvedDefault.name,
+    t,
   ]);
 
   const openChangeLocationModal = useCallback(() => {
@@ -77,7 +80,7 @@ const QueueLocationHeaderTitle: React.FC = () => {
   }
 
   const locationLabel = selectedQueueLocationName ?? t(dashboardTitle.key, dashboardTitle.value);
-  const showService = Boolean(selectedQueueLocationName && selectedServiceUuid);
+  const showService = Boolean(selectedServiceUuid);
 
   return (
     <span className={styles.title}>

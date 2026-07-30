@@ -47,6 +47,8 @@ const ExpectedAppointments: React.FC = () => {
     [appointments, t],
   );
 
+  const patientUuidsByRowId = useMemo(() => new Map(rows.map((row) => [row.id, row.patientUuid])), [rows]);
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
@@ -82,27 +84,24 @@ const ExpectedAppointments: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {dataRows.map((row) => {
-                const appointmentRow = rows.find((r) => r.id === row.id);
-                return (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) =>
-                      cell.info.header === 'name' ? (
-                        <TableCell key={cell.id}>
-                          <ConfigurableLink
-                            className={styles.nameLink}
-                            to={customPatientChartUrl}
-                            templateParams={{ patientUuid: appointmentRow?.patientUuid }}>
-                            {cell.value}
-                          </ConfigurableLink>
-                        </TableCell>
-                      ) : (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ),
-                    )}
-                  </TableRow>
-                );
-              })}
+              {dataRows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.cells.map((cell) =>
+                    cell.info.header === 'name' ? (
+                      <TableCell key={cell.id}>
+                        <ConfigurableLink
+                          className={styles.nameLink}
+                          to={customPatientChartUrl}
+                          templateParams={{ patientUuid: patientUuidsByRowId.get(row.id) }}>
+                          {cell.value}
+                        </ConfigurableLink>
+                      </TableCell>
+                    ) : (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ),
+                  )}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

@@ -72,24 +72,3 @@ export function useAverageWaitTime(serviceUuid: string, locationUuid: string, st
     mutate,
   };
 }
-
-export function useServiceMetricsCount(service: string, location: string) {
-  const status = 'Waiting';
-  const apiUrl =
-    `${restBaseUrl}/queue-entry-metrics?status=${status}&isEnded=false` +
-    (service ? `&service=${service}` : '') +
-    (location ? `&location=${location}` : '');
-
-  const { data } = useSWR<
-    {
-      data: {
-        count: number;
-      };
-    },
-    Error
-  >(service ? apiUrl : null, openmrsFetch);
-
-  return {
-    serviceCount: data ? data?.data?.count : 0,
-  };
-}

@@ -62,7 +62,7 @@ const ChangeQueueLocationModal: React.FC<ChangeQueueLocationModalProps> = ({ clo
       uniqBy(
         queues.flatMap((queue) => queue.service),
         (service) => service?.uuid,
-      ).sort((a, b) => a.display.localeCompare(b.display, getLocale())),
+      ).sort((a, b) => (a?.display ?? '').localeCompare(b?.display ?? '', getLocale())),
     [queues],
   );
 
