@@ -33,6 +33,11 @@ const AppointmentsCalendarView: React.FC = () => {
     setViewMode(mode);
   }, []);
 
+  const handleSelectDate = useCallback((isoDate: string) => {
+    setCalendarSelectedDate(dayjs(isoDate));
+    setViewMode('daily');
+  }, []);
+
   return (
     <div data-testid="appointments-calendar">
       <AppointmentsHeader title={t('calendar', 'Calendar')} showNewAppointmentButton />
@@ -44,10 +49,17 @@ const AppointmentsCalendarView: React.FC = () => {
         onNext={handleNext}
       />
       {viewMode === 'monthly' && (
-        <MonthlyCalendarView events={calendarEvents} calendarSelectedDate={calendarSelectedDate} />
+        <MonthlyCalendarView
+          events={calendarEvents}
+          calendarSelectedDate={calendarSelectedDate}
+          onSelectDate={handleSelectDate}
+        />
       )}
       {viewMode === 'weekly' && (
-        <WeeklyCalendarView calendarSelectedDate={calendarSelectedDate} onSelectDate={() => {}} />
+        <WeeklyCalendarView
+          calendarSelectedDate={calendarSelectedDate}
+          onSelectDate={(isoDate) => handleSelectDate(isoDate)}
+        />
       )}
       {viewMode === 'daily' && <DailyCalendarView calendarSelectedDate={calendarSelectedDate} />}
     </div>

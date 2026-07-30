@@ -153,6 +153,24 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText(/\w{3} \d{1,2} – \w{3} \d{1,2}, \d{4}/)).toBeInTheDocument();
   });
 
+  it('switches to daily view when a day cell with appointments is clicked in monthly mode', async () => {
+    const user = userEvent.setup();
+    const today = dayjs().format('YYYY-MM-DD');
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [{ appointmentDate: today, services: [{ serviceName: 'Gen', serviceUuid: 'u1', count: 5 }] }],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    await user.click(screen.getByRole('button', { name: '5' }));
+
+    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
+    expect(lastCall?.[1]).toBe('daily');
+    expect(lastCall?.[0]).toContain(today);
+  });
+
   it('displays full date title in daily mode', async () => {
     const user = userEvent.setup();
     renderCalendar();
