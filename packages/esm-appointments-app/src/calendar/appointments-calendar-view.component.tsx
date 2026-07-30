@@ -14,8 +14,10 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const period = viewMode === 'weekly' ? 'weekly' : viewMode === 'daily' ? 'daily' : 'monthly';
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), period);
+  const { calendarEvents } = useAppointmentsCalendar(
+    viewMode === 'monthly' ? calendarSelectedDate.toISOString() : null,
+    viewMode,
+  );
 
   const handlePrev = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
