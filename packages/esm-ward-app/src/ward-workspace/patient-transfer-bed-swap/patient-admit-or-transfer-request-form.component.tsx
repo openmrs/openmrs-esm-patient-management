@@ -301,7 +301,7 @@ export default function PatientAdmitOrTransferForm({
             )}
           />
         </div>
-        {!formDefaultValues.transferType && (
+        {!formDefaultValues.transferType && dispositionsOfRequestedType?.length > 1 && (
           <div className={styles.field}>
             <h2 className={styles.productiveHeading02}>
               {isTransfer ? t('transferType', 'Transfer type') : t('admitType', 'Admit type')}
@@ -317,7 +317,7 @@ export default function PatientAdmitOrTransferForm({
                     invalid={!!error?.message}
                     invalidText={error?.message}>
                     {dispositionsOfRequestedType.map((disposition) => (
-                      <RadioButton id={disposition.uuid} labelText={disposition.name} value={disposition.uuid} />
+                      <RadioButton id={disposition.uuid} labelText={disposition.name} value={disposition.conceptCode} />
                     ))}
                   </RadioButtonGroup>
                 </ResponsiveWrapper>
