@@ -87,6 +87,7 @@
   "nextPage": "下一页",
   "noActiveTickets": "无待显示的活跃票号",
   "noActiveVisit": "无活跃就诊",
+  "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "未定义表格列，请检查配置。",
   "noEncountersFound": "未找到问诊记录",
   "noMedicationsFound": "未找到药物",
