@@ -60,6 +60,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
       onClick={handleClick}
       className={classNames(
         styles[isSameMonth(dateTime, calendarSelectedDate) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        { [styles['monthly-cell-clickable']]: totalCount > 0 },
         !showAllServices && {
           [styles.smallDesktop]: layout === 'small-desktop',
           [styles.largeDesktop]: layout !== 'small-desktop',
