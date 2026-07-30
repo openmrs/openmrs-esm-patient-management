@@ -82,9 +82,11 @@ const CheckedInPatientRow: React.FC<CheckedInPatientRowProps> = ({
 
 /**
  * Rendered in the "Add patient to queue" workspace before the user types a search term. Lists
- * patients with an active visit at the selected queue location who are not yet in a queue at that
- * location, so a clerk can add them without searching. Note that the exclusion is scoped to the
- * selected location: a patient already queued at another location still appears here.
+ * patients whose visit started today and is still open at the selected queue location, and who are
+ * not yet in a queue at that location, so a clerk can add them without searching. The list is
+ * today-only, so an overnight or carried-over visit does not appear even though it is still open.
+ * The queue exclusion is scoped to the selected location, so a patient already queued at another
+ * location still appears here.
  * Selecting a row uses the same `onPatientSelected` as search.
  */
 const CheckedInPatients: React.FC<CheckedInPatientsProps> = ({
