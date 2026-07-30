@@ -61,6 +61,13 @@ describe('queueTableActionColumn', () => {
     expect(await openOverflowMenu()).toEqual(['Move', 'Remove patient']);
   });
 
+  it('does not repeat a button action in the overflow menu when the deprecated "transition" resolves to it', async () => {
+    renderActionCell({ buttons: ['move'], overflowMenu: ['transition', 'remove'] });
+
+    expect(screen.getByRole('button', { name: 'Move' })).toBeInTheDocument();
+    expect(await openOverflowMenu()).toEqual(['Remove patient']);
+  });
+
   it('promotes a deprecated "transition" to the fallback button', async () => {
     renderActionCell({ buttons: ['call'], overflowMenu: ['transition', 'edit'] });
 

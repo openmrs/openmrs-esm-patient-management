@@ -154,7 +154,8 @@ describe('MoveQueueEntryModal', () => {
     expect(closeModal).toHaveBeenCalled();
   });
 
-  it('enables the submit action when only the priority changes', async () => {
+  it('submits the new priority when only the priority changes', async () => {
+    mockTransitionQueueEntry.mockResolvedValue({ status: 200 });
     mockUseQueueEntry.mockReturnValue({
       queueEntry: mockQueueEntryAlice,
       error: null,
@@ -171,5 +172,15 @@ describe('MoveQueueEntryModal', () => {
     await user.click(screen.getByRole('radio', { name: mockPriorityNonUrgent.display }));
 
     expect(submitButton).toBeEnabled();
+
+    await user.click(submitButton);
+
+    expect(mockTransitionQueueEntry).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queueEntryToTransition: mockQueueEntryAlice.uuid,
+        newPriority: mockPriorityNonUrgent.uuid,
+      }),
+    );
+    expect(closeModal).toHaveBeenCalled();
   });
 });

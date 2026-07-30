@@ -222,7 +222,9 @@ function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEnt
 
 export const queueTableActionColumn: QueueTableColumnFunction = (key, header, config: ActionsColumnConfig) => {
   const buttons = normalizeActions(config.actions.buttons, 'actions.buttons');
-  const overflowMenu = normalizeActions(config.actions.overflowMenu, 'actions.overflowMenu');
+  const overflowMenu = normalizeActions(config.actions.overflowMenu, 'actions.overflowMenu').filter(
+    (actionKey) => !buttons.includes(actionKey),
+  );
 
   const QueueTableActionCell = ({ queueEntry }: QueueTableCellComponentProps) => {
     const layout = useLayoutType();

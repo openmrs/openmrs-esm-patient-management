@@ -100,9 +100,9 @@ const MoveQueueEntryModal: React.FC<MoveQueueEntryModalProps> = ({ queueEntry, c
       modalParams={{
         modalTitle: t('movePatient', 'Move {{patient}}', { patient: freshEntry.display }),
         submitButtonText: t('move', 'Move'),
-        submitSuccessTitle: t('queueEntryMoved', 'Queue entry moved'),
-        submitSuccessText: t('queueEntryMovedSuccessfully', 'Queue entry moved successfully'),
-        submitFailureTitle: t('queueEntryMoveFailed', 'Error moving queue entry'),
+        submitSuccessTitle: t('queueEntryUpdated', 'Queue entry updated'),
+        submitSuccessText: t('queueEntryUpdatedSuccessfully', 'Queue entry updated successfully'),
+        submitFailureTitle: t('queueEntryUpdateFailed', 'Error updating queue entry'),
         submitAction: (queueEntry, formState) => {
           const transitionDate = new Date(formState.transitionDate);
           const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
