@@ -20,8 +20,15 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
-const queueEntryActions = ['move', 'call', 'edit', 'transition', 'remove', 'delete', 'undo'] as const;
+const queueEntryActions = ['move', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
 export type QueueEntryAction = (typeof queueEntryActions)[number];
+
+// Retired action names, mapped to the actions that replaced them. Still accepted in configuration and
+// resolved to their replacement when the action cell renders, so that older configurations keep working.
+export const deprecatedQueueEntryActions = { transition: 'move' } as const;
+export type ConfigurableQueueEntryAction = QueueEntryAction | keyof typeof deprecatedQueueEntryActions;
+
+const configurableQueueEntryActions = [...queueEntryActions, ...Object.keys(deprecatedQueueEntryActions)];
 
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
@@ -80,7 +87,7 @@ export const defaultPriorityConfig: PriorityConfig[] = [
 export const defaultColumnConfig: ColumnConfig = {
   actions: {
     buttons: ['call'],
-    overflowMenu: ['move', 'transition', 'edit', 'remove', 'undo'],
+    overflowMenu: ['move', 'edit', 'remove', 'undo'],
   },
   identifierTypeUuid: defaultIdentifierTypeUuid,
   statusConfigs: [],
@@ -311,10 +318,11 @@ export const configSchema = {
               _default: ['call'],
               _description:
                 'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
+                queueEntryActions.join(', ') +
+                '. Deprecated: "transition" is still accepted but is treated as "move".',
               _elements: {
                 _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
+                _validators: [validators.oneOf(configurableQueueEntryActions)],
               },
             },
             overflowMenu: {
@@ -322,10 +330,11 @@ export const configSchema = {
               _default: ['edit', 'remove', 'undo'],
               _description:
                 'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
+                queueEntryActions.join(', ') +
+                '. Deprecated: "transition" is still accepted but is treated as "move".',
               _elements: {
                 _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
+                _validators: [validators.oneOf(configurableQueueEntryActions)],
               },
             },
           },
@@ -561,8 +570,8 @@ export type ColumnDefinition = {
 
 export interface ActionsColumnConfig {
   actions: {
-    buttons: QueueEntryAction[];
-    overflowMenu: QueueEntryAction[];
+    buttons: ConfigurableQueueEntryAction[];
+    overflowMenu: ConfigurableQueueEntryAction[];
   };
 }
 
