@@ -51,7 +51,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   return (
     <div className={styles.calendarHeaderContainer}>
-      <div className={styles.leftGroup}>
+      <div className={styles.navigationSection}>
         <div className={styles.navGroup}>
           <div className={styles.navButtonGroup}>
             <Button
@@ -75,7 +75,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           <span className={styles.titleLabel}>{titleLabel}</span>
         </div>
       </div>
-      <div className={styles.rightGroup}>
+      <div className={styles.switcherSection}>
         <ContentSwitcher
           selectedIndex={viewModeIndex}
           size="sm"

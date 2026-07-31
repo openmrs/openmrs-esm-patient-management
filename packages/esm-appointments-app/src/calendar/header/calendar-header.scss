@@ -13,7 +13,7 @@
   border-bottom: 1px solid colors.$gray-20;
 }
 
-.leftGroup {
+.navigationSection {
   display: flex;
   align-items: center;
   gap: layout.$spacing-03;
@@ -57,7 +57,7 @@
   white-space: nowrap;
 }
 
-.rightGroup {
+.switcherSection {
   display: flex;
   align-items: center;
   gap: layout.$spacing-04;
