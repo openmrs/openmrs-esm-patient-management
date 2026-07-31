@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { type TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { isDesktop, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
@@ -10,7 +11,7 @@ import {
   type ConfigurableQueueEntryAction,
   type QueueEntryAction,
 } from '../../config-schema';
-import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
+import { getVisitQueueNumber, serveQueueEntry } from '../../service-queues.resource';
 import { getErrorMessage } from '../../modals/queue-entry-error.utils';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './queue-table-action-cell.scss';
@@ -23,15 +24,30 @@ type ActionProps = {
   isDelete?: boolean;
 };
 
+// `getErrorMessage` digs the server's own wording out of an `OpenmrsFetchError`, which is far more
+// useful than "Server responded with 500 ...", but it returns an empty string when there is nothing
+// to report — a rejected `undefined`, say — and an error snackbar with no subtitle says nothing.
+function showActionErrorSnackbar(title: string, error: unknown, t: TFunction) {
+  showSnackbar({
+    isLowContrast: false,
+    kind: 'error',
+    title,
+    subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
+  });
+}
+
 // Row actions are invoked from DOM event handlers, which ignore the promise an async action returns.
 // Actions are expected to report their own failures to the user; this is the last-resort net that
 // keeps a rejection from becoming an unhandled promise rejection, which React's development-only
-// error overlay turns into a full-screen crash the user can only escape by reloading the page.
-function runAction(actionKey: QueueEntryAction, actionProps: ActionProps, queueEntry: QueueEntry) {
+// error overlay turns into a full-screen crash the user can only escape by reloading the page. It
+// still tells the user something went wrong, because a click that silently does nothing is the
+// production half of the same defect.
+function runAction(actionKey: QueueEntryAction, actionProps: ActionProps, queueEntry: QueueEntry, t: TFunction) {
   return Promise.resolve()
     .then(() => actionProps.onClick(queueEntry))
     .catch((error) => {
       console.error(`Service queue table action '${actionKey}' failed`, error);
+      showActionErrorSnackbar(t('queueEntryActionFailed', 'Action failed'), error, t);
     });
 }
 
@@ -71,29 +87,37 @@ function useActionPropsByKey() {
         label: 'call',
         text: 'Call',
         onClick: async (queueEntry: QueueEntry) => {
-          const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
-          const servicePointName = mappedQueueEntry.queue?.name;
-          const ticketNumber = mappedQueueEntry.visitQueueNumber;
+          const servicePointName = queueEntry.queue?.name;
+          const ticketNumber = getVisitQueueNumber(queueEntry, visitQueueNumberAttributeUuid);
 
-          // The assignticket endpoint needs all three values. They come from the queue, from the
-          // visit attribute named by `visitQueueNumberAttributeUuid`, and from `callingStatus`, so
-          // any of them can be missing on a misconfigured installation. Say so rather than posting
-          // an incomplete request and reporting whatever the server makes of it.
+          // The assignticket endpoint needs all three values, so say which one is missing rather
+          // than posting an incomplete request and reporting whatever the server makes of it. The
+          // ticket number is singled out because it is the one that is missing in ordinary use:
+          // it comes from a visit attribute, so any visit created outside the queue flow lacks it,
+          // and telling that user to go and check the configuration would be wrong advice.
           if (!servicePointName || !ticketNumber || !callingStatus) {
             showSnackbar({
               isLowContrast: false,
               kind: 'error',
               title: t('errorCallingPatient', 'Error calling patient'),
-              subtitle: t(
-                'callPatientMissingDetails',
-                'The queue name, ticket number, or calling status is missing. Check the service queues configuration.',
-              ),
+              subtitle: ticketNumber
+                ? t(
+                    'callPatientMissingConfiguration',
+                    'The queue name or calling status is missing. Check the service queues configuration.',
+                  )
+                : t(
+                    'callPatientNoTicketNumber',
+                    "This patient's visit has no ticket number, so there is nothing for the queue screen to call.",
+                  ),
             });
             return;
           }
 
           try {
             const callingQueueResponse = await serveQueueEntry(servicePointName, ticketNumber, callingStatus);
+            // `openmrsFetch` rejects on any non-2xx, so this is not the ordinary server-error path.
+            // It catches the case where it resolves without a response at all, which it does while
+            // it is redirecting the browser after an authentication failure.
             if (!callingQueueResponse?.ok) {
               throw new Error(t('unexpectedServerResponse', 'Unexpected Server Response'));
             }
@@ -104,12 +128,7 @@ function useActionPropsByKey() {
               size: 'sm',
             });
           } catch (error) {
-            showSnackbar({
-              isLowContrast: false,
-              kind: 'error',
-              title: t('errorCallingPatient', 'Error calling patient'),
-              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
-            });
+            showActionErrorSnackbar(t('errorCallingPatient', 'Error calling patient'), error, t);
           }
         },
         showIf: (queueEntry: QueueEntry) => {
@@ -213,7 +232,7 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
     isPendingRef.current = true;
     setIsPending(true);
     try {
-      await runAction(actionKey, actionProps, queueEntry);
+      await runAction(actionKey, actionProps, queueEntry, t);
     } finally {
       isPendingRef.current = false;
       setIsPending(false);
@@ -254,7 +273,7 @@ function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEnt
       aria-label={t(actionProps.label, actionProps.text)}
       hasDivider
       isDelete={actionProps.isDelete}
-      onClick={() => void runAction(actionKey, actionProps, queueEntry)}
+      onClick={() => void runAction(actionKey, actionProps, queueEntry, t)}
       itemText={t(actionProps.label, actionProps.text)}
     />
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockQueueEntryAlice } from '__mocks__';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
@@ -10,6 +10,7 @@ import { requeueQueueEntry } from './call-queue-entry.resource';
 import CallQueueEntryModal from './call-queue-entry.modal';
 
 const mockNavigate = vi.mocked(navigate);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
 vi.mock('../../service-queues.resource', async () => ({
@@ -28,6 +29,8 @@ vi.mock('./call-queue-entry.resource', () => ({
 
 describe('MoveQueueEntryModal', () => {
   beforeEach(() => {
+    // `clearMocks` clears calls but keeps implementations, so restore the happy path each time.
+    vi.mocked(serveQueueEntry).mockResolvedValue({ status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       concepts: {
@@ -71,5 +74,24 @@ describe('MoveQueueEntryModal', () => {
     expect(updateQueueEntry).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalled();
     expect(serveQueueEntry).toHaveBeenCalled();
+  });
+
+  // `serveQueueEntry` here is a second request chained off `updateQueueEntry`'s success, so the
+  // rejection handler on that first request does not cover it. Without one of its own a failure
+  // escapes as an unhandled rejection: the crash overlay O3-5666 is about, one click further on.
+  it('reports a failed serve request in a snackbar instead of rejecting', async () => {
+    const user = userEvent.setup();
+    vi.mocked(serveQueueEntry).mockRejectedValue(new Error('Failed to fetch'));
+
+    const closeModal = vi.fn();
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
+
+    await user.click(screen.getByText('Serve'));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'error', subtitle: 'Failed to fetch' }),
+    );
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(closeModal).not.toHaveBeenCalled();
   });
 });

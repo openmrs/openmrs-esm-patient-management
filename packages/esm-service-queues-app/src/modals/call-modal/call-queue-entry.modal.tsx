@@ -5,6 +5,7 @@ import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
 import { requeueQueueEntry } from './call-queue-entry.resource';
+import { getErrorMessage } from '../queue-entry-error.utils';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type QueueEntry } from '../../types';
 import styles from './call-queue-entry.scss';
@@ -46,7 +47,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
     ).then(
       () => {
         serveQueueEntry(mappedQueueEntry.queue.name, mappedQueueEntry.visitQueueNumber, 'serving').then(
-          ({ status }) => {
+          () => {
             showSnackbar({
               isLowContrast: true,
               title: t('success', 'Success'),
@@ -56,6 +57,18 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
             closeModal();
             mutateQueueEntries();
             navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
+          },
+          // This is a second request, chained off the first one's success, so the rejection handler
+          // below belongs to `updateQueueEntry` and does not cover it. Without a handler of its own
+          // a failure here escapes as an unhandled rejection: the same full-screen crash overlay in
+          // development, and the same silent no-op in production, that O3-5666 is about.
+          (error) => {
+            showSnackbar({
+              title: t('errorCallingPatient', 'Error calling patient'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
+            });
           },
         );
       },

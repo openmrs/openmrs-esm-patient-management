@@ -27,6 +27,9 @@ const visitQueueNumberAttributeUuid = 'queue-number-visit-attr-type-uuid';
 // waiting to be called, which is the only state in which the Call action is offered.
 const mockWaitingQueueEntry: QueueEntry = { ...mockQueueEntryAlice, status: mockStatusWaiting };
 
+const missingConfigurationMessage =
+  'The queue name or calling status is missing. Check the service queues configuration.';
+
 vi.mock('../../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
@@ -136,14 +139,84 @@ describe('queueTableActionColumn', () => {
       expect(screen.getByRole('button', { name: 'Call' })).toBeEnabled();
     });
 
-    it('reports a server error response in a snackbar instead of opening the call modal', async () => {
+    // `openmrsFetch` rejects on any non-2xx, so a server error reaches the action as a rejection
+    // carrying the server's own message in `responseBody`, not as a resolved non-ok response.
+    it('shows the message the server sent when the request fails', async () => {
       const user = userEvent.setup();
-      mockServeQueueEntry.mockResolvedValue({ ok: false, status: 500 } as Awaited<ReturnType<typeof serveQueueEntry>>);
+      mockServeQueueEntry.mockRejectedValue({
+        message: 'Server responded with 500 (Internal Server Error) for url /ws/rest/v1/queueutil/assignticket',
+        responseBody: { error: { message: 'Ticket display service is unavailable' } },
+      });
       renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
 
       await user.click(screen.getByRole('button', { name: 'Call' }));
 
-      expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Ticket display service is unavailable' }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('falls back to a generic message when the failure carries none', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue(new Error(''));
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'An unknown error occurred' }),
+      );
+    });
+
+    // `serveQueueEntry` resolves with no response at all while `openmrsFetch` is redirecting the
+    // browser after an authentication failure, which is the only way a non-ok response gets here.
+    it('reports a response without a result instead of opening the call modal', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockResolvedValue(undefined as Awaited<ReturnType<typeof serveQueueEntry>>);
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Unexpected Server Response' }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('does not send an incomplete request when the queue has no name', async () => {
+      const user = userEvent.setup();
+      const namelessQueueEntry: QueueEntry = {
+        ...mockWaitingQueueEntry,
+        queue: { ...mockWaitingQueueEntry.queue, name: '' },
+      };
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, namelessQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockServeQueueEntry).not.toHaveBeenCalled();
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: missingConfigurationMessage }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('does not send an incomplete request when the calling status is not configured', async () => {
+      const user = userEvent.setup();
+      mockUseConfig.mockReturnValue({
+        ...configDefaults,
+        callingStatus: '',
+        concepts: { ...configDefaults.concepts, defaultStatusConceptUuid: mockStatusWaiting.uuid },
+        visitQueueNumberAttributeUuid,
+      } as ConfigObject);
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockServeQueueEntry).not.toHaveBeenCalled();
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: missingConfigurationMessage }),
+      );
       expect(mockShowModal).not.toHaveBeenCalled();
     });
 
@@ -159,11 +232,13 @@ describe('queueTableActionColumn', () => {
       await user.click(screen.getByRole('button', { name: 'Call' }));
 
       expect(mockServeQueueEntry).not.toHaveBeenCalled();
+      // The ticket number comes from the visit, not the configuration, so the message must not send
+      // a clerk who cannot change the configuration off to go and check it.
       expect(mockShowSnackbar).toHaveBeenCalledWith(
         expect.objectContaining({
           kind: 'error',
           title: 'Error calling patient',
-          subtitle: expect.stringContaining('ticket number'),
+          subtitle: "This patient's visit has no ticket number, so there is nothing for the queue screen to call.",
         }),
       );
       expect(mockShowModal).not.toHaveBeenCalled();
@@ -182,6 +257,46 @@ describe('queueTableActionColumn', () => {
       await user.click(callMenuItem);
 
       expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
+    });
+  });
+
+  // Every action is invoked from a DOM event handler, which discards the promise it returns, so an
+  // action that fails outside its own error handling would otherwise leave an unhandled rejection:
+  // a full-screen crash overlay in development builds, and a click that does nothing in production.
+  describe('the last-resort failure net', () => {
+    const expectedSnackbar = expect.objectContaining({
+      kind: 'error',
+      title: 'Action failed',
+      subtitle: 'modal registry unavailable',
+    });
+
+    it('reports an action that fails without handling it itself', async () => {
+      const user = userEvent.setup();
+      mockShowModal.mockImplementationOnce(() => {
+        throw new Error('modal registry unavailable');
+      });
+      renderActionCell({ buttons: ['edit'], overflowMenu: [] });
+
+      await user.click(screen.getByRole('button', { name: 'Edit' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(expectedSnackbar);
+    });
+
+    it('reports an action that fails without handling it itself, launched from the overflow menu', async () => {
+      const user = userEvent.setup();
+      mockShowModal.mockImplementationOnce(() => {
+        throw new Error('modal registry unavailable');
+      });
+      renderActionCell({ buttons: ['move'], overflowMenu: ['edit'] });
+
+      await user.click(screen.getByRole('button', { name: 'Options' }));
+      // See `openOverflowMenu` above: Carbon's opened menu has no accessible name under happy-dom.
+      const editMenuItem = screen
+        .getAllByRole('menuitem', { hidden: true })
+        .find((item) => item.getAttribute('aria-label') === 'Edit');
+      await user.click(editMenuItem);
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(expectedSnackbar);
     });
   });
 });
