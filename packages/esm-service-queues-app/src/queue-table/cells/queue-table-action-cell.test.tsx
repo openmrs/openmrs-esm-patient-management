@@ -61,6 +61,7 @@ async function openOverflowMenu() {
 
 describe('queueTableActionColumn', () => {
   let warnSpy: MockInstance;
+  let errorSpy: MockInstance;
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
@@ -70,7 +71,7 @@ describe('queueTableActionColumn', () => {
     } as ConfigObject);
     mockServeQueueEntry.mockResolvedValue({ ok: true, status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('treats the deprecated "transition" action as "move"', async () => {
@@ -155,6 +156,21 @@ describe('queueTableActionColumn', () => {
         expect.objectContaining({ kind: 'error', subtitle: 'Ticket display service is unavailable' }),
       );
       expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    // A rejected promise carries whatever it was rejected with, and `getErrorMessage` reads a shape
+    // the REST API documents rather than one anything enforces. A non-string reaching the snackbar
+    // subtitle is a React render crash — the error handler failing the same way the action used to.
+    it('falls back to a generic message when the failure carries a message that is not text', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue({ message: { unexpectedlyNotAString: true } });
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'An unknown error occurred' }),
+      );
     });
 
     it('falls back to a generic message when the failure carries none', async () => {
@@ -297,6 +313,35 @@ describe('queueTableActionColumn', () => {
       await user.click(editMenuItem);
 
       expect(mockShowSnackbar).toHaveBeenCalledWith(expectedSnackbar);
+    });
+
+    // The net is the last thing between a failed action and an unhandled rejection, so a throw
+    // while it is reporting the failure puts back the crash it was added to prevent.
+    it('does not reject when reporting the failure itself fails', async () => {
+      const user = userEvent.setup();
+      const unhandled: unknown[] = [];
+      const onUnhandled = (reason: unknown) => unhandled.push(reason);
+      process.on('unhandledRejection', onUnhandled);
+      try {
+        mockShowModal.mockImplementationOnce(() => {
+          throw new Error('modal registry unavailable');
+        });
+        mockShowSnackbar.mockImplementationOnce(() => {
+          throw new Error('snackbar store unavailable');
+        });
+        renderActionCell({ buttons: ['edit'], overflowMenu: [] });
+
+        await user.click(screen.getByRole('button', { name: 'Edit' }));
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(errorSpy).toHaveBeenCalledWith(
+          expect.stringContaining("Reporting the failure of service queue table action 'edit' failed"),
+          expect.any(Error),
+        );
+        expect(unhandled).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandled);
+      }
     });
   });
 });

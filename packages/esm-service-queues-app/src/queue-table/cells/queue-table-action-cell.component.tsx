@@ -46,8 +46,16 @@ function runAction(actionKey: QueueEntryAction, actionProps: ActionProps, queueE
   return Promise.resolve()
     .then(() => actionProps.onClick(queueEntry))
     .catch((error) => {
-      console.error(`Service queue table action '${actionKey}' failed`, error);
-      showActionErrorSnackbar(t('queueEntryActionFailed', 'Action failed'), error, t);
+      // Reporting the failure must not fail. Both steps below touch things that can throw on a
+      // bad day — reading properties off whatever value was rejected, and the framework's
+      // snackbar store — and a throw in here escapes as exactly the unhandled rejection this net
+      // exists to prevent, which is the original defect wearing the error handler's clothes.
+      try {
+        console.error(`Service queue table action '${actionKey}' failed`, error);
+        showActionErrorSnackbar(t('queueEntryActionFailed', 'Action failed'), error, t);
+      } catch (reportingError) {
+        console.error(`Reporting the failure of service queue table action '${actionKey}' failed`, reportingError);
+      }
     });
 }
 

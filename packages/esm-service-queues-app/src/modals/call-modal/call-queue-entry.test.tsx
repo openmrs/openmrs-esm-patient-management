@@ -94,4 +94,18 @@ describe('MoveQueueEntryModal', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(closeModal).not.toHaveBeenCalled();
   });
+
+  it('falls back to a generic message when the failed serve request carries none', async () => {
+    const user = userEvent.setup();
+    vi.mocked(serveQueueEntry).mockRejectedValue(new Error(''));
+
+    const closeModal = vi.fn();
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
+
+    await user.click(screen.getByText('Serve'));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'error', subtitle: 'An unknown error occurred' }),
+    );
+  });
 });
