@@ -14,14 +14,10 @@ import styles from './appointments-header.scss';
 interface AppointmentHeaderProps {
   title: string;
   showServiceTypeFilter?: boolean;
-  showNewAppointmentButton?: boolean;
+  isCalendarView?: boolean;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
-  title,
-  showServiceTypeFilter,
-  showNewAppointmentButton,
-}) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter, isCalendarView }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,7 +44,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
     <PageHeader className={styles.header} data-testid="appointments-header">
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
-        {showNewAppointmentButton ? (
+        {isCalendarView ? (
           <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
             {t('newAppointment', 'New appointment')}
           </Button>

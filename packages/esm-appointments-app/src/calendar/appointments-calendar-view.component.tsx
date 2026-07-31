@@ -43,7 +43,7 @@ const AppointmentsCalendarView: React.FC = () => {
 
   return (
     <div data-testid="appointments-calendar">
-      <AppointmentsHeader title={t('calendar', 'Calendar')} showNewAppointmentButton />
+      <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
       <CalendarHeader
         viewMode={viewMode}
         calendarSelectedDate={calendarSelectedDate}
