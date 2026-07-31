@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import {
   deprecatedQueueEntryActions,
@@ -11,16 +11,29 @@ import {
   type QueueEntryAction,
 } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
+import { getErrorMessage } from '../../modals/queue-entry-error.utils';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './queue-table-action-cell.scss';
 
 type ActionProps = {
   label: string;
   text: string;
-  onClick: (queueEntry: QueueEntry) => void;
+  onClick: (queueEntry: QueueEntry) => void | Promise<void>;
   showIf?: (queueEntry: QueueEntry) => boolean;
   isDelete?: boolean;
 };
+
+// Row actions are invoked from DOM event handlers, which ignore the promise an async action returns.
+// Actions are expected to report their own failures to the user; this is the last-resort net that
+// keeps a rejection from becoming an unhandled promise rejection, which React's development-only
+// error overlay turns into a full-screen crash the user can only escape by reloading the page.
+function runAction(actionKey: QueueEntryAction, actionProps: ActionProps, queueEntry: QueueEntry) {
+  return Promise.resolve()
+    .then(() => actionProps.onClick(queueEntry))
+    .catch((error) => {
+      console.error(`Service queue table action '${actionKey}' failed`, error);
+    });
+}
 
 // Resolves deprecated action names to the actions that replaced them, dropping duplicates in case a
 // configuration lists both a deprecated action and its replacement.
@@ -42,6 +55,7 @@ function normalizeActions(actionKeys: ConfigurableQueueEntryAction[], configKey:
 }
 
 function useActionPropsByKey() {
+  const { t } = useTranslation();
   const {
     callingStatus,
     concepts: { defaultStatusConceptUuid },
@@ -58,17 +72,43 @@ function useActionPropsByKey() {
         text: 'Call',
         onClick: async (queueEntry: QueueEntry) => {
           const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
-          const callingQueueResponse = await serveQueueEntry(
-            mappedQueueEntry.queue.name,
-            mappedQueueEntry.visitQueueNumber,
-            callingStatus,
-          );
-          if (callingQueueResponse.ok) {
+          const servicePointName = mappedQueueEntry.queue?.name;
+          const ticketNumber = mappedQueueEntry.visitQueueNumber;
+
+          // The assignticket endpoint needs all three values. They come from the queue, from the
+          // visit attribute named by `visitQueueNumberAttributeUuid`, and from `callingStatus`, so
+          // any of them can be missing on a misconfigured installation. Say so rather than posting
+          // an incomplete request and reporting whatever the server makes of it.
+          if (!servicePointName || !ticketNumber || !callingStatus) {
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'error',
+              title: t('errorCallingPatient', 'Error calling patient'),
+              subtitle: t(
+                'callPatientMissingDetails',
+                'The queue name, ticket number, or calling status is missing. Check the service queues configuration.',
+              ),
+            });
+            return;
+          }
+
+          try {
+            const callingQueueResponse = await serveQueueEntry(servicePointName, ticketNumber, callingStatus);
+            if (!callingQueueResponse?.ok) {
+              throw new Error(t('unexpectedServerResponse', 'Unexpected Server Response'));
+            }
             await mutateQueueEntries();
             const dispose = showModal('call-queue-entry-modal', {
               closeModal: () => dispose(),
               queueEntry,
               size: 'sm',
+            });
+          } catch (error) {
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'error',
+              title: t('errorCallingPatient', 'Error calling patient'),
+              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             });
           }
         },
@@ -145,7 +185,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries, t]);
   return actionPropsByKey;
 }
 
@@ -173,7 +213,7 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
     isPendingRef.current = true;
     setIsPending(true);
     try {
-      await Promise.resolve(actionProps.onClick(queueEntry));
+      await runAction(actionKey, actionProps, queueEntry);
     } finally {
       isPendingRef.current = false;
       setIsPending(false);
@@ -214,7 +254,7 @@ function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEnt
       aria-label={t(actionProps.label, actionProps.text)}
       hasDivider
       isDelete={actionProps.isDelete}
-      onClick={() => actionProps.onClick(queueEntry)}
+      onClick={() => void runAction(actionKey, actionProps, queueEntry)}
       itemText={t(actionProps.label, actionProps.text)}
     />
   );
