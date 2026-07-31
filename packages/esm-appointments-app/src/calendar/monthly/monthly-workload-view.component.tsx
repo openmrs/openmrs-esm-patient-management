@@ -33,10 +33,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
     [dateTime, events],
   );
 
-  const totalCount = useMemo(
-    () => currentData?.services?.reduce((sum, { count = 0 }) => sum + count, 0) ?? 0,
-    [currentData],
-  );
+  const totalCount = currentData?.services?.reduce((sum, { count = 0 }) => sum + count, 0) ?? 0;
 
   const maxVisible = layout === 'small-desktop' ? 2 : 4;
 
