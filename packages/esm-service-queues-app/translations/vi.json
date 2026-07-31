@@ -87,6 +87,7 @@
   "nextPage": "Trang tiếp theo",
   "noActiveTickets": "No active tickets to display",
   "noActiveVisit": "No active visit",
+  "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "Không có cột bảng nào được xác định. Kiểm tra cấu hình",
   "noEncountersFound": "Không tìm thấy cuộc gặp gỡ nào",
   "noMedicationsFound": "Không tìm thấy thuốc",

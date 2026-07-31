@@ -445,6 +445,13 @@ export const configSchema = {
       ),
     ],
   },
+  showCheckedInPatientsBeforeSearch: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether the "Add patient to queue" workspace lists patients who are checked in (have an active visit) ' +
+      'at the selected location but are not yet in a queue, before the user types a search term.',
+  },
   showRecommendedVisitTypeTab: {
     _type: Type.Boolean,
     _default: false,
@@ -525,6 +532,7 @@ export interface ConfigObject {
     value: string;
   };
   queueTables: TablesConfig;
+  showCheckedInPatientsBeforeSearch: boolean;
   showRecommendedVisitTypeTab: boolean;
   visitNoteEncounterTypeUuid: string;
   visitQueueNumberAttributeUuid: string | null;
