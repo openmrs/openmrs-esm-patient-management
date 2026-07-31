@@ -26,7 +26,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
 
-  const titleLabel = useMemo(() => {
+  const dateLabel = useMemo(() => {
     const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
     const gregDate = parseDate(isoDate);
 
@@ -72,7 +72,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               onClick={onNext}
             />
           </div>
-          <span className={styles.titleLabel}>{titleLabel}</span>
+          <span className={styles.dateLabel}>{dateLabel}</span>
         </div>
       </div>
       <div className={styles.switcherSection}>

@@ -51,7 +51,7 @@
   background-color: colors.$gray-30;
 }
 
-.titleLabel {
+.dateLabel {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-100;
   white-space: nowrap;
