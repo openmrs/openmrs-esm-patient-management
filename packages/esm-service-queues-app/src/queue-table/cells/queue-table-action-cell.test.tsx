@@ -30,8 +30,10 @@ const mockWaitingQueueEntry: QueueEntry = { ...mockQueueEntryAlice, status: mock
 const missingConfigurationMessage =
   'The queue name or calling status is missing. Check the service queues configuration.';
 
+const { mockMutateQueueEntries } = vi.hoisted(() => ({ mockMutateQueueEntries: vi.fn() }));
+
 vi.mock('../../hooks/useQueueEntries', () => ({
-  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: mockMutateQueueEntries }),
 }));
 
 vi.mock('../../service-queues.resource', async () => ({
@@ -115,6 +117,9 @@ describe('queueTableActionColumn', () => {
       await user.click(screen.getByRole('button', { name: 'Call' }));
 
       expect(mockServeQueueEntry).toHaveBeenCalledWith(mockWaitingQueueEntry.queue.name, '42', 'calling');
+      // The entry's status changed on the server, so the table has to be re-read before the modal
+      // opens on top of it.
+      expect(mockMutateQueueEntries).toHaveBeenCalled();
       expect(mockShowModal).toHaveBeenCalledWith('call-queue-entry-modal', expect.objectContaining({ size: 'sm' }));
       expect(mockShowSnackbar).not.toHaveBeenCalled();
     });
