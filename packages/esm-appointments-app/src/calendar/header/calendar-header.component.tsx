@@ -4,25 +4,24 @@ import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
 import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { parseDate, startOfWeek } from '@internationalized/date';
+import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
 
-export type CalendarViewMode = 'monthly' | 'weekly' | 'daily';
-
 interface CalendarHeaderProps {
-  viewMode?: CalendarViewMode;
-  calendarSelectedDate?: Dayjs;
-  onViewModeChange?: (mode: CalendarViewMode) => void;
-  onPrev?: () => void;
-  onNext?: () => void;
+  viewMode: CalendarViewMode;
+  calendarSelectedDate: Dayjs;
+  onViewModeChange: (mode: CalendarViewMode) => void;
+  onPrev: () => void;
+  onNext: () => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
-  viewMode = 'monthly',
-  calendarSelectedDate = dayjs(),
-  onViewModeChange = () => {},
-  onPrev = () => {},
-  onNext = () => {},
+  viewMode,
+  calendarSelectedDate,
+  onViewModeChange,
+  onPrev,
+  onNext,
 }) => {
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
