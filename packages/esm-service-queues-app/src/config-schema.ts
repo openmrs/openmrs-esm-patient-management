@@ -231,10 +231,7 @@ export const configSchema = {
     waitingStatusConceptUuid: {
       _type: Type.ConceptUuid,
       _default: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
-      _description:
-        'The UUID of the status for patients waiting to be attended to, eg Waiting. The dashboard waiting list, ' +
-        'its tab count and the "Waiting" metric are all scoped to this status, so it is configured separately from ' +
-        'defaultStatusConceptUuid (which is only the status a newly created queue entry starts in).',
+      _description: 'The concept UUID of the status for patients waiting to be attended to.',
     },
     weightUuid: {
       _type: Type.ConceptUuid,
