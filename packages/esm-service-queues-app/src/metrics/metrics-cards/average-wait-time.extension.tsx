@@ -10,12 +10,12 @@ export default function AverageWaitTimeExtension() {
   const { t } = useTranslation();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const {
-    concepts: { defaultStatusConceptUuid },
+    concepts: { waitingStatusConceptUuid },
   } = useConfig<ConfigObject>();
   const { waitTime, isLoading, error } = useAverageWaitTime(
     selectedServiceUuid,
     selectedQueueLocationUuid,
-    defaultStatusConceptUuid,
+    waitingStatusConceptUuid,
   );
 
   useEffect(() => {
