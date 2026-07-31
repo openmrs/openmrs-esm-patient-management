@@ -117,6 +117,7 @@
   "patientAttendingService": "Patient attending service",
   "patientGender": "Gender",
   "patientId": "Patient Id",
+  "patientMovedButNotCalled": "The patient has been moved on in the queue, but the ticket display was not updated",
   "patientName": "Patient name",
   "patientRemoved": "Patient removed",
   "patientRemovedFailed": "Error removing patient from queue",
