@@ -301,6 +301,58 @@ describe('queueTableActionColumn', () => {
       expect(callButton).toHaveAttribute('aria-busy', 'false');
     });
 
+    // Measured on a live queue table before this guard existed: two clicks 85ms apart on the
+    // overflow menu's Call item sent two `POST /queueutil/assignticket` requests for one intended
+    // call. The menu stays open on a real page, so the item is still there when the second click
+    // lands — happy-dom's copy of Carbon closes it instead, from the document-level outside-click
+    // handler, because it cannot measure the floating menu body and so cannot tell that the click
+    // was inside it. Holding the click at `<body>` keeps the item mounted the way a browser does:
+    // React 18 listens on the container that `render` mounts, which is below `<body>`, so the
+    // component still sees the click and Carbon's document listener does not.
+    function keepOverflowMenuOpen() {
+      const stopBeforeDocument = (event: Event) => event.stopPropagation();
+      document.body.addEventListener('click', stopBeforeDocument);
+      return () => document.body.removeEventListener('click', stopBeforeDocument);
+    }
+
+    it('sends one request when the overflow menu item is double-clicked', async () => {
+      const user = userEvent.setup();
+      let resolveCall: (response: Awaited<ReturnType<typeof serveQueueEntry>>) => void;
+      mockServeQueueEntry.mockReturnValue(
+        new Promise<Awaited<ReturnType<typeof serveQueueEntry>>>((resolve) => {
+          resolveCall = resolve;
+        }),
+      );
+      renderActionCell({ buttons: ['edit'], overflowMenu: ['call'] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Options' }));
+      // See `openOverflowMenu` above: Carbon's opened menu has no accessible name under happy-dom.
+      const callMenuItem = screen
+        .getAllByRole('menuitem', { hidden: true })
+        .find((item) => item.getAttribute('aria-label') === 'Call');
+      const releaseMenu = keepOverflowMenuOpen();
+
+      try {
+        await user.click(callMenuItem);
+        await user.click(callMenuItem);
+
+        expect(callMenuItem).toBeInTheDocument();
+        expect(mockServeQueueEntry).toHaveBeenCalledTimes(1);
+
+        // The guard is released once the request settles, so a deliberate second call still works.
+        // Without this the menu item would be dead for the rest of the page's life: the menu does
+        // not close on its own, so this item is not replaced by a fresh one.
+        await act(async () => {
+          resolveCall({ ok: true, status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
+        });
+        await user.click(callMenuItem);
+
+        expect(mockServeQueueEntry).toHaveBeenCalledTimes(2);
+      } finally {
+        releaseMenu();
+      }
+    });
+
     it('reports a failed call request launched from the overflow menu', async () => {
       const user = userEvent.setup();
       mockServeQueueEntry.mockRejectedValue(new Error('Failed to fetch'));
