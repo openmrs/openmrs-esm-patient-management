@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type MockInstance } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, showModal, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockQueueEntryAlice, mockStatusWaiting } from '__mocks__';
@@ -28,7 +28,7 @@ const visitQueueNumberAttributeUuid = 'queue-number-visit-attr-type-uuid';
 const mockWaitingQueueEntry: QueueEntry = { ...mockQueueEntryAlice, status: mockStatusWaiting };
 
 const missingConfigurationMessage =
-  'The queue name or calling status is missing. Check the service queues configuration.';
+  'Calling patients is not set up for this queue. Ask your system administrator to check the service queues configuration.';
 
 const { mockMutateQueueEntries } = vi.hoisted(() => ({ mockMutateQueueEntries: vi.fn() }));
 
@@ -263,6 +263,42 @@ describe('queueTableActionColumn', () => {
         }),
       );
       expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    // `disabled` takes the button out of the tab order the moment it is pressed, so the browser
+    // drops focus onto `document.body` while the request is still in flight. A keyboard user then
+    // has to tab back in from the top of the queue table — one row per waiting patient — to read
+    // the outcome or retry, which is the failure the visible error message is supposed to prevent.
+    it('keeps focus on the button, and keeps it in the tab order, while the request is in flight', async () => {
+      const user = userEvent.setup();
+      let resolveCall: (response: Awaited<ReturnType<typeof serveQueueEntry>>) => void;
+      mockServeQueueEntry.mockReturnValue(
+        new Promise<Awaited<ReturnType<typeof serveQueueEntry>>>((resolve) => {
+          resolveCall = resolve;
+        }),
+      );
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      const callButton = screen.getByRole('button', { name: 'Call' });
+      await user.click(callButton);
+
+      expect(callButton).toHaveFocus();
+      // `toBeEnabled` reads the `disabled` attribute, which is what governs the tab order; the
+      // `aria-disabled` below is the part that only a screen reader sees.
+      expect(callButton).toBeEnabled();
+      expect(callButton).toHaveAttribute('aria-disabled', 'true');
+      expect(callButton).toHaveAttribute('aria-busy', 'true');
+
+      // The pending guard, not the attribute, is what discards the second click.
+      await user.click(callButton);
+      expect(mockServeQueueEntry).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        resolveCall({ ok: true, status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
+      });
+
+      expect(callButton).toHaveAttribute('aria-disabled', 'false');
+      expect(callButton).toHaveAttribute('aria-busy', 'false');
     });
 
     it('reports a failed call request launched from the overflow menu', async () => {

@@ -15,7 +15,7 @@
   "bmi": "Bmi",
   "bp": "Bp",
   "call": "Call",
-  "callPatientMissingConfiguration": "The queue name or calling status is missing. Check the service queues configuration.",
+  "callPatientMissingConfiguration": "Calling patients is not set up for this queue. Ask your system administrator to check the service queues configuration.",
   "callPatientNoTicketNumber": "This patient's visit has no ticket number, so there is nothing for the queue screen to call.",
   "cancel": "Cancel",
   "checkedInPatients": "Checked in patients",

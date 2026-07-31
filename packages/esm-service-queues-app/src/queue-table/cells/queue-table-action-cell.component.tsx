@@ -108,10 +108,13 @@ function useActionPropsByKey() {
               isLowContrast: false,
               kind: 'error',
               title: t('errorCallingPatient', 'Error calling patient'),
+              // "calling status" is the name of a configuration property, not something a triage
+              // clerk has a word for, and neither is the queue's own name something they can go and
+              // fix: this is an administrator's job, so the message says whose.
               subtitle: ticketNumber
                 ? t(
                     'callPatientMissingConfiguration',
-                    'The queue name or calling status is missing. Check the service queues configuration.',
+                    'Calling patients is not set up for this queue. Ask your system administrator to check the service queues configuration.',
                   )
                 : t(
                     'callPatientNoTicketNumber',
@@ -252,7 +255,14 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
       key={actionKey}
       kind="ghost"
       aria-label={t(actionProps.label, actionProps.text)}
-      disabled={isPending}
+      // `disabled` removes the button from the tab order the instant it is pressed, which drops a
+      // keyboard user's focus onto `document.body` before the request has even been sent. Getting
+      // back to the button to read the error or retry then means tabbing in from the top of a queue
+      // table that is one row per waiting patient. `aria-disabled` keeps the button focused and
+      // still tells a screen reader the state changed; the `isPendingRef` guard in `handleClick`,
+      // not the attribute, is what actually discards the second click.
+      aria-disabled={isPending}
+      aria-busy={isPending}
       onClick={handleClick}
       size={isDesktop(layout) ? 'sm' : 'lg'}>
       {t(actionProps.label, actionProps.text)}
