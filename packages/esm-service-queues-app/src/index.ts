@@ -6,7 +6,6 @@ import { dashboardMeta } from './dashboard.meta';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-service-queues-app';
-const swrRefreshIntervalInMs = 60000;
 
 const options = {
   featureName: 'serviceQueues',
@@ -16,9 +15,6 @@ const options = {
 export const root = getAsyncLifecycle(() => import('./root.component'), {
   featureName: 'service-queues-app-root',
   moduleName,
-  swrConfig: {
-    refreshInterval: swrRefreshIntervalInMs,
-  },
 });
 
 export const queueTableByStatusMenu = getAsyncLifecycle(
@@ -28,9 +24,6 @@ export const queueTableByStatusMenu = getAsyncLifecycle(
 export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/queue-table-by-status-view.component'), {
   featureName: 'queue-table-by-status-view',
   moduleName,
-  swrConfig: {
-    refreshInterval: swrRefreshIntervalInMs,
-  },
 });
 
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
@@ -62,11 +55,6 @@ export const callQueueEntryModal = getAsyncLifecycle(() => import('./modals/call
 
 export const moveQueueEntryModal = getAsyncLifecycle(() => import('./modals/move-queue-entry.modal'), {
   featureName: 'move queue entry',
-  moduleName,
-});
-
-export const transitionQueueEntryModal = getAsyncLifecycle(() => import('./modals/transition-queue-entry.modal'), {
-  featureName: 'transition queue entry',
   moduleName,
 });
 
