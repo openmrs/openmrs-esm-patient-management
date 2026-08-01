@@ -16,8 +16,15 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
-const queueEntryActions = ['move', 'call', 'edit', 'transition', 'remove', 'delete', 'undo'] as const;
+const queueEntryActions = ['move', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
 export type QueueEntryAction = (typeof queueEntryActions)[number];
+
+// Retired action names, mapped to the actions that replaced them. Still accepted in configuration and
+// resolved to their replacement when the action cell renders, so that older configurations keep working.
+export const deprecatedQueueEntryActions = { transition: 'move' } as const;
+export type ConfigurableQueueEntryAction = QueueEntryAction | keyof typeof deprecatedQueueEntryActions;
+
+const configurableQueueEntryActions = [...queueEntryActions, ...Object.keys(deprecatedQueueEntryActions)];
 
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
@@ -75,7 +82,7 @@ export const defaultPriorityConfig: PriorityConfig[] = [
 export const defaultColumnConfig: ColumnConfig = {
   actions: {
     buttons: ['call'],
-    overflowMenu: ['move', 'transition', 'edit', 'remove', 'undo'],
+    overflowMenu: ['move', 'edit', 'remove', 'undo'],
   },
   identifierTypeUuid: defaultIdentifierTypeUuid,
   statusConfigs: [],
@@ -238,6 +245,39 @@ export const configSchema = {
     _default: 'Outpatient Triage',
     _description: 'The name of the default service queue to be selected when the start visit form is opened',
   },
+  refreshIntervals: {
+    dashboard: {
+      active: {
+        _type: Type.Number,
+        _default: 60000,
+        _description:
+          'How often (in ms) the queue dashboards poll for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 120000,
+        _description: 'How often (in ms) the queue dashboards poll for updates once the user has gone idle.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+    },
+    queueScreen: {
+      active: {
+        _type: Type.Number,
+        _default: 5000,
+        _description:
+          'How often (in ms) the queue screen polls for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 10000,
+        _description:
+          'How often (in ms) the queue screen polls for updates once the user has gone idle. Kept short so an unattended, wall-mounted board stays reasonably current.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+    },
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -268,10 +308,11 @@ export const configSchema = {
               _default: ['call'],
               _description:
                 'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
+                queueEntryActions.join(', ') +
+                '. Deprecated: "transition" is still accepted but is treated as "move".',
               _elements: {
                 _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
+                _validators: [validators.oneOf(configurableQueueEntryActions)],
               },
             },
             overflowMenu: {
@@ -279,10 +320,11 @@ export const configSchema = {
               _default: ['edit', 'remove', 'undo'],
               _description:
                 'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
+                queueEntryActions.join(', ') +
+                '. Deprecated: "transition" is still accepted but is treated as "move".',
               _elements: {
                 _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
+                _validators: [validators.oneOf(configurableQueueEntryActions)],
               },
             },
           },
@@ -470,6 +512,10 @@ export interface ConfigObject {
     visitDiagnosesConceptUuid: string;
   };
   defaultInitialServiceQueue: string;
+  refreshIntervals: {
+    dashboard: { active: number; idle: number };
+    queueScreen: { active: number; idle: number };
+  };
   contactAttributeType: string;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;
@@ -506,8 +552,8 @@ export type ColumnDefinition = {
 
 export interface ActionsColumnConfig {
   actions: {
-    buttons: QueueEntryAction[];
-    overflowMenu: QueueEntryAction[];
+    buttons: ConfigurableQueueEntryAction[];
+    overflowMenu: ConfigurableQueueEntryAction[];
   };
 }
 
