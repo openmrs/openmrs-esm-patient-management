@@ -293,6 +293,39 @@ export const configSchema = {
     _default: defaultDrugOrderTypeUuid,
     _description: 'The UUID of the "Drug Order" order type, used to filter medications in the previous-visit view.',
   },
+  refreshIntervals: {
+    dashboard: {
+      active: {
+        _type: Type.Number,
+        _default: 60000,
+        _description:
+          'How often (in ms) the queue dashboards poll for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 120000,
+        _description: 'How often (in ms) the queue dashboards poll for updates once the user has gone idle.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+    },
+    queueScreen: {
+      active: {
+        _type: Type.Number,
+        _default: 5000,
+        _description:
+          'How often (in ms) the queue screen polls for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 10000,
+        _description:
+          'How often (in ms) the queue screen polls for updates once the user has gone idle. Kept short so an unattended, wall-mounted board stays reasonably current.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+    },
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -539,6 +572,10 @@ export interface ConfigObject {
   };
   defaultInitialServiceQueue: string;
   drugOrderTypeUuid: string;
+  refreshIntervals: {
+    dashboard: { active: number; idle: number };
+    queueScreen: { active: number; idle: number };
+  };
   contactAttributeType: string;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;
