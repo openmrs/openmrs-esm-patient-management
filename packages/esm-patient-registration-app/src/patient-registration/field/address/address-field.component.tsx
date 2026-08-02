@@ -11,6 +11,7 @@ import {
 import { ResourcesContextProvider, useResourcesContext } from '../../../resources-context';
 import { type AddressTemplate } from '../../patient-registration.types';
 import { Input } from '../../input/basic-input/input/input.component';
+import { SelectInput } from '../../input/basic-input/select/select-input.component';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
@@ -26,9 +27,15 @@ export const AddressComponent: React.FC = () => {
     fieldConfigurations: {
       address: {
         useAddressHierarchy: { enabled: addressHierarchyEnabled, useQuickSearch, searchAddressByLevel },
+        selectFields,
       },
     },
   } = config;
+
+  const selectFieldOptionsByCodeName = useMemo(
+    () => Object.fromEntries((selectFields ?? []).map(({ id, options }) => [id, options])),
+    [selectFields],
+  );
 
   const { addressTemplate } = useResourcesContext();
   const addressLayout = useMemo(() => {
@@ -71,6 +78,32 @@ export const AddressComponent: React.FC = () => {
     );
   }, [isLoadingFieldOrder, errorFetchingFieldOrder, orderedFields, addressLayout]);
 
+  const renderAddressField = (attributes: (typeof addressLayout)[number], index: number) => {
+    const options = selectFieldOptionsByCodeName[attributes.name];
+    if (options) {
+      return (
+        <SelectInput
+          key={`combo_input_${index}`}
+          name={`address.${attributes.name}`}
+          label={t(attributes.label)}
+          options={options}
+          required={attributes.required}
+        />
+      );
+    }
+
+    return (
+      <Input
+        key={`combo_input_${index}`}
+        name={`address.${attributes.name}`}
+        labelText={t(attributes.label)}
+        id={attributes.name}
+        value={selected}
+        required={attributes.required}
+      />
+    );
+  };
+
   if (addressTemplate && !Object.keys(addressTemplate)?.length) {
     return (
       <AddressComponentContainer>
@@ -82,20 +115,7 @@ export const AddressComponent: React.FC = () => {
   }
 
   if (!addressHierarchyEnabled || !isOnline) {
-    return (
-      <AddressComponentContainer>
-        {addressLayout.map((attributes, index) => (
-          <Input
-            key={`combo_input_${index}`}
-            name={`address.${attributes.name}`}
-            labelText={t(attributes.label)}
-            id={attributes.name}
-            value={selected}
-            required={attributes.required}
-          />
-        ))}
-      </AddressComponentContainer>
-    );
+    return <AddressComponentContainer>{addressLayout.map(renderAddressField)}</AddressComponentContainer>;
   }
 
   if (isLoadingFieldOrder) {
@@ -127,16 +147,7 @@ export const AddressComponent: React.FC = () => {
       {searchAddressByLevel ? (
         <AddressHierarchyLevels orderedAddressFields={orderedAddressFields} />
       ) : (
-        orderedAddressFields.map((attributes, index) => (
-          <Input
-            key={`combo_input_${index}`}
-            name={`address.${attributes.name}`}
-            labelText={t(attributes.label)}
-            id={attributes.name}
-            value={selected}
-            required={attributes.required}
-          />
-        ))
+        orderedAddressFields.map(renderAddressField)
       )}
     </AddressComponentContainer>
   );

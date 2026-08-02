@@ -3,12 +3,14 @@ import * as Yup from 'yup';
 import type { ObjectSchema } from 'yup';
 import mapValues from 'lodash/mapValues';
 import { type RegistrationConfig } from '../../config-schema';
-import { type FormValues } from '../patient-registration.types';
+import { type AddressTemplate, type FormValues } from '../patient-registration.types';
 import { getDatetime } from '../patient-registration.resource';
+import { isValidLuhn } from './luhn';
 
 export function getValidationSchema(
   config: RegistrationConfig,
   t: (key: string, defaultValue: string) => string,
+  addressTemplate?: AddressTemplate,
 ): ObjectSchema<any> {
   return Yup.object({
     givenName: Yup.string().required(t('givenNameRequired', 'Given name is required')),
@@ -124,6 +126,28 @@ export function getValidationSchema(
         relatedPersonUuid: Yup.string().required(),
         relationshipType: Yup.string().required(),
       }),
+    ),
+    address: Yup.object(
+      Object.fromEntries(
+        (config.fieldConfigurations.address?.fieldValidation ?? []).map(({ id, validateLuhn }) => {
+          let schema = Yup.string();
+          const regex = addressTemplate?.elementRegex?.[id];
+          if (regex) {
+            schema = schema.matches(new RegExp(regex), {
+              message: addressTemplate?.elementRegexFormats?.[id] || t('invalidFormat', 'Invalid format'),
+              excludeEmptyString: true,
+            });
+          }
+          if (validateLuhn) {
+            schema = schema.test(
+              'luhn-check',
+              t('invalidCheckDigit', 'Invalid check digit'),
+              (value) => !value || isValidLuhn(value),
+            );
+          }
+          return [id, schema];
+        }),
+      ),
     ),
   });
 }
