@@ -72,6 +72,16 @@ const mapEncounterProperties = (encounter: CoreEncounter): MappedEncounter => ({
   voided: encounter.voided,
 });
 
+// The ticket number shown on the queue display is stored as a visit attribute whose type is named
+// by the `visitQueueNumberAttributeUuid` configuration. A visit that predates the configuration, or
+// that was created outside the queue flow, simply does not carry the attribute, so this is undefined
+// far more often than not — callers that send it to the server must check it first.
+export function getVisitQueueNumber(queueEntry: QueueEntry, visitQueueNumberAttributeUuid: string) {
+  return queueEntry?.visit?.attributes?.find(
+    (attribute) => attribute?.attributeType?.uuid === visitQueueNumberAttributeUuid,
+  )?.value;
+}
+
 export const mapVisitQueueEntryProperties = (
   queueEntry: QueueEntry,
   visitQueueNumberAttributeUuid: string,
@@ -98,8 +108,7 @@ export const mapVisitQueueEntryProperties = (
   queueUuid: queueEntry.queue.uuid,
   queueEntryUuid: queueEntry.uuid,
   sortWeight: queueEntry.sortWeight,
-  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)
-    ?.value,
+  visitQueueNumber: getVisitQueueNumber(queueEntry, visitQueueNumberAttributeUuid),
   identifiers: queueEntry.patient?.identifiers as Identifer[],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
