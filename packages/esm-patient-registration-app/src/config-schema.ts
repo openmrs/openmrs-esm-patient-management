@@ -16,6 +16,7 @@ export interface FieldDefinition {
   allowFutureDates?: boolean;
   allowPastDates?: boolean;
   showHeading: boolean;
+  hideOptionalLabel?: boolean;
   validation?: {
     required: boolean;
     matches?: string;
