@@ -1,14 +1,24 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: layout.$spacing-10;
-}
 .workLoadCard {
   display: flex;
   color: colors.$black;
+}
+
+.dowCell {
+  flex: 1;
+  height: layout.$spacing-10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+  border-right: none;
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+
+  &:last-child {
+    border-right: 1px solid colors.$gray-20;
+  }
 }
