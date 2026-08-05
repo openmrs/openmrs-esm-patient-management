@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
 import {
   cohortUrl,
   getAllPatientLists,
@@ -147,6 +147,41 @@ export function usePatientListMembers(
     isLoadingListMembers: isLoading,
     error: error,
     mutateListMembers: mutate,
+  };
+}
+
+export interface SimplePatient {
+  uuid: string;
+  name: string;
+  identifier: string;
+  sex: string;
+  birthDate: string;
+}
+
+export function useAllPatients(startIndex: number = 0, pageSize: number = 10, searchTerm: string = '') {
+  const searchParam = searchTerm ? `&name=${encodeURIComponent(searchTerm)}` : '';
+  const url = `${fhirBaseUrl}/Patient?_count=${pageSize}&_getpagesoffset=${startIndex}&_sort=name${searchParam}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<fhir.Bundle>, Error>(url, openmrsFetch);
+
+  const patients: Array<SimplePatient> = (data?.data?.entry ?? [])
+    .map((entry) => entry.resource as fhir.Patient)
+    .filter(Boolean)
+    .map((patient) => ({
+      uuid: patient.id,
+      name: patient.name?.[0]?.text ?? '--',
+      identifier: patient.identifier?.[0]?.value ?? '--',
+      sex: patient.gender ?? '--',
+      birthDate: patient.birthDate ?? '--',
+    }));
+
+  return {
+    patients,
+    totalPatients: data?.data?.total ?? 0,
+    isLoading,
+    isValidating,
+    error,
+    mutate,
   };
 }
 

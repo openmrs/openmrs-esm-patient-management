@@ -16,6 +16,7 @@ export interface FieldDefinition {
   allowFutureDates?: boolean;
   allowPastDates?: boolean;
   showHeading: boolean;
+  hideOptionalLabel?: boolean;
   validation?: {
     required: boolean;
     matches?: string;
@@ -59,6 +60,8 @@ export interface RegistrationConfig {
         useQuickSearch: boolean;
         searchAddressByLevel: boolean;
       };
+      selectFields: Array<{ id: string; options: Array<string> }>;
+      fieldValidation: Array<{ id: string; validateLuhn?: boolean }>;
     };
     dateOfBirth: {
       allowEstimatedDateOfBirth: boolean;
@@ -92,7 +95,7 @@ export const builtInSections: Array<SectionDefinition> = [
   {
     id: 'demographics',
     name: 'Basic Info',
-    fields: ['name', 'gender', 'dob', 'id'],
+    fields: ['name', 'gender', 'patientStatus', 'dob', 'id'],
   },
   { id: 'contact', name: 'Contact Details', fields: ['address', 'phone'] },
   { id: 'death', name: 'Death Info', fields: ['dateAndTimeOfDeath', 'causeOfDeath'] },
@@ -150,7 +153,20 @@ export const esmPatientRegistrationSchema = {
   },
   fieldDefinitions: {
     _type: Type.Array,
-    _default: [],
+    _default: [
+      {
+        id: 'patientStatus',
+        type: 'person attribute',
+        uuid: 'c980ebc9-ce83-4954-9249-96cad71b8b1e',
+        label: 'Patient Status',
+        showHeading: true,
+        customConceptAnswers: [
+          { uuid: '7ff64150-c85a-427e-898a-c213d44d8a52', label: 'Resident' },
+          { uuid: '93356930-08f0-4a87-a2a5-b6cbfdae963c', label: 'IDP' },
+        ],
+        validation: { required: false },
+      },
+    ],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
     _elements: {
@@ -330,6 +346,40 @@ export const esmPatientRegistrationSchema = {
           _default: false,
           _description:
             "Whether to fill the addresses by levels, i.e. County => subCounty, the current field is dependent on it's previous field.",
+        },
+      },
+      selectFields: {
+        _type: Type.Array,
+        _default: [],
+        _description:
+          'Address fields (matched by address template codeName, e.g. stateProvince) that should render as a fixed dropdown instead of free text.',
+        _elements: {
+          id: {
+            _type: Type.String,
+            _description: 'The address template codeName (e.g. stateProvince, cityVillage) this applies to.',
+          },
+          options: {
+            _type: Type.Array,
+            _default: [],
+            _elements: { _type: Type.String },
+          },
+        },
+      },
+      fieldValidation: {
+        _type: Type.Array,
+        _default: [],
+        _description:
+          "Address fields (matched by address template codeName) opted into having the address template's elementRegex/elementRegexFormats enforced client-side, optionally with an added Luhn checksum.",
+        _elements: {
+          id: {
+            _type: Type.String,
+            _description: 'The address template codeName (e.g. address3) this applies to.',
+          },
+          validateLuhn: {
+            _type: Type.Boolean,
+            _default: false,
+            _description: 'Whether to additionally require the value to pass a Luhn checksum.',
+          },
         },
       },
     },
