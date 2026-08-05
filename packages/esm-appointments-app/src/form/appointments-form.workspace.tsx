@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import {
   Controller,
@@ -68,16 +68,19 @@ const time12HourFormatRegex = /^(1[0-2]|0?[1-9]):[0-5][0-9]$/;
 
 const isValidTime = (timeStr: string) => time12HourFormatRegex.test(timeStr);
 
-export const appointmentsFormSchema = z
+export const createAppointmentsFormSchema = (requireProvider: boolean) =>
+  z
   .object({
     duration: z.union([z.number(), z.null()]).optional(),
     isAllDayAppointment: z.boolean(),
     location: z.string().refine((value) => value !== '', {
       message: translateFrom(moduleName, 'locationRequired', 'Location is required'),
     }),
-    provider: z.string().refine((value) => value !== '', {
-      message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
-    }),
+    provider: requireProvider
+      ? z.string().refine((value) => value !== '', {
+          message: translateFrom(moduleName, 'providerRequired', 'Provider is required'),
+        })
+      : z.string().optional(),
     appointmentStatus: z.string().optional(),
     appointmentNote: z.string(),
     appointmentType: z.string().refine((value) => value !== '', {
@@ -165,7 +168,7 @@ export const appointmentsFormSchema = z
     }
   });
 
-export type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
+export type AppointmentFormData = z.infer<ReturnType<typeof createAppointmentsFormSchema>>;
 
 /**
  * Workspace used to create or edit an appointment within the appointments app
@@ -190,7 +193,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
 
   const selectedDate = useSelectedDate();
   const { serviceTypes, isLoading } = useAppointmentServices();
-  const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
+  const { appointmentStatuses, appointmentTypes, allowAllDayAppointments, requireProvider } =
+    useConfig<ConfigObject>();
+
+  const appointmentsFormSchema = useMemo(
+    () => createAppointmentsFormSchema(requireProvider),
+    [requireProvider],
+  );
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
@@ -228,6 +237,12 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     ? new Date(appointment?.dateAppointmentScheduled)
     : new Date();
 
+  const defaultProviderUuid = requireProvider
+    ? appointment?.providers?.find((p) => p.response === 'ACCEPTED')?.uuid ??
+      session?.currentProvider?.uuid ??
+      ''
+    : (appointment?.providers?.find((p) => p.response === 'ACCEPTED')?.uuid ?? '');
+
   const {
     control,
     getValues,
@@ -241,10 +256,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     resolver: zodResolver(appointmentsFormSchema),
     defaultValues: {
       location: appointment?.location?.uuid ?? session?.sessionLocation?.uuid ?? '',
-      provider:
-        appointment?.providers?.find((provider) => provider.response === 'ACCEPTED')?.uuid ??
-        session?.currentProvider?.uuid ??
-        '', // assumes only a single previously-scheduled provider with state "ACCEPTED", if multiple, just takes the first
+      provider: defaultProviderUuid,
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
       appointmentType: appointment?.appointmentKind || (appointmentTypes?.length === 1 ? appointmentTypes[0] : ''),
@@ -268,6 +280,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
+
+  useEffect(() => {
+    if (!requireProvider) {
+      const acceptedUuid = appointment?.providers?.find((p) => p.response === 'ACCEPTED')?.uuid ?? '';
+      setValue('provider', acceptedUuid);
+    }
+  }, [requireProvider, appointment, setValue]);
 
   // Retrieve ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
@@ -444,7 +463,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
       locationUuid: location,
-      providers: [{ uuid: provider }],
+      providers: provider ? [{ uuid: provider }] : [],
       patientUuid: patientUuid,
       comments: appointmentNote,
       uuid: isEditing ? appointment.uuid : undefined,
@@ -825,30 +844,33 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </FormGroup>
           ) : null}
 
-          <FormGroup className={styles.formGroup} legendText={t('provider', 'Provider')}>
-            <ResponsiveWrapper>
-              <Controller
-                name="provider"
-                control={control}
-                render={({ field: { onChange, value, onBlur, ref } }) => (
-                  <Select
-                    id="provider"
-                    invalidText="Required"
-                    labelText={t('selectProvider', 'Select a provider')}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    ref={ref}
-                    value={value}>
-                    <SelectItem key="chooseProvider" text={t('chooseProvider', 'Choose a provider')} value="" />
-                    {providers?.providers?.length > 0 &&
-                      providers?.providers?.map((provider) => (
-                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid} />
-                      ))}
-                  </Select>
-                )}
-              />
-            </ResponsiveWrapper>
-          </FormGroup>
+          {requireProvider ? (
+            <FormGroup className={styles.formGroup} legendText={t('provider', 'Provider')}>
+              <ResponsiveWrapper>
+                <Controller
+                  name="provider"
+                  control={control}
+                  render={({ field: { onChange, value, onBlur, ref } }) => (
+                    <Select
+                      id="provider"
+                      invalid={!!errors?.provider}
+                      invalidText={errors?.provider?.message}
+                      labelText={t('selectProvider', 'Select a provider')}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      ref={ref}
+                      value={value}>
+                      <SelectItem key="chooseProvider" text={t('chooseProvider', 'Choose a provider')} value="" />
+                      {providers?.providers?.length > 0 &&
+                        providers?.providers?.map((provider) => (
+                          <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid} />
+                        ))}
+                    </Select>
+                  )}
+                />
+              </ResponsiveWrapper>
+            </FormGroup>
+          ) : null}
 
           <FormGroup
             className={styles.formGroup}
