@@ -186,7 +186,7 @@
     },
     {
       "name": "service-queues-visit-notes-workspace",
-      "component": "@openmrs/esm-patient-notes-app#visitNotesFormWorkspace",
+      "component": "@openmrs/esm-patient-notes-app#exportedVisitNotesFormWorkspace",
       "window": "service-queues-visit-note"
     }
   ],

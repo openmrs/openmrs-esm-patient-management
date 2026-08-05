@@ -2,10 +2,13 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 
-export function usePastVisits(patientUuid: string) {
+export function usePastVisits(patientUuid: string, currentVisitUuid?: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,form:(uuid,display),encounterDatetime,' +
-    'orders:full,' +
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),' +
+    'form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,' +
+    // Use default representation for orders to safely include subclass-specific fields (e.g., DrugOrder)
+    // without requesting properties that are not present on other subclasses (e.g., TestOrder).
+    'orders,' +
     'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
     'value:(uuid,display)),value),encounterType:(uuid,display),' +
@@ -20,7 +23,9 @@ export function usePastVisits(patientUuid: string) {
   );
 
   const previousVisit = data?.data?.results
-    ?.filter((result) => dayjs(result.startDatetime).isBefore(dayjs().startOf('day')))
+    ?.filter(
+      (result) => result.uuid !== currentVisitUuid && dayjs(result.startDatetime).isBefore(dayjs().startOf('day')),
+    )
     ?.shift();
 
   return {
