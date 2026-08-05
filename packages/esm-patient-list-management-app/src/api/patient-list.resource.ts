@@ -93,7 +93,6 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
 
 export async function getAllPatientLists(
   filter: PatientListFilter = {},
-  myListCohortTypeUUID,
   systemListCohortTypeUUID,
   ac = new AbortController(),
 ) {
@@ -109,9 +108,7 @@ export async function getAllPatientLists(
     query.push(['attribute', `starred:${filter.isStarred}`]);
   }
 
-  if (filter.type === PatientListType.USER) {
-    query.push(['cohortType', myListCohortTypeUUID]);
-  } else if (filter.type === PatientListType.SYSTEM) {
+  if (filter.type === PatientListType.SYSTEM) {
     query.push(['cohortType', systemListCohortTypeUUID]);
   }
 
@@ -262,11 +259,10 @@ export async function getPatientListName(patientListUuid: string) {
 
 export async function findRealPatientListsWithoutPatient(
   patientUuid: string,
-  myListCohortUUID: string,
   systemListCohortType: string,
 ): Promise<Array<AddablePatientListViewModel>> {
   const [allLists, listsIdsOfThisPatient] = await Promise.all([
-    getAllPatientLists({}, myListCohortUUID, systemListCohortType),
+    getAllPatientLists({}, systemListCohortType),
     getPatientListIdsForPatient(patientUuid),
   ]);
 
@@ -322,7 +318,7 @@ export function useAddablePatientLists(patientUuid: string) {
     // In that case we still want to show fake lists and *not* error out here.
     const [fakeLists, realLists] = await Promise.allSettled([
       findFakePatientListsWithoutPatient(patientUuid, t),
-      findRealPatientListsWithoutPatient(patientUuid, config.myListCohortTypeUUID, config.systemListCohortTypeUUID),
+      findRealPatientListsWithoutPatient(patientUuid, config.systemListCohortTypeUUID),
     ]);
 
     return [
