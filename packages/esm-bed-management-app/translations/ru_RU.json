@@ -61,7 +61,7 @@
   "errorDeletingBedTag": "Ошибка при удалении метки койки",
   "errorDeletingBedType": "Ошибка при удалении типа койки",
   "errorFetchingbedInformation": "Ошибка при получении информации о койке",
-  "filterByOccupancyStatus": "По статусу",
+  "filterByOccupancyStatus": "Фильтровать по занятости",
   "ids": "ID",
   "itemsPerPage": "Записей на странице:",
   "location": "Местонахождение",
