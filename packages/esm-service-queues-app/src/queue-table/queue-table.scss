@@ -4,7 +4,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .defaultQueueTable {
-  margin: layout.$spacing-05;
+  margin: 0;
 }
 
 .container {
@@ -41,16 +41,6 @@
 
   :global(.cds--inline-loading) {
     justify-content: end;
-  }
-}
-
-.filterContainer {
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: layout.$spacing-05;
   }
 }
 

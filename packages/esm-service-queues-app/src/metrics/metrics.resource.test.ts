@@ -1,9 +1,13 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import dayjs from 'dayjs';
+import useSWR from 'swr';
 import { restBaseUrl, useOpenmrsFetchAll, useSession } from '@openmrs/esm-framework';
-import { useActiveVisits } from './metrics.resource';
+import { useActiveVisits, useAverageWaitTime } from './metrics.resource';
 
+vi.mock('swr', () => ({ default: vi.fn() }));
+
+const mockUseSWR = vi.mocked(useSWR);
 const mockUseOpenmrsFetchAll = vi.mocked(useOpenmrsFetchAll);
 const mockUseSession = vi.mocked(useSession);
 
@@ -67,5 +71,20 @@ describe('useActiveVisits', () => {
     );
     const { result } = renderHook(() => useActiveVisits('location-1'));
     expect(result.current.activeVisits.map((visit) => visit.uuid)).toEqual(['v2']);
+  });
+});
+
+describe('useAverageWaitTime', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('bounds the average to entries started today', () => {
+    mockUseSWR.mockReturnValue({ data: undefined, error: undefined, isLoading: true } as ReturnType<typeof useSWR>);
+    renderHook(() => useAverageWaitTime('service-1', 'location-1', 'status-1'));
+
+    // The exact format matters as much as the parameter itself; see useAverageWaitTime.
+    const url = decodeURIComponent(mockUseSWR.mock.calls[0][0] as string);
+    expect(url).toMatch(/&startedOnOrAfter=\d{4}-\d{2}-\d{2} 00:00:00/);
   });
 });

@@ -55,7 +55,7 @@ export const MetricsCardBody: React.FC<MetricsCardBodyProps> = ({ children }) =>
 };
 
 interface MetricsCardItemProps {
-  label: string;
+  label?: string;
   /** If the value is null, the item will not be rendered. */
   value: number | string | null;
   small?: boolean;
@@ -73,7 +73,7 @@ export const MetricsCardItem: React.FC<MetricsCardItemProps> = ({ label, value, 
         [styles.smallItem]: small,
         [styles.mainItem]: !small,
       })}>
-      <span className={styles.metricLabel}>{label}</span>
+      {label && <span className={styles.metricLabel}>{label}</span>}
       <p
         className={classNames(styles.metricValue, {
           [styles.red]: color === 'red',

@@ -1,0 +1,19 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tabsContainer {
+  margin: layout.$spacing-05 layout.$spacing-05 0;
+
+  :global(.cds--tabs) {
+    --cds-border-interactive: #{$brand-01};
+  }
+
+  :global(.cds--tabs__nav-item--selected),
+  :global(.cds--tab--selected) {
+    border-block-start-color: $brand-01;
+  }
+
+  :global(.cds--tab-content) {
+    padding: layout.$spacing-05 0 0;
+  }
+}
