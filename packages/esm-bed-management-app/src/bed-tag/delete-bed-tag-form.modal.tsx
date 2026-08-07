@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Form, FormGroup, ModalBody, ModalFooter, ModalHeader, Stack, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
@@ -15,10 +15,6 @@ interface DeleteBedTagFormProps {
   bedTagData: BedTagData;
   closeModal: () => void;
   handleDeleteBedTag: (uuid: string, reason: string, bedTagData: BedTagData, closeModal: () => void) => void;
-}
-
-interface ErrorType {
-  message: string;
 }
 
 const DeleteBedTagAdministrationSchema = z.object({
@@ -48,8 +44,9 @@ const DeleteBedTagForm: React.FC<DeleteBedTagFormProps> = ({ bedTagData, handleD
     }
   };
 
-  const onError = (error: { [key: string]: ErrorType }) => {
-    setFormStateError(Object.entries(error)[0][1].message);
+  const onError = (errors: FieldErrors<BedTagData>) => {
+    const firstError = Object.values(errors)[0];
+    setFormStateError(firstError?.message ?? 'Validation failed');
     setIsInvalid(true);
   };
 
