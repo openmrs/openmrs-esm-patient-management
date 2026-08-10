@@ -28,6 +28,13 @@ test.beforeEach(async ({ api, emrConfiguration }) => {
   await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
 });
 
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+});
+
 test('Admit a patient to a ward from the admission requests list', async ({ page, api }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
@@ -70,11 +77,4 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
       page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
     ).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });
