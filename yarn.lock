@@ -745,13 +745,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@epic-web/invariant@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@epic-web/invariant@npm:1.0.0"
-  checksum: 10/28b36a7447f60b84f9d6a23571480042170ef4239a577577ad8447f64a2e4f1a4e57e6fe1b592e61534c5ab53ff67776130e6c88a68cbd997eb6e9c9759a5934
-  languageName: node
-  linkType: hard
-
 "@esbuild/aix-ppc64@npm:0.25.11":
   version: 0.25.11
   resolution: "@esbuild/aix-ppc64@npm:0.25.11"
@@ -2770,7 +2763,6 @@ __metadata:
     "@vitest/coverage-v8": "npm:^4.1.2"
     babel-preset-minify: "npm:^0.5.1"
     concurrently: "npm:^5.3.0"
-    cross-env: "npm:^10.1.0"
     css-loader: "npm:^6.8.1"
     dayjs: "npm:^1.8.36"
     dotenv: "npm:^16.0.3"
@@ -7664,19 +7656,6 @@ __metadata:
   bin:
     crc32: bin/crc32.njs
   checksum: 10/824f696a5baaf617809aa9cd033313c8f94f12d15ebffa69f10202480396be44aef9831d900ab291638a8022ed91c360696dd5b1ba691eb3f34e60be8835b7c3
-  languageName: node
-  linkType: hard
-
-"cross-env@npm:^10.1.0":
-  version: 10.1.0
-  resolution: "cross-env@npm:10.1.0"
-  dependencies:
-    "@epic-web/invariant": "npm:^1.0.0"
-    cross-spawn: "npm:^7.0.6"
-  bin:
-    cross-env: dist/bin/cross-env.js
-    cross-env-shell: dist/bin/cross-env-shell.js
-  checksum: 10/0e5d8bdefbbcd000460b69755e0eeb22953510abac8375e4f8b638ff7c45406141acfd57b8a4c1d1cf0b5ea42f33451b302062fb9b34408753b4d465e901b845
   languageName: node
   linkType: hard
 

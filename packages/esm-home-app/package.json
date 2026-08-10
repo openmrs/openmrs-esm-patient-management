@@ -12,7 +12,7 @@
     "debug": "npm run serve",
     "build": "rspack --mode production",
     "analyze": "rspack --mode=production --env.analyze=true",
-    "lint": "cross-env eslint src --fix --max-warnings=0 --color",
+    "lint": "eslint src --fix --max-warnings=0 --color",
     "typescript": "tsc",
     "verify": "turbo lint typescript test --color",
     "extract-translations": "i18next 'src/**/*.{component.tsx,tsx}' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
