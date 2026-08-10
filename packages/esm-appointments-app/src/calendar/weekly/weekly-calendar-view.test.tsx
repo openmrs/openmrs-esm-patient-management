@@ -4,11 +4,19 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { SWRConfig } from 'swr';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, getLocale } from '@openmrs/esm-framework';
+import { getDefaultCalendar } from '@openmrs/esm-utils';
 import { AppointmentKind, AppointmentStatus } from './../../types';
 import WeeklyCalendarView from './weekly-calendar-view.component';
 
+vi.mock('@openmrs/esm-utils', async () => {
+  const actual = await vi.importActual('@openmrs/esm-utils');
+  return { ...(actual as object), getDefaultCalendar: vi.fn(() => 'gregory') };
+});
+
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockGetLocale = vi.mocked(getLocale);
+const mockGetDefaultCalendar = vi.mocked(getDefaultCalendar);
 
 const june09WeekStart = dayjs('2026-06-09').startOf('week');
 
@@ -80,12 +88,7 @@ function renderWeekly(props = {}) {
         revalidateOnFocus: false,
         shouldRetryOnError: false,
       }}>
-      <WeeklyCalendarView
-        calKey="gregory"
-        calendarSelectedDate={dayjs('2026-06-09')}
-        onSelectDate={vi.fn()}
-        {...props}
-      />
+      <WeeklyCalendarView calendarSelectedDate={dayjs('2026-06-09')} onSelectDate={vi.fn()} {...props} />
     </SWRConfig>,
   );
 }
@@ -95,6 +98,8 @@ describe('WeeklyCalendarView', () => {
     apptCounter = 0;
     mockOpenmrsFetch.mockReset();
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+    mockGetLocale.mockReturnValue('en');
+    mockGetDefaultCalendar.mockReturnValue('gregory');
   });
 
   it('renders the 7 day column headers', async () => {
@@ -292,6 +297,7 @@ describe('WeeklyCalendarView', () => {
   });
 
   it('supports different calendar keys without crashing', async () => {
+    mockGetDefaultCalendar.mockReturnValue('ethiopic');
     mockAppointmentsForDay(0, [
       mockAppointment({
         startDateTime: ts(0, 9, 0),
@@ -299,7 +305,7 @@ describe('WeeklyCalendarView', () => {
       }),
     ]);
 
-    renderWeekly({ calKey: 'ethiopic' });
+    renderWeekly();
 
     await screen.findByText('John Wilson');
   });

@@ -1,43 +1,24 @@
 import React from 'react';
-import { type Dayjs } from 'dayjs';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
-import { formatDate } from '@openmrs/esm-framework';
-import DaysOfWeekCard from './days-of-week.component';
+import { getCalendarFormat } from '../calendar-utils';
 import styles from './monthly-header.scss';
 
-const DAYS_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+interface MonthlyHeaderProps {}
 
-interface MonthlyHeaderProps {
-  calendarSelectedDate: Dayjs;
-  onSelectPrevMonth: () => void;
-  onSelectNextMonth: () => void;
-}
-
-const MonthlyHeader: React.FC<MonthlyHeaderProps> = ({
-  calendarSelectedDate,
-  onSelectPrevMonth,
-  onSelectNextMonth,
-}) => {
-  const { t } = useTranslation();
+const MonthlyHeader: React.FC<MonthlyHeaderProps> = () => {
+  const { locale, calendar } = getCalendarFormat();
+  const dayNames = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(1970, 0, 4 + i);
+    return new Intl.DateTimeFormat(locale, { weekday: 'short', calendar }).format(d);
+  });
 
   return (
-    <>
-      <div className={styles.container}>
-        <Button aria-label={t('previousMonth', 'Previous month')} kind="tertiary" onClick={onSelectPrevMonth} size="sm">
-          {t('prev', 'Prev')}
-        </Button>
-        <span>{formatDate(calendarSelectedDate.toDate(), { day: false, time: false, noToday: true })}</span>
-        <Button aria-label={t('nextMonth', 'Next month')} kind="tertiary" onClick={onSelectNextMonth} size="sm">
-          {t('next', 'Next')}
-        </Button>
-      </div>
-      <div className={styles.workLoadCard}>
-        {DAYS_IN_WEEK.map((day) => (
-          <DaysOfWeekCard key={day} dayOfWeek={day} />
-        ))}
-      </div>
-    </>
+    <div className={styles.workLoadCard}>
+      {dayNames.map((label, i) => (
+        <div key={i} className={styles.dowCell}>
+          {label}
+        </div>
+      ))}
+    </div>
   );
 };
 

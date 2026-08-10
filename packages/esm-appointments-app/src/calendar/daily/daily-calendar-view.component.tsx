@@ -14,33 +14,14 @@ import {
 } from '../utils/calendar-colors';
 import styles from './daily-calendar-view.scss';
 
-const LOCALE_MAP: Record<string, string> = {
-  gregory: 'en-US',
-  ethiopic: 'am-ET',
-  islamic: 'ar-SA',
-  persian: 'fa-IR',
-};
-
 interface DailyCalendarViewProps {
-  calKey: string;
   calendarSelectedDate: Dayjs;
 }
 
-const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calKey, calendarSelectedDate }) => {
+const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate }) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
-  const locale = LOCALE_MAP[calKey] ?? 'en-US';
   const { appointments, isLoading } = useAppointmentsByDate(isoDate);
-
-  const displayDate = useMemo(() => {
-    const d = calendarSelectedDate.toDate();
-    return new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      calendar: calKey,
-    }).format(d);
-  }, [calendarSelectedDate, locale, calKey]);
 
   const hourSlots = useMemo(
     () =>
@@ -65,7 +46,6 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calKey, calendarS
   return (
     <div className={styles.container}>
       <div className={styles.heading}>
-        <h2 className={styles.title}>{displayDate}</h2>
         <p className={styles.subtitle}>
           {appointments.length === 0
             ? t('noAppointments', 'No appointments scheduled')
