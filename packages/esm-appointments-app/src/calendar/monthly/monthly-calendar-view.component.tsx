@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import isBetween from 'dayjs/plugin/isBetween';
 import dayjs, { type Dayjs } from 'dayjs';
 import { type DailyAppointmentsCountByService } from '../../types';
@@ -12,29 +12,13 @@ dayjs.extend(isBetween);
 interface MonthlyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;
   calendarSelectedDate: Dayjs;
-  setCalendarSelectedDate: React.Dispatch<React.SetStateAction<Dayjs>>;
+  onSelectDate?: (isoDate: string) => void;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
-  events,
-  calendarSelectedDate,
-  setCalendarSelectedDate,
-}) => {
-  const handleSelectPrevMonth = useCallback(() => {
-    setCalendarSelectedDate((prev) => prev.subtract(1, 'month'));
-  }, [setCalendarSelectedDate]);
-
-  const handleSelectNextMonth = useCallback(() => {
-    setCalendarSelectedDate((prev) => prev.add(1, 'month'));
-  }, [setCalendarSelectedDate]);
-
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate }) => {
   return (
     <div className={styles.calendarViewContainer}>
-      <MonthlyHeader
-        calendarSelectedDate={calendarSelectedDate}
-        onSelectPrevMonth={handleSelectPrevMonth}
-        onSelectNextMonth={handleSelectNextMonth}
-      />
+      <MonthlyHeader />
       <div className={styles.wrapper}>
         <div className={styles.monthlyCalendar}>
           {monthDays(calendarSelectedDate).map((dateTime, i) => (
@@ -43,6 +27,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
               dateTime={dateTime}
               events={events}
               calendarSelectedDate={calendarSelectedDate}
+              onSelectDate={onSelectDate}
             />
           ))}
         </div>
