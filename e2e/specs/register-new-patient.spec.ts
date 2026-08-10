@@ -7,6 +7,16 @@ import { type PatientRegistrationFormValues } from '../commands/types';
 const PATIENT_CHART_URL = /\/patient\/(?<uuid>[a-f0-9-]{36})\/chart/i;
 let patientUuid: string;
 
+test.afterEach(async ({ api }) => {
+  if (patientUuid) {
+    try {
+      await deletePatient(api, patientUuid);
+    } catch (error) {
+      console.error(`Error deleting patient ${patientUuid}:`, error);
+    }
+  }
+});
+
 test('Register a new patient', async ({ page }) => {
   test.slow();
   const patientRegistrationPage = new RegistrationAndEditPage(page);
@@ -215,6 +225,7 @@ test('Register an unknown patient', async ({ page }) => {
   });
 
   const estimatedAge = 25;
+
   await test.step(`And I fill in ${estimatedAge} as the estimated age in years`, async () => {
     await page.getByLabel(/estimated age in years/i).fill(`${estimatedAge}`);
   });
@@ -243,14 +254,4 @@ test('Register an unknown patient', async ({ page }) => {
     await expect(patientBanner.getByText(expectedBirthYear.toString())).toBeVisible();
     await expect(patientBanner.getByText(/OpenMRS ID/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  if (patientUuid) {
-    try {
-      await deletePatient(api, patientUuid);
-    } catch (error) {
-      console.error(`Error deleting patient ${patientUuid}:`, error);
-    }
-  }
 });

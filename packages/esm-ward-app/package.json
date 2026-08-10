@@ -13,7 +13,7 @@
     "debug": "npm run serve",
     "build": "rspack --mode production",
     "analyze": "rspack --mode=production --env.analyze=true",
-    "lint": "cross-env eslint src --ext ts,tsx",
+    "lint": "cross-env eslint src",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage --passWithNoTests",
