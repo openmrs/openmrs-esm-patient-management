@@ -1,30 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
+import { useSelectedDate } from '../hooks/useSelectedDate';
+import { type CalendarViewMode } from '../types';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
-import { useSelectedDate } from '../hooks/useSelectedDate';
+import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
+import DailyCalendarView from './daily/daily-calendar-view.component';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
+  const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
+  const { calendarEvents } = useAppointmentsCalendar(
+    viewMode === 'monthly' ? calendarSelectedDate.toISOString() : null,
+    viewMode,
+  );
 
-  const period = 'monthly';
+  const handlePrev = useCallback(() => {
+    if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
+    else if (viewMode === 'weekly') setCalendarSelectedDate((d) => d.subtract(7, 'day'));
+    else setCalendarSelectedDate((d) => d.subtract(1, 'day'));
+  }, [viewMode]);
 
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), period);
+  const handleNext = useCallback(() => {
+    if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.add(1, 'month'));
+    else if (viewMode === 'weekly') setCalendarSelectedDate((d) => d.add(7, 'day'));
+    else setCalendarSelectedDate((d) => d.add(1, 'day'));
+  }, [viewMode]);
+
+  const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
+    setViewMode(mode);
+  }, []);
+
+  const handleSelectDate = useCallback((isoDate: string) => {
+    setCalendarSelectedDate(dayjs(isoDate));
+    setViewMode('daily');
+  }, []);
 
   return (
     <div data-testid="appointments-calendar">
-      <AppointmentsHeader title={t('calendar', 'Calendar')} />
-      <CalendarHeader />
-      <MonthlyCalendarView
-        events={calendarEvents}
+      <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
+      <CalendarHeader
+        viewMode={viewMode}
         calendarSelectedDate={calendarSelectedDate}
-        setCalendarSelectedDate={setCalendarSelectedDate}
+        onViewModeChange={handleViewModeChange}
+        onPrev={handlePrev}
+        onNext={handleNext}
       />
+      {viewMode === 'monthly' && (
+        <MonthlyCalendarView
+          events={calendarEvents}
+          calendarSelectedDate={calendarSelectedDate}
+          onSelectDate={handleSelectDate}
+        />
+      )}
+      {viewMode === 'weekly' && (
+        <WeeklyCalendarView
+          calendarSelectedDate={calendarSelectedDate}
+          onSelectDate={(isoDate) => handleSelectDate(isoDate)}
+        />
+      )}
+      {viewMode === 'daily' && <DailyCalendarView calendarSelectedDate={calendarSelectedDate} />}
     </div>
   );
 };

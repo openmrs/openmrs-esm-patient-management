@@ -19,7 +19,6 @@ vi.mock('react-i18next', () => ({
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 const defaultProps = {
-  calKey: 'gregory',
   calendarSelectedDate: dayjs('2026-06-09'),
 };
 
@@ -79,19 +78,11 @@ describe('DailyCalendarView', () => {
     });
   });
 
-  it('renders the date heading and appointment count', async () => {
+  it('renders the appointment count', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [mockAppointment()] } as FetchResponse);
     renderWithSwr(<DailyCalendarView {...defaultProps} />);
 
-    await screen.findByText(/June 9, 2026/);
     await screen.findByText('1 appointment(s)');
-  });
-
-  it('renders date using the given calendar key', async () => {
-    mockOpenmrsFetch.mockResolvedValue({ data: [mockAppointment()] } as FetchResponse);
-    renderWithSwr(<DailyCalendarView {...defaultProps} calKey="ethiopic" />);
-
-    await waitFor(() => expect(screen.getByRole('heading').textContent).toBeTruthy());
   });
 
   it('renders hour labels only for hours with appointments', async () => {

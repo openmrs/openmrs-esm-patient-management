@@ -8,10 +8,13 @@
   border-bottom: 1px solid colors.$gray-20;
   background: colors.$white;
   color: colors.$black;
-  cursor: pointer;
   padding: layout.$spacing-01;
   text-align: right;
   @include type.type-style('body-compact-02');
+
+  &-clickable {
+    cursor: pointer;
+  }
 
   &:nth-child(7n) {
     border-right: 1px solid colors.$gray-20;
@@ -136,6 +139,12 @@
     text-align: right;
     @include type.type-style('heading-compact-01');
   }
+}
+
+.calendarDate {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  font-weight: 600;
 }
 
 .smallDesktop {
