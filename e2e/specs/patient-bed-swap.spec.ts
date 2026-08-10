@@ -49,6 +49,13 @@ test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, swapBed.id, wardPatient.uuid);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+});
+
 test('Swap a patient from one bed to another', async ({ page, api }) => {
   const wardPage = new WardPage(page);
   const fullName = wardPatient.person?.display;
@@ -131,11 +138,4 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     });
     await expect(originalBedLocator.getByText(/empty bed/i)).toBeVisible({ timeout: 60000 });
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, swapBed.id, wardPatient.uuid);
-  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });
