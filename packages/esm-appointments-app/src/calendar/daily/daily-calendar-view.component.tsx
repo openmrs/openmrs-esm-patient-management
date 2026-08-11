@@ -67,7 +67,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
 };
 
 const DailyCard: React.FC<{ appointment: Appointment }> = ({ appointment }) => {
-  const color = getServiceColor(appointment.service.name);
+  const color = getServiceColor(appointment.service?.uuid, appointment.service?.name, appointment.service?.color);
   const tagType = STATUS_TAG_TYPES[appointment.status] ?? DEFAULT_STATUS_TAG_TYPE;
   const time = useMemo(() => {
     if (appointment.startDateTime == null) return '—';

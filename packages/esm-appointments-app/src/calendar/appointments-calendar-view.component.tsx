@@ -9,6 +9,7 @@ import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
+import styles from './appointments-calendar-view-view.scss';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ const AppointmentsCalendarView: React.FC = () => {
   }, []);
 
   return (
-    <div data-testid="appointments-calendar">
+    <div data-testid="appointments-calendar" className={styles.backgroundColor}>
       <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
       <CalendarHeader
         viewMode={viewMode}

@@ -157,7 +157,7 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText(/\w{3} \d{1,2} – \w{3} \d{1,2}, \d{4}/)).toBeInTheDocument();
   });
 
-  it('switches to daily view when a day cell with appointments is clicked in monthly mode', async () => {
+  it('opens popup when a day cell with appointments is clicked in monthly mode, then switches to daily view when Open day view is clicked', async () => {
     const user = userEvent.setup();
     const today = dayjs().format('YYYY-MM-DD');
     mockUseAppointmentsCalendar.mockReturnValue({
@@ -168,7 +168,11 @@ describe('Appointment calendar view', () => {
 
     renderCalendar();
 
-    await user.click(screen.getByRole('button', { name: '5' }));
+    await user.click(screen.getAllByText('Gen')[0]);
+
+    const openDayViewBtn = screen.getAllByRole('button', { name: /open day view/i })[0];
+    expect(openDayViewBtn).toBeInTheDocument();
+    await user.click(openDayViewBtn);
 
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('daily');

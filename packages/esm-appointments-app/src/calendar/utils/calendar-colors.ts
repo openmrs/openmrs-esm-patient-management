@@ -11,24 +11,53 @@ export const STATUS_TAG_TYPES: Readonly<Record<string, CarbonTagType>> = {
 
 export const DEFAULT_STATUS_TAG_TYPE: CarbonTagType = 'gray';
 
-const SERVICE_COLOR_PALETTE: ReadonlyArray<string> = [
-  'var(--cds-blue-60)',
-  'var(--cds-purple-60)',
-  'var(--cds-teal-60)',
-  'var(--cds-magenta-60)',
-  'var(--cds-cyan-60)',
-  'var(--cds-green-60)',
-  'var(--cds-orange-60)',
-  'var(--cds-cool-gray-60)',
-] as const;
+export interface ServiceColorTheme {
+  swatch: string;
+  bg: string;
+}
 
-export function getServiceColor(serviceName: string): string {
-  let hash = 0;
-  for (let i = 0; i < serviceName.length; i++) {
-    hash = (hash << 5) - hash + serviceName.charCodeAt(i);
-    hash |= 0;
+const themeCache = new Map<string, ServiceColorTheme>();
+
+export function getServiceTheme(serviceUuid?: string, serviceName?: string, serviceColor?: string): ServiceColorTheme {
+  const identifier = serviceUuid || serviceName || '';
+  const cacheKey = serviceColor ? `${identifier}_${serviceColor}` : identifier;
+
+  if (!cacheKey) {
+    return {
+      swatch: 'hsl(0, 0%, 45%)',
+      bg: 'hsl(0, 0%, 96%)',
+    };
   }
-  return SERVICE_COLOR_PALETTE[Math.abs(hash) % SERVICE_COLOR_PALETTE.length];
+
+  if (themeCache.has(cacheKey)) {
+    return themeCache.get(cacheKey)!;
+  }
+
+  let theme: ServiceColorTheme;
+  if (serviceColor && serviceColor.startsWith('#')) {
+    theme = {
+      swatch: serviceColor,
+      bg: serviceColor + '1a',
+    };
+  } else {
+    let hash = 0;
+    for (let i = 0; i < identifier.length; i++) {
+      hash = (hash << 5) - hash + identifier.charCodeAt(i);
+      hash |= 0;
+    }
+    const hue = Math.abs(hash) % 360;
+    theme = {
+      swatch: `hsl(${hue}, 65%, 42%)`,
+      bg: `hsl(${hue}, 65%, 96%)`,
+    };
+  }
+
+  themeCache.set(cacheKey, theme);
+  return theme;
+}
+
+export function getServiceColor(serviceUuid?: string, serviceName?: string, serviceColor?: string): string {
+  return getServiceTheme(serviceUuid, serviceName, serviceColor).swatch;
 }
 
 export const CALENDAR_HOURS: ReadonlyArray<number> = Array.from({ length: 24 }, (_, i) => i) as ReadonlyArray<number>;
