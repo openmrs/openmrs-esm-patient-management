@@ -14,6 +14,15 @@ test.beforeEach(async ({ api }) => {
   location = await bedLocation(api);
 });
 
+test.afterEach(async ({ api }) => {
+  if (bedType?.uuid) {
+    await retireBedType(api, bedType.uuid, 'Retired during automated testing');
+  }
+  if (bed?.uuid) {
+    await deleteBed(api, bed);
+  }
+});
+
 test('Create a bed with a type, tag and location', async ({ page }) => {
   const bedAdministration = new BedAdministrationPage(page);
 
@@ -120,13 +129,4 @@ test('Create a bed with a type, tag and location', async ({ page }) => {
     await expect(table).toContainText(bed.bedNumber);
     (bed as any).uuid = bedBody.uuid as string;
   });
-});
-
-test.afterEach(async ({ api }) => {
-  if (bedType?.uuid) {
-    await retireBedType(api, bedType.uuid, 'Retired during automated testing');
-  }
-  if (bed?.uuid) {
-    await deleteBed(api, bed);
-  }
 });
