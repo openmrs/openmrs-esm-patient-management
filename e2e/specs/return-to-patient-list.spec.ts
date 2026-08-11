@@ -13,6 +13,11 @@ test.beforeEach(async ({ api, patient }) => {
   cohortMembership = (await addPatientToCohort(api, cohort.uuid, patient.uuid)) as unknown as CohortMember;
 });
 
+test.afterEach(async ({ api }) => {
+  await removePatientFromCohort(api, cohortMembership.uuid);
+  await deleteCohort(api, cohort.uuid);
+});
+
 test('Return to patient list from the patient chart', async ({ page, patient }) => {
   const patientListPage = new PatientListsPage(page);
 
@@ -145,9 +150,4 @@ test.skip('Return to patient list from the patient chart on a new tab', async ({
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await removePatientFromCohort(api, cohortMembership.uuid);
-  await deleteCohort(api, cohort.uuid);
 });
