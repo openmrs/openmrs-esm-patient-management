@@ -11,6 +11,7 @@
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
+    "check-translations": "turbo run extract-translations --force && git diff --exit-code -- 'packages/*/translations/en.json' && git ls-files --others --exclude-standard -- 'packages/*/translations/en.json' | sed 's/^/Uncommitted generated catalog: /' && test -z \"$(git ls-files --others --exclude-standard -- 'packages/*/translations/en.json')\"",
     "verify": "turbo run lint typescript test --concurrency=1",
     "test-e2e": "playwright test",
     "postinstall": "husky install"
