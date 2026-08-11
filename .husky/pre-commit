@@ -4,4 +4,4 @@
 set -e  # die on error
 
 yarn lint-staged --no-stash
-yarn turbo run extract-translations
+yarn check-translations
