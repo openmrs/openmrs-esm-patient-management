@@ -36,7 +36,7 @@
 }
 
 .monthly-cell-today {
-  border: 2px solid colors.$teal-60 !important;
+  border: 2px solid var(--brand-03) !important;
   z-index: 1;
 }
 
@@ -68,7 +68,7 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
-  background-color: colors.$teal-60;
+  background-color: var(--brand-03);
   color: colors.$white;
   display: flex;
   align-items: center;
@@ -135,7 +135,7 @@
   margin-top: 0.25rem;
   padding: 0;
   @include type.type-style('label-01');
-  color: colors.$teal-60;
+  color: var(--brand-03);
   font-weight: 600;
   background: transparent;
   border: none;
@@ -238,7 +238,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: colors.$teal-60;
+  color: var(--brand-03);
   @include type.type-style('heading-compact-01');
   font-weight: 600;
   background: transparent;
