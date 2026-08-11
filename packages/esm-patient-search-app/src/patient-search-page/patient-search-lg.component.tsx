@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
 import type { SearchedPatient } from '../types';
 import { EmptyState, ErrorState, LoadingState, PatientSearchResults } from './patient-search-views.component';
+import { useMinSearchCharacters } from '../patient-search.resource';
 import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
 
@@ -25,6 +26,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   fetchError,
 }) => {
   const { t } = useTranslation();
+  const { minSearchCharacters } = useMinSearchCharacters();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
   const totalResults = searchResults.length;
 
@@ -48,11 +50,11 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     if (!isLoading && (!results || results.length === 0)) {
-      return <EmptyState />;
+      return <EmptyState query={query} minSearchCharacters={minSearchCharacters} />;
     }
 
     return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+  }, [fetchError, isLoading, results, query, minSearchCharacters]);
 
   return (
     <div

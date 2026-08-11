@@ -10,18 +10,36 @@ interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
 }
 
-export const EmptyState: React.FC = () => {
+interface EmptyStateProps {
+  query?: string;
+  minSearchCharacters?: number;
+}
+
+export const EmptyState: React.FC<EmptyStateProps> = ({ query = '', minSearchCharacters = 0 }) => {
   const { t } = useTranslation();
+  const tooFewCharacters = query.trim().length < minSearchCharacters;
   return (
     <Layer>
       <Tile className={styles.emptySearchResultsTile}>
         <EmptyCardIllustration />
-        <p className={styles.emptyResultText}>
-          {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-        </p>
-        <p className={styles.actionText}>
-          <span>{t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}</span>
-        </p>
+        {tooFewCharacters ? (
+          <p className={styles.emptyResultText}>
+            {t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+              count: minSearchCharacters,
+            })}
+          </p>
+        ) : (
+          <>
+            <p className={styles.emptyResultText}>
+              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
+            </p>
+            <p className={styles.actionText}>
+              <span>
+                {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+              </span>
+            </p>
+          </>
+        )}
       </Tile>
     </Layer>
   );
