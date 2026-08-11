@@ -8,7 +8,14 @@
 .monthlyCalendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(0px, 1fr));
-  grid-template-rows: repeat(6, minmax(0px, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+
+  :global(.cds--popover-container) {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .calendarViewContainer {
