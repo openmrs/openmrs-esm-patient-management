@@ -4,6 +4,7 @@ import { Button, Tag, DataTableSkeleton } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { attach, ExtensionSlot, getGlobalStore, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
 import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
+import { getEditEncounterHandler } from '../edit-encounter';
 import { useVisit } from './current-visit.resource';
 import styles from './current-visit.scss';
 
@@ -106,7 +107,14 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
       </div>
       <div className={styles.visitContainer}>
         <ExtensionSlot name={vitalsInfoSlot} state={vitalsSlotState} />
-        <ExtensionSlot name={visitSummarySlot} state={{ visit, patientUuid }} />
+        <ExtensionSlot
+          name={visitSummarySlot}
+          state={{
+            visit,
+            patientUuid,
+            onEditEncounter: getEditEncounterHandler({ patient, patientUuid, visit, mutateVisit: mutate }),
+          }}
+        />
       </div>
     </>
   );

@@ -5,7 +5,11 @@ import userEvent from '@testing-library/user-event';
 import { ExtensionSlot, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { mockPatient } from 'tools';
-import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
+import {
+  serviceQueuesPatientFormEntryWorkspace,
+  serviceQueuesPatientVitalsWorkspace,
+  serviceQueuesVisitNotesWorkspace,
+} from '../constants';
 import { useVisit } from './current-visit.resource';
 import CurrentVisit from './current-visit-summary.component';
 
@@ -63,6 +67,31 @@ describe('CurrentVisit', () => {
     vitalsState.launchCustomVitalsForm();
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       serviceQueuesPatientVitalsWorkspace,
+      expect.objectContaining({ patientUuid, visitContext: visit }),
+    );
+  });
+
+  it('edits encounters through the queues-owned workspaces rather than the chart-group ones', async () => {
+    render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
+
+    const { onEditEncounter } = getSlotState(visitSummarySlotName) as {
+      onEditEncounter: (encounter: { id: string; form?: unknown }, isVisitNote: boolean) => void;
+    };
+
+    // The notes form keys "editing" off the encounter it is handed, so it has to arrive unchanged.
+    const noteEncounter = { id: 'encounter-1', rawDatetime: '2026-08-12T10:00:00.000+0000' };
+    onEditEncounter(noteEncounter, true);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      serviceQueuesVisitNotesWorkspace,
+      expect.objectContaining({ encounter: noteEncounter, formContext: 'editing', patientUuid, visitContext: visit }),
+    );
+
+    const form = { uuid: 'form-1' };
+    onEditEncounter({ id: 'encounter-2', form }, false);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      serviceQueuesPatientFormEntryWorkspace,
+      { form, encounterUuid: 'encounter-2' },
+      // The exported form entry workspace reads the patient context from window props, not workspace props.
       expect.objectContaining({ patientUuid, visitContext: visit }),
     );
   });

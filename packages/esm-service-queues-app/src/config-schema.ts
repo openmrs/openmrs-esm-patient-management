@@ -179,28 +179,6 @@ export const configSchema = {
       _default: defaultEmergencyPriorityUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
     },
-    generalPatientNoteConceptUuid: {
-      _type: Type.ConceptUuid,
-      _default: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      _description:
-        'The UUID of the free text note field intended to capture unstructured description of the patient encounter',
-    },
-    historicalObsConceptUuid: {
-      _type: Type.Array,
-      _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
-      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
-      _elements: {
-        _type: Type.ConceptUuid,
-      },
-    },
-    problemListConceptUuid: {
-      _type: Type.ConceptUuid,
-      _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    visitDiagnosesConceptUuid: {
-      _type: Type.ConceptUuid,
-      _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
   },
   contactAttributeType: {
     _type: Type.UUID,
@@ -456,12 +434,6 @@ export const configSchema = {
     _default: false,
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
   },
-  visitNoteEncounterTypeUuid: {
-    _type: Type.UUID,
-    _default: 'd7151f82-c1f3-4152-a605-2f9ea7414a79',
-    _description:
-      'The UUID of the visit note encounter type, used to source diagnoses and notes shown in the visit summary.',
-  },
   visitQueueNumberAttributeUuid: {
     _type: Type.UUID,
     _default: 'c0c579b0-8e59-401d-8a4a-976a0b183519',
@@ -506,10 +478,6 @@ export interface ConfigObject {
     defaultStatusConceptUuid: string;
     defaultTransitionStatus: string;
     emergencyPriorityConceptUuid: string;
-    generalPatientNoteConceptUuid: string;
-    historicalObsConceptUuid: Array<string>;
-    problemListConceptUuid: string;
-    visitDiagnosesConceptUuid: string;
   };
   defaultInitialServiceQueue: string;
   refreshIntervals: {
@@ -526,7 +494,6 @@ export interface ConfigObject {
   queueTables: TablesConfig;
   showCheckedInPatientsBeforeSearch: boolean;
   showRecommendedVisitTypeTab: boolean;
-  visitNoteEncounterTypeUuid: string;
   visitQueueNumberAttributeUuid: string | null;
   visitTypeResourceUrl: string;
 }

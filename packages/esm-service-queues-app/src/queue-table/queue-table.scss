@@ -142,17 +142,13 @@
 }
 
 .expandedActiveVisitRow {
-  td {
+  > td {
     padding: layout.$spacing-03;
 
     > div {
       max-height: max-content !important;
       background-color: $ui-02;
     }
-  }
-
-  th[colspan] td[colspan] > div:first-child {
-    padding: 0 layout.$spacing-05;
   }
 }
 

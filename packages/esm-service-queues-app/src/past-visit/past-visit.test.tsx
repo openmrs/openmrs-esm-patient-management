@@ -30,7 +30,7 @@ describe('PastVisit', () => {
     expect(mockExtensionSlot.mock.calls.map(([props]) => props)).toContainEqual(
       expect.objectContaining({
         name: 'service-queues-past-visit-summary-slot',
-        state: { visit: pastVisit, patientUuid: mockPatient.id },
+        state: expect.objectContaining({ visit: pastVisit, patientUuid: mockPatient.id }),
       }),
     );
   });
