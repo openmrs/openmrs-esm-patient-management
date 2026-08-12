@@ -125,6 +125,11 @@
   ],
   "workspaces2": [
     {
+      "name": "appointment-details-workspace",
+      "component": "appointmentDetailsWorkspace",
+      "window": "appointments-window"
+    },
+    {
       "name": "appointments-form-workspace",
       "component": "appointmentsFormWorkspace",
       "window": "appointments-window"

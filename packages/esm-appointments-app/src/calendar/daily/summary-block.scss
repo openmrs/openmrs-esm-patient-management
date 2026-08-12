@@ -1,0 +1,60 @@
+.summary {
+  height: 100%;
+  padding: 12px;
+  background: #f4f8f7;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.count {
+  font-size: 15px;
+  font-weight: 600;
+  color: #161616;
+}
+
+.peak {
+  font-size: 12px;
+  color: #6f6f6f;
+  margin: 2px 0 10px;
+}
+
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.servicePill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 13px;
+  color: #161616;
+}
+
+.serviceDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.openTable {
+  background: transparent;
+  border: none;
+  color: #017d79;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

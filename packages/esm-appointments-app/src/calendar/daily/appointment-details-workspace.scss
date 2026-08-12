@@ -1,0 +1,7 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.actions {
+  padding: layout.$spacing-04;
+  border-bottom: 1px solid colors.$gray-20;
+}

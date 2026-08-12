@@ -7,6 +7,7 @@ export const appointmentLocationTagName = 'Appointment Location';
 
 export const moduleName = '@openmrs/esm-appointments-app';
 export const appointmentsFormWorkspace = 'appointments-form-workspace';
+export const appointmentDetailsWorkspace = 'appointment-details-workspace';
 
 export const dateFormat = 'DD/MM/YYYY';
 export const weekDays = [

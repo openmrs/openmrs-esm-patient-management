@@ -107,10 +107,36 @@ export function buildServiceColorMap(services: ReadonlyArray<{ uuid: string }>):
   return map;
 }
 
+/** Accent + background color pairs per service, matching the design mockup. */
+const SERVICE_COLOR_PAIRS: ReadonlyArray<Readonly<{ color: string; bg: string }>> = [
+  { color: '#009ce5', bg: '#e2f2fb' },
+  { color: '#7db344', bg: '#eef5e4' },
+  { color: '#9e6aae', bg: '#f2ecf4' },
+  { color: '#f4900f', bg: '#fdf0e0' },
+] as const;
+
+function serviceColorIndex(serviceName: string): number {
+  let hash = 0;
+  for (let i = 0; i < serviceName.length; i++) {
+    hash = (hash << 5) - hash + serviceName.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) % SERVICE_COLOR_PAIRS.length;
+}
+
+export function getServiceColor(serviceName: string): string {
+  return SERVICE_COLOR_PAIRS[serviceColorIndex(serviceName)].color;
+}
+
+export function getServiceBackgroundColor(serviceName: string): string {
+  return SERVICE_COLOR_PAIRS[serviceColorIndex(serviceName)].bg;
+}
+
 export const CALENDAR_HOURS: ReadonlyArray<number> = Array.from({ length: 24 }, (_, i) => i) as ReadonlyArray<number>;
 
 export function formatHourLabel(hour: number): string {
-  const h = hour % 12 || 12;
-  const period = hour < 12 ? 'AM' : 'PM';
-  return `${h} ${period}`;
+  const h = hour % 24;
+  const h12 = h % 12 || 12;
+  const period = h < 12 ? 'AM' : 'PM';
+  return `${h12} ${period}`;
 }

@@ -43,6 +43,7 @@ const AppointmentsCalendarView: React.FC = () => {
   const [serviceUuids, setServiceUuids] = useState<Array<string>>([]);
   const [providerUuids, setProviderUuids] = useState<Array<string>>([]);
   const [locationUuids, setLocationUuids] = useState<Array<string>>([]);
+  const [dailyAppointmentCount, setDailyAppointmentCount] = useState<number | null>(null);
   const { serviceTypes } = useAppointmentServices();
   const { providers } = useProviders();
   const locations = useLocations();
@@ -104,10 +105,6 @@ const AppointmentsCalendarView: React.FC = () => {
     );
   }, [calendarEvents]);
 
-  const handleToday = useCallback(() => {
-    setCalendarSelectedDate(dayjs());
-  }, []);
-
   const handlePrev = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
     else setCalendarSelectedDate((d) => d.subtract(1, 'day'));
@@ -120,6 +117,10 @@ const AppointmentsCalendarView: React.FC = () => {
 
   const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
     setViewMode(mode);
+  }, []);
+
+  const handleToday = useCallback(() => {
+    setCalendarSelectedDate(dayjs());
   }, []);
 
   const handleSelectDate = useCallback((isoDate: string) => {
@@ -223,6 +224,11 @@ const AppointmentsCalendarView: React.FC = () => {
         onPrev={handlePrev}
         onNext={handleNext}
         onToday={handleToday}
+        headerSub={
+          viewMode === 'daily' && dailyAppointmentCount != null
+            ? t('appointmentCount', '{{count}} appointments', { count: dailyAppointmentCount })
+            : undefined
+        }
       />
       {viewMode === 'monthly' && (
         <MonthlyCalendarView
@@ -233,7 +239,10 @@ const AppointmentsCalendarView: React.FC = () => {
         />
       )}
       {viewMode === 'daily' && (
-        <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
+        <DailyCalendarView
+          calendarSelectedDate={calendarSelectedDate}
+          onAppointmentCountChange={setDailyAppointmentCount}
+        />
       )}
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />
     </div>

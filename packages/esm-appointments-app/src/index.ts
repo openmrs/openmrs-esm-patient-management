@@ -98,6 +98,11 @@ export const cancelAppointmentModal = getAsyncLifecycle(
   options,
 );
 
+export const appointmentDetailsWorkspace = getAsyncLifecycle(
+  () => import('./calendar/daily/appointment-details-workspace.component'),
+  options,
+);
+
 export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.workspace'), options);
 
 export const exportedAppointmentsFormWorkspace = getAsyncLifecycle(

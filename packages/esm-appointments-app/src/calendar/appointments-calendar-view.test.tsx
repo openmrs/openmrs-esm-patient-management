@@ -210,23 +210,23 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText('1 appointments this month')).toBeInTheDocument();
   });
 
-  it('displays the singular appointment count for a single appointment in daily mode', async () => {
+  it('displays full date title with weekday in daily mode', async () => {
     const user = userEvent.setup();
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: '2026-07-02',
-          services: [{ serviceName: 'Outpatient', serviceUuid: 'svc-uuid', count: 1 }],
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
     renderCalendar();
+
     await user.click(screen.getByRole('tab', { name: /daily/i }));
 
-    expect(screen.getByText('1 appointment')).toBeInTheDocument();
+    const titles = screen.getAllByText(/^[A-Z][a-z]+day, [A-Z][a-z]+ \d{1,2}, \d{4}$/);
+    expect(titles.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows the appointment count next to the date in daily mode', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(screen.getByText('0 appointments')).toBeInTheDocument();
   });
 
   it('displays month and year title in monthly mode', () => {
@@ -350,5 +350,25 @@ describe('Appointment calendar view', () => {
     const providerFilter = screen.getByRole('combobox', { name: /provider/i });
     await user.click(providerFilter);
     expect(await screen.findByRole('option', { name: /dr\. ada nwosu/i })).toBeInTheDocument();
+  });
+
+  it('shows the appointment count next to the date in daily mode', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(screen.getByText('0 appointments')).toBeInTheDocument();
+  });
+
+  it('resets the calendar to today when Today is clicked', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /^today$/i }));
+
+    const expectedLabel = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'long' }).format(new Date());
+    expect(screen.getByText(expectedLabel)).toBeInTheDocument();
   });
 });

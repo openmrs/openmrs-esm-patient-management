@@ -9,88 +9,26 @@
   overflow-x: auto;
 }
 
-.heading {
-  display: flex;
-  align-items: baseline;
-  gap: layout.$spacing-03;
-  padding: layout.$spacing-03 layout.$spacing-05;
-  border-bottom: 1px solid colors.$gray-20;
-  background: colors.$gray-10;
+.dayBody {
+  --hour-height: 8rem;
 }
 
-.title {
-  @include type.type-style('heading-compact-02');
-  color: colors.$gray-100;
-  margin: 0;
+.tableOverlay {
+  border-top: 1px solid #e0e0e0;
 }
 
-.subtitle {
-  @include type.type-style('label-01');
-  color: colors.$gray-50;
-  margin: 0;
-}
-
-.hourRow {
-  display: flex;
-  border-bottom: 1px solid colors.$gray-20;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.hourLabel {
-  @include type.type-style('label-01');
-  color: colors.$gray-60;
-  font-size: 0.6875rem;
-  white-space: nowrap;
-  min-width: 6.5rem;
-  padding: layout.$spacing-02 layout.$spacing-03 0 layout.$spacing-03;
-  text-align: right;
-  border-right: 1px solid colors.$gray-20;
-  background: colors.$white;
-  flex-shrink: 0;
-}
-
-.hourSlot {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: layout.$spacing-02;
-  padding: layout.$spacing-02 layout.$spacing-04;
-  min-height: 3rem;
-  background: colors.$white;
-}
-
-.card {
+.tableToolbar {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-04;
-  padding: layout.$spacing-04 layout.$spacing-04;
-  margin: layout.$spacing-03 0;
-  border-left: 3px solid;
-  border-radius: 0 2px 2px 0;
-  background: colors.$gray-10;
+  gap: 8px;
+  padding: 4px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f4f4f4;
 }
 
-.cardTime {
-  @include type.type-style('label-01');
-  color: colors.$gray-60;
-  min-width: 3.5rem;
-  flex-shrink: 0;
-}
-
-.cardDetails {
-  flex: 1;
-  min-width: 0;
-}
-
-.cardName {
-  @include type.type-style('body-compact-01');
-  color: colors.$gray-100;
-}
-
-.cardService {
-  @include type.type-style('label-01');
-  color: colors.$gray-50;
+.tableHeading {
+  font-size: 16px;
+  font-weight: 600;
+  color: #525252;
+  white-space: nowrap;
 }

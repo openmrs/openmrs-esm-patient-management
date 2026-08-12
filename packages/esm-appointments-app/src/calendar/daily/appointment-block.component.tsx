@@ -1,0 +1,58 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { type PositionedBlock, formatTimeRange } from '../utils/day-timeline';
+import { getServiceColor, getServiceBackgroundColor } from '../utils/calendar-colors';
+import styles from './appointment-block.scss';
+
+interface AppointmentBlockProps {
+  block: PositionedBlock;
+  onClick: () => void;
+}
+
+const AppointmentBlock: React.FC<AppointmentBlockProps> = ({ block, onClick }) => {
+  const { t } = useTranslation();
+  const { appointment, lane, lanes, topPx, heightPx } = block;
+  const color = getServiceColor(appointment.service.name);
+  const bg = getServiceBackgroundColor(appointment.service.name);
+  const provider = appointment.providers?.[0]?.display ?? appointment.providers?.[0]?.name ?? '—';
+  const timeRange = formatTimeRange(block.s, block.e);
+  const oneLine = heightPx < 44;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      title={`${appointment.patient?.name ?? '—'} — ${timeRange} · ${provider} · ${t(appointment.status)}`}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`${styles.block} ${oneLine ? styles.oneLine : ''}`}
+      style={{
+        top: `${topPx}px`,
+        height: `${heightPx}px`,
+        left: `${(lane / lanes) * 100}%`,
+        width: `${100 / lanes}%`,
+        borderLeftColor: color,
+        background: bg,
+      }}>
+      {oneLine ? (
+        <span className={styles.oneLineText}>
+          <strong>{appointment.patient?.name ?? '—'}</strong>&nbsp;&nbsp;{timeRange} · {provider}
+        </span>
+      ) : (
+        <>
+          <span className={styles.patient}>{appointment.patient?.name ?? '—'}</span>
+          <span className={styles.meta}>
+            {timeRange} · {provider}
+          </span>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default AppointmentBlock;

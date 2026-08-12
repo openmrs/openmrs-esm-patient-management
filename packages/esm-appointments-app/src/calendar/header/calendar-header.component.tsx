@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import dayjs, { type Dayjs } from 'dayjs';
+import { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { parseDate } from '@internationalized/date';
@@ -15,6 +15,7 @@ interface CalendarHeaderProps {
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
+  headerSub?: string;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -25,6 +26,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onPrev,
   onNext,
   onToday,
+  headerSub,
 }) => {
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
@@ -48,12 +50,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   }, [viewMode, calendarSelectedDate, locale, calendar]);
 
   const countLabel = useMemo(() => {
-    if (viewMode === 'daily') {
-      return appointmentCount === 1
-        ? t('appointmentCountSingular', '{{count}} appointment', { count: appointmentCount })
-        : t('appointmentCountPlural', '{{count}} appointments', { count: appointmentCount });
+    if (viewMode === 'monthly') {
+      return t('appointmentsThisMonth', '{{count}} appointments this month', { count: appointmentCount });
     }
-    return t('appointmentsThisMonth', '{{count}} appointments this month', { count: appointmentCount });
+    return null;
   }, [viewMode, appointmentCount, t]);
 
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
@@ -78,6 +78,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       </div>
       <span className={styles.dateLabel}>{dateLabel}</span>
       <span className={styles.countLabel}>{countLabel}</span>
+      {headerSub && <span className={styles.headerSub}>{headerSub}</span>}
       <div className={styles.switcherSection}>
         <ContentSwitcher
           selectedIndex={viewModeIndex}
