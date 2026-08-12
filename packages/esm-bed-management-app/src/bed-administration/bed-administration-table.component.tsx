@@ -147,7 +147,10 @@ const BedAdministrationTable: React.FC = () => {
     );
   }
 
-  if (errorFetchingBedsGroupedByLocation) {
+  const flattened = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
+  const hasLoadedRows = flattened.length > 0;
+
+  if (errorFetchingBedsGroupedByLocation && !hasLoadedRows) {
     return (
       <>
         <Header title={t('bedAllocation', 'Bed allocation')} />
@@ -179,6 +182,11 @@ const BedAdministrationTable: React.FC = () => {
                 type="inline"
               />
             </div>
+            {errorFetchingBedsGroupedByLocation && hasLoadedRows ? (
+              <div className={styles.backgroundErrorNotification}>
+                <InlineLoading description={t('backgroundFetchFailed', 'Background fetch failed')} />
+              </div>
+            ) : null}
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}

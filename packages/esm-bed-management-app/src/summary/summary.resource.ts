@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import type {
@@ -84,66 +84,66 @@ export const useLocationName = (locationUuid: string) => {
 
 export function useBedsGroupedByLocation() {
   const { admissionLocations, isLoadingAdmissionLocations } = useLocationsWithAdmissionTag();
-
-  const [error, setError] = useState<Error | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isValidating, setIsValidating] = useState(true);
-  const [result, setResult] = useState([]);
+  // SWR-backed aggregation of beds across admission locations.
+  // Use AbortController per-fetch and preserve previous data on background failures.
+  const controllersRef = useRef(new Set<AbortController>());
 
   useEffect(() => {
-    let isSubscribed = true;
-    if (!isLoadingAdmissionLocations && admissionLocations && isValidating) {
-      const fetchData = async () => {
-        const promises = admissionLocations.map(async (location) => {
-          const bedsUrl = `${restBaseUrl}/bed?locationUuid=${location.uuid}`;
-          const bedsFetchResult = await openmrsFetch<BedFetchResponse>(bedsUrl, {
-            method: 'GET',
-          });
-          if (bedsFetchResult.data.results.length) {
-            return bedsFetchResult.data.results.map((bed) => ({
-              ...bed,
-              location: location,
-            }));
-          }
-          return null;
-        });
+    const activeControllers = controllersRef.current;
 
-        const updatedWards = (await Promise.all(promises)).filter(Boolean);
-        if (isSubscribed) {
-          setResult(updatedWards);
-        }
-      };
-      fetchData()
-        .catch((error) => {
-          if (isSubscribed) {
-            setError(error);
-          }
-        })
-        .finally(() => {
-          if (isSubscribed) {
-            setIsLoading(false);
-            setIsValidating(false);
-          }
-        });
-    }
     return () => {
-      isSubscribed = false;
+      // Abort any in-flight requests when unmounting or when locations change.
+      activeControllers.forEach((c) => c.abort());
+      activeControllers.clear();
     };
-  }, [admissionLocations, isLoadingAdmissionLocations, isValidating]);
+  }, [admissionLocations]);
 
-  const mutate = useCallback(() => {
-    setIsValidating(true);
-  }, []);
+  const locationUuids = (admissionLocations || []).map((l) => l.uuid).sort();
+  const swrKey = locationUuids.length ? ['beds-aggregate', ...locationUuids] : null;
+
+  const fetcher = async () => {
+    const controller = new AbortController();
+    controllersRef.current.add(controller);
+    try {
+      const promises = (admissionLocations || []).map(async (location) => {
+        const bedsUrl = `${restBaseUrl}/bed?locationUuid=${location.uuid}`;
+        const bedsFetchResult = await openmrsFetch<BedFetchResponse>(bedsUrl, {
+          method: 'GET',
+          signal: controller.signal,
+        });
+        if (bedsFetchResult?.data?.results?.length) {
+          return bedsFetchResult.data.results.map((bed) => ({ ...bed, location }));
+        }
+        return null;
+      });
+
+      const updatedWards = (await Promise.all(promises)).filter(Boolean) as Array<Array<Bed & { location: any }>>;
+      return updatedWards;
+    } catch (err: unknown) {
+      // SWR will surface the error; if aborted, rethrow to let caller ignore.
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw err;
+      }
+      throw err;
+    } finally {
+      controllersRef.current.delete(controller);
+    }
+  };
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR(swrKey, fetcher, {
+    keepPreviousData: true,
+    revalidateOnFocus: true,
+  });
 
   const results = useMemo(
     () => ({
-      bedsGroupedByLocation: result,
-      errorFetchingBedsGroupedByLocation: error,
-      isLoadingBedsGroupedByLocation: isLoading || isLoadingAdmissionLocations,
-      isValidatingBedsGroupedByLocation: isValidating,
+      bedsGroupedByLocation: (data as Array<Array<Bed & { location: any }>> | undefined) ?? [],
+      errorFetchingBedsGroupedByLocation: (error as Error) ?? null,
+      isLoadingBedsGroupedByLocation: (isLoading || isLoadingAdmissionLocations) ?? false,
+      isValidatingBedsGroupedByLocation: isValidating ?? false,
       mutateBedsGroupedByLocation: mutate,
     }),
-    [error, isLoading, isLoadingAdmissionLocations, isValidating, mutate, result],
+    [data, error, isLoading, isLoadingAdmissionLocations, isValidating, mutate],
   );
 
   return results;
