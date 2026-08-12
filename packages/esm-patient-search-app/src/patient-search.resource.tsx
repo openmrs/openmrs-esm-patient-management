@@ -1,8 +1,23 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  omrsOfflineCachingStrategyHttpHeaderName,
+  openmrsFetch,
+  useSession,
+  type FetchResponse,
+  type OmrsOfflineHttpHeaders,
+  restBaseUrl,
+} from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
+
+const cachingStrategyHeaders: OmrsOfflineHttpHeaders = {
+  [omrsOfflineCachingStrategyHttpHeaderName]: 'network-only-or-cache-only',
+};
+
+function fetcher<T>(url: string) {
+  return openmrsFetch<T>(url, { headers: cachingStrategyHeaders });
+}
 
 type InfinitePatientSearchResponse = FetchResponse<{
   results: Array<SearchedPatient>;
@@ -13,6 +28,7 @@ type InfinitePatientSearchResponse = FetchResponse<{
 const patientProperties = [
   'patientId',
   'uuid',
+  'voided',
   'identifiers',
   'display',
   'patientIdentifier:(uuid,identifier)',
@@ -77,33 +93,35 @@ export function useInfinitePatientSearch(
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const shouldFetch = isSearching && searchQuery;
+  const shouldFetch = isSearching && Boolean(searchQuery);
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
     shouldFetch ? getUrl : null,
-    openmrsFetch,
+    fetcher,
+    { keepPreviousData: true },
   );
 
   // Filter out null patients and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
   // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData =
-    data
-      ?.flatMap((res) => res.data?.results ?? [])
-      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
+  const mappedData = shouldFetch
+    ? (data
+        ?.flatMap((res) => res.data?.results ?? [])
+        ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
+    : null;
 
   return useMemo(
     () => ({
       data: mappedData,
       isLoading,
       fetchError: error,
-      hasMore: data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false,
+      hasMore: shouldFetch ? (data?.at(-1)?.data?.links?.some((link) => link.rel === 'next') ?? false) : false,
       isValidating,
       setPage: setSize,
       currentPage: size,
-      totalResults: data?.[0]?.data?.totalCount ?? 0,
+      totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
     }),
-    [mappedData, isLoading, error, data, isValidating, setSize, size],
+    [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size],
   );
 }
 
@@ -127,7 +145,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
   // This request will be loaded from the SWR cache as a preload request happens ahead  when the user hovers over the search icon.
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<User>, Error>(
     shouldFetchRecentlyViewedPatients ? url : null,
-    openmrsFetch,
+    fetcher,
   );
 
   const userProperties = data?.data?.userProperties;
@@ -138,6 +156,10 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
 
   const updateRecentlyViewedPatients = useCallback(
     (patientUuid: string) => {
+      if (!url) {
+        return Promise.resolve();
+      }
+
       const uniquePatients = Array.from(new Set([patientUuid, ...patientsVisited]));
       const mostRecentPatients = uniquePatients.slice(0, 10);
       const newUserProperties = { ...userProperties, patientsVisited: mostRecentPatients.join(',') };
@@ -207,20 +229,22 @@ export function useRestPatients(
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<FetchResponse<SearchedPatient>, Error>(
     shouldFetch ? getPatientUrl : null,
-    openmrsFetch,
+    fetcher,
     {
       keepPreviousData: true,
       initialSize: patientUuids ? Math.min(resultsToFetch, patientUuids.length) : 0,
     },
   );
 
-  // Filter out null patients and patients with null person property to prevent errors
+  // Filter out null, voided, and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
   // (in the hook) to ensure all consumers receive clean, valid data.
   const mappedData =
     data
       ?.flatMap((res) => res.data)
-      ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null;
+      ?.filter(
+        (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
+      ) ?? null;
 
   return useMemo(
     () => ({

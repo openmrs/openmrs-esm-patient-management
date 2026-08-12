@@ -6,30 +6,34 @@ import {
   endVisit,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   startVisit,
   waitForAdmissionRequestToBeProcessed,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient } from '../commands/types';
 import { deleteBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
 let bed: Bed;
 let bedtype: BedType;
-let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
+test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await changeToWardLocation(api);
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
+});
+
+test.afterEach(async ({ api }) => {
+  await deleteBed(api, bed);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
 });
 
 test('Cancel an admission request', async ({ page }) => {
@@ -68,11 +72,4 @@ test('Cancel an admission request', async ({ page }) => {
   await test.step('Then I should see a success notification confirming the admission was cancelled', async () => {
     await wardPage.expectAdmissionRequestCancelled();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deleteBed(api, bed);
-  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });

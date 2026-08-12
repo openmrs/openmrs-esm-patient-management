@@ -259,7 +259,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const handleAddPatientToList = useCallback(
     async (patient) => {
-      const alreadyInList = patients.some((p) => patient == p.uuid);
+      const alreadyInList = patients.some((p) => patient === p.uuid);
 
       if (alreadyInList) {
         showSnackbar({

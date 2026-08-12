@@ -30,7 +30,7 @@ test('Search patient by patient identifier', async ({ page, patient }) => {
 
   await test.step("Then I should be redirected to the patient's chart page", async () => {
     await expect(homePage.page).toHaveURL(
-      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`,
     );
   });
 });
@@ -63,7 +63,7 @@ test('Search patient by full name', async ({ page, patient }) => {
 
   await test.step("Then I should be in the patient's chart page", async () => {
     await expect(homePage.page).toHaveURL(
-      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`,
     );
   });
 

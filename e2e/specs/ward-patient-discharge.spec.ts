@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient } from '../commands/types';
 import {
   changeToWardLocation,
   changeToDefaultLocation,
@@ -11,7 +11,6 @@ import {
   generateRandomBed,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   startVisit,
   retireBedType,
   waitForAdmissionRequestToBeProcessed,
@@ -22,19 +21,25 @@ import { WardPage } from '../pages';
 
 let bed: Bed;
 let bedType: BedType;
-let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
+test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
+});
+
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+  await changeToDefaultLocation(api);
 });
 
 test('Discharge a patient from a ward', async ({ page, api }) => {
@@ -43,15 +48,6 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
 
   await test.step('When I open the Ward page', async () => {
     await wardPage.goTo();
-  });
-
-  await test.step('And I navigate to Ward Management', async () => {
-    await expect(page.getByRole('link', { name: /Wards/i })).toBeVisible();
-    await page.getByRole('link', { name: /Wards/i }).click();
-  });
-
-  await test.step("Then I see the 'Inpatient Ward' heading", async () => {
-    await expect(page.getByRole('heading', { name: 'Inpatient Ward' })).toBeVisible();
   });
 
   await test.step("And I click Manage to view 'Admission requests'", async () => {
@@ -68,7 +64,7 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('And I select the bed for admission', async () => {
-    await page.getByText(`${bed.bedNumber} · Empty`).click();
+    await wardPage.selectBedForAdmission(bed.bedNumber);
   });
 
   await test.step('And I admit the patient', async () => {
@@ -80,7 +76,6 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   });
 
   await test.step('Then I see the patient in the ward', async () => {
-    await expect(page.getByRole('heading', { name: 'Inpatient Ward' })).toBeVisible();
     await wardPage.waitForPatientInWardView(patientName);
   });
 
@@ -92,16 +87,23 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
     await wardPage.clickPatientCard(patientName);
   });
 
-  await test.step("Then I see the 'Discharge' button", async () => {
+  await test.step("Then I click the 'Discharge' siderail button to open the discharge workspace", async () => {
     await expect(page.getByRole('button', { name: 'Discharge' })).toBeVisible({ timeout: 10000 });
-  });
-
-  await test.step('And I discharge the patient', async () => {
     await page.getByRole('button', { name: 'Discharge' }).click();
   });
 
+  await test.step("Then I see the discharge form with a 'Confirm discharge' button", async () => {
+    await expect(page.getByRole('button', { name: /Confirm discharge/i })).toBeVisible({ timeout: 10000 });
+  });
+
+  await test.step('And I optionally add a discharge note', async () => {
+    const noteInput = page.getByPlaceholder(/Write any notes here/i);
+    await expect(noteInput).toBeVisible();
+    await noteInput.fill('Patient recovered and is ready to go home');
+  });
+
   await test.step('And I confirm the discharge', async () => {
-    await page.getByRole('button', { name: 'Proceed with patient discharge' }).click();
+    await page.getByRole('button', { name: /Confirm discharge/i }).click();
   });
 
   await test.step('Then I should see a success message confirming the patient was discharged', async () => {
@@ -111,12 +113,4 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   await test.step('And the patient should no longer be listed in the ward', async () => {
     await expect(page.getByText(patientName, { exact: true })).toBeHidden();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
-  await changeToDefaultLocation(api);
 });

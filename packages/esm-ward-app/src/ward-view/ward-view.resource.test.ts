@@ -1,4 +1,5 @@
 import { createAndGetWardPatientGrouping, getWardMetrics } from './ward-view.resource';
+import { vi, describe, it, expect } from 'vitest';
 import { type AdmissionLocationFetchResponse, type InpatientAdmission, type WardPatientGroupDetails } from '../types';
 import type { Location } from '@openmrs/esm-framework';
 

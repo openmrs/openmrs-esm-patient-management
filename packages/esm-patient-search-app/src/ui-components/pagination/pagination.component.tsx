@@ -52,7 +52,7 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
         iconDescription={t('previousPage', 'Previous page')}
         renderIcon={CaretLeft}
         onClick={decrementPage}
-        disabled={currentPage == 1}
+        disabled={currentPage === 1}
       />
       <div className={styles.pageNumbers}>{pageButtons}</div>
       <Button

@@ -1,28 +1,36 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
+import DeleteQueueEntryModal from './delete-queue-entry.modal';
 import RemoveQueueEntryModal from './remove-queue-entry.modal';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
-import DeleteQueueEntryModal from './delete-queue-entry.modal';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockMutateQueueEntries = vi.fn();
 
-jest.mock('../hooks/useQueues', () => {
+vi.mock('../hooks/useQueues', () => {
   return {
-    useQueues: jest.fn().mockReturnValue({
+    useQueues: vi.fn().mockReturnValue({
       queues: mockQueues,
     }),
   };
 });
 
+vi.mock('../hooks/useQueueEntries', () => ({
+  useMutateQueueEntries: () => ({
+    mutateQueueEntries: mockMutateQueueEntries,
+  }),
+}));
+
 describe('UndoTransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -57,7 +65,7 @@ describe('VoidQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<DeleteQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -91,7 +99,7 @@ describe('EndQueueEntryModal', () => {
   const queueEntry = mockQueueEntryAlice;
 
   it('has a cancel button that closes the modal', async () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const user = userEvent.setup();
 
     renderWithSwr(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
@@ -119,5 +127,32 @@ describe('EndQueueEntryModal', () => {
       subtitle: 'Patient removed from queue successfully',
       title: 'Patient removed',
     });
+  });
+
+  it('closes modal and shows warning when queue entry has already ended', async () => {
+    mockOpenmrsFetch.mockRejectedValue({
+      responseBody: {
+        error: {
+          message: 'Cannot transition a queue entry that has already ended',
+        },
+      },
+    });
+
+    const closeModal = vi.fn();
+    const user = userEvent.setup();
+
+    renderWithSwr(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+
+    const submitButton = screen.getByRole('button', { name: /Remove/ });
+    await user.click(submitButton);
+
+    expect(showSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'warning',
+        title: 'Queue entry is no longer active',
+      }),
+    );
+    expect(mockMutateQueueEntries).toHaveBeenCalled();
+    expect(closeModal).toHaveBeenCalled();
   });
 });

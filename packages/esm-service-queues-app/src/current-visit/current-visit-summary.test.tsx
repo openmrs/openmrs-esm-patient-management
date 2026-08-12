@@ -1,13 +1,16 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { useVisit } from './current-visit.resource';
 import CurrentVisit from './current-visit-summary.component';
 
-const useVisitMock = jest.mocked(useVisit);
+const useVisitMock = vi.mocked(useVisit);
+vi.mocked(useConfig).mockReturnValue({ concepts: {} });
 
-jest.mock('./current-visit.resource', () => ({
-  useVisit: jest.fn().mockReturnValue({
+vi.mock('./current-visit.resource', () => ({
+  useVisit: vi.fn().mockReturnValue({
     visit: {
       visitType: { display: 'Visit Type' },
       encounters: [],
@@ -35,10 +38,40 @@ describe('CurrentVisit', () => {
       error: null,
       isLoading: true,
       isValidating: false,
+      mutate: vi.fn(),
     });
 
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+
+  it('renders a fallback when visit uuid is missing', async () => {
+    useVisitMock.mockReturnValue({
+      visit: null,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    render(<CurrentVisit patientUuid={patientUuid} />);
+
+    expect(useVisitMock).toHaveBeenCalledWith(undefined);
+    expect(screen.getByText('No active visit')).toBeInTheDocument();
+  });
+
+  it('renders a fallback when visit data is unavailable', async () => {
+    useVisitMock.mockReturnValue({
+      visit: null,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
+
+    expect(screen.getByText('No active visit')).toBeInTheDocument();
   });
 });

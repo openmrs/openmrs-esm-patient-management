@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from './config-schema';
@@ -6,28 +7,28 @@ import { useQueueEntries } from './hooks/useQueueEntries';
 import { updateSelectedQueueLocationName } from './store/store';
 import Home from './home.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-jest.mock('./hooks/useQueues', () => ({
-  useQueues: jest.fn(() => ({ queues: [] })),
+vi.mock('./hooks/useQueues', () => ({
+  useQueues: vi.fn(() => ({ queues: [] })),
 }));
 
-jest.mock('./create-queue-entry/hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+vi.mock('./create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: vi.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
 }));
 
-jest.mock('./hooks/useQueueEntries', () => ({
-  ...jest.requireActual('./hooks/useQueueEntries'),
-  useQueueEntries: jest.fn(),
+vi.mock('./hooks/useQueueEntries', async () => ({
+  ...((await vi.importActual('./hooks/useQueueEntries')) as object),
+  useQueueEntries: vi.fn(),
 }));
 
-jest.mocked(useQueueEntries).mockReturnValue({
+vi.mocked(useQueueEntries).mockReturnValue({
   queueEntries: [],
   isLoading: false,
   isValidating: false,
   totalCount: 0,
   error: undefined,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
 });
 
 mockUseConfig.mockReturnValue({
@@ -47,7 +48,7 @@ describe('Home Component', () => {
     expect(screen.getByRole('combobox', { name: /show patients with status/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /search this list/i })).toBeInTheDocument();
     expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /clear queue entries/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /clear queue entries/i })).not.toBeInTheDocument();
 
     const expectedColumnHeaders = [/name/, /priority/, /coming from/, /status/, /queue/, /wait time/, /actions/];
 

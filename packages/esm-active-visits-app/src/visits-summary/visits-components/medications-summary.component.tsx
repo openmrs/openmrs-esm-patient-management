@@ -2,7 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
-import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate, useConfig } from '@openmrs/esm-framework';
+import { type ActiveVisitsConfigSchema } from '../../config-schema';
 import { type OrderItem } from '../../types';
 import styles from '../visit-detail-overview.scss';
 
@@ -12,6 +13,7 @@ interface MedicationSummaryProps {
 
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
+  const { drugOrderTypeUuid } = useConfig<ActiveVisitsConfigSchema>();
 
   return (
     <React.Fragment>
@@ -20,7 +22,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
           {medications.map(
             (medication, i) =>
               medication.order?.dose &&
-              medication.order?.orderType?.display === 'Drug Order' && (
+              medication.order?.orderType?.uuid === drugOrderTypeUuid && (
                 <React.Fragment key={i}>
                   <div className={styles.medicationContainer}>
                     <div>

@@ -1,6 +1,8 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useAppContext } from '@openmrs/esm-framework';
 import type { WardPatientCardType, WardViewContext } from '../../types';
+import wardPatientCardStyles from '../../ward-patient-card/ward-patient-card.scss';
 import styles from './style.scss';
 
 const WardPatientWorkspaceBanner: WardPatientCardType = ({ wardPatient }) => {
@@ -13,7 +15,7 @@ const WardPatientWorkspaceBanner: WardPatientCardType = ({ wardPatient }) => {
   }
 
   return WardPatientHeader ? (
-    <div className={styles.wardWorkspacePatientBanner}>
+    <div className={classNames(styles.wardWorkspacePatientBanner, wardPatientCardStyles.wardPatientCard)}>
       <WardPatientHeader wardPatient={wardPatient} />
     </div>
   ) : (

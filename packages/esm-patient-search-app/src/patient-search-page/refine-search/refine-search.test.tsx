@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -6,18 +13,18 @@ import { type PatientSearchConfig } from '../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 import RefineSearch from './refine-search.component';
 
-const mockUseConfig = jest.mocked(useConfig);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
+const mockUseConfig = vi.mocked(useConfig);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
 
-jest.mock('./person-attributes.resource', () => ({
-  usePersonAttributeType: jest.fn(),
+vi.mock('./person-attributes.resource', () => ({
+  usePersonAttributeType: vi.fn(),
 }));
 
 describe('RefineSearch', () => {
   const user = userEvent.setup();
 
-  const mockSetFilters = jest.fn();
+  const mockSetFilters = vi.fn();
   const mockConfig = {
     search: {
       searchFilterFields: {

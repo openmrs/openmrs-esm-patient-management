@@ -1,31 +1,37 @@
 import React from 'react';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { useActiveTickets } from './useActiveTickets';
 import { updateSelectedQueueLocationName, updateSelectedQueueLocationUuid } from '../store/store';
 import QueueScreen from './queue-screen.component';
 
-const mockUseActiveTickets = jest.mocked(useActiveTickets);
+const mockUseActiveTickets = vi.mocked(useActiveTickets);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 
-jest.mock('./useActiveTickets', () => ({
-  useActiveTickets: jest.fn(),
+vi.mock('./useActiveTickets', () => ({
+  useActiveTickets: vi.fn(),
 }));
 
-jest.mock('../hooks/useQueues', () => ({
-  useQueues: jest.fn(() => ({ queues: [] })),
+vi.mock('../hooks/useQueues', () => ({
+  useQueues: vi.fn(() => ({ queues: [] })),
 }));
 
-jest.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
-  useQueueLocations: jest.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
+vi.mock('../create-queue-entry/hooks/useQueueLocations', () => ({
+  useQueueLocations: vi.fn(() => ({ queueLocations: [], isLoading: false, error: undefined })),
 }));
 
 describe('QueueScreen component', () => {
   beforeEach(() => {
     updateSelectedQueueLocationName('Room A');
     updateSelectedQueueLocationUuid('123');
+    mockUseConfig.mockReturnValue(configDefaults);
   });
 
   test('renders loading skeleton when data is loading', () => {
-    mockUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined, mutate: jest.fn() });
+    mockUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined, mutate: vi.fn() });
 
     render(<QueueScreen />);
 
@@ -37,7 +43,7 @@ describe('QueueScreen component', () => {
       error: new Error('Error'),
       isLoading: false,
       activeTickets: [],
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<QueueScreen />);
@@ -50,7 +56,7 @@ describe('QueueScreen component', () => {
       activeTickets: [],
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<QueueScreen />);
@@ -69,7 +75,7 @@ describe('QueueScreen component', () => {
       ],
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<QueueScreen />);
@@ -77,5 +83,23 @@ describe('QueueScreen component', () => {
     expect(screen.getByText('Room : Room A')).toBeInTheDocument();
     expect(screen.getByText('Ticket number')).toBeInTheDocument();
     expect(screen.getByText('123')).toBeInTheDocument();
+  });
+
+  test('applies the blinking style to a ticket whose status matches the configured callingStatus', () => {
+    mockUseConfig.mockReturnValue({ ...configDefaults, callingStatus: 'now-serving' });
+    mockUseActiveTickets.mockReturnValue({
+      activeTickets: [
+        { room: 'Room A', ticketNumber: '123', status: 'now-serving' },
+        { room: 'Room B', ticketNumber: '456', status: 'Pending' },
+      ],
+      isLoading: false,
+      error: undefined,
+      mutate: vi.fn(),
+    });
+
+    render(<QueueScreen />);
+
+    expect(screen.getByText('123')).toHaveClass('headerBlinking');
+    expect(screen.getByText('456')).not.toHaveClass('headerBlinking');
   });
 });

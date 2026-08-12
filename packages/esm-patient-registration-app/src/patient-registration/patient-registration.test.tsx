@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { useParams } from 'react-router-dom';
 import { fireEvent, screen, within } from '@testing-library/react';
@@ -19,16 +26,16 @@ import { PatientRegistration } from './patient-registration.component';
 import { useInitialFormValues } from './patient-registration-hooks';
 import { ResourcesContextProvider } from '../resources-context';
 
-const mockSaveEncounter = jest.mocked(saveEncounter);
-const mockSavePatient = jest.mocked(savePatient);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-const mockUsePatient = jest.mocked(usePatient);
-const mockUseParams = jest.mocked(useParams);
-const mockUseInitialFormValues = jest.mocked(useInitialFormValues);
+const mockSaveEncounter = vi.mocked(saveEncounter);
+const mockSavePatient = vi.mocked(savePatient);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUsePatient = vi.mocked(usePatient);
+const mockUseParams = vi.mocked(useParams);
+const mockUseInitialFormValues = vi.mocked(useInitialFormValues);
 
-jest.mock('./field/field.resource', () => ({
-  useConcept: jest.fn().mockImplementation((uuid: string) => {
+vi.mock('./field/field.resource', () => ({
+  useConcept: vi.fn().mockImplementation((uuid: string) => {
     let data;
     if (uuid === 'weight-uuid') {
       data = {
@@ -63,7 +70,7 @@ jest.mock('./field/field.resource', () => ({
       isLoading: !data,
     };
   }),
-  useConceptAnswers: jest.fn().mockImplementation((uuid: string) => {
+  useConceptAnswers: vi.fn().mockImplementation((uuid: string) => {
     if (uuid === 'nationality-uuid') {
       return {
         data: [
@@ -84,23 +91,23 @@ jest.mock('./field/field.resource', () => ({
   }),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as object),
   useLocation: () => ({
     pathname: 'openmrs/spa/patient-registration',
   }),
   useHistory: () => [],
-  useParams: jest.fn().mockReturnValue({ patientUuid: undefined }),
+  useParams: vi.fn().mockReturnValue({ patientUuid: undefined }),
 }));
 
-jest.mock('./patient-registration.resource', () => ({
-  ...jest.requireActual('./patient-registration.resource'),
-  saveEncounter: jest.fn(),
-  savePatient: jest.fn(),
+vi.mock('./patient-registration.resource', async () => ({
+  ...((await vi.importActual('./patient-registration.resource')) as object),
+  saveEncounter: vi.fn(),
+  savePatient: vi.fn(),
 }));
 
-jest.mock('./patient-registration-hooks', () => {
-  const actual = jest.requireActual('./patient-registration-hooks');
+vi.mock('./patient-registration-hooks', async () => {
+  const actual = (await vi.importActual('./patient-registration-hooks')) as object;
   const defaultInitialFormValues = {
     additionalFamilyName: '',
     additionalGivenName: '',
@@ -129,9 +136,9 @@ jest.mock('./patient-registration-hooks', () => {
 
   return {
     ...actual,
-    useInitialFormValues: jest.fn().mockReturnValue([defaultInitialFormValues, jest.fn()]),
-    useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
-    usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
+    useInitialFormValues: vi.fn().mockReturnValue([defaultInitialFormValues, vi.fn()]),
+    useInitialAddressFieldValues: vi.fn().mockReturnValue([{}, vi.fn()]),
+    usePatientUuidMap: vi.fn().mockReturnValue([{}, vi.fn()]),
   };
 });
 
@@ -288,7 +295,7 @@ describe('Registering a new patient', () => {
 
   it('should render all the required fields and sections', async () => {
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />,
+      <PatientRegistration isOffline={false} savePatientForm={vi.fn()} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -349,7 +356,7 @@ describe('Registering a new patient', () => {
 
   it('should not save the patient if validation fails', async () => {
     const user = userEvent.setup();
-    const mockSavePatientForm = jest.fn();
+    const mockSavePatientForm = vi.fn();
 
     renderWithContext(
       <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />,
@@ -458,7 +465,7 @@ describe('Updating an existing patient record', () => {
 
   it('edits patient demographics', async () => {
     const user = userEvent.setup();
-    const mockSavePatientForm = jest.fn();
+    const mockSavePatientForm = vi.fn();
 
     mockUseInitialFormValues.mockReturnValue([
       {
@@ -509,7 +516,7 @@ describe('Updating an existing patient record', () => {
         telephoneNumber: '',
         yearsEstimated: 0,
       } as FormValues,
-      jest.fn(),
+      vi.fn(),
     ]);
 
     renderWithContext(

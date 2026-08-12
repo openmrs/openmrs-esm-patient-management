@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { usePatient } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -50,9 +51,9 @@ const appointment: Appointment = {
   extensions: [],
 };
 
-const mockUsePatient = jest.mocked(usePatient);
+const mockUsePatient = vi.mocked(usePatient);
 
-jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
+vi.mock('../../hooks/usePatientAppointmentHistory', () => ({
   usePatientAppointmentHistory: () => ({
     appointmentsCount: {
       completedAppointments: 1,

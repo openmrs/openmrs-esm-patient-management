@@ -16,7 +16,7 @@ interface AppointmentSummaryResponse {
   appointmentCountMap: Map<string, AppointmentCountMapEntry>;
 }
 
-export const useAppointmentsCalendar = (forDate: string, period: string) => {
+export const useAppointmentsCalendar = (forDate: string | null, period: string) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
   const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
 
@@ -25,26 +25,32 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
     openmrsFetch,
     { errorRetryCount: 2 },
   );
-  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
-    const serviceName = service.appointmentService.name;
-    const serviceUuid = service.appointmentService.uuid;
-    Object.entries(service.appointmentCountMap).map(([key, value]) => {
-      const existingEntry = acc.find((entry) => entry.appointmentDate === key);
-      if (existingEntry) {
-        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
-      } else {
-        acc.push({
-          appointmentDate: key,
-          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
-        });
-      }
-    });
-    return acc;
-  }, []);
+  // Transform API response into daily appointment counts grouped by service
+  const results: DailyAppointmentsCountByService[] =
+    data?.data.reduce((acc: DailyAppointmentsCountByService[], service) => {
+      const serviceName = service.appointmentService.name;
+      const serviceUuid = service.appointmentService.uuid;
+      Object.entries(service.appointmentCountMap).forEach(([key, value]) => {
+        const existingEntry = acc.find((entry) => entry.appointmentDate === key);
+        if (existingEntry) {
+          existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
+        } else {
+          acc.push({
+            appointmentDate: key,
+            services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
+          });
+        }
+      });
+      return acc;
+    }, []) ?? [];
   return { isLoading, calendarEvents: results, error };
 };
 
-function evaluateAppointmentCalendarDates(forDate: string, period: string) {
+function evaluateAppointmentCalendarDates(forDate: string | null, period: string) {
+  if (!forDate) {
+    return { startDate: null, endDate: null };
+  }
+
   if (period === 'daily') {
     return {
       startDate: dayjs(forDate).startOf('day').format(omrsDateFormat),
@@ -59,10 +65,8 @@ function evaluateAppointmentCalendarDates(forDate: string, period: string) {
     };
   }
 
-  if (period === 'monthly') {
-    return {
-      startDate: dayjs(forDate).startOf('month').format(omrsDateFormat),
-      endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),
-    };
-  }
+  return {
+    startDate: dayjs(forDate).startOf('month').format(omrsDateFormat),
+    endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),
+  };
 }

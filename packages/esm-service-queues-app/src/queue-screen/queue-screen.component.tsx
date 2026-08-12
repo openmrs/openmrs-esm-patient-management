@@ -1,13 +1,15 @@
 import React from 'react';
 import { DataTableSkeleton, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { EmptyCardIllustration, ErrorState } from '@openmrs/esm-framework';
+import { EmptyCardIllustration, ErrorState, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { useActiveTickets } from './useActiveTickets';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
 const QueueScreen: React.FC = () => {
   const { t } = useTranslation();
+  const { callingStatus } = useConfig<ConfigObject>();
   const { activeTickets, isLoading, error } = useActiveTickets();
 
   if (isLoading) {
@@ -38,7 +40,7 @@ const QueueScreen: React.FC = () => {
           {rowData.map((row) => (
             <div className={styles.card} key={row.id}>
               <p className={styles.subheader}>{t('ticketNumber', 'Ticket number')}</p>
-              <p className={row.status === 'calling' ? styles.headerBlinking : styles.header}>{row.ticketNumber}</p>
+              <p className={row.status === callingStatus ? styles.headerBlinking : styles.header}>{row.ticketNumber}</p>
               <p className={styles.subheader}>
                 {t('room', 'Room')} &nbsp; : &nbsp; {row.room}
               </p>

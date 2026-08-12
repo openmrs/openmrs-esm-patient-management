@@ -89,7 +89,7 @@ function QueueTable({
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (columns.length == 0) {
+  if (columns.length === 0) {
     return <p>{t('noColumnsDefined', 'No table columns defined. Check Configuration')}</p>;
   }
 
@@ -145,7 +145,7 @@ function QueueTable({
                           </TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && row.isExpanded ? (
+                      {ExpandedRow && row.isExpanded && paginatedQueueEntries[i] ? (
                         <TableExpandedRow
                           className={styles.expandedActiveVisitRow}
                           colSpan={headers.length + 2}

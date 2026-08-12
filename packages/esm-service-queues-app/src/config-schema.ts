@@ -20,8 +20,15 @@ const columnTypes = [
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
-const queueEntryActions = ['move', 'call', 'edit', 'transition', 'remove', 'delete', 'undo'] as const;
+const queueEntryActions = ['move', 'call', 'edit', 'remove', 'delete', 'undo'] as const;
 export type QueueEntryAction = (typeof queueEntryActions)[number];
+
+// Retired action names, mapped to the actions that replaced them. Still accepted in configuration and
+// resolved to their replacement when the action cell renders, so that older configurations keep working.
+export const deprecatedQueueEntryActions = { transition: 'move' } as const;
+export type ConfigurableQueueEntryAction = QueueEntryAction | keyof typeof deprecatedQueueEntryActions;
+
+const configurableQueueEntryActions = [...queueEntryActions, ...Object.keys(deprecatedQueueEntryActions)];
 
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
@@ -47,12 +54,17 @@ type PriorityTagColor = (typeof priorityTagColors)[number];
 const tagStyles = ['bold'] as const;
 type TagStyle = (typeof tagStyles)[number];
 
+// Semantic colors used to highlight how long a patient has been waiting, mapped to Carbon color tokens in queue-duration.scss
+const waitTimeColors = ['red', 'orange'] as const;
+type WaitTimeColor = (typeof waitTimeColors)[number];
+
 // equal to columnTypes but without extension
 export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
 const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
 const defaultPriorityUuid = 'f4620bfa-3625-4883-bd3f-84c2cce14470';
 const defaultEmergencyPriorityUuid = '04f6f7e0-e3cb-4e13-a133-4479f759574e';
 const defaultUrgentPriorityUuid = 'dc3492ef-24a5-4fd9-b58d-4fd2acf7071f';
+const defaultDrugOrderTypeUuid = '131168f4-15f5-102d-96e4-000c29c2a5d7';
 
 export const defaultPriorityConfig: PriorityConfig[] = [
   {
@@ -75,7 +87,7 @@ export const defaultPriorityConfig: PriorityConfig[] = [
 export const defaultColumnConfig: ColumnConfig = {
   actions: {
     buttons: ['call'],
-    overflowMenu: ['move', 'transition', 'edit', 'remove', 'undo'],
+    overflowMenu: ['move', 'edit', 'remove', 'undo'],
   },
   identifierTypeUuid: defaultIdentifierTypeUuid,
   statusConfigs: [],
@@ -112,6 +124,28 @@ export const configSchema = {
       },
     },
   },
+  waitTimeThresholds: {
+    _type: Type.Array,
+    _default: [],
+    _description:
+      'Optional. Colour the wait-time value once a patient has waited at least the given number of minutes, ' +
+      'drawing attention to patients who have been in the queue a long time. The highest matching band wins. ' +
+      'Empty by default, so wait times are not coloured unless this is configured. ' +
+      'A reasonable starting point could be [{ waitTimeInMinutes: 120, color: "red" }], which turns the value red after two hours.',
+    _elements: {
+      waitTimeInMinutes: {
+        _type: Type.Number,
+        _description: 'The minimum wait time in minutes for this colour to apply',
+        _validators: [validator((waitTime: number) => waitTime > 0, 'waitTimeInMinutes must be a positive number')],
+      },
+      color: {
+        _type: Type.String,
+        _description: 'The colour to apply to the wait-time value once the threshold is reached',
+        _validators: [validators.oneOf(waitTimeColors)],
+        _default: 'red',
+      },
+    },
+  },
   appointmentStatuses: {
     _type: Type.Array,
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
@@ -121,6 +155,15 @@ export const configSchema = {
     },
   },
   biometrics: biometricsConfigSchema,
+  callingStatus: {
+    _type: Type.String,
+    _default: 'calling',
+    _description:
+      'The status string sent to the queueutil/assignticket endpoint when a patient is called, ' +
+      'and matched on the queue screen to trigger the blinking ticket display. Change to match ' +
+      'what your digital signage expects (e.g. "Now serving"). ' +
+      'Avoid "completed", which the queue backend treats as a signal to remove the ticket.',
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -240,6 +283,44 @@ export const configSchema = {
     _default: 'Outpatient Triage',
     _description: 'The name of the default service queue to be selected when the start visit form is opened',
   },
+  drugOrderTypeUuid: {
+    _type: Type.UUID,
+    _default: defaultDrugOrderTypeUuid,
+    _description: 'The UUID of the "Drug Order" order type, used to filter medications in the previous-visit view.',
+  },
+  refreshIntervals: {
+    dashboard: {
+      active: {
+        _type: Type.Number,
+        _default: 60000,
+        _description:
+          'How often (in ms) the queue dashboards poll for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 120000,
+        _description: 'How often (in ms) the queue dashboards poll for updates once the user has gone idle.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+    },
+    queueScreen: {
+      active: {
+        _type: Type.Number,
+        _default: 5000,
+        _description:
+          'How often (in ms) the queue screen polls for updates while the user is actively interacting with the tab.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+      idle: {
+        _type: Type.Number,
+        _default: 10000,
+        _description:
+          'How often (in ms) the queue screen polls for updates once the user has gone idle. Kept short so an unattended, wall-mounted board stays reasonably current.',
+        _validators: [validators.inRange(1000, 3600000)],
+      },
+    },
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -270,10 +351,11 @@ export const configSchema = {
               _default: ['call'],
               _description:
                 'For columnType "actions". Configures the buttons to display in the action cell. It is recommended to only use one, and put the rest in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
+                queueEntryActions.join(', ') +
+                '. Deprecated: "transition" is still accepted but is treated as "move".',
               _elements: {
                 _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
+                _validators: [validators.oneOf(configurableQueueEntryActions)],
               },
             },
             overflowMenu: {
@@ -281,10 +363,11 @@ export const configSchema = {
               _default: ['edit', 'remove', 'undo'],
               _description:
                 'For columnType "actions". Configures the items to display in the overflow menu. Valid actions are: ' +
-                queueEntryActions.join(', '),
+                queueEntryActions.join(', ') +
+                '. Deprecated: "transition" is still accepted but is treated as "move".',
               _elements: {
                 _type: Type.String,
-                _validators: [validators.oneOf(queueEntryActions)],
+                _validators: [validators.oneOf(configurableQueueEntryActions)],
               },
             },
           },
@@ -320,7 +403,7 @@ export const configSchema = {
         _validators: [
           validator(
             (columnDfn: ColumnDefinition) =>
-              Boolean(columnDfn.columnType || columnTypes.some((c) => c == columnDfn.id)),
+              Boolean(columnDfn.columnType || columnTypes.some((c) => c === columnDfn.id)),
             (columnDfn) =>
               `No columnType provided for column with ID '${
                 columnDfn.id
@@ -329,7 +412,7 @@ export const configSchema = {
           validator(
             (columnDfn: ColumnDefinition) => {
               return (
-                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid ||
+                columnDfn.config.identifierTypeUuid === defaultIdentifierTypeUuid ||
                 columnHasType(columnDfn, 'patient-identifier')
               );
             },
@@ -343,7 +426,7 @@ export const configSchema = {
             (columnDfn: ColumnDefinition) => {
               return (
                 !columnDfn.config.statusConfigs ||
-                columnDfn.config.statusConfigs.length == 0 ||
+                columnDfn.config.statusConfigs.length === 0 ||
                 columnHasType(columnDfn, 'status')
               );
             },
@@ -404,14 +487,27 @@ export const configSchema = {
       ),
     ],
   },
+  showCheckedInPatientsBeforeSearch: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether the "Add patient to queue" workspace lists patients who are checked in (have an active visit) ' +
+      'at the selected location but are not yet in a queue, before the user types a search term.',
+  },
   showRecommendedVisitTypeTab: {
     _type: Type.Boolean,
     _default: false,
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
   },
+  visitNoteEncounterTypeUuid: {
+    _type: Type.UUID,
+    _default: 'd7151f82-c1f3-4152-a605-2f9ea7414a79',
+    _description:
+      'The UUID of the visit note encounter type, used to source diagnoses and notes shown in the visit summary.',
+  },
   visitQueueNumberAttributeUuid: {
-    _type: Type.String,
-    _default: null,
+    _type: Type.UUID,
+    _default: 'c0c579b0-8e59-401d-8a4a-976a0b183519',
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
   },
   visitTypeResourceUrl: {
@@ -433,7 +529,7 @@ export const configSchema = {
       return Boolean(
         config.visitQueueNumberAttributeUuid ||
           queueNumberColumnsUsed.every(
-            (columnId) => queueNumberColumnDefs.find((d) => d.id == columnId).config.visitQueueNumberAttributeUuid,
+            (columnId) => queueNumberColumnDefs.find((d) => d.id === columnId).config.visitQueueNumberAttributeUuid,
           ),
       );
     }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
@@ -446,8 +542,10 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 
 export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
+  waitTimeThresholds: Array<WaitTimeThresholdConfig>;
   appointmentStatuses: Array<string>;
   biometrics: BiometricsConfigObject;
+  callingStatus: string;
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
@@ -467,6 +565,11 @@ export interface ConfigObject {
     weightUuid: string;
   };
   defaultInitialServiceQueue: string;
+  drugOrderTypeUuid: string;
+  refreshIntervals: {
+    dashboard: { active: number; idle: number };
+    queueScreen: { active: number; idle: number };
+  };
   contactAttributeType: string;
   customPatientChartUrl: string;
   defaultIdentifierTypes: Array<string>;
@@ -475,7 +578,9 @@ export interface ConfigObject {
     value: string;
   };
   queueTables: TablesConfig;
+  showCheckedInPatientsBeforeSearch: boolean;
   showRecommendedVisitTypeTab: boolean;
+  visitNoteEncounterTypeUuid: string;
   visitQueueNumberAttributeUuid: string | null;
   visitTypeResourceUrl: string;
   vitals: VitalsConfigObject;
@@ -502,8 +607,8 @@ export type ColumnDefinition = {
 
 export interface ActionsColumnConfig {
   actions: {
-    buttons: QueueEntryAction[];
-    overflowMenu: QueueEntryAction[];
+    buttons: ConfigurableQueueEntryAction[];
+    overflowMenu: ConfigurableQueueEntryAction[];
   };
 }
 
@@ -515,6 +620,11 @@ export interface PriorityConfig {
   conceptUuid: string;
   color: PriorityTagColor;
   style: TagStyle | null;
+}
+
+export interface WaitTimeThresholdConfig {
+  waitTimeInMinutes: number;
+  color: WaitTimeColor;
 }
 
 export interface StatusConfig {

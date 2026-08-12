@@ -14,6 +14,11 @@ test.beforeEach(async ({ api }) => {
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
 });
 
+test.afterEach(async ({ api }) => {
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+});
+
 test('Add a patient to the admission request list', async ({ page }) => {
   const chartPage = new PatientChartPage(page);
   const fullName = wardPatient.person?.display;
@@ -70,9 +75,4 @@ test('Add a patient to the admission request list', async ({ page }) => {
     await page.getByRole('button', { name: 'Manage' }).click();
     await expect(page.getByText(fullName)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });

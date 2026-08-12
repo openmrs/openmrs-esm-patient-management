@@ -5,7 +5,7 @@ import styles from './ward-bed.scss';
 
 const EmptyBedSkeleton = () => {
   return (
-    <div className={styles.emptyBed + ' ' + styles.skeleton}>
+    <div className={`${styles.emptyBed} ${styles.skeleton}`}>
       <SkeletonIcon />
       <WardPatientSkeletonText />
     </div>
