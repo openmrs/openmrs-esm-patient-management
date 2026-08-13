@@ -1,0 +1,70 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.searchContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: layout.$spacing-05;
+  background-color: #ededed;
+  padding: layout.$spacing-03;
+}
+
+.searchOverrides {
+  width: 100%;
+  max-width: 15.625rem;
+  border: 0px !important;
+}
+
+div.tableOverride {
+  background-color: $ui-01;
+}
+
+.table {
+  background-color: $ui-03;
+}
+
+.desktopRow,
+.desktopHeader {
+  height: layout.$spacing-07 !important;
+}
+
+.tabletRow,
+.tabletHeader {
+  height: layout.$spacing-09 !important;
+}
+
+.paginationOverride {
+  background-color: $ui-background;
+  border-top: 1px solid $ui-03 !important;
+  border-bottom: 1px solid $ui-03 !important;
+  overflow-x: hidden;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.dataTableSkeleton {
+  background-color: transparent;
+  padding: 0;
+}
+
+.skeletonContainer {
+  margin: layout.$spacing-05;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+  margin: layout.$spacing-05 0;
+}
+
+.illo {
+  margin-top: layout.$spacing-05;
+}
+
+.content {
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
