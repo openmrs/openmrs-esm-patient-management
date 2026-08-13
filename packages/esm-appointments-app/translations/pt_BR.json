@@ -117,9 +117,8 @@
   "Missed": "Perdida / Não compareceu",
   "MON": "SEG",
   "monthly": "Monthly",
-  "next": "Próximo",
-  "nextMonth": "Próximo mês",
   "newAppointment": "New appointment",
+  "next": "Próximo",
   "nextPage": "Próxima página",
   "no": "Não",
   "noAppointments": "No appointments scheduled",
@@ -139,8 +138,6 @@
   "patientName": "Nome do Paciente",
   "patients": "Pacientes",
   "period": "Período",
-  "prev": "Anterior",
-  "previousMonth": "Mês anterior",
   "previous": "Previous",
   "previousPage": "Página anterior",
   "provider": "Profissional",
@@ -186,7 +183,7 @@
   "visitStartTime": "Horário de início da visita",
   "WalkIn": "Atendimento sem agendamento",
   "WED": "QUA",
-  "weekly": "Weekly",
   "week": "Semana",
+  "weekly": "Weekly",
   "yes": "Sim"
 }
