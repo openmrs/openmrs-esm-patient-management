@@ -11,7 +11,6 @@ export const STATUS_TAG_TYPES: Readonly<Record<string, CarbonTagType>> = {
 
 export const DEFAULT_STATUS_TAG_TYPE: CarbonTagType = 'gray';
 
-
 export const SERVICE_COLOR_PALETTE: ReadonlyArray<string> = [
   '#73A947',
   '#1990DC',
@@ -74,21 +73,35 @@ export const SERVICE_COLOR_PALETTE: ReadonlyArray<string> = [
   '#B33939',
 ];
 
+/**
+ * Generates a fallback HSL color for a service UUID when the handpicked color palette is exhausted.
+ *
+ * @param serviceUuid - The service UUID string to hash.
+ * @returns An HSL color string formatted as `hsl(hue, 65%, 42%)`.
+ */
+export function getFallbackServiceColor(serviceUuid: string): string {
+  let hash = 0;
+  for (let i = 0; i < serviceUuid.length; i++) {
+    hash = (hash << 5) - hash + serviceUuid.charCodeAt(i);
+    hash |= 0;
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 65%, 42%)`;
+}
 
-
+/*
+ * If the list of services exceeds the palette size, it falls back to a hash-derived HSL color.
+ *
+ * @param services - Ordered list of service objects containing at least a uuid.
+ * @returns A Map mapping service UUID to hex/HSL color string.
+ */
 export function buildServiceColorMap(services: ReadonlyArray<{ uuid: string }>): Map<string, string> {
   const map = new Map<string, string>();
   services.forEach(({ uuid }, index) => {
     if (index < SERVICE_COLOR_PALETTE.length) {
       map.set(uuid, SERVICE_COLOR_PALETTE[index]);
     } else {
-      let hash = 0;
-      for (let i = 0; i < uuid.length; i++) {
-        hash = (hash << 5) - hash + uuid.charCodeAt(i);
-        hash |= 0;
-      }
-      const hue = Math.abs(hash) % 360;
-      map.set(uuid, `hsl(${hue}, 65%, 42%)`);
+      map.set(uuid, getFallbackServiceColor(uuid));
     }
   });
   return map;
