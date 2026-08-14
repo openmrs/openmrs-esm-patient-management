@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { getServiceTheme } from '../utils/calendar-colors';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -18,6 +17,7 @@ export interface MonthlyWorkloadViewProps {
   showAllServices?: boolean;
   onSelectDate?: (isoDate: string) => void;
   index?: number;
+  serviceColorMap?: Map<string, string>;
 }
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
@@ -28,6 +28,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   showAllServices = false,
   onSelectDate,
   index,
+  serviceColorMap,
 }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -130,10 +131,10 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
         {currentData?.services && currentData.services.length > 0 && (
           <div className={styles.currentData}>
             {visibleServices.map(({ serviceName, serviceUuid, count }, i) => {
-              const theme = getServiceTheme(serviceUuid, serviceName);
+              const color = serviceColorMap?.get(serviceUuid ?? '');
               return (
-                <div key={`${serviceUuid}-${i}`} className={styles.serviceArea} style={{ backgroundColor: theme.bg }}>
-                  <span className={styles.swatch} style={{ backgroundColor: theme.swatch }} />
+                <div key={`${serviceUuid}-${i}`} className={styles.serviceArea} style={{ backgroundColor: `${color}21` }}>
+                  <span className={styles.swatch} style={{ backgroundColor: color }} />
                   <span className={styles.serviceName}>{serviceName}</span>
                   <span className={styles.serviceCount}>{count}</span>
                 </div>
@@ -172,10 +173,10 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
           <div className={styles.popoverDivider} />
           <div className={styles.popoverServiceList}>
             {currentData?.services?.map(({ serviceName, serviceUuid, count }, i) => {
-              const theme = getServiceTheme(serviceUuid, serviceName);
+              const color = serviceColorMap?.get(serviceUuid ?? '');
               return (
                 <div key={`${serviceUuid}-${i}`} className={styles.popoverServiceRow}>
-                  <span className={styles.swatch} style={{ backgroundColor: theme.swatch }} />
+                  <span className={styles.swatch} style={{ backgroundColor: color }} />
                   <span className={styles.popoverServiceName}>{serviceName}</span>
                   <span className={styles.popoverServiceCount}>{count}</span>
                 </div>

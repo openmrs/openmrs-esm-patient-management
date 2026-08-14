@@ -13,9 +13,10 @@ interface MonthlyCalendarViewProps {
   events: Array<DailyAppointmentsCountByService>;
   calendarSelectedDate: Dayjs;
   onSelectDate?: (isoDate: string) => void;
+  serviceColorMap?: Map<string, string>;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate }) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate, serviceColorMap }) => {
   const gridDayCells = useMemo(() => monthDays(calendarSelectedDate), [calendarSelectedDate]);
 
   const eventsMap = useMemo(() => {
@@ -44,6 +45,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calen
               eventsMap={eventsMap}
               calendarSelectedDate={calendarSelectedDate}
               onSelectDate={onSelectDate}
+              serviceColorMap={serviceColorMap}
             />
           ))}
         </div>

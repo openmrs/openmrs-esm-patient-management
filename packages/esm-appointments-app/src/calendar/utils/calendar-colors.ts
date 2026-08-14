@@ -11,10 +11,6 @@ export const STATUS_TAG_TYPES: Readonly<Record<string, CarbonTagType>> = {
 
 export const DEFAULT_STATUS_TAG_TYPE: CarbonTagType = 'gray';
 
-export interface ServiceColorTheme {
-  swatch: string;
-  bg: string;
-}
 
 export const SERVICE_COLOR_PALETTE: ReadonlyArray<string> = [
   '#73A947',
@@ -78,63 +74,24 @@ export const SERVICE_COLOR_PALETTE: ReadonlyArray<string> = [
   '#B33939',
 ];
 
-const themeCache = new Map<string, ServiceColorTheme>();
-const assignedServiceIndices = new Map<string, number>();
 
-export function getServiceTheme(serviceUuid?: string, serviceName?: string, serviceColor?: string): ServiceColorTheme {
-  const identifier = serviceUuid || serviceName || '';
-  const cacheKey = serviceColor ? `${identifier}_${serviceColor}` : identifier;
 
-  if (!cacheKey) {
-    return {
-      swatch: 'hsl(0, 0%, 45%)',
-      bg: 'hsl(0, 0%, 96%)',
-    };
-  }
-
-  if (themeCache.has(cacheKey)) {
-    return themeCache.get(cacheKey)!;
-  }
-
-  let theme: ServiceColorTheme;
-
-  if (serviceColor && serviceColor.startsWith('#')) {
-    theme = {
-      swatch: serviceColor,
-      bg: serviceColor + '1a',
-    };
-  } else {
-    if (!assignedServiceIndices.has(identifier)) {
-      assignedServiceIndices.set(identifier, assignedServiceIndices.size);
-    }
-    const serviceIndex = assignedServiceIndices.get(identifier)!;
-
-    if (serviceIndex < SERVICE_COLOR_PALETTE.length) {
-      const hexColor = SERVICE_COLOR_PALETTE[serviceIndex];
-      theme = {
-        swatch: hexColor,
-        bg: hexColor + '1a',
-      };
+export function buildServiceColorMap(services: ReadonlyArray<{ uuid: string }>): Map<string, string> {
+  const map = new Map<string, string>();
+  services.forEach(({ uuid }, index) => {
+    if (index < SERVICE_COLOR_PALETTE.length) {
+      map.set(uuid, SERVICE_COLOR_PALETTE[index]);
     } else {
       let hash = 0;
-      for (let i = 0; i < identifier.length; i++) {
-        hash = (hash << 5) - hash + identifier.charCodeAt(i);
+      for (let i = 0; i < uuid.length; i++) {
+        hash = (hash << 5) - hash + uuid.charCodeAt(i);
         hash |= 0;
       }
       const hue = Math.abs(hash) % 360;
-      theme = {
-        swatch: `hsl(${hue}, 65%, 42%)`,
-        bg: `hsl(${hue}, 65%, 96%)`,
-      };
+      map.set(uuid, `hsl(${hue}, 65%, 42%)`);
     }
-  }
-
-  themeCache.set(cacheKey, theme);
-  return theme;
-}
-
-export function getServiceColor(serviceUuid?: string, serviceName?: string, serviceColor?: string): string {
-  return getServiceTheme(serviceUuid, serviceName, serviceColor).swatch;
+  });
+  return map;
 }
 
 export const CALENDAR_HOURS: ReadonlyArray<number> = Array.from({ length: 24 }, (_, i) => i) as ReadonlyArray<number>;
