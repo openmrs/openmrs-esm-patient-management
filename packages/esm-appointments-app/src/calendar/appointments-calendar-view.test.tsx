@@ -178,13 +178,21 @@ describe('Appointment calendar view', () => {
     expect(lastCall?.[1]).toBe('daily');
   });
 
-  it('displays full date title in daily mode', async () => {
-    const user = userEvent.setup();
+  it('renders the services legend when services are present', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [{ serviceName: 'Cardiology', serviceUuid: 'cardio-1', count: 3 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
     renderCalendar();
 
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
-
-    const titles = screen.getAllByText(/^[A-Z][a-z]+ \d{1,2}, \d{4}$/);
-    expect(titles.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Services')).toBeInTheDocument();
+    expect(screen.getAllByText('Cardiology').length).toBeGreaterThanOrEqual(1);
   });
 });

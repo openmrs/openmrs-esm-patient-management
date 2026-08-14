@@ -9,6 +9,7 @@ import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
+import ServicesLegend from './services-legend.component';
 import styles from './appointments-calendar-view-view.scss';
 
 const AppointmentsCalendarView: React.FC = () => {
@@ -16,10 +17,7 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarEvents } = useAppointmentsCalendar(
-    viewMode === 'monthly' ? calendarSelectedDate.toISOString() : null,
-    viewMode,
-  );
+  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
 
   const handlePrev = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
@@ -66,6 +64,7 @@ const AppointmentsCalendarView: React.FC = () => {
         />
       )}
       {viewMode === 'daily' && <DailyCalendarView calendarSelectedDate={calendarSelectedDate} />}
+      <ServicesLegend events={calendarEvents} />
     </div>
   );
 };
