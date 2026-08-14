@@ -16,7 +16,7 @@ interface MonthlyCalendarViewProps {
 }
 
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate }) => {
-  const gridDays = useMemo(() => monthDays(calendarSelectedDate), [calendarSelectedDate]);
+  const gridDayCells = useMemo(() => monthDays(calendarSelectedDate), [calendarSelectedDate]);
 
   const eventsMap = useMemo(() => {
     const map = new Map<string, DailyAppointmentsCountByService>();
@@ -35,7 +35,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calen
       <MonthlyHeader />
       <div className={styles.wrapper}>
         <div className={styles.monthlyCalendar}>
-          {gridDays.map((dateTime, i) => (
+          {gridDayCells.map((dateTime, i) => (
             <MonthlyViewWorkload
               key={i}
               index={i}
