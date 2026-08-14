@@ -16,7 +16,70 @@ export interface ServiceColorTheme {
   bg: string;
 }
 
+export const SERVICE_COLOR_PALETTE: ReadonlyArray<string> = [
+  '#73A947',
+  '#1990DC',
+  '#925FA2',
+  '#EB8A28',
+  '#A11B4C',
+  '#EF4B28',
+  '#DFBD4B',
+  '#197440',
+  '#3747A7',
+  '#81249B',
+  '#CF2255',
+  '#E96321',
+  '#B9C343',
+  '#198A7D',
+  '#6E7BC0',
+  '#6D4C41',
+  '#CC1514',
+  '#A993D2',
+  '#565656',
+  '#DF736A',
+  '#F3B83C',
+  '#36AC72',
+  '#3C79EB',
+  '#9D9084',
+  '#1ABC9C',
+  '#2ECC71',
+  '#3498DB',
+  '#9B59B6',
+  '#34495E',
+  '#16A085',
+  '#27AE60',
+  '#2980B9',
+  '#8E44AD',
+  '#aaa69d',
+  '#C0392B',
+  '#D35400',
+  '#F39C12',
+  '#E74C3C',
+  '#E67E22',
+  '#F1C40F',
+  '#F78FB3',
+  '#574B90',
+  '#786FA6',
+  '#F19066',
+  '#F5CD79',
+  '#546DE5',
+  '#C44569',
+  '#63CDDA',
+  '#596275',
+  '#3DC1D3',
+  '#CF6A87',
+  '#38ADA9',
+  '#079992',
+  '#0A3D62',
+  '#1E3799',
+  '#FA983A',
+  '#E55039',
+  '#40407A',
+  '#B33939',
+];
+
 const themeCache = new Map<string, ServiceColorTheme>();
+const assignedServiceIndices = new Map<string, number>();
 
 export function getServiceTheme(serviceUuid?: string, serviceName?: string, serviceColor?: string): ServiceColorTheme {
   const identifier = serviceUuid || serviceName || '';
@@ -34,22 +97,36 @@ export function getServiceTheme(serviceUuid?: string, serviceName?: string, serv
   }
 
   let theme: ServiceColorTheme;
+
   if (serviceColor && serviceColor.startsWith('#')) {
     theme = {
       swatch: serviceColor,
       bg: serviceColor + '1a',
     };
   } else {
-    let hash = 0;
-    for (let i = 0; i < identifier.length; i++) {
-      hash = (hash << 5) - hash + identifier.charCodeAt(i);
-      hash |= 0;
+    if (!assignedServiceIndices.has(identifier)) {
+      assignedServiceIndices.set(identifier, assignedServiceIndices.size);
     }
-    const hue = Math.abs(hash) % 360;
-    theme = {
-      swatch: `hsl(${hue}, 65%, 42%)`,
-      bg: `hsl(${hue}, 65%, 96%)`,
-    };
+    const serviceIndex = assignedServiceIndices.get(identifier)!;
+
+    if (serviceIndex < SERVICE_COLOR_PALETTE.length) {
+      const hexColor = SERVICE_COLOR_PALETTE[serviceIndex];
+      theme = {
+        swatch: hexColor,
+        bg: hexColor + '1a',
+      };
+    } else {
+      let hash = 0;
+      for (let i = 0; i < identifier.length; i++) {
+        hash = (hash << 5) - hash + identifier.charCodeAt(i);
+        hash |= 0;
+      }
+      const hue = Math.abs(hash) % 360;
+      theme = {
+        swatch: `hsl(${hue}, 65%, 42%)`,
+        bg: `hsl(${hue}, 65%, 96%)`,
+      };
+    }
   }
 
   themeCache.set(cacheKey, theme);
