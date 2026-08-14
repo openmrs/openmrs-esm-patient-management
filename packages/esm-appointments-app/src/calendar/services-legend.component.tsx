@@ -5,9 +5,14 @@ import { getServiceTheme } from './utils/calendar-colors';
 import styles from './services-legend.scss';
 
 interface ServicesLegendProps {
+  /* List of daily appointment counts grouped by service. */
   events: Array<DailyAppointmentsCountByService>;
 }
 
+/*
+  Renders a bottom legend bar mapping appointment service names to their assigned color swatches.
+  Used across calendar views (monthly, weekly, daily) to provide visual context for service color coding.
+ */
 const ServicesLegend: React.FC<ServicesLegendProps> = ({ events }) => {
   const { t } = useTranslation();
 
