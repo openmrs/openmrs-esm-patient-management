@@ -1,10 +1,20 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
+import * as esmFramework from '@openmrs/esm-framework';
 // BedAdministrationTable and summaryResource are imported after mocks to ensure mocks are applied
 
-jest.mock('../summary/summary.resource', () => ({
-  useBedsGroupedByLocation: jest.fn(),
+(globalThis as any).getOpenmrsSpaBase = vi.fn(() => '/openmrs/spa/');
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, defaultValue?: string) => defaultValue ?? key,
+  }),
+}));
+
+vi.mock('../summary/summary.resource', () => ({
+  useBedsGroupedByLocation: vi.fn(),
 }));
 
 // Mock ResizeObserver used by floating-ui (Carbon components)
@@ -15,13 +25,14 @@ global.ResizeObserver = class {
   disconnect() {}
 };
 
-jest.mock('@openmrs/esm-framework', () => ({
-  usePagination: (data: any) => ({ results: data ?? [], currentPage: 1, goTo: jest.fn() }),
-  useLayoutType: jest.fn(() => 'desktop'),
+vi.mock('@openmrs/esm-framework', () => ({
+  usePagination: (data: any) => ({ results: data ?? [], currentPage: 1, goTo: vi.fn() }),
+  useLayoutType: vi.fn(() => 'desktop'),
   ErrorState: ({ error, headerTitle }: any) => React.createElement('div', null, headerTitle, error?.message ?? ''),
   isDesktop: (_layout: any) => true,
-  launchWorkspace2: jest.fn(),
-  useSession: jest.fn(() => ({})),
+  launchWorkspace2: vi.fn(),
+  showSnackbar: vi.fn(),
+  useSession: vi.fn(() => ({})),
   PageHeader: ({ children }: any) => React.createElement('div', null, children),
   PageHeaderContent: ({ title, illustration }: any) => React.createElement('div', null, illustration, title),
   ConfigurableLink: ({ children }: any) => React.createElement('a', null, children),
@@ -32,8 +43,10 @@ jest.mock('@openmrs/esm-framework', () => ({
 import BedAdministrationTable from './bed-administration-table.component';
 import * as summaryResource from '../summary/summary.resource';
 
+const mockShowSnackbar = vi.mocked(esmFramework.showSnackbar);
+
 describe('BedAdministrationTable', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.clearAllMocks());
 
   it('shows blocking ErrorState when initial load errors', async () => {
     (summaryResource as any).useBedsGroupedByLocation.mockReturnValue({
@@ -41,7 +54,7 @@ describe('BedAdministrationTable', () => {
       errorFetchingBedsGroupedByLocation: new Error('boom'),
       isLoadingBedsGroupedByLocation: false,
       isValidatingBedsGroupedByLocation: false,
-      mutateBedsGroupedByLocation: jest.fn(),
+      mutateBedsGroupedByLocation: vi.fn(),
     });
 
     render(<BedAdministrationTable />);
@@ -69,7 +82,7 @@ describe('BedAdministrationTable', () => {
       errorFetchingBedsGroupedByLocation: null,
       isLoadingBedsGroupedByLocation: false,
       isValidatingBedsGroupedByLocation: false,
-      mutateBedsGroupedByLocation: jest.fn(),
+      mutateBedsGroupedByLocation: vi.fn(),
     });
 
     const { rerender } = render(<BedAdministrationTable />);
@@ -83,7 +96,7 @@ describe('BedAdministrationTable', () => {
       errorFetchingBedsGroupedByLocation: new Error('background-fail'),
       isLoadingBedsGroupedByLocation: false,
       isValidatingBedsGroupedByLocation: true,
-      mutateBedsGroupedByLocation: jest.fn(),
+      mutateBedsGroupedByLocation: vi.fn(),
     });
 
     rerender(<BedAdministrationTable />);
@@ -91,8 +104,14 @@ describe('BedAdministrationTable', () => {
     // previously loaded row should still be visible
     expect(await screen.findByText('B-1')).toBeInTheDocument();
 
-    // non-blocking background notification should be shown
-    expect(await screen.findByText('Background fetch failed')).toBeInTheDocument();
+    // non-blocking background warning should be shown via snackbar
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        kind: 'warning',
+        isLowContrast: true,
+        title: 'Background fetch failed',
+      }),
+    );
   });
 
   it('clears error and updates rows after successful revalidation', async () => {
@@ -124,27 +143,36 @@ describe('BedAdministrationTable', () => {
       errorFetchingBedsGroupedByLocation: new Error('background-fail'),
       isLoadingBedsGroupedByLocation: false,
       isValidatingBedsGroupedByLocation: true,
-      mutateBedsGroupedByLocation: jest.fn(),
+      mutateBedsGroupedByLocation: vi.fn(),
     });
 
-    const { rerender } = render(<BedAdministrationTable />);
+    const { unmount } = render(<BedAdministrationTable />);
 
-    expect(await screen.findByText('B-1')).toBeInTheDocument();
-    expect(await screen.findByText('Background fetch failed')).toBeInTheDocument();
+    const bedNumberCells = await screen.findAllByText('B-1');
+    expect(bedNumberCells.length).toBeGreaterThan(0);
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith({
+        kind: 'warning',
+        isLowContrast: true,
+        title: 'Background fetch failed',
+      }),
+    );
 
     // simulate successful revalidation with updated data
+    unmount();
     (summaryResource as any).useBedsGroupedByLocation.mockReturnValue({
       bedsGroupedByLocation: updatedBeds,
       errorFetchingBedsGroupedByLocation: null,
       isLoadingBedsGroupedByLocation: false,
       isValidatingBedsGroupedByLocation: false,
-      mutateBedsGroupedByLocation: jest.fn(),
+      mutateBedsGroupedByLocation: vi.fn(),
     });
 
-    rerender(<BedAdministrationTable />);
+    const { container } = render(<BedAdministrationTable />);
+    const local = within(container);
 
-    // background notification should be gone and new row present
-    await waitFor(() => expect(screen.queryByText('Background fetch failed')).not.toBeInTheDocument());
-    expect(await screen.findByText('B-2')).toBeInTheDocument();
+    // background warning should clear after successful revalidation and new row present
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalledTimes(1));
+    expect(await local.findByText('B-2')).toBeInTheDocument();
   });
 });
