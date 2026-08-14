@@ -9,14 +9,14 @@
 
 .dowCell {
   flex: 1;
-  height: layout.$spacing-10;
+  height: layout.$spacing-08;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: colors.$white;
   border: 1px solid colors.$gray-20;
   border-right: none;
-  @include type.type-style('heading-compact-02');
+  @include type.type-style('heading-compact-01');
   color: colors.$gray-70;
 
   &:last-child {
