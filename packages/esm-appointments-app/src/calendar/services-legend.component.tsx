@@ -26,24 +26,24 @@ const ServicesLegend: React.FC<ServicesLegendProps> = ({ events }) => {
     return Array.from(legendMap.values());
   }, [events]);
 
-  if (!servicesLegendList.length) {
-    return null;
-  }
-
   return (
     <div className={styles.servicesLegend}>
-      <span className={styles.legendTitle}>{t('services', 'Services')}</span>
-      <div className={styles.legendItems}>
-        {servicesLegendList.map(({ serviceName, serviceUuid }) => {
-          const theme = getServiceTheme(serviceUuid, serviceName);
-          return (
-            <div key={serviceUuid || serviceName} className={styles.legendItem}>
-              <span className={styles.swatch} style={{ backgroundColor: theme.swatch }} />
-              <span>{serviceName}</span>
-            </div>
-          );
-        })}
-      </div>
+      {servicesLegendList.length > 0 && (
+        <>
+          <span className={styles.legendTitle}>{t('services', 'Services')}</span>
+          <div className={styles.legendItems}>
+            {servicesLegendList.map(({ serviceName, serviceUuid }) => {
+              const theme = getServiceTheme(serviceUuid, serviceName);
+              return (
+                <div key={serviceUuid || serviceName} className={styles.legendItem}>
+                  <span className={styles.swatch} style={{ backgroundColor: theme.swatch }} />
+                  <span>{serviceName}</span>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 };
