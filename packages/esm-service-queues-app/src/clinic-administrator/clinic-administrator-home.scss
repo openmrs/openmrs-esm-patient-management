@@ -1,0 +1,84 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  background-color: $ui-background;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+
+  a {
+    @include type.type-style('body-compact-01');
+    text-decoration: none;
+    white-space: nowrap;
+  }
+}
+
+.locationDropdown {
+  :global(.cds--list-box__field) {
+    width: 14rem;
+    overflow: hidden;
+  }
+
+  :global(.cds--dropdown--inline .cds--list-box__menu) {
+    left: -(layout.$spacing-10);
+  }
+}
+
+.metrics {
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+  align-items: stretch;
+  padding: layout.$spacing-05;
+  background-color: $ui-02;
+
+  > * {
+    flex: 1 0 0%;
+    min-width: 16rem;
+  }
+}
+
+.section {
+  margin: layout.$spacing-05;
+}
+
+.sectionHeader {
+  @include type.type-style('heading-compact-02');
+  color: $ui-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tableContainer {
+  border: 1px solid $ui-03;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.longestWaitPatient {
+  @include type.type-style('label-01');
+  display: block;
+  color: $text-02;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $ui-03;
+  padding: layout.$spacing-09;
+  text-align: center;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+}
