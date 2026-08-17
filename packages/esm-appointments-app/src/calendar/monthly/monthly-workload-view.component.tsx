@@ -101,6 +101,8 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
     <Popover open={isPopoverOpen} align={popoverAlign} ref={cellRef}>
       <div
         onClick={handleCellClick}
+        data-testid={`workload-cell-${dateFormatted.isoDate}`}
+        data-popover-open={isPopoverOpen}
         className={classNames(
           styles[isCurrentMonth ? 'monthly-cell' : 'monthly-cell-disabled'],
           {
@@ -115,9 +117,13 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
         )}>
         <div className={styles.cellHeader}>
           {isToday ? (
-            <span className={styles.todayCircle}>{dateFormatted.dayNumber}</span>
+            <span className={styles.todayCircle} data-testid="today-indicator">
+              {dateFormatted.dayNumber}
+            </span>
           ) : (
-            <span className={isCurrentMonth ? styles.dateNumber : styles.dateNumberOtherMonth}>
+            <span
+              className={isCurrentMonth ? styles.dateNumber : styles.dateNumberOtherMonth}
+              data-testid={isCurrentMonth ? 'current-month-day' : 'other-month-day'}>
               {dateFormatted.dayNumber}
             </span>
           )}
@@ -129,12 +135,20 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
         </div>
 
         {currentData?.services && currentData.services.length > 0 && (
-          <div className={styles.currentData}>
+          <div className={styles.currentData} data-testid="current-data">
             {visibleServices.map(({ serviceName, serviceUuid, count }, i) => {
               const color = serviceColorMap?.get(serviceUuid ?? '');
               return (
-                <div key={`${serviceUuid}-${i}`} className={styles.serviceArea} style={{ backgroundColor: `${color}21` }}>
-                  <span className={styles.swatch} style={{ backgroundColor: color }} />
+                <div
+                  key={`${serviceUuid}-${i}`}
+                  className={styles.serviceArea}
+                  data-testid={`service-area-${serviceUuid}`}
+                  style={color ? { backgroundColor: `${color}21` } : undefined}>
+                  <span
+                    className={styles.swatch}
+                    style={{ backgroundColor: color }}
+                    data-testid={`service-swatch-${serviceUuid}`}
+                  />
                   <span className={styles.serviceName}>{serviceName}</span>
                   <span className={styles.serviceCount}>{count}</span>
                 </div>
@@ -155,7 +169,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
       </div>
 
       <PopoverContent>
-        <div className={styles.popoverCard} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.popoverCard} onClick={(e) => e.stopPropagation()} data-testid="popover-card">
           <div className={styles.popoverHeader}>
             <div className={styles.popoverTitleGroup}>
               <span className={styles.popoverDate}>{dateFormatted.popoverDate}</span>
@@ -171,7 +185,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
             </button>
           </div>
           <div className={styles.popoverDivider} />
-          <div className={styles.popoverServiceList}>
+          <div className={styles.popoverServiceList} data-testid="popover-service-list">
             {currentData?.services?.map(({ serviceName, serviceUuid, count }, i) => {
               const color = serviceColorMap?.get(serviceUuid ?? '');
               return (

@@ -15,6 +15,14 @@ vi.mock('../hooks/useAppointmentsByDate', () => ({
   useAppointmentsByDate: vi.fn().mockReturnValue({ appointments: [], isLoading: false }),
 }));
 
+vi.mock('../hooks/useAppointmentService', () => ({
+  useAppointmentServices: vi.fn().mockReturnValue({
+    serviceTypes: [{ uuid: 'cardio-1', name: 'Cardiology' }],
+    isLoading: false,
+    error: null,
+  }),
+}));
+
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
 
 function renderCalendar() {
@@ -194,5 +202,29 @@ describe('Appointment calendar view', () => {
 
     expect(screen.getByText('Services')).toBeInTheDocument();
     expect(screen.getAllByText('Cardiology').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows the same color for a service in both legend and monthly views', () => {
+    const today = dayjs().format('YYYY-MM-DD');
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: today,
+          services: [{ serviceName: 'Cardiology', serviceUuid: 'cardio-1', count: 3 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    const legendSwatch = screen.getByTestId('legend-swatch-cardio-1');
+    const cellSwatch = screen.getByTestId('service-swatch-cardio-1');
+
+    expect(legendSwatch).toBeInTheDocument();
+    expect(cellSwatch).toBeInTheDocument();
+    expect(legendSwatch.style.backgroundColor).toBeTruthy();
+    expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
   });
 });

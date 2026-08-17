@@ -16,7 +16,7 @@ const ServicesLegend: React.FC<ServicesLegendProps> = ({ services, serviceColorM
   const { t } = useTranslation();
 
   return (
-    <div className={styles.servicesLegend}>
+    <div className={styles.servicesLegend} data-testid="services-legend">
       {services.length > 0 && (
         <>
           <span className={styles.legendTitle}>{t('services', 'Services')}</span>
@@ -24,8 +24,12 @@ const ServicesLegend: React.FC<ServicesLegendProps> = ({ services, serviceColorM
             {services.map(({ name, uuid }) => {
               const color = serviceColorMap?.get(uuid);
               return (
-                <div key={uuid} className={styles.legendItem}>
-                  <span className={styles.swatch} style={{ backgroundColor: color }} />
+                <div key={uuid} className={styles.legendItem} data-testid={`legend-item-${uuid}`}>
+                  <span
+                    className={styles.swatch}
+                    style={{ backgroundColor: color }}
+                    data-testid={`legend-swatch-${uuid}`}
+                  />
                   <span>{name}</span>
                 </div>
               );
