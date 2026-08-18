@@ -24,25 +24,25 @@ export default function AverageWaitTimeExtension() {
     }
   }, [error]);
 
-  // With nothing to average the queue module returns 0, or "NaN" from older versions that divide by
-  // zero. Neither is a real measurement, and a genuine average is never exactly 0, so both show "--".
-  const averageWaitTime = Number(waitTime?.averageWaitTime);
-  const hasWaitTime = waitTime?.averageWaitTime != null && Number.isFinite(averageWaitTime) && averageWaitTime > 0;
+  // With nothing to average the queue module returns null, or 0 / "NaN" from released versions (an
+  // empty match set / no matched entry with both timestamps). None of these is a real measurement, so
+  // all show "--". Rounding before the check also keeps a sub-minute average on "--".
+  const totalMinutes = Math.round(Number(waitTime?.averageWaitTime));
+  const hasWaitTime = Number.isFinite(totalMinutes) && totalMinutes > 0;
 
   return (
     <MetricsCard>
       <MetricsCardHeader title={t('avgWaitTime', 'Avg. wait time')} />
       <MetricsCardBody>
-        <MetricsCardItem value={isLoading || error || !hasWaitTime ? '--' : formatWaitTimeInMinutes(averageWaitTime)} />
+        <MetricsCardItem value={isLoading || error || !hasWaitTime ? '--' : formatWaitTime(totalMinutes)} />
       </MetricsCardBody>
     </MetricsCard>
   );
 }
 
-// Formats minutes like the table's "Wait time" column (see QueueDuration). Rounding before splitting
-// avoids "3 hours, 60 minutes". Only call with a finite number — Intl.DurationFormat throws on NaN.
-function formatWaitTimeInMinutes(minutes: number) {
-  const totalMinutes = Math.round(minutes);
+// Formats whole minutes like the table's "Wait time" column (see QueueDuration). Only call with a finite
+// number — Intl.DurationFormat rejects NaN.
+function formatWaitTime(totalMinutes: number) {
   return formatDuration(
     { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 },
     { style: 'long', minutesDisplay: 'always' },

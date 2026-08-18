@@ -15,8 +15,8 @@ vi.mock('../metrics.resource', () => ({
   useAverageWaitTime: vi.fn(),
 }));
 
-// Spies on the real formatDuration so we can assert it is never handed a non-finite value. Node's ICU
-// tolerates NaN (it returns "0 minutes"), but Intl.DurationFormat in the browser throws a RangeError.
+// Spies on the real formatDuration so we can assert it is never handed a non-finite value.
+// Intl.DurationFormat rejects NaN, natively and in the formatjs polyfill the test mocks load.
 vi.mock('@openmrs/esm-framework', async (importOriginal) => {
   const actual = (await importOriginal()) as typeof EsmFramework;
   return { ...actual, formatDuration: vi.fn(actual.formatDuration) };
@@ -58,11 +58,13 @@ describe('AverageWaitTimeExtension', () => {
   it.each([
     ['while loading', { isLoading: true }],
     ['on error', { error: new Error('failed to fetch the average wait time') }],
-    // The queue module divides by zero when no entry has an `endedAt` and returns {"averageWaitTime": "NaN"}.
+    // Queue <= 3.0.0 divides by zero when entries match the query but none has both timestamps.
     ['when the backend returns NaN', { waitTime: { averageWaitTime: 'NaN' as unknown as number } }],
     ['when the backend returns no value', { waitTime: { averageWaitTime: null as unknown as number } }],
-    // Newer queue module versions return 0 instead of NaN when nothing matches the query.
+    // Queue <= 3.0.0 returns 0 when no entries match at all; newer versions return null in both cases.
     ['when nothing matches the query', { waitTime: { averageWaitTime: 0 } }],
+    // Rounds to 0 minutes, so it is not a value worth showing either.
+    ['when the average is under a minute', { waitTime: { averageWaitTime: 0.4 } }],
   ])('renders a dash without formatting a non-finite duration %s', (_scenario, overrides) => {
     mockWaitTime(overrides);
 
