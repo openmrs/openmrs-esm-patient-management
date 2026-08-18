@@ -41,7 +41,19 @@ function QueueTableSection() {
     };
   }, [selectedServiceUuid, selectedQueueLocationUuid, waitingStatusConceptUuid]);
 
-  const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
+  const { queueEntries, isLoading, error, isValidating, totalCount } = useQueueEntries(searchCriteria);
+
+  const heading = (
+    <div className={styles.headerContainer}>
+      <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+        <h2>
+          {isLoading || error
+            ? t('waitingList', 'Waiting list')
+            : t('waitingListWithCount', 'Waiting list ({{count}})', { count: totalCount })}
+        </h2>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     if (error?.message) {
@@ -75,37 +87,45 @@ function QueueTableSection() {
   }, [columns, queueEntries, searchTerm]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return (
+      <>
+        {heading}
+        <DataTableSkeleton role="progressbar" />
+      </>
+    );
   }
 
   return (
-    <QueueTable
-      ExpandedRow={QueueTableExpandedRow}
-      isValidating={isValidating}
-      queueEntries={filteredQueueEntries ?? []}
-      queueUuid={null}
-      statusUuid={null}
-      tableFilters={
-        <>
-          {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
-          <AddPatientToQueueButton />
-          <TableToolbarSearch
-            className={styles.search}
-            onChange={(e) => {
-              if (typeof e === 'string') {
-                setSearchTerm(e);
-              } else if (e && 'target' in e) {
-                const target = e.target as HTMLInputElement;
-                setSearchTerm(target.value);
-              }
-            }}
-            placeholder={t('searchThisList', 'Search this list')}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
-            persistent
-          />
-        </>
-      }
-    />
+    <>
+      {heading}
+      <QueueTable
+        ExpandedRow={QueueTableExpandedRow}
+        isValidating={isValidating}
+        queueEntries={filteredQueueEntries ?? []}
+        queueUuid={null}
+        statusUuid={null}
+        tableFilters={
+          <>
+            {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
+            <AddPatientToQueueButton />
+            <TableToolbarSearch
+              className={styles.search}
+              onChange={(e) => {
+                if (typeof e === 'string') {
+                  setSearchTerm(e);
+                } else if (e && 'target' in e) {
+                  const target = e.target as HTMLInputElement;
+                  setSearchTerm(target.value);
+                }
+              }}
+              placeholder={t('searchThisList', 'Search this list')}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              persistent
+            />
+          </>
+        }
+      />
+    </>
   );
 }
 

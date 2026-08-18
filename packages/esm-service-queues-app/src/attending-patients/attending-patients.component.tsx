@@ -116,16 +116,21 @@ function GenderIndicator({ gender }: { gender?: string }) {
   if (!gender) {
     return null;
   }
-  const normalized = gender.charAt(0).toUpperCase();
-  const label =
-    normalized === 'F'
-      ? getCoreTranslation('female', 'Female')
-      : normalized === 'M'
-        ? getCoreTranslation('male', 'Male')
-        : normalized === 'O'
-          ? getCoreTranslation('other', 'Other')
-          : getCoreTranslation('unknown', 'Unknown');
-  return <span className={styles.gender}>{label}</span>;
+
+  return <span className={styles.gender}>{getGenderLabel(gender)}</span>;
+}
+
+function getGenderLabel(gender: string) {
+  switch (gender.charAt(0).toUpperCase()) {
+    case 'F':
+      return getCoreTranslation('female', 'Female');
+    case 'M':
+      return getCoreTranslation('male', 'Male');
+    case 'O':
+      return getCoreTranslation('other', 'Other');
+    default:
+      return getCoreTranslation('unknown', 'Unknown');
+  }
 }
 
 export default AttendingPatients;

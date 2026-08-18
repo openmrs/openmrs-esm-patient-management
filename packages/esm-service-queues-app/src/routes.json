@@ -2,8 +2,7 @@
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
     "webservices.rest": ">=2.2.0",
-    "queue": ">=2.4.0 <4.0.0",
-    "appointments": ">=2.0.0"
+    "queue": ">=2.4.0 <4.0.0"
   },
   "extensions": [
     {
@@ -74,16 +73,10 @@
       "order": 1
     },
     {
-      "name": "metrics-card-appointments-today",
-      "component": "metricsCardAppointmentsToday",
-      "slot": "service-queues-metrics-slot",
-      "order": 2
-    },
-    {
       "name": "metrics-card-waiting-patients",
       "component": "metricsCardWaitingPatients",
       "slot": "service-queues-metrics-slot",
-      "order": 3
+      "order": 2
     },
     {
       "name": "queue-screen-link",

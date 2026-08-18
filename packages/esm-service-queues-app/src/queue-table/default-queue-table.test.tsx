@@ -86,7 +86,7 @@ describe('DefaultQueueTable', () => {
 
     await screen.findByRole('table');
 
-    expect(screen.getByRole('search', { name: /search this list/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /waiting list \(2\)/i })).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Brian Johnson/i })).toBeInTheDocument();
     const john = screen.getByRole('link', { name: /Alice Johnson/i });

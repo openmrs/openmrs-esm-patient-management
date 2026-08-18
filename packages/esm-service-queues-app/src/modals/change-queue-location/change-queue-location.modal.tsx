@@ -20,6 +20,7 @@ import {
   updateSelectedService,
   useServiceQueuesStore,
 } from '../../store/store';
+import { type Concept } from '../../types';
 
 interface ChangeQueueLocationModalProps {
   closeModal: () => void;
@@ -27,15 +28,10 @@ interface ChangeQueueLocationModalProps {
 
 const ALL = 'all';
 
-interface LocationItem {
-  id: string;
-  name: string;
-}
-
-interface ServiceItem {
-  uuid: string;
-  display: string;
-}
+// The dropdowns list an "All" entry alongside the fetched locations/services, so items are typed to the
+// fields both share: `id`/`name` for locations (fhir.Location) and `uuid`/`display` for services.
+type LocationItem = Pick<fhir.Location, 'id' | 'name'>;
+type ServiceItem = Pick<Concept, 'uuid' | 'display'>;
 
 const ChangeQueueLocationModal: React.FC<ChangeQueueLocationModalProps> = ({ closeModal }) => {
   const { t } = useTranslation();
@@ -67,15 +63,9 @@ const ChangeQueueLocationModal: React.FC<ChangeQueueLocationModalProps> = ({ clo
   );
 
   const allLocation: LocationItem = { id: ALL, name: t('all', 'All') };
-  const locationItems: LocationItem[] = [
-    allLocation,
-    ...queueLocations.map((location) => ({ id: location.id ?? '', name: location.name ?? '' })),
-  ];
+  const locationItems: Array<LocationItem> = [allLocation, ...queueLocations];
   const allService: ServiceItem = { uuid: ALL, display: t('all', 'All') };
-  const serviceItems: ServiceItem[] = [
-    allService,
-    ...services.map((service) => ({ uuid: service.uuid ?? '', display: service.display ?? '' })),
-  ];
+  const serviceItems: Array<ServiceItem> = [allService, ...services];
 
   const handleLocationChange = ({ selectedItem }: { selectedItem: LocationItem }) => {
     setLocationUuid(selectedItem.id);

@@ -4,7 +4,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .defaultQueueTable {
-  margin: 0;
+  margin: layout.$spacing-05 0 0;
 }
 
 .container {

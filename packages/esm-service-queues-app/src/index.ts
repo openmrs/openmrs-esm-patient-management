@@ -41,11 +41,6 @@ export const clearAllQueueEntriesModal = getAsyncLifecycle(
 
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
-export const metricsCardAppointmentsToday = getAsyncLifecycle(
-  () => import('./metrics/metrics-cards/appointments-today.extension'),
-  options,
-);
-
 export const metricsCardWaitingPatients = getAsyncLifecycle(
   () => import('./metrics/metrics-cards/waiting-patients.extension'),
   options,

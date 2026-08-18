@@ -1,6 +1,5 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .tileContainer {
@@ -45,36 +44,13 @@
 
 .metricItem {
   display: inline-block;
-  flex-direction: column;
-}
-
-.metricLabel {
-  @include type.type-style('label-01');
-  color: $text-02;
-  margin-bottom: layout.$spacing-02;
+  flex: 1;
 }
 
 .metricValue {
   @include type.type-style('heading-03');
   color: $ui-05;
   margin: 0;
-}
-
-.mainItem {
-  flex: 1;
-}
-
-.smallItem {
-  flex-direction: row;
-}
-
-.smallValue {
-  font-size: 1rem !important;
-  margin-top: layout.$spacing-02;
-}
-
-.red {
-  color: colors.$red-50;
 }
 
 // Overriding styles for RTL support

@@ -6,9 +6,8 @@ import { type WaitTime } from '../types';
 
 /**
  * Fetches today's currently-active visits at a location (defaults to the session location), deduped
- * by patient. Used both for the "Checked in patients" metric and for the pre-search shortlist in the
- * "Add patient to queue" workspace. All pages are fetched, so the result is never truncated at the
- * REST default page size.
+ * by patient. Used for the pre-search shortlist in the "Add patient to queue" workspace. All pages are
+ * fetched, so the result is never truncated at the REST default page size.
  */
 export function useActiveVisits(locationUuid?: string) {
   const currentUserSession = useSession();
