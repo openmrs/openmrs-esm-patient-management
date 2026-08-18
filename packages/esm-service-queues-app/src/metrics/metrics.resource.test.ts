@@ -79,12 +79,15 @@ describe('useAverageWaitTime', () => {
     vi.clearAllMocks();
   });
 
-  it('bounds the average to entries started today', () => {
+  it('bounds the average to today, sent in the format and timezone the queue module parses', () => {
     mockUseSWR.mockReturnValue({ data: undefined, error: undefined, isLoading: true } as ReturnType<typeof useSWR>);
     renderHook(() => useAverageWaitTime('service-1', 'location-1', 'status-1'));
 
-    // The exact format matters as much as the parameter itself; see useAverageWaitTime.
     const url = decodeURIComponent(mockUseSWR.mock.calls[0][0] as string);
-    expect(url).toMatch(/&startedOnOrAfter=\d{4}-\d{2}-\d{2} 00:00:00/);
+    const startedOnOrAfter = url.match(/&startedOnOrAfter=([^&]+)/)?.[1];
+
+    expect(startedOnOrAfter).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+    // Appending Z reads it back as UTC, which is how the server parses the zone-less string.
+    expect(new Date(`${startedOnOrAfter}Z`).getTime()).toBe(dayjs().startOf('day').valueOf());
   });
 });
