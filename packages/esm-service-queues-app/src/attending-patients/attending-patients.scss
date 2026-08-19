@@ -25,9 +25,16 @@
 }
 
 .card {
+  display: flex;
   flex: 0 1 22rem;
+  flex-direction: column;
   background-color: $ui-02;
   border: 1px solid $ui-03;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $ui-03;
+  }
 }
 
 .cardSkeleton {
@@ -57,16 +64,11 @@
   margin-top: layout.$spacing-05;
 }
 
-.cardLink {
+.patient {
   display: flex;
   align-items: center;
   gap: layout.$spacing-05;
   padding: layout.$spacing-05;
-  text-decoration: none;
-
-  &:hover {
-    background-color: $ui-03;
-  }
 }
 
 .details {
@@ -78,7 +80,11 @@
 .serviceRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: layout.$spacing-03;
+  margin-top: auto;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  border-top: 1px solid $ui-03;
 }
 
 .name {

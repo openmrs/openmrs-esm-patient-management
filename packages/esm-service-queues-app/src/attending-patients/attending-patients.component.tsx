@@ -86,28 +86,27 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
     .filter(Boolean)
     .join(' · ');
 
-  // One row per concern, so that a name wrapping onto a second line doesn't rearrange the card.
   return (
-    <div className={styles.card}>
-      <ConfigurableLink
-        className={styles.cardLink}
-        to={customPatientChartUrl}
-        templateParams={{ patientUuid: queueEntry.patient.uuid }}>
+    <ConfigurableLink
+      className={styles.card}
+      to={customPatientChartUrl}
+      templateParams={{ patientUuid: queueEntry.patient.uuid }}>
+      <div className={styles.patient}>
         <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
         <div className={styles.details}>
           <span className={styles.name}>{person?.display}</span>
           <p className={styles.demographics}>{demographics}</p>
-          <div className={styles.serviceRow}>
-            <span className={styles.service}>{queueEntry.queue?.display}</span>
-            <QueuePriority
-              priority={queueEntry.priority}
-              priorityComment={queueEntry.priorityComment ?? undefined}
-              priorityConfigs={priorityConfigs}
-            />
-          </div>
         </div>
-      </ConfigurableLink>
-    </div>
+      </div>
+      <div className={styles.serviceRow}>
+        <span className={styles.service}>{queueEntry.queue?.display}</span>
+        <QueuePriority
+          priority={queueEntry.priority}
+          priorityComment={queueEntry.priorityComment ?? undefined}
+          priorityConfigs={priorityConfigs}
+        />
+      </div>
+    </ConfigurableLink>
   );
 }
 
