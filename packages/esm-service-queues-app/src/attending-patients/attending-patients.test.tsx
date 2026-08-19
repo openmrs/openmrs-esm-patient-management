@@ -23,6 +23,7 @@ const queueEntry = {
   },
   priority: { uuid: 'priority-1', display: 'Urgent' },
   priorityComment: null,
+  queue: { display: 'Outpatient Triage' },
 } as unknown as QueueEntry;
 
 function mockEntries(entries: Array<QueueEntry>, overrides: Partial<ReturnType<typeof useQueueEntries>> = {}) {
@@ -57,15 +58,15 @@ describe('AttendingPatients', () => {
     });
   });
 
-  it('renders a card per in-service patient with a translated gender and localized birthdate', () => {
+  it('renders a card per in-service patient with a translated gender, their age and their queue', () => {
     mockEntries([queueEntry]);
     render(<AttendingPatients />);
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.getByText(/Male/)).toBeInTheDocument();
-    // Locale-aware date (not the old hardcoded DD-MM-YYYY); year must appear.
-    expect(screen.getByText(/1990/)).toBeInTheDocument();
-    expect(screen.queryByText('15-01-1990')).not.toBeInTheDocument();
+    // Sex and age share a line, in that order; the queue replaced the birthdate.
+    expect(screen.getByText(/^Male · /)).toBeInTheDocument();
+    expect(screen.getByText(/Outpatient Triage/)).toBeInTheDocument();
+    expect(screen.queryByText(/1990/)).not.toBeInTheDocument();
   });
 
   it('says explicitly that no one is being attended rather than hiding the section', () => {

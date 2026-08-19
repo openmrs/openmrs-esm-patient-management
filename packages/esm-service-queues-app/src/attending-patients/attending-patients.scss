@@ -75,7 +75,7 @@
   gap: layout.$spacing-02;
 }
 
-.nameRow {
+.serviceRow {
   display: flex;
   align-items: center;
   gap: layout.$spacing-03;
@@ -84,12 +84,12 @@
 .name {
   @include type.type-style('heading-compact-01');
   color: $ui-05;
+  overflow-wrap: anywhere;
 }
 
-.gender {
+.service {
   @include type.type-style('body-compact-01');
-  color: $text-02;
-  white-space: nowrap;
+  color: $ui-05;
 }
 
 .demographics {

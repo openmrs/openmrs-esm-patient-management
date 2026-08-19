@@ -6,9 +6,7 @@ import {
   ConfigurableLink,
   EmptyCardIllustration,
   ErrorState,
-  formatDate,
   getCoreTranslation,
-  parseDate,
   PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
@@ -82,12 +80,13 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
   const { person } = queueEntry.patient;
 
   const demographics = [
+    person?.gender ? getGenderLabel(person.gender) : null,
     person?.birthdate ? age(person.birthdate) : null,
-    person?.birthdate ? formatDate(parseDate(person.birthdate), { time: false }) : null,
   ]
     .filter(Boolean)
     .join(' · ');
 
+  // One row per concern, so that a name wrapping onto a second line doesn't rearrange the card.
   return (
     <div className={styles.card}>
       <ConfigurableLink
@@ -96,28 +95,20 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
         templateParams={{ patientUuid: queueEntry.patient.uuid }}>
         <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
         <div className={styles.details}>
-          <div className={styles.nameRow}>
-            <span className={styles.name}>{person?.display}</span>
-            <GenderIndicator gender={person?.gender} />
+          <span className={styles.name}>{person?.display}</span>
+          <p className={styles.demographics}>{demographics}</p>
+          <div className={styles.serviceRow}>
+            <span className={styles.service}>{queueEntry.queue?.display}</span>
             <QueuePriority
               priority={queueEntry.priority}
               priorityComment={queueEntry.priorityComment ?? undefined}
               priorityConfigs={priorityConfigs}
             />
           </div>
-          <p className={styles.demographics}>{demographics}</p>
         </div>
       </ConfigurableLink>
     </div>
   );
-}
-
-function GenderIndicator({ gender }: { gender?: string }) {
-  if (!gender) {
-    return null;
-  }
-
-  return <span className={styles.gender}>{getGenderLabel(gender)}</span>;
 }
 
 function getGenderLabel(gender: string) {
