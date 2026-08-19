@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { editBedType, useBedTypes } from '../summary/summary.resource';
+import { editBedType } from '../summary/summary.resource';
 import { type BedTypeDataAdministration } from '../bed-administration/bed-administration-types';
 import { type BedType, type BedTypeData, type Mutator } from '../types';
 import BedTypeAdministrationForm from './bed-type-admin-form.modal';
@@ -14,7 +14,6 @@ interface EditBedTypeFormProps {
 
 const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, closeModal }) => {
   const { t } = useTranslation();
-  const { bedTypes } = useBedTypes();
   const headerTitle = t('editBedType', 'Edit bed type');
 
   const handleUpdateBedType = useCallback(
@@ -54,11 +53,9 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ editData, mutate, clo
 
   return (
     <BedTypeAdministrationForm
-      availableBedTypes={bedTypes}
       handleSubmission={handleUpdateBedType}
       headerTitle={headerTitle}
       initialData={editData}
-      allLocations={[]}
       closeModal={closeModal}
     />
   );

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { saveBedType, useBedTypes, useLocationsWithAdmissionTag } from '../summary/summary.resource';
+import { saveBedType } from '../summary/summary.resource';
 import type { BedType, BedTypeData, Mutator } from '../types';
 import BedTypeAdministrationForm from './bed-type-admin-form.modal';
 
@@ -12,9 +12,7 @@ interface BedTypeFormProps {
 
 const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
   const { t } = useTranslation();
-  const { admissionLocations } = useLocationsWithAdmissionTag();
   const headerTitle = t('createBedType', 'Create bed type');
-  const { bedTypes } = useBedTypes();
 
   const initialData: BedTypeData = {
     description: '',
@@ -58,8 +56,6 @@ const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ mutate, closeModal }) => {
 
   return (
     <BedTypeAdministrationForm
-      allLocations={admissionLocations}
-      availableBedTypes={bedTypes}
       handleSubmission={handleCreateBedType}
       headerTitle={headerTitle}
       initialData={initialData}
