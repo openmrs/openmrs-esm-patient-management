@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { type Provider } from '../types';
 
 export function useProviders() {
-  const apiUrl = `${restBaseUrl}/provider`;
+  const apiUrl = `${restBaseUrl}/provider?limit=100`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Provider> } }, Error>(
     apiUrl,
     openmrsFetch,
