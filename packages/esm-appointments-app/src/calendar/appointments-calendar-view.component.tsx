@@ -50,20 +50,26 @@ const AppointmentsCalendarView: React.FC = () => {
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
   const isMonthly = viewMode === 'monthly';
-  const { calendarEvents: summaryEvents } = useAppointmentsCalendar(
-    isMonthly ? null : calendarSelectedDate.toISOString(),
-    viewMode,
-  );
+  const hasActiveFilters = serviceUuids.length > 0 || providerUuids.length > 0 || locationUuids.length > 0;
+
+  // Always fetch the appointmentSummary for monthly view – this is the only endpoint
+  // that returns future appointments. It is used as the display source when no filters
+  // are active so that the full month (including upcoming dates) is visible.
+  const { calendarEvents: summaryEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
+
   const { appointments: monthlyAppointments } = useMonthlyAppointments(calendarSelectedDate);
 
   const filteredMonthlyEvents = useMemo(() => {
-    if (!isMonthly) return null;
+    if (!isMonthly || !hasActiveFilters) return null;
     return aggregateDailyCountsByService(
       filterAppointments(monthlyAppointments, { serviceUuids, providerUuids, locationUuids }),
     );
-  }, [isMonthly, monthlyAppointments, serviceUuids, providerUuids, locationUuids]);
+  }, [isMonthly, hasActiveFilters, monthlyAppointments, serviceUuids, providerUuids, locationUuids]);
 
-  const calendarEvents = isMonthly ? filteredMonthlyEvents : summaryEvents;
+  // When filters are active use the filtered individual-appointment data.
+  // When no filters are active, use summaryEvents (appointmentSummary API) so that
+  // future appointments are visible – exactly matching the main-branch behaviour.
+  const calendarEvents = isMonthly ? (hasActiveFilters ? filteredMonthlyEvents : summaryEvents) : summaryEvents;
 
   const appointmentCount = useMemo(() => {
     if (!calendarEvents) return 0;

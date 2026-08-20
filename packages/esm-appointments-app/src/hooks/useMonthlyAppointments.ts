@@ -14,20 +14,24 @@ export const useMonthlyAppointments = (
   const url = `${restBaseUrl}/appointments/search`;
 
   const startDate = forDate ? dayjs(forDate).startOf('month').startOf('day').format(omrsDateFormat) : null;
-  const endDate = forDate ? dayjs(forDate).endOf('month').endOf('day').format(omrsDateFormat) : null;
 
   const { data, isLoading, error } = useSWR<{ data: Array<Appointment> }, Error>(
-    startDate && endDate ? [url, startDate, endDate] : null,
+    startDate ? [url, startDate] : null,
     () =>
       openmrsFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: { startDate, endDate },
+        body: { startDate },
       }),
     { errorRetryCount: 2 },
   );
 
-  const appointments = [...(data?.data ?? [])].sort((a, b) => (a.startDateTime ?? 0) - (b.startDateTime ?? 0));
+  const appointments = [...(data?.data ?? [])]
+    .filter((a) => {
+      if (!forDate || a.startDateTime == null) return false;
+      return dayjs(a.startDateTime).isSame(forDate, 'month');
+    })
+    .sort((a, b) => (a.startDateTime ?? 0) - (b.startDateTime ?? 0));
 
   return { appointments, isLoading, error };
 };

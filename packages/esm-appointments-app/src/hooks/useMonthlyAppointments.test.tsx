@@ -55,7 +55,7 @@ describe('useMonthlyAppointments', () => {
     expect(mockOpenmrsFetch).not.toHaveBeenCalled();
   });
 
-  it('POSTs the month window to the search endpoint', async () => {
+  it('POSTs the month start to the search endpoint', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
 
     renderHook(() => useMonthlyAppointments(dayjs('2026-08-15')), { wrapper });
@@ -65,13 +65,14 @@ describe('useMonthlyAppointments', () => {
     expect(url).toBe(`${restBaseUrl}/appointments/search`);
     expect(options.method).toBe('POST');
     expect(options.body.startDate).toMatch(/^2026-08-01T/);
-    expect(options.body.endDate).toMatch(/^2026-08-31T/);
+    expect(options.body.endDate).toBeUndefined();
   });
 
-  it('extracts and sorts appointments by startDateTime ascending', async () => {
-    const late = mockAppointment({ uuid: 'late', startDateTime: new Date('2026-08-20T14:00:00').getTime() });
+  it('extracts, sorts by startDateTime, and filters to the requested month', async () => {
     const early = mockAppointment({ uuid: 'early', startDateTime: new Date('2026-08-05T09:00:00').getTime() });
-    mockOpenmrsFetch.mockResolvedValue({ data: [late, early] } as FetchResponse);
+    const late = mockAppointment({ uuid: 'late', startDateTime: new Date('2026-08-25T14:00:00').getTime() });
+    const nextMonth = mockAppointment({ uuid: 'next-month', startDateTime: new Date('2026-09-02T10:00:00').getTime() });
+    mockOpenmrsFetch.mockResolvedValue({ data: [late, nextMonth, early] } as FetchResponse);
 
     const { result } = renderHook(() => useMonthlyAppointments(dayjs('2026-08-15')), { wrapper });
 
@@ -81,8 +82,12 @@ describe('useMonthlyAppointments', () => {
 
   it('re-fetches when the month changes', async () => {
     mockOpenmrsFetch
-      .mockResolvedValueOnce({ data: [mockAppointment({ uuid: 'aug' })] } as FetchResponse)
-      .mockResolvedValueOnce({ data: [mockAppointment({ uuid: 'sep' })] } as FetchResponse);
+      .mockResolvedValueOnce({
+        data: [mockAppointment({ uuid: 'aug', startDateTime: new Date('2026-08-10').getTime() })],
+      } as FetchResponse)
+      .mockResolvedValueOnce({
+        data: [mockAppointment({ uuid: 'sep', startDateTime: new Date('2026-09-10').getTime() })],
+      } as FetchResponse);
 
     const { result, rerender } = renderHook(
       ({ forDate }: { forDate: ReturnType<typeof dayjs> }) => useMonthlyAppointments(forDate),

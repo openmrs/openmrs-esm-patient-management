@@ -117,8 +117,11 @@ describe('Appointment calendar view', () => {
 
   it('defaults to monthly period on initial render', () => {
     renderCalendar();
+    // In monthly mode the hook now always fetches via appointmentSummary (which
+    // returns future appointments) – so the date arg must be a non-null ISO string.
     expect(mockUseMonthlyAppointments.mock.calls.at(-1)?.[0]).toBeTruthy();
-    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[0]).toBeNull();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[0]).not.toBeNull();
+    expect(typeof mockUseAppointmentsCalendar.mock.calls.at(-1)?.[0]).toBe('string');
   });
 
   it('switches to weekly period when Weekly tab is clicked', async () => {
@@ -231,11 +234,18 @@ describe('Appointment calendar view', () => {
     expect(screen.getByRole('button', { name: /today/i })).toBeDisabled();
   });
 
-  it('displays the appointment count for the filtered month', () => {
-    mockUseMonthlyAppointments.mockReturnValue({
-      appointments: [mockAppointment({ uuid: 'a1' })],
+  it('displays the appointment count for the month', () => {
+    // In monthly view without active filters, calendarEvents comes from summaryEvents
+    // (useAppointmentsCalendar / appointmentSummary API) so mock that source.
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: dayjs().date(10).format('YYYY-MM-DD'),
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'svc-uuid', count: 1 }],
+        },
+      ],
       isLoading: false,
-      error: undefined,
+      error: null,
     });
 
     renderCalendar();
@@ -297,10 +307,17 @@ describe('Appointment calendar view', () => {
 
   it('opens popup when a day cell with appointments is clicked in monthly mode, then switches to daily view when Open day view is clicked', async () => {
     const user = userEvent.setup();
-    mockUseMonthlyAppointments.mockReturnValue({
-      appointments: [mockAppointment({ uuid: 'a1' })],
+    // Monthly view without active filters uses summaryEvents (useAppointmentsCalendar),
+    // so mock that hook to make the cell clickable.
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: dayjs().date(10).format('YYYY-MM-DD'),
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'svc-uuid', count: 1 }],
+        },
+      ],
       isLoading: false,
-      error: undefined,
+      error: null,
     });
 
     renderCalendar();
@@ -316,10 +333,16 @@ describe('Appointment calendar view', () => {
   });
 
   it('renders the services legend when services are present', () => {
-    mockUseMonthlyAppointments.mockReturnValue({
-      appointments: [mockAppointment({ uuid: 'a1', service: svc('Cardiology', 'cardio-1') })],
+    // Legend is derived from calendarEvents; in unfiltered monthly mode that's summaryEvents.
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: dayjs().date(10).format('YYYY-MM-DD'),
+          services: [{ serviceName: 'Cardiology', serviceUuid: 'cardio-1', count: 1 }],
+        },
+      ],
       isLoading: false,
-      error: undefined,
+      error: null,
     });
 
     renderCalendar();
@@ -338,6 +361,24 @@ describe('Appointment calendar view', () => {
 
   it('narrows the monthly grid when a service filter is selected', async () => {
     const user = userEvent.setup();
+    // When no filter is active, monthly view uses summaryEvents (useAppointmentsCalendar).
+    // Mock it with both services so they appear in the grid initially.
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: dayjs().date(10).format('YYYY-MM-DD'),
+          services: [
+            { serviceName: 'Outpatient', serviceUuid: 'svc-opd', count: 1 },
+            { serviceName: 'Lab', serviceUuid: 'svc-lab', count: 1 },
+          ],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+    // When a filter becomes active, monthly view uses filteredMonthlyEvents from
+    // useMonthlyAppointments. Supply individual appointments so the client-side
+    // filter can narrow them down.
     mockUseMonthlyAppointments.mockReturnValue({
       appointments: [
         mockAppointment({ uuid: 'a1', service: svc('Outpatient', 'svc-opd') }),
