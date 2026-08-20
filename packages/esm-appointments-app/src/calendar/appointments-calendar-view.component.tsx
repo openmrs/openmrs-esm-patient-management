@@ -50,7 +50,8 @@ const AppointmentsCalendarView: React.FC = () => {
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
   const isMonthly = viewMode === 'monthly';
-  const hasActiveFilters = serviceUuids.length > 0 || providerUuids.length > 0 || locationUuids.length > 0;
+  const hasProviderOrLocationFilter = providerUuids.length > 0 || locationUuids.length > 0;
+  const hasServiceFilter = serviceUuids.length > 0;
 
   // Always fetch the appointmentSummary for monthly view – this is the only endpoint
   // that returns future appointments. It is used as the display source when no filters
@@ -59,17 +60,41 @@ const AppointmentsCalendarView: React.FC = () => {
 
   const { appointments: monthlyAppointments } = useMonthlyAppointments(calendarSelectedDate);
 
+  // Directly filter summaryEvents by serviceUuid when only service filter is active.
+  // This guarantees all appointments in the month (including 20 Aug onwards) remain visible.
+  const filteredSummaryEvents = useMemo(() => {
+    if (!summaryEvents) return [];
+    if (!hasServiceFilter) return summaryEvents;
+    return summaryEvents
+      .map((event) => ({
+        ...event,
+        services: (event.services ?? []).filter((s) => serviceUuids.includes(s.serviceUuid)),
+      }))
+      .filter((event) => event.services.length > 0);
+  }, [summaryEvents, hasServiceFilter, serviceUuids]);
+
   const filteredMonthlyEvents = useMemo(() => {
-    if (!isMonthly || !hasActiveFilters) return null;
+    if (!isMonthly || (!hasProviderOrLocationFilter && !hasServiceFilter)) return null;
     return aggregateDailyCountsByService(
       filterAppointments(monthlyAppointments, { serviceUuids, providerUuids, locationUuids }),
     );
-  }, [isMonthly, hasActiveFilters, monthlyAppointments, serviceUuids, providerUuids, locationUuids]);
+  }, [
+    isMonthly,
+    hasProviderOrLocationFilter,
+    hasServiceFilter,
+    monthlyAppointments,
+    serviceUuids,
+    providerUuids,
+    locationUuids,
+  ]);
 
-  // When filters are active use the filtered individual-appointment data.
-  // When no filters are active, use summaryEvents (appointmentSummary API) so that
-  // future appointments are visible – exactly matching the main-branch behaviour.
-  const calendarEvents = isMonthly ? (hasActiveFilters ? filteredMonthlyEvents : summaryEvents) : summaryEvents;
+  // When provider or location filters are active, use filtered individual-appointment data.
+  // When only service filter or no filter is active, use filteredSummaryEvents (appointmentSummary API).
+  const calendarEvents = isMonthly
+    ? hasProviderOrLocationFilter
+      ? filteredMonthlyEvents
+      : filteredSummaryEvents
+    : summaryEvents;
 
   const appointmentCount = useMemo(() => {
     if (!calendarEvents) return 0;

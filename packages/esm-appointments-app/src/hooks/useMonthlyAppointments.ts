@@ -13,7 +13,7 @@ export const useMonthlyAppointments = (
 } => {
   const url = `${restBaseUrl}/appointments/search`;
 
-  const startDate = forDate ? dayjs(forDate).startOf('month').startOf('day').format(omrsDateFormat) : null;
+  const startDate = forDate ? dayjs(forDate).startOf('month').startOf('day').toISOString() : null;
 
   const { data, isLoading, error } = useSWR<{ data: Array<Appointment> }, Error>(
     startDate ? [url, startDate] : null,
