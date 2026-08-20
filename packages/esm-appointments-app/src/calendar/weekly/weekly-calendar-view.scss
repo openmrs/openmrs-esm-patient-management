@@ -3,7 +3,7 @@
 @use '@carbon/type';
 
 .container {
-  margin: layout.$spacing-05;
+  margin: 0 layout.$spacing-05 layout.$spacing-05;
   padding-bottom: layout.$spacing-10;
   overflow-x: auto;
 }

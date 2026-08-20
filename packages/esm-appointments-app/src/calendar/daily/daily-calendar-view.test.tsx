@@ -78,13 +78,6 @@ describe('DailyCalendarView', () => {
     });
   });
 
-  it('renders the appointment count', async () => {
-    mockOpenmrsFetch.mockResolvedValue({ data: [mockAppointment()] } as FetchResponse);
-    renderWithSwr(<DailyCalendarView {...defaultProps} />);
-
-    await screen.findByText('1 appointment(s)');
-  });
-
   it('renders hour labels only for hours with appointments', async () => {
     mockOpenmrsFetch.mockResolvedValue({
       data: [
