@@ -2494,9 +2494,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-home-app@workspace:packages/esm-home-app"
   dependencies:
+    "@carbon/icons-react": "npm:^11.68.0"
+    "@carbon/react": "npm:^1.83.0"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/icons-react": 11.x
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     react: 18.x
     react-dom: 18.x
