@@ -1,6 +1,7 @@
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   mockLocationSurgery,
   mockLocationTriage,
@@ -109,6 +110,32 @@ describe('DefaultQueueTable', () => {
         }),
       ).toBeInTheDocument();
     });
+  });
+
+  it('counts the entries left by a search rather than every waiting entry', async () => {
+    const user = userEvent.setup();
+    mockQueueLocations.mockReturnValue({
+      queueLocations: [mockLocationSurgery, mockLocationTriage],
+      isLoading: false,
+      error: null,
+    });
+    mockUseQueueEntries.mockReturnValue({
+      queueEntries: mockQueueEntries,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+      totalCount: 2,
+    });
+
+    rendeDefaultQueueTable();
+
+    await screen.findByRole('table');
+
+    await user.type(screen.getByRole('searchbox'), 'Brian');
+
+    expect(screen.getByRole('heading', { name: /waiting list \(1\)/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Alice Johnson/i })).not.toBeInTheDocument();
   });
 });
 

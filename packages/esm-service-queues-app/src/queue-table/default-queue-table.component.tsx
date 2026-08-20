@@ -43,18 +43,6 @@ function QueueTableSection() {
 
   const { queueEntries, isLoading, error, isValidating, totalCount } = useQueueEntries(searchCriteria);
 
-  const heading = (
-    <div className={styles.headerContainer}>
-      <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-        <h2>
-          {isLoading || error
-            ? t('waitingList', 'Waiting list')
-            : t('waitingListWithCount', 'Waiting list ({{count}})', { count: totalCount })}
-        </h2>
-      </div>
-    </div>
-  );
-
   useEffect(() => {
     if (error?.message) {
       showSnackbar({
@@ -85,6 +73,21 @@ function QueueTableSection() {
       });
     });
   }, [columns, queueEntries, searchTerm]);
+
+  // `totalCount` counts every waiting entry on the server, which is not what a search leaves in the table.
+  const waitingCount = searchTerm ? (filteredQueueEntries?.length ?? 0) : totalCount;
+
+  const heading = (
+    <div className={styles.headerContainer}>
+      <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+        <h2>
+          {isLoading || error
+            ? t('waitingList', 'Waiting list')
+            : t('waitingListWithCount', 'Waiting list ({{count}})', { count: waitingCount })}
+        </h2>
+      </div>
+    </div>
+  );
 
   if (isLoading) {
     return (
