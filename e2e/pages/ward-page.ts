@@ -81,6 +81,46 @@ export class WardPage {
       .click();
   }
 
+  async selectBedForAdmission(bedNumber: string) {
+    // if the ward contains many beds, the bed selection will be a dropdown instead of radio buttons. Handle both cases.
+    const bedDropdown = this.page.getByRole('combobox', { name: 'Choose an option' });
+    const isDropdownVisible = await bedDropdown
+      .waitFor({ state: 'visible', timeout: 1000 })
+      .then(() => true)
+      .catch(() => false);
+    if (isDropdownVisible) {
+      await bedDropdown.click();
+    }
+    await this.page.getByText(new RegExp(`^${bedNumber} · `)).click();
+  }
+
+  async confirmAdmission() {
+    await this.page.getByRole('button', { name: 'Admit', exact: true }).click();
+  }
+
+  ////////////////////////////////////////
+  // Edit inpatients notes / View edit history
+
+  async selectEditNoteOption() {
+    await this.page.getByRole('button', { name: 'Options' }).click();
+    await this.page.getByRole('menuitem', { name: /^edit$/i }).click();
+  }
+
+  async fillEditNote(note: string) {
+    await this.page.getByRole('textbox', { name: /edit note/i }).fill(note);
+  }
+
+  async clickSaveEditButton() {
+    await this.page.getByRole('button', { name: 'Save edit' }).click();
+  }
+
+  async selectViewEditHistoryOption() {
+    await this.page.getByRole('button', { name: 'Options' }).click();
+    await this.page.getByRole('menuitem', { name: /view edit history/i }).click();
+  }
+
+  ////////////////////////////////////////
+
   async expectAdmissionSuccessNotification(patientName: string, bedNumber: string) {
     await this.page
       .getByText(new RegExp(`${patientName}\\s+has been successfully admitted and assigned to bed ${bedNumber}`, 'i'))

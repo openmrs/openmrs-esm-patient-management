@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
@@ -9,7 +10,7 @@ import { PatientRegistrationContextProvider } from '../../patient-registration-c
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { DeathInfoSection } from './death-info-section.component';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
  * Helper to render DeathInfoSection with Formik for state-dependent tests.
@@ -35,8 +36,8 @@ function renderDeathInfoSectionWithFormik(fields: string[] = [], initialValues: 
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
-                setFieldTouched: jest.fn().mockResolvedValue(undefined),
+                setCapturePhotoProps: vi.fn(),
+                setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
                 isOffline: false,
                 initialFormValues: formValuesRef,

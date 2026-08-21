@@ -124,7 +124,6 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               void preload(getUserPropertiesUrl(userUuid), openmrsFetch);
             }
           }}>
-          {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
           <HeaderGlobalAction
             aria-label={t('searchPatient', 'Search patient')}
             className={styles.searchIconButton}

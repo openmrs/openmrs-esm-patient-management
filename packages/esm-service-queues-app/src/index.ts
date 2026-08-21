@@ -6,7 +6,6 @@ import { dashboardMeta } from './dashboard.meta';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-service-queues-app';
-const swrRefreshIntervalInMs = 60000;
 
 const options = {
   featureName: 'serviceQueues',
@@ -16,9 +15,6 @@ const options = {
 export const root = getAsyncLifecycle(() => import('./root.component'), {
   featureName: 'service-queues-app-root',
   moduleName,
-  swrConfig: {
-    refreshInterval: swrRefreshIntervalInMs,
-  },
 });
 
 export const queueTableByStatusMenu = getAsyncLifecycle(
@@ -28,15 +24,7 @@ export const queueTableByStatusMenu = getAsyncLifecycle(
 export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/queue-table-by-status-view.component'), {
   featureName: 'queue-table-by-status-view',
   moduleName,
-  swrConfig: {
-    refreshInterval: swrRefreshIntervalInMs,
-  },
 });
-
-export const queueList = getAsyncLifecycle(
-  () => import('./queue-patient-linelists/queue-services-table.component'),
-  options,
-);
 
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
 
@@ -78,11 +66,6 @@ export const moveQueueEntryModal = getAsyncLifecycle(() => import('./modals/move
   moduleName,
 });
 
-export const transitionQueueEntryModal = getAsyncLifecycle(() => import('./modals/transition-queue-entry.modal'), {
-  featureName: 'transition queue entry',
-  moduleName,
-});
-
 export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit-queue-entry.modal'), {
   featureName: 'edit queue entry of a patient',
   moduleName,
@@ -91,7 +74,7 @@ export const editQueueEntryModal = getAsyncLifecycle(() => import('./modals/edit
 export const undoTransitionQueueEntryModal = getAsyncLifecycle(
   () => import('./modals/undo-transition-queue-entry.modal'),
   {
-    featureName: 'undo queue entry transiion of a patient',
+    featureName: 'undo queue entry transition of a patient',
     moduleName,
   },
 );

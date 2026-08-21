@@ -82,8 +82,8 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
           ) : error ? (
             <li className={styles.noResults}>{t('errorFetchingAddresses', 'Error fetching address results')}</li>
           ) : addressOptions.length > 0 ? (
-            addressOptions.map((address, index) => (
-              <li key={index} onClick={() => handleChange(address)}>
+            addressOptions.map((address) => (
+              <li key={address} onClick={() => handleChange(address)}>
                 {address}
               </li>
             ))

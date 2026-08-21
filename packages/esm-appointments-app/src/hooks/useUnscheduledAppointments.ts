@@ -3,6 +3,7 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Identifier } from '../types';
 import { configSchema } from '../config-schema';
 import { useAppointmentsStore } from '../store';
+import { useSelectedDate } from './useSelectedDate';
 
 interface UnscheduledAppointment {
   age: number;
@@ -19,8 +20,11 @@ interface UnscheduledAppointment {
   };
 }
 
+/**
+ * This is a non-standard API that does not come with the appointments module by default
+ */
 export function useUnscheduledAppointments() {
-  const { selectedDate } = useAppointmentsStore();
+  const selectedDate = useSelectedDate();
   // TODO/NOTE: this endpoint is not implemented in main Bahmni Appointments backend
   const url = `${restBaseUrl}/appointment/unScheduledAppointment?forDate=${selectedDate}`;
   const { data, error, isLoading } = useSWR<{ data: Array<UnscheduledAppointment> }>(url, openmrsFetch, {

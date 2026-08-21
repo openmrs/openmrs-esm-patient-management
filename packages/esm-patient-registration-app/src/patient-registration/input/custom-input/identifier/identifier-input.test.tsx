@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
@@ -95,15 +96,15 @@ const mockContextValues: PatientRegistrationContextProps = {
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
   isOffline: false,
-  setCapturePhotoProps: jest.fn(),
-  setFieldValue: jest.fn(),
-  setInitialFormValues: jest.fn(),
-  setFieldTouched: jest.fn(),
+  setCapturePhotoProps: vi.fn(),
+  setFieldValue: vi.fn(),
+  setInitialFormValues: vi.fn(),
+  setFieldTouched: vi.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
 };
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
  * Helper to render IdentifierInput component with Formik.
@@ -114,7 +115,7 @@ function renderIdentifierInput(
   initialValues: Record<string, any> = {},
 ) {
   return renderWithContext(
-    <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+    <Formik initialValues={initialValues} onSubmit={vi.fn()}>
       <Form>
         <PatientRegistrationContextProvider value={mockContextValues}>
           <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
@@ -305,8 +306,8 @@ describe('IdentifierInput component', () => {
         } as IdentifierSource,
       };
 
-      const mockSetFieldTouched = jest.fn();
-      const mockSetFieldValue = jest.fn();
+      const mockSetFieldTouched = vi.fn();
+      const mockSetFieldValue = vi.fn();
       const testContextValues = {
         ...mockContextValues,
         setFieldTouched: mockSetFieldTouched,
@@ -328,7 +329,7 @@ describe('IdentifierInput component', () => {
       };
 
       renderWithContext(
-        <Formik initialValues={initialValues} onSubmit={jest.fn()}>
+        <Formik initialValues={initialValues} onSubmit={vi.fn()}>
           <Form>
             <PatientRegistrationContextProvider value={testContextValues}>
               <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />

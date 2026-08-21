@@ -1,11 +1,18 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import PatientSearchBar from './patient-search-bar.component';
 
 describe('PatientSearchBar', () => {
   it('renders a search input', () => {
-    render(<PatientSearchBar onClear={jest.fn()} onSubmit={jest.fn()} />);
+    render(<PatientSearchBar onClear={vi.fn()} onSubmit={vi.fn()} />);
 
     const searchInput = screen.getByPlaceholderText('Search for a patient by name or identifier number');
 
@@ -14,7 +21,7 @@ describe('PatientSearchBar', () => {
 
   it('displays the initial search term', () => {
     const initialSearchTerm = 'John Doe';
-    render(<PatientSearchBar initialSearchTerm={initialSearchTerm} onClear={jest.fn()} onSubmit={jest.fn()} />);
+    render(<PatientSearchBar initialSearchTerm={initialSearchTerm} onClear={vi.fn()} onSubmit={vi.fn()} />);
 
     const searchInput: HTMLInputElement = screen.getByPlaceholderText(
       'Search for a patient by name or identifier number',
@@ -25,9 +32,9 @@ describe('PatientSearchBar', () => {
 
   it('calls the onChange callback on input change', async () => {
     const user = userEvent.setup();
-    const onChangeMock = jest.fn();
+    const onChangeMock = vi.fn();
 
-    render(<PatientSearchBar onChange={onChangeMock} onClear={jest.fn()} onSubmit={jest.fn()} />);
+    render(<PatientSearchBar onChange={onChangeMock} onClear={vi.fn()} onSubmit={vi.fn()} />);
 
     const searchInput = screen.getByPlaceholderText('Search for a patient by name or identifier number');
 
@@ -38,9 +45,9 @@ describe('PatientSearchBar', () => {
 
   it('calls the onClear callback on clear button click', async () => {
     const user = userEvent.setup();
-    const onClearMock = jest.fn();
+    const onClearMock = vi.fn();
 
-    render(<PatientSearchBar onClear={onClearMock} onSubmit={jest.fn()} />);
+    render(<PatientSearchBar onClear={onClearMock} onSubmit={vi.fn()} />);
 
     const clearButton = screen.getByRole('button', { name: 'Clear' });
 
@@ -51,9 +58,9 @@ describe('PatientSearchBar', () => {
 
   it('calls the onSubmit callback on form submission', async () => {
     const user = userEvent.setup();
-    const onSubmitMock = jest.fn();
+    const onSubmitMock = vi.fn();
 
-    render(<PatientSearchBar onSubmit={onSubmitMock} onClear={jest.fn()} />);
+    render(<PatientSearchBar onSubmit={onSubmitMock} onClear={vi.fn()} />);
 
     const searchInput = screen.getByPlaceholderText('Search for a patient by name or identifier number');
     const searchButton = screen.getByRole('button', { name: 'Search' });

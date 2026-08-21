@@ -21,10 +21,15 @@ import styles from './cancel-admission-request.scss';
 
 interface CancelAdmissionRequestProps {
   wardPatient: WardPatient;
+  relatedTransferPatients?: WardPatient[];
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
-const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWorkspace, wardPatient }) => {
+const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({
+  closeWorkspace,
+  wardPatient,
+  relatedTransferPatients,
+}) => {
   const { patient, visit } = wardPatient ?? {};
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,21 +80,37 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWo
         },
       ];
 
-      createEncounter(patient, emrConfiguration?.cancelADTRequestEncounterType, visit?.uuid, obs)
-        .then(() => {
-          showSnackbar({
-            title: t('admissionRequestCancelled', 'Admission request cancelled.'),
-            kind: 'success',
+      const allPatientsToCancel = [wardPatient, ...(relatedTransferPatients ?? [])];
+      Promise.allSettled(
+        allPatientsToCancel.map(({ patient: p, visit: v }) =>
+          createEncounter(p, emrConfiguration?.cancelADTRequestEncounterType, v?.uuid, obs),
+        ),
+      )
+        .then((results) => {
+          results.forEach((result, i) => {
+            const patientName = allPatientsToCancel[i].patient.person.preferredName.display;
+            if (result.status === 'fulfilled') {
+              showSnackbar({
+                title: t('admissionRequestCancelledForPatient', 'Admission request cancelled for {{patientName}}', {
+                  patientName,
+                }),
+                kind: 'success',
+              });
+            } else {
+              showSnackbar({
+                title: t('errorCancellingAdmissionRequest', 'Error cancelling admission request for {{patientName}}', {
+                  patientName,
+                }),
+                subtitle: (result.reason as Error)?.message,
+                kind: 'error',
+              });
+            }
           });
-          closeWorkspace({ discardUnsavedChanges: true });
-          closeWorkspaceGroup2();
-        })
-        .catch((err: Error) => {
-          showSnackbar({
-            title: t('errorCancellingAdmissionRequest', 'Error cancelling admission request'),
-            subtitle: err.message,
-            kind: 'error',
-          });
+
+          if (results.some((r) => r.status === 'fulfilled')) {
+            closeWorkspace({ discardUnsavedChanges: true });
+            closeWorkspaceGroup2();
+          }
         })
         .finally(() => {
           setIsSubmitting(false);
@@ -102,10 +123,10 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWo
       emrConfiguration?.denyAdmissionConcept?.uuid,
       emrConfiguration?.cancelADTRequestEncounterType,
       createEncounter,
-      patient,
+      wardPatient,
+      relatedTransferPatients,
       t,
       wardPatientGroupDetails,
-      visit?.uuid,
       closeWorkspace,
     ],
   );
@@ -120,6 +141,9 @@ const CancelAdmissionRequest: React.FC<CancelAdmissionRequestProps> = ({ closeWo
     <Workspace2 title={t('cancelAdmissionRequest', 'Cancel admission request')} hasUnsavedChanges={isDirty}>
       <div className={styles.flexWrapper}>
         <WardPatientWorkspaceBanner wardPatient={wardPatient} />
+        {relatedTransferPatients?.map((rp) => (
+          <WardPatientWorkspaceBanner key={rp.patient.uuid} wardPatient={rp} />
+        ))}
         <Form
           onSubmit={handleSubmit(onSubmit, onError)}
           className={classNames(styles.formContainer, styles.workspaceContent)}>

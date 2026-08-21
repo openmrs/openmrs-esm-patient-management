@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { Button, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ConfigurableLink,
   ExtensionSlot,
@@ -13,6 +13,7 @@ import {
   useLayoutType,
   useVisit,
   navigate,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
@@ -31,7 +32,11 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({
+  patient,
+  patientUuid,
+  hideActionsOverflow: hideActionsOverflowProp,
+}) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { activeVisit } = useVisit(patientUuid);
@@ -40,7 +45,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   // if context2 is present, we use the new workspace v2 APIs,
   // else, default to the old ones
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, launchChildWorkspace, startVisitWorkspaceName } = context2 ?? {};
+  const {
+    onPatientSelected,
+    onVisitStarted,
+    launchChildWorkspace,
+    closeWorkspace,
+    startVisitWorkspaceName,
+    selectPatientButton,
+  } = context2 ?? {};
+
+  const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
   const patientName = patient.person.personName.display;
   const isDeceased = !!patient.person.deathDate;
@@ -92,8 +106,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                   name="start-visit-button-slot2"
                   state={{
                     patientUuid,
+                    patient: fhirMappedPatient,
                     launchChildWorkspace,
                     startVisitWorkspaceName,
+                    onVisitStarted: onVisitStarted
+                      ? (visit: Visit) =>
+                          onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)
+                      : undefined,
                   }}
                 />
               ) : (
@@ -103,9 +122,20 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                     handleReturnToSearchList,
                     hidePatientSearch,
                     patientUuid,
+                    patient: fhirMappedPatient,
                   }}
                 />
               ))}
+            {!isDeceased && context2 && selectPatientButton && (
+              <Button
+                disabled={selectPatientButton.requiresActiveVisit && !activeVisit}
+                kind="primary"
+                onClick={() =>
+                  onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace)
+                }>
+                {selectPatientButton.text}
+              </Button>
+            )}
           </div>
         </div>
         <div>
@@ -141,6 +171,14 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
   }, [patientClickSideEffect, patientUuid, patient]);
 
   if (context2) {
+    if (context2.selectPatientButton) {
+      // Selecting a patient happens through a dedicated button on the card instead
+      return (
+        <div className={styles.patientBanner} key={patientUuid}>
+          {children}
+        </div>
+      );
+    }
     return (
       <button
         className={classNames(styles.patientBannerButton, styles.patientBanner, {

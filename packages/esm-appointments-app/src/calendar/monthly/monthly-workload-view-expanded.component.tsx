@@ -8,23 +8,26 @@ interface MonthlyWorkloadViewExpandedProps extends MonthlyWorkloadViewProps {
   count: number;
 }
 
-const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({ count, events, dateTime }) => {
+const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = ({
+  count,
+  events,
+  dateTime,
+  calendarSelectedDate,
+  onSelectDate,
+}) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const popoverRef = useRef(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
 
-  const handleClickOutside = useCallback((event) => {
-    if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
       setIsOpen(false);
     }
   }, []);
 
   useEffect(() => {
     document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [handleClickOutside]);
 
   return (
@@ -38,7 +41,13 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
         {t('countMore', '{{count}} more', { count })}
       </button>
       <PopoverContent>
-        <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
+        <MonthlyWorkloadView
+          events={events}
+          dateTime={dateTime}
+          calendarSelectedDate={calendarSelectedDate}
+          showAllServices
+          onSelectDate={onSelectDate}
+        />
       </PopoverContent>
     </Popover>
   );

@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, expect, test, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -21,8 +28,8 @@ const testProps: WardPatientWorkspaceDefinition = {
   groupProps: {
     wardPatient: mockWardPatientAlice,
   },
-  closeWorkspace: jest.fn(),
-  launchChildWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: undefined,
   windowProps: undefined,
   workspaceName: '',
@@ -31,23 +38,23 @@ const testProps: WardPatientWorkspaceDefinition = {
   showActionMenu: false,
 };
 
-const mockCreatePatientNote = createPatientNote as jest.Mock;
-const mockedShowSnackbar = jest.mocked(showSnackbar);
+const mockCreatePatientNote = createPatientNote as Mock;
+const mockedShowSnackbar = vi.mocked(showSnackbar);
 
-jest.mock('./notes.resource', () => ({
-  createPatientNote: jest.fn(),
-  usePatientNotes: jest.fn(),
+vi.mock('./notes.resource', () => ({
+  createPatientNote: vi.fn(),
+  usePatientNotes: vi.fn(),
 }));
 
-jest.mock('../../hooks/useEmrConfiguration', () => jest.fn());
+vi.mock('../../hooks/useEmrConfiguration', () => ({ default: vi.fn() }));
 
-const mockedUseEmrConfiguration = jest.mocked(useEmrConfiguration);
-const mockedUsePatientNotes = jest.mocked(usePatientNotes);
-const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
+const mockedUseEmrConfiguration = vi.mocked(useEmrConfiguration);
+const mockedUsePatientNotes = vi.mocked(usePatientNotes);
+const mockUseConfig = vi.mocked(useConfig<WardConfigObject>);
 
 mockedUseEmrConfiguration.mockReturnValue({
   emrConfiguration: emrConfigurationMock,
-  mutateEmrConfiguration: jest.fn(),
+  mutateEmrConfiguration: vi.fn(),
   isLoadingEmrConfiguration: false,
   errorFetchingEmrConfiguration: null,
 });
@@ -58,7 +65,7 @@ describe('<WardPatientNotesWorkspace>', () => {
     patientNotes: [],
     errorFetchingPatientNotes: undefined,
     isLoadingPatientNotes: false,
-    mutatePatientNotes: jest.fn(),
+    mutatePatientNotes: vi.fn(),
   });
 
   test('renders the visit notes form with all the relevant fields and values', () => {

@@ -1,12 +1,13 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock, type MockInstance } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { showModal, navigate } from '@openmrs/esm-framework';
 import BeforeSavePrompt from './before-save-prompt.component';
 
-const mockShowModal = jest.mocked(showModal);
-const mockNavigate = jest.mocked(navigate);
+const mockShowModal = vi.mocked(showModal);
+const mockNavigate = vi.mocked(navigate);
 
-const mockGetOpenmrsSpaBase = jest.fn(() => '/openmrs/spa');
+const mockGetOpenmrsSpaBase = vi.fn(() => '/openmrs/spa');
 window['getOpenmrsSpaBase'] = mockGetOpenmrsSpaBase;
 
 /**
@@ -17,18 +18,18 @@ function renderBeforeSavePrompt(when: boolean, redirect?: string) {
 }
 
 describe('BeforeSavePrompt component', () => {
-  let addEventListenerSpy: jest.SpyInstance;
-  let removeEventListenerSpy: jest.SpyInstance;
-  let disposeMock: jest.Mock;
+  let addEventListenerSpy: MockInstance;
+  let removeEventListenerSpy: MockInstance;
+  let disposeMock: Mock;
 
   beforeEach(() => {
-    disposeMock = jest.fn();
+    disposeMock = vi.fn();
     mockShowModal.mockReturnValue(disposeMock);
     mockNavigate.mockClear();
 
     // Spy on window.addEventListener and removeEventListener
-    addEventListenerSpy = jest.spyOn(window, 'addEventListener');
-    removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+    addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
   });
 
   afterEach(() => {
@@ -75,7 +76,7 @@ describe('BeforeSavePrompt component', () => {
       ) => string;
 
       const mockEvent = {
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
         returnValue: '',
       } as unknown as BeforeUnloadEvent;
 
@@ -95,7 +96,7 @@ describe('BeforeSavePrompt component', () => {
         (call) => call[0] === 'single-spa:before-routing-event',
       )?.[1] as (e: CustomEvent) => void;
 
-      const mockCancelNavigation = jest.fn();
+      const mockCancelNavigation = vi.fn();
       const mockEvent = {
         detail: {
           newUrl: '/openmrs/spa/new-page',
@@ -127,7 +128,7 @@ describe('BeforeSavePrompt component', () => {
         detail: {
           newUrl: '/openmrs/spa/new-page',
           navigationIsCanceled: true,
-          cancelNavigation: jest.fn(),
+          cancelNavigation: vi.fn(),
         },
       } as unknown as CustomEvent;
 
@@ -147,7 +148,7 @@ describe('BeforeSavePrompt component', () => {
         detail: {
           newUrl: '/openmrs/spa/new-page',
           navigationIsCanceled: false,
-          cancelNavigation: jest.fn(),
+          cancelNavigation: vi.fn(),
         },
       } as unknown as CustomEvent;
 

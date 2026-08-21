@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type EncounterPayload } from '../../types';
-import { type PatientNote, type RESTPatientNote, type UsePatientNotes } from './types';
+import { type PatientNote, type RESTPatientNote, type UsePatientNotes, type NoteObsData } from './types';
 
 export function createPatientNote(payload: EncounterPayload, abortController: AbortController = new AbortController()) {
   return openmrsFetch(`${restBaseUrl}/encounter`, {
@@ -26,7 +26,7 @@ export function editPatientNote(obsUuid: string, note: string) {
 
 export function usePatientNotes(patientUuid: string, visitUuid: string, conceptUuids: Array<string>): UsePatientNotes {
   const customRepresentation =
-    'custom:(uuid,patient:(uuid),obs:(uuid,concept:(uuid),obsDatetime,value:(uuid)),encounterType,' +
+    'custom:(uuid,encounterDatetime,patient:(uuid),obs:(uuid,concept:(uuid),dateCreated,value:(uuid),previousVersions:(value,dateCreated,creator),creator),encounterType,' +
     'encounterProviders:(uuid,provider:(uuid,person:(uuid,display)))';
   const encountersApiUrl = `${restBaseUrl}/encounter?patient=${patientUuid}&visit=${visitUuid}&v=${customRepresentation}`;
 
@@ -39,16 +39,24 @@ export function usePatientNotes(patientUuid: string, visitUuid: string, conceptU
       data
         ? data
             .flatMap((encounter) => {
-              return encounter.obs?.reduce((acc, obs) => {
+              return (encounter.obs as Array<NoteObsData>)?.reduce((acc, obs) => {
                 if (conceptUuids.includes(obs.concept.uuid)) {
                   acc.push({
                     encounterUuid: encounter.uuid,
                     obsUuid: obs.uuid,
-                    encounterNote: obs ? obs.value : '',
-                    encounterNoteRecordedAt: obs ? obs.obsDatetime : '',
+                    encounterNote: obs.value,
+                    encounterNoteRecordedAt: encounter.encounterDatetime,
                     encounterProvider: encounter.encounterProviders.map((ep) => ep.provider.person.display).join(', '),
                     conceptUuid: obs.concept.uuid,
                     encounterTypeUuid: encounter.encounterType.uuid,
+                    isEdited: (obs.previousVersions?.length ?? 0) > 0,
+                    lastEditedBy: obs.creator?.person?.display ?? obs.creator?.display ?? '',
+                    lastEditedAt: obs.dateCreated,
+                    editHistory: (obs.previousVersions ?? []).map((v) => ({
+                      note: v.value as string,
+                      recordedAt: v.dateCreated,
+                      recordedBy: v.creator?.person?.display ?? v.creator?.display ?? '',
+                    })),
                   });
                 }
                 return acc;

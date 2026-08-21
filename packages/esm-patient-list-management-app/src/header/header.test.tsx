@@ -1,10 +1,11 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
 import Header from './header.component';
 
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 describe('Header', () => {
   it('renders the header with title and new list button', () => {
@@ -27,7 +28,7 @@ describe('Header', () => {
 
   it('passes onCreateSuccess callback to workspace', async () => {
     const user = userEvent.setup();
-    const mockOnCreateSuccess = jest.fn();
+    const mockOnCreateSuccess = vi.fn();
 
     render(<Header onCreateSuccess={mockOnCreateSuccess} />);
 

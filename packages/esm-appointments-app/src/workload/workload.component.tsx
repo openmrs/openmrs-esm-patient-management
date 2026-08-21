@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppointmentService } from '../form/appointments-form.resource';
+import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
 import MonthlyCalendarView from './monthly-view-workload/monthly-view.component';
 import styles from './workload.scss';
@@ -11,8 +11,8 @@ interface WorkloadProps {
 }
 
 const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, onWorkloadDateChange }) => {
-  const { data: services } = useAppointmentService();
-  const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+  const { serviceTypes } = useAppointmentServices();
+  const serviceUuid = serviceTypes?.find((service) => service.name === selectedService)?.uuid;
 
   const [selectedTab, setSelectedTab] = useState(0);
 

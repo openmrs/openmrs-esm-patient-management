@@ -108,7 +108,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
         submitSuccessText: t('queueEntryEditedSuccessfully', 'Queue entry edited successfully'),
         submitFailureTitle: t('queueEntryEditingFailed', 'Error editing queue entry'),
         submitAction: (queueEntry, formState) => {
-          const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
+          const selectedQueue = queues.find((q) => q.uuid === formState.selectedQueue);
           const statuses = selectedQueue?.allowedStatuses;
           const priorities = selectedQueue?.allowedPriorities;
 
@@ -117,8 +117,8 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
           startAtDate.setHours(hour, minute, 0, 0);
 
           return updateQueueEntry(queueEntry.uuid, {
-            status: statuses.find((s) => s.uuid == formState.selectedStatus),
-            priority: priorities.find((p) => p.uuid == formState.selectedPriority),
+            status: statuses.find((s) => s.uuid === formState.selectedStatus),
+            priority: priorities.find((p) => p.uuid === formState.selectedPriority),
             priorityComment: formState.priorityComment,
             ...(formState.modifyDefaultTransitionDateTime ? { startedAt: startAtDate.toISOString() } : {}),
           });

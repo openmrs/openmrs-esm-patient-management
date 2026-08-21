@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { Formik, Form } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -8,10 +9,10 @@ import { PatientRegistrationContextProvider } from '../../patient-registration-c
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 // Mock PersonAttributeField since PhoneField is a wrapper around it
-jest.mock('../person-attributes/person-attribute-field.component', () => ({
+vi.mock('../person-attributes/person-attribute-field.component', () => ({
   PersonAttributeField: ({ fieldDefinition }) => (
     <div data-testid="phone-field">
       <label htmlFor="phone-input">Phone</label>
@@ -33,9 +34,9 @@ const renderPhoneField = () => {
             values: initialFormValues,
             validationSchema: null,
             inEditMode: false,
-            setFieldValue: jest.fn().mockResolvedValue(undefined),
-            setCapturePhotoProps: jest.fn(),
-            setFieldTouched: jest.fn().mockResolvedValue(undefined),
+            setFieldValue: vi.fn().mockResolvedValue(undefined),
+            setCapturePhotoProps: vi.fn(),
+            setFieldTouched: vi.fn().mockResolvedValue(undefined),
             currentPhoto: '',
             isOffline: false,
             initialFormValues: initialFormValues,

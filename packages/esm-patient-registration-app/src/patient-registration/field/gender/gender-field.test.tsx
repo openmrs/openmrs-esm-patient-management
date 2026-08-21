@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -10,7 +11,7 @@ import { GenderField } from './gender-field.component';
 import { type FormValues } from '../../patient-registration.types';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
  * Helper to render GenderField with Formik render props for state-dependent tests.
@@ -50,7 +51,7 @@ const renderGenderFieldWithFormik = (
                 validationSchema: validationSchema,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
+                setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
                 isOffline: false,
@@ -88,9 +89,9 @@ const renderGenderField = (initialValues: Partial<FormValues> = {}) => {
             values: { ...initialFormValues, ...defaultValues } as FormValues,
             validationSchema: null,
             inEditMode: false,
-            setFieldValue: jest.fn().mockResolvedValue(undefined),
-            setCapturePhotoProps: jest.fn(),
-            setFieldTouched: jest.fn().mockResolvedValue(undefined),
+            setFieldValue: vi.fn().mockResolvedValue(undefined),
+            setCapturePhotoProps: vi.fn(),
+            setFieldTouched: vi.fn().mockResolvedValue(undefined),
             currentPhoto: '',
             isOffline: false,
             initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,

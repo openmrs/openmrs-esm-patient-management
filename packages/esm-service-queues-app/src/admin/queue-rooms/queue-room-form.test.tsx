@@ -1,26 +1,33 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLayoutType, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { useSWRConfig } from 'swr';
 import QueueRoomForm from './queue-room-form.workspace';
 
-jest.mock('swr', () => ({
-  useSWRConfig: jest.fn(),
+vi.mock('swr', () => ({
+  useSWRConfig: vi.fn(),
 }));
 
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockMutate = jest.fn();
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockMutate = vi.fn();
 
-jest.mock('../../create-queue-entry/hooks/useQueueLocations', () => ({
-  ...jest.requireActual('../../create-queue-entry/hooks/useQueueLocations'),
-  useQueueLocations: jest.fn(() => ({
+vi.mock('../../create-queue-entry/hooks/useQueueLocations', async () => ({
+  ...((await vi.importActual('../../create-queue-entry/hooks/useQueueLocations')) as object),
+  useQueueLocations: vi.fn(() => ({
     queueLocations: [{ id: 'e7786d9a-ab62-11ec-b909-0242ac120002', name: 'Location Test' }],
   })),
 }));
 
-jest.mock('../../hooks/useQueues', () => ({
-  useQueues: jest.fn(() => ({
+vi.mock('../../hooks/useQueues', () => ({
+  useQueues: vi.fn(() => ({
     queues: [
       { uuid: 'queue-uuid-1', display: 'Queue 1', service: { uuid: 'service-uuid-1' } },
       { uuid: 'queue-uuid-2', display: 'Queue 2', service: { uuid: 'service-uuid-2' } },
@@ -29,14 +36,14 @@ jest.mock('../../hooks/useQueues', () => ({
 }));
 
 const workspaceProps = {
-  closeWorkspace: jest.fn(),
-  setTitle: jest.fn(),
-  launchChildWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
+  setTitle: vi.fn(),
+  launchChildWorkspace: vi.fn(),
 };
 
-jest.mock('./queue-room.resource', () => ({
-  saveQueueRoom: jest.fn().mockResolvedValue({ status: 201 }),
-  useServices: jest.fn(() => ({
+vi.mock('./queue-room.resource', () => ({
+  saveQueueRoom: vi.fn().mockResolvedValue({ status: 201 }),
+  useServices: vi.fn(() => ({
     services: [
       { uuid: 'service-uuid-1', display: 'Service 1' },
       { uuid: 'service-uuid-2', display: 'Service 2' },
@@ -47,7 +54,7 @@ jest.mock('./queue-room.resource', () => ({
 describe('QueueRoomForm', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('tablet');
-    (useSWRConfig as jest.Mock).mockReturnValue({ mutate: mockMutate });
+    (useSWRConfig as Mock).mockReturnValue({ mutate: mockMutate });
   });
 
   it('renders the form with queue room elements', () => {
@@ -84,7 +91,7 @@ describe('QueueRoomForm', () => {
   it('calls closePanel when Cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    const closeWorkspace = jest.fn();
+    const closeWorkspace = vi.fn();
     render(<QueueRoomForm {...({ ...workspaceProps, closeWorkspace } as any)} />);
 
     await user.click(screen.getByText('Cancel'));

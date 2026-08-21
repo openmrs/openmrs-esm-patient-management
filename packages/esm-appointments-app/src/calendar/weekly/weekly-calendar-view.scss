@@ -1,0 +1,184 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  margin: layout.$spacing-05;
+  padding-bottom: layout.$spacing-10;
+  overflow-x: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 6.5rem repeat(7, 1fr);
+  grid-auto-rows: minmax(6rem, 1fr);
+}
+
+.cornerCell {
+  border-top: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  border-right: 1px solid colors.$gray-20;
+  border-left: 1px solid colors.$gray-20;
+  background: colors.$white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-02;
+}
+
+.cornerLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-50;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-02;
+  border-top: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  border-right: 1px solid colors.$gray-20;
+  background: colors.$white;
+  min-height: 4rem;
+
+  &:first-of-type {
+    border-left: 1px solid colors.$gray-20;
+  }
+}
+
+.dayHeaderToday {
+  background: colors.$blue-10;
+  border-bottom-color: colors.$blue-50;
+}
+
+.dowLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.dayNum {
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
+  line-height: 1.2;
+}
+
+.dayNumToday {
+  color: colors.$blue-60;
+  background: colors.$blue-20;
+  border-radius: 50%;
+  width: 1.625rem;
+  height: 1.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.monthLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-50;
+}
+
+.timeLabel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: layout.$spacing-02 layout.$spacing-03 0 0;
+  border-left: 1px solid colors.$gray-20;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  background: colors.$white;
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+.slotCell {
+  border-left: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  padding: layout.$spacing-02;
+  min-height: 2.5rem;
+  overflow: hidden;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: colors.$white;
+}
+
+.grid > :nth-child(8n) {
+  border-right: 1px solid colors.$gray-20;
+}
+
+.slotCellToday {
+  background: rgba(colors.$blue-10, 0.4);
+}
+
+.slotCellHasAppts {
+  cursor: pointer;
+
+  &:hover {
+    background: colors.$gray-10;
+  }
+}
+
+.previewList {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+  overflow: hidden;
+  width: 100%;
+}
+
+.previewRow {
+  display: flex;
+  align-items: baseline;
+  gap: layout.$spacing-02;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.previewTime {
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  flex-shrink: 0;
+}
+
+.previewName {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-100;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreLink {
+  @include type.type-style('label-01');
+  background: none;
+  border: none;
+  color: colors.$blue-60;
+  cursor: pointer;
+  padding: layout.$spacing-01 0 0;
+  border-top: 1px solid colors.$gray-20;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    color: colors.$blue-70;
+    text-decoration: underline;
+  }
+}
+
+.emptyWeek {
+  grid-column: 1 / -1;
+  padding: layout.$spacing-05;
+  text-align: center;
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-50;
+}

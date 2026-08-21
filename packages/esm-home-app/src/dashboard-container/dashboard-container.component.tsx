@@ -28,7 +28,7 @@ export default function DashboardContainer() {
       <section
         className={classNames([
           isDesktop(layout) ? styles.dashboardContainer : styles.dashboardContainerTablet,
-          leftNavMode == 'normal' ? styles.hasLeftNav : '',
+          leftNavMode === 'normal' ? styles.hasLeftNav : '',
         ])}>
         {isDesktop(layout) && <ExtensionSlot name="home-sidebar-slot" key={layout} />}
         <ExtensionSlot

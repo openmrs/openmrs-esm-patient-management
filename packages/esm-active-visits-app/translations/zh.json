@@ -1,12 +1,12 @@
 {
-  "activeVisits": "活动就诊",
+  "activeVisits": "当前就诊",
   "allEncounters": "所有问诊记录",
   "checkFilters": "检查上方的筛选条件",
   "diagnoses": "诊断",
   "dose": "剂量",
   "encounterType": "问诊类型",
   "endDate": "结束日期",
-  "filterActiveVisits": "Filter active visits",
+  "filterActiveVisits": "过滤活动的就诊",
   "filterTable": "筛选表格",
   "indication": "适应症",
   "medications": "药物",
@@ -27,7 +27,7 @@
   "tests": "检验",
   "thereIsNoInformationToDisplayHere": "这里没有可显示的信息",
   "time": "时间",
-  "totalVisits": "Total Visits Today",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "totalVisits": "本日总接诊",
+  "viewPatientChartFor": "查看患者  {{patientName}} 病历图表",
   "visitSummary": "就诊总结"
 }

@@ -2,23 +2,28 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { User } from '@carbon/react/icons';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { spaHomePage } from '../../constants';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { useAppointmentsStore } from '../../store';
 import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
+  calendarSelectedDate: Dayjs;
   showAllServices?: boolean;
+  onSelectDate?: (isoDate: string) => void;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
+  dateTime,
+  events,
+  calendarSelectedDate,
+  showAllServices = false,
+  onSelectDate,
+}) => {
   const layout = useLayoutType();
-  const { selectedDate } = useAppointmentsStore();
 
   const currentData = useMemo(
     () =>
@@ -28,45 +33,43 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     [dateTime, events],
   );
 
+  const totalCount = currentData?.services?.reduce((sum, { count = 0 }) => sum + count, 0) ?? 0;
+
+  const maxVisible = layout === 'small-desktop' ? 2 : 4;
+
   const visibleServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return currentData.services;
-      return currentData.services.slice(0, layout === 'small-desktop' ? 2 : 4);
-    }
-    return [];
-  }, [currentData, showAllServices, layout]);
+    if (!currentData?.services) return [];
+    return showAllServices ? currentData.services : currentData.services.slice(0, maxVisible);
+  }, [currentData, showAllServices, maxVisible]);
 
-  const hasHiddenServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return false;
-      return layout === 'small-desktop' ? currentData.services.length > 2 : currentData.services.length > 4;
-    }
-    return false;
-  }, [currentData?.services, layout, showAllServices]);
+  const hasHidden = useMemo(() => {
+    if (!currentData?.services || showAllServices) return false;
+    return currentData.services.length > maxVisible;
+  }, [currentData?.services, showAllServices, maxVisible]);
 
-  const navigateToAppointmentsByDate = (serviceUuid: string) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
+  const handleClick = () => {
+    if (totalCount === 0) return;
+    onSelectDate?.(dateTime.format('YYYY-MM-DD'));
   };
 
   return (
     <div
-      onClick={() => navigateToAppointmentsByDate('')}
+      onClick={handleClick}
       className={classNames(
-        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
-        showAllServices
-          ? {}
-          : {
-              [styles.smallDesktop]: layout === 'small-desktop',
-              [styles.largeDesktop]: layout !== 'small-desktop',
-            },
+        styles[isSameMonth(dateTime, calendarSelectedDate) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        { [styles['monthly-cell-clickable']]: totalCount > 0 },
+        !showAllServices && {
+          [styles.smallDesktop]: layout === 'small-desktop',
+          [styles.largeDesktop]: layout !== 'small-desktop',
+        },
       )}>
-      {isSameMonth(dateTime, dayjs(selectedDate)) && (
+      {isSameMonth(dateTime, calendarSelectedDate) && (
         <div>
-          <span className={classNames(styles.totals)}>
+          <span className={styles.totals}>
             {currentData?.services ? (
               <div role="button" tabIndex={0}>
                 <User size={16} />
-                <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
+                <span>{totalCount}</span>
               </div>
             ) : (
               <div />
@@ -77,26 +80,26 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
             <div className={styles.currentData}>
               {visibleServices.map(({ serviceName, serviceUuid, count }, i) => (
                 <div
-                  key={`${serviceUuid}-${count}-${i}`}
+                  key={`${serviceUuid}-${i}`}
                   role="button"
                   tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigateToAppointmentsByDate(serviceUuid);
+                    handleClick();
                   }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>
                   <span>{count}</span>
                 </div>
               ))}
-              {hasHiddenServices ? (
+              {hasHidden && (
                 <MonthlyWorkloadViewExpanded
-                  count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
+                  count={currentData.services.length - maxVisible}
                   events={events}
                   dateTime={dateTime}
+                  calendarSelectedDate={calendarSelectedDate}
+                  onSelectDate={onSelectDate}
                 />
-              ) : (
-                ''
               )}
             </div>
           )}

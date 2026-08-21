@@ -89,7 +89,7 @@ function QueueTable({
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (columns.length == 0) {
+  if (columns.length === 0) {
     return <p>{t('noColumnsDefined', 'No table columns defined. Check Configuration')}</p>;
   }
 

@@ -38,7 +38,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   }, [query, goTo]);
 
   const searchResultsView = useMemo(() => {
-    if (isLoading) {
+    // Only show the full skeleton when there is nothing to show
+    if (isLoading && !results?.length) {
       return <LoadingState />;
     }
 
