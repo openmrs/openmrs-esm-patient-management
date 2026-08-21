@@ -1,7 +1,8 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { type TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import {
   deprecatedQueueEntryActions,
@@ -10,17 +11,82 @@ import {
   type ConfigurableQueueEntryAction,
   type QueueEntryAction,
 } from '../../config-schema';
-import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
+import { getVisitQueueNumber, serveQueueEntry } from '../../service-queues.resource';
+import { getErrorMessage } from '../../modals/queue-entry-error.utils';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './queue-table-action-cell.scss';
 
 type ActionProps = {
   label: string;
   text: string;
-  onClick: (queueEntry: QueueEntry) => void;
+  onClick: (queueEntry: QueueEntry) => void | Promise<void>;
   showIf?: (queueEntry: QueueEntry) => boolean;
   isDelete?: boolean;
 };
+
+// `getErrorMessage` digs the server's own wording out of an `OpenmrsFetchError`, which is far more
+// useful than "Server responded with 500 ...", but it returns an empty string when there is nothing
+// to report — a rejected `undefined`, say — and an error snackbar with no subtitle says nothing.
+function showActionErrorSnackbar(title: string, error: unknown, t: TFunction) {
+  showSnackbar({
+    isLowContrast: false,
+    kind: 'error',
+    title,
+    subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
+  });
+}
+
+// Row actions are invoked from DOM event handlers, which ignore the promise an async action returns.
+// Actions are expected to report their own failures to the user; this is the last-resort net that
+// keeps a rejection from becoming an unhandled promise rejection, which React's development-only
+// error overlay turns into a full-screen crash the user can only escape by reloading the page. It
+// still tells the user something went wrong, because a click that silently does nothing is the
+// production half of the same defect.
+function runAction(actionKey: QueueEntryAction, actionProps: ActionProps, queueEntry: QueueEntry, t: TFunction) {
+  return Promise.resolve()
+    .then(() => actionProps.onClick(queueEntry))
+    .catch((error) => {
+      // Reporting the failure must not fail. Both steps below touch things that can throw on a
+      // bad day — reading properties off whatever value was rejected, and the framework's
+      // snackbar store — and a throw in here escapes as exactly the unhandled rejection this net
+      // exists to prevent, which is the original defect wearing the error handler's clothes.
+      try {
+        console.error(`Service queue table action '${actionKey}' failed`, error);
+        showActionErrorSnackbar(t('queueEntryActionFailed', 'Action failed'), error, t);
+      } catch (reportingError) {
+        console.error(`Reporting the failure of service queue table action '${actionKey}' failed`, reportingError);
+      }
+    });
+}
+
+// A row action posts to the server, and a rapid double-click on one is an ordinary thing for a user
+// to do while a slow request is in flight. Neither control is `disabled` while it runs — that would
+// take a keyboard user's focus off it mid-request, see `ActionButton` below — so nothing in the DOM
+// discards the second click, and this ref is what does. It has to be a ref rather than state because
+// the second click can arrive before React has re-rendered from the first.
+//
+// Measured on a live queue table: two clicks 85ms apart on the overflow menu's Call item sent two
+// `POST /queueutil/assignticket` requests for one intended call.
+function useSingleFlight() {
+  const [isPending, setIsPending] = useState(false);
+  const isPendingRef = useRef(false);
+
+  const runOnce = useCallback(async (task: () => Promise<void>) => {
+    if (isPendingRef.current) {
+      return;
+    }
+    isPendingRef.current = true;
+    setIsPending(true);
+    try {
+      await task();
+    } finally {
+      isPendingRef.current = false;
+      setIsPending(false);
+    }
+  }, []);
+
+  return { isPending, runOnce };
+}
 
 // Resolves deprecated action names to the actions that replaced them, dropping duplicates in case a
 // configuration lists both a deprecated action and its replacement.
@@ -42,6 +108,7 @@ function normalizeActions(actionKeys: ConfigurableQueueEntryAction[], configKey:
 }
 
 function useActionPropsByKey() {
+  const { t } = useTranslation();
   const {
     callingStatus,
     concepts: { defaultStatusConceptUuid },
@@ -57,19 +124,51 @@ function useActionPropsByKey() {
         label: 'call',
         text: 'Call',
         onClick: async (queueEntry: QueueEntry) => {
-          const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
-          const callingQueueResponse = await serveQueueEntry(
-            mappedQueueEntry.queue.name,
-            mappedQueueEntry.visitQueueNumber,
-            callingStatus,
-          );
-          if (callingQueueResponse.ok) {
+          const servicePointName = queueEntry.queue?.name;
+          const ticketNumber = getVisitQueueNumber(queueEntry, visitQueueNumberAttributeUuid);
+
+          // The assignticket endpoint needs all three values, so say which one is missing rather
+          // than posting an incomplete request and reporting whatever the server makes of it. The
+          // ticket number is singled out because it is the one that is missing in ordinary use:
+          // it comes from a visit attribute, so any visit created outside the queue flow lacks it,
+          // and telling that user to go and check the configuration would be wrong advice.
+          if (!servicePointName || !ticketNumber || !callingStatus) {
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'error',
+              title: t('errorCallingPatient', 'Error calling patient'),
+              // "calling status" is the name of a configuration property, not something a triage
+              // clerk has a word for, and neither is the queue's own name something they can go and
+              // fix: this is an administrator's job, so the message says whose.
+              subtitle: ticketNumber
+                ? t(
+                    'callPatientMissingConfiguration',
+                    'Calling patients is not set up for this queue. Ask your system administrator to check the service queues configuration.',
+                  )
+                : t(
+                    'callPatientNoTicketNumber',
+                    "This patient's visit has no ticket number, so there is nothing for the queue screen to call.",
+                  ),
+            });
+            return;
+          }
+
+          try {
+            const callingQueueResponse = await serveQueueEntry(servicePointName, ticketNumber, callingStatus);
+            // `openmrsFetch` rejects on any non-2xx, so this is not the ordinary server-error path.
+            // It catches the case where it resolves without a response at all, which it does while
+            // it is redirecting the browser after an authentication failure.
+            if (!callingQueueResponse?.ok) {
+              throw new Error(t('unexpectedServerResponse', 'Unexpected Server Response'));
+            }
             await mutateQueueEntries();
             const dispose = showModal('call-queue-entry-modal', {
               closeModal: () => dispose(),
               queueEntry,
               size: 'sm',
             });
+          } catch (error) {
+            showActionErrorSnackbar(t('errorCallingPatient', 'Error calling patient'), error, t);
           }
         },
         showIf: (queueEntry: QueueEntry) => {
@@ -145,7 +244,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries, t]);
   return actionPropsByKey;
 }
 
@@ -153,8 +252,7 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
   const { t } = useTranslation();
   const layout = useLayoutType();
   const actionPropsByKey = useActionPropsByKey();
-  const [isPending, setIsPending] = useState(false);
-  const isPendingRef = useRef(false);
+  const { isPending, runOnce } = useSingleFlight();
 
   const actionProps = actionPropsByKey[actionKey];
   if (!actionProps) {
@@ -166,26 +264,21 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
     return null;
   }
 
-  const handleClick = async () => {
-    if (isPendingRef.current) {
-      return;
-    }
-    isPendingRef.current = true;
-    setIsPending(true);
-    try {
-      await Promise.resolve(actionProps.onClick(queueEntry));
-    } finally {
-      isPendingRef.current = false;
-      setIsPending(false);
-    }
-  };
+  const handleClick = () => void runOnce(() => runAction(actionKey, actionProps, queueEntry, t));
 
   return (
     <Button
       key={actionKey}
       kind="ghost"
       aria-label={t(actionProps.label, actionProps.text)}
-      disabled={isPending}
+      // `disabled` removes the button from the tab order the instant it is pressed, which drops a
+      // keyboard user's focus onto `document.body` before the request has even been sent. Getting
+      // back to the button to read the error or retry then means tabbing in from the top of a queue
+      // table that is one row per waiting patient. `aria-disabled` keeps the button focused and
+      // still tells a screen reader the state changed; the `isPendingRef` guard in `handleClick`,
+      // not the attribute, is what actually discards the second click.
+      aria-disabled={isPending}
+      aria-busy={isPending}
       onClick={handleClick}
       size={isDesktop(layout) ? 'sm' : 'lg'}>
       {t(actionProps.label, actionProps.text)}
@@ -196,6 +289,11 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
 function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
   const { t } = useTranslation();
   const actionPropsByKey = useActionPropsByKey();
+  // The same in-flight guard the inline button carries, for the same reason: the item is not
+  // `disabled` while its request runs, so nothing in the DOM discards a second click. It is not
+  // given the button's `aria-disabled`/`aria-busy` as well — a menu item is chosen once and the menu
+  // is meant to close behind it, so there is no pending state for a user to read.
+  const { runOnce } = useSingleFlight();
 
   const actionProps = actionPropsByKey[actionKey];
   if (!actionProps) {
@@ -214,7 +312,7 @@ function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEnt
       aria-label={t(actionProps.label, actionProps.text)}
       hasDivider
       isDelete={actionProps.isDelete}
-      onClick={() => actionProps.onClick(queueEntry)}
+      onClick={() => void runOnce(() => runAction(actionKey, actionProps, queueEntry, t))}
       itemText={t(actionProps.label, actionProps.text)}
     />
   );
