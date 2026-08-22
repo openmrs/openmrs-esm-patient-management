@@ -320,7 +320,7 @@ function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) 
     ?.map(({ concept, value }) => ({
       [(concept as OpenmrsResource).uuid]: typeof value === 'object' ? value?.uuid : value,
     }))
-    .reduce((accu, curr) => Object.assign(accu, curr), {});
+    .reduce((accu, curr) => ({ ...accu, ...curr }), {});
 
   return { data: encounters, isLoading, error };
 }
