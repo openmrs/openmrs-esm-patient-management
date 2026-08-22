@@ -1,11 +1,8 @@
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import { useMemo } from 'react';
 import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll, useSession, type Visit } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type WaitTime } from '../types';
-
-dayjs.extend(utc);
 
 /**
  * Fetches today's currently-active visits at a location (defaults to the session location), deduped
@@ -53,10 +50,9 @@ export function useActiveVisits(locationUuid?: string) {
 
 export function useAverageWaitTime(serviceUuid: string, locationUuid: string, statusUuid: string) {
   // Service queues are an outpatient concern, so the average is scoped to entries started today rather
-  // than to the whole history of the queue. The queue module parses this with a zone-less
-  // `yyyy-MM-dd HH:mm:ss` SimpleDateFormat and throws on anything else, so the value is sent in UTC,
-  // the timezone servers run in — browser-local time would shift the window by the client's offset.
-  const startOfDay = useMemo(() => dayjs().startOf('day').utc().format('YYYY-MM-DD HH:mm:ss'), []);
+  // than to the whole history of the queue. Sent as an ISO-8601 instant so the server does not have to
+  // guess the client's timezone (requires queue module 3.1.0 or later).
+  const startOfDay = useMemo(() => dayjs().startOf('day').toISOString(), []);
 
   const apiUrl =
     `${restBaseUrl}/queue-entry-metrics?metric=averageWaitTime` +

@@ -79,15 +79,15 @@ describe('useAverageWaitTime', () => {
     vi.clearAllMocks();
   });
 
-  it('bounds the average to today, sent in the format and timezone the queue module parses', () => {
+  it('bounds the average to today, as an unambiguous instant', () => {
     mockUseSWR.mockReturnValue({ data: undefined, error: undefined, isLoading: true } as ReturnType<typeof useSWR>);
     renderHook(() => useAverageWaitTime('service-1', 'location-1', 'status-1'));
 
     const url = decodeURIComponent(mockUseSWR.mock.calls[0][0] as string);
     const startedOnOrAfter = url.match(/&startedOnOrAfter=([^&]+)/)?.[1];
 
-    expect(startedOnOrAfter).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
-    // Appending Z reads it back as UTC, which is how the server parses the zone-less string.
-    expect(new Date(`${startedOnOrAfter}Z`).getTime()).toBe(dayjs().startOf('day').valueOf());
+    // The offset is what makes it unambiguous; without one the server falls back to its own timezone.
+    expect(startedOnOrAfter).toMatch(/(Z|[+-]\d{2}:\d{2})$/);
+    expect(new Date(startedOnOrAfter).getTime()).toBe(dayjs().startOf('day').valueOf());
   });
 });
