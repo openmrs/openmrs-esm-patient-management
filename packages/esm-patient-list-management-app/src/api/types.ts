@@ -1,4 +1,4 @@
-import type { OpenmrsResource } from '@openmrs/esm-framework';
+import type { Link, OpenmrsResource, OpenmrsResourceStrict, Person } from '@openmrs/esm-framework';
 
 export enum PatientListType {
   STARRED = 'Starred',
@@ -7,11 +7,16 @@ export enum PatientListType {
   ALL = 'All',
 }
 
+export interface CohortLocation {
+  uuid: string;
+  display: string;
+}
+
 export interface AddablePatientListViewModel {
   addPatient(): Promise<void>;
   displayName: string;
-  checked?: boolean;
   id: string;
+  checked?: boolean;
 }
 
 export interface PatientList {
@@ -19,7 +24,7 @@ export interface PatientList {
   display: string;
   description: string;
   type: string;
-  location: { uuid: string; display: string } | null;
+  location: CohortLocation | null;
   size: number;
   options?: Array<PatientListOption>;
 }
@@ -38,12 +43,31 @@ export interface PatientListFilter {
 export interface PatientListOption {
   type: string;
   name: string;
-  value: any;
+  value: string | number | boolean;
 }
 
 export interface PatientListMember {
   endDate: string | number | Date;
   id: string;
+}
+
+export interface PatientListPatient {
+  name: string;
+  identifier: string;
+  sex: string;
+  startDate: string;
+  uuid: string;
+  membershipUuid?: string;
+  mobile?: string | null;
+}
+
+export interface PatientIdentifier extends OpenmrsResourceStrict {
+  identifier: string;
+}
+
+export interface CohortMemberPatient extends OpenmrsResourceStrict {
+  identifiers: Array<PatientIdentifier>;
+  person: Person;
 }
 
 export interface AddPatientData {
@@ -57,17 +81,17 @@ export interface OpenmrsCohort {
   resourceVersion: string;
   name: string;
   description: string;
-  attributes: Array<any>;
-  links: Array<any>;
-  location: Location | null;
+  attributes: Array<OpenmrsResource>;
+  links: Array<Link>;
+  location: CohortLocation | null;
   groupCohort: boolean | null;
   startDate: string | null;
   endDate: string | null;
   voidReason: string | null;
   voided: boolean;
+  size: number;
   isStarred?: boolean;
   type?: string;
-  size: number;
   cohortType?: CohortType;
 }
 
@@ -76,19 +100,19 @@ export interface OpenmrsCohortRef {
 }
 
 export interface OpenmrsCohortMember {
-  attributes: Array<any>;
+  attributes: Array<OpenmrsResource>;
   description: string;
   endDate: string;
   startDate: string;
   name: string;
   uuid: string;
-  patient: OpenmrsResource;
+  patient: CohortMemberPatient;
   voided: boolean;
 }
 
 export interface CohortResponse<T> {
   results: Array<T>;
-  error: any;
+  error: Error | null;
   totalCount: number;
 }
 

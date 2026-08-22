@@ -15,18 +15,9 @@ import {
 } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/patient-list.resource';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
+import { type PatientListPatient } from '../api/types';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
 import styles from './list-details.scss';
-
-interface ListDetails {
-  name: string;
-  identifier: string;
-  sex: string;
-  startDate: string;
-  uuid: string;
-  membershipUuid?: string;
-  mobile?: string | null;
-}
 
 const ListDetails = () => {
   const { t } = useTranslation();
@@ -44,7 +35,7 @@ const ListDetails = () => {
     currentPageSize,
   );
 
-  const patients: Array<ListDetails> = useMemo(
+  const patients: Array<PatientListPatient> = useMemo(
     () =>
       listMembers
         ? listMembers?.length
@@ -70,7 +61,7 @@ const ListDetails = () => {
         key: 'name',
         header: t('name', 'Name'),
         link: {
-          getUrl: (patient) =>
+          getUrl: (patient: PatientListPatient) =>
             patient?.uuid ? `${window.getOpenmrsSpaBase()}patient/${patient?.uuid}/chart/` : window?.location?.href,
         },
       },
