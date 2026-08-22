@@ -1,21 +1,30 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListSkeleton } from '@carbon/react';
-import { parseDate, formatDatetime } from '@openmrs/esm-framework';
+import { attach, ExtensionSlot, parseDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
+import { getEditEncounterHandler } from '../edit-encounter';
 import { usePastVisits } from './past-visit.resource';
-import PastVisitSummary from './past-visit-details/past-visit-summary.component';
 import styles from './past-visit.scss';
+
+const visitSummarySlot = 'service-queues-past-visit-summary-slot';
+attach(visitSummarySlot, 'visit-summary');
 
 interface PastVisitProps {
   patientUuid: string;
+  currentVisitUuid?: string;
 }
 
-const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
+const PastVisit: React.FC<PastVisitProps> = ({ patientUuid, currentVisitUuid }) => {
   const { t } = useTranslation();
-  const { visits, isLoading } = usePastVisits(patientUuid);
+  const { visits, isLoading, mutate } = usePastVisits(patientUuid, currentVisitUuid);
+  const { patient } = usePatient(patientUuid);
 
   if (isLoading) {
-    return <StructuredListSkeleton />;
+    return (
+      <div role="progressbar">
+        <StructuredListSkeleton />
+      </div>
+    );
   }
 
   if (visits) {
@@ -24,15 +33,17 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
         <div className={styles.header}>
           <h4 className={styles.visitType}>{visits?.visitType?.display}</h4>
           <p className={styles.date}>
-            {visits?.startDatetime
-              ? (() => {
-                  const parsedDate = parseDate(visits.startDatetime);
-                  return parsedDate && !isNaN(parsedDate.getTime()) ? formatDatetime(parsedDate) : '--';
-                })()
-              : '--'}
+            {visits?.startDatetime ? formatDatetime(parseDate(visits.startDatetime)) : '--'}
           </p>
         </div>
-        <PastVisitSummary encounters={visits.encounters} patientUuid={patientUuid} />
+        <ExtensionSlot
+          name={visitSummarySlot}
+          state={{
+            visit: visits,
+            patientUuid,
+            onEditEncounter: getEditEncounterHandler({ patient, patientUuid, visit: visits, mutateVisit: mutate }),
+          }}
+        />
       </div>
     );
   }
