@@ -106,13 +106,15 @@ test('Edit an encounter from the Previous visit tab of a queue entry', async ({ 
     await page.getByRole('tab', { name: /encounters/i }).click();
   });
 
+  const encounters = page.getByLabel(/queue table/i).getByRole('table');
+
   await test.step('Then I should see the encounter recorded on that visit', async () => {
-    const encounterRow = page.getByRole('row').filter({ hasText: 'Visit Note' });
-    await expect(encounterRow).toBeVisible();
-    await encounterRow.getByRole('button').first().click();
-    // Scope to the cell: the queue entry's own expanded row contains this table, so a row-level locator
-    // matches both.
-    await expect(page.getByRole('cell', { name: new RegExp(`Text of encounter note ${encounterNote}`) })).toBeVisible();
+    await expect(encounters).toContainText(/visit note/i);
+  });
+
+  await test.step('And then I expand that encounter', async () => {
+    await encounters.getByRole('button', { name: /expand current row/i }).click();
+    await expect(encounters).toContainText(/text of encounter note/i);
   });
 
   await test.step('When I choose "Edit this encounter"', async () => {

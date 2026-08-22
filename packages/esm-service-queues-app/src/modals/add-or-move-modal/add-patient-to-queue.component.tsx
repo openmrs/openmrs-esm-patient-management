@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
-import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import QueueFields from '../../create-queue-entry/queue-fields/queue-fields.component';
 import { type ConfigObject } from '../../config-schema';
 
@@ -14,7 +13,6 @@ interface AddPatientToQueueModalProps {
 
 const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTitle, activeVisit, closeModal }) => {
   const { t } = useTranslation();
-  const { mutateQueueEntries } = useMutateQueueEntries();
   const config = useConfig<ConfigObject>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +29,6 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
         ?.submitQueueEntry?.(activeVisit)
         ?.then(() => {
           closeModal();
-          mutateQueueEntries();
         })
         ?.catch((error) => {
           showSnackbar({
@@ -45,7 +42,7 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
           setIsSubmitting(false);
         });
     },
-    [callback, activeVisit, closeModal, mutateQueueEntries, t],
+    [callback, activeVisit, closeModal, t],
   );
 
   return (
