@@ -10,7 +10,7 @@ interface ServicesLegendProps {
 
 /*
   Renders a bottom legend bar mapping appointment service names to their assigned color swatches.
-  Used across calendar views (monthly, weekly, daily) to provide visual context for service color coding.
+  Used across calendar views (monthly, daily) to provide visual context for service color coding.
  */
 const ServicesLegend: React.FC<ServicesLegendProps> = ({ services, serviceColorMap }) => {
   const { t } = useTranslation();

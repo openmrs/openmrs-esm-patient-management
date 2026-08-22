@@ -9,6 +9,7 @@ import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { useMonthlyAppointments } from '../hooks/useMonthlyAppointments';
 import { useProviders } from '../hooks/useProviders';
+import { AppointmentKind, AppointmentStatus } from '../types';
 
 vi.mock('../hooks/useAppointmentsCalendar', () => ({
   useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
@@ -63,7 +64,7 @@ const svc = (name: string, uuid: string) => ({
 const mockAppointment = (overrides = {}) => ({
   uuid: 'test-uuid',
   appointmentNumber: '0001',
-  appointmentKind: 'Scheduled',
+  appointmentKind: AppointmentKind.SCHEDULED,
   comments: '',
   endDateTime: null,
   location: { uuid: 'loc-uuid', name: 'Test Clinic' },
@@ -73,7 +74,8 @@ const mockAppointment = (overrides = {}) => ({
   recurring: false,
   service: svc('Outpatient', 'svc-uuid'),
   startDateTime: dayjs().date(10).hour(9).minute(0).valueOf(),
-  status: 'Scheduled',
+  dateAppointmentScheduled: null,
+  status: AppointmentStatus.SCHEDULED,
   voided: false,
   extensions: {},
   teleconsultationLink: null,
@@ -108,11 +110,11 @@ describe('Appointment calendar view', () => {
     expect(initialDate.diff(latestRequestedDate(), 'month')).toBe(1);
   });
 
-  it('renders the Monthly, Weekly, Daily view switcher', () => {
+  it('renders the Monthly and Daily view switcher', () => {
     renderCalendar();
     expect(screen.getByRole('tab', { name: /monthly/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /weekly/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /daily/i })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: /weekly/i })).not.toBeInTheDocument();
   });
 
   it('defaults to monthly period on initial render', () => {
@@ -124,16 +126,6 @@ describe('Appointment calendar view', () => {
     expect(typeof mockUseAppointmentsCalendar.mock.calls.at(-1)?.[0]).toBe('string');
   });
 
-  it('switches to weekly period when Weekly tab is clicked', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
-    expect(lastCall?.[1]).toBe('weekly');
-  });
-
   it('switches to daily period when Daily tab is clicked', async () => {
     const user = userEvent.setup();
     renderCalendar();
@@ -142,32 +134,6 @@ describe('Appointment calendar view', () => {
 
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('daily');
-  });
-
-  it('advances by 7 days when Next is clicked in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    const dateBeforeNav = latestRequestedDate();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-    await user.click(screen.getByRole('button', { name: /next/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
-
-    expect(latestRequestedDate().diff(dateBeforeNav, 'day')).toBe(7);
-  });
-
-  it('rewinds by 7 days when Prev is clicked in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    const dateBeforeNav = latestRequestedDate();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-    await user.click(screen.getByRole('button', { name: /previous/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
-
-    expect(dateBeforeNav.diff(latestRequestedDate(), 'day')).toBe(7);
   });
 
   it('advances by 1 day when Next is clicked in daily mode', async () => {
@@ -225,15 +191,6 @@ describe('Appointment calendar view', () => {
     expect(latestRequestedDate().isSame(dayjs(), 'day')).toBe(true);
   });
 
-  it('disables the Today button in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    expect(screen.getByRole('button', { name: /today/i })).toBeDisabled();
-  });
-
   it('displays the appointment count for the month', () => {
     // In monthly view without active filters, calendarEvents comes from summaryEvents
     // (useAppointmentsCalendar / appointmentSummary API) so mock that source.
@@ -251,25 +208,6 @@ describe('Appointment calendar view', () => {
     renderCalendar();
 
     expect(screen.getByText('1 appointments this month')).toBeInTheDocument();
-  });
-
-  it('displays the appointment count for the week', async () => {
-    const user = userEvent.setup();
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: '2026-07-01',
-          services: [{ serviceName: 'Outpatient', serviceUuid: 'svc-uuid', count: 3 }],
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    renderCalendar();
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    expect(screen.getByText('3 appointments this week')).toBeInTheDocument();
   });
 
   it('displays the singular appointment count for a single appointment in daily mode', async () => {
@@ -294,15 +232,6 @@ describe('Appointment calendar view', () => {
   it('displays month and year title in monthly mode', () => {
     renderCalendar();
     expect(screen.getByText(/^[A-Z][a-z]+ \d{4}$/)).toBeInTheDocument();
-  });
-
-  it('displays week range title in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    expect(screen.getByText(/\w{3} \d{1,2} – \w{3} \d{1,2}, \d{4}/)).toBeInTheDocument();
   });
 
   it('opens popup when a day cell with appointments is clicked in monthly mode, then switches to daily view when Open day view is clicked', async () => {
@@ -390,6 +319,7 @@ describe('Appointment calendar view', () => {
     mockUseAppointmentServices.mockReturnValue({
       serviceTypes: [svc('Outpatient', 'svc-opd'), svc('Lab', 'svc-lab')],
       isLoading: false,
+      error: null,
     });
 
     renderCalendar();
@@ -411,6 +341,8 @@ describe('Appointment calendar view', () => {
     mockUseProviders.mockReturnValue({
       providers: [{ uuid: 'prov-1', display: 'Dr. Ada Nwosu', person: { uuid: 'person-1' } }],
       isLoading: false,
+      error: undefined,
+      isValidating: false,
     });
 
     renderCalendar();

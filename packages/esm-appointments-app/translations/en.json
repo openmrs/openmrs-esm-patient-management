@@ -49,8 +49,6 @@
   "appointmentStatus": "Appointment status",
   "appointmentsThisMonth_one": "{{count}} appointments this month",
   "appointmentsThisMonth_other": "{{count}} appointments this month",
-  "appointmentsThisWeek_one": "{{count}} appointments this week",
-  "appointmentsThisWeek_other": "{{count}} appointments this week",
   "appointmentsUpdated": "Appointments updated",
   "appointmentsUpdatedMessage": "Appointments for selected patients have been successfully updated",
   "appointmentsUpdateFailed": "Appointments update failed",
@@ -204,6 +202,5 @@
   "WalkIn": "Walk In",
   "WED": "WED",
   "week": "Week",
-  "weekly": "Weekly",
   "yes": "Yes"
 }
