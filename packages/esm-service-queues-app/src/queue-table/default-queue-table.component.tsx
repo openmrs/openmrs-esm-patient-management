@@ -1,32 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { DataTableSkeleton, Dropdown, Layer, TableToolbarSearch } from '@carbon/react';
+import { DataTableSkeleton, Layer, TableToolbarSearch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { updateSelectedQueueStatus, useServiceQueuesStore } from '../store/store';
+import { isDesktop, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useServiceQueuesStore } from '../store/store';
 import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import useQueueStatuses from '../hooks/useQueueStatuses';
 import AddPatientToQueueButton from './components/add-patient-to-queue-button.component';
 import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
 import QueueTable from './queue-table.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
+import { type ConfigObject } from '../config-schema';
 import styles from './queue-table.scss';
 
 function DefaultQueueTable() {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-
   return (
     <div className={styles.defaultQueueTable}>
       <Layer className={styles.tableSection}>
-        <div className={styles.headerContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h2>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h2>
-          </div>
-          <div className={styles.headerButtons}>
-            <AddPatientToQueueButton />
-          </div>
-        </div>
         <QueueTableSection />
       </Layer>
     </div>
@@ -36,19 +25,23 @@ function DefaultQueueTable() {
 function QueueTableSection() {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid } = useServiceQueuesStore();
+  const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
+  const {
+    concepts: { waitingStatusConceptUuid },
+  } = useConfig<ConfigObject>();
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Waiting list shows only waiting patients; in-service ones live in the Attending cards.
   const searchCriteria = useMemo(() => {
     return {
       service: selectedServiceUuid,
       location: selectedQueueLocationUuid,
       isEnded: false,
-      status: selectedQueueStatusUuid,
+      status: waitingStatusConceptUuid,
     };
-  }, [selectedServiceUuid, selectedQueueLocationUuid, selectedQueueStatusUuid]);
+  }, [selectedServiceUuid, selectedQueueLocationUuid, waitingStatusConceptUuid]);
 
-  const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
+  const { queueEntries, isLoading, error, isValidating, totalCount } = useQueueEntries(searchCriteria);
 
   useEffect(() => {
     if (error?.message) {
@@ -81,63 +74,61 @@ function QueueTableSection() {
     });
   }, [columns, queueEntries, searchTerm]);
 
+  // `totalCount` counts every waiting entry on the server, which is not what a search leaves in the table.
+  const waitingCount = searchTerm ? (filteredQueueEntries?.length ?? 0) : totalCount;
+
+  const heading = (
+    <div className={styles.headerContainer}>
+      <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+        <h2>
+          {isLoading || error
+            ? t('waitingList', 'Waiting list')
+            : t('waitingListWithCount', 'Waiting list ({{count}})', { count: waitingCount })}
+        </h2>
+      </div>
+    </div>
+  );
+
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return (
+      <>
+        {heading}
+        <DataTableSkeleton role="progressbar" />
+      </>
+    );
   }
 
   return (
-    <QueueTable
-      ExpandedRow={QueueTableExpandedRow}
-      isValidating={isValidating}
-      queueEntries={filteredQueueEntries ?? []}
-      queueUuid={null}
-      statusUuid={null}
-      tableFilters={
-        <>
-          {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
-          <StatusDropdownFilter />
-          <TableToolbarSearch
-            className={styles.search}
-            onChange={(e) => {
-              if (typeof e === 'string') {
-                setSearchTerm(e);
-              } else if (e && 'target' in e) {
-                const target = e.target as HTMLInputElement;
-                setSearchTerm(target.value);
-              }
-            }}
-            placeholder={t('searchThisList', 'Search this list')}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
-            persistent
-          />
-        </>
-      }
-    />
-  );
-}
-
-function StatusDropdownFilter() {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { statuses } = useQueueStatuses();
-  const { selectedQueueStatusDisplay } = useServiceQueuesStore();
-  const handleStatusChange = ({ selectedItem }) => {
-    updateSelectedQueueStatus(selectedItem.uuid, selectedItem?.display);
-  };
-
-  return (
-    <div className={styles.filterContainer}>
-      <Dropdown
-        id="statusFilter"
-        items={[{ display: `${t('any', 'Any')}` }, ...(statuses ?? [])]}
-        itemToString={(item) => (item ? item.display : '')}
-        label={selectedQueueStatusDisplay ?? t('all', 'All')}
-        onChange={handleStatusChange}
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        titleText={t('showPatientsWithStatus', 'Show patients with status:')}
-        type="inline"
+    <>
+      {heading}
+      <QueueTable
+        ExpandedRow={QueueTableExpandedRow}
+        isValidating={isValidating}
+        queueEntries={filteredQueueEntries ?? []}
+        queueUuid={null}
+        statusUuid={null}
+        tableFilters={
+          <>
+            {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
+            <AddPatientToQueueButton />
+            <TableToolbarSearch
+              className={styles.search}
+              onChange={(e) => {
+                if (typeof e === 'string') {
+                  setSearchTerm(e);
+                } else if (e && 'target' in e) {
+                  const target = e.target as HTMLInputElement;
+                  setSearchTerm(target.value);
+                }
+              }}
+              placeholder={t('searchThisList', 'Search this list')}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              persistent
+            />
+          </>
+        }
       />
-    </div>
+    </>
   );
 }
 

@@ -1,0 +1,104 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-05 layout.$spacing-05 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-03;
+}
+
+.heading {
+  @include type.type-style('heading-compact-02');
+  color: $ui-05;
+}
+
+.cards {
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+}
+
+.card {
+  display: flex;
+  flex: 0 1 22rem;
+  flex-direction: column;
+  background-color: $ui-02;
+  border: 1px solid $ui-03;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $ui-03;
+  }
+}
+
+.cardSkeleton {
+  flex: 0 1 22rem;
+  width: 22rem;
+  height: layout.$spacing-10;
+}
+
+.viewAllButton {
+  min-height: unset;
+  padding: 0 layout.$spacing-03;
+}
+
+.emptyState {
+  border: 1px solid $ui-03;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-09;
+  text-align: center;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: var(--cds-text-secondary);
+  margin-top: layout.$spacing-05;
+}
+
+.patient {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.serviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+  margin-top: auto;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  border-top: 1px solid $ui-03;
+}
+
+.name {
+  @include type.type-style('heading-compact-01');
+  color: $ui-05;
+  overflow-wrap: anywhere;
+}
+
+.service {
+  @include type.type-style('body-compact-01');
+  color: $ui-05;
+}
+
+.demographics {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
