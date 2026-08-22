@@ -98,7 +98,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   }, [isPopoverOpen, handleClickOutside]);
 
   return (
-    <Popover open={isPopoverOpen} align={popoverAlign} ref={cellRef}>
+    <Popover open={isPopoverOpen} align={popoverAlign} ref={cellRef} data-testid="popover-container">
       <div
         onClick={handleCellClick}
         data-testid={`workload-cell-${dateFormatted.isoDate}`}

@@ -10,7 +10,7 @@ import { type DailyAppointmentsCountByService } from '../../types';
 const mockUseLayoutType = vi.mocked(useLayoutType);
 
 beforeEach(() => {
-  mockUseLayoutType.mockReturnValue('desktop');
+  mockUseLayoutType.mockReturnValue('large-desktop');
 });
 
 describe('MonthlyWorkloadView', () => {
@@ -221,41 +221,26 @@ describe('MonthlyWorkloadView', () => {
     const user = userEvent.setup();
     const events: DailyAppointmentsCountByService[] = [{ appointmentDate: '2026-06-15', services: singleApptService }];
 
+    const renderAndCheckAlignment = async (index: number, expectedAlign: string) => {
+      const { unmount } = render(
+        <MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} index={index} />,
+      );
+      const cell = screen.getByTestId('workload-cell-2026-06-15');
+      expect(screen.getByTestId('popover-container')).toHaveClass(`cds--popover--${expectedAlign}`);
+
+      await user.click(cell);
+      expect(cell).toHaveAttribute('data-popover-open', 'true');
+      unmount();
+    };
+
     // index 0: top row, left side
-    const { unmount: u0 } = render(
-      <MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} index={0} />,
-    );
-    const cell0 = screen.getByTestId('workload-cell-2026-06-15');
-    await user.click(cell0);
-    expect(cell0).toHaveAttribute('data-popover-open', 'true');
-    u0();
-
+    await renderAndCheckAlignment(0, 'bottom-start');
     // index 5: top row, right side
-    const { unmount: u5 } = render(
-      <MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} index={5} />,
-    );
-    const cell5 = screen.getByTestId('workload-cell-2026-06-15');
-    await user.click(cell5);
-    expect(cell5).toHaveAttribute('data-popover-open', 'true');
-    u5();
-
+    await renderAndCheckAlignment(5, 'bottom-end');
     // index 14: lower row, left side
-    const { unmount: u14 } = render(
-      <MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} index={14} />,
-    );
-    const cell14 = screen.getByTestId('workload-cell-2026-06-15');
-    await user.click(cell14);
-    expect(cell14).toHaveAttribute('data-popover-open', 'true');
-    u14();
-
+    await renderAndCheckAlignment(14, 'top-start');
     // index 19: lower row, right side
-    const { unmount: u19 } = render(
-      <MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} index={19} />,
-    );
-    const cell19 = screen.getByTestId('workload-cell-2026-06-15');
-    await user.click(cell19);
-    expect(cell19).toHaveAttribute('data-popover-open', 'true');
-    u19();
+    await renderAndCheckAlignment(19, 'top-end');
   });
 
   it('closes popover when clicking outside of it', async () => {
