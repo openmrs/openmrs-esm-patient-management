@@ -43,7 +43,7 @@
     "formik": "^2.2.9",
     "lodash-es": "^4.17.15",
     "react-hook-form": "^7.54.0",
-    "xlsx": "^0.18.5",
+    "xlsx": "npm:@stackline/xlsx@^1.0.6",
     "yup": "^0.32.11",
     "zod": "^3.24.1"
   },
