@@ -5,20 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { formatAMPM } from '../../helpers/functions';
 import { type Appointment } from '../../types';
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
-import {
-  getServiceColor,
-  STATUS_TAG_TYPES,
-  DEFAULT_STATUS_TAG_TYPE,
-  CALENDAR_HOURS,
-  formatHourLabel,
-} from '../utils/calendar-colors';
+import { STATUS_TAG_TYPES, DEFAULT_STATUS_TAG_TYPE, CALENDAR_HOURS, formatHourLabel } from '../utils/calendar-colors';
 import styles from './daily-calendar-view.scss';
 
 interface DailyCalendarViewProps {
   calendarSelectedDate: Dayjs;
+  serviceColorMap?: Map<string, string>;
 }
 
-const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate }) => {
+const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate, serviceColorMap }) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
   const { appointments, isLoading } = useAppointmentsByDate(isoDate);
@@ -45,19 +40,17 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
 
   return (
     <div className={styles.container}>
-      <div className={styles.heading}>
-        <p className={styles.subtitle}>
-          {appointments.length === 0
-            ? t('noAppointments', 'No appointments scheduled')
-            : t('appointmentCount', '{{count}} appointment(s)', { count: appointments.length })}
-        </p>
-      </div>
+      {appointments.length === 0 && (
+        <div className={styles.heading}>
+          <p className={styles.subtitle}>{t('noAppointments', 'No appointments scheduled')}</p>
+        </div>
+      )}
       {hourSlots.map(({ hr, appts }) => (
         <div key={hr} className={styles.hourRow}>
           <div className={styles.hourLabel}>{formatHourLabel(hr)}</div>
           <div className={styles.hourSlot}>
             {appts.map((a) => (
-              <DailyCard key={a.uuid} appointment={a} />
+              <DailyCard key={a.uuid} appointment={a} serviceColorMap={serviceColorMap} />
             ))}
           </div>
         </div>
@@ -66,8 +59,11 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
   );
 };
 
-const DailyCard: React.FC<{ appointment: Appointment }> = ({ appointment }) => {
-  const color = getServiceColor(appointment.service.name);
+const DailyCard: React.FC<{ appointment: Appointment; serviceColorMap?: Map<string, string> }> = ({
+  appointment,
+  serviceColorMap,
+}) => {
+  const color = serviceColorMap?.get(appointment.service?.uuid ?? '');
   const tagType = STATUS_TAG_TYPES[appointment.status] ?? DEFAULT_STATUS_TAG_TYPE;
   const time = useMemo(() => {
     if (appointment.startDateTime == null) return '—';
