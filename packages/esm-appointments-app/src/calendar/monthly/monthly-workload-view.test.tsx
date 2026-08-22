@@ -18,13 +18,15 @@ describe('MonthlyWorkloadView', () => {
   const selectedDate = dayjs('2026-06-01');
 
   const sampleServices = [
-    { serviceName: 'General', serviceUuid: 's-1', count: 3 },
-    { serviceName: 'Cardiology', serviceUuid: 's-2', count: 2 },
-    { serviceName: 'Dental', serviceUuid: 's-3', count: 1 },
-    { serviceName: 'Neurology', serviceUuid: 's-4', count: 4 },
+    { serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 5 },
+    { serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 },
+    { serviceName: 'TB Clinic', serviceUuid: '4a228e52-0bfe-11ed-861d-0242ac120002', count: 2 },
+    { serviceName: 'Cardiology', serviceUuid: 'd9e5a2f1-7c3b-4e8f-a1d6-9b2c4e5f6a7b', count: 4 },
   ];
 
-  const singleApptService = [{ serviceName: 'General', serviceUuid: 's-1', count: 1 }];
+  const singleApptService = [
+    { serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 1 },
+  ];
 
   it('shows total appointment count using "appt" for 1 appointment and "appts" for more than 1', () => {
     const singleEvent: DailyAppointmentsCountByService[] = [
@@ -43,7 +45,7 @@ describe('MonthlyWorkloadView', () => {
 
     rerender(<MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={multipleEvents} />);
 
-    expect(screen.getByText('10 appts')).toBeInTheDocument();
+    expect(screen.getByText('14 appts')).toBeInTheDocument();
   });
 
   it('shows no count and does not open popover on click when a day has no appointments', async () => {
@@ -63,10 +65,10 @@ describe('MonthlyWorkloadView', () => {
     render(<MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} />);
 
     const currentData = screen.getByTestId('current-data');
-    expect(within(currentData).getByText('General')).toBeInTheDocument();
-    expect(within(currentData).getByText('Cardiology')).toBeInTheDocument();
-    expect(within(currentData).getByText('Dental')).toBeInTheDocument();
-    expect(within(currentData).queryByText('Neurology')).not.toBeInTheDocument();
+    expect(within(currentData).getByText('Outpatient')).toBeInTheDocument();
+    expect(within(currentData).getByText('HIV Clinic')).toBeInTheDocument();
+    expect(within(currentData).getByText('TB Clinic')).toBeInTheDocument();
+    expect(within(currentData).queryByText('Cardiology')).not.toBeInTheDocument();
     expect(within(currentData).getByText('+1 more')).toBeInTheDocument();
   });
 
@@ -78,9 +80,9 @@ describe('MonthlyWorkloadView', () => {
     render(<MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} />);
 
     const currentData = screen.getByTestId('current-data');
-    expect(within(currentData).getByText('General')).toBeInTheDocument();
-    expect(within(currentData).getByText('Cardiology')).toBeInTheDocument();
-    expect(within(currentData).queryByText('Dental')).not.toBeInTheDocument();
+    expect(within(currentData).getByText('Outpatient')).toBeInTheDocument();
+    expect(within(currentData).getByText('HIV Clinic')).toBeInTheDocument();
+    expect(within(currentData).queryByText('TB Clinic')).not.toBeInTheDocument();
     expect(within(currentData).getByText('+2 more')).toBeInTheDocument();
   });
 
@@ -97,10 +99,10 @@ describe('MonthlyWorkloadView', () => {
     );
 
     const currentData = screen.getByTestId('current-data');
-    expect(within(currentData).getByText('General')).toBeInTheDocument();
+    expect(within(currentData).getByText('Outpatient')).toBeInTheDocument();
+    expect(within(currentData).getByText('HIV Clinic')).toBeInTheDocument();
+    expect(within(currentData).getByText('TB Clinic')).toBeInTheDocument();
     expect(within(currentData).getByText('Cardiology')).toBeInTheDocument();
-    expect(within(currentData).getByText('Dental')).toBeInTheDocument();
-    expect(within(currentData).getByText('Neurology')).toBeInTheDocument();
     expect(within(currentData).queryByText(/\+\d+ more/)).not.toBeInTheDocument();
   });
 
@@ -124,14 +126,14 @@ describe('MonthlyWorkloadView', () => {
     render(<MonthlyWorkloadView dateTime={baseDate} calendarSelectedDate={selectedDate} events={events} />);
 
     const cell = screen.getByTestId('workload-cell-2026-06-15');
-    await user.click(screen.getByText('10 appts'));
+    await user.click(screen.getByText('14 appts'));
     expect(cell).toHaveAttribute('data-popover-open', 'true');
 
     const popoverList = screen.getByTestId('popover-service-list');
-    expect(within(popoverList).getByText('General')).toBeInTheDocument();
+    expect(within(popoverList).getByText('Outpatient')).toBeInTheDocument();
+    expect(within(popoverList).getByText('HIV Clinic')).toBeInTheDocument();
+    expect(within(popoverList).getByText('TB Clinic')).toBeInTheDocument();
     expect(within(popoverList).getByText('Cardiology')).toBeInTheDocument();
-    expect(within(popoverList).getByText('Dental')).toBeInTheDocument();
-    expect(within(popoverList).getByText('Neurology')).toBeInTheDocument();
 
     const closeBtn = screen.getByRole('button', { name: /close/i });
     await user.click(closeBtn);
@@ -182,11 +184,11 @@ describe('MonthlyWorkloadView', () => {
       />,
     );
 
-    expect(screen.getByText('10 appts')).toBeInTheDocument();
+    expect(screen.getByText('14 appts')).toBeInTheDocument();
   });
 
   it('applies assigned service colors and renders safely when service has no color assigned', () => {
-    const serviceColorMap = new Map([['s-1', '#73A947']]);
+    const serviceColorMap = new Map([['e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', '#73A947']]);
     const events: DailyAppointmentsCountByService[] = [{ appointmentDate: '2026-06-15', services: sampleServices }];
 
     render(
@@ -198,10 +200,10 @@ describe('MonthlyWorkloadView', () => {
       />,
     );
 
-    const serviceArea = screen.getByTestId('service-area-s-1');
+    const serviceArea = screen.getByTestId('service-area-e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
     expect(serviceArea.style.backgroundColor).toBeTruthy();
 
-    const swatch = screen.getByTestId('service-swatch-s-1');
+    const swatch = screen.getByTestId('service-swatch-e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
     expect(swatch).toHaveStyle({ backgroundColor: '#73A947' });
   });
 

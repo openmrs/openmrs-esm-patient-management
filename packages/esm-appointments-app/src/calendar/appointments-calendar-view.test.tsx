@@ -17,7 +17,7 @@ vi.mock('../hooks/useAppointmentsByDate', () => ({
 
 vi.mock('../hooks/useAppointmentService', () => ({
   useAppointmentServices: vi.fn().mockReturnValue({
-    serviceTypes: [{ uuid: 'cardio-1', name: 'Cardiology' }],
+    serviceTypes: [{ uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', name: 'HIV Clinic' }],
     isLoading: false,
     error: null,
   }),
@@ -169,14 +169,19 @@ describe('Appointment calendar view', () => {
     const user = userEvent.setup();
     const today = dayjs().format('YYYY-MM-DD');
     mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [{ appointmentDate: today, services: [{ serviceName: 'Gen', serviceUuid: 'u1', count: 5 }] }],
+      calendarEvents: [
+        {
+          appointmentDate: today,
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 5 }],
+        },
+      ],
       isLoading: false,
       error: null,
     });
 
     renderCalendar();
 
-    await user.click(screen.getAllByText('Gen')[0]);
+    await user.click(screen.getAllByText('Outpatient')[0]);
 
     const openDayViewBtn = screen.getAllByRole('button', { name: /open day view/i })[0];
     expect(openDayViewBtn).toBeInTheDocument();
@@ -191,7 +196,7 @@ describe('Appointment calendar view', () => {
       calendarEvents: [
         {
           appointmentDate: '2026-08-14',
-          services: [{ serviceName: 'Cardiology', serviceUuid: 'cardio-1', count: 3 }],
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 }],
         },
       ],
       isLoading: false,
@@ -201,7 +206,7 @@ describe('Appointment calendar view', () => {
     renderCalendar();
 
     expect(screen.getByText('Services')).toBeInTheDocument();
-    expect(screen.getAllByText('Cardiology').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('HIV Clinic').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows the same color for a service in both legend and monthly views', () => {
@@ -210,7 +215,7 @@ describe('Appointment calendar view', () => {
       calendarEvents: [
         {
           appointmentDate: today,
-          services: [{ serviceName: 'Cardiology', serviceUuid: 'cardio-1', count: 3 }],
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 }],
         },
       ],
       isLoading: false,
@@ -219,8 +224,8 @@ describe('Appointment calendar view', () => {
 
     renderCalendar();
 
-    const legendSwatch = screen.getByTestId('legend-swatch-cardio-1');
-    const cellSwatch = screen.getByTestId('service-swatch-cardio-1');
+    const legendSwatch = screen.getByTestId('legend-swatch-53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1');
+    const cellSwatch = screen.getByTestId('service-swatch-53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1');
 
     expect(legendSwatch).toBeInTheDocument();
     expect(cellSwatch).toBeInTheDocument();
