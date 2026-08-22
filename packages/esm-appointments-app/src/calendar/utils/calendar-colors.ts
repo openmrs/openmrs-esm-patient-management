@@ -132,16 +132,3 @@ export function formatHourLabel(hour: number): string {
   const period = hour < 12 ? 'AM' : 'PM';
   return `${h} ${period}`;
 }
-
-export interface TimeBlock {
-  label: string;
-  startHour: number;
-  endHour: number;
-}
-
-export const TIME_BLOCKS: ReadonlyArray<TimeBlock> = [
-  { label: '12 AM – 6 AM', startHour: 0, endHour: 6 },
-  { label: '6 AM – 12 PM', startHour: 6, endHour: 12 },
-  { label: '12 PM – 6 PM', startHour: 12, endHour: 18 },
-  { label: '6 PM – 12 AM', startHour: 18, endHour: 24 },
-];

@@ -66,27 +66,17 @@ describe('Appointment calendar view', () => {
     expect(initialDate.diff(latestRequestedDate(), 'month')).toBe(1);
   });
 
-  it('renders the Monthly, Weekly, Daily view switcher', () => {
+  it('renders the Monthly and Daily view switcher', () => {
     renderCalendar();
     expect(screen.getByRole('tab', { name: /monthly/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /weekly/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /daily/i })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: /weekly/i })).not.toBeInTheDocument();
   });
 
   it('defaults to monthly period on initial render', () => {
     renderCalendar();
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('monthly');
-  });
-
-  it('switches to weekly period when Weekly tab is clicked', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
-    expect(lastCall?.[1]).toBe('weekly');
   });
 
   it('switches to daily period when Daily tab is clicked', async () => {
@@ -97,32 +87,6 @@ describe('Appointment calendar view', () => {
 
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('daily');
-  });
-
-  it('advances by 7 days when Next is clicked in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    const dateBeforeNav = latestRequestedDate();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-    await user.click(screen.getByRole('button', { name: /next/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
-
-    expect(latestRequestedDate().diff(dateBeforeNav, 'day')).toBe(7);
-  });
-
-  it('rewinds by 7 days when Prev is clicked in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    const dateBeforeNav = latestRequestedDate();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-    await user.click(screen.getByRole('button', { name: /previous/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
-
-    expect(dateBeforeNav.diff(latestRequestedDate(), 'day')).toBe(7);
   });
 
   it('advances by 1 day when Next is clicked in daily mode', async () => {
@@ -154,15 +118,6 @@ describe('Appointment calendar view', () => {
   it('displays month and year title in monthly mode', () => {
     renderCalendar();
     expect(screen.getByText(/^[A-Z][a-z]+ \d{4}$/)).toBeInTheDocument();
-  });
-
-  it('displays week range title in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    expect(screen.getByText(/\w{3} \d{1,2} – \w{3} \d{1,2}, \d{4}/)).toBeInTheDocument();
   });
 
   it('opens popup when a day cell with appointments is clicked in monthly mode, then switches to daily view when Open day view is clicked', async () => {
