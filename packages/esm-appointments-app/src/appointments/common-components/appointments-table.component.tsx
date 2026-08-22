@@ -54,10 +54,12 @@ import styles from './appointments-table.scss';
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
   isLoading: boolean;
-  tableHeading: string;
+  tableHeading?: string;
+  /** Removes the outer container padding, e.g. when embedded under a custom toolbar. */
+  noPadding?: boolean;
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading }) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading, noPadding }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
@@ -153,11 +155,13 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   }
 
   return (
-    <Layer className={styles.container}>
+    <Layer className={noPadding ? styles.noPaddingContainer : styles.container}>
       <div className={styles.headerContainer}>
-        <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h2>{tableHeading}</h2>
-        </div>
+        {tableHeading && (
+          <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+            <h2>{tableHeading}</h2>
+          </div>
+        )}
       </div>
       <DataTable
         aria-label={t('appointmentsTable', 'Appointments table')}
@@ -231,7 +235,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                             noToday: true,
                           })
                         : null;
-                      exportAppointmentsToSpreadsheet(appointments, rowData, `${tableHeading}_appointments_${date}`);
+                      exportAppointmentsToSpreadsheet(
+                        appointments,
+                        rowData,
+                        `${tableHeading ?? 'appointments'}_appointments_${date}`,
+                      );
                     }}>
                     {t('download', 'Download')}
                   </Button>

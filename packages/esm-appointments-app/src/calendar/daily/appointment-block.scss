@@ -1,0 +1,69 @@
+.block {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  border-left: 4px solid;
+  border-radius: 3px;
+  padding: 6px 10px;
+  overflow: hidden;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: inherit;
+
+  &:hover {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cds-focus);
+    outline-offset: -2px;
+  }
+}
+
+.oneLine {
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.oneLineText {
+  display: block;
+  width: 100%;
+  font-size: 12px;
+  color: #525252;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  strong {
+    font-weight: 600;
+    color: #161616;
+  }
+}
+
+.patient {
+  display: block;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: #161616;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: block;
+  width: 100%;
+  font-size: 11px;
+  color: #525252;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
