@@ -43,6 +43,10 @@ export type ErrorObject = {
   };
 };
 
+interface PatientListMemberBundle {
+  entry: Array<{ resource: PatientListMember }>;
+}
+
 export const cohortUrl = `${restBaseUrl}/cohortm`;
 
 async function postData(url: string, data = {}, ac = new AbortController()) {
@@ -93,8 +97,8 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
 
 export async function getAllPatientLists(
   filter: PatientListFilter = {},
-  myListCohortTypeUUID,
-  systemListCohortTypeUUID,
+  myListCohortTypeUUID: string,
+  systemListCohortTypeUUID: string,
   ac = new AbortController(),
 ) {
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
@@ -174,12 +178,12 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
   const currentDate = new Date();
   const searchQuery = results.map((p) => p.patient.uuid).join(',');
 
-  const result = await openmrsFetch(`${fhirBaseUrl}/Patient/_search?_id=${searchQuery}`, {
+  const result = await openmrsFetch<PatientListMemberBundle>(`${fhirBaseUrl}/Patient/_search?_id=${searchQuery}`, {
     method: 'POST',
     signal: ac.signal,
   });
 
-  const patients: Array<PatientListMember> = result.data.entry.map((e) => e.resource);
+  const patients: Array<PatientListMember> = result.data.entry.map((entry) => entry.resource);
   const validPatients = patients.filter((patient) => {
     if (!patient.endDate) {
       return true;

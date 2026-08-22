@@ -14,12 +14,13 @@ import {
   type CohortType,
   type OpenmrsCohort,
   type OpenmrsCohortMember,
+  type PatientList,
   type PatientListFilter,
   PatientListType,
 } from './types';
 
 interface PatientListResponse {
-  results: CohortResponse<OpenmrsCohort>;
+  results: Array<OpenmrsCohort>;
   links: Array<{ rel: 'prev' | 'next' }>;
   totalCount: number;
 }
@@ -40,7 +41,7 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
 
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-  const getUrl = (pageIndex, previousPageData: FetchResponse<PatientListResponse>) => {
+  const getUrl = (pageIndex: number, previousPageData: FetchResponse<PatientListResponse>): string | null => {
     if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
       return null;
     }
@@ -70,14 +71,16 @@ export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData = (data?.flatMap((res) => res?.data?.results ?? []) ?? []).map((cohort) => ({
-    id: cohort.uuid,
-    display: cohort.name,
-    description: cohort.description,
-    type: cohort.cohortType?.display,
-    size: cohort.size,
-    location: cohort.location,
-  }));
+  const patientListsData: Array<PatientList> = (data?.flatMap((res) => res?.data?.results ?? []) ?? []).map(
+    (cohort) => ({
+      id: cohort.uuid,
+      display: cohort.name,
+      description: cohort.description,
+      type: cohort.cohortType?.display,
+      size: cohort.size,
+      location: cohort.location,
+    }),
+  );
   const { user } = useSession();
 
   return {

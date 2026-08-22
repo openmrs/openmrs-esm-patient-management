@@ -34,6 +34,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
+import { type PatientListPatient } from '../api/types';
 import styles from './list-details-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -140,13 +141,13 @@ interface ListDetailsTableProps {
   pagination: {
     usePagination: boolean;
     currentPage: number;
-    onChange(props: any): any;
+    onChange(props: { page: number; pageSize: number }): void;
     pageSize: number;
     totalItems: number;
     pagesUnknown?: boolean;
     lastPage?: boolean;
   };
-  patients;
+  patients: Array<PatientListPatient>;
   cohortUuid: string;
   style?: CSSProperties;
 }
@@ -154,9 +155,9 @@ interface ListDetailsTableProps {
 interface PatientTableColumn {
   key: string;
   header: string;
-  getValue?(patient: any): any;
+  getValue?(patient: PatientListPatient): string;
   link?: {
-    getUrl(patient: any): string;
+    getUrl(patient: PatientListPatient): string;
   };
 }
 
@@ -188,7 +189,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     return debouncedSearchTerm
       ? fuzzy
           .filter(debouncedSearchTerm, patients, {
-            extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
+            extract: (patient: PatientListPatient) => `${patient.name} ${patient.identifier} ${patient.sex}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
           .map((result) => result.original)
@@ -246,7 +247,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   );
 
   const handleLaunchRemovePatientFromListModal = useCallback(
-    async (currentPatient) => {
+    async (currentPatient: PatientListPatient) => {
       const dispose = showModal('remove-patient-from-list-modal', {
         patientName: currentPatient.name,
         membershipUuid: currentPatient.membershipUuid,
@@ -258,7 +259,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   );
 
   const handleAddPatientToList = useCallback(
-    async (patient) => {
+    async (patient: string) => {
       const alreadyInList = patients.some((p) => patient === p.uuid);
 
       if (alreadyInList) {

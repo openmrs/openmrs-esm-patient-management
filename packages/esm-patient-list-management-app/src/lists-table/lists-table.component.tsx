@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  type DataTableSortState,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
@@ -44,6 +45,14 @@ import styles from './lists-table.scss';
 interface DataTableHeader {
   key: string;
   header: React.ReactNode;
+}
+
+interface SortRowParams {
+  key: string;
+  sortDirection: DataTableSortState;
+  sortStates: Record<DataTableSortState, DataTableSortState>;
+  locale: string;
+  compare: (a: string | number, b: string | number, locale?: string) => number;
 }
 
 interface PatientListTableProps {
@@ -116,7 +125,11 @@ const ListsTable: React.FC<PatientListTableProps> = ({
     return patientLists.filter((list) => list.location?.uuid === selectedLocation);
   }, [patientLists, selectedLocation]);
 
-  function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
+  function customSortRow(
+    listA: string | number,
+    listB: string | number,
+    { sortDirection, sortStates, ...props }: SortRowParams,
+  ) {
     const { key } = props;
     setSortParams({ key, order: sortDirection });
     return 0; // Return value is not used, actual sorting happens in useMemo
@@ -288,7 +301,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 interface PatientListStarIconProps {
   cohortUuid: string;
   isStarred: boolean;
-  toggleStarredList: (cohortUuid: string, starList) => void;
+  toggleStarredList: (cohortUuid: string, starList: boolean) => void;
   t: TFunction;
 }
 
@@ -312,8 +325,8 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
 
 function useStarredLists() {
   const { t } = useTranslation();
-  const [starredLists, setStarredLists] = useState([]);
-  const [starhandleTimeout, setStarHandleTimeout] = useState(null);
+  const [starredLists, setStarredLists] = useState<Array<string>>([]);
+  const [starhandleTimeout, setStarHandleTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const { user: currentUser } = useSession();
 
   const setInitialStarredLists = useCallback(() => {
@@ -346,7 +359,7 @@ function useStarredLists() {
    * @param starPatientList
    */
   const toggleStarredList = useCallback(
-    (cohortUuid, starPatientList) => {
+    (cohortUuid: string, starPatientList: boolean) => {
       const newStarredLists = starPatientList
         ? [...starredLists, cohortUuid]
         : starredLists.filter((uuid) => uuid !== cohortUuid);
