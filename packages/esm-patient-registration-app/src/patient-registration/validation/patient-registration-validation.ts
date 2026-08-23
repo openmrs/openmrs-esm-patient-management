@@ -64,7 +64,7 @@ export function getValidationSchema(
         function (value) {
           const { birthdate } = this.parent;
           if (birthdate && value) {
-            return dayjs(value).isAfter(birthdate);
+            return !dayjs(value).isBefore(birthdate, 'day');
           }
           return true;
         },
