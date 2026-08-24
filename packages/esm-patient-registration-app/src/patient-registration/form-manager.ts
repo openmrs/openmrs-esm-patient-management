@@ -334,7 +334,7 @@ export class FormManager {
         gender: values.gender.charAt(0).toUpperCase(),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(isNewPatient, values, patientUuidMap),
+        attributes: FormManager.getPatientAttributes(values),
         addresses: [values.address],
         ...FormManager.getPatientDeathInfo(values, config),
       },
@@ -366,7 +366,7 @@ export class FormManager {
     return names;
   }
 
-  static getPatientAttributes(isNewPatient: boolean, values: FormValues, patientUuidMap: PatientUuidMapType) {
+  static getPatientAttributes(values: FormValues) {
     const attributes: Array<AttributeValue> = [];
     if (values.attributes) {
       Object.entries(values.attributes)
