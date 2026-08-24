@@ -113,8 +113,9 @@ export type Patient = {
     attributes: Array<AttributeValue>;
     addresses: Array<Record<string, string>>;
     dead: boolean;
-    deathDate?: string;
-    causeOfDeath?: string;
+    deathDate?: string | null;
+    causeOfDeath?: string | null;
+    causeOfDeathNonCoded?: string | null;
   };
 };
 
