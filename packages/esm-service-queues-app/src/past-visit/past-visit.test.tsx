@@ -22,6 +22,7 @@ describe('PastVisit', () => {
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: vi.fn(),
     });
 
     renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
@@ -41,6 +42,7 @@ describe('PastVisit', () => {
       error: null,
       isLoading: true,
       isValidating: false,
+      mutate: vi.fn(),
     });
 
     renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
@@ -54,6 +56,7 @@ describe('PastVisit', () => {
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: vi.fn(),
     });
 
     renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
