@@ -39,6 +39,22 @@ import { type RegistrationConfig } from '../config-schema';
 
 type AddressFieldValues = Partial<Record<AddressProperties, string>>;
 
+function getSettledValuesOrThrow<T>(results: Array<PromiseSettledResult<T>>): Array<T> {
+  const rejectedResult = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
+
+  if (rejectedResult) {
+    throw rejectedResult.reason;
+  }
+
+  return results.map((result) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    }
+
+    throw result.reason;
+  });
+}
+
 export type SavePatientForm = (
   isNewPatient: boolean,
   values: FormValues,
@@ -114,6 +130,15 @@ export class FormManager {
       currentLocation,
     );
 
+    getSettledValuesOrThrow(
+      await Promise.allSettled([
+        ...FormManager.getDeletedNames(values, patientUuidMap).map((name) =>
+          deletePersonName(name.nameUuid, name.personUuid),
+        ),
+        FormManager.deletePatientAttributes(isNewPatient, values, patientUuidMap),
+      ]),
+    );
+
     const createdPatient = FormManager.getPatientToCreate(
       isNewPatient,
       values,
@@ -122,10 +147,6 @@ export class FormManager {
       patientIdentifiers,
       config,
     );
-
-    FormManager.getDeletedNames(values, patientUuidMap).forEach(async (name) => {
-      await deletePersonName(name.nameUuid, name.personUuid);
-    });
 
     const savePatientResponse = await savePatient(
       createdPatient,
@@ -279,15 +300,22 @@ export class FormManager {
       to delete the respective identifiers.
     */
 
-    if (patientUuid) {
-      Object.keys(initialIdentifierValues)
-        .filter((identifierFieldName) => !patientIdentifiers[identifierFieldName])
-        .forEach(async (identifierFieldName) => {
-          await deletePatientIdentifier(patientUuid, initialIdentifierValues[identifierFieldName].identifierUuid);
-        });
-    }
+    const identifierDeletionRequests = patientUuid
+      ? Object.keys(initialIdentifierValues)
+          .filter((identifierFieldName) => !patientIdentifiers[identifierFieldName])
+          .map((identifierFieldName) =>
+            deletePatientIdentifier(patientUuid, initialIdentifierValues[identifierFieldName].identifierUuid),
+          )
+      : [];
 
-    return Promise.all(identifierTypeRequests);
+    const [identifierResults, identifierDeletionResults] = await Promise.all([
+      Promise.allSettled(identifierTypeRequests),
+      Promise.allSettled(identifierDeletionRequests),
+    ]);
+
+    const identifiers = getSettledValuesOrThrow(identifierResults);
+    getSettledValuesOrThrow(identifierDeletionResults);
+    return identifiers;
   }
 
   static getDeletedNames(values: FormValues, patientUuidMap: PatientUuidMapType) {
@@ -327,7 +355,7 @@ export class FormManager {
         gender: values.gender.charAt(0).toUpperCase(),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(isNewPatient, values, patientUuidMap),
+        attributes: FormManager.getPatientAttributes(values),
         addresses: [values.address],
         ...FormManager.getPatientDeathInfo(values, config),
       },
@@ -359,7 +387,7 @@ export class FormManager {
     return names;
   }
 
-  static getPatientAttributes(isNewPatient: boolean, values: FormValues, patientUuidMap: PatientUuidMapType) {
+  static getPatientAttributes(values: FormValues) {
     const attributes: Array<AttributeValue> = [];
     if (values.attributes) {
       Object.entries(values.attributes)
@@ -370,22 +398,29 @@ export class FormManager {
             value,
           });
         });
-
-      if (!isNewPatient && values.patientUuid) {
-        Object.entries(values.attributes)
-          .filter(([, value]) => !value)
-          .forEach(async ([key]) => {
-            const attributeUuid = patientUuidMap[`attribute.${key}`];
-            await openmrsFetch(`${restBaseUrl}/person/${values.patientUuid}/attribute/${attributeUuid}`, {
-              method: 'DELETE',
-            }).catch((err) => {
-              console.error(err);
-            });
-          });
-      }
     }
 
     return attributes;
+  }
+
+  static async deletePatientAttributes(isNewPatient: boolean, values: FormValues, patientUuidMap: PatientUuidMapType) {
+    if (isNewPatient || !values.patientUuid || !values.attributes) {
+      return;
+    }
+
+    getSettledValuesOrThrow(
+      await Promise.allSettled(
+        Object.entries(values.attributes)
+          .filter(([, value]) => !value)
+          .map(([key]) => patientUuidMap[`attribute.${key}`])
+          .filter(Boolean)
+          .map((attributeUuid) =>
+            openmrsFetch(`${restBaseUrl}/person/${values.patientUuid}/attribute/${attributeUuid}`, {
+              method: 'DELETE',
+            }),
+          ),
+      ),
+    );
   }
 
   static getPatientDeathInfo(values: FormValues, config?: RegistrationConfig) {
