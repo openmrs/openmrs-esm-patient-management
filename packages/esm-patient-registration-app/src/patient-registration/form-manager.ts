@@ -394,6 +394,9 @@ export class FormManager {
     if (!isDead) {
       return {
         dead: false,
+        deathDate: null,
+        causeOfDeath: null,
+        causeOfDeathNonCoded: null,
       };
     }
     const dateTimeOfDeath = toOmrsIsoString(getDatetime(deathDate, deathTime, deathTimeFormat));
