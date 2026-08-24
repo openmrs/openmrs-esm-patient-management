@@ -4,6 +4,7 @@ import { type FetchResponse, openmrsFetch, type Session } from '@openmrs/esm-fra
 import { type RegistrationConfig } from '../config-schema';
 import { type FormValues, type PatientUuidMapType } from './patient-registration.types';
 import {
+  addPatientIdentifier,
   deletePatientIdentifier,
   deletePersonName,
   generateIdentifier,
@@ -12,12 +13,14 @@ import {
 
 vi.mock('./patient-registration.resource', async () => ({
   ...((await vi.importActual('./patient-registration.resource')) as object),
+  addPatientIdentifier: vi.fn(),
   deletePatientIdentifier: vi.fn(),
   deletePersonName: vi.fn(),
   generateIdentifier: vi.fn(),
   savePatient: vi.fn(),
 }));
 
+const mockAddPatientIdentifier = vi.mocked(addPatientIdentifier);
 const mockDeletePatientIdentifier = vi.mocked(deletePatientIdentifier);
 const mockDeletePersonName = vi.mocked(deletePersonName);
 const mockGenerateIdentifier = vi.mocked(generateIdentifier);
@@ -88,6 +91,7 @@ describe('FormManager', () => {
   const savedPatientResponse = { data: { uuid: 'patient-uuid' }, ok: true } as FetchResponse;
 
   beforeEach(() => {
+    mockAddPatientIdentifier.mockReset().mockResolvedValue(successfulResponse);
     mockDeletePatientIdentifier.mockReset().mockResolvedValue(successfulResponse);
     mockDeletePersonName.mockReset().mockResolvedValue(successfulResponse);
     mockOpenmrsFetch.mockReset().mockResolvedValue(successfulResponse);
@@ -380,6 +384,116 @@ describe('FormManager', () => {
       await expect(saveExistingPatient({ attributes: { 'attribute-type-uuid': '' } }, patientUuidMap)).rejects.toBe(
         error,
       );
+      expect(mockSavePatient).not.toHaveBeenCalled();
+    });
+
+    it('waits for attribute deletion to settle before rejecting a name deletion failure', async () => {
+      const error = new Error('Name deletion failed');
+      const attributeDeletion = createDeferred<FetchResponse>();
+      mockDeletePersonName.mockRejectedValue(error);
+      mockOpenmrsFetch.mockReturnValue(attributeDeletion.promise);
+      const patientUuidMap = {
+        additionalNameUuid: 'additional-name-uuid',
+        'attribute.attribute-type-uuid': 'attribute-uuid',
+      } as PatientUuidMapType;
+
+      const savePromise = saveExistingPatient({ attributes: { 'attribute-type-uuid': '' } }, patientUuidMap);
+      let saveSettled = false;
+      void savePromise.then(
+        () => {
+          saveSettled = true;
+        },
+        () => {
+          saveSettled = true;
+        },
+      );
+
+      await vi.waitFor(() => {
+        expect(mockDeletePersonName).toHaveBeenCalled();
+        expect(mockOpenmrsFetch).toHaveBeenCalled();
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(saveSettled).toBe(false);
+      expect(mockSavePatient).not.toHaveBeenCalled();
+
+      attributeDeletion.resolve(successfulResponse);
+      await expect(savePromise).rejects.toBe(error);
+      expect(mockSavePatient).not.toHaveBeenCalled();
+    });
+
+    it('waits for every attribute deletion to settle before rejecting', async () => {
+      const error = new Error('Attribute deletion failed');
+      const pendingDeletion = createDeferred<FetchResponse>();
+      mockOpenmrsFetch.mockRejectedValueOnce(error).mockReturnValueOnce(pendingDeletion.promise);
+      const patientUuidMap = {
+        'attribute.first-attribute-type-uuid': 'first-attribute-uuid',
+        'attribute.second-attribute-type-uuid': 'second-attribute-uuid',
+      } as PatientUuidMapType;
+
+      const savePromise = saveExistingPatient(
+        { attributes: { 'first-attribute-type-uuid': '', 'second-attribute-type-uuid': '' } },
+        patientUuidMap,
+      );
+      let saveSettled = false;
+      void savePromise.then(
+        () => {
+          saveSettled = true;
+        },
+        () => {
+          saveSettled = true;
+        },
+      );
+
+      await vi.waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(saveSettled).toBe(false);
+      expect(mockSavePatient).not.toHaveBeenCalled();
+
+      pendingDeletion.resolve(successfulResponse);
+      await expect(savePromise).rejects.toBe(error);
+      expect(mockSavePatient).not.toHaveBeenCalled();
+    });
+
+    it('waits for identifier writes to settle before rejecting a deletion failure', async () => {
+      const error = new Error('Identifier deletion failed');
+      const identifierCreation = createDeferred<FetchResponse>();
+      mockAddPatientIdentifier.mockReturnValue(identifierCreation.promise);
+      mockDeletePatientIdentifier.mockRejectedValue(error);
+      const newIdentifier = {
+        ...formValues.identifiers.foo,
+        identifierUuid: '',
+        initialValue: '',
+        identifierValue: 'new-identifier',
+        autoGeneration: false,
+      };
+      const removedIdentifier = {
+        ...formValues.identifiers.foo,
+        identifierUuid: 'removed-identifier-uuid',
+        initialValue: 'removed-identifier',
+        identifierValue: 'removed-identifier',
+      };
+
+      const savePromise = saveExistingPatient({ identifiers: { newIdentifier } }, {}, { removedIdentifier });
+      let saveSettled = false;
+      void savePromise.then(
+        () => {
+          saveSettled = true;
+        },
+        () => {
+          saveSettled = true;
+        },
+      );
+
+      await vi.waitFor(() => {
+        expect(mockAddPatientIdentifier).toHaveBeenCalled();
+        expect(mockDeletePatientIdentifier).toHaveBeenCalled();
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(saveSettled).toBe(false);
+      expect(mockSavePatient).not.toHaveBeenCalled();
+
+      identifierCreation.resolve(successfulResponse);
+      await expect(savePromise).rejects.toBe(error);
       expect(mockSavePatient).not.toHaveBeenCalled();
     });
   });
