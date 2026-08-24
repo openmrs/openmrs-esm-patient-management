@@ -123,7 +123,7 @@ export class FormManager {
       config,
     );
 
-    FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
+    FormManager.getDeletedNames(values, patientUuidMap).forEach(async (name) => {
       await deletePersonName(name.nameUuid, name.personUuid);
     });
 
@@ -290,12 +290,12 @@ export class FormManager {
     return Promise.all(identifierTypeRequests);
   }
 
-  static getDeletedNames(patientUuid: string, patientUuidMap: PatientUuidMapType) {
-    if (patientUuidMap?.additionalNameUuid) {
+  static getDeletedNames(values: FormValues, patientUuidMap: PatientUuidMapType) {
+    if (patientUuidMap?.additionalNameUuid && !values.addNameInLocalLanguage) {
       return [
         {
           nameUuid: patientUuidMap.additionalNameUuid,
-          personUuid: patientUuid,
+          personUuid: values.patientUuid,
         },
       ];
     }
@@ -394,6 +394,9 @@ export class FormManager {
     if (!isDead) {
       return {
         dead: false,
+        deathDate: null,
+        causeOfDeath: null,
+        causeOfDeathNonCoded: null,
       };
     }
     const dateTimeOfDeath = toOmrsIsoString(getDatetime(deathDate, deathTime, deathTimeFormat));
