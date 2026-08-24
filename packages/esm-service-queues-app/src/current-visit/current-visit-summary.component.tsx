@@ -113,6 +113,9 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
             visit,
             patientUuid,
             onEditEncounter: getEditEncounterHandler({ patient, patientUuid, visit, mutateVisit: mutate }),
+            // Deleting an encounter opens a modal rather than a workspace, so the workspace subscription
+            // above never fires for it and the extension has to revalidate us directly.
+            mutateVisitContext: mutate,
           }}
         />
       </div>

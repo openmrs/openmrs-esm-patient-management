@@ -43,6 +43,7 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid, currentVisitUuid }) 
             visit: visits,
             patientUuid,
             onEditEncounter: getEditEncounterHandler({ patient, patientUuid, visit: visits, mutateVisit: mutate }),
+            mutateVisitContext: mutate,
           }}
         />
       </div>
