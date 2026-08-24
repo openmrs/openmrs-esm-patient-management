@@ -28,13 +28,14 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid, currentVisitUuid }) 
   }
 
   if (visits) {
+    // `formatDatetime` throws a RangeError on an invalid date, so check before formatting.
+    const startDate = visits.startDatetime ? parseDate(visits.startDatetime) : null;
+
     return (
       <div className={styles.container}>
         <div className={styles.header}>
           <h4 className={styles.visitType}>{visits?.visitType?.display}</h4>
-          <p className={styles.date}>
-            {visits?.startDatetime ? formatDatetime(parseDate(visits.startDatetime)) : '--'}
-          </p>
+          <p className={styles.date}>{startDate && !isNaN(startDate.getTime()) ? formatDatetime(startDate) : '--'}</p>
         </div>
         <ExtensionSlot
           name={visitSummarySlot}

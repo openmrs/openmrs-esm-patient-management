@@ -26,6 +26,11 @@ interface EditEncounterContext {
  */
 export function getEditEncounterHandler({ patient, patientUuid, visit, mutateVisit }: EditEncounterContext) {
   return (encounter: EditableEncounter, isVisitNote: boolean) => {
+    // Both workspaces need the patient, and a click can land before `usePatient` resolves.
+    if (!patient) {
+      return;
+    }
+
     if (isVisitNote) {
       launchWorkspace2(serviceQueuesVisitNotesWorkspace, {
         encounter,

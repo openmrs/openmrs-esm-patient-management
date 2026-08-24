@@ -68,4 +68,13 @@ describe('usePastVisits', () => {
 
     await waitFor(() => expect(result.current.visits?.uuid).toBe('past'));
   });
+
+  it("returns nothing when the only visits are today's or the current one", async () => {
+    mockVisits({ uuid: 'today', startDatetime: today }, { uuid: 'current', startDatetime: yesterday });
+
+    const { result } = renderHook(() => usePastVisits(patientUuid, 'current'), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.visits).toBeUndefined();
+  });
 });

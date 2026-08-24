@@ -218,7 +218,9 @@
     },
     {
       "name": "service-queues-patient-form-entry",
-      "group": "service-queues-patient-context"
+      "group": "service-queues-patient-context",
+      "width": "extra-wide",
+      "canMaximize": true
     }
   ],
   "workspaceGroups2": [
