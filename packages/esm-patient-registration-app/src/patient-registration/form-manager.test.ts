@@ -325,6 +325,7 @@ describe('FormManager', () => {
       const savePromise = saveExistingPatient({}, {}, { foo: formValues.identifiers.foo });
 
       await vi.waitFor(() => expect(mockDeletePatientIdentifier).toHaveBeenCalled());
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(mockSavePatient).not.toHaveBeenCalled();
 
       deletion.resolve(successfulResponse);
