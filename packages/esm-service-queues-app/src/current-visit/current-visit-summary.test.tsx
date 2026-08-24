@@ -110,7 +110,7 @@ describe('CurrentVisit', () => {
     });
   });
 
-  it('disables the visit note form button until the patient has loaded', async () => {
+  it('defers the vitals extension and visit note form until the patient has loaded', async () => {
     mockUsePatient.mockReturnValue({
       patient: null,
       patientUuid,
@@ -121,6 +121,10 @@ describe('CurrentVisit', () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
     expect(screen.getByRole('button', { name: /visit note form/i })).toBeDisabled();
+    // The vitals extension reads `patient` during render, so mounting it early throws into its
+    // error boundary. The visit summary only needs the visit, so it still mounts.
+    expect(getSlotState(vitalsSlotName)).toBeUndefined();
+    expect(getSlotState(visitSummarySlotName)).toMatchObject({ visit, patientUuid });
   });
 
   it('renders a loading skeleton when fetching data', async () => {

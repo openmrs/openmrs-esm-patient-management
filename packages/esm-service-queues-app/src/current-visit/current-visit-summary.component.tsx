@@ -106,7 +106,8 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
         </Button>
       </div>
       <div className={styles.visitContainer}>
-        <ExtensionSlot name={vitalsInfoSlot} state={vitalsSlotState} />
+        {/* The vitals extension reads `patient` during render, before its own loading fallback. */}
+        {patient && <ExtensionSlot name={vitalsInfoSlot} state={vitalsSlotState} />}
         <ExtensionSlot
           name={visitSummarySlot}
           state={{
