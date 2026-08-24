@@ -191,4 +191,49 @@ describe('FormManager', () => {
       });
     });
   });
+
+  describe('getDeletedNames', () => {
+    const patientUuid = 'patient-uuid';
+    const patientUuidMap = { additionalNameUuid: 'additional-name-uuid' };
+
+    it('does not delete the local-language name when the option is still enabled', () => {
+      const values: FormValues = { ...formValues, patientUuid, addNameInLocalLanguage: true };
+
+      expect(FormManager.getDeletedNames(values, patientUuidMap)).toEqual([]);
+    });
+
+    it('deletes the local-language name when the option has been disabled', () => {
+      const values: FormValues = { ...formValues, patientUuid, addNameInLocalLanguage: false };
+
+      expect(FormManager.getDeletedNames(values, patientUuidMap)).toEqual([
+        { nameUuid: 'additional-name-uuid', personUuid: patientUuid },
+      ]);
+    });
+
+    it('updates the local-language name rather than deleting it when it is edited', () => {
+      const values: FormValues = {
+        ...formValues,
+        patientUuid,
+        addNameInLocalLanguage: true,
+        additionalGivenName: 'Wanjiru',
+        additionalMiddleName: '',
+        additionalFamilyName: 'Kamau',
+      };
+
+      expect(FormManager.getDeletedNames(values, patientUuidMap)).toEqual([]);
+      expect(FormManager.getNames(values, patientUuidMap)).toContainEqual({
+        uuid: 'additional-name-uuid',
+        preferred: false,
+        givenName: 'Wanjiru',
+        middleName: '',
+        familyName: 'Kamau',
+      });
+    });
+
+    it('returns no deletions when the patient has no local-language name', () => {
+      const values: FormValues = { ...formValues, patientUuid, addNameInLocalLanguage: false };
+
+      expect(FormManager.getDeletedNames(values, {})).toEqual([]);
+    });
+  });
 });
