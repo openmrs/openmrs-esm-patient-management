@@ -59,7 +59,7 @@ export function getValidationSchema(
       })
       .max(new Date(), t('deathDateInFuture', 'Death date cannot be in future'))
       .test(
-        'deathDate-after-birthdate',
+        'deathDate-not-before-birthdate',
         t('deathdayBeforeBirthday', 'Death date and time cannot be before the birthday'),
         function (value) {
           const { birthdate } = this.parent;
