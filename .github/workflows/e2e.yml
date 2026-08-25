@@ -51,10 +51,6 @@ jobs:
       - name: ⏳ Wait for OpenMRS instance to start
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8080/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
-      # The seeded image reports zero rows for every table, so the ~44-table queue entry join takes minutes
-      - name: 📊 Repair database statistics
-        run: docker exec $(docker ps -q --filter ancestor=openmrs/openmrs-reference-application-3-db:nightly-with-data) mysqlcheck -uroot -popenmrs --analyze --databases openmrs
-
       - name: 🧪 Run E2E tests
         run: yarn playwright test
 
