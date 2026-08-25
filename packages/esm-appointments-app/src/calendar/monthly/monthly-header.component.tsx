@@ -15,7 +15,7 @@ const MonthlyHeader: React.FC<MonthlyHeaderProps> = () => {
     <div className={styles.workLoadCard}>
       {dayNames.map((label, i) => (
         <div key={i} className={styles.dowCell}>
-          {label}
+          {label.toUpperCase()}
         </div>
       ))}
     </div>
