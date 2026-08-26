@@ -9,6 +9,7 @@ import type {
   BedTagPayload,
   BedType,
   BedTypePayload,
+  BedWithLocation,
   LocationFetchResponse,
   MappedBedData,
 } from '../types';
@@ -47,7 +48,7 @@ export const useBedsForLocation = (locationUuid: string) => {
 
   const mappedBedData: MappedBedData = (data?.data?.results ?? []).map((bed) => ({
     id: bed.id,
-    type: bed.bedType?.displayName,
+    type: bed.bedType?.displayName ?? '',
     number: bed.bedNumber,
     status: bed.status,
     uuid: bed.uuid,
@@ -88,7 +89,7 @@ export function useBedsGroupedByLocation() {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(true);
-  const [result, setResult] = useState([]);
+  const [result, setResult] = useState<Array<Array<BedWithLocation>>>([]);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -108,7 +109,8 @@ export function useBedsGroupedByLocation() {
           return null;
         });
 
-        const updatedWards = (await Promise.all(promises)).filter(Boolean);
+        const updatedWards = (await Promise.all(promises)).filter((ward): ward is BedWithLocation[] => ward !== null);
+
         if (isSubscribed) {
           setResult(updatedWards);
         }
