@@ -40,6 +40,9 @@ function QueueTableSection() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const searchCriteria = useMemo(() => {
+    if (!selectedQueueLocationUuid) {
+      return null;
+    }
     return {
       service: selectedServiceUuid,
       location: selectedQueueLocationUuid,
