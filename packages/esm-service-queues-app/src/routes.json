@@ -113,10 +113,6 @@
       "component": "addProviderToRoomModal"
     },
     {
-      "name": "clear-all-queue-entries-modal",
-      "component": "clearAllQueueEntriesModal"
-    },
-    {
       "name": "edit-queue-entry-modal",
       "component": "editQueueEntryModal"
     },
