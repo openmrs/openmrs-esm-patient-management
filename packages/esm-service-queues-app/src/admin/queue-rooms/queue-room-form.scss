@@ -54,3 +54,30 @@ $overlay-header-height: 5.5rem;
   padding: 0;
   margin-top: layout.$spacing-05;
 }
+
+@media (max-width: 600px) {
+  .tablet,
+  .desktop {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    width: 100% !important;
+    padding: layout.$spacing-05 !important;
+  }
+
+  .button {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+
+    padding: 0.75rem 1rem !important;
+  }
+
+  .button:last-child {
+    margin-bottom: 0.5rem !important;
+  }
+}
