@@ -6,7 +6,6 @@ import { useServiceQueuesStore } from '../store/store';
 import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import AddPatientToQueueButton from './components/add-patient-to-queue-button.component';
-import ClearQueueEntries from '../modals/clear-queue-entries-modal/clear-queue-entries.component';
 import QueueTable from './queue-table.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import { type ConfigObject } from '../config-schema';
@@ -109,7 +108,6 @@ function QueueTableSection() {
         statusUuid={null}
         tableFilters={
           <>
-            {filteredQueueEntries?.length > 0 && <ClearQueueEntries queueEntries={filteredQueueEntries} />}
             <AddPatientToQueueButton />
             <TableToolbarSearch
               className={styles.search}
