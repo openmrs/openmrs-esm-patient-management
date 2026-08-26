@@ -1,8 +1,8 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type MockInstance } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showModal, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockQueueEntryAlice, mockStatusWaiting } from '__mocks__';
 import {
   configSchema,
@@ -10,23 +10,48 @@ import {
   type ConfigObject,
   type ConfigurableQueueEntryAction,
 } from '../../config-schema';
+import { type QueueEntry } from '../../types';
+import { serveQueueEntry } from '../../service-queues.resource';
 import { queueTableActionColumn } from './queue-table-action-cell.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockShowModal = vi.mocked(showModal);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockServeQueueEntry = vi.mocked(serveQueueEntry);
 const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 
+// The UUID of the visit attribute type carrying Alice's ticket number, see `mockQueueEntryAlice`.
+const visitQueueNumberAttributeUuid = 'queue-number-visit-attr-type-uuid';
+
+// Alice is "In Service" by default, so the `call` action is hidden for her; this is the same entry
+// waiting to be called, which is the only state in which the Call action is offered.
+const mockWaitingQueueEntry: QueueEntry = { ...mockQueueEntryAlice, status: mockStatusWaiting };
+
+const missingConfigurationMessage =
+  'Calling patients is not set up for this queue. Ask your system administrator to check the service queues configuration.';
+
+const { mockMutateQueueEntries } = vi.hoisted(() => ({ mockMutateQueueEntries: vi.fn() }));
+
 vi.mock('../../hooks/useQueueEntries', () => ({
-  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: mockMutateQueueEntries }),
+}));
+
+vi.mock('../../service-queues.resource', async () => ({
+  ...((await vi.importActual('../../service-queues.resource')) as object),
+  serveQueueEntry: vi.fn(),
 }));
 
 // Alice is "In Service", so the `call` action is hidden for her and the cell falls back to promoting
 // the first visible overflow menu action to an inline button.
-function renderActionCell(actions: {
-  buttons: ConfigurableQueueEntryAction[];
-  overflowMenu: ConfigurableQueueEntryAction[];
-}) {
+function renderActionCell(
+  actions: {
+    buttons: ConfigurableQueueEntryAction[];
+    overflowMenu: ConfigurableQueueEntryAction[];
+  },
+  queueEntry: QueueEntry = mockQueueEntryAlice,
+) {
   const { CellComponent } = queueTableActionColumn('actions', 'Actions', { actions } as ActionsColumnConfig);
-  render(<CellComponent queueEntry={mockQueueEntryAlice} />);
+  render(<CellComponent queueEntry={queueEntry} />);
 }
 
 async function openOverflowMenu() {
@@ -38,14 +63,17 @@ async function openOverflowMenu() {
 
 describe('queueTableActionColumn', () => {
   let warnSpy: MockInstance;
+  let errorSpy: MockInstance;
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...configDefaults,
       concepts: { ...configDefaults.concepts, defaultStatusConceptUuid: mockStatusWaiting.uuid },
+      visitQueueNumberAttributeUuid,
     } as ConfigObject);
+    mockServeQueueEntry.mockResolvedValue({ ok: true, status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('treats the deprecated "transition" action as "move"', async () => {
@@ -79,5 +107,334 @@ describe('queueTableActionColumn', () => {
     renderActionCell({ buttons: ['call'], overflowMenu: ['bogus' as ConfigurableQueueEntryAction, 'edit'] });
 
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+  });
+
+  describe('the Call action', () => {
+    it('opens the call modal once the patient has been called', async () => {
+      const user = userEvent.setup();
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockServeQueueEntry).toHaveBeenCalledWith(mockWaitingQueueEntry.queue.name, '42', 'calling');
+      // The entry's status changed on the server, so the table has to be re-read before the modal
+      // opens on top of it.
+      expect(mockMutateQueueEntries).toHaveBeenCalled();
+      expect(mockShowModal).toHaveBeenCalledWith('call-queue-entry-modal', expect.objectContaining({ size: 'sm' }));
+      expect(mockShowSnackbar).not.toHaveBeenCalled();
+    });
+
+    // Without a rejection handler this leaves an unhandled promise rejection behind, which shows up
+    // as a full-screen error overlay in development builds and as nothing at all in production.
+    it('reports a failed call request in a snackbar instead of rejecting', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue(new Error('Failed to fetch'));
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          kind: 'error',
+          title: 'Error calling patient',
+          subtitle: 'Failed to fetch',
+        }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+      // The button is re-enabled, so the user can retry without reloading the page.
+      expect(screen.getByRole('button', { name: 'Call' })).toBeEnabled();
+    });
+
+    // `openmrsFetch` rejects on any non-2xx, so a server error reaches the action as a rejection
+    // carrying the server's own message in `responseBody`, not as a resolved non-ok response.
+    it('shows the message the server sent when the request fails', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue({
+        message: 'Server responded with 500 (Internal Server Error) for url /ws/rest/v1/queueutil/assignticket',
+        responseBody: { error: { message: 'Ticket display service is unavailable' } },
+      });
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Ticket display service is unavailable' }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    // A rejected promise carries whatever it was rejected with, and `getErrorMessage` reads a shape
+    // the REST API documents rather than one anything enforces. A non-string reaching the snackbar
+    // subtitle is a React render crash — the error handler failing the same way the action used to.
+    it('falls back to a generic message when the failure carries a message that is not text', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue({ message: { unexpectedlyNotAString: true } });
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'An unknown error occurred' }),
+      );
+    });
+
+    it('falls back to a generic message when the failure carries none', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue(new Error(''));
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'An unknown error occurred' }),
+      );
+    });
+
+    // `serveQueueEntry` resolves with no response at all while `openmrsFetch` is redirecting the
+    // browser after an authentication failure, which is the only way a non-ok response gets here.
+    it('reports a response without a result instead of opening the call modal', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockResolvedValue(undefined as Awaited<ReturnType<typeof serveQueueEntry>>);
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Unexpected Server Response' }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('does not send an incomplete request when the queue has no name', async () => {
+      const user = userEvent.setup();
+      const namelessQueueEntry: QueueEntry = {
+        ...mockWaitingQueueEntry,
+        queue: { ...mockWaitingQueueEntry.queue, name: '' },
+      };
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, namelessQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockServeQueueEntry).not.toHaveBeenCalled();
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: missingConfigurationMessage }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('does not send an incomplete request when the calling status is not configured', async () => {
+      const user = userEvent.setup();
+      mockUseConfig.mockReturnValue({
+        ...configDefaults,
+        callingStatus: '',
+        concepts: { ...configDefaults.concepts, defaultStatusConceptUuid: mockStatusWaiting.uuid },
+        visitQueueNumberAttributeUuid,
+      } as ConfigObject);
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockServeQueueEntry).not.toHaveBeenCalled();
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: missingConfigurationMessage }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('does not send an incomplete request when the ticket number is missing', async () => {
+      const user = userEvent.setup();
+      mockUseConfig.mockReturnValue({
+        ...configDefaults,
+        concepts: { ...configDefaults.concepts, defaultStatusConceptUuid: mockStatusWaiting.uuid },
+        visitQueueNumberAttributeUuid: 'an-attribute-type-this-visit-does-not-have',
+      } as ConfigObject);
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Call' }));
+
+      expect(mockServeQueueEntry).not.toHaveBeenCalled();
+      // The ticket number comes from the visit, not the configuration, so the message must not send
+      // a clerk who cannot change the configuration off to go and check it.
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          kind: 'error',
+          title: 'Error calling patient',
+          subtitle: "This patient's visit has no ticket number, so there is nothing for the queue screen to call.",
+        }),
+      );
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    // `disabled` takes the button out of the tab order the moment it is pressed, so the browser
+    // drops focus onto `document.body` while the request is still in flight. A keyboard user then
+    // has to tab back in from the top of the queue table — one row per waiting patient — to read
+    // the outcome or retry, which is the failure the visible error message is supposed to prevent.
+    it('keeps focus on the button, and keeps it in the tab order, while the request is in flight', async () => {
+      const user = userEvent.setup();
+      let resolveCall: (response: Awaited<ReturnType<typeof serveQueueEntry>>) => void;
+      mockServeQueueEntry.mockReturnValue(
+        new Promise<Awaited<ReturnType<typeof serveQueueEntry>>>((resolve) => {
+          resolveCall = resolve;
+        }),
+      );
+      renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockWaitingQueueEntry);
+
+      const callButton = screen.getByRole('button', { name: 'Call' });
+      await user.click(callButton);
+
+      expect(callButton).toHaveFocus();
+      // `toBeEnabled` reads the `disabled` attribute, which is what governs the tab order; the
+      // `aria-disabled` below is the part that only a screen reader sees.
+      expect(callButton).toBeEnabled();
+      expect(callButton).toHaveAttribute('aria-disabled', 'true');
+      expect(callButton).toHaveAttribute('aria-busy', 'true');
+
+      // The pending guard, not the attribute, is what discards the second click.
+      await user.click(callButton);
+      expect(mockServeQueueEntry).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        resolveCall({ ok: true, status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
+      });
+
+      expect(callButton).toHaveAttribute('aria-disabled', 'false');
+      expect(callButton).toHaveAttribute('aria-busy', 'false');
+    });
+
+    // Measured on a live queue table before this guard existed: two clicks 85ms apart on the
+    // overflow menu's Call item sent two `POST /queueutil/assignticket` requests for one intended
+    // call. The menu stays open on a real page, so the item is still there when the second click
+    // lands — happy-dom's copy of Carbon closes it instead, from the document-level outside-click
+    // handler, because it cannot measure the floating menu body and so cannot tell that the click
+    // was inside it. Holding the click at `<body>` keeps the item mounted the way a browser does:
+    // React 18 listens on the container that `render` mounts, which is below `<body>`, so the
+    // component still sees the click and Carbon's document listener does not.
+    function keepOverflowMenuOpen() {
+      const stopBeforeDocument = (event: Event) => event.stopPropagation();
+      document.body.addEventListener('click', stopBeforeDocument);
+      return () => document.body.removeEventListener('click', stopBeforeDocument);
+    }
+
+    it('sends one request when the overflow menu item is double-clicked', async () => {
+      const user = userEvent.setup();
+      let resolveCall: (response: Awaited<ReturnType<typeof serveQueueEntry>>) => void;
+      mockServeQueueEntry.mockReturnValue(
+        new Promise<Awaited<ReturnType<typeof serveQueueEntry>>>((resolve) => {
+          resolveCall = resolve;
+        }),
+      );
+      renderActionCell({ buttons: ['edit'], overflowMenu: ['call'] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Options' }));
+      // See `openOverflowMenu` above: Carbon's opened menu has no accessible name under happy-dom.
+      const callMenuItem = screen
+        .getAllByRole('menuitem', { hidden: true })
+        .find((item) => item.getAttribute('aria-label') === 'Call');
+      const releaseMenu = keepOverflowMenuOpen();
+
+      try {
+        await user.click(callMenuItem);
+        await user.click(callMenuItem);
+
+        expect(callMenuItem).toBeInTheDocument();
+        expect(mockServeQueueEntry).toHaveBeenCalledTimes(1);
+
+        // The guard is released once the request settles, so a deliberate second call still works.
+        // Without this the menu item would be dead for the rest of the page's life: the menu does
+        // not close on its own, so this item is not replaced by a fresh one.
+        await act(async () => {
+          resolveCall({ ok: true, status: 200 } as Awaited<ReturnType<typeof serveQueueEntry>>);
+        });
+        await user.click(callMenuItem);
+
+        expect(mockServeQueueEntry).toHaveBeenCalledTimes(2);
+      } finally {
+        releaseMenu();
+      }
+    });
+
+    it('reports a failed call request launched from the overflow menu', async () => {
+      const user = userEvent.setup();
+      mockServeQueueEntry.mockRejectedValue(new Error('Failed to fetch'));
+      renderActionCell({ buttons: ['edit'], overflowMenu: ['call'] }, mockWaitingQueueEntry);
+
+      await user.click(screen.getByRole('button', { name: 'Options' }));
+      // See `openOverflowMenu` above: Carbon's opened menu has no accessible name under happy-dom.
+      const callMenuItem = screen
+        .getAllByRole('menuitem', { hidden: true })
+        .find((item) => item.getAttribute('aria-label') === 'Call');
+      await user.click(callMenuItem);
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
+    });
+  });
+
+  // Every action is invoked from a DOM event handler, which discards the promise it returns, so an
+  // action that fails outside its own error handling would otherwise leave an unhandled rejection:
+  // a full-screen crash overlay in development builds, and a click that does nothing in production.
+  describe('the last-resort failure net', () => {
+    const expectedSnackbar = expect.objectContaining({
+      kind: 'error',
+      title: 'Action failed',
+      subtitle: 'modal registry unavailable',
+    });
+
+    it('reports an action that fails without handling it itself', async () => {
+      const user = userEvent.setup();
+      mockShowModal.mockImplementationOnce(() => {
+        throw new Error('modal registry unavailable');
+      });
+      renderActionCell({ buttons: ['edit'], overflowMenu: [] });
+
+      await user.click(screen.getByRole('button', { name: 'Edit' }));
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(expectedSnackbar);
+    });
+
+    it('reports an action that fails without handling it itself, launched from the overflow menu', async () => {
+      const user = userEvent.setup();
+      mockShowModal.mockImplementationOnce(() => {
+        throw new Error('modal registry unavailable');
+      });
+      renderActionCell({ buttons: ['move'], overflowMenu: ['edit'] });
+
+      await user.click(screen.getByRole('button', { name: 'Options' }));
+      // See `openOverflowMenu` above: Carbon's opened menu has no accessible name under happy-dom.
+      const editMenuItem = screen
+        .getAllByRole('menuitem', { hidden: true })
+        .find((item) => item.getAttribute('aria-label') === 'Edit');
+      await user.click(editMenuItem);
+
+      expect(mockShowSnackbar).toHaveBeenCalledWith(expectedSnackbar);
+    });
+
+    // The net is the last thing between a failed action and an unhandled rejection, so a throw
+    // while it is reporting the failure puts back the crash it was added to prevent.
+    it('does not reject when reporting the failure itself fails', async () => {
+      const user = userEvent.setup();
+      const unhandled: unknown[] = [];
+      const onUnhandled = (reason: unknown) => unhandled.push(reason);
+      process.on('unhandledRejection', onUnhandled);
+      try {
+        mockShowModal.mockImplementationOnce(() => {
+          throw new Error('modal registry unavailable');
+        });
+        mockShowSnackbar.mockImplementationOnce(() => {
+          throw new Error('snackbar store unavailable');
+        });
+        renderActionCell({ buttons: ['edit'], overflowMenu: [] });
+
+        await user.click(screen.getByRole('button', { name: 'Edit' }));
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(errorSpy).toHaveBeenCalledWith(
+          expect.stringContaining("Reporting the failure of service queue table action 'edit' failed"),
+          expect.any(Error),
+        );
+        expect(unhandled).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandled);
+      }
+    });
   });
 });

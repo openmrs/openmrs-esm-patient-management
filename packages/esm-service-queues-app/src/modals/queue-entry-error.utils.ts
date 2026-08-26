@@ -12,13 +12,17 @@ export function getErrorMessage(error: unknown): string {
     message?: string;
   };
 
-  return (
+  const message =
     err?.responseBody?.error?.rawMessage ||
     err?.responseBody?.error?.translatedMessage ||
     err?.responseBody?.error?.message ||
     err?.message ||
-    ''
-  );
+    '';
+
+  // The cast above describes the shape the REST API documents, not one anything guarantees: a
+  // rejected promise carries whatever it was rejected with. Callers put this straight into a
+  // snackbar subtitle, where a non-string is a React render crash, and call `.includes()` on it.
+  return typeof message === 'string' ? message : '';
 }
 
 // Note: Detection relies on matching a substring from the backend's IllegalStateException
