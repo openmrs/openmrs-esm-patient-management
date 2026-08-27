@@ -33,11 +33,6 @@ export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(d
 
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
 
-export const metricsCardCheckedInPatients = getAsyncLifecycle(
-  () => import('./metrics/metrics-cards/checked-in-patients.extension'),
-  options,
-);
-
 export const metricsCardWaitingPatients = getAsyncLifecycle(
   () => import('./metrics/metrics-cards/waiting-patients.extension'),
   options,
@@ -87,6 +82,14 @@ export const addOrMoveModal = getAsyncLifecycle(() => import('./modals/add-or-mo
   featureName: 'add or move modal',
   moduleName,
 });
+
+export const changeQueueLocationModal = getAsyncLifecycle(
+  () => import('./modals/change-queue-location/change-queue-location.modal'),
+  {
+    featureName: 'change queue location modal',
+    moduleName,
+  },
+);
 
 export const transitionOverflowMenuItem = getAsyncLifecycle(
   () => import('./add-or-move-button/add-or-move-overflow-menu-item.extension'),

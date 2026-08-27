@@ -44,7 +44,7 @@ function normalizeActions(actionKeys: ConfigurableQueueEntryAction[], configKey:
 function useActionPropsByKey() {
   const {
     callingStatus,
-    concepts: { defaultStatusConceptUuid },
+    concepts: { waitingStatusConceptUuid },
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
   const { mutateQueueEntries } = useMutateQueueEntries();
@@ -73,7 +73,7 @@ function useActionPropsByKey() {
           }
         },
         showIf: (queueEntry: QueueEntry) => {
-          return queueEntry.status.uuid === defaultStatusConceptUuid;
+          return queueEntry.status.uuid === waitingStatusConceptUuid;
         },
       },
       move: {
@@ -145,7 +145,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [callingStatus, waitingStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
   return actionPropsByKey;
 }
 

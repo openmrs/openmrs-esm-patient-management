@@ -179,6 +179,11 @@ export const configSchema = {
       _default: defaultEmergencyPriorityUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
     },
+    waitingStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _default: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
+      _description: 'The concept UUID of the status for patients waiting to be attended to.',
+    },
   },
   contactAttributeType: {
     _type: Type.UUID,
@@ -478,6 +483,7 @@ export interface ConfigObject {
     defaultStatusConceptUuid: string;
     defaultTransitionStatus: string;
     emergencyPriorityConceptUuid: string;
+    waitingStatusConceptUuid: string;
   };
   defaultInitialServiceQueue: string;
   refreshIntervals: {
