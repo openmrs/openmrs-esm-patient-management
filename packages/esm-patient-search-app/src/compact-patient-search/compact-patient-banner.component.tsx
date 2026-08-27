@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
+import { SWRConfig } from 'swr';
 import { Loading } from '@carbon/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
@@ -14,6 +15,7 @@ import { type PatientSearchConfig } from '../config-schema';
 import Loader from './loader.component';
 import { usePatientSearchContext } from '../patient-search-context';
 import { mapToFhirPatient } from '../utils/fhir-mapper';
+import { patientBannerSwrConfig } from '../utils/swr-config';
 import type { SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
 
@@ -143,48 +145,50 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
     }, [pendingFocusIndex, patients, virtualItems, virtualizer]);
 
     return (
-      // The bounding height is also set inline so the virtualizer always measures a 22rem viewport.
-      // Otherwise, the virtualizer will detect the wrong height and won't scroll properly.
-      <div ref={scrollContainerRef} className={styles.virtualScrollContainer} style={{ maxBlockSize: '22rem' }}>
-        {virtualize ? (
-          <div style={{ blockSize: virtualizer.getTotalSize() }}>
-            {virtualItems.map((virtualRow) => {
-              // Show the skeleton only for patients we haven't shown yet
-              const showSkeleton =
-                virtualizer.isScrolling &&
-                !seenPatientUuids.current.has(patients[virtualRow.index]?.uuid) &&
-                virtualRow.index !== pendingFocusIndex;
-              return (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  ref={virtualizer.isScrolling ? undefined : virtualizer.measureElement}
-                  className={styles.virtualRow}
-                  style={
-                    virtualizer.isScrolling
-                      ? { blockSize: virtualRow.size, transform: `translateY(${virtualRow.start}px)` }
-                      : { transform: `translateY(${virtualRow.start}px)` }
-                  }>
-                  {showSkeleton ? <Loader /> : <CompactPatientBannerRow patient={patients[virtualRow.index]} />}
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          // Bounded list: every row stays mounted (the `data-index` wrapper lets arrow-key focus find
-          // it, exactly as in the virtualized branch).
-          patients.map((patient, index) => (
-            <div key={patient.uuid} data-index={index}>
-              <CompactPatientBannerRow patient={patient} />
+      <SWRConfig value={patientBannerSwrConfig}>
+        {/* The bounding height is also set inline so the virtualizer always measures a 22rem
+        viewport. Otherwise, the virtualizer will detect the wrong height and won't scroll properly. */}
+        <div ref={scrollContainerRef} className={styles.virtualScrollContainer} style={{ maxBlockSize: '22rem' }}>
+          {virtualize ? (
+            <div style={{ blockSize: virtualizer.getTotalSize() }}>
+              {virtualItems.map((virtualRow) => {
+                // Show the skeleton only for patients we haven't shown yet
+                const showSkeleton =
+                  virtualizer.isScrolling &&
+                  !seenPatientUuids.current.has(patients[virtualRow.index]?.uuid) &&
+                  virtualRow.index !== pendingFocusIndex;
+                return (
+                  <div
+                    key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    ref={virtualizer.isScrolling ? undefined : virtualizer.measureElement}
+                    className={styles.virtualRow}
+                    style={
+                      virtualizer.isScrolling
+                        ? { blockSize: virtualRow.size, transform: `translateY(${virtualRow.start}px)` }
+                        : { transform: `translateY(${virtualRow.start}px)` }
+                    }>
+                    {showSkeleton ? <Loader /> : <CompactPatientBannerRow patient={patients[virtualRow.index]} />}
+                  </div>
+                );
+              })}
             </div>
-          ))
-        )}
-        {hasMore && (
-          <div className={styles.loadingIcon}>
-            <Loading withOverlay={false} small />
-          </div>
-        )}
-      </div>
+          ) : (
+            // Bounded list: every row stays mounted (the `data-index` wrapper lets arrow-key focus
+            // find it, exactly as in the virtualized branch).
+            patients.map((patient, index) => (
+              <div key={patient.uuid} data-index={index}>
+                <CompactPatientBannerRow patient={patient} />
+              </div>
+            ))
+          )}
+          {hasMore && (
+            <div className={styles.loadingIcon}>
+              <Loading withOverlay={false} small />
+            </div>
+          )}
+        </div>
+      </SWRConfig>
     );
   },
 );

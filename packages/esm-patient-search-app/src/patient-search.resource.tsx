@@ -95,20 +95,27 @@ export function useInfinitePatientSearch(
 
   const shouldFetch = isSearching && Boolean(searchQuery);
 
+  // Re-fetching page 1 on every page load would cost a round trip and replace the rendered rows'
+  // objects, breaking the identity they memoize on.
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
     shouldFetch ? getUrl : null,
     fetcher,
-    { keepPreviousData: true },
+    { keepPreviousData: true, revalidateFirstPage: false },
   );
 
   // Filter out null patients and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
-  // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData = shouldFetch
-    ? (data
-        ?.flatMap((res) => res.data?.results ?? [])
-        ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
-    : null;
+  // (in the hook) to ensure all consumers receive clean, valid data. Memoized because consumers
+  // key their own memos off this array's identity.
+  const mappedData = useMemo(
+    () =>
+      shouldFetch
+        ? (data
+            ?.flatMap((res) => res.data?.results ?? [])
+            ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
+        : null,
+    [shouldFetch, data],
+  );
 
   return useMemo(
     () => ({
@@ -227,24 +234,32 @@ export function useRestPatients(
 
   const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
 
+  // One patient per page, so fetch them in parallel; safe because the page URLs depend only on the
+  // index, never on the previous page. For `revalidateFirstPage`, see `useInfinitePatientSearch`.
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<FetchResponse<SearchedPatient>, Error>(
     shouldFetch ? getPatientUrl : null,
     fetcher,
     {
       keepPreviousData: true,
+      revalidateFirstPage: false,
+      parallel: true,
       initialSize: patientUuids ? Math.min(resultsToFetch, patientUuids.length) : 0,
     },
   );
 
   // Filter out null, voided, and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
-  // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData =
-    data
-      ?.flatMap((res) => res.data)
-      ?.filter(
-        (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
-      ) ?? null;
+  // (in the hook) to ensure all consumers receive clean, valid data. Memoized because consumers
+  // key their own memos off this array's identity.
+  const mappedData = useMemo(
+    () =>
+      data
+        ?.flatMap((res) => res.data)
+        ?.filter(
+          (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
+        ) ?? null,
+    [data],
+  );
 
   return useMemo(
     () => ({

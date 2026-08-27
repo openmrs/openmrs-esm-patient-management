@@ -32,127 +32,128 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({
-  patient,
-  patientUuid,
-  hideActionsOverflow: hideActionsOverflowProp,
-}) => {
-  const layout = useLayoutType();
-  const isTablet = layout === 'tablet';
-  const { activeVisit } = useVisit(patientUuid);
-  const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
-    usePatientSearchContext() ?? {};
-  // if context2 is present, we use the new workspace v2 APIs,
-  // else, default to the old ones
-  const context2 = usePatientSearchContext2();
-  const {
-    onPatientSelected,
-    onVisitStarted,
-    launchChildWorkspace,
-    closeWorkspace,
-    startVisitWorkspaceName,
-    selectPatientButton,
-  } = context2 ?? {};
+// Memoized: each banner carries a visit lookup, a photo, and several extension slots, so
+// re-rendering rows whose patient hasn't changed is expensive.
+const PatientBanner = React.memo(
+  ({ patient, patientUuid, hideActionsOverflow: hideActionsOverflowProp }: PatientBannerProps) => {
+    const layout = useLayoutType();
+    const isTablet = layout === 'tablet';
+    const { activeVisit } = useVisit(patientUuid);
+    const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
+      usePatientSearchContext() ?? {};
+    // if context2 is present, we use the new workspace v2 APIs,
+    // else, default to the old ones
+    const context2 = usePatientSearchContext2();
+    const {
+      onPatientSelected,
+      onVisitStarted,
+      launchChildWorkspace,
+      closeWorkspace,
+      startVisitWorkspaceName,
+      selectPatientButton,
+    } = context2 ?? {};
 
-  const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
+    const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
-  const patientName = patient.person.personName.display;
-  const isDeceased = !!patient.person.deathDate;
+    const patientName = patient.person.personName.display;
+    const isDeceased = !!patient.person.deathDate;
 
-  const [showContactDetails, setShowContactDetails] = useState(false);
+    const [showContactDetails, setShowContactDetails] = useState(false);
 
-  const handleToggleContactDetails = useCallback(() => {
-    setShowContactDetails((value) => !value);
-  }, []);
+    const handleToggleContactDetails = useCallback(() => {
+      setShowContactDetails((value) => !value);
+    }, []);
 
-  const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
+    const fhirMappedPatient: fhir.Patient = useMemo(() => mapToFhirPatient(patient), [patient]);
 
-  return (
-    <>
-      <div
-        className={classNames(styles.container, {
-          [styles.deceasedPatientContainer]: isDeceased,
-          [styles.activePatientContainer]: !isDeceased,
-        })}
-        role="banner">
-        <ClickablePatientContainer patient={fhirMappedPatient}>
-          <div className={styles.patientAvatar}>
-            <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
+    return (
+      <>
+        <div
+          className={classNames(styles.container, {
+            [styles.deceasedPatientContainer]: isDeceased,
+            [styles.activePatientContainer]: !isDeceased,
+          })}
+          role="banner">
+          <ClickablePatientContainer patient={fhirMappedPatient}>
+            <div className={styles.patientAvatar}>
+              <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
+            </div>
+            <PatientBannerPatientInfo patient={fhirMappedPatient} />
+          </ClickablePatientContainer>
+          <div className={styles.actionButtons}>
+            <PatientBannerToggleContactDetailsButton
+              className={styles.toggleContactDetailsButton}
+              showContactDetails={showContactDetails}
+              toggleContactDetails={handleToggleContactDetails}
+            />
+            <div className={styles.rightActions}>
+              {!hideActionsOverflow ? (
+                <PatientBannerActionsMenu
+                  actionsSlotName="patient-search-actions-slot"
+                  additionalActionsSlotState={{
+                    selectPatientAction: onPatientSelected ?? nonNavigationSelectPatientAction,
+                    launchPatientChart: true,
+                  }}
+                  patient={fhirMappedPatient}
+                  patientUuid={patientUuid}
+                />
+              ) : null}
+              {!isDeceased &&
+                !activeVisit &&
+                (context2 ? (
+                  <ExtensionSlot
+                    name="start-visit-button-slot2"
+                    state={{
+                      patientUuid,
+                      patient: fhirMappedPatient,
+                      launchChildWorkspace,
+                      startVisitWorkspaceName,
+                      onVisitStarted: onVisitStarted
+                        ? (visit: Visit) =>
+                            onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)
+                        : undefined,
+                    }}
+                  />
+                ) : (
+                  <ExtensionSlot
+                    name="start-visit-button-slot"
+                    state={{
+                      handleReturnToSearchList,
+                      hidePatientSearch,
+                      patientUuid,
+                      patient: fhirMappedPatient,
+                    }}
+                  />
+                ))}
+              {!isDeceased && context2 && selectPatientButton && (
+                <Button
+                  disabled={selectPatientButton.requiresActiveVisit && !activeVisit}
+                  kind="primary"
+                  onClick={() =>
+                    onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace)
+                  }>
+                  {selectPatientButton.text}
+                </Button>
+              )}
+            </div>
           </div>
-          <PatientBannerPatientInfo patient={fhirMappedPatient} />
-        </ClickablePatientContainer>
-        <div className={styles.actionButtons}>
-          <PatientBannerToggleContactDetailsButton
-            className={styles.toggleContactDetailsButton}
-            showContactDetails={showContactDetails}
-            toggleContactDetails={handleToggleContactDetails}
-          />
-          <div className={styles.rightActions}>
-            {!hideActionsOverflow ? (
-              <PatientBannerActionsMenu
-                actionsSlotName="patient-search-actions-slot"
-                additionalActionsSlotState={{
-                  selectPatientAction: onPatientSelected ?? nonNavigationSelectPatientAction,
-                  launchPatientChart: true,
-                }}
-                patient={fhirMappedPatient}
-                patientUuid={patientUuid}
-              />
-            ) : null}
-            {!isDeceased &&
-              !activeVisit &&
-              (context2 ? (
-                <ExtensionSlot
-                  name="start-visit-button-slot2"
-                  state={{
-                    patientUuid,
-                    patient: fhirMappedPatient,
-                    launchChildWorkspace,
-                    startVisitWorkspaceName,
-                    onVisitStarted: onVisitStarted
-                      ? (visit: Visit) =>
-                          onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)
-                      : undefined,
-                  }}
-                />
-              ) : (
-                <ExtensionSlot
-                  name="start-visit-button-slot"
-                  state={{
-                    handleReturnToSearchList,
-                    hidePatientSearch,
-                    patientUuid,
-                    patient: fhirMappedPatient,
-                  }}
-                />
-              ))}
-            {!isDeceased && context2 && selectPatientButton && (
-              <Button
-                disabled={selectPatientButton.requiresActiveVisit && !activeVisit}
-                kind="primary"
-                onClick={() =>
-                  onPatientSelected?.(patientUuid, fhirMappedPatient, launchChildWorkspace, closeWorkspace)
-                }>
-                {selectPatientButton.text}
-              </Button>
+          <div>
+            {showContactDetails && (
+              <div
+                className={classNames(styles.contactDetails, {
+                  [styles.deceasedContactDetails]: isDeceased,
+                  [styles.tabletContactDetails]: isTablet,
+                })}>
+                <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
+              </div>
             )}
           </div>
         </div>
-        <div>
-          {showContactDetails && (
-            <div
-              className={classNames(styles.contactDetails, {
-                [styles.deceasedContactDetails]: isDeceased,
-                [styles.tabletContactDetails]: isTablet,
-              })}>
-              <PatientBannerContactDetails deceased={isDeceased} patientId={patientUuid} />
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
-};
+      </>
+    );
+  },
+);
+PatientBanner.displayName = 'PatientBanner';
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext() ?? {};
