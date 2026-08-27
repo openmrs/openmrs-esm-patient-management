@@ -334,8 +334,8 @@ export interface ProvidersQueueRoom {
 }
 
 export interface WaitTime {
-  metric: string;
-  averageWaitTime: string;
+  // Older queue-module versions serialize an unavailable average as the string "NaN"; newer ones send null.
+  averageWaitTime: number | string | null;
 }
 
 export interface QueueTableCellComponentProps {

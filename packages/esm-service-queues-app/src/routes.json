@@ -2,7 +2,7 @@
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
     "webservices.rest": ">=2.2.0",
-    "queue": ">=2.4.0 <4.0.0"
+    "queue": ">=3.1.0-0 <4.0.0"
   },
   "extensions": [
     {
@@ -67,8 +67,8 @@
       "slot": "transition-overflow-menu-item-slot"
     },
     {
-      "name": "metrics-card-checked-in-patients",
-      "component": "metricsCardCheckedInPatients",
+      "name": "metrics-card-average-wait-time",
+      "component": "metricsCardAverageWaitTime",
       "slot": "service-queues-metrics-slot",
       "order": 1
     },
@@ -77,12 +77,6 @@
       "component": "metricsCardWaitingPatients",
       "slot": "service-queues-metrics-slot",
       "order": 2
-    },
-    {
-      "name": "metrics-card-average-wait-time",
-      "component": "metricsCardAverageWaitTime",
-      "slot": "service-queues-metrics-slot",
-      "order": 3
     },
     {
       "name": "queue-screen-link",
@@ -123,6 +117,10 @@
     {
       "name": "transition-patient-to-latest-queue-modal",
       "component": "addOrMoveModal"
+    },
+    {
+      "name": "change-queue-location-modal",
+      "component": "changeQueueLocationModal"
     },
     {
       "name": "call-queue-entry-modal",

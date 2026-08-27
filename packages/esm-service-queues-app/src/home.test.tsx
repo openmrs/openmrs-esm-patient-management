@@ -44,8 +44,7 @@ describe('Home Component', () => {
   it('renders the service queues dashboard', () => {
     render(<Home />);
 
-    expect(screen.getByRole('heading', { name: /patients currently in queue/i })).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /show patients with status/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /waiting list/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /search this list/i })).toBeInTheDocument();
     expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /clear queue entries/i })).not.toBeInTheDocument();

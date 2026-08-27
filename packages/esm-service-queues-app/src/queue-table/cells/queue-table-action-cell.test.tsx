@@ -3,13 +3,14 @@ import { vi, describe, it, expect, beforeEach, type MockInstance } from 'vitest'
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { mockQueueEntryAlice, mockStatusWaiting } from '__mocks__';
+import { mockQueueEntryAlice, mockQueueEntryBrian, mockStatusWaiting } from '__mocks__';
 import {
   configSchema,
   type ActionsColumnConfig,
   type ConfigObject,
   type ConfigurableQueueEntryAction,
 } from '../../config-schema';
+import { type QueueEntry } from '../../types';
 import { queueTableActionColumn } from './queue-table-action-cell.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -19,14 +20,14 @@ vi.mock('../../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
 
-// Alice is "In Service", so the `call` action is hidden for her and the cell falls back to promoting
-// the first visible overflow menu action to an inline button.
-function renderActionCell(actions: {
-  buttons: ConfigurableQueueEntryAction[];
-  overflowMenu: ConfigurableQueueEntryAction[];
-}) {
+// Alice is "In Service" and Brian is "Waiting", so the `call` action is hidden for Alice and the cell
+// falls back to promoting the first visible overflow menu action to an inline button.
+function renderActionCell(
+  actions: { buttons: ConfigurableQueueEntryAction[]; overflowMenu: ConfigurableQueueEntryAction[] },
+  queueEntry: QueueEntry = mockQueueEntryAlice,
+) {
   const { CellComponent } = queueTableActionColumn('actions', 'Actions', { actions } as ActionsColumnConfig);
-  render(<CellComponent queueEntry={mockQueueEntryAlice} />);
+  render(<CellComponent queueEntry={queueEntry} />);
 }
 
 async function openOverflowMenu() {
@@ -42,7 +43,7 @@ describe('queueTableActionColumn', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       ...configDefaults,
-      concepts: { ...configDefaults.concepts, defaultStatusConceptUuid: mockStatusWaiting.uuid },
+      concepts: { ...configDefaults.concepts, waitingStatusConceptUuid: mockStatusWaiting.uuid },
     } as ConfigObject);
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -79,5 +80,13 @@ describe('queueTableActionColumn', () => {
     renderActionCell({ buttons: ['call'], overflowMenu: ['bogus' as ConfigurableQueueEntryAction, 'edit'] });
 
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+  });
+
+  // Only the mocked waitingStatusConceptUuid matches Brian's status, so this pins `call` to the waiting
+  // status rather than defaultStatusConceptUuid, which it used to compare against.
+  it('shows the Call action for an entry in the waiting status', () => {
+    renderActionCell({ buttons: ['call'], overflowMenu: [] }, mockQueueEntryBrian);
+
+    expect(screen.getByRole('button', { name: 'Call' })).toBeInTheDocument();
   });
 });
