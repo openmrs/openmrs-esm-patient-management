@@ -51,7 +51,7 @@ export function useActiveVisits(locationUuid?: string) {
 export function useAverageWaitTime(serviceUuid: string, locationUuid: string, statusUuid: string) {
   // Service queues are an outpatient concern, so the average is scoped to entries started today rather
   // than to the whole history of the queue. Sent as an ISO-8601 instant so the server does not have to
-  // guess the client's timezone (requires queue module 3.1.0 or later).
+  // guess the client's timezone.
   const startOfDay = useMemo(() => dayjs().startOf('day').toISOString(), []);
 
   const apiUrl =
