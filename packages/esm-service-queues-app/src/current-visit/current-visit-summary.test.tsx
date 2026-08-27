@@ -61,7 +61,13 @@ describe('CurrentVisit', () => {
   it('mounts the vitals and visit-summary slots and wires the vitals form launcher', async () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
-    expect(getSlotState(visitSummarySlotName)).toMatchObject({ visit, patientUuid });
+    expect(getSlotState(visitSummarySlotName)).toMatchObject({
+      visit,
+      patientUuid,
+      patient: mockPatient,
+      onEditEncounter: expect.any(Function),
+      mutateVisitContext: expect.any(Function),
+    });
 
     const vitalsState = getSlotState(vitalsSlotName) as { launchCustomVitalsForm: () => void };
     vitalsState.launchCustomVitalsForm();

@@ -42,6 +42,7 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid, currentVisitUuid }) 
           state={{
             visit: visits,
             patientUuid,
+            patient,
             onEditEncounter: getEditEncounterHandler({ patient, patientUuid, visit: visits, mutateVisit: mutate }),
             mutateVisitContext: mutate,
           }}
