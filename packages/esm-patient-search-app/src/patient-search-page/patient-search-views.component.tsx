@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SWRConfig } from 'swr';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
-import { patientBannerSwrConfig } from '../utils/swr-config';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
 import styles from './patient-search-lg.scss';
 
@@ -63,12 +61,10 @@ export const ErrorState: React.FC = () => {
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
   return (
-    <SWRConfig value={patientBannerSwrConfig}>
-      <div data-openmrs-role="Search Results">
-        {searchResults.map((patient) => (
-          <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
-        ))}
-      </div>
-    </SWRConfig>
+    <div data-openmrs-role="Search Results">
+      {searchResults.map((patient) => (
+        <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
+      ))}
+    </div>
   );
 };

@@ -1,12 +1,12 @@
 import { type SWRConfiguration } from 'swr';
 
 /**
- * SWR settings for the lookups the patient banner rows make on their own (photo, active visit).
- * Keyed by patient and stable while results are on screen, so caching them stops rows re-requesting
- * on every mount — which virtualized rows do as they scroll back into view. Only automatic
- * revalidation is suppressed; an explicit `mutate()` still fetches.
+ * SWR settings for the lookups a search result makes on its own behalf, principally the patient
+ * photo. Those are keyed by patient and stable while the results are on screen, so caching them
+ * stops rows re-requesting on every mount — which virtualized rows do as they scroll back into
+ * view. Only automatic revalidation is suppressed; an explicit `mutate()` still fetches.
  */
-export const patientBannerSwrConfig: SWRConfiguration = {
+export const searchResultSwrConfig: SWRConfiguration = {
   revalidateIfStale: false,
   revalidateOnFocus: false,
   revalidateOnReconnect: false,

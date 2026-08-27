@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
+import { SWRConfig } from 'swr';
 import { Button, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ConfigurableLink,
@@ -19,6 +20,7 @@ import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
 import { usePatientSearchContext, usePatientSearchContext2 } from '../../../patient-search-context';
 import { mapToFhirPatient } from '../../../utils/fhir-mapper';
+import { searchResultSwrConfig } from '../../../utils/swr-config';
 import styles from './patient-banner.scss';
 
 interface ClickablePatientContainerProps {
@@ -76,7 +78,9 @@ const PatientBanner = React.memo(
           role="banner">
           <ClickablePatientContainer patient={fhirMappedPatient}>
             <div className={styles.patientAvatar}>
-              <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
+              <SWRConfig value={searchResultSwrConfig}>
+                <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
+              </SWRConfig>
             </div>
             <PatientBannerPatientInfo patient={fhirMappedPatient} />
           </ClickablePatientContainer>

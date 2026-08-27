@@ -15,7 +15,7 @@ import { type PatientSearchConfig } from '../config-schema';
 import Loader from './loader.component';
 import { usePatientSearchContext } from '../patient-search-context';
 import { mapToFhirPatient } from '../utils/fhir-mapper';
-import { patientBannerSwrConfig } from '../utils/swr-config';
+import { searchResultSwrConfig } from '../utils/swr-config';
 import type { SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
 
@@ -145,7 +145,7 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
     }, [pendingFocusIndex, patients, virtualItems, virtualizer]);
 
     return (
-      <SWRConfig value={patientBannerSwrConfig}>
+      <SWRConfig value={searchResultSwrConfig}>
         {/* The bounding height is also set inline so the virtualizer always measures a 22rem
         viewport. Otherwise, the virtualizer will detect the wrong height and won't scroll properly. */}
         <div ref={scrollContainerRef} className={styles.virtualScrollContainer} style={{ maxBlockSize: '22rem' }}>
