@@ -180,8 +180,13 @@
     },
     {
       "name": "service-queues-visit-notes-workspace",
-      "component": "@openmrs/esm-patient-notes-app#visitNotesFormWorkspace",
+      "component": "@openmrs/esm-patient-notes-app#exportedVisitNotesFormWorkspace",
       "window": "service-queues-visit-note"
+    },
+    {
+      "name": "service-queues-patient-form-entry-workspace",
+      "component": "@openmrs/esm-patient-forms-app#exportedPatientFormEntryWorkspace",
+      "window": "service-queues-patient-form-entry"
     }
   ],
   "workspaceWindows2": [
@@ -204,6 +209,12 @@
     {
       "name": "service-queues-visit-note",
       "group": "service-queues-patient-context"
+    },
+    {
+      "name": "service-queues-patient-form-entry",
+      "group": "service-queues-patient-context",
+      "width": "extra-wide",
+      "canMaximize": true
     }
   ],
   "workspaceGroups2": [
