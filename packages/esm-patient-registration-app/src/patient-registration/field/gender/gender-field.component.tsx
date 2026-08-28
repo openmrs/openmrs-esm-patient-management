@@ -36,14 +36,17 @@ export const GenderField: React.FC = () => {
           orientation="vertical"
           onChange={setGender}
           valueSelected={field.value}>
-          {fieldConfigs.map((option) => (
-            <RadioButton
-              id={`gender-option-${option.value}`}
-              key={option.label ?? option.value}
-              labelText={t(option.label ?? option.value, option.label ?? option.value)}
-              value={option.value}
-            />
-          ))}
+          {fieldConfigs.map((option) => {
+            const label = option.label || option.value;
+            return (
+              <RadioButton
+                id={`gender-option-${option.value}`}
+                key={label}
+                labelText={t(label, label)}
+                value={option.value}
+              />
+            );
+          })}
         </RadioButtonGroup>
         {meta.touched && meta.error && (
           <div className={styles.radioFieldError}>{t(meta.error, 'Gender is required')}</div>
