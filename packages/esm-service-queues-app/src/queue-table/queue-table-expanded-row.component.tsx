@@ -20,7 +20,7 @@ const QueueTableExpandedRow: FC<{ queueEntry: QueueEntry }> = ({ queueEntry }) =
           <CurrentVisit patientUuid={queueEntry.patient.uuid} visitUuid={queueEntry.visit?.uuid} />
         </TabPanel>
         <TabPanel>
-          <PastVisit patientUuid={queueEntry.patient.uuid} />
+          <PastVisit patientUuid={queueEntry.patient.uuid} currentVisitUuid={queueEntry.visit?.uuid} />
         </TabPanel>
       </TabPanels>
     </Tabs>

@@ -25,8 +25,8 @@ done;
 echo "Created packed app archives"
 
 echo "Creating dynamic spa-assemble-config.json..."
-# Dynamically assemble our list of frontend modules, including core apps
-# (form-engine, home, patient-attachments, patient-banner, patient-chart, patient-forms, primary-navigation)
+# Dynamically assemble our list of frontend modules, including core apps (form-engine, home,
+# patient-attachments, patient-banner, patient-chart, patient-forms, patient-notes, primary-navigation)
 # and workspace apps; all apps will be in the /app directory of the Docker container
 jq -n \
   --arg apps "$apps" \
@@ -38,6 +38,7 @@ jq -n \
     "@openmrs/esm-patient-banner-app": "next",
     "@openmrs/esm-patient-chart-app": "next",
     "@openmrs/esm-patient-forms-app": "next",
+    "@openmrs/esm-patient-notes-app": "next",
     "@openmrs/esm-primary-navigation-app": "next",
   } + (
     ($apps | split("\n")) as $apps | ($app_names | split(" ") | map("/app/" + .)) as $app_files
