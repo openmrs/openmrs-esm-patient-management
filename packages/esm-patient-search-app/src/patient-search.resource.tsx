@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from 'react';
-import useSWR from 'swr';
-import useSWRInfinite from 'swr/infinite';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
+import useSWRInfinite, { type SWRInfiniteResponse } from 'swr/infinite';
 import {
   omrsOfflineCachingStrategyHttpHeaderName,
   openmrsFetch,
@@ -42,6 +42,57 @@ export const userPropertiesRepresentation = 'custom:(userProperties)';
 
 export const getUserPropertiesUrl = (userUuid: string) =>
   `${restBaseUrl}/user/${userUuid}?v=${encodeURIComponent(userPropertiesRepresentation)}`;
+
+/**
+ * Refreshes page 1 of an infinite search the first time a given query becomes active.
+ *
+ * The searches in this module set `revalidateFirstPage: false` so that appending a page does not
+ * re-fetch page 1. SWR has no notion of cache expiry, so that flag alone would pin a query's
+ * results — including an empty result — for as long as the SPA stays loaded: neither remounting
+ * the search UI nor refocusing the window causes `useSWRInfinite` to re-fetch a page it already
+ * holds. A clerk who searches for a patient, registers them, and searches again would keep seeing
+ * the cached "no results".
+ *
+ * Passing a per-page predicate to `mutate` revalidates page 1 alone, leaving the already-loaded
+ * pages (and their object identities) untouched, so the append optimization is preserved. This
+ * fires once per query: a query is "reopened" when its key changes, or when the search is cleared
+ * and the same term is entered again.
+ *
+ * @param firstPageUrl The page 1 URL of the active query, or null when the search is inactive
+ * @param mutate The `mutate` returned by the `useSWRInfinite` call being bounded
+ */
+function useRevalidateFirstPageOnce<T>(firstPageUrl: string | null, mutate: SWRInfiniteResponse<T>['mutate']) {
+  const { cache } = useSWRConfig();
+  const revalidatedUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Closing the search resets this, so re-entering the same term revalidates again.
+    if (!firstPageUrl) {
+      revalidatedUrlRef.current = null;
+      return;
+    }
+
+    if (revalidatedUrlRef.current === firstPageUrl) {
+      return;
+    }
+
+    revalidatedUrlRef.current = firstPageUrl;
+
+    // An uncached page 1 is fetched by SWR regardless, so mutating would only duplicate it. Note
+    // that `data` cannot stand in for this check: `keepPreviousData` leaves the outgoing query's
+    // results in place while a new query has nothing cached.
+    if (cache.get(firstPageUrl)?.data === undefined) {
+      return;
+    }
+
+    // The pages are written back unchanged rather than passing `undefined`, which would clear the
+    // cache entry and put the hook back into its loading state, flashing a skeleton over results
+    // that are already on screen.
+    void mutate((currentPages) => currentPages, {
+      revalidate: (_pageData, pageKey) => pageKey === firstPageUrl,
+    });
+  }, [cache, firstPageUrl, mutate]);
+}
 
 /**
  * A custom React hook for implementing infinite scrolling patient search.
@@ -95,20 +146,29 @@ export function useInfinitePatientSearch(
 
   const shouldFetch = isSearching && Boolean(searchQuery);
 
-  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
-    shouldFetch ? getUrl : null,
-    fetcher,
-    { keepPreviousData: true },
-  );
+  // Re-fetching page 1 on every page load would cost a round trip and replace the rendered rows'
+  // objects, breaking the identity they memoize on. See `useRevalidateFirstPageOnce` for how the
+  // resulting staleness is bounded.
+  const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<
+    InfinitePatientSearchResponse,
+    Error
+  >(shouldFetch ? getUrl : null, fetcher, { keepPreviousData: true, revalidateFirstPage: false });
+
+  useRevalidateFirstPageOnce(shouldFetch ? getUrl(0, null) : null, mutate);
 
   // Filter out null patients and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
-  // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData = shouldFetch
-    ? (data
-        ?.flatMap((res) => res.data?.results ?? [])
-        ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
-    : null;
+  // (in the hook) to ensure all consumers receive clean, valid data. Memoized because consumers
+  // key their own memos off this array's identity.
+  const mappedData = useMemo(
+    () =>
+      shouldFetch
+        ? (data
+            ?.flatMap((res) => res.data?.results ?? [])
+            ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
+        : null,
+    [shouldFetch, data],
+  );
 
   return useMemo(
     () => ({
@@ -227,24 +287,33 @@ export function useRestPatients(
 
   const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
 
+  // One patient per page, so fetch them in parallel; safe because the page URLs depend only on the
+  // index, never on the previous page.
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<FetchResponse<SearchedPatient>, Error>(
     shouldFetch ? getPatientUrl : null,
     fetcher,
     {
       keepPreviousData: true,
+      revalidateFirstPage: false,
+      revalidateOnMount: true,
+      parallel: true,
       initialSize: patientUuids ? Math.min(resultsToFetch, patientUuids.length) : 0,
     },
   );
 
   // Filter out null, voided, and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
-  // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData =
-    data
-      ?.flatMap((res) => res.data)
-      ?.filter(
-        (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
-      ) ?? null;
+  // (in the hook) to ensure all consumers receive clean, valid data. Memoized because consumers
+  // key their own memos off this array's identity.
+  const mappedData = useMemo(
+    () =>
+      data
+        ?.flatMap((res) => res.data)
+        ?.filter(
+          (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
+        ) ?? null,
+    [data],
+  );
 
   return useMemo(
     () => ({

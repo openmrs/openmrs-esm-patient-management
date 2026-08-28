@@ -3,7 +3,7 @@ import { vi, describe, it, beforeEach, expect } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import { useInfinitePatientSearch } from './patient-search.resource';
+import { useInfinitePatientSearch, useRestPatients } from './patient-search.resource';
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
@@ -81,5 +81,265 @@ describe('useInfinitePatientSearch', () => {
     expect(result.current.data).toBeNull();
     expect(result.current.hasMore).toBe(false);
     expect(result.current.totalResults).toBe(0);
+  });
+});
+
+// `revalidateFirstPage: false` stops SWR from ever re-fetching a page it already holds, and SWR has
+// no cache expiry, so without the targeted revalidation below a query's results would be pinned for
+// the life of the SPA session.
+describe('useInfinitePatientSearch page 1 revalidation', () => {
+  let cache: Map<string, unknown>;
+  let requestedUrls: Array<string>;
+
+  const sharedCacheWrapper = ({ children }: { children: React.ReactNode }) => (
+    <SWRConfig value={{ provider: () => cache as never, dedupingInterval: 0 }}>{children}</SWRConfig>
+  );
+
+  /** Serves `total` patients in pages of 10, so page boundaries and `hasMore` behave realistically. */
+  const respondWith = (total: number) =>
+    mockOpenmrsFetch.mockImplementation((url: string) => {
+      requestedUrls.push(url);
+      const params = new URL(url, 'http://localhost').searchParams;
+      const startIndex = Number(params.get('startIndex') ?? 0);
+      const count = Math.max(0, Math.min(10, total - startIndex));
+
+      return Promise.resolve({
+        data: {
+          results: Array.from({ length: count }, (_, i) => ({
+            uuid: `${params.get('q')}-${startIndex + i}`,
+            person: { personName: { display: params.get('q') } },
+          })),
+          links: total > startIndex + 10 ? [{ rel: 'next' }] : [],
+          totalCount: total,
+        },
+      } as unknown as FetchResponse);
+    });
+
+  const settle = () =>
+    act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+  const isFirstPage = (url: string) => !url.includes('startIndex');
+
+  beforeEach(() => {
+    vi.useRealTimers();
+    cache = new Map();
+    requestedUrls = [];
+    mockOpenmrsFetch.mockReset();
+    respondWith(100);
+  });
+
+  it('issues exactly one request for a query that is not cached yet', async () => {
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+    await settle();
+
+    expect(requestedUrls).toHaveLength(1);
+    expect(isFirstPage(requestedUrls[0])).toBe(true);
+  });
+
+  // The workflow this exists for: a clerk searches for a patient who does not exist yet, registers
+  // them, then searches the same term again to check them in. Registration navigates within the SPA
+  // and never invalidates the search key, so without this the cached "no results" would be shown.
+  it('picks up a patient registered after an empty result was cached', async () => {
+    respondWith(0);
+
+    const { result: cachedResult, unmount } = renderHook(() => useInfinitePatientSearch('Mary', false), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(cachedResult.current.data).toEqual([]));
+    unmount();
+
+    respondWith(1);
+    requestedUrls = [];
+
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+
+    await waitFor(() => expect(result.current.data).toHaveLength(1));
+    expect(requestedUrls).toHaveLength(1);
+    expect(isFirstPage(requestedUrls[0])).toBe(true);
+  });
+
+  // Refreshing page 1 must not become a refresh of everything: re-fetching the loaded pages would
+  // cost a round trip each and replace the rendered rows' objects, which is what
+  // `revalidateFirstPage: false` was introduced to avoid.
+  it('refreshes only page 1, leaving already-loaded pages untouched', async () => {
+    const { result: cachedResult, unmount } = renderHook(() => useInfinitePatientSearch('Mary', false), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(cachedResult.current.data).toHaveLength(10));
+    await act(async () => {
+      await cachedResult.current.setPage(3);
+    });
+    await waitFor(() => expect(cachedResult.current.data).toHaveLength(30));
+    unmount();
+
+    requestedUrls = [];
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+    await settle();
+
+    expect(requestedUrls).toHaveLength(1);
+    expect(isFirstPage(requestedUrls[0])).toBe(true);
+    expect(result.current.data).toHaveLength(30);
+  });
+
+  it('does not re-fetch page 1 when appending a page', async () => {
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+
+    requestedUrls = [];
+    await act(async () => {
+      await result.current.setPage(2);
+    });
+    await settle();
+
+    expect(requestedUrls).toEqual([expect.stringContaining('startIndex=10')]);
+  });
+
+  it('revalidates again when the search is cleared and the same term is entered again', async () => {
+    const { result, rerender } = renderHook(
+      ({ q, searching }: { q: string; searching: boolean }) => useInfinitePatientSearch(q, false, searching),
+      { wrapper: sharedCacheWrapper, initialProps: { q: 'Mary', searching: true } },
+    );
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+
+    rerender({ q: '', searching: false });
+    await settle();
+
+    requestedUrls = [];
+    rerender({ q: 'Mary', searching: true });
+    await settle();
+
+    expect(requestedUrls).toHaveLength(1);
+    expect(isFirstPage(requestedUrls[0])).toBe(true);
+  });
+
+  it('keeps the cached results on screen while page 1 is being refreshed', async () => {
+    const { result: cachedResult, unmount } = renderHook(() => useInfinitePatientSearch('Mary', false), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(cachedResult.current.data).toHaveLength(10));
+    unmount();
+
+    mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as never);
+
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+    await settle();
+
+    expect(result.current.data).toHaveLength(10);
+    expect(result.current.isLoading).toBe(false);
+  });
+});
+
+describe('useRestPatients', () => {
+  let cache: Map<string, unknown>;
+  let requestedUrls: Array<string>;
+
+  const uuids = Array.from({ length: 10 }, (_, i) => `uuid-${i}`);
+
+  const sharedCacheWrapper = ({ children }: { children: React.ReactNode }) => (
+    <SWRConfig value={{ provider: () => cache as never, dedupingInterval: 0 }}>{children}</SWRConfig>
+  );
+
+  /** Serves one patient per URL, tagging the name so a stale read is distinguishable from a fresh one. */
+  const respondWith = ({ nameSuffix = '', voided = false }: { nameSuffix?: string; voided?: boolean } = {}) =>
+    mockOpenmrsFetch.mockImplementation((url: string) => {
+      requestedUrls.push(url);
+      const uuid = url.split('/patient/')[1].split('?')[0];
+
+      return Promise.resolve({
+        data: { uuid, voided, person: { personName: { display: `${uuid}${nameSuffix}` } } },
+      } as unknown as FetchResponse);
+    });
+
+  const settle = () =>
+    act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+  beforeEach(() => {
+    vi.useRealTimers();
+    cache = new Map();
+    requestedUrls = [];
+    mockOpenmrsFetch.mockReset();
+    respondWith();
+  });
+
+  // `initialSize` covers the whole list and the list is capped at 10, so the infinite pagination
+  // never engages. This is what makes refreshing page 1 alone the wrong unit for this hook.
+  it('fetches the whole list up front, leaving no further pages to append', async () => {
+    const { result } = renderHook(() => useRestPatients(uuids), { wrapper: sharedCacheWrapper });
+
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+
+    expect(requestedUrls).toHaveLength(10);
+    expect(result.current.hasMore).toBe(false);
+    expect(result.current.currentPage).toBe(10);
+  });
+
+  it('refreshes every patient when the list is mounted again', async () => {
+    const { result: cachedResult, unmount } = renderHook(() => useRestPatients(uuids), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(cachedResult.current.data).toHaveLength(10));
+    unmount();
+
+    respondWith({ nameSuffix: '-renamed' });
+    requestedUrls = [];
+
+    const { result } = renderHook(() => useRestPatients(uuids), { wrapper: sharedCacheWrapper });
+
+    await waitFor(() => expect(result.current.data?.[0].person.personName.display).toBe('uuid-0-renamed'));
+    expect(requestedUrls).toHaveLength(10);
+  });
+
+  // The list is filtered on `voided`, so pinning it for the session would keep showing a patient
+  // who has since been voided.
+  it('drops a patient voided since the list was cached', async () => {
+    const { result: cachedResult, unmount } = renderHook(() => useRestPatients(uuids), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(cachedResult.current.data).toHaveLength(10));
+    unmount();
+
+    respondWith({ voided: true });
+
+    const { result } = renderHook(() => useRestPatients(uuids), { wrapper: sharedCacheWrapper });
+
+    await waitFor(() => expect(result.current.data).toEqual([]));
+  });
+
+  // Refreshing on mount is scoped to opening the search; refetching all ten patients every time the
+  // window regains focus would be needless traffic for data that rarely changes.
+  it('does not refresh on window focus', async () => {
+    const { result } = renderHook(() => useRestPatients(uuids), { wrapper: sharedCacheWrapper });
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+
+    requestedUrls = [];
+    await act(async () => {
+      window.dispatchEvent(new Event('focus'));
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await settle();
+
+    expect(requestedUrls).toHaveLength(0);
+  });
+
+  it('keeps the cached list on screen while it is being refreshed', async () => {
+    const { result: cachedResult, unmount } = renderHook(() => useRestPatients(uuids), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(cachedResult.current.data).toHaveLength(10));
+    unmount();
+
+    mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as never);
+
+    const { result } = renderHook(() => useRestPatients(uuids), { wrapper: sharedCacheWrapper });
+    await settle();
+
+    expect(result.current.data).toHaveLength(10);
+    expect(result.current.isLoading).toBe(false);
   });
 });
