@@ -1,0 +1,15 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.longestWaitPatient {
+  @include type.type-style('label-01');
+  display: block;
+  color: $text-02;
+}
+
+.emptyState {
+  border: 1px solid $ui-03;
+  margin: 0 layout.$spacing-05;
+  padding: layout.$spacing-09;
+}

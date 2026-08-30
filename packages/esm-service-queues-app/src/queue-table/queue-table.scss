@@ -7,10 +7,6 @@
   margin: layout.$spacing-05 0 0;
 }
 
-.container {
-  border: 1px solid colors.$gray-20;
-}
-
 .tableSection {
   background: colors.$gray-10;
   padding-bottom: layout.$spacing-05;
@@ -22,14 +18,6 @@
   align-items: center;
   padding: layout.$spacing-05;
   background-color: colors.$gray-10;
-}
-
-.headerButtons {
-  display: flex;
-
-  .filterSearch {
-    margin-left: layout.$spacing-05;
-  }
 }
 
 .loaderContainer {
@@ -51,15 +39,6 @@
   input {
     background-color: $ui-02 !important;
   }
-}
-
-.statusTableContainer {
-  padding: layout.$spacing-05;
-  background-color: colors.$gray-10;
-}
-
-.statusTableHeader {
-  padding: layout.$spacing-03 0;
 }
 
 .tableHeader {
@@ -174,10 +153,6 @@ html[dir='rtl'] {
       }
     }
   }
-}
-
-.tabList {
-  padding-left: layout.$spacing-05;
 }
 
 .tileContainer {

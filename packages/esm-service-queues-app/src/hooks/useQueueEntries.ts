@@ -49,7 +49,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   };
 }
 
-export function useQueueEntriesMetrics(searchCriteria?: QueueEntrySearchCriteria) {
+export function useQueueEntriesMetrics(searchCriteria: QueueEntrySearchCriteria) {
   const searchParam = new URLSearchParams();
   for (let [key, value] of Object.entries(searchCriteria)) {
     if (value != null) {

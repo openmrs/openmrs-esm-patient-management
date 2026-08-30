@@ -158,6 +158,25 @@ export const configSchema = {
       'what your digital signage expects (e.g. "Now serving"). ' +
       'Avoid "completed", which the queue backend treats as a signal to remove the ticket.',
   },
+  clinicAdministratorScreen: {
+    enabled: {
+      _type: Type.Boolean,
+      _default: false,
+      _description:
+        'Whether users holding the privilege named below get a clinic-wide monitoring tab on the Service ' +
+        'Queues dashboard, opened first, with the standard waiting list on a second tab. Users without the ' +
+        'privilege see no tabs and their dashboard is unchanged. Off by default because the privilege is ' +
+        'satisfied by any user with the System Developer role, so turning this on would give the tabs to ' +
+        'every administrator whether or not the privilege has been rolled out.',
+    },
+    privilege: {
+      _type: Type.String,
+      _default: 'App: Service Queues Clinic Administrator',
+      _description:
+        'The privilege that grants the clinic-wide monitoring tab. Must match the privilege defined in ' +
+        'your distribution content; until it is attached to a role, only System Developers see the tab.',
+    },
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -478,6 +497,10 @@ export interface ConfigObject {
   waitTimeThresholds: Array<WaitTimeThresholdConfig>;
   appointmentStatuses: Array<string>;
   callingStatus: string;
+  clinicAdministratorScreen: {
+    enabled: boolean;
+    privilege: string;
+  };
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;

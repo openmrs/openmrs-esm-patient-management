@@ -8,20 +8,28 @@ import { useQueueEntries } from '../hooks/useQueueEntries';
 import AddPatientToQueueButton from './components/add-patient-to-queue-button.component';
 import QueueTable from './queue-table.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
+import { type Concept } from '../types';
 import { type ConfigObject } from '../config-schema';
 import styles from './queue-table.scss';
 
-function DefaultQueueTable() {
+interface DefaultQueueTableProps {
+  /** Scope to a single queue. Without it, the selected location and service are used. */
+  queueUuid?: string;
+  /** The status to list. Without it, the configured waiting status is used. */
+  status?: Concept;
+}
+
+function DefaultQueueTable({ queueUuid, status }: DefaultQueueTableProps) {
   return (
     <div className={styles.defaultQueueTable}>
       <Layer className={styles.tableSection}>
-        <QueueTableSection />
+        <QueueTableSection queueUuid={queueUuid} status={status} />
       </Layer>
     </div>
   );
 }
 
-function QueueTableSection() {
+function QueueTableSection({ queueUuid, status }: DefaultQueueTableProps) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
@@ -29,16 +37,19 @@ function QueueTableSection() {
     concepts: { waitingStatusConceptUuid },
   } = useConfig<ConfigObject>();
   const [searchTerm, setSearchTerm] = useState('');
+  const statusUuid = status?.uuid ?? waitingStatusConceptUuid;
 
-  // Waiting list shows only waiting patients; in-service ones live in the Attending cards.
+  // One status per table; in-service patients live in the Attending cards rather than a table.
   const searchCriteria = useMemo(() => {
-    return {
-      service: selectedServiceUuid,
-      location: selectedQueueLocationUuid,
-      isEnded: false,
-      status: waitingStatusConceptUuid,
-    };
-  }, [selectedServiceUuid, selectedQueueLocationUuid, waitingStatusConceptUuid]);
+    return queueUuid
+      ? { queue: queueUuid, isEnded: false, status: statusUuid }
+      : {
+          service: selectedServiceUuid,
+          location: selectedQueueLocationUuid,
+          isEnded: false,
+          status: statusUuid,
+        };
+  }, [queueUuid, selectedServiceUuid, selectedQueueLocationUuid, statusUuid]);
 
   const { queueEntries, isLoading, error, isValidating, totalCount } = useQueueEntries(searchCriteria);
 
@@ -52,16 +63,20 @@ function QueueTableSection() {
     }
   }, [error?.message, t]);
 
-  const columns = useColumns(null, null);
+  const columns = useColumns(queueUuid ?? null, status ? statusUuid : null);
   useEffect(() => {
     if (!columns) {
       showSnackbar({
         kind: 'warning',
         title: t('notableConfig', 'No table configuration'),
-        subtitle: 'No table configuration defined for queue: null and status: null',
+        subtitle: t(
+          'noTableConfigForQueueAndStatus',
+          'No table configuration defined for queue: {{queue}} and status: {{status}}',
+          { queue: queueUuid ?? 'any', status: status ? statusUuid : 'any' },
+        ),
       });
     }
-  }, [columns, t]);
+  }, [columns, queueUuid, status, statusUuid, t]);
 
   const filteredQueueEntries = useMemo(() => {
     const searchTermLowercase = searchTerm.toLowerCase();
@@ -73,16 +88,19 @@ function QueueTableSection() {
     });
   }, [columns, queueEntries, searchTerm]);
 
-  // `totalCount` counts every waiting entry on the server, which is not what a search leaves in the table.
-  const waitingCount = searchTerm ? (filteredQueueEntries?.length ?? 0) : totalCount;
+  // `totalCount` counts every matching entry on the server, which is not what a search leaves in the table.
+  const shownCount = searchTerm ? (filteredQueueEntries?.length ?? 0) : totalCount;
+  const title = status ? status.display : t('waitingList', 'Waiting list');
 
   const heading = (
     <div className={styles.headerContainer}>
       <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
         <h2>
           {isLoading || error
-            ? t('waitingList', 'Waiting list')
-            : t('waitingListWithCount', 'Waiting list ({{count}})', { count: waitingCount })}
+            ? title
+            : status
+              ? t('statusListWithCount', '{{status}} ({{count}})', { status: status.display, count: shownCount })
+              : t('waitingListWithCount', 'Waiting list ({{count}})', { count: shownCount })}
         </h2>
       </div>
     </div>
@@ -104,11 +122,13 @@ function QueueTableSection() {
         ExpandedRow={QueueTableExpandedRow}
         isValidating={isValidating}
         queueEntries={filteredQueueEntries ?? []}
-        queueUuid={null}
-        statusUuid={null}
+        queueUuid={queueUuid ?? null}
+        statusUuid={status ? statusUuid : null}
         tableFilters={
           <>
-            <AddPatientToQueueButton />
+            {/* Adding a patient puts them in the waiting status, so the control only belongs on
+                that table — not on Finished service, or any other status a deployment adds. */}
+            {statusUuid === waitingStatusConceptUuid && <AddPatientToQueueButton />}
             <TableToolbarSearch
               className={styles.search}
               onChange={(e) => {

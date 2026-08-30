@@ -15,6 +15,7 @@ import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { useQueueEntries } from '../hooks/useQueueEntries';
+import { type Concept } from '../types';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -136,6 +137,41 @@ describe('DefaultQueueTable', () => {
 
     expect(screen.getByRole('heading', { name: /waiting list \(1\)/i })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Alice Johnson/i })).not.toBeInTheDocument();
+  });
+
+  describe('when scoped to one status of one queue', () => {
+    beforeEach(() => {
+      mockQueueLocations.mockReturnValue({ queueLocations: [], isLoading: false, error: null });
+      mockUseQueueEntries.mockReturnValue({
+        queueEntries: [],
+        isLoading: false,
+        error: undefined,
+        totalCount: 0,
+        isValidating: false,
+        mutate: vi.fn(),
+      });
+    });
+
+    it('heads the table with the status and offers to add a patient to a waiting list', () => {
+      const waitingStatus = {
+        uuid: getDefaultsFromConfigSchema<ConfigObject>(configSchema).concepts.waitingStatusConceptUuid,
+        display: 'Waiting',
+      } as Concept;
+
+      renderWithSwr(<DefaultQueueTable queueUuid="queue-uuid" status={waitingStatus} />);
+
+      expect(screen.getByRole('heading', { name: /waiting \(0\)/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /add a patient to this list/i })).toBeInTheDocument();
+    });
+
+    it('does not offer to add a patient to a finished-service list', () => {
+      const finishedStatus = { uuid: 'finished-service-uuid', display: 'Finished service' } as Concept;
+
+      renderWithSwr(<DefaultQueueTable queueUuid="queue-uuid" status={finishedStatus} />);
+
+      expect(screen.getByRole('heading', { name: /finished service \(0\)/i })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /add a patient to this list/i })).not.toBeInTheDocument();
+    });
   });
 });
 

@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// No border, padding or margin: the surrounding layout owns those and passes them via className.
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+}

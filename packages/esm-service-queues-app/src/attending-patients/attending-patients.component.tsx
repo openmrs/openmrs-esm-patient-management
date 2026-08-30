@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, SkeletonPlaceholder, Tag, Tile } from '@carbon/react';
-import {
-  age,
-  ConfigurableLink,
-  EmptyCardIllustration,
-  ErrorState,
-  getCoreTranslation,
-  PatientPhoto,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { Button, SkeletonPlaceholder, Tag } from '@carbon/react';
+import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
+import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
@@ -19,19 +12,33 @@ import styles from './attending-patients.scss';
 
 const collapsedCardCount = 3;
 
+interface AttendingPatientsProps {
+  /** Scope to a single queue. Without it, the selected location and service are used. */
+  queueUuid?: string;
+}
+
 // Renders patients currently being attended (queue entries with an "In Service" status) as cards.
-const AttendingPatients: React.FC = () => {
+const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
   const { t } = useTranslation();
   const {
     concepts: { defaultTransitionStatus },
   } = useConfig<ConfigObject>();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
-  const { queueEntries, isLoading, error } = useQueueEntries({
-    service: selectedServiceUuid,
-    location: selectedQueueLocationUuid,
-    status: defaultTransitionStatus,
-    isEnded: false,
-  });
+
+  const searchCriteria = useMemo(
+    () =>
+      queueUuid
+        ? { queue: queueUuid, status: defaultTransitionStatus, isEnded: false }
+        : {
+            service: selectedServiceUuid,
+            location: selectedQueueLocationUuid,
+            status: defaultTransitionStatus,
+            isEnded: false,
+          },
+    [queueUuid, selectedServiceUuid, selectedQueueLocationUuid, defaultTransitionStatus],
+  );
+
+  const { queueEntries, isLoading, error } = useQueueEntries(searchCriteria);
   const [showAll, setShowAll] = useState(false);
 
   const visibleEntries = showAll ? queueEntries : queueEntries.slice(0, collapsedCardCount);
@@ -60,10 +67,7 @@ const AttendingPatients: React.FC = () => {
       ) : error ? (
         <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
       ) : queueEntries.length === 0 ? (
-        <Tile className={styles.emptyState}>
-          <EmptyCardIllustration />
-          <p className={styles.emptyStateContent}>{t('noOneBeingAttended', 'No one is being attended')}</p>
-        </Tile>
+        <EmptyState className={styles.emptyState} displayText={t('noOneBeingAttended', 'No one is being attended')} />
       ) : (
         <div className={styles.cards}>
           {visibleEntries.map((queueEntry) => (

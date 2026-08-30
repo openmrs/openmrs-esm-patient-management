@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import dayjs from 'dayjs';
 import QueueDuration from './queue-duration.component';
 
@@ -14,6 +14,25 @@ describe('QueueDuration', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it('counts a long wait in days, and does not pad a shorter one with a zero day', () => {
+    render(<QueueDuration startedAt={dayjs().subtract(30, 'hours').toDate()} thresholds={[]} />);
+    expect(screen.getByText('1 day, 6 hours, 0 minutes')).toBeInTheDocument();
+
+    render(<QueueDuration startedAt={dayjs().subtract(90, 'minutes').toDate()} thresholds={[]} />);
+    expect(screen.getByText('1 hour, 30 minutes')).toBeInTheDocument();
+  });
+
+  it('refreshes without a refetch as time passes', () => {
+    render(<QueueDuration startedAt={dayjs().subtract(5, 'minutes').toDate()} thresholds={[]} />);
+    expect(screen.getByText('5 minutes')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+
+    expect(screen.getByText('6 minutes')).toBeInTheDocument();
   });
 
   it('does not colour the wait time when no thresholds are configured', () => {
