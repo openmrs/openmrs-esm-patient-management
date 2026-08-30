@@ -69,12 +69,13 @@ describe('AttendingPatients', () => {
     expect(screen.queryByText(/1990/)).not.toBeInTheDocument();
   });
 
-  it('says explicitly that no one is being attended rather than hiding the section', () => {
+  it('says explicitly that no patients are being attended to rather than hiding the section', () => {
     mockEntries([]);
     render(<AttendingPatients />);
 
     expect(screen.getByText('Attending')).toBeInTheDocument();
-    expect(screen.getByText('No one is being attended')).toBeInTheDocument();
+    expect(screen.getByText('No patients are currently being attended to')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveClass('cds--layer-two');
   });
 
   it('distinguishes a failed request from an empty list', () => {
@@ -82,7 +83,7 @@ describe('AttendingPatients', () => {
     render(<AttendingPatients />);
 
     expect(screen.getByText('Error State')).toBeInTheDocument();
-    expect(screen.queryByText('No one is being attended')).not.toBeInTheDocument();
+    expect(screen.queryByText('No patients are currently being attended to')).not.toBeInTheDocument();
   });
 
   it('caps the cards and reveals the rest behind "View all"', async () => {

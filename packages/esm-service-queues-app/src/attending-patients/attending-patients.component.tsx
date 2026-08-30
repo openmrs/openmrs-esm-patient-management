@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, SkeletonPlaceholder, Tag, Tile } from '@carbon/react';
+import { Button, Layer, SkeletonPlaceholder, Tag, Tile } from '@carbon/react';
 import {
   age,
   ConfigurableLink,
@@ -60,10 +60,14 @@ const AttendingPatients: React.FC = () => {
       ) : error ? (
         <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
       ) : queueEntries.length === 0 ? (
-        <Tile className={styles.emptyState}>
-          <EmptyCardIllustration />
-          <p className={styles.emptyStateContent}>{t('noOneBeingAttended', 'No one is being attended')}</p>
-        </Tile>
+        <Layer role="status">
+          <Tile className={styles.emptyState}>
+            <EmptyCardIllustration />
+            <p className={styles.emptyStateContent}>
+              {t('noOneBeingAttended', 'No patients are currently being attended to')}
+            </p>
+          </Tile>
+        </Layer>
       ) : (
         <div className={styles.cards}>
           {visibleEntries.map((queueEntry) => (
