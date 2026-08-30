@@ -1,17 +1,35 @@
 import { useMemo } from 'react';
-import dayjs from 'dayjs';
-import { useConfig } from '@openmrs/esm-framework';
+import useSWR from 'swr';
+import { openmrsFetch, parseDate, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { type Queue, type QueueEntry } from '../types';
-import { useQueueEntries } from './useQueueEntries';
-import { useQueues } from './useQueues';
+import { type Queue } from '../types';
 
-const clinicRollupRepresentation = 'custom:(uuid,startedAt,status:(uuid),queue:(uuid),patient:(uuid,person:(display)))';
+// The roll-up reports on those still waiting, so it asks for the open-wait metrics rather than
+// `averageWaitTime`, which the queue module measures over waits that have already finished.
+const metrics = ['countsByStatus', 'averageOpenWaitTime', 'longestOpenWait'];
+
+interface LongestOpenWait {
+  minutes: number;
+  queueEntry: {
+    uuid: string;
+    startedAt: string;
+    patient?: { uuid: string; display: string };
+  };
+}
+
+interface QueueEntryMetrics {
+  countsByStatus: Record<string, number>;
+  averageOpenWaitTime: number | null;
+  longestOpenWait: LongestOpenWait | null;
+}
+
+interface QueueEntryMetricsResponse extends QueueEntryMetrics {
+  queues: Array<QueueEntryMetrics & { queue: Queue }>;
+}
 
 interface Summary {
   waiting: number;
   attending: number;
-  totalWaitMinutes: number;
   averageWaitMinutes: number | null;
   longestWait: { minutes: number; startedAt: Date; patientName: string } | null;
 }
@@ -20,104 +38,52 @@ export interface QueueRollup extends Summary {
   queue: Queue;
 }
 
-const emptySummary: Summary = {
-  waiting: 0,
-  attending: 0,
-  totalWaitMinutes: 0,
-  averageWaitMinutes: null,
-  longestWait: null,
-};
-
-function average(totalWaitMinutes: number, waiting: number) {
-  return waiting === 0 ? null : Math.round(totalWaitMinutes / waiting);
-}
-
 export function useClinicQueueMetrics(locationUuid?: string, serviceUuid?: string) {
   const {
     concepts: { waitingStatusConceptUuid, defaultTransitionStatus },
   } = useConfig<ConfigObject>();
 
-  const { queues: queuesAtLocation, isLoading: isLoadingQueues, error: queuesError } = useQueues(locationUuid);
-  const {
-    queueEntries,
-    isLoading: isLoadingEntries,
-    error: entriesError,
-  } = useQueueEntries({ location: locationUuid, service: serviceUuid, isEnded: false }, clinicRollupRepresentation);
+  const searchParams = new URLSearchParams({ groupBy: 'queue', isEnded: 'false' });
+  metrics.forEach((metric) => searchParams.append('metric', metric));
+  if (locationUuid) {
+    searchParams.append('location', locationUuid);
+  }
+  if (serviceUuid) {
+    searchParams.append('service', serviceUuid);
+  }
 
-  // useQueues cannot narrow by service, so the narrowing the entry search gets for free on the server
-  // is repeated here, otherwise the rows and the entries would describe different sets of queues.
-  const queues = useMemo(
-    () => (serviceUuid ? queuesAtLocation.filter((queue) => queue.service?.uuid === serviceUuid) : queuesAtLocation),
-    [queuesAtLocation, serviceUuid],
+  // The URL contains `/queue-entry`, so useMutateQueueEntries still revalidates these figures when
+  // an entry is added, moved or ended.
+  const { data, isLoading, error } = useSWR<{ data: QueueEntryMetricsResponse }, Error>(
+    `${restBaseUrl}/queue-entry-metric?${searchParams.toString()}`,
+    openmrsFetch,
   );
 
   const { rollups, totals } = useMemo(() => {
-    const now = dayjs();
-
-    const entriesByQueue = new Map<string, Array<QueueEntry>>();
-    for (const entry of queueEntries) {
-      const queueUuid = entry.queue?.uuid;
-      if (queueUuid) {
-        const bucket = entriesByQueue.get(queueUuid);
-        if (bucket) {
-          bucket.push(entry);
-        } else {
-          entriesByQueue.set(queueUuid, [entry]);
-        }
-      }
+    function summarise(queueMetrics: QueueEntryMetrics): Summary {
+      const { countsByStatus, averageOpenWaitTime, longestOpenWait } = queueMetrics;
+      return {
+        // Only the two configured statuses are reported, so entries a deployment holds in some other
+        // unfinished status count towards neither figure.
+        waiting: countsByStatus?.[waitingStatusConceptUuid] ?? 0,
+        attending: countsByStatus?.[defaultTransitionStatus] ?? 0,
+        averageWaitMinutes: averageOpenWaitTime == null ? null : Math.round(averageOpenWaitTime),
+        longestWait: longestOpenWait
+          ? {
+              minutes: longestOpenWait.minutes,
+              startedAt: parseDate(longestOpenWait.queueEntry.startedAt),
+              patientName: longestOpenWait.queueEntry.patient?.display ?? '',
+            }
+          : null,
+      };
     }
 
-    function summarise(entries: Array<QueueEntry>): Summary {
-      const summary = { ...emptySummary };
+    const response = data?.data;
+    return {
+      rollups: (response?.queues ?? []).map<QueueRollup>((queue) => ({ queue: queue.queue, ...summarise(queue) })),
+      totals: summarise(response ?? { countsByStatus: {}, averageOpenWaitTime: null, longestOpenWait: null }),
+    };
+  }, [data, waitingStatusConceptUuid, defaultTransitionStatus]);
 
-      for (const entry of entries) {
-        if (entry.status?.uuid === defaultTransitionStatus) {
-          summary.attending++;
-        } else if (entry.status?.uuid === waitingStatusConceptUuid) {
-          const startedAt = new Date(entry.startedAt);
-          const minutes = now.diff(startedAt, 'minute');
-          summary.waiting++;
-          summary.totalWaitMinutes += minutes;
-          if (!summary.longestWait || minutes > summary.longestWait.minutes) {
-            summary.longestWait = { minutes, startedAt, patientName: entry.patient?.person?.display ?? '' };
-          }
-        }
-      }
-
-      summary.averageWaitMinutes = average(summary.totalWaitMinutes, summary.waiting);
-      return summary;
-    }
-
-    // Driven by the queue list, so a queue with nobody in it still gets a row of zeros.
-    const rollups = queues.map<QueueRollup>((queue) => ({
-      queue,
-      ...summarise(entriesByQueue.get(queue.uuid) ?? []),
-    }));
-
-    // Folded from the rows rather than recomputed over every entry, so the totals always agree with
-    // what is on screen even when an entry belongs to a queue outside the current location.
-    const totals = rollups.reduce<Summary>(
-      (running, rollup) => ({
-        waiting: running.waiting + rollup.waiting,
-        attending: running.attending + rollup.attending,
-        totalWaitMinutes: running.totalWaitMinutes + rollup.totalWaitMinutes,
-        averageWaitMinutes: null,
-        longestWait:
-          rollup.longestWait && (!running.longestWait || rollup.longestWait.minutes > running.longestWait.minutes)
-            ? rollup.longestWait
-            : running.longestWait,
-      }),
-      { ...emptySummary },
-    );
-    totals.averageWaitMinutes = average(totals.totalWaitMinutes, totals.waiting);
-
-    return { rollups, totals };
-  }, [queueEntries, queues, waitingStatusConceptUuid, defaultTransitionStatus]);
-
-  return {
-    rollups,
-    totals,
-    isLoading: isLoadingQueues || isLoadingEntries,
-    error: queuesError ?? entriesError,
-  };
+  return { rollups, totals, isLoading, error };
 }
