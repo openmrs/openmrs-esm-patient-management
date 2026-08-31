@@ -8,6 +8,15 @@ import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch, { initialFilters } from './refine-search/refine-search.component';
 import styles from './advanced-patient-search.scss';
 
+const resultsPerPage = 50;
+
+/**
+ * How many pages to request at once. Every page of a result set still gets loaded — this only
+ * bounds how many are in flight together, so a query matching thousands of patients arrives in a
+ * handful of waves instead of one burst of requests at the backend.
+ */
+const pagesPerWave = 8;
+
 interface AdvancedPatientSearchProps {
   query: string;
   inTabletOrOverlay?: boolean;
@@ -39,16 +48,26 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     data: searchResults,
     currentPage,
     setPage,
-    hasMore,
     isLoading,
+    isValidating,
     fetchError,
-  } = useInfinitePatientSearch(query, includeDead, !!query, 50);
+    totalResults,
+  } = useInfinitePatientSearch(query, includeDead, !!query, resultsPerPage);
+
+  // The refine-search filters and the result count below both run over the rows held on the client,
+  // so the whole result set has to be loaded. `useInfinitePatientSearch` fetches pages in parallel,
+  // so request them a wave at a time: a 1700-result query then costs five round trips rather than
+  // the thirty-four it took to walk the set one page at a time, without leaving any patient
+  // unreachable. Waiting on `isValidating` is what keeps a wave from being requested on top of the
+  // one still in flight — `currentPage` advances as soon as the pages are asked for, not when they
+  // land, so without it every wave would collapse back into a single burst.
+  const pagesNeeded = Math.ceil(totalResults / resultsPerPage);
 
   useEffect(() => {
-    if (searchResults?.length === currentPage * 50 && hasMore) {
-      setPage((page) => page + 1);
+    if (!isValidating && pagesNeeded > currentPage) {
+      setPage(Math.min(currentPage + pagesPerWave, pagesNeeded));
     }
-  }, [searchResults, currentPage, hasMore, setPage]);
+  }, [isValidating, pagesNeeded, currentPage, setPage]);
 
   const filteredResults = useMemo(() => {
     if (searchResults && filtersApplied) {

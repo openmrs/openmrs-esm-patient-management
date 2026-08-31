@@ -120,23 +120,20 @@ export function useInfinitePatientSearch(
   resultsToFetch: number = 10,
   customRepresentation: string = patientSearchCustomRepresentation,
 ): PatientSearchResponse {
-  const getUrl = useCallback(
-    (
-      page: number,
-      prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
-    ) => {
-      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
-        return null;
-      }
+  const { cache } = useSWRConfig();
 
+  const buildUrl = useCallback(
+    (page: number) => {
       const baseUrl = `${restBaseUrl}/patient`;
       const params = new URLSearchParams({
         q: searchQuery,
         v: customRepresentation,
         includeDead: includeDead.toString(),
         limit: resultsToFetch.toString(),
-        totalCount: 'true',
-        ...(page ? { startIndex: (page * resultsToFetch).toString() } : {}),
+        // Only page 1's count is ever read (see `totalResults` below). `totalCount=true` makes the
+        // REST module run a separate count query, so asking for it on every appended page buys
+        // nothing and adds a second query to each round trip.
+        ...(page ? { startIndex: (page * resultsToFetch).toString() } : { totalCount: 'true' }),
       });
 
       return `${baseUrl}?${params.toString()}`;
@@ -145,6 +142,30 @@ export function useInfinitePatientSearch(
   );
 
   const shouldFetch = isSearching && Boolean(searchQuery);
+  const firstPageUrl = shouldFetch ? buildUrl(0) : null;
+
+  // Read the total through the cache rather than off `data`: `keepPreviousData` leaves the outgoing
+  // query's pages in `data` while a new query loads, so `data[0]` would report the wrong query's
+  // total — and callers size their page requests from it.
+  const totalCount = firstPageUrl ? cache.get(firstPageUrl)?.data?.data?.totalCount : undefined;
+
+  // Pages are fetched in parallel, so appending one costs a round trip rather than a round trip per
+  // page walked. The trade-off is that SWR no longer passes the previous page to `getKey`, so the
+  // end of the result set is recognised from the total page 1 reports instead of its `next` link.
+  // Until that total is known there is nothing to page through, so only page 1 is requested.
+  const getUrl = useCallback(
+    (page: number) => {
+      if (page > 0) {
+        const total = cache.get(buildUrl(0))?.data?.data?.totalCount;
+        if (total === undefined || page * resultsToFetch >= total) {
+          return null;
+        }
+      }
+
+      return buildUrl(page);
+    },
+    [buildUrl, cache, resultsToFetch],
+  );
 
   // Re-fetching page 1 on every page load would cost a round trip and replace the rendered rows'
   // objects, breaking the identity they memoize on. See `useRevalidateFirstPageOnce` for how the
@@ -152,9 +173,9 @@ export function useInfinitePatientSearch(
   const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<
     InfinitePatientSearchResponse,
     Error
-  >(shouldFetch ? getUrl : null, fetcher, { keepPreviousData: true, revalidateFirstPage: false });
+  >(shouldFetch ? getUrl : null, fetcher, { keepPreviousData: true, revalidateFirstPage: false, parallel: true });
 
-  useRevalidateFirstPageOnce(shouldFetch ? getUrl(0, null) : null, mutate);
+  useRevalidateFirstPageOnce(firstPageUrl, mutate);
 
   // Filter out null patients and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
@@ -179,9 +200,9 @@ export function useInfinitePatientSearch(
       isValidating,
       setPage: setSize,
       currentPage: size,
-      totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
+      totalResults: totalCount ?? 0,
     }),
-    [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size],
+    [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size, totalCount],
   );
 }
 
