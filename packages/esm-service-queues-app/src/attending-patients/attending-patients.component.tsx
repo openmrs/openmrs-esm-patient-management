@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, SkeletonPlaceholder, Tag } from '@carbon/react';
+import { Button, Layer, SkeletonPlaceholder, Tag } from '@carbon/react';
 import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
 import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
@@ -67,7 +67,12 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
       ) : error ? (
         <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
       ) : queueEntries.length === 0 ? (
-        <EmptyState className={styles.emptyState} displayText={t('noOneBeingAttended', 'No one is being attended')} />
+        <Layer role="status">
+          <EmptyState
+            className={styles.emptyState}
+            displayText={t('noOneBeingAttended', 'No patients are currently being attended to')}
+          />
+        </Layer>
       ) : (
         <div className={styles.cards}>
           {visibleEntries.map((queueEntry) => (
