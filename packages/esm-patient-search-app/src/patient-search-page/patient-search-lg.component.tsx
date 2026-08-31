@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
@@ -33,8 +33,15 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     resultsToShow,
   );
 
+  // `goTo` from `usePagination` is rebuilt whenever `totalPages` changes, and `totalPages` grows
+  // as the infinite search appends server pages. Depending on `goTo` alone would therefore snap the
+  // user back to page 1 every time another page of results lands. Reset only on an actual new query.
+  const previousQueryRef = useRef(query);
   useEffect(() => {
-    goTo(1);
+    if (previousQueryRef.current !== query) {
+      previousQueryRef.current = query;
+      goTo(1);
+    }
   }, [query, goTo]);
 
   const searchResultsView = useMemo(() => {
