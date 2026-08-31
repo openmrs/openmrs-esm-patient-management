@@ -40,10 +40,10 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     );
   }
 
+  const allowedStatuses = selectedQueue?.allowedStatuses ?? [];
+
   // In-service patients are the Attending cards, so they get no table of their own.
-  const tabledStatuses = [...(selectedQueue?.allowedStatuses ?? [])]
-    .reverse()
-    .filter((status) => status.uuid !== defaultTransitionStatus);
+  const tabledStatuses = [...allowedStatuses].reverse().filter((status) => status.uuid !== defaultTransitionStatus);
 
   return (
     <>
@@ -54,7 +54,9 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
         <>
           <QueueTableMetrics selectedQueue={selectedQueue} />
           <AttendingPatients queueUuid={selectedQueue.uuid} />
-          {tabledStatuses.length === 0 ? (
+          {/* Only a queue allowing no status at all is misconfigured: one allowing just the
+              in-service status has no table, but the Attending cards above are its list. */}
+          {allowedStatuses.length === 0 ? (
             <InlineNotification
               kind="error"
               lowContrast

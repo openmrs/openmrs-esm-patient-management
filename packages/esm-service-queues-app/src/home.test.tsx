@@ -130,6 +130,17 @@ describe('Home Component', () => {
       expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
     });
 
+    it('leaves the unselected tab unmounted rather than polling behind the one on screen', async () => {
+      const user = userEvent.setup();
+      render(<Home />);
+
+      expect(screen.queryByRole('table', { name: /queue table/i })).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('tab', { name: /waiting list/i }));
+
+      expect(screen.queryByTestId('clinic-overview')).not.toBeInTheDocument();
+    });
+
     // The overview carries its own clinic totals, so the header's metrics would duplicate them.
     it('shows the header metrics only alongside the waiting list', async () => {
       const user = userEvent.setup();

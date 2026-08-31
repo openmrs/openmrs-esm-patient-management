@@ -34,7 +34,7 @@ function QueueTableSection({ queueUuid, status }: DefaultQueueTableProps) {
   const layout = useLayoutType();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const {
-    concepts: { waitingStatusConceptUuid },
+    concepts: { defaultStatusConceptUuid, waitingStatusConceptUuid },
   } = useConfig<ConfigObject>();
   const [searchTerm, setSearchTerm] = useState('');
   const statusUuid = status?.uuid ?? waitingStatusConceptUuid;
@@ -126,9 +126,10 @@ function QueueTableSection({ queueUuid, status }: DefaultQueueTableProps) {
         statusUuid={status ? statusUuid : null}
         tableFilters={
           <>
-            {/* Adding a patient puts them in the waiting status, so the control only belongs on
-                that table — not on Finished service, or any other status a deployment adds. */}
-            {statusUuid === waitingStatusConceptUuid && <AddPatientToQueueButton />}
+            {/* A new entry starts in `defaultStatusConceptUuid`, so a status-scoped table only gets
+                the control when the patient would land in it — not on Finished service, or any other
+                status a deployment adds. The unscoped list is the dashboard's own add action. */}
+            {(!status || statusUuid === defaultStatusConceptUuid) && <AddPatientToQueueButton />}
             <TableToolbarSearch
               className={styles.search}
               onChange={(e) => {

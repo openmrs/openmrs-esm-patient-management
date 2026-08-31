@@ -28,7 +28,8 @@ vi.mock('../queue-table/default-queue-table.component', () => ({
 const config = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 const inServiceUuid = config.concepts.defaultTransitionStatus;
 
-// The backend returns allowed statuses in reverse workflow order, which the view flips back.
+// The concept set in the dictionary returns the statuses as [Finished service, In Service, Waiting].
+// The view reverses the list, so the tables show Waiting first.
 const queue = {
   uuid: 'q1',
   display: 'Outpatient Triage',
@@ -63,6 +64,23 @@ describe('QueueTablesForAllStatuses', () => {
 
     expect(screen.getByText('Outpatient Triage')).toBeInTheDocument();
     expect(screen.getByTestId('queue-metrics')).toBeInTheDocument();
+  });
+
+  // In-service patients are the Attending cards, so such a queue has no table but is configured fine.
+  it('treats a queue that allows only the in-service status as configured', () => {
+    render(
+      <QueueTablesForAllStatuses
+        selectedQueue={
+          { ...queue, allowedStatuses: [{ uuid: inServiceUuid, display: 'In Service' }] } as unknown as Queue
+        }
+        isLoadingQueue={false}
+        errorFetchingQueue={null}
+      />,
+    );
+
+    expect(screen.queryByText(/no status configured/i)).not.toBeInTheDocument();
+    expect(screen.getByTestId('attending-patients')).toHaveTextContent('attending:q1');
+    expect(screen.queryByTestId('status-table')).not.toBeInTheDocument();
   });
 
   it('asks for a status to be configured when the queue allows none', () => {

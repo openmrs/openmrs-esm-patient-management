@@ -47,12 +47,14 @@ const Home: React.FC = () => {
           <Tab className={styles.tab}>{t('clinicOverview', 'Clinic overview')}</Tab>
           <Tab className={styles.tab}>{t('waitingList', 'Waiting list')}</Tab>
         </TabList>
+        {/* Carbon keeps hidden panels mounted, so each panel is gated on being the selected one:
+            otherwise the tab nobody is looking at keeps polling for queue entries. */}
         <TabPanels>
           <TabPanel className={styles.tabPanel}>
-            <ClinicOverview />
+            {selectedTabIndex === clinicOverviewTabIndex && <ClinicOverview />}
           </TabPanel>
           <TabPanel className={styles.tabPanel}>
-            <WaitingListView />
+            {selectedTabIndex !== clinicOverviewTabIndex && <WaitingListView />}
           </TabPanel>
         </TabPanels>
       </Tabs>

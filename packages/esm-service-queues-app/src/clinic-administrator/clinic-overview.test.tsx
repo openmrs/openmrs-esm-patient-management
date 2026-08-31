@@ -1,9 +1,10 @@
 import React from 'react';
 import { vi, describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { useClinicQueueMetrics } from '../hooks/useClinicQueueMetrics';
+import { useClinicQueueMetrics, type QueueRollup } from '../hooks/useClinicQueueMetrics';
 import { useServiceQueuesStore } from '../store/store';
 import { type Queue } from '../types';
 import ClinicOverview from './clinic-overview.component';
@@ -22,12 +23,17 @@ function queue(uuid: string, display: string, location: string, service: string)
   return { uuid, display, name: display, location: { display: location }, service: { display: service } } as Queue;
 }
 
-function rollup(queue: Queue, waiting: number, attending: number, longestWaitMinutes: number | null, patient = '') {
+function rollup(
+  queue: Queue,
+  waiting: number,
+  attending: number,
+  longestWaitMinutes: number | null,
+  patient = '',
+): QueueRollup {
   return {
     queue,
     waiting,
     attending,
-    totalWaitMinutes: longestWaitMinutes ?? 0,
     averageWaitMinutes: longestWaitMinutes,
     longestWait:
       longestWaitMinutes === null ? null : { minutes: longestWaitMinutes, startedAt: new Date(), patientName: patient },
@@ -40,20 +46,23 @@ const rollups = [
   rollup(queue('q3', 'Antenatal', 'MCH clinic', 'Antenatal care'), 0, 0, null),
 ];
 
-function givenMetrics(overrides: Partial<ReturnType<typeof useClinicQueueMetrics>> = {}) {
-  mockUseClinicQueueMetrics.mockReturnValue({
+type ClinicQueueMetrics = ReturnType<typeof useClinicQueueMetrics>;
+
+function givenMetrics(overrides: Partial<ClinicQueueMetrics> = {}) {
+  // Annotated rather than cast, so a field the hook does not actually return is flagged.
+  const metrics: ClinicQueueMetrics = {
     rollups,
     totals: {
       waiting: 20,
       attending: 5,
-      totalWaitMinutes: 520,
       averageWaitMinutes: 26,
       longestWait: { minutes: 108, startedAt: new Date(), patientName: 'Achieng Otieno' },
     },
     isLoading: false,
     error: undefined,
-    ...overrides,
-  } as ReturnType<typeof useClinicQueueMetrics>);
+  };
+
+  mockUseClinicQueueMetrics.mockReturnValue({ ...metrics, ...overrides });
 }
 
 function givenSelectedLocation(uuid: string | null, name: string | null = null, serviceUuid: string | null = null) {
@@ -62,6 +71,14 @@ function givenSelectedLocation(uuid: string | null, name: string | null = null, 
     selectedQueueLocationName: name,
     selectedServiceUuid: serviceUuid,
   } as ReturnType<typeof useServiceQueuesStore>);
+}
+
+// The queue name is the first cell of every body row.
+function queueNamesInOrder() {
+  return screen
+    .getAllByRole('row')
+    .slice(1)
+    .map((row) => within(row).getAllByRole('cell')[0].textContent);
 }
 
 describe('ClinicOverview', () => {
@@ -124,9 +141,22 @@ describe('ClinicOverview', () => {
   it('puts the queue with the longest wait first', () => {
     render(<ClinicOverview />);
 
-    const rows = screen.getAllByRole('row').slice(1);
-    expect(rows[0]).toHaveTextContent('Clinician review');
-    expect(rows[rows.length - 1]).toHaveTextContent('Antenatal');
+    expect(queueNamesInOrder()).toEqual(['Clinician review', 'Triage', 'Antenatal']);
+  });
+
+  // The order above comes from the `rows` memo; Carbon only reaches `sortRow` once a header is clicked.
+  it('sorts the longest wait numerically, keeping queues with no wait at the bottom either way', async () => {
+    const user = userEvent.setup();
+    render(<ClinicOverview />);
+
+    const longestWait = within(screen.getByRole('columnheader', { name: /longest wait/i })).getByRole('button');
+
+    await user.click(longestWait);
+    expect(queueNamesInOrder()).toEqual(['Triage', 'Clinician review', 'Antenatal']);
+
+    await user.click(longestWait);
+    // 108 above 38 rather than '108' below '38', and the queue with no wait still last.
+    expect(queueNamesInOrder()).toEqual(['Clinician review', 'Triage', 'Antenatal']);
   });
 
   it('scopes the metrics to the location selected in the shared store', () => {

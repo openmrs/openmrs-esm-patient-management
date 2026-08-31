@@ -123,7 +123,7 @@ const ClinicOverview: React.FC = () => {
     <>
       <div className={metricsStyles.metricsBorder} data-testid="clinic-administrator-metrics">
         {totalsCards.map(({ key, title, value }) => (
-          <QueueMetricTile key={key} headerLabel={title} value={isLoading || value == null ? '--' : value} />
+          <QueueMetricTile key={key} headerLabel={title} value={isLoading || error || value == null ? '--' : value} />
         ))}
       </div>
 
