@@ -8,7 +8,6 @@ import { useSelectedDate } from '../hooks/useSelectedDate';
 import { type CalendarViewMode } from '../types';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
-import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
 import ServicesLegend from './services-legend.component';
 import { buildServiceColorMap } from './utils/calendar-colors';
@@ -25,13 +24,11 @@ const AppointmentsCalendarView: React.FC = () => {
 
   const handlePrev = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
-    else if (viewMode === 'weekly') setCalendarSelectedDate((d) => d.subtract(7, 'day'));
     else setCalendarSelectedDate((d) => d.subtract(1, 'day'));
   }, [viewMode]);
 
   const handleNext = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.add(1, 'month'));
-    else if (viewMode === 'weekly') setCalendarSelectedDate((d) => d.add(7, 'day'));
     else setCalendarSelectedDate((d) => d.add(1, 'day'));
   }, [viewMode]);
 
@@ -75,13 +72,9 @@ const AppointmentsCalendarView: React.FC = () => {
           serviceColorMap={serviceColorMap}
         />
       )}
-      {viewMode === 'weekly' && (
-        <WeeklyCalendarView
-          calendarSelectedDate={calendarSelectedDate}
-          onSelectDate={(isoDate) => handleSelectDate(isoDate)}
-        />
+      {viewMode === 'daily' && (
+        <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
       )}
-      {viewMode === 'daily' && <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />}
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />
     </div>
   );
