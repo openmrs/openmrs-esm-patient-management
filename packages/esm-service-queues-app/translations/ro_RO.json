@@ -76,7 +76,7 @@
   "noActiveVisit": "No active visit",
   "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "Nicio coloană definită în tabel. Verifică configurația",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "Niciun pacient de afișat",
   "noPreviousVisitFound": "Nu a fost găsită o vizită anterioară",
   "noPrioritiesConfigured": "Nu au fost configurate priorități",

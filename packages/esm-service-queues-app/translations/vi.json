@@ -76,7 +76,7 @@
   "noActiveVisit": "No active visit",
   "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "Không có cột bảng nào được xác định. Kiểm tra cấu hình",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "Không có bệnh nhân để hiển thị",
   "noPreviousVisitFound": "Không tìm thấy lượt thăm khám trước",
   "noPrioritiesConfigured": "Không có ưu tiên nào được cấu hình",

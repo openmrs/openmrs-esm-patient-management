@@ -76,7 +76,7 @@
   "noActiveVisit": "无活跃就诊",
   "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "未定义表格列，请检查配置。",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "没有患者可显示",
   "noPreviousVisitFound": "未找到先前的就诊",
   "noPrioritiesConfigured": "未配置优先级",
