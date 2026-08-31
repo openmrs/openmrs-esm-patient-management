@@ -55,25 +55,25 @@ describe('useMonthlyAppointments', () => {
     expect(mockOpenmrsFetch).not.toHaveBeenCalled();
   });
 
-  it('POSTs the month start to the search endpoint', async () => {
+  it('fetches all days in the month using the GET /appointments?forDate= endpoint', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
 
     renderHook(() => useMonthlyAppointments(dayjs('2026-08-15')), { wrapper });
 
-    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
-    const [url, options] = mockOpenmrsFetch.mock.calls[0];
-    expect(url).toBe(`${restBaseUrl}/appointments/search?limit=5000`);
-    expect(options.method).toBe('POST');
-    expect(options.body.startDate).toMatch(/^2026-08-01T/);
-    expect(options.body.endDate).toMatch(/^2026-08-31T/);
-    expect(options.body.limit).toBe(5000);
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(31));
+    const urls: Array<string> = mockOpenmrsFetch.mock.calls.map(([url]) => url as string);
+    expect(urls[0]).toContain(`${restBaseUrl}/appointments?forDate=`);
+    expect(urls[0]).toContain('2026-08-01');
+    expect(urls[30]).toContain('2026-08-31');
   });
 
-  it('extracts, sorts by startDateTime, and filters to the requested month', async () => {
+  it('deduplicates recurring appointments and sorts by startDateTime', async () => {
     const early = mockAppointment({ uuid: 'early', startDateTime: new Date('2026-08-05T09:00:00').getTime() });
     const late = mockAppointment({ uuid: 'late', startDateTime: new Date('2026-08-25T14:00:00').getTime() });
-    const nextMonth = mockAppointment({ uuid: 'next-month', startDateTime: new Date('2026-09-02T10:00:00').getTime() });
-    mockOpenmrsFetch.mockResolvedValue({ data: [late, nextMonth, early] } as FetchResponse);
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: [late, early] } as FetchResponse)
+      .mockResolvedValueOnce({ data: [early] } as FetchResponse)
+      .mockResolvedValue({ data: [] } as FetchResponse);
 
     const { result } = renderHook(() => useMonthlyAppointments(dayjs('2026-08-15')), { wrapper });
 
@@ -86,9 +86,7 @@ describe('useMonthlyAppointments', () => {
       .mockResolvedValueOnce({
         data: [mockAppointment({ uuid: 'aug', startDateTime: new Date('2026-08-10').getTime() })],
       } as FetchResponse)
-      .mockResolvedValueOnce({
-        data: [mockAppointment({ uuid: 'sep', startDateTime: new Date('2026-09-10').getTime() })],
-      } as FetchResponse);
+      .mockResolvedValue({ data: [] } as FetchResponse);
 
     const { result, rerender } = renderHook(
       ({ forDate }: { forDate: ReturnType<typeof dayjs> }) => useMonthlyAppointments(forDate),
@@ -98,12 +96,18 @@ describe('useMonthlyAppointments', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.appointments[0]?.uuid).toBe('aug'));
+    await waitFor(() => expect(result.current.appointments.some((a) => a.uuid === 'aug')).toBe(true));
+
+    mockOpenmrsFetch.mockReset();
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({
+        data: [mockAppointment({ uuid: 'sep', startDateTime: new Date('2026-09-10').getTime() })],
+      } as FetchResponse)
+      .mockResolvedValue({ data: [] } as FetchResponse);
 
     rerender({ forDate: dayjs('2026-09-15') });
 
-    await waitFor(() => expect(result.current.appointments[0]?.uuid).toBe('sep'));
-    expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(result.current.appointments.some((a) => a.uuid === 'sep')).toBe(true));
   });
 
   it('surfaces the error when the fetch fails', async () => {

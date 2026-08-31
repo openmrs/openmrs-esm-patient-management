@@ -55,19 +55,11 @@ const AppointmentsCalendarView: React.FC = () => {
   }, [summaryEvents, hasServiceFilter, serviceUuids]);
 
   const filteredMonthlyEvents = useMemo(() => {
-    if (!isMonthly || (!hasProviderOrLocationFilter && !hasServiceFilter)) return null;
+    if (!isMonthly || !hasProviderOrLocationFilter) return null;
     return aggregateDailyCountsByService(
       filterAppointments(monthlyAppointments, { serviceUuids, providerUuids, locationUuids }),
     );
-  }, [
-    isMonthly,
-    hasProviderOrLocationFilter,
-    hasServiceFilter,
-    monthlyAppointments,
-    serviceUuids,
-    providerUuids,
-    locationUuids,
-  ]);
+  }, [isMonthly, hasProviderOrLocationFilter, monthlyAppointments, serviceUuids, providerUuids, locationUuids]);
 
   const calendarEvents = isMonthly
     ? hasProviderOrLocationFilter
