@@ -197,7 +197,9 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   }, [queueLocation, memoizedQueues, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
-    if (queueService && priorities.length > 0) {
+    // A prefilled service is not known to be offered until the patient's entries have loaded, so
+    // hold off on the priority that would let it be submitted
+    if (queueService && priorities.length > 0 && !isLoadingQueueEntries) {
       const isPriorityValid = priorities.some((p) => p.uuid === priority);
       if (!isPriorityValid) {
         const defaultPriority = priorities.find((p) => p.uuid === defaultPriorityConceptUuid) || priorities[0];
@@ -209,7 +211,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
       setValue('priority', '', { shouldValidate: false });
       clearErrors('priority');
     }
-  }, [queueService, priorities, priority, defaultPriorityConceptUuid, setValue, clearErrors]);
+  }, [queueService, priorities, priority, defaultPriorityConceptUuid, isLoadingQueueEntries, setValue, clearErrors]);
 
   useEffect(() => {
     if (!queueLocation) {

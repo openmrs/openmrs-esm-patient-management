@@ -15,6 +15,7 @@ import { mockSession, mockVisitAlice } from '__mocks__';
 import { postQueueEntry } from './queue-fields.resource';
 import { useQueues } from '../../hooks/useQueues';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
+import { useServiceQueuesStore } from '../../store/store';
 import QueueFields from './queue-fields.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -48,11 +49,16 @@ vi.mock('../../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: vi.fn(() => ({ mutateQueueEntries: vi.fn() })),
 }));
 
+vi.mock('../../store/store', () => ({
+  useServiceQueuesStore: vi.fn(),
+}));
+
 vi.mock('./queue-fields.resource', () => {
   return { postQueueEntry: vi.fn() };
 });
 
 const mockUseQueues = vi.mocked(useQueues);
+const mockUseServiceQueuesStore = vi.mocked(useServiceQueuesStore);
 const mockUseQueueEntries = vi.mocked(useQueueEntries);
 const mockPostQueueEntry = vi.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
 
@@ -63,6 +69,7 @@ describe('QueueFields', () => {
     mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema) });
     mockUseQueues.mockReturnValue({ queues: mockQueues } as any);
     mockUseQueueEntries.mockReturnValue({ queueEntries: [] } as any);
+    mockUseServiceQueuesStore.mockReturnValue({} as any);
   });
 
   it('renders the form fields and returns the set values', async () => {
@@ -121,6 +128,17 @@ describe('QueueFields', () => {
 
     expect(screen.queryByRole('option', { name: 'Location 1' })).not.toBeInTheDocument();
     expect(screen.getByText(/already in every queue at the available locations/i)).toBeInTheDocument();
+  });
+
+  it('does not submit a service prefilled from the dashboard until the entries have loaded', async () => {
+    mockUseServiceQueuesStore.mockReturnValue({ selectedServiceUuid: service1Uuid } as any);
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: true } as any);
+    let onSubmit: (visit: Visit) => Promise<any>;
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={(cb) => (onSubmit = cb)} />);
+
+    await expect(onSubmit(mockVisitAlice)).rejects.toThrow(/validation/i);
+    expect(mockPostQueueEntry).not.toHaveBeenCalled();
   });
 
   it('does not look up queue entries when there is no patient to look them up for', () => {
