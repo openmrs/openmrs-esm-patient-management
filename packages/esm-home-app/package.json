@@ -37,6 +37,8 @@
     "url": "https://github.com/openmrs/openmrs-esm-home/issues"
   },
   "peerDependencies": {
+    "@carbon/icons-react": "11.x",
+    "@carbon/react": "1.x",
     "@openmrs/esm-framework": "10.x",
     "react": "18.x",
     "react-dom": "18.x",
@@ -45,6 +47,8 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@carbon/icons-react": "^11.68.0",
+    "@carbon/react": "^1.83.0",
     "openmrs": "next",
     "vitest": "^4.1.2"
   }
