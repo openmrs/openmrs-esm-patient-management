@@ -56,24 +56,27 @@ test('Edit an encounter from the Previous visit tab of a queue entry', async ({ 
     await patientRow.getByRole('button', { name: /expand current row/i }).click();
   });
 
-  await test.step('And I open the Encounters tab of the Previous visit', async () => {
+  await test.step('And I open the Timeline tab of the Previous visit', async () => {
     await page.getByRole('tab', { name: /previous visit/i }).click();
-    await page.getByRole('tab', { name: /encounters/i }).click();
+    await page.getByRole('tab', { name: /timeline/i }).click();
   });
 
-  const encounters = page.getByLabel(/queue table/i).getByRole('table');
+  // Carbon names each tab panel after its tab, so this is the Timeline panel of the visible Previous visit
+  // tab; the Current visit tab's Timeline panel is hidden and stays out of the accessibility tree.
+  const timeline = page.getByRole('tabpanel', { name: /timeline/i });
 
   await test.step('Then I should see the encounter recorded on that visit', async () => {
-    await expect(encounters).toContainText(/visit note/i);
+    await expect(timeline).toContainText(/visit note/i);
   });
 
   await test.step('And then I expand that encounter', async () => {
-    await encounters.getByRole('button', { name: /expand current row/i }).click();
-    await expect(encounters).toContainText(/text of encounter note/i);
+    await timeline.getByRole('button', { name: /expand encounter/i }).click();
+    await expect(timeline).toContainText(/text of encounter note/i);
   });
 
   await test.step('When I choose "Edit this encounter"', async () => {
-    await encounters.getByRole('button', { name: /edit this encounter/i }).click();
+    await timeline.getByRole('button', { name: /options/i }).click();
+    await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
   });
 
   await test.step('Then the visit note form opens on that encounter, with no extension erroring', async () => {
