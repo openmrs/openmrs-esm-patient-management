@@ -76,7 +76,7 @@
   "noActiveVisit": "No active visit",
   "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "Tidak ada kolom tabel yang ditentukan. Periksa Konfigurasi",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "Tidak ada pasien untuk ditampilkan",
   "noPreviousVisitFound": "Tidak ada kunjungan sebelumnya yang ditemukan",
   "noPrioritiesConfigured": "Tidak ada prioritas yang dikonfigurasi",
