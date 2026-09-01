@@ -90,6 +90,7 @@
   "now": "Now",
   "onTime": "On time",
   "patientAge": "Age",
+  "patientAlreadyInEveryQueue": "This patient is already in every queue at the available locations",
   "patientAlreadyInQueue": "Patient already in queue",
   "patientAttendingService": "Patient attending service",
   "patientGender": "Gender",
