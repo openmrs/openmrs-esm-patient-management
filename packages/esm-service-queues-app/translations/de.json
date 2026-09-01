@@ -76,7 +76,7 @@
   "noActiveVisit": "Kein aktiver Aufenthalt",
   "noCheckedInPatients": "An diesem Standort warten keine aufgenommenen Patienten darauf, in eine Warteschlange aufgenommen zu werden",
   "noColumnsDefined": "Es sind keine Tabellenspalten definiert. Überprüfen Sie die Konfiguration.",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "Keine Patienten anzuzeigen",
   "noPreviousVisitFound": "Es wurden keine früheren Aufenthalte gefunden",
   "noPrioritiesConfigured": "Es sind keine Prioritäten konfiguriert",

@@ -76,7 +76,7 @@
   "noActiveVisit": "No active visit",
   "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "No table columns defined. Check Configuration",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "គ្មានអ្នកជំងឺត្រូវបង្ហាញទេ",
   "noPreviousVisitFound": "រកមិនឃើញការមកពិនិត្យជំងឺពីលើកមុនទេ",
   "noPrioritiesConfigured": "No priorities configured",

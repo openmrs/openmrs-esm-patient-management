@@ -76,7 +76,7 @@
   "noActiveVisit": "Nenhuma visita ativa",
   "noCheckedInPatients": "No checked-in patients waiting to be added to a queue at this location",
   "noColumnsDefined": "Não há colunas de tabela definidas. Verifique a configuração",
-  "noOneBeingAttended": "No one is being attended",
+  "noOneBeingAttended": "No patients are currently being attended to",
   "noPatientsToDisplay": "Nenhum paciente para exibir",
   "noPreviousVisitFound": "Nenhuma visita anterior encontrada",
   "noPrioritiesConfigured": "Nenhuma prioridade configurada",
