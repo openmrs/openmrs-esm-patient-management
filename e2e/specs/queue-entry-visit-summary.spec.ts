@@ -75,7 +75,7 @@ test('Edit an encounter from the Previous visit tab of a queue entry', async ({ 
   });
 
   await test.step('When I choose "Edit this encounter"', async () => {
-    await timeline.getByRole('button', { name: /options/i }).click();
+    await timeline.getByRole('button', { name: /encounter table actions menu/i }).click();
     await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
   });
 
