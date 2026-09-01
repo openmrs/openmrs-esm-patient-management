@@ -200,5 +200,7 @@ describe('ClinicOverview', () => {
     render(<ClinicOverview />);
 
     expect(screen.getByText(/error state/i)).toBeInTheDocument();
+    // The error card titles itself, so the section header would say "Queues" a second time.
+    expect(screen.queryByRole('heading', { name: /queues/i })).not.toBeInTheDocument();
   });
 });

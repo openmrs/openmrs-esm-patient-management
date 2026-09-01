@@ -82,6 +82,9 @@ describe('Home Component', () => {
   });
 
   it('shows no tabs at all for a user without access, so their dashboard is unchanged', () => {
+    givenConfig({ enabled: true });
+    mockUserHasAccess.mockReturnValue(false);
+
     render(<Home />);
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument();

@@ -129,16 +129,30 @@ const ClinicOverview: React.FC = () => {
 
       <div className={queueTableStyles.defaultQueueTable}>
         <Layer className={queueTableStyles.tableSection}>
-          <div className={queueTableStyles.headerContainer}>
-            <div className={isDesktop(layout) ? queueTableStyles.desktopHeading : queueTableStyles.tabletHeading}>
-              <h2>{t('queues', 'Queues')}</h2>
+          {/* The error card titles itself, so the section header would say "Queues" twice. */}
+          {!error && (
+            <div className={queueTableStyles.headerContainer}>
+              <div className={isDesktop(layout) ? queueTableStyles.desktopHeading : queueTableStyles.tabletHeading}>
+                <h2>{t('queues', 'Queues')}</h2>
+              </div>
             </div>
-          </div>
+          )}
 
           {isLoading ? (
-            <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra columnCount={7} rowCount={4} />
+            <DataTableSkeleton
+              className={styles.tableSkeleton}
+              role="progressbar"
+              compact={isDesktop(layout)}
+              columnCount={7}
+              rowCount={4}
+              showHeader={false}
+              showToolbar={false}
+              zebra
+            />
           ) : error ? (
-            <ErrorState error={error} headerTitle={t('queues', 'Queues')} />
+            <div className={styles.errorState}>
+              <ErrorState error={error} headerTitle={t('queues', 'Queues')} />
+            </div>
           ) : rows.length === 0 ? (
             <EmptyState className={styles.emptyState} displayText={t('noQueuesToDisplay', 'No queues to display')} />
           ) : (

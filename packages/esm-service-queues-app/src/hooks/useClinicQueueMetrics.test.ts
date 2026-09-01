@@ -22,35 +22,50 @@ const longestOpenWait = {
   queueEntry: { uuid: 'entry-1', startedAt, patient: { uuid: 'p1', display: 'Achieng Otieno' } },
 };
 
-function queueMetrics(display: string, waiting: number, attending: number, averageOpenWaitTime: number | null) {
-  return {
-    queue: { uuid: display.toLowerCase(), display },
-    countsByStatus: { [waitingUuid]: waiting, [attendingUuid]: attending },
-    averageOpenWaitTime,
-    longestOpenWait: averageOpenWaitTime === null ? null : longestOpenWait,
-  };
+function queue(display: string) {
+  return { uuid: display.toLowerCase(), display };
 }
 
-function givenResponse(overrides: Record<string, unknown> = {}) {
-  mockOpenmrsFetch.mockResolvedValue({
-    data: {
-      countsByStatus: { [waitingUuid]: 20, [attendingUuid]: 5 },
-      averageOpenWaitTime: 26.4,
-      longestOpenWait,
-      queues: [queueMetrics('Triage', 12, 3, 38), queueMetrics('Antenatal', 0, 0, null)],
-      ...overrides,
-    },
-  } as unknown as Awaited<ReturnType<typeof openmrsFetch>>);
+function counts(display: string, waiting: number, attending: number) {
+  return { queue: queue(display), countsByStatus: { [waitingUuid]: waiting, [attendingUuid]: attending } };
 }
 
-function requestedUrl() {
-  return mockOpenmrsFetch.mock.calls[0][0] as string;
+/** The hook makes two requests; answer each from its URL, as the server would. */
+function givenResponses() {
+  mockOpenmrsFetch.mockImplementation(
+    (url: string) =>
+      Promise.resolve({
+        data: url.includes(`status=${waitingUuid}`)
+          ? {
+              averageOpenWaitTime: 26.4,
+              longestOpenWait,
+              // Antenatal has nobody waiting, so the wait request leaves it out entirely.
+              queues: [{ queue: queue('Triage'), averageOpenWaitTime: 38, longestOpenWait }],
+            }
+          : {
+              countsByStatus: { [waitingUuid]: 20, [attendingUuid]: 5 },
+              queues: [counts('Triage', 12, 3), counts('Antenatal', 0, 0)],
+            },
+      }) as unknown as ReturnType<typeof openmrsFetch>,
+  );
+}
+
+function requestedUrls() {
+  return mockOpenmrsFetch.mock.calls.map(([url]) => url as string);
+}
+
+function countsUrl() {
+  return requestedUrls().find((url) => !url.includes('status='));
+}
+
+function waitsUrl() {
+  return requestedUrls().find((url) => url.includes('status='));
 }
 
 describe('useClinicQueueMetrics', () => {
   beforeEach(() => {
     vi.mocked(useConfig<ConfigObject>).mockReturnValue(config);
-    givenResponse();
+    givenResponses();
   });
 
   it('maps each queue in the response to a row, and the whole-set figures to the totals', async () => {
@@ -81,33 +96,42 @@ describe('useClinicQueueMetrics', () => {
     );
   });
 
-  // Grouping on the server means one request for the whole screen, rather than fetching every
-  // unfinished queue entry at the location to count them here.
+  // Grouping on the server keeps the screen to two requests, rather than fetching every unfinished
+  // queue entry at the location to count them here.
   it('asks for the metrics grouped by queue, scoped to the location, service and unfinished entries', () => {
     renderHook(() => useClinicQueueMetrics('loc-1', 'service-1'), { wrapper });
 
-    expect(requestedUrl()).toContain('groupBy=queue');
-    expect(requestedUrl()).toContain('isEnded=false');
-    expect(requestedUrl()).toContain('location=loc-1');
-    expect(requestedUrl()).toContain('service=service-1');
+    expect(requestedUrls()).toHaveLength(2);
+    requestedUrls().forEach((url) => {
+      expect(url).toContain('groupBy=queue');
+      expect(url).toContain('isEnded=false');
+      expect(url).toContain('location=loc-1');
+      expect(url).toContain('service=service-1');
+    });
   });
 
   it('requests the whole clinic when no location or service is selected', () => {
     renderHook(() => useClinicQueueMetrics(), { wrapper });
 
-    expect(requestedUrl()).not.toContain('location=');
-    expect(requestedUrl()).not.toContain('service=');
+    requestedUrls().forEach((url) => {
+      expect(url).not.toContain('location=');
+      expect(url).not.toContain('service=');
+    });
   });
 
-  // The screen reports on those still waiting, so it cannot use the metric that measures waits which
-  // have already finished.
-  it('asks for the open-wait metrics rather than the completed-wait average', () => {
+  // An In Service entry's `startedAt` is when service began, not when the patient joined the queue,
+  // so counting it into the wait metrics would report time in service as waiting time. The open-wait
+  // metrics, rather than `averageWaitTime`, which measures waits that have already finished.
+  it('measures the waits over waiting entries alone, while counting every unfinished one', () => {
     renderHook(() => useClinicQueueMetrics(), { wrapper });
 
-    expect(requestedUrl()).toContain('metric=averageOpenWaitTime');
-    expect(requestedUrl()).toContain('metric=longestOpenWait');
-    expect(requestedUrl()).toContain('metric=countsByStatus');
-    expect(new URL(requestedUrl(), 'http://localhost').searchParams.getAll('metric')).not.toContain('averageWaitTime');
+    const waitParams = new URL(waitsUrl(), 'http://localhost').searchParams;
+    expect(waitParams.get('status')).toBe(waitingUuid);
+    expect(waitParams.getAll('metric')).toEqual(['averageOpenWaitTime', 'longestOpenWait']);
+
+    const countParams = new URL(countsUrl(), 'http://localhost').searchParams;
+    expect(countParams.get('status')).toBeNull();
+    expect(countParams.getAll('metric')).toEqual(['countsByStatus']);
   });
 
   it('surfaces a failed request', async () => {

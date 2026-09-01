@@ -8,8 +8,14 @@
   color: $text-02;
 }
 
+// Inset to match the table, which pads its container by the same amount.
+.emptyState,
+.errorState,
+.tableSkeleton {
+  margin: 0 layout.$spacing-05;
+}
+
 .emptyState {
   border: 1px solid $ui-03;
-  margin: 0 layout.$spacing-05;
   padding: layout.$spacing-09;
 }

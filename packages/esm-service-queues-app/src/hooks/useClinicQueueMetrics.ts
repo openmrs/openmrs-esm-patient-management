@@ -4,10 +4,6 @@ import { openmrsFetch, parseDate, restBaseUrl, useConfig } from '@openmrs/esm-fr
 import { type ConfigObject } from '../config-schema';
 import { type Queue } from '../types';
 
-// The roll-up reports on those still waiting, so it asks for the open-wait metrics rather than
-// `averageWaitTime`, which the queue module measures over waits that have already finished.
-const metrics = ['countsByStatus', 'averageOpenWaitTime', 'longestOpenWait'];
-
 interface LongestOpenWait {
   minutes: number;
   queueEntry: {
@@ -17,15 +13,17 @@ interface LongestOpenWait {
   };
 }
 
-interface QueueEntryMetrics {
+interface CountMetrics {
   countsByStatus: Record<string, number>;
+}
+
+interface WaitMetrics {
   averageOpenWaitTime: number | null;
   longestOpenWait: LongestOpenWait | null;
 }
 
-interface QueueEntryMetricsResponse extends QueueEntryMetrics {
-  queues: Array<QueueEntryMetrics & { queue: Queue }>;
-}
+/** A `groupBy=queue` response: the metrics over the whole set, then the same metrics per queue. */
+type GroupedByQueue<T> = T & { queues: Array<T & { queue: Queue }> };
 
 interface Summary {
   waiting: number;
@@ -43,25 +41,38 @@ export function useClinicQueueMetrics(locationUuid?: string, serviceUuid?: strin
     concepts: { waitingStatusConceptUuid, defaultTransitionStatus },
   } = useConfig<ConfigObject>();
 
-  const searchParams = new URLSearchParams({ groupBy: 'queue', isEnded: 'false' });
-  metrics.forEach((metric) => searchParams.append('metric', metric));
-  if (locationUuid) {
-    searchParams.append('location', locationUuid);
-  }
-  if (serviceUuid) {
-    searchParams.append('service', serviceUuid);
+  function metricsUrl(metrics: Array<string>, status?: string) {
+    const searchParams = new URLSearchParams({ groupBy: 'queue', isEnded: 'false' });
+    metrics.forEach((metric) => searchParams.append('metric', metric));
+    if (locationUuid) {
+      searchParams.append('location', locationUuid);
+    }
+    if (serviceUuid) {
+      searchParams.append('service', serviceUuid);
+    }
+    if (status) {
+      searchParams.append('status', status);
+    }
+    // The URL contains `/queue-entry`, so useMutateQueueEntries still revalidates these figures when
+    // an entry is added, moved or ended.
+    return `${restBaseUrl}/queue-entry-metric?${searchParams.toString()}`;
   }
 
-  // The URL contains `/queue-entry`, so useMutateQueueEntries still revalidates these figures when
-  // an entry is added, moved or ended.
-  const { data, isLoading, error } = useSWR<{ data: QueueEntryMetricsResponse }, Error>(
-    `${restBaseUrl}/queue-entry-metric?${searchParams.toString()}`,
+  const counts = useSWR<{ data: GroupedByQueue<CountMetrics> }, Error>(metricsUrl(['countsByStatus']), openmrsFetch);
+
+  // A separate request, scoped to waiting entries: the queue module ends an entry and starts a new
+  // one at transition, so an In Service entry's `startedAt` is when service began rather than when
+  // the patient joined the queue. Open waits rather than `averageWaitTime`, which the queue module
+  // measures over waits that have already finished.
+  const waits = useSWR<{ data: GroupedByQueue<WaitMetrics> }, Error>(
+    metricsUrl(['averageOpenWaitTime', 'longestOpenWait'], waitingStatusConceptUuid),
     openmrsFetch,
   );
 
   const { rollups, totals } = useMemo(() => {
-    function summarise(queueMetrics: QueueEntryMetrics): Summary {
-      const { countsByStatus, averageOpenWaitTime, longestOpenWait } = queueMetrics;
+    function summarise(queueCounts?: CountMetrics, queueWaits?: WaitMetrics): Summary {
+      const { countsByStatus } = queueCounts ?? {};
+      const { averageOpenWaitTime, longestOpenWait } = queueWaits ?? {};
       return {
         // Only the two configured statuses are reported, so entries a deployment holds in some other
         // unfinished status count towards neither figure.
@@ -78,12 +89,24 @@ export function useClinicQueueMetrics(locationUuid?: string, serviceUuid?: strin
       };
     }
 
-    const response = data?.data;
-    return {
-      rollups: (response?.queues ?? []).map<QueueRollup>((queue) => ({ queue: queue.queue, ...summarise(queue) })),
-      totals: summarise(response ?? { countsByStatus: {}, averageOpenWaitTime: null, longestOpenWait: null }),
-    };
-  }, [data, waitingStatusConceptUuid, defaultTransitionStatus]);
+    const countsResponse = counts.data?.data;
+    const waitsResponse = waits.data?.data;
+    // The wait request leaves out queues with nobody waiting, so the counts decide which rows exist.
+    const waitsByQueueUuid = new Map((waitsResponse?.queues ?? []).map((entry) => [entry.queue.uuid, entry]));
 
-  return { rollups, totals, isLoading, error };
+    return {
+      rollups: (countsResponse?.queues ?? []).map<QueueRollup>((entry) => ({
+        queue: entry.queue,
+        ...summarise(entry, waitsByQueueUuid.get(entry.queue.uuid)),
+      })),
+      totals: summarise(countsResponse, waitsResponse),
+    };
+  }, [counts.data, waits.data, waitingStatusConceptUuid, defaultTransitionStatus]);
+
+  return {
+    rollups,
+    totals,
+    isLoading: counts.isLoading || waits.isLoading,
+    error: counts.error ?? waits.error,
+  };
 }

@@ -167,7 +167,10 @@ export const configSchema = {
         'Queues dashboard, opened first, with the standard waiting list on a second tab. Users without the ' +
         'privilege see no tabs and their dashboard is unchanged. Off by default because the privilege is ' +
         'satisfied by any user with the System Developer role, so turning this on would give the tabs to ' +
-        'every administrator whether or not the privilege has been rolled out.',
+        'every administrator whether or not the privilege has been rolled out. ' +
+        'Requires a queue module carrying https://github.com/openmrs/openmrs-module-queue/pull/123: without it ' +
+        '/queue-entry-metric understands neither `groupBy` nor the open-wait metric names, and the tab shows ' +
+        'an empty clinic rather than an error.',
     },
     privilege: {
       _type: Type.String,
