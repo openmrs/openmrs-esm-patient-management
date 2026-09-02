@@ -201,7 +201,7 @@ describe('Appointment calendar view', () => {
 
     renderCalendar();
 
-    expect(screen.getByText('1 appointments this month')).toBeInTheDocument();
+    expect(screen.getByText('1 appointment this month')).toBeInTheDocument();
   });
 
   it('displays the singular appointment count for a single appointment in daily mode', async () => {
