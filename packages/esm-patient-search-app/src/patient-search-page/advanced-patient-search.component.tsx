@@ -51,7 +51,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     isLoading,
     isValidating,
     fetchError,
-    totalResults,
+    totalResultsForQuery,
   } = useInfinitePatientSearch(query, includeDead, !!query, resultsPerPage);
 
   // The refine-search filters and the result count below both run over the rows held on the client,
@@ -61,13 +61,16 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   // unreachable. Waiting on `isValidating` is what keeps a wave from being requested on top of the
   // one still in flight — `currentPage` advances as soon as the pages are asked for, not when they
   // land, so without it every wave would collapse back into a single burst.
-  const pagesNeeded = Math.ceil(totalResults / resultsPerPage);
+  const pagesNeeded = Math.ceil(totalResultsForQuery / resultsPerPage);
 
+  // A failed request also ends the wave, so stop on `fetchError`: the count that `pagesNeeded` is
+  // derived from survives the failure, and the loop would otherwise keep opening waves for a result
+  // set the user is no longer being shown.
   useEffect(() => {
-    if (!isValidating && pagesNeeded > currentPage) {
+    if (!fetchError && !isValidating && pagesNeeded > currentPage) {
       setPage(Math.min(currentPage + pagesPerWave, pagesNeeded));
     }
-  }, [isValidating, pagesNeeded, currentPage, setPage]);
+  }, [fetchError, isValidating, pagesNeeded, currentPage, setPage]);
 
   const filteredResults = useMemo(() => {
     if (searchResults && filtersApplied) {

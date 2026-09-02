@@ -435,13 +435,31 @@ describe('useInfinitePatientSearch parallel paging', () => {
       wrapper: sharedCacheWrapper,
       initialProps: { q: 'Mary' },
     });
-    await waitFor(() => expect(result.current.totalResults).toBe(100));
+    await waitFor(() => expect(result.current.totalResultsForQuery).toBe(100));
 
     mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as never);
     rerender({ q: 'Zebediah' });
     await settle();
 
     expect(result.current.data).toHaveLength(10); // the previous query's page 1, still on screen
-    expect(result.current.totalResults).toBe(0);
+    expect(result.current.totalResultsForQuery).toBe(0);
+  });
+
+  // The counterpart to the above: the rows held by `keepPreviousData` are still on screen, and
+  // `totalResults` is what a view prints above them. Reporting the incoming query's total here —
+  // zero until its first page lands — renders those patients under "0 search results".
+  it('keeps reporting the loaded result count while a new query is being fetched', async () => {
+    const { result, rerender } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false), {
+      wrapper: sharedCacheWrapper,
+      initialProps: { q: 'Mary' },
+    });
+    await waitFor(() => expect(result.current.totalResults).toBe(100));
+
+    mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as never);
+    rerender({ q: 'Zebediah' });
+    await settle();
+
+    expect(result.current.data).toHaveLength(10);
+    expect(result.current.totalResults).toBe(100);
   });
 });

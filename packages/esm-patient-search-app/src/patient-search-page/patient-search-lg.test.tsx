@@ -55,4 +55,24 @@ describe('PatientSearchComponent pagination', () => {
 
     expect(firstShown()).toBe('p-0');
   });
+
+  it('resets to page 1 when a refine filter leaves the selected page out of range', async () => {
+    const user = userEvent.setup();
+    // 50 results at 20 per page => 3 client pages.
+    const { rerender } = render(
+      <PatientSearchComponent query="jos" searchResults={makeResults(50)} isLoading={false} fetchError={null} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: '3' }));
+    expect(firstShown()).toBe('p-40');
+
+    // Refine-search filters run on the client under the same query, so only the row count changes.
+    // Page 3 no longer exists in a 10-row result set.
+    rerender(
+      <PatientSearchComponent query="jos" searchResults={makeResults(10)} isLoading={false} fetchError={null} />,
+    );
+
+    expect(screen.queryByTestId('empty')).not.toBeInTheDocument();
+    expect(firstShown()).toBe('p-0');
+  });
 });

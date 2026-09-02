@@ -111,7 +111,8 @@ function useRevalidateFirstPageOnce<T>(firstPageUrl: string | null, mutate: SWRI
  *   - isValidating: Boolean indicating if new data is being loaded
  *   - setPage: Function to load the next page of results
  *   - currentPage: The current page number
- *   - totalResults: The total number of results for the search query
+ *   - totalResults: The number of results for the query the returned `data` belongs to
+ *   - totalResultsForQuery: The number of results for the query currently being searched for
  */
 export function useInfinitePatientSearch(
   searchQuery: string,
@@ -130,9 +131,10 @@ export function useInfinitePatientSearch(
         v: customRepresentation,
         includeDead: includeDead.toString(),
         limit: resultsToFetch.toString(),
-        // Only page 1's count is ever read (see `totalResults` below). `totalCount=true` makes the
-        // REST module run a separate count query, so asking for it on every appended page buys
-        // nothing and adds a second query to each round trip.
+        // Only page 1's count is ever read (see below), so only page 1 asks for it. This is about
+        // asking for what we use rather than about backend cost: the patient search handler hands
+        // back a `NeedsPaging`, whose count is the size of the list it has already built in memory,
+        // so `totalCount=true` does not make the REST module run a separate count query here.
         ...(page ? { startIndex: (page * resultsToFetch).toString() } : { totalCount: 'true' }),
       });
 
@@ -144,9 +146,9 @@ export function useInfinitePatientSearch(
   const shouldFetch = isSearching && Boolean(searchQuery);
   const firstPageUrl = shouldFetch ? buildUrl(0) : null;
 
-  // Read the total through the cache rather than off `data`: `keepPreviousData` leaves the outgoing
-  // query's pages in `data` while a new query loads, so `data[0]` would report the wrong query's
-  // total — and callers size their page requests from it.
+  // The count for the query being fetched, read through the cache rather than off `data`:
+  // `keepPreviousData` leaves the outgoing query's pages in `data` while a new query loads, so
+  // `data[0]` would report the wrong query's total — and callers size their page requests from it.
   const totalCount = firstPageUrl ? cache.get(firstPageUrl)?.data?.data?.totalCount : undefined;
 
   // Pages are fetched in parallel, so appending one costs a round trip rather than a round trip per
@@ -200,7 +202,11 @@ export function useInfinitePatientSearch(
       isValidating,
       setPage: setSize,
       currentPage: size,
-      totalResults: totalCount ?? 0,
+      // Describes the rows in `data`, which under `keepPreviousData` are the outgoing query's until
+      // the new first page lands — so a view can print this above the rows it is rendering without
+      // the count and the list disagreeing mid-query.
+      totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
+      totalResultsForQuery: totalCount ?? 0,
     }),
     [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size, totalCount],
   );
@@ -346,6 +352,9 @@ export function useRestPatients(
       setPage: setSize,
       currentPage: size,
       totalResults: patientUuids?.length ?? 0,
+      // This hook pages a list it already holds, so there is no in-flight query for the count to
+      // lag behind.
+      totalResultsForQuery: patientUuids?.length ?? 0,
     }),
     [mappedData, isLoading, error, patientUuids, size, isValidating, setSize],
   );
