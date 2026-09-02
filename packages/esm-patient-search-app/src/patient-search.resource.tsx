@@ -329,3 +329,12 @@ export function useRestPatients(
     [mappedData, isLoading, error, patientUuids, size, isValidating, setSize],
   );
 }
+
+export function useMinSearchCharacters() {
+  const url = `${restBaseUrl}/systemsetting?q=minSearchCharacters&v=custom:(property,value)`;
+  const { data, isLoading, error } = useSWR<FetchResponse<{ results: Array<{ value: string }> }>, Error>(url, fetcher);
+
+  const minSearchCharacters = data?.data?.results?.[0]?.value ? parseInt(data.data.results[0].value, 10) : 3;
+
+  return { minSearchCharacters, isLoadingMinSearchCharacters: isLoading, error };
+}

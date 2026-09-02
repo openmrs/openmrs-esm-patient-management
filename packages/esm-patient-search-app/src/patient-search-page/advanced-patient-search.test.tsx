@@ -23,6 +23,7 @@ const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
 
 vi.mock('../patient-search.resource', () => ({
   useInfinitePatientSearch: vi.fn(),
+  useMinSearchCharacters: vi.fn().mockReturnValue({ minSearchCharacters: 3 }),
 }));
 
 vi.mock('./refine-search/person-attributes.resource', () => ({
@@ -121,6 +122,38 @@ describe('AdvancedPatientSearchComponent', () => {
   it('displays search results correctly', () => {
     renderComponent();
     expect(screen.getByText(/2 search result/)).toBeInTheDocument();
+  });
+
+  it('shows a message asking for more characters when the query is too short', () => {
+    mockUseInfinitePatientSearch.mockReturnValue({
+      ...mockSearchResults,
+      data: [],
+      totalResults: 0,
+    });
+
+    render(
+      <Wrapper>
+        <AdvancedPatientSearchComponent query="Jo" />
+      </Wrapper>,
+    );
+
+    expect(screen.getByText(/please enter at least 3 characters to search/i)).toBeInTheDocument();
+  });
+
+  it('shows the no-results message when enough characters were entered but nothing matched', () => {
+    mockUseInfinitePatientSearch.mockReturnValue({
+      ...mockSearchResults,
+      data: [],
+      totalResults: 0,
+    });
+
+    render(
+      <Wrapper>
+        <AdvancedPatientSearchComponent query="Joseph" />
+      </Wrapper>,
+    );
+
+    expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
   });
 
   describe('Filtering', () => {

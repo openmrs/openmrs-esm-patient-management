@@ -7,6 +7,13 @@ import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
+import { useMinSearchCharacters } from '../patient-search.resource';
+
+vi.mock('../patient-search.resource', () => ({
+  useMinSearchCharacters: vi.fn(),
+}));
+
+const mockUseMinSearchCharacters = vi.mocked(useMinSearchCharacters);
 
 // The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
 // Stub it to render every row, letting the result assertions run.
@@ -36,7 +43,14 @@ const defaultProps = {
 const mockUseConfig = vi.mocked(useConfig);
 
 describe('PatientSearch', () => {
-  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUseMinSearchCharacters.mockReturnValue({
+      minSearchCharacters: 3,
+      isLoadingMinSearchCharacters: false,
+      error: undefined,
+    });
+  });
 
   it('renders a loading state when search results are being fetched', () => {
     renderPatientSearch({
@@ -81,6 +95,17 @@ describe('PatientSearch', () => {
     expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
     expect(screen.getByText(/try to search again using the patient's unique ID number/i)).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('renders a message telling the user to enter more characters when the query is too short', () => {
+    renderPatientSearch({
+      isLoading: false,
+      data: [],
+      query: 'Jo',
+    });
+
+    expect(screen.getByText(/please enter at least 3 characters to search/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no patient charts were found/i)).not.toBeInTheDocument();
   });
 
   it('renders an error state when search results fail to fetch', () => {
