@@ -36,6 +36,8 @@ const startIndexesOf = (urls: Array<string>) =>
 // A big clinic's result set: far more pages than one wave, and not a whole number of pages.
 const TOTAL = 1700;
 const PAGE_SIZE = 50;
+// Mirrors `pagesPerWave` in the component: how many requests may be in flight together.
+const PAGES_PER_WAVE = 4;
 
 describe('advanced search paging for a large result set', () => {
   let requestedUrls: Array<string>;
@@ -88,7 +90,7 @@ describe('advanced search paging for a large result set', () => {
 
     await screen.findByRole('heading', { name: /1700 search result/i }, { timeout: 10000 });
 
-    expect(maxInFlight).toBeLessThanOrEqual(8);
+    expect(maxInFlight).toBeLessThanOrEqual(PAGES_PER_WAVE);
     expect(maxInFlight).toBeGreaterThan(1);
   });
 
@@ -123,8 +125,8 @@ describe('advanced search paging for a large result set', () => {
     // Give any further wave time to be opened, so this fails loudly if the loop keeps going.
     await new Promise((r) => setTimeout(r, 200));
 
-    // The first wave reaches startIndex=400. A second wave would start at 450.
-    expect(Math.max(...startIndexesOf(requestedUrls))).toBeLessThanOrEqual(400);
-    expect(maxInFlight).toBeLessThanOrEqual(8);
+    // The first wave ends at this startIndex; a second wave would start one page past it.
+    expect(Math.max(...startIndexesOf(requestedUrls))).toBeLessThanOrEqual(PAGES_PER_WAVE * PAGE_SIZE);
+    expect(maxInFlight).toBeLessThanOrEqual(PAGES_PER_WAVE);
   });
 });
