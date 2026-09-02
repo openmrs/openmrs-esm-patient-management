@@ -47,11 +47,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   const countLabel = useMemo(() => {
     if (viewMode === 'daily') {
-      return appointmentCount === 1
-        ? t('appointmentCountSingular', '{{count}} appointment', { count: appointmentCount })
-        : t('appointmentCountPlural', '{{count}} appointments', { count: appointmentCount });
+      return t('appointmentCount', '{{count}} appointment', {
+        count: appointmentCount,
+        defaultValue_other: '{{count}} appointments',
+      });
     }
-    return t('appointmentsThisMonth', '{{count}} appointments this month', { count: appointmentCount });
+    return t('appointmentsThisMonth', '{{count}} appointment this month', {
+      count: appointmentCount,
+      defaultValue_other: '{{count}} appointments this month',
+    });
   }, [viewMode, appointmentCount, t]);
 
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;

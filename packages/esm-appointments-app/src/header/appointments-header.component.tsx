@@ -4,15 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, MultiSelect } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import {
-  PageHeader,
-  PageHeaderContent,
-  AppointmentsPictogram,
-  OpenmrsDatePicker,
-  useStore,
-  useWorkspaces,
-} from '@openmrs/esm-framework';
-import { workspace2Store } from '@openmrs/esm-extensions';
+import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { useSelectedDate } from '../hooks/useSelectedDate';
 import { useAppointmentsStore } from '../store';
@@ -56,16 +48,6 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
   const { appointmentServiceTypes, setAppointmentServiceTypes } = useAppointmentsStore();
   const { serviceTypes } = useAppointmentServices();
   const selectedDate = useSelectedDate();
-
-  const workspace2State = useStore(workspace2Store);
-  const workspaces1Info = useWorkspaces();
-
-  const isWorkspaceOpen = useMemo(() => {
-    const isWorkspace2Open =
-      Boolean(workspace2State?.openedWindows?.length) && !workspace2State?.isMostRecentlyOpenedWindowHidden;
-    const isWorkspace1Open = Boolean(workspaces1Info?.active);
-    return isWorkspace2Open || isWorkspace1Open;
-  }, [workspace2State, workspaces1Info]);
 
   const selectedDateValue = useMemo(() => dayjs(selectedDate).toDate(), [selectedDate]);
 
@@ -163,11 +145,9 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
         {isCalendarView ? (
           <div className={styles.calendarActions}>
             {calendarFilterMultiselects}
-            {!isWorkspaceOpen && (
-              <Button kind="primary" renderIcon={Add} size="md" onClick={() => launchCreateAppointmentForm(t)}>
-                {t('newAppointment', 'New appointment')}
-              </Button>
-            )}
+            <Button kind="primary" renderIcon={Add} size="md" onClick={() => launchCreateAppointmentForm(t)}>
+              {t('newAppointment', 'New appointment')}
+            </Button>
           </div>
         ) : (
           <>
