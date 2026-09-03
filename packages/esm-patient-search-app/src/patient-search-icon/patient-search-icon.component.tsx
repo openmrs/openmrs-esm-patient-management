@@ -66,9 +66,10 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   }, [setShowSearchInput, setCanClickOutside]);
 
   useEffect(() => {
-    // Search input should always be open when we direct to the search page.
-    setShowSearchInput(isSearchPage);
-  }, [isSearchPage]);
+    // On desktop the search page relies on this header input. On tablet the page renders its own
+    // overlay, so opening one here would stack a second copy on top of it.
+    setShowSearchInput(isSearchPage && isDesktop(layout));
+  }, [isSearchPage, layout]);
 
   useEffect(() => {
     if (showSearchInput) {
@@ -81,6 +82,11 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       setCanClickOutside(false);
     }
   }, [showSearchInput, isSearchPage]);
+
+  if (isSearchPage && !isDesktop(layout)) {
+    // The page's overlay already carries the search input and its own back button.
+    return null;
+  }
 
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>

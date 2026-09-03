@@ -2,15 +2,18 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { useParams } from 'react-router-dom';
 import { getDefaultsFromConfigSchema, isDesktop, useConfig } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchLaunch from './patient-search-icon.component';
 
 const mockIsDesktop = vi.mocked(isDesktop);
 const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
+const mockUseParams = vi.mocked(useParams);
 
 vi.mock('react-router-dom', async () => ({
   ...((await vi.importActual('react-router-dom')) as object),
+  useParams: vi.fn(() => ({})),
   useSearchParams: vi.fn(() => [
     {
       get: vi.fn(() => 'John'),
@@ -20,6 +23,7 @@ vi.mock('react-router-dom', async () => ({
 
 describe('PatientSearchLaunch', () => {
   beforeEach(() => {
+    mockUseParams.mockReturnValue({});
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       search: {
@@ -47,6 +51,25 @@ describe('PatientSearchLaunch', () => {
     const closeButton = screen.getByTestId('closeSearchIcon');
     await user.click(closeButton);
     expect(searchInput).not.toBeInTheDocument();
+  });
+
+  it('keeps the search input open on the search page on desktop', () => {
+    mockIsDesktop.mockReturnValue(true);
+    mockUseParams.mockReturnValue({ page: 'search' });
+
+    render(<PatientSearchLaunch />);
+
+    expect(screen.getByRole('searchbox')).toHaveValue('John');
+  });
+
+  it('renders nothing on the search page in tablet layout, where the page owns the overlay', () => {
+    mockIsDesktop.mockReturnValue(false);
+    mockUseParams.mockReturnValue({ page: 'search' });
+
+    const { container } = render(<PatientSearchLaunch />);
+
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByText('Search results')).not.toBeInTheDocument();
   });
 
   it('displays search input in overlay on mobile', async () => {
