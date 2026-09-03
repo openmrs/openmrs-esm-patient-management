@@ -134,13 +134,16 @@ describe('RefineSearch', () => {
         },
       } as PatientSearchConfig);
 
-    it('applies the configured minimum and maximum to the age field', () => {
+    it('applies the configured minimum and maximum to the age field', async () => {
       withAgeConfig({ enabled: true, min: 18, max: 65 });
       renderComponent();
 
       const ageInput = screen.getByRole('spinbutton', { name: /age/i });
       expect(ageInput).toHaveAttribute('min', '18');
       expect(ageInput).toHaveAttribute('max', '65');
+
+      await user.type(ageInput, '70');
+      expect(screen.getByText('Enter an age between 18 and 65')).toBeInTheDocument();
     });
 
     it('leaves the age field unbounded above when the maximum is 0', () => {
