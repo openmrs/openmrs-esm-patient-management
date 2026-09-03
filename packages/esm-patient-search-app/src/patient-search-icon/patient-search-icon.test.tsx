@@ -3,13 +3,14 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useParams } from 'react-router-dom';
-import { getDefaultsFromConfigSchema, isDesktop, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from '../config-schema';
 import PatientSearchLaunch from './patient-search-icon.component';
 
 const mockIsDesktop = vi.mocked(isDesktop);
 const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
 const mockUseParams = vi.mocked(useParams);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 vi.mock('react-router-dom', async () => ({
   ...((await vi.importActual('react-router-dom')) as object),
@@ -24,9 +25,11 @@ vi.mock('react-router-dom', async () => ({
 describe('PatientSearchLaunch', () => {
   beforeEach(() => {
     mockUseParams.mockReturnValue({});
+    mockUseLayoutType.mockReturnValue('desktop');
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       search: {
+        ...getDefaultsFromConfigSchema(configSchema).search,
         disableTabletSearchOnKeyUp: false,
         showRecentlySearchedPatients: false,
       } as PatientSearchConfig['search'],
@@ -64,12 +67,23 @@ describe('PatientSearchLaunch', () => {
 
   it('renders nothing on the search page in tablet layout, where the page owns the overlay', () => {
     mockIsDesktop.mockReturnValue(false);
+    mockUseLayoutType.mockReturnValue('tablet');
     mockUseParams.mockReturnValue({ page: 'search' });
 
     const { container } = render(<PatientSearchLaunch />);
 
     expect(container).toBeEmptyDOMElement();
     expect(screen.queryByText('Search results')).not.toBeInTheDocument();
+  });
+
+  it('keeps its overlay open on the search page in phone layout, where the page renders none', () => {
+    mockIsDesktop.mockReturnValue(false);
+    mockUseLayoutType.mockReturnValue('phone');
+    mockUseParams.mockReturnValue({ page: 'search' });
+
+    render(<PatientSearchLaunch />);
+
+    expect(screen.getByText('Search results')).toBeInTheDocument();
   });
 
   it('displays search input in overlay on mobile', async () => {
