@@ -7,7 +7,8 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { getDefaultsFromConfigSchema, navigate, useConfig, useSession } from '@openmrs/esm-framework';
 import { renderWithRouter } from 'tools';
 import { mockSession } from '__mocks__';
@@ -71,6 +72,17 @@ describe('CompactPatientSearchComponent', () => {
     renderWithRouter(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
 
     expect(screen.getByPlaceholderText(/Search for a patient by name or identifier number/i)).toBeInTheDocument();
+  });
+
+  it('follows the search term from the URL when it changes on the search page', () => {
+    const { rerender } = render(<CompactPatientSearchComponent isSearchPage initialSearchTerm="John" />, {
+      wrapper: MemoryRouter,
+    });
+    expect(screen.getByRole('searchbox')).toHaveValue('John');
+
+    // A browser back or forward changes the query in the URL without remounting the header.
+    rerender(<CompactPatientSearchComponent isSearchPage initialSearchTerm="Mary" />);
+    expect(screen.getByRole('searchbox')).toHaveValue('Mary');
   });
 
   it('renders search results when search term is not empty', async () => {
