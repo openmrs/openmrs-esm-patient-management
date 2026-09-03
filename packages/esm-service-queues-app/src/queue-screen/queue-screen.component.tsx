@@ -1,9 +1,10 @@
 import React from 'react';
-import { DataTableSkeleton, Tile } from '@carbon/react';
+import { DataTableSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { EmptyCardIllustration, ErrorState, useConfig } from '@openmrs/esm-framework';
+import { ErrorState, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useActiveTickets } from './useActiveTickets';
+import EmptyState from '../empty-state/empty-state.component';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
@@ -31,10 +32,7 @@ const QueueScreen: React.FC = () => {
           <ErrorState error={error} headerTitle={t('queueScreen', 'Queue screen')} />
         </div>
       ) : rowData.length === 0 ? (
-        <Tile className={styles.emptyState}>
-          <EmptyCardIllustration />
-          <p className={styles.emptyStateContent}>{t('noActiveTickets', 'No active tickets to display')}</p>
-        </Tile>
+        <EmptyState className={styles.emptyState} displayText={t('noActiveTickets', 'No active tickets to display')} />
       ) : (
         <div className={styles.gridFlow}>
           {rowData.map((row) => (

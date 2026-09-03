@@ -1,32 +1,17 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { useQueueEntriesMetrics } from '../hooks/useQueueEntries';
 import styles from './queue-table-metrics-card.scss';
 
-interface QueueTableMetricsCardProps {
-  value?: number;
-  queueUuid?: string;
-  status?: string;
+interface QueueMetricTileProps {
+  value: React.ReactNode;
   headerLabel: string;
   children?: React.ReactNode;
 }
 
-const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
-  value,
-  queueUuid,
-  status,
-  headerLabel,
-  children,
-}) => {
-  const { t } = useTranslation();
-  const { count } = useQueueEntriesMetrics({
-    queue: queueUuid,
-    status: status,
-    isEnded: false,
-  });
-
+/** One tile in a metrics strip, for a figure the caller already has. */
+export const QueueMetricTile: React.FC<QueueMetricTileProps> = ({ value, headerLabel, children }) => {
   return (
     <Layer
       className={classNames(styles.container, {
@@ -40,10 +25,28 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
           </div>
         </div>
         <div>
-          <label className={styles.valueLabel}>{!isNaN(value) ? value : count}</label>
+          <label className={styles.valueLabel}>{value}</label>
         </div>
       </Tile>
     </Layer>
+  );
+};
+
+interface QueueTableMetricsCardProps {
+  queueUuid?: string;
+  status?: string;
+  headerLabel: string;
+  children?: React.ReactNode;
+}
+
+/** A tile that counts a queue and status for itself. */
+const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({ queueUuid, status, headerLabel, children }) => {
+  const { count } = useQueueEntriesMetrics({ queue: queueUuid, status: status, isEnded: false });
+
+  return (
+    <QueueMetricTile headerLabel={headerLabel} value={count}>
+      {children}
+    </QueueMetricTile>
   );
 };
 

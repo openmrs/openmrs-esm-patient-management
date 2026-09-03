@@ -103,6 +103,19 @@ describe('AttendingPatients', () => {
     expect(screen.queryByText('Patient 3')).not.toBeInTheDocument();
   });
 
+  it('uses the queue when given rather than the selected location and service', () => {
+    mockEntries([queueEntry]);
+    const { concepts } = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
+
+    render(<AttendingPatients queueUuid="q1" />);
+
+    expect(mockUseQueueEntries).toHaveBeenCalledWith({
+      queue: 'q1',
+      status: concepts.defaultTransitionStatus,
+      isEnded: false,
+    });
+  });
+
   it('does not offer "View all" when everything already fits', () => {
     mockEntries(buildEntries(3));
     render(<AttendingPatients />);

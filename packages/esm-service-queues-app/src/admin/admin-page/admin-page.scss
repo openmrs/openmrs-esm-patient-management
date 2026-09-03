@@ -43,22 +43,8 @@
 }
 
 .emptyState {
-  border: 1px solid $ui-03;
   border-top: none;
   padding: layout.$spacing-07 layout.$spacing-05;
-  text-align: center;
-
-  p {
-    color: var(--cds-text-secondary);
-    margin-top: layout.$spacing-05;
-  }
-}
-
-.emptyStateContent {
-  @include type.type-style('heading-compact-01');
-  color: $text-02;
-  margin-top: layout.$spacing-05;
-  margin-bottom: layout.$spacing-03;
 }
 
 @media (max-width: 768px) {

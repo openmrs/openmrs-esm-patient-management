@@ -11,12 +11,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { EmptyCardIllustration, ErrorState, launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
+import EmptyState from '../../empty-state/empty-state.component';
 import QueueActionMenu from './queue-action-menu.component';
 import QueueRoomActionMenu from './queue-room-action-menu.component';
 import styles from './admin-page.scss';
@@ -147,10 +147,7 @@ const AdminPage = () => {
               )}
             </DataTable>
             {queueTableRows.length === 0 && (
-              <Tile className={styles.emptyState}>
-                <EmptyCardIllustration />
-                <p>{t('noQueuesToDisplay', 'No queues to display')}</p>
-              </Tile>
+              <EmptyState className={styles.emptyState} displayText={t('noQueuesToDisplay', 'No queues to display')} />
             )}
           </Layer>
         )}
@@ -206,10 +203,10 @@ const AdminPage = () => {
               )}
             </DataTable>
             {queueRoomTableRows.length === 0 && (
-              <Tile className={styles.emptyState}>
-                <EmptyCardIllustration />
-                <p className={styles.emptyStateContent}>{t('noQueueRoomsToDisplay', 'No queue rooms to display')}</p>
-              </Tile>
+              <EmptyState
+                className={styles.emptyState}
+                displayText={t('noQueueRoomsToDisplay', 'No queue rooms to display')}
+              />
             )}
           </Layer>
         )}
