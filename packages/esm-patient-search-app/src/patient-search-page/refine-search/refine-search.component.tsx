@@ -50,7 +50,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
 
   const onSubmit = useCallback(
     (data: AdvancedPatientSearchState) => {
-      setFilters(data);
+      setFilters({ ...data, postcode: data.postcode.trim() });
       setShowRefineSearchDialog(false);
     },
     [setFilters],
