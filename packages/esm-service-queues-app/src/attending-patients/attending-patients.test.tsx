@@ -103,7 +103,7 @@ describe('AttendingPatients', () => {
     expect(screen.queryByText('Patient 3')).not.toBeInTheDocument();
   });
 
-  it('asks for the given queue rather than the selected location and service', () => {
+  it('uses the queue when given rather than the selected location and service', () => {
     mockEntries([queueEntry]);
     const { concepts } = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 

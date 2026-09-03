@@ -68,10 +68,7 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
         <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
       ) : queueEntries.length === 0 ? (
         <Layer role="status">
-          <EmptyState
-            className={styles.emptyState}
-            displayText={t('noOneBeingAttended', 'No patients are currently being attended to')}
-          />
+          <EmptyState displayText={t('noOneBeingAttended', 'No patients are currently being attended to')} />
         </Layer>
       ) : (
         <div className={styles.cards}>

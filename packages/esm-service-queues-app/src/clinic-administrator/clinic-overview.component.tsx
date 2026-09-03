@@ -13,11 +13,11 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ConfigurableLink, ErrorState, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { useClinicQueueMetrics, type QueueRollup } from '../hooks/useClinicQueueMetrics';
 import EmptyState from '../empty-state/empty-state.component';
 import QueueDuration from '../queue-table/components/queue-duration.component';
 import { QueueMetricTile } from '../queue-table/queue-table-metrics-card.component';
 import { useServiceQueuesStore } from '../store/store';
+import { useClinicQueueMetrics, type QueueRollup } from '../hooks/useClinicQueueMetrics';
 import { formatWaitTimeInMinutes } from '../wait-time';
 import { spaBasePath } from '../constants';
 import { type ConfigObject } from '../config-schema';

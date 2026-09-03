@@ -1,14 +1,9 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.errorState {
-  margin: layout.$spacing-05;
-}
-
+.errorState,
 .emptyState {
-  border: 1px solid $ui-03;
   margin: layout.$spacing-05;
-  padding: layout.$spacing-09;
 }
 
 .gridFlow {

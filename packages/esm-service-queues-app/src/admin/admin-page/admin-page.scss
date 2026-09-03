@@ -42,9 +42,7 @@
   }
 }
 
-// Sits flush beneath a table, hence no top border.
 .emptyState {
-  border: 1px solid $ui-03;
   border-top: none;
   padding: layout.$spacing-07 layout.$spacing-05;
 }
