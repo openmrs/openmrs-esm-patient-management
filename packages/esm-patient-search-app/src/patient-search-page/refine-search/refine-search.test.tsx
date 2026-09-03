@@ -128,7 +128,7 @@ describe('RefineSearch', () => {
     it('renders desktop layout by default', () => {
       renderComponent();
 
-      expect(screen.getByRole('refine-search')).toHaveClass('refineSearchContainer');
+      expect(screen.getByRole('form', { name: /refine search/i })).toHaveClass('refineSearchContainer');
       expect(screen.queryByRole('button', { name: /refine search/i })).not.toBeInTheDocument();
     });
 

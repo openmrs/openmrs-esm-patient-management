@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@openmrs/esm-framework';
 import { type Control } from 'react-hook-form';
@@ -109,8 +109,11 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
           </p>
         ) : (
           <div className={styles.refineSearchBannerFilterInfo}>
-            <span className={classNames(styles.filtersAppliedCount, styles.bodyShort01)}>{filtersApplied}</span>{' '}
-            <p className={styles.bodyShort01}>{t('filtersAppliedText', 'search queries added')}</p>
+            <p className={styles.bodyShort01}>
+              <Trans i18nKey="searchQueriesAdded" count={filtersApplied} values={{ count: filtersApplied }}>
+                <span className={styles.filtersAppliedCount}>{'{{count}}'}</span> search queries added
+              </Trans>
+            </p>
             <Button kind="ghost" onClick={onResetFields} className={styles.refineSearchDialogOpener} size="sm">
               {t('clear', 'Clear')}
             </Button>
@@ -129,7 +132,9 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
         <div className={styles.refineSearchDialogContainer}>
           <div className={styles.refineSearchDialog}>
             <div className={styles.refineSearchDialogHeader}>
-              <p className={styles.bodyShort01}>{t('refineSearchHeaderText', 'Add additional search criteria')}</p>
+              <p id="refine-search-dialog-heading" className={styles.bodyShort01}>
+                {t('refineSearchHeaderText', 'Add additional search criteria')}
+              </p>
               <Button
                 kind="ghost"
                 onClick={onToggleDialog}
@@ -139,7 +144,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
                 {t('refineSearch', 'Refine search')}
               </Button>
             </div>
-            <form onSubmit={onSubmit} role="refine-search-tablet">
+            <form onSubmit={onSubmit} aria-labelledby="refine-search-dialog-heading">
               {renderSearchFields}
               <div className={classNames(styles.buttonSet, styles.paddedButtons)}>
                 <Button kind="secondary" size="xl" onClick={onResetFields} className={styles.button}>
