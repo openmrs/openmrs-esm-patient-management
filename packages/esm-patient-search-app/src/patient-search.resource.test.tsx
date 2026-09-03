@@ -343,3 +343,123 @@ describe('useRestPatients', () => {
     expect(result.current.isLoading).toBe(false);
   });
 });
+
+// The advanced search needs the whole result set on the client for its filters and result count.
+// Walking it a page at a time cost a serialised round trip per page, so pages are fetched in
+// parallel instead. `parallel: true` stops SWR passing the previous page to `getKey`, so the end of
+// the result set is recognised from the total page 1 reports rather than from its `next` link.
+describe('useInfinitePatientSearch parallel paging', () => {
+  let cache: Map<string, unknown>;
+  let requestedUrls: Array<string>;
+  let inFlight: number;
+  let maxInFlight: number;
+
+  const sharedCacheWrapper = ({ children }: { children: React.ReactNode }) => (
+    <SWRConfig value={{ provider: () => cache as never, dedupingInterval: 0 }}>{children}</SWRConfig>
+  );
+
+  /** Serves `total` patients in pages of 10, resolving after a tick so overlap is observable. */
+  const respondWith = (total: number) =>
+    mockOpenmrsFetch.mockImplementation(async (url: string) => {
+      requestedUrls.push(url);
+      inFlight++;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight--;
+
+      const params = new URL(url, 'http://localhost').searchParams;
+      const startIndex = Number(params.get('startIndex') ?? 0);
+      const count = Math.max(0, Math.min(10, total - startIndex));
+
+      return {
+        data: {
+          results: Array.from({ length: count }, (_, i) => ({ uuid: `p-${startIndex + i}`, person: {} })),
+          links: total > startIndex + 10 ? [{ rel: 'next' }] : [],
+          totalCount: total,
+        },
+      } as unknown as FetchResponse;
+    });
+
+  const settle = () =>
+    act(async () => {
+      await new Promise((r) => setTimeout(r, 50));
+    });
+
+  beforeEach(() => {
+    vi.useRealTimers();
+    cache = new Map();
+    requestedUrls = [];
+    inFlight = 0;
+    maxInFlight = 0;
+    mockOpenmrsFetch.mockReset();
+    respondWith(100);
+  });
+
+  it('fetches the requested pages concurrently rather than one round trip at a time', async () => {
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+    await waitFor(() => expect(result.current.totalResults).toBe(100));
+
+    requestedUrls = [];
+    maxInFlight = 0;
+    await act(async () => {
+      await result.current.setPage(10);
+    });
+    await settle();
+
+    expect(result.current.data).toHaveLength(100);
+    expect(requestedUrls).toHaveLength(9); // pages 2..10; page 1 is already cached
+    expect(maxInFlight).toBe(9);
+  });
+
+  it('does not request pages past the end of the result set', async () => {
+    respondWith(25);
+    const { result } = renderHook(() => useInfinitePatientSearch('Mary', false), { wrapper: sharedCacheWrapper });
+    await waitFor(() => expect(result.current.totalResults).toBe(25));
+
+    // Far more pages than exist: the guard, not the caller, has to stop the fetching.
+    await act(async () => {
+      await result.current.setPage(20);
+    });
+    await settle();
+
+    expect(requestedUrls).toHaveLength(3);
+    expect(result.current.data).toHaveLength(25);
+    expect(result.current.hasMore).toBe(false);
+  });
+
+  // `keepPreviousData` leaves the outgoing query's pages in `data`, so reading the total off
+  // `data[0]` reported the previous query's count. Callers size their page requests from it, which
+  // would make a narrow query fetch pages the new result set does not have.
+  it('reports no total for a query whose first page has not arrived yet', async () => {
+    const { result, rerender } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false), {
+      wrapper: sharedCacheWrapper,
+      initialProps: { q: 'Mary' },
+    });
+    await waitFor(() => expect(result.current.totalResultsForQuery).toBe(100));
+
+    mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as never);
+    rerender({ q: 'Zebediah' });
+    await settle();
+
+    expect(result.current.data).toHaveLength(10); // the previous query's page 1, still on screen
+    expect(result.current.totalResultsForQuery).toBe(0);
+  });
+
+  // The counterpart to the above: the rows held by `keepPreviousData` are still on screen, and
+  // `totalResults` is what a view prints above them. Reporting the incoming query's total here —
+  // zero until its first page lands — renders those patients under "0 search results".
+  it('keeps reporting the loaded result count while a new query is being fetched', async () => {
+    const { result, rerender } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false), {
+      wrapper: sharedCacheWrapper,
+      initialProps: { q: 'Mary' },
+    });
+    await waitFor(() => expect(result.current.totalResults).toBe(100));
+
+    mockOpenmrsFetch.mockImplementation(() => new Promise(() => {}) as never);
+    rerender({ q: 'Zebediah' });
+    await settle();
+
+    expect(result.current.data).toHaveLength(10);
+    expect(result.current.totalResults).toBe(100);
+  });
+});
