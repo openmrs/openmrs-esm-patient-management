@@ -6,7 +6,7 @@ const hasChildren = (node) => node && (node.children || (node.props && node.prop
 const getChildren = (node) => (node && node.children ? node.children : node.props && node.props.children);
 
 const interpolate = (text, values = {}) =>
-  Object.entries(values).reduce((str, [k, v]) => str.replace(new RegExp(`{{${k}}}`, 'g'), v), text);
+  Object.entries(values).reduce((str, [k, v]) => str.replace(new RegExp(`{{${k}}}`, 'g'), () => String(v)), text);
 
 const renderNodes = (reactNodes, values) => {
   if (typeof reactNodes === 'string') {

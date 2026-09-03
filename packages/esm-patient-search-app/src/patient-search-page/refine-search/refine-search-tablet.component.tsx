@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useId, useMemo } from 'react';
 import classNames from 'classnames';
 import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
@@ -35,6 +35,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
   onSubmit,
 }) => {
   const { t } = useTranslation();
+  const headingId = useId();
 
   const renderSearchFields = useMemo(() => {
     const fields: Array<SearchFieldConfig> = [];
@@ -132,7 +133,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
         <div className={styles.refineSearchDialogContainer}>
           <div className={styles.refineSearchDialog}>
             <div className={styles.refineSearchDialogHeader}>
-              <p id="refine-search-dialog-heading" className={styles.bodyShort01}>
+              <p id={headingId} className={styles.bodyShort01}>
                 {t('refineSearchHeaderText', 'Add additional search criteria')}
               </p>
               <Button
@@ -144,7 +145,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
                 {t('refineSearch', 'Refine search')}
               </Button>
             </div>
-            <form onSubmit={onSubmit} aria-labelledby="refine-search-dialog-heading">
+            <form onSubmit={onSubmit} aria-labelledby={headingId}>
               {renderSearchFields}
               <div className={classNames(styles.buttonSet, styles.paddedButtons)}>
                 <Button kind="secondary" size="xl" onClick={onResetFields} className={styles.button}>
