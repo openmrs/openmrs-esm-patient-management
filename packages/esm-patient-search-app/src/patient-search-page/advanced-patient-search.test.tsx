@@ -164,6 +164,52 @@ describe('AdvancedPatientSearchComponent', () => {
       // expect(within(patientBanners[0]).getByText(/Joseph Davis/i)).toBeInTheDocument();
     });
 
+    it('does not match a patient without a birthdate to a date of birth filter', async () => {
+      const [patient] = mockAdvancedSearchResults;
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: [
+          { ...patient, person: { ...patient.person, birthdate: null, age: null } },
+        ] as unknown as PatientSearchResponse['data'],
+      });
+      renderComponent();
+
+      await user.type(screen.getByRole('spinbutton', { name: /day of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /month of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /year of birth/i }), '1970');
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/0 search result/)).toBeInTheDocument();
+    });
+
+    it('matches the date of birth as stored, whatever timezone the backend serialised it in', async () => {
+      // Tests run in UTC, where `new Date` would read this birthdate as 31 December 1939.
+      const [patient] = mockAdvancedSearchResults;
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: [
+          { ...patient, person: { ...patient.person, birthdate: '1940-01-01T00:00:00.000+0300' } },
+        ] as unknown as PatientSearchResponse['data'],
+      });
+      renderComponent();
+
+      await user.type(screen.getByRole('spinbutton', { name: /day of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /month of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /year of birth/i }), '1940');
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/1 search result/)).toBeInTheDocument();
+    });
+
+    it('ignores surrounding whitespace in the postcode filter', async () => {
+      renderComponent();
+
+      await user.type(screen.getByRole('textbox', { name: /postcode/i }), ' 20839 ');
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/1 search result/)).toBeInTheDocument();
+    });
+
     it('filters by person attribute correctly', async () => {
       renderComponent();
 
