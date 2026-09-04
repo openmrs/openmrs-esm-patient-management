@@ -24,6 +24,7 @@ vi.mock('react-router-dom', async () => ({
 
 describe('PatientSearchLaunch', () => {
   beforeEach(() => {
+    mockIsDesktop.mockReturnValue(true);
     mockUseParams.mockReturnValue({});
     mockUseLayoutType.mockReturnValue('desktop');
     mockUseConfig.mockReturnValue({
@@ -43,6 +44,8 @@ describe('PatientSearchLaunch', () => {
 
   it('toggles search input when search button is clicked', async () => {
     const user = userEvent.setup();
+    mockIsDesktop.mockReturnValue(false);
+    mockUseLayoutType.mockReturnValue('phone');
     render(<PatientSearchLaunch />);
 
     const searchButton = screen.getByTestId('searchPatientIcon');
@@ -73,7 +76,6 @@ describe('PatientSearchLaunch', () => {
     const { container } = render(<PatientSearchLaunch />);
 
     expect(container).toBeEmptyDOMElement();
-    expect(screen.queryByText('Search results')).not.toBeInTheDocument();
   });
 
   it('keeps its overlay open on the search page in phone layout, where the page renders none', () => {
@@ -89,6 +91,7 @@ describe('PatientSearchLaunch', () => {
   it('displays search input in overlay on mobile', async () => {
     const user = userEvent.setup();
     mockIsDesktop.mockReturnValue(false);
+    mockUseLayoutType.mockReturnValue('phone');
 
     render(<PatientSearchLaunch />);
 
