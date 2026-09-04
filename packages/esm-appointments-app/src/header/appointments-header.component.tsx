@@ -11,13 +11,37 @@ import { useAppointmentsStore } from '../store';
 import { launchCreateAppointmentForm } from '../helpers/functions';
 import styles from './appointments-header.scss';
 
+interface CalendarFilterOption {
+  uuid: string;
+  label: string;
+  color?: string;
+}
+
+export interface CalendarFilters {
+  serviceOptions: Array<CalendarFilterOption>;
+  providerOptions: Array<CalendarFilterOption>;
+  locationOptions: Array<CalendarFilterOption>;
+  selectedServiceUuids: Array<string>;
+  selectedProviderUuids: Array<string>;
+  selectedLocationUuids: Array<string>;
+  onServiceChange: (selectedItems: Array<{ id: string }>) => void;
+  onProviderChange: (selectedItems: Array<{ id: string }>) => void;
+  onLocationChange: (selectedItems: Array<{ id: string }>) => void;
+}
+
 interface AppointmentHeaderProps {
   title: string;
   showServiceTypeFilter?: boolean;
   isCalendarView?: boolean;
+  calendarFilters?: CalendarFilters;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter, isCalendarView }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
+  title,
+  showServiceTypeFilter,
+  isCalendarView,
+  calendarFilters,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,14 +64,91 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServi
     [serviceTypes],
   );
 
+  const toMultiSelectItems = useCallback((options: Array<CalendarFilterOption>) => {
+    return options.map((option) =>
+      option.color
+        ? { id: option.uuid, label: option.label, color: option.color }
+        : { id: option.uuid, label: option.label },
+    );
+  }, []);
+
+  const renderServiceItemWithColor = useCallback((item: { id: string; label: string; color?: string }) => {
+    if (!item) return null;
+    return (
+      <span className={styles.filterOptionLabel}>
+        {item.color && <span className={styles.serviceColorSwatch} style={{ backgroundColor: item.color }} />}
+        <span className={item.color ? styles.filterOptionTextWithColor : ''}>{item.label}</span>
+      </span>
+    );
+  }, []);
+
+  const handleMultiSelectChange = useCallback((handler: (selectedItems: Array<{ id: string }>) => void) => {
+    return ({ selectedItems }: { selectedItems: Array<{ id: string; label: string }> }) => handler(selectedItems);
+  }, []);
+
+  const serviceFilterLabel = t('filterByService', 'Service');
+  const providerFilterLabel = t('filterByProvider', 'Provider');
+  const locationFilterLabel = t('filterByLocation', 'Location');
+  const allServicesLabel = t('allServices', 'All services');
+  const allProvidersLabel = t('allProviders', 'All providers');
+  const allLocationsLabel = t('allLocations', 'All locations');
+
+  const calendarFilterMultiselects = calendarFilters && (
+    <div className={styles.calendarFilters}>
+      <MultiSelect
+        id="calendarServiceFilter"
+        items={toMultiSelectItems(calendarFilters.serviceOptions)}
+        itemToString={(item) => (item ? item.label : '')}
+        itemToElement={renderServiceItemWithColor}
+        label={allServicesLabel}
+        titleText={serviceFilterLabel}
+        onChange={handleMultiSelectChange(calendarFilters.onServiceChange)}
+        selectedItems={toMultiSelectItems(
+          calendarFilters.serviceOptions.filter((option) => calendarFilters.selectedServiceUuids.includes(option.uuid)),
+        )}
+      />
+      <MultiSelect
+        id="calendarProviderFilter"
+        items={toMultiSelectItems(calendarFilters.providerOptions)}
+        itemToString={(item) => (item ? item.label : '')}
+        label={allProvidersLabel}
+        titleText={providerFilterLabel}
+        onChange={handleMultiSelectChange(calendarFilters.onProviderChange)}
+        selectedItems={toMultiSelectItems(
+          calendarFilters.providerOptions.filter((option) =>
+            calendarFilters.selectedProviderUuids.includes(option.uuid),
+          ),
+        )}
+      />
+      <MultiSelect
+        id="calendarLocationFilter"
+        items={toMultiSelectItems(calendarFilters.locationOptions)}
+        itemToString={(item) => (item ? item.label : '')}
+        label={allLocationsLabel}
+        titleText={locationFilterLabel}
+        onChange={handleMultiSelectChange(calendarFilters.onLocationChange)}
+        selectedItems={toMultiSelectItems(
+          calendarFilters.locationOptions.filter((option) =>
+            calendarFilters.selectedLocationUuids.includes(option.uuid),
+          ),
+        )}
+      />
+    </div>
+  );
+
   return (
-    <PageHeader className={styles.header} data-testid="appointments-header">
+    <PageHeader
+      className={`${styles.header} ${isCalendarView ? styles.calendarHeader : ''}`}
+      data-testid="appointments-header">
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
         {isCalendarView ? (
-          <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
-            {t('newAppointment', 'New appointment')}
-          </Button>
+          <div className={styles.calendarActions}>
+            {calendarFilterMultiselects}
+            <Button kind="primary" renderIcon={Add} size="md" onClick={() => launchCreateAppointmentForm(t)}>
+              {t('newAppointment', 'New appointment')}
+            </Button>
+          </div>
         ) : (
           <>
             <OpenmrsDatePicker
