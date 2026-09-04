@@ -135,6 +135,14 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 label={t('age', 'Age')}
                 min={field.min}
                 max={field.max}
+                invalidText={
+                  field.max
+                    ? t('ageOutOfRange', 'Enter an age between {{min}} and {{max}}', {
+                        min: field.min ?? 0,
+                        max: field.max,
+                      })
+                    : t('ageBelowMinimum', 'Enter an age of at least {{min}}', { min: field.min ?? 0 })
+                }
                 allowEmpty
                 hideSteppers
                 size={isTablet ? 'lg' : 'md'}
