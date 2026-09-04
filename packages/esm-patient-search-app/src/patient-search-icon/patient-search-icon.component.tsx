@@ -65,10 +65,14 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     setCanClickOutside(false);
   }, [setShowSearchInput, setCanClickOutside]);
 
+  // The search page renders its own overlay in the tablet layout (see patient-search-page), so the
+  // icon must not open a second one there. Desktop keeps the header input and phone keeps this
+  // overlay, since the page renders neither.
+  const pageRendersOverlay = isSearchPage && layout === 'tablet';
+
   useEffect(() => {
-    // Search input should always be open when we direct to the search page.
-    setShowSearchInput(isSearchPage);
-  }, [isSearchPage]);
+    setShowSearchInput(isSearchPage && !pageRendersOverlay);
+  }, [isSearchPage, pageRendersOverlay]);
 
   useEffect(() => {
     if (showSearchInput) {
@@ -81,6 +85,11 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       setCanClickOutside(false);
     }
   }, [showSearchInput, isSearchPage]);
+
+  if (pageRendersOverlay) {
+    // The page's overlay already carries the search input and its own back button.
+    return null;
+  }
 
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>
