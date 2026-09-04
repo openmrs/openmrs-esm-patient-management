@@ -166,6 +166,9 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     return searchResults;
   }, [filtersApplied, filters, searchResults]);
 
+  // Only the filters can be blamed when the query itself found patients.
+  const emptiedByFilters = filtersApplied > 0 && (searchResults?.length ?? 0) > 0 && filteredResults?.length === 0;
+
   return (
     <div
       className={classNames({
@@ -189,6 +192,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           isLoading={isLoading}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}
+          emptiedByFilters={emptiedByFilters}
         />
       </div>
       {inTabletOrOverlay && (

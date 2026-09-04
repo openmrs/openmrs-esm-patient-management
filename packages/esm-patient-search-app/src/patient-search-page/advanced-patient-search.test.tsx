@@ -131,6 +131,19 @@ describe('AdvancedPatientSearchComponent', () => {
       await user.click(screen.getByRole('button', { name: /apply/i }));
 
       expect(screen.getByText(/0 search result/)).toBeInTheDocument();
+      expect(screen.getByText('No patients match these filters')).toBeInTheDocument();
+      expect(screen.getByText(/remove or change a filter/i)).toBeInTheDocument();
+    });
+
+    it('keeps the no-results message when the query itself found no patients', async () => {
+      mockUseInfinitePatientSearch.mockReturnValue({ ...mockSearchResults, data: [], totalResults: 0 });
+      renderComponent();
+
+      await user.click(screen.getByRole('tab', { name: /female/i }));
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/sorry, no patient charts were found/i)).toBeInTheDocument();
+      expect(screen.queryByText('No patients match these filters')).not.toBeInTheDocument();
     });
 
     it('filters by age correctly', async () => {
