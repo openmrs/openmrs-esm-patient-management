@@ -153,6 +153,11 @@ export interface RelationshipValue {
    */
   initialrelationshipTypeValue?: string;
   uuid?: string;
+  /**
+   * Client-side identifier for a relationship that has not been saved yet.
+   * Used as a stable React key until the server assigns a uuid. Never sent to the server.
+   */
+  clientId?: string;
 }
 
 export interface FormValues {
