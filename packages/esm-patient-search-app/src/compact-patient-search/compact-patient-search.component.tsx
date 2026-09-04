@@ -33,6 +33,12 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const debouncedSearchTerm = useDebounce(searchTerm);
+
+  // On the search page the term comes from the URL, so follow it when the route changes (a browser
+  // back or forward, or a link to another query) rather than reading it once on mount.
+  useEffect(() => {
+    setSearchTerm(initialSearchTerm ?? '');
+  }, [initialSearchTerm]);
   const hasSearchTerm = Boolean(debouncedSearchTerm?.trim());
 
   const config = useConfig<PatientSearchConfig>();

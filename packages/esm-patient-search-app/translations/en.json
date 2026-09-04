@@ -1,5 +1,7 @@
 {
   "age": "Age",
+  "ageBelowMinimum": "Enter an age of at least {{min}}",
+  "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
   "any": "Any",
   "apply": "Apply",
   "clear": "Clear",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
@@ -12,14 +12,10 @@ import { renderWithContext } from 'tools';
 import { initialFormValues } from '../../patient-registration.component';
 
 vi.mock('../../patient-registration.resource', () => ({
-  fetchPerson: vi.fn().mockResolvedValue({
-    data: {
-      results: [
-        { uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd24', display: 'Person 1' },
-        { uuid: '691eed12-c0f1-11e2-94be-8c13b969e334', display: 'Person 2' },
-      ],
-    },
-  }),
+  fetchPerson: vi.fn().mockResolvedValue([
+    { uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd24', display: 'Person 1' },
+    { uuid: '691eed12-c0f1-11e2-94be-8c13b969e334', display: 'Person 2' },
+  ]),
 }));
 
 const mockRelationshipTypes = {
@@ -92,6 +88,18 @@ function renderRelationshipsSectionWithFormik(
 }
 
 describe('RelationshipsSection', () => {
+  let consoleErrorSpy: MockInstance;
+
+  beforeEach(() => {
+    consoleErrorSpy = vi.spyOn(console, 'error');
+  });
+
+  afterEach(() => {
+    const keyWarnings = consoleErrorSpy.mock.calls.filter((call) => String(call[0]).includes('unique "key" prop'));
+    consoleErrorSpy.mockRestore();
+    expect(keyWarnings).toHaveLength(0);
+  });
+
   describe('Loading state', () => {
     it('renders a loader when relationshipTypes are not available', () => {
       const mockResourcesContextValue = {
@@ -148,6 +156,7 @@ describe('RelationshipsSection', () => {
         {
           relationships: [
             {
+              clientId: 'new-relationship-1',
               action: 'ADD',
               relatedPersonUuid: '11524ae7-3ef6-4ab6-aff6-804ffc58704a',
               relatedPersonName: 'John Doe',
@@ -178,7 +187,9 @@ describe('RelationshipsSection', () => {
 
       renderRelationshipsSectionWithFormik(
         {
-          relationships: [{ action: 'ADD', relatedPersonUuid: '', relationshipType: '' }],
+          relationships: [
+            { clientId: 'new-relationship-1', action: 'ADD', relatedPersonUuid: '', relationshipType: '' },
+          ],
         },
         mockResourcesContextValue,
       );
@@ -240,7 +251,13 @@ describe('RelationshipsSection', () => {
       const { getFormValues } = renderRelationshipsSectionWithFormik(
         {
           relationships: [
-            { action: 'ADD', relatedPersonUuid: 'test-uuid', relatedPersonName: 'Test Person', relationshipType: '' },
+            {
+              clientId: 'new-relationship-1',
+              action: 'ADD',
+              relatedPersonUuid: 'test-uuid',
+              relatedPersonName: 'Test Person',
+              relationshipType: '',
+            },
           ],
         },
         mockResourcesContextValue,
@@ -302,6 +319,63 @@ describe('RelationshipsSection', () => {
       await waitFor(() => {
         expect(screen.getByText(/relationship removed/i)).toBeInTheDocument();
       });
+    });
+
+    it('keeps the remaining new relationship row associated with its own values when another row is removed', async () => {
+      const user = userEvent.setup();
+      const person1Uuid = '42ae5ce0-d64b-11ea-9064-5adc43bbdd24';
+      const person2Uuid = '691eed12-c0f1-11e2-94be-8c13b969e334';
+      const motherValue = '42ae5ce0-d64b-11ea-9064-5adc43bbdd34/aIsToB';
+      const fatherValue = '52ae5ce0-d64b-11ea-9064-5adc43bbdd24/aIsToB';
+      const mockResourcesContextValue = {
+        addressTemplate: null,
+        currentSession: {
+          authenticated: true,
+          sessionId: 'JSESSION',
+          currentProvider: { uuid: '45ce6c2e-dd5a-11e6-9d9c-0242ac150002', identifier: 'PRO-123' },
+        },
+        identifierTypes: [],
+        relationshipTypes: mockRelationshipTypes,
+      } as Resources;
+
+      const { getFormValues } = renderRelationshipsSectionWithFormik({}, mockResourcesContextValue);
+
+      const addButton = screen.getByRole('button', { name: /add relationship/i });
+      await user.click(addButton);
+      await user.click(addButton);
+
+      const searchboxes = screen.getAllByRole('searchbox', { name: /full name/i });
+      const selects = screen.getAllByRole('combobox', { name: /relationship/i });
+      expect(searchboxes).toHaveLength(2);
+      expect(selects).toHaveLength(2);
+
+      await user.type(searchboxes[0], 'Person');
+      await user.click(await screen.findByText('Person 1'));
+      await user.selectOptions(selects[0], motherValue);
+
+      await user.type(searchboxes[1], 'Person');
+      await user.click(await screen.findByText('Person 2'));
+      await user.selectOptions(selects[1], fatherValue);
+
+      await waitFor(() => {
+        const { relationships } = getFormValues();
+        expect(relationships[0]).toMatchObject({ relatedPersonUuid: person1Uuid, relationshipType: motherValue });
+        expect(relationships[1]).toMatchObject({ relatedPersonUuid: person2Uuid, relationshipType: fatherValue });
+      });
+
+      await user.click(screen.getAllByRole('button', { name: /delete/i })[0]);
+
+      await waitFor(() => {
+        const { relationships } = getFormValues();
+        expect(relationships).toHaveLength(1);
+        expect(relationships[0]).toMatchObject({
+          action: 'ADD',
+          relatedPersonUuid: person2Uuid,
+          relationshipType: fatherValue,
+        });
+      });
+      expect(screen.getByRole('searchbox', { name: /full name/i })).toHaveValue('Person 2');
+      expect(screen.getByRole('combobox', { name: /relationship/i })).toHaveValue(fatherValue);
     });
   });
 });
