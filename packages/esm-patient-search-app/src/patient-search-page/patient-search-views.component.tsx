@@ -10,17 +10,24 @@ interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
 }
 
-export const EmptyState: React.FC = () => {
+interface EmptyStateProps {
+  title?: string;
+  hint?: string;
+}
+
+export const EmptyState: React.FC<EmptyStateProps> = ({ title, hint }) => {
   const { t } = useTranslation();
   return (
     <Layer>
       <Tile className={styles.emptySearchResultsTile}>
         <EmptyCardIllustration />
         <p className={styles.emptyResultText}>
-          {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
+          {title ?? t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
         </p>
         <p className={styles.actionText}>
-          <span>{t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}</span>
+          <span>
+            {hint ?? t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+          </span>
         </p>
       </Tile>
     </Layer>
