@@ -30,6 +30,14 @@ describe('PatientSearchBar', () => {
     expect(searchInput.value).toBe(initialSearchTerm);
   });
 
+  it('updates the field when the initial search term changes', () => {
+    const { rerender } = render(<PatientSearchBar initialSearchTerm="John" onClear={vi.fn()} onSubmit={vi.fn()} />);
+    expect(screen.getByRole('searchbox')).toHaveValue('John');
+
+    rerender(<PatientSearchBar initialSearchTerm="Mary" onClear={vi.fn()} onSubmit={vi.fn()} />);
+    expect(screen.getByRole('searchbox')).toHaveValue('Mary');
+  });
+
   it('calls the onChange callback on input change', async () => {
     const user = userEvent.setup();
     const onChangeMock = vi.fn();
