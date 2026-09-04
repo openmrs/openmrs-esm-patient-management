@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer } from '@carbon/react';
@@ -35,6 +35,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<PatientSearchConfig>();
+  const headingId = useId();
 
   const { control, handleSubmit, reset, formState } = useForm<AdvancedPatientSearchState>({
     defaultValues: {
@@ -118,8 +119,10 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
       onSubmit={handleSubmit(onSubmit)}
       className={styles.refineSearchContainer}
       data-openmrs-role="Refine Search"
-      role="refine-search">
-      <h2 className={styles.productiveHeading02}>{t('refineSearch', 'Refine search')}</h2>
+      aria-labelledby={headingId}>
+      <h2 id={headingId} className={styles.productiveHeading02}>
+        {t('refineSearch', 'Refine search')}
+      </h2>
       {renderSearchFields}
       <hr className={classNames(styles.field, styles.horizontalDivider)} />
       <Button type="submit" kind="primary" size="md" className={classNames(styles.field, styles.button)}>
