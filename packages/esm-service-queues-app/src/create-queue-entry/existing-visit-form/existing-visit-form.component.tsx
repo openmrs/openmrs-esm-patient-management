@@ -66,7 +66,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
       )}
       <Form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.container}>
-          <QueueFields setOnSubmit={handleSetOnSubmit} />
+          <QueueFields patientUuid={visit.patient?.uuid} setOnSubmit={handleSetOnSubmit} />
         </div>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button

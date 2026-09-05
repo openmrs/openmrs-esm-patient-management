@@ -13,35 +13,53 @@ import {
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSession, mockVisitAlice } from '__mocks__';
 import { postQueueEntry } from './queue-fields.resource';
+import { useQueues } from '../../hooks/useQueues';
+import { useQueueEntries } from '../../hooks/useQueueEntries';
+import { useServiceQueuesStore } from '../../store/store';
 import QueueFields from './queue-fields.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = vi.mocked(useLayoutType);
 const mockUseSession = vi.mocked(useSession);
 
+const service1Uuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
+const service2Uuid = 'f3b8a1d2-6c47-4e19-9c2f-8d1a5b7e4c30';
+
+const mockQueues = [
+  {
+    uuid: service1Uuid,
+    name: 'Service 1',
+    location: { uuid: '1' },
+    allowedPriorities: [{ uuid: '197852c7-5fd4-4b33-89cc-7bae6848c65a', display: 'High' }],
+    allowedStatuses: [{ uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'In Progress' }],
+  },
+  { uuid: service2Uuid, name: 'Service 2', location: { uuid: '1' } },
+];
+
 vi.mock('../hooks/useQueueLocations', () => ({
   useQueueLocations: vi.fn(() => ({ queueLocations: [{ id: '1', name: 'Location 1' }] })),
 }));
 
-vi.mock('../../hooks/useQueues', () => {
-  return {
-    useQueues: vi.fn().mockReturnValue({
-      queues: [
-        {
-          uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
-          name: 'Service 1',
-          allowedPriorities: [{ uuid: '197852c7-5fd4-4b33-89cc-7bae6848c65a', display: 'High' }],
-          allowedStatuses: [{ uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'In Progress' }],
-        },
-      ],
-    }),
-  };
-});
+vi.mock('../../hooks/useQueues', () => ({
+  useQueues: vi.fn(),
+}));
+
+vi.mock('../../hooks/useQueueEntries', () => ({
+  useQueueEntries: vi.fn(),
+  useMutateQueueEntries: vi.fn(() => ({ mutateQueueEntries: vi.fn() })),
+}));
+
+vi.mock('../../store/store', () => ({
+  useServiceQueuesStore: vi.fn(),
+}));
 
 vi.mock('./queue-fields.resource', () => {
   return { postQueueEntry: vi.fn() };
 });
 
+const mockUseQueues = vi.mocked(useQueues);
+const mockUseServiceQueuesStore = vi.mocked(useServiceQueuesStore);
+const mockUseQueueEntries = vi.mocked(useQueueEntries);
 const mockPostQueueEntry = vi.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
 
 describe('QueueFields', () => {
@@ -49,6 +67,9 @@ describe('QueueFields', () => {
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseSession.mockReturnValue(mockSession.data);
     mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema) });
+    mockUseQueues.mockReturnValue({ queues: mockQueues } as any);
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [] } as any);
+    mockUseServiceQueuesStore.mockReturnValue({} as any);
   });
 
   it('renders the form fields and returns the set values', async () => {
@@ -58,7 +79,7 @@ describe('QueueFields', () => {
       onSubmit = callback;
     };
 
-    render(<QueueFields setOnSubmit={setOnSubmit} />);
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={setOnSubmit} />);
 
     expect(screen.getByRole('group', { name: /queue location/i })).toBeInTheDocument();
 
@@ -67,9 +88,8 @@ describe('QueueFields', () => {
 
     expect(screen.getByRole('group', { name: /service/i })).toBeInTheDocument();
 
-    const queueUuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
     const serviceSelect = screen.getByTitle(/select a queue service/i);
-    await user.selectOptions(serviceSelect, queueUuid);
+    await user.selectOptions(serviceSelect, service1Uuid);
 
     expect(screen.getByText('Priority')).toBeInTheDocument();
     expect(screen.getByText('High')).toBeInTheDocument();
@@ -77,7 +97,7 @@ describe('QueueFields', () => {
     await onSubmit(mockVisitAlice);
     expect(mockPostQueueEntry).toHaveBeenCalledWith(
       mockVisitAlice.uuid,
-      queueUuid,
+      service1Uuid,
       mockVisitAlice.patient.uuid,
       '197852c7-5fd4-4b33-89cc-7bae6848c65a',
       '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
@@ -85,5 +105,46 @@ describe('QueueFields', () => {
       '1',
       'c0c579b0-8e59-401d-8a4a-976a0b183519',
     );
+  });
+
+  it('omits services the patient is already queued in', async () => {
+    const user = userEvent.setup();
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [{ queue: { uuid: service1Uuid } }] } as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
+
+    expect(screen.getByRole('option', { name: 'Service 2' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Service 1' })).not.toBeInTheDocument();
+  });
+
+  it('omits a queue location once the patient is queued in all of its services', () => {
+    mockUseQueueEntries.mockReturnValue({
+      queueEntries: [{ queue: { uuid: service1Uuid } }, { queue: { uuid: service2Uuid } }],
+    } as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    expect(screen.queryByRole('option', { name: 'Location 1' })).not.toBeInTheDocument();
+    expect(screen.getByText(/already in every queue at the available locations/i)).toBeInTheDocument();
+  });
+
+  it('does not submit a service prefilled from the dashboard until the entries have loaded', async () => {
+    mockUseServiceQueuesStore.mockReturnValue({ selectedServiceUuid: service1Uuid } as any);
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: true } as any);
+    let onSubmit: (visit: Visit) => Promise<any>;
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={(cb) => (onSubmit = cb)} />);
+
+    await expect(onSubmit(mockVisitAlice)).rejects.toThrow(/validation/i);
+    expect(mockPostQueueEntry).not.toHaveBeenCalled();
+  });
+
+  it('does not look up queue entries when there is no patient to look them up for', () => {
+    render(<QueueFields patientUuid={undefined} setOnSubmit={vi.fn()} />);
+
+    expect(mockUseQueueEntries).toHaveBeenCalledWith(expect.anything(), expect.anything(), false);
+    expect(screen.getByRole('option', { name: 'Location 1' })).toBeInTheDocument();
   });
 });
