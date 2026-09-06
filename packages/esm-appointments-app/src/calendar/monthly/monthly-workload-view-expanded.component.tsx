@@ -14,6 +14,7 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
   dateTime,
   calendarSelectedDate,
   onSelectDate,
+  serviceColorMap,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +48,7 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
           calendarSelectedDate={calendarSelectedDate}
           showAllServices
           onSelectDate={onSelectDate}
+          serviceColorMap={serviceColorMap}
         />
       </PopoverContent>
     </Popover>

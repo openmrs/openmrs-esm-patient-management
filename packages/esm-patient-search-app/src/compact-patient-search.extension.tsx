@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
+import { useConfig, navigate, interpolateString, useDebounce } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from './config-schema';
 import { useInfinitePatientSearch } from './patient-search.resource';
 import { PatientSearchContextProvider } from './patient-search-context';
@@ -28,8 +28,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const bannerRef = useRef<CompactPatientBannerHandle>(null);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
-  const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const showSearchResults = useMemo(() => !!debouncedSearchTerm?.trim(), [debouncedSearchTerm]);
+  const patientSearchResponse = useInfinitePatientSearch(debouncedSearchTerm, config.includeDead, showSearchResults);
   const { data: patients } = patientSearchResponse;
 
   const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
@@ -106,7 +107,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
             patientClickSideEffect: handleClear,
           }}>
           <div className={styles.floatingSearchResultsContainer}>
-            <PatientSearch query={searchTerm} ref={bannerRef} {...patientSearchResponse} />
+            <PatientSearch query={debouncedSearchTerm} ref={bannerRef} {...patientSearchResponse} />
           </div>
         </PatientSearchContextProvider>
       )}

@@ -3,191 +3,252 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.monthly-cell {
+.monthly-cell,
+.monthly-cell-disabled {
+  position: relative;
+  height: 100%;
+  width: 100%;
   border-left: 1px solid colors.$gray-20;
   border-bottom: 1px solid colors.$gray-20;
-  background: colors.$white;
+  border-right: 1px solid colors.$gray-20;
+  padding: layout.$spacing-02;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  @include type.type-style('body-compact-01');
+}
+
+.monthly-cell {
+  background-color: colors.$white;
   color: colors.$black;
-  padding: layout.$spacing-01;
-  text-align: right;
-  @include type.type-style('body-compact-02');
 
   &-clickable {
     cursor: pointer;
-  }
 
-  &:nth-child(7n) {
-    border-right: 1px solid colors.$gray-20;
-  }
-
-  &-disabled {
-    border-left: 1px solid colors.$gray-20;
-    border-bottom: 1px solid colors.$gray-20;
-  }
-
-  &-disabled:last-child {
-    border-right: 1px solid colors.$gray-20;
-  }
-}
-
-.identifiers {
-  @include type.type-style('body-compact-02');
-  color: $ui-04;
-  display: list-item;
-
-  span:not(:first-child) {
-    margin: 0 layout.$spacing-04;
-  }
-}
-
-.identifierTag {
-  display: flex;
-  align-items: center;
-}
-
-.weekly-cell {
-  position: relative;
-  border-right: 1px solid colors.$gray-20;
-  border-bottom: 1px solid colors.$gray-20;
-  min-height: 7.5rem;
-  color: colors.$white;
-
-  .week-time {
-    display: none;
-  }
-
-  &:nth-child(-n + 8) {
-    border-top: 1px solid colors.$gray-20;
-  }
-
-  &:first-child {
-    border-top: none;
-  }
-
-  &:nth-child(8n + 1) {
-    border-bottom: none;
-
-    .week-time {
-      white-space: nowrap;
-      display: inline;
-      color: colors.$white;
-      position: absolute;
-      top: -11px;
-      height: layout.$spacing-06;
-      width: layout.$spacing-07;
+    &:hover {
+      background-color: colors.$gray-10;
     }
   }
+}
+
+.monthly-cell-disabled {
+  background-color: colors.$gray-10;
+  color: colors.$gray-50;
+}
+
+.monthly-cell-today {
+  border: 2px solid var(--brand-03) !important;
+  z-index: 1;
+}
+
+.popoverOpen {
+  z-index: 1000 !important;
+}
+
+.cellHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: layout.$spacing-02;
+  width: 100%;
+}
+
+.dateNumber {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-90;
+  font-weight: 600;
+}
+
+.dateNumberOtherMonth {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-50;
+  font-weight: 400;
+}
+
+.todayCircle {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: var(--brand-03);
+  color: colors.$white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @include type.type-style('heading-compact-01');
+  font-weight: 600;
+}
+
+.totalBadge {
+  display: inline-flex;
+  align-items: center;
+  background-color: color-mix(in srgb, var(--brand-03) 15%, transparent);
+  color: var(--brand-03);
+  border-radius: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  @include type.type-style('label-01');
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .currentData {
   display: flex;
   flex-direction: column;
-  align-items: start;
-  margin: 0.1rem 0.1rem layout.$spacing-03 0.1rem;
-
-  & > span {
-    @include type.type-style('label-02');
-  }
+  gap: 0.25rem;
+  width: 100%;
 }
 
 .serviceArea {
   width: 100%;
-  padding: layout.$spacing-01;
-  margin-right: layout.$spacing-03;
-  display: grid;
-  grid-template-columns: 4fr 1fr;
-  justify-content: flex-start;
-  color: #020f1b;
-  cursor: pointer;
+  padding: 0.25rem 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  border-radius: 0.25rem;
   @include type.type-style('label-01');
+  color: colors.$gray-100;
+  box-sizing: border-box;
 
-  & > span:first-child {
+  .serviceName {
+    flex: 1;
     text-align: left;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
   }
 
-  & > span:nth-child(2) {
-    text-align: right;
+  .serviceCount {
+    font-weight: 600;
+    margin-left: auto;
   }
 }
 
-.serviceArea:hover {
-  background-color: colors.$gray-10;
-}
-
-.totals {
-  padding: layout.$spacing-01;
-  display: grid;
-  grid-template-columns: 4fr 1fr;
-  justify-content: flex-start;
-  background-color: colors.$gray-10;
-
-  & > div {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    cursor: pointer;
-    font-weight: lighter;
-  }
-
-  & > span:nth-child(2) {
-    color: #020f1b;
-    font-weight: bold;
-    text-align: right;
-    @include type.type-style('heading-compact-01');
-  }
-}
-
-.calendarDate {
-  @include type.type-style('body-compact-01');
-  color: colors.$gray-70;
-  font-weight: 600;
-}
-
-.smallDesktop {
-  height: 6.25rem;
-}
-
-.largeDesktop {
-  height: 9.375rem;
-}
-
-.red {
-  background-color: colors.$red-70;
-  color: colors.$white;
-  font-weight: bold;
-}
-
-.purple {
-  background-color: colors.$yellow-70;
-  color: colors.$white;
-  font-weight: bold;
-}
-
-.blue {
-  background-color: colors.$blue-70;
-  color: colors.$white;
-  font-weight: bold;
-}
-
-.green {
-  background-color: colors.$green-70;
-  color: colors.$white;
-  font-weight: bold;
+.swatch {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  min-width: 0.5rem;
+  min-height: 0.5rem;
+  border-radius: 0.125rem;
+  flex-shrink: 0;
 }
 
 .showMoreItems {
-  margin-top: 0.1rem;
+  margin-top: 0.25rem;
   padding: 0;
-  @include type.type-style('heading-compact-01');
-  text-decoration: underline;
-  color: colors.$blue-50;
-  background-color: colors.$white;
-  font-weight: lighter;
+  @include type.type-style('label-01');
+  color: var(--brand-03);
+  font-weight: 600;
+  background: transparent;
   border: none;
   outline: none;
   cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.smallDesktop {
+  min-height: 6.5rem;
+}
+
+.largeDesktop {
+  min-height: 9.5rem;
+}
+
+.popoverCard {
+  width: 16rem;
+  padding: layout.$spacing-04;
+  background: colors.$white;
+  color: colors.$gray-100;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+.popoverHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: layout.$spacing-02;
+}
+
+.popoverTitleGroup {
+  display: flex;
+  flex-direction: column;
+
+  .popoverDate {
+    @include type.type-style('heading-compact-01');
+    font-weight: 600;
+    color: colors.$gray-100;
+  }
+
+  .popoverSubtitle {
+    @include type.type-style('label-01');
+    color: colors.$gray-60;
+  }
+}
+
+.popoverCloseBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: colors.$gray-70;
+  border-radius: 0.25rem;
+
+  &:hover {
+    background: colors.$gray-10;
+  }
+}
+
+.popoverDivider {
+  height: 1px;
+  background-color: colors.$gray-20;
+  margin: layout.$spacing-03 0;
+}
+
+.popoverServiceList {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-02;
+}
+
+.popoverServiceRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  @include type.type-style('body-compact-01');
+
+  .popoverServiceName {
+    flex: 1;
+    color: colors.$gray-100;
+  }
+
+  .popoverServiceCount {
+    font-weight: 600;
+    color: colors.$gray-100;
+  }
+}
+
+.openDayViewLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--brand-03);
+  @include type.type-style('heading-compact-01');
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

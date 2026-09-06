@@ -6,7 +6,6 @@ import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
-import { SWRConfig } from 'swr';
 
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
@@ -59,22 +58,13 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
                 count: totalResults,
               })}
             </p>
-            {/* Set SWRConfig to minimize revalidations of, e.g., the patient photo */}
-            <SWRConfig
-              value={{
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false,
-                dedupingInterval: 180_000, // 3 minutes
-              }}>
-              <CompactPatientBanner
-                ref={ref}
-                patients={searchResults}
-                hasMore={hasMore}
-                isValidating={isValidating}
-                fetchMore={fetchMore}
-              />
-            </SWRConfig>
+            <CompactPatientBanner
+              ref={ref}
+              patients={searchResults}
+              hasMore={hasMore}
+              isValidating={isValidating}
+              fetchMore={fetchMore}
+            />
           </div>
         </div>
       );

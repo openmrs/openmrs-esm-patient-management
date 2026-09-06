@@ -12,6 +12,7 @@
     "serve": "rspack serve --mode=development",
     "debug": "npm run serve",
     "build": "rspack --mode production",
+    "clean": "git clean -fdX -- dist",
     "analyze": "rspack --mode=production --env analyze=true",
     "lint": "eslint src",
     "test": "vitest run --passWithNoTests",

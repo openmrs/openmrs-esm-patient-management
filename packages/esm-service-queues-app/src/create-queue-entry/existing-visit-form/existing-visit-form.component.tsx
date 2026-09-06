@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { ExtensionSlot, useLayoutType, type Workspace2DefinitionProps, type Visit } from '@openmrs/esm-framework';
-import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import QueueFields from '../queue-fields/queue-fields.component';
 import styles from './existing-visit-form.scss';
 
@@ -20,7 +19,6 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { mutateQueueEntries } = useMutateQueueEntries();
   const [callback, setCallback] = useState<{
     submitQueueEntry: (visit: Visit) => Promise<unknown>;
   } | null>(null);
@@ -39,13 +37,12 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         .submitQueueEntry(visit)
         .then(() => {
           closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
-          mutateQueueEntries();
         })
         .finally(() => {
           setIsSubmitting(false);
         });
     },
-    [closeWorkspace, callback, visit, mutateQueueEntries],
+    [closeWorkspace, callback, visit],
   );
 
   const handleSetOnSubmit = useCallback((onSubmit: (visit: Visit) => Promise<unknown>) => {

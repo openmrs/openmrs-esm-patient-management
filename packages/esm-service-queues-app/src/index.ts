@@ -31,20 +31,7 @@ export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/sid
 // t('serviceQueues', 'Service queues')
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const clearAllQueueEntriesModal = getAsyncLifecycle(
-  () => import('./modals/clear-queue-entries-modal/clear-queue-entries.modal'),
-  {
-    featureName: 'clear all queue entries and end visits',
-    moduleName,
-  },
-);
-
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
-
-export const metricsCardCheckedInPatients = getAsyncLifecycle(
-  () => import('./metrics/metrics-cards/checked-in-patients.extension'),
-  options,
-);
 
 export const metricsCardWaitingPatients = getAsyncLifecycle(
   () => import('./metrics/metrics-cards/waiting-patients.extension'),
@@ -95,6 +82,14 @@ export const addOrMoveModal = getAsyncLifecycle(() => import('./modals/add-or-mo
   featureName: 'add or move modal',
   moduleName,
 });
+
+export const changeQueueLocationModal = getAsyncLifecycle(
+  () => import('./modals/change-queue-location/change-queue-location.modal'),
+  {
+    featureName: 'change queue location modal',
+    moduleName,
+  },
+);
 
 export const transitionOverflowMenuItem = getAsyncLifecycle(
   () => import('./add-or-move-button/add-or-move-overflow-menu-item.extension'),

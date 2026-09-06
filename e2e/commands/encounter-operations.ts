@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { type APIRequestContext, type Page, expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
 import { type EMRConfiguration, type Encounter } from './types';
 
 export const createEncounter = async (
@@ -35,6 +36,33 @@ export const createEncounter = async (
       obs: observations,
     },
   });
+  expect(encounterRes.ok()).toBeTruthy();
+  return await encounterRes.json();
+};
+
+/**
+ * Records a visit note against an existing visit, dated inside that visit's window because the backend
+ * rejects an encounter dated outside it. `E2E_ADMISSION_ENCOUNTER_TYPE_UUID` holds the Visit Note
+ * encounter type despite its name, as `createEncounter` above also relies on.
+ */
+export const createVisitNoteEncounter = async (
+  api: APIRequestContext,
+  patientId: string,
+  visit: Visit,
+  note: string,
+  locationUuid?: string,
+): Promise<Encounter> => {
+  const encounterRes = await api.post('encounter', {
+    data: {
+      encounterDatetime: dayjs(visit.startDatetime).add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+      patient: patientId,
+      location: locationUuid || process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
+      encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
+      visit: visit.uuid,
+      obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: note }],
+    },
+  });
+
   expect(encounterRes.ok()).toBeTruthy();
   return await encounterRes.json();
 };

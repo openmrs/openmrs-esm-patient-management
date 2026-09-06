@@ -1,9 +1,13 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import dayjs from 'dayjs';
+import useSWR from 'swr';
 import { restBaseUrl, useOpenmrsFetchAll, useSession } from '@openmrs/esm-framework';
-import { useActiveVisits } from './metrics.resource';
+import { useActiveVisits, useAverageWaitTime } from './metrics.resource';
 
+vi.mock('swr', () => ({ default: vi.fn() }));
+
+const mockUseSWR = vi.mocked(useSWR);
 const mockUseOpenmrsFetchAll = vi.mocked(useOpenmrsFetchAll);
 const mockUseSession = vi.mocked(useSession);
 
@@ -67,5 +71,23 @@ describe('useActiveVisits', () => {
     );
     const { result } = renderHook(() => useActiveVisits('location-1'));
     expect(result.current.activeVisits.map((visit) => visit.uuid)).toEqual(['v2']);
+  });
+});
+
+describe('useAverageWaitTime', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('bounds the average to today, as an unambiguous instant', () => {
+    mockUseSWR.mockReturnValue({ data: undefined, error: undefined, isLoading: true } as ReturnType<typeof useSWR>);
+    renderHook(() => useAverageWaitTime('service-1', 'location-1', 'status-1'));
+
+    const url = decodeURIComponent(mockUseSWR.mock.calls[0][0] as string);
+    const startedOnOrAfter = url.match(/&startedOnOrAfter=([^&]+)/)?.[1];
+
+    // The offset is what makes it unambiguous; without one the server falls back to its own timezone.
+    expect(startedOnOrAfter).toMatch(/(Z|[+-]\d{2}:\d{2})$/);
+    expect(new Date(startedOnOrAfter).getTime()).toBe(dayjs().startOf('day').valueOf());
   });
 });
