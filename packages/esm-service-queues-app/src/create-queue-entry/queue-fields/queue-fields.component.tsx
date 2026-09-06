@@ -21,7 +21,7 @@ import { postQueueEntry } from './queue-fields.resource';
 import { useMutateQueueEntries, useQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
-import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE } from '../../constants';
+import { isDuplicateQueueEntryError } from '../../modals/queue-entry-error.utils';
 import { useServiceQueuesStore } from '../../store/store';
 
 export interface QueueFieldsProps {
@@ -52,11 +52,9 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const schema = useMemo(() => createQueueServiceSchema(t), [t]);
   const { sessionLocation } = useSession();
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
-  const { queues: allQueues, isLoading: isLoadingAllQueues } = useQueues();
 
-  // A patient cannot be added to a queue they are already in, so those queues are left out below,
-  // along with any location where they are in every queue. A location with no queues at all is kept,
-  // so that its misconfiguration still surfaces.
+  // A patient cannot be added to a queue they are already in, so those queues are left out of the
+  // Service options below.
   const { queueEntries, isLoading: isLoadingQueueEntries } = useQueueEntries(
     { patient: patientUuid, isEnded: false },
     'custom:(uuid,queue:(uuid))',
@@ -64,16 +62,6 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   );
   const activeQueueUuids = useMemo(() => new Set(queueEntries.map((entry) => entry.queue?.uuid)), [queueEntries]);
 
-  const memoizedQueueLocations = useMemo(
-    () =>
-      queueLocations
-        .filter((location) => {
-          const locationQueues = allQueues.filter((queue) => queue.location?.uuid === location.id);
-          return !locationQueues.length || locationQueues.some((queue) => !activeQueueUuids.has(queue.uuid));
-        })
-        .map((l) => ({ id: l.id, name: l.name })),
-    [activeQueueUuids, allQueues, queueLocations],
-  );
   const {
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
     visitQueueNumberAttributeUuid,
@@ -114,11 +102,11 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const priorities = useMemo(() => {
     return memoizedQueues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
   }, [memoizedQueues, queueService]);
+  const isPatientInEveryQueue = queues.length > 0 && memoizedQueues.length === 0;
 
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
-  const isLoadingLocations = isLoadingQueueLocations || isLoadingAllQueues || isLoadingQueueEntries;
   const isLoadingServices = isLoadingQueues || isLoadingQueueEntries;
-  const isDataLoaded = !isLoadingLocations && !isLoadingServices;
+  const isDataLoaded = !isLoadingQueueLocations && !isLoadingServices;
 
   const onSubmit = useCallback(
     async (visit: Visit) => {
@@ -146,10 +134,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
           mutateQueueEntries();
         })
         .catch((error) => {
-          const errorMessage = error?.responseBody?.error?.message || error?.message || '';
-          const isDuplicatePatientError = errorMessage.includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
-
-          if (isDuplicatePatientError) {
+          if (isDuplicateQueueEntryError(error)) {
             showSnackbar({
               title: t('patientAlreadyInQueue', 'Patient already in queue'),
               kind: 'warning',
@@ -176,15 +161,6 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   useEffect(() => {
     setOnSubmit?.(onSubmit);
   }, [onSubmit, setOnSubmit]);
-
-  useEffect(() => {
-    if (queueLocation && isDataLoaded) {
-      const isLocationValid = memoizedQueueLocations.some((location) => location.id === queueLocation);
-      if (!isLocationValid) {
-        setValue('queueLocation', '', { shouldValidate: true });
-      }
-    }
-  }, [isDataLoaded, memoizedQueueLocations, queueLocation, setValue]);
 
   useEffect(() => {
     if (queueLocation && queueService) {
@@ -236,18 +212,8 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
             name="queueLocation"
             control={control}
             render={({ field }) =>
-              isLoadingLocations ? (
+              isLoadingQueueLocations ? (
                 <SelectSkeleton />
-              ) : !memoizedQueueLocations.length && activeQueueUuids.size ? (
-                <InlineNotification
-                  hideCloseButton
-                  kind="info"
-                  lowContrast
-                  subtitle={t(
-                    'patientAlreadyInEveryQueue',
-                    'This patient is already in every queue at the available locations',
-                  )}
-                />
               ) : (
                 <Select
                   {...field}
@@ -264,7 +230,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
                     }
                   }}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                  {memoizedQueueLocations?.map((location) => (
+                  {queueLocations.map((location) => (
                     <SelectItem key={location.id} text={location.name} value={location.id}>
                       {location.name}
                     </SelectItem>
@@ -284,7 +250,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
             render={({ field }) =>
               isLoadingServices ? (
                 <SelectSkeleton />
-              ) : !memoizedQueues?.length ? (
+              ) : !queues.length ? (
                 <InlineNotification
                   kind="error"
                   lowContrast
@@ -296,7 +262,12 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
                   {...field}
                   labelText=""
                   id="queueService"
-                  invalid={!!errors.queueService}
+                  helperText={
+                    isPatientInEveryQueue
+                      ? t('patientInEveryQueueAtLocation', 'This patient is already in every queue at this location')
+                      : undefined
+                  }
+                  invalid={!!errors.queueService && !isPatientInEveryQueue}
                   invalidText={errors.queueService?.message}
                   onChange={(event) => {
                     field.onChange(event.target.value);
@@ -326,7 +297,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
             name="priority"
             control={control}
             render={({ field }) =>
-              isLoadingQueues ? (
+              isLoadingServices ? (
                 <RadioButtonGroup name="priority">
                   <RadioButtonSkeleton />
                   <RadioButtonSkeleton />

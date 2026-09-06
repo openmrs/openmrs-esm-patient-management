@@ -5,6 +5,7 @@ import { render, screen } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useSession,
@@ -44,9 +45,11 @@ vi.mock('../../hooks/useQueues', () => ({
   useQueues: vi.fn(),
 }));
 
+const mockMutateQueueEntries = vi.fn();
+
 vi.mock('../../hooks/useQueueEntries', () => ({
   useQueueEntries: vi.fn(),
-  useMutateQueueEntries: vi.fn(() => ({ mutateQueueEntries: vi.fn() })),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: mockMutateQueueEntries }),
 }));
 
 vi.mock('../../store/store', () => ({
@@ -119,15 +122,19 @@ describe('QueueFields', () => {
     expect(screen.queryByRole('option', { name: 'Service 1' })).not.toBeInTheDocument();
   });
 
-  it('omits a queue location once the patient is queued in all of its services', () => {
+  it('says so when the patient is already queued in every service at the location', async () => {
+    const user = userEvent.setup();
     mockUseQueueEntries.mockReturnValue({
       queueEntries: [{ queue: { uuid: service1Uuid } }, { queue: { uuid: service2Uuid } }],
     } as any);
 
     render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
 
-    expect(screen.queryByRole('option', { name: 'Location 1' })).not.toBeInTheDocument();
-    expect(screen.getByText(/already in every queue at the available locations/i)).toBeInTheDocument();
+    await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
+
+    expect(screen.getByRole('option', { name: 'Location 1' })).toBeInTheDocument();
+    expect(screen.getByText(/already in every queue at this location/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no services configured/i)).not.toBeInTheDocument();
   });
 
   it('does not submit a service prefilled from the dashboard until the entries have loaded', async () => {
@@ -139,6 +146,31 @@ describe('QueueFields', () => {
 
     await expect(onSubmit(mockVisitAlice)).rejects.toThrow(/validation/i);
     expect(mockPostQueueEntry).not.toHaveBeenCalled();
+  });
+
+  it('warns and refreshes the entries when the backend rejects a duplicate queue entry', async () => {
+    const user = userEvent.setup();
+    const duplicateError = {
+      responseBody: {
+        error: {
+          message: 'Invalid Submission',
+          globalErrors: [{ code: 'queue.entry.error.duplicate', message: 'This patient is already in this queue' }],
+        },
+      },
+    };
+    mockPostQueueEntry.mockRejectedValueOnce(duplicateError);
+    let onSubmit: (visit: Visit) => Promise<any>;
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={(cb) => (onSubmit = cb)} />);
+
+    await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
+    await user.selectOptions(screen.getByTitle(/select a queue service/i), service1Uuid);
+
+    await expect(onSubmit(mockVisitAlice)).rejects.toBe(duplicateError);
+    expect(showSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'warning', title: 'Patient already in queue' }),
+    );
+    expect(mockMutateQueueEntries).toHaveBeenCalledTimes(1);
   });
 
   it('does not look up queue entries when there is no patient to look them up for', () => {

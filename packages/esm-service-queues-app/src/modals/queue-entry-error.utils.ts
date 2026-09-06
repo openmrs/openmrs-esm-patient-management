@@ -7,18 +7,24 @@ export function getErrorMessage(error: unknown): string {
         rawMessage?: string;
         translatedMessage?: string;
         message?: string;
+        globalErrors?: Array<{ code?: string; message?: string }>;
       };
     };
     message?: string;
   };
 
-  return (
+  const message =
     err?.responseBody?.error?.rawMessage ||
     err?.responseBody?.error?.translatedMessage ||
     err?.responseBody?.error?.message ||
     err?.message ||
-    ''
-  );
+    '';
+
+  // Validation failures carry a generic "Invalid Submission" message, with the code identifying the
+  // actual problem in `globalErrors`, so those codes are appended for the callers below to match on.
+  const globalErrorCodes = (err?.responseBody?.error?.globalErrors ?? []).map((globalError) => globalError.code);
+
+  return [message, ...globalErrorCodes].filter(Boolean).join(' ');
 }
 
 // Note: Detection relies on matching a substring from the backend's IllegalStateException
