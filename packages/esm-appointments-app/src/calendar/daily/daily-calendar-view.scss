@@ -3,7 +3,7 @@
 @use '@carbon/type';
 
 .container {
-  margin: layout.$spacing-05;
+  margin: 0 layout.$spacing-05 layout.$spacing-05;
   border: 1px solid colors.$gray-20;
   background: colors.$white;
   overflow-x: auto;
