@@ -1,9 +1,8 @@
 import { useEffect, useState, useCallback, type RefObject } from 'react';
-import { type SearchedPatient } from '../types';
 
 const useArrowNavigation = (
   totalResults: number,
-  enterCallback: (evt: KeyboardEvent, index: number, patients?: Array<SearchedPatient>) => void,
+  enterCallback: (evt: KeyboardEvent, index: number) => void,
   resetFocusCallback: () => void,
   initalFocusedResult: number = -1,
   containerRef?: RefObject<HTMLElement>,
