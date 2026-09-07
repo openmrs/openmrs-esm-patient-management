@@ -112,7 +112,7 @@ const AdminPage = () => {
         ) : queuesError ? (
           <ErrorState error={queuesError} headerTitle={t('queues', 'Queues')} />
         ) : (
-          <Layer>
+          <Layer className={styles.tableSection}>
             <DataTable
               rows={queueTableRows}
               headers={queueTableHeaders}
@@ -146,9 +146,7 @@ const AdminPage = () => {
                 </TableContainer>
               )}
             </DataTable>
-            {queueTableRows.length === 0 && (
-              <EmptyState className={styles.emptyState} displayText={t('noQueuesToDisplay', 'No queues to display')} />
-            )}
+            {queueTableRows.length === 0 && <EmptyState displayText={t('noQueuesToDisplay', 'No queues to display')} />}
           </Layer>
         )}
       </div>
@@ -168,7 +166,7 @@ const AdminPage = () => {
         ) : queueRoomsError ? (
           <ErrorState error={queueRoomsError} headerTitle={t('queueRooms', 'Queue rooms')} />
         ) : (
-          <Layer>
+          <Layer className={styles.tableSection}>
             <DataTable
               rows={queueRoomTableRows}
               headers={queueRoomTableHeaders}
@@ -203,10 +201,7 @@ const AdminPage = () => {
               )}
             </DataTable>
             {queueRoomTableRows.length === 0 && (
-              <EmptyState
-                className={styles.emptyState}
-                displayText={t('noQueueRoomsToDisplay', 'No queue rooms to display')}
-              />
+              <EmptyState displayText={t('noQueueRoomsToDisplay', 'No queue rooms to display')} />
             )}
           </Layer>
         )}

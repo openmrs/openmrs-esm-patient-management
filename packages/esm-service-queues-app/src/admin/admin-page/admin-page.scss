@@ -42,9 +42,11 @@
   }
 }
 
-.emptyState {
-  border-top: none;
-  padding: layout.$spacing-07 layout.$spacing-05;
+.tableSection {
+  :global(.cds--tile) {
+    border-top: none;
+    padding: layout.$spacing-07 layout.$spacing-05;
+  }
 }
 
 @media (max-width: 768px) {
