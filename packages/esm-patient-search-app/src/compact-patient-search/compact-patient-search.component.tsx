@@ -122,6 +122,10 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     handleFocusToInput,
     -1,
     searchContainerRef,
+    {
+      key: JSON.stringify([isSearchPage, searchTerm, debouncedSearchTerm]),
+      patientUuids: (hasSearchTerm ? searchedPatients : recentPatients)?.map(({ uuid }) => uuid) ?? [],
+    },
   );
 
   useEffect(() => {

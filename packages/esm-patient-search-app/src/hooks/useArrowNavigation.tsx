@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, type RefObject } from 'react';
+import { useEffect, useState, useCallback, useRef, type RefObject } from 'react';
 
 const useArrowNavigation = (
   totalResults: number,
@@ -6,8 +6,22 @@ const useArrowNavigation = (
   resetFocusCallback: () => void,
   initalFocusedResult: number = -1,
   containerRef?: RefObject<HTMLElement>,
+  navigationScope?: { key: string; patientUuids: Array<string> },
 ) => {
   const [focusedResult, setFocusedResult] = useState(initalFocusedResult);
+
+  const previousScope = useRef(navigationScope);
+
+  useEffect(() => {
+    const previous = previousScope.current;
+    if (
+      previous?.key !== navigationScope?.key ||
+      previous?.patientUuids[focusedResult] !== navigationScope?.patientUuids[focusedResult]
+    ) {
+      setFocusedResult(initalFocusedResult);
+    }
+    previousScope.current = navigationScope;
+  }, [navigationScope, focusedResult, initalFocusedResult]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
