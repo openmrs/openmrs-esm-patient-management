@@ -23,6 +23,20 @@ const resultsPerPage = 50;
  */
 const pagesPerWave = 4;
 
+/**
+ * Reads the calendar date off a REST birthdate. The backend serialises birthdates as midnight in
+ * its own timezone (for example `1940-01-01T00:00:00.000+0000`), so parsing them with `Date` would
+ * shift the day, month and year for a browser in a different timezone, and would turn a missing
+ * birthdate into 1 January 1970.
+ */
+function parseBirthdate(birthdate: string | null | undefined) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(birthdate ?? '');
+  if (!match) {
+    return null;
+  }
+  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+}
+
 interface AdvancedPatientSearchProps {
   query: string;
   inTabletOrOverlay?: boolean;
@@ -95,24 +109,19 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           }
         }
 
-        // Date of birth filters
-        if (filters.dateOfBirth) {
-          const dayOfBirth = new Date(patient.person.birthdate).getDate();
-          if (dayOfBirth !== filters.dateOfBirth) {
+        // Date of birth filters. A patient with no recorded birthdate cannot match any of them.
+        if (filters.dateOfBirth || filters.monthOfBirth || filters.yearOfBirth) {
+          const birthdate = parseBirthdate(patient.person.birthdate);
+          if (!birthdate) {
             return false;
           }
-        }
-
-        if (filters.monthOfBirth) {
-          const monthOfBirth = new Date(patient.person.birthdate).getMonth() + 1;
-          if (monthOfBirth !== filters.monthOfBirth) {
+          if (filters.dateOfBirth && birthdate.day !== filters.dateOfBirth) {
             return false;
           }
-        }
-
-        if (filters.yearOfBirth) {
-          const yearOfBirth = new Date(patient.person.birthdate).getFullYear();
-          if (yearOfBirth !== filters.yearOfBirth) {
+          if (filters.monthOfBirth && birthdate.month !== filters.monthOfBirth) {
+            return false;
+          }
+          if (filters.yearOfBirth && birthdate.year !== filters.yearOfBirth) {
             return false;
           }
         }

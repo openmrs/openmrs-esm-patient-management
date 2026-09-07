@@ -5,9 +5,12 @@ const hasChildren = (node) => node && (node.children || (node.props && node.prop
 
 const getChildren = (node) => (node && node.children ? node.children : node.props && node.props.children);
 
-const renderNodes = (reactNodes) => {
+const interpolate = (text, values = {}) =>
+  Object.entries(values).reduce((str, [k, v]) => str.replace(new RegExp(`{{${k}}}`, 'g'), () => String(v)), text);
+
+const renderNodes = (reactNodes, values) => {
   if (typeof reactNodes === 'string') {
-    return reactNodes;
+    return interpolate(reactNodes, values);
   }
 
   return Object.keys(reactNodes).map((key, i) => {
@@ -15,10 +18,10 @@ const renderNodes = (reactNodes) => {
     const isElement = React.isValidElement(child);
 
     if (typeof child === 'string') {
-      return child;
+      return interpolate(child, values);
     }
     if (hasChildren(child)) {
-      const inner = renderNodes(getChildren(child));
+      const inner = renderNodes(getChildren(child), values);
       return React.cloneElement(child, { ...child.props, key: i }, inner);
     }
     if (typeof child === 'object' && !isElement) {
@@ -45,7 +48,7 @@ useMock.i18n = { language: 'en_US' };
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop
-  Trans: ({ children }) => (Array.isArray(children) ? renderNodes(children) : renderNodes([children])),
+  Trans: ({ children, values }) => renderNodes(Array.isArray(children) ? children : [children], values),
   Translation: ({ children }) => children((k) => k, { i18n: {} }),
   useTranslation: () => useMock,
   // mock if needed

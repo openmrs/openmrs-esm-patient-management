@@ -1,5 +1,5 @@
 import React from 'react';
-import { DataTableSkeleton } from '@carbon/react';
+import { DataTableSkeleton, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ErrorState, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
@@ -32,7 +32,12 @@ const QueueScreen: React.FC = () => {
           <ErrorState error={error} headerTitle={t('queueScreen', 'Queue screen')} />
         </div>
       ) : rowData.length === 0 ? (
-        <EmptyState className={styles.emptyState} displayText={t('noActiveTickets', 'No active tickets to display')} />
+        <Layer role="status">
+          <EmptyState
+            className={styles.emptyState}
+            displayText={t('noActiveTickets', 'No active tickets to display')}
+          />
+        </Layer>
       ) : (
         <div className={styles.gridFlow}>
           {rowData.map((row) => (

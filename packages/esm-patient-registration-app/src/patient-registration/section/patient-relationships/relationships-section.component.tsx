@@ -3,6 +3,7 @@ import { ActionableNotification, Button, Layer, Select, SelectItem, SkeletonText
 import { TrashCan } from '@carbon/react/icons';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { v4 } from 'uuid';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { fetchPerson } from '../../patient-registration.resource';
@@ -120,7 +121,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
             labelText={t('relationship', 'Relationship')}
             onChange={handleRelationshipTypeChange}
             name={`relationships[${index}].relationshipType`}
-            defaultValue={relationship?.relationshipType ?? 'placeholder-item'}>
+            value={relationship.relationshipType || 'placeholder-item'}>
             <SelectItem
               disabled
               hidden
@@ -203,7 +204,7 @@ export const RelationshipsSection = () => {
             {relationships && relationships.length > 0
               ? relationships.map((relationship: RelationshipValue, index) => {
                   return (
-                    <div key={relationship.uuid} className={sectionStyles.formSection}>
+                    <div key={relationship.uuid ?? relationship.clientId} className={sectionStyles.formSection}>
                       <RelationshipView
                         relationship={relationship}
                         index={index}
@@ -219,6 +220,7 @@ export const RelationshipsSection = () => {
                 kind="ghost"
                 onClick={() =>
                   push({
+                    clientId: v4(),
                     relatedPersonUuid: '',
                     action: 'ADD',
                   })
