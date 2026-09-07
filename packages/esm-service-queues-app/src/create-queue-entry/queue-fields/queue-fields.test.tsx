@@ -12,7 +12,14 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../../config-schema';
-import { mockSession, mockVisitAlice } from '__mocks__';
+import {
+  mockPriorityNonUrgent,
+  mockQueues,
+  mockQueueSurgery,
+  mockQueueTriage,
+  mockSession,
+  mockVisitAlice,
+} from '__mocks__';
 import { postQueueEntry } from './queue-fields.resource';
 import { useQueues } from '../../hooks/useQueues';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
@@ -22,20 +29,6 @@ import QueueFields from './queue-fields.component';
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = vi.mocked(useLayoutType);
 const mockUseSession = vi.mocked(useSession);
-
-const service1Uuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
-const service2Uuid = 'f3b8a1d2-6c47-4e19-9c2f-8d1a5b7e4c30';
-
-const mockQueues = [
-  {
-    uuid: service1Uuid,
-    name: 'Service 1',
-    location: { uuid: '1' },
-    allowedPriorities: [{ uuid: '197852c7-5fd4-4b33-89cc-7bae6848c65a', display: 'High' }],
-    allowedStatuses: [{ uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'In Progress' }],
-  },
-  { uuid: service2Uuid, name: 'Service 2', location: { uuid: '1' } },
-];
 
 vi.mock('../hooks/useQueueLocations', () => ({
   useQueueLocations: vi.fn(() => ({ queueLocations: [{ id: '1', name: 'Location 1' }] })),
@@ -92,17 +85,17 @@ describe('QueueFields', () => {
     expect(screen.getByRole('group', { name: /service/i })).toBeInTheDocument();
 
     const serviceSelect = screen.getByTitle(/select a queue service/i);
-    await user.selectOptions(serviceSelect, service1Uuid);
+    await user.selectOptions(serviceSelect, mockQueueTriage.uuid);
 
     expect(screen.getByText('Priority')).toBeInTheDocument();
-    expect(screen.getByText('High')).toBeInTheDocument();
+    expect(screen.getByText(mockPriorityNonUrgent.display)).toBeInTheDocument();
 
     await onSubmit(mockVisitAlice);
     expect(mockPostQueueEntry).toHaveBeenCalledWith(
       mockVisitAlice.uuid,
-      service1Uuid,
+      mockQueueTriage.uuid,
       mockVisitAlice.patient.uuid,
-      '197852c7-5fd4-4b33-89cc-7bae6848c65a',
+      mockPriorityNonUrgent.uuid,
       '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
       0,
       '1',
@@ -112,20 +105,20 @@ describe('QueueFields', () => {
 
   it('omits services the patient is already queued in', async () => {
     const user = userEvent.setup();
-    mockUseQueueEntries.mockReturnValue({ queueEntries: [{ queue: { uuid: service1Uuid } }] } as any);
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [{ queue: { uuid: mockQueueTriage.uuid } }] } as any);
 
     render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
 
     await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
 
-    expect(screen.getByRole('option', { name: 'Service 2' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Service 1' })).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: mockQueueSurgery.name })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: mockQueueTriage.name })).not.toBeInTheDocument();
   });
 
   it('says so when the patient is already queued in every service at the location', async () => {
     const user = userEvent.setup();
     mockUseQueueEntries.mockReturnValue({
-      queueEntries: [{ queue: { uuid: service1Uuid } }, { queue: { uuid: service2Uuid } }],
+      queueEntries: [{ queue: { uuid: mockQueueTriage.uuid } }, { queue: { uuid: mockQueueSurgery.uuid } }],
     } as any);
 
     render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
@@ -137,8 +130,20 @@ describe('QueueFields', () => {
     expect(screen.queryByText(/no services configured/i)).not.toBeInTheDocument();
   });
 
+  it('reports a location with no services configured as a misconfiguration', async () => {
+    const user = userEvent.setup();
+    mockUseQueues.mockReturnValue({ queues: [] } as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
+
+    expect(screen.getByText(/no services configured/i)).toBeInTheDocument();
+    expect(screen.queryByText(/already in every queue at this location/i)).not.toBeInTheDocument();
+  });
+
   it('does not submit a service prefilled from the dashboard until the entries have loaded', async () => {
-    mockUseServiceQueuesStore.mockReturnValue({ selectedServiceUuid: service1Uuid } as any);
+    mockUseServiceQueuesStore.mockReturnValue({ selectedServiceUuid: mockQueueTriage.uuid } as any);
     mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: true } as any);
     let onSubmit: (visit: Visit) => Promise<any>;
 
@@ -164,7 +169,7 @@ describe('QueueFields', () => {
     render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={(cb) => (onSubmit = cb)} />);
 
     await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
-    await user.selectOptions(screen.getByTitle(/select a queue service/i), service1Uuid);
+    await user.selectOptions(screen.getByTitle(/select a queue service/i), mockQueueTriage.uuid);
 
     await expect(onSubmit(mockVisitAlice)).rejects.toBe(duplicateError);
     expect(showSnackbar).toHaveBeenCalledWith(

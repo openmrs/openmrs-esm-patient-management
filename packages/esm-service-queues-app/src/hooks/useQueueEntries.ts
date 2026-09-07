@@ -31,7 +31,7 @@ export function useMutateQueueEntries() {
 export function useQueueEntries(
   searchCriteria?: QueueEntrySearchCriteria,
   rep: string = repString,
-  fetch: boolean = true,
+  shouldFetch: boolean = true,
 ) {
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
@@ -46,7 +46,7 @@ export function useQueueEntries(
   }
 
   const apiUrl = `${queueEntryBaseUrl}?${searchParam.toString()}`;
-  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(fetch ? apiUrl : null);
+  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(shouldFetch ? apiUrl : null);
 
   return {
     queueEntries: data ?? [],

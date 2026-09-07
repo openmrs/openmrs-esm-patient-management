@@ -25,7 +25,7 @@ import { isDuplicateQueueEntryError } from '../../modals/queue-entry-error.utils
 import { useServiceQueuesStore } from '../../store/store';
 
 export interface QueueFieldsProps {
-  patientUuid: string;
+  patientUuid?: string;
   setOnSubmit(onSubmit: (visit: Visit) => Promise<void>): void;
   defaultInitialServiceQueue?: string;
 }
@@ -53,8 +53,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const { sessionLocation } = useSession();
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
 
-  // A patient cannot be added to a queue they are already in, so those queues are left out of the
-  // Service options below.
+  // A patient cannot be added to a queue they are already in, so those queues are left out below
   const { queueEntries, isLoading: isLoadingQueueEntries } = useQueueEntries(
     { patient: patientUuid, isEnded: false },
     'custom:(uuid,queue:(uuid))',
@@ -103,6 +102,11 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
     return memoizedQueues.find((q) => q.uuid === queueService)?.allowedPriorities ?? [];
   }, [memoizedQueues, queueService]);
   const isPatientInEveryQueue = queues.length > 0 && memoizedQueues.length === 0;
+  // Serves as both helper and error text, so an empty Service dropdown explains itself either way
+  const patientInEveryQueueMessage = t(
+    'patientInEveryQueueAtLocation',
+    'This patient is already in every queue at this location',
+  );
 
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
   const isLoadingServices = isLoadingQueues || isLoadingQueueEntries;
@@ -141,8 +145,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
               isLowContrast: false,
               subtitle: t('duplicateQueueEntry', 'This patient is already in the selected queue.'),
             });
-            // The queue was offered because our view of the patient's entries was stale; refresh it
-            // so the service drops out of the options instead of failing again on retry.
+            // Our view of the patient's entries was stale, so refresh it to drop the service
             mutateQueueEntries();
           } else {
             showSnackbar({
@@ -173,8 +176,8 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   }, [queueLocation, memoizedQueues, queueService, setValue, isDataLoaded]);
 
   useEffect(() => {
-    // A prefilled service is not known to be offered until the patient's entries have loaded, so
-    // hold off on the priority that would let it be submitted
+    // A prefilled service is not known to be offered until the entries have loaded, so hold off on
+    // the priority that would let it be submitted
     if (queueService && priorities.length > 0 && !isLoadingQueueEntries) {
       const isPriorityValid = priorities.some((p) => p.uuid === priority);
       if (!isPriorityValid) {
@@ -230,7 +233,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
                     }
                   }}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                  {queueLocations.map((location) => (
+                  {queueLocations?.map((location) => (
                     <SelectItem key={location.id} text={location.name} value={location.id}>
                       {location.name}
                     </SelectItem>
@@ -262,13 +265,9 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
                   {...field}
                   labelText=""
                   id="queueService"
-                  helperText={
-                    isPatientInEveryQueue
-                      ? t('patientInEveryQueueAtLocation', 'This patient is already in every queue at this location')
-                      : undefined
-                  }
-                  invalid={!!errors.queueService && !isPatientInEveryQueue}
-                  invalidText={errors.queueService?.message}
+                  helperText={isPatientInEveryQueue ? patientInEveryQueueMessage : undefined}
+                  invalid={!!errors.queueService}
+                  invalidText={isPatientInEveryQueue ? patientInEveryQueueMessage : errors.queueService?.message}
                   onChange={(event) => {
                     field.onChange(event.target.value);
                     if (event.target.value !== queueService) {

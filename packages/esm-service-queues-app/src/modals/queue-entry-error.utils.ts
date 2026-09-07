@@ -7,30 +7,31 @@ export function getErrorMessage(error: unknown): string {
         rawMessage?: string;
         translatedMessage?: string;
         message?: string;
-        globalErrors?: Array<{ code?: string; message?: string }>;
       };
     };
     message?: string;
   };
 
-  const message =
+  return (
     err?.responseBody?.error?.rawMessage ||
     err?.responseBody?.error?.translatedMessage ||
     err?.responseBody?.error?.message ||
     err?.message ||
-    '';
+    ''
+  );
+}
 
-  // Validation failures carry a generic "Invalid Submission" message, with the code identifying the
-  // actual problem in `globalErrors`, so those codes are appended for the callers below to match on.
-  const globalErrorCodes = (err?.responseBody?.error?.globalErrors ?? []).map((globalError) => globalError.code);
-
-  return [message, ...globalErrorCodes].filter(Boolean).join(' ');
+// Validation failures carry a generic "Invalid Submission" message, with the code identifying the
+// actual problem in `globalErrors`.
+function getGlobalErrorCodes(error: unknown): Array<string> {
+  const err = error as { responseBody?: { error?: { globalErrors?: Array<{ code?: string }> } } };
+  return (err?.responseBody?.error?.globalErrors ?? []).map((globalError) => globalError.code).filter(Boolean);
 }
 
 // Note: Detection relies on matching a substring from the backend's IllegalStateException
 // message ("Cannot transition a queue entry that has already ended") because the REST
 // response does not include a structured error code for this case — unlike duplicate
-// entry errors which use a bracketed code. If the backend message changes, this will
+// entry errors, which report one in `globalErrors`. If the backend message changes, this will
 // silently fall through to the generic error handler, which is an acceptable degradation.
 // See: https://github.com/openmrs/openmrs-module-queue/blob/1a82392a444d/api/src/main/java/org/openmrs/module/queue/api/impl/QueueEntryServiceImpl.java#L117
 export function isAlreadyEndedQueueEntryError(error: unknown): boolean {
@@ -38,5 +39,5 @@ export function isAlreadyEndedQueueEntryError(error: unknown): boolean {
 }
 
 export function isDuplicateQueueEntryError(error: unknown): boolean {
-  return getErrorMessage(error).includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
+  return getGlobalErrorCodes(error).includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
 }
