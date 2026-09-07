@@ -104,4 +104,13 @@ describe('QueueTablesForAllStatuses', () => {
     expect(screen.getByText(/invalid queue/i)).toBeInTheDocument();
     expect(screen.queryByTestId('status-table')).not.toBeInTheDocument();
   });
+
+  // The queue list leaves retired queues out, but the clinic overview rows come from the queue
+  // entries, which do not, so a retired queue somebody is still waiting in is reachable by link.
+  it('reports a queue that resolved to nothing without erroring', () => {
+    render(<QueueTablesForAllStatuses selectedQueue={undefined} isLoadingQueue={false} errorFetchingQueue={null} />);
+
+    expect(screen.getByText(/invalid queue/i)).toBeInTheDocument();
+    expect(screen.queryByTestId('status-table')).not.toBeInTheDocument();
+  });
 });

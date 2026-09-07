@@ -159,15 +159,7 @@ describe('ClinicOverview', () => {
     expect(queueNamesInOrder()).toEqual(['Clinician review', 'Triage', 'Antenatal']);
   });
 
-  it('scopes the metrics to the location selected in the shared store', () => {
-    givenSelectedLocation('loc-2', 'MCH clinic');
-
-    render(<ClinicOverview />);
-
-    expect(mockUseClinicQueueMetrics).toHaveBeenCalledWith('loc-2', null);
-  });
-
-  it('narrows to the service selected in the shared store', () => {
+  it('scopes the metrics to the location and service selected in the shared store', () => {
     givenSelectedLocation('loc-2', 'MCH clinic', 'service-1');
 
     render(<ClinicOverview />);

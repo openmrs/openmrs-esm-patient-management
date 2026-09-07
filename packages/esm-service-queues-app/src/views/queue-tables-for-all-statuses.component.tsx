@@ -11,8 +11,8 @@ import DefaultQueueTable from '../queue-table/default-queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 
 interface QueueTablesForAllStatusesProps {
-  selectedQueue: Queue; // the selected queue
-  isLoadingQueue: boolean; // whether the queue is still loading
+  selectedQueue?: Queue; // absent if the uuid matched no queue
+  isLoadingQueue: boolean;
   errorFetchingQueue: Error;
 }
 
@@ -30,7 +30,18 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     concepts: { defaultTransitionStatus },
   } = useConfig<ConfigObject>();
 
-  if (errorFetchingQueue) {
+  if (isLoadingQueue) {
+    return (
+      <>
+        <PatientQueueHeader title={<SkeletonText />} />
+        <QueueTableByStatusSkeleton />
+      </>
+    );
+  }
+
+  // The queue list leaves out retired queues, but the clinic overview links whatever the queue entries
+  // report, so a retired queue resolves to nothing here, and does so without erroring.
+  if (errorFetchingQueue || !selectedQueue) {
     return (
       <InlineNotification
         kind="error"
@@ -40,35 +51,29 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     );
   }
 
-  const allowedStatuses = selectedQueue?.allowedStatuses ?? [];
+  const allowedStatuses = selectedQueue.allowedStatuses ?? [];
 
   // In-service patients are the Attending cards, so they get no table of their own.
   const tabledStatuses = [...allowedStatuses].reverse().filter((status) => status.uuid !== defaultTransitionStatus);
 
   return (
     <>
-      <PatientQueueHeader title={!isLoadingQueue ? selectedQueue?.display : <SkeletonText />} />
-      {isLoadingQueue ? (
-        <QueueTableByStatusSkeleton />
+      <PatientQueueHeader title={selectedQueue.display} />
+      <QueueTableMetrics selectedQueue={selectedQueue} />
+      <AttendingPatients queueUuid={selectedQueue.uuid} />
+      {/* Only a queue allowing no status at all is misconfigured: one allowing just the in-service
+          status has no table, but the Attending cards above are its list. */}
+      {allowedStatuses.length === 0 ? (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          subtitle={t('configureStatus', 'Please configure status to continue.')}
+          title={t('noStatusConfigured', 'No status configured')}
+        />
       ) : (
-        <>
-          <QueueTableMetrics selectedQueue={selectedQueue} />
-          <AttendingPatients queueUuid={selectedQueue.uuid} />
-          {/* Only a queue allowing no status at all is misconfigured: one allowing just the
-              in-service status has no table, but the Attending cards above are its list. */}
-          {allowedStatuses.length === 0 ? (
-            <InlineNotification
-              kind="error"
-              lowContrast
-              subtitle={t('configureStatus', 'Please configure status to continue.')}
-              title={t('noStatusConfigured', 'No status configured')}
-            />
-          ) : (
-            tabledStatuses.map((status) => (
-              <DefaultQueueTable key={status.uuid} queueUuid={selectedQueue.uuid} status={status} />
-            ))
-          )}
-        </>
+        tabledStatuses.map((status) => (
+          <DefaultQueueTable key={status.uuid} queueUuid={selectedQueue.uuid} status={status} />
+        ))
       )}
     </>
   );

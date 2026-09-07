@@ -128,7 +128,7 @@ function QueueTableSection({ queueUuid, status }: DefaultQueueTableProps) {
           <>
             {/* A new entry starts in `defaultStatusConceptUuid`, so a status-scoped table only gets
                 the control when the patient would land in it — not on Finished service, or any other
-                status a deployment adds. The unscoped list is the dashboard's own add action. */}
+                status a deployment adds. */}
             {(!status || statusUuid === defaultStatusConceptUuid) && <AddPatientToQueueButton />}
             <TableToolbarSearch
               className={styles.search}

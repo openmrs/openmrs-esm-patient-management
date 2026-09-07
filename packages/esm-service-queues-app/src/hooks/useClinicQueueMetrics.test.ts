@@ -105,10 +105,6 @@ describe('useClinicQueueMetrics', () => {
     expect(params.get('service')).toBeNull();
   });
 
-  // An In Service entry's `startedAt` is when service began, not when the patient joined the queue,
-  // so counting it into the wait metrics would report time in service as waiting time. `waitStatus`
-  // scopes the two wait metrics without narrowing the counts, so one request measures both at one
-  // instant. The open-wait metrics, rather than `averageWaitTime`, which measures finished waits.
   it('measures the waits over waiting entries alone, while counting every unfinished one', () => {
     renderHook(() => useClinicQueueMetrics(), { wrapper });
 
