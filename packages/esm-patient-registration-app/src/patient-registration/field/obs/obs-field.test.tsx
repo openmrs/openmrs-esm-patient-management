@@ -223,6 +223,18 @@ describe('ObsField', () => {
     consoleSpy.mockRestore();
   });
 
+  it('does not render if the registration encounter type is an empty string', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      registrationObs: { encounterTypeUuid: '' },
+    } as RegistrationConfig);
+
+    const { container } = render(<ObsField fieldDefinition={textFieldDef} />);
+    expect(container).toBeEmptyDOMElement();
+    consoleSpy.mockRestore();
+  });
+
   it('does not render while concept is loading', () => {
     mockUseConcept.mockReturnValue({
       data: null,

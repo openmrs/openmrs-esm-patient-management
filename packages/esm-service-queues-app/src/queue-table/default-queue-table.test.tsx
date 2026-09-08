@@ -1,6 +1,7 @@
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   mockLocationSurgery,
   mockLocationTriage,
@@ -63,7 +64,7 @@ describe('DefaultQueueTable', () => {
     await screen.findByRole('table');
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
+    expect(screen.getByRole('search', { name: /search this list/i })).toBeInTheDocument();
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
   });
 
@@ -86,7 +87,7 @@ describe('DefaultQueueTable', () => {
 
     await screen.findByRole('table');
 
-    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /waiting list \(2\)/i })).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Brian Johnson/i })).toBeInTheDocument();
     const john = screen.getByRole('link', { name: /Alice Johnson/i });
@@ -109,6 +110,32 @@ describe('DefaultQueueTable', () => {
         }),
       ).toBeInTheDocument();
     });
+  });
+
+  it('counts the entries left by a search rather than every waiting entry', async () => {
+    const user = userEvent.setup();
+    mockQueueLocations.mockReturnValue({
+      queueLocations: [mockLocationSurgery, mockLocationTriage],
+      isLoading: false,
+      error: null,
+    });
+    mockUseQueueEntries.mockReturnValue({
+      queueEntries: mockQueueEntries,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+      totalCount: 2,
+    });
+
+    rendeDefaultQueueTable();
+
+    await screen.findByRole('table');
+
+    await user.type(screen.getByRole('searchbox'), 'Brian');
+
+    expect(screen.getByRole('heading', { name: /waiting list \(1\)/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Alice Johnson/i })).not.toBeInTheDocument();
   });
 });
 

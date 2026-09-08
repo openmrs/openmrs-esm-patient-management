@@ -5,8 +5,8 @@ import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 
 const queueEntryBaseUrl = `${restBaseUrl}/queue-entry`;
 
-const repString =
-  'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
+export const repString =
+  'custom:(uuid,display,queue:(uuid,display,name),status:(uuid,display),patient:(uuid,display,person:(uuid,display,age,birthdate,gender),identifiers:(uuid,identifier,identifierType:(uuid,display))),visit:(uuid,startDatetime,attributes:(uuid,value,attributeType:(uuid))),priority:(uuid,display),priorityComment,sortWeight,startedAt,endedAt,queueComingFrom:(uuid,display),previousQueueEntry:(uuid,startedAt,status:(uuid,display)))';
 
 export function useMutateQueueEntries() {
   const { mutate, cache } = useSWRConfig();
@@ -28,7 +28,11 @@ export function useMutateQueueEntries() {
   );
 }
 
-export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
+export function useQueueEntries(
+  searchCriteria?: QueueEntrySearchCriteria,
+  rep: string = repString,
+  shouldFetch: boolean = true,
+) {
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
   searchParam.append('totalCount', 'true');
@@ -41,7 +45,8 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     }
   }
 
-  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(`${queueEntryBaseUrl}?${searchParam.toString()}`);
+  const apiUrl = `${queueEntryBaseUrl}?${searchParam.toString()}`;
+  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(shouldFetch ? apiUrl : null);
 
   return {
     queueEntries: data ?? [],

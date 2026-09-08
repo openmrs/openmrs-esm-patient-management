@@ -13,8 +13,8 @@ test('Add patient with visit to queue', async ({ api, page, patient }) => {
     await serviceQueuesPage.goto();
   });
 
-  await test.step('And I click on the “Add patient to queue” button', async () => {
-    await page.getByRole('button', { name: 'Add patient to queue', exact: true }).click();
+  await test.step('And I click on the “Add a patient to this list” button', async () => {
+    await page.getByRole('button', { name: 'Add a patient to this list', exact: true }).click();
   });
 
   await test.step('And I search for the patient', async () => {

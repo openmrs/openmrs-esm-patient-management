@@ -1,114 +1,215 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
-import { User } from '@carbon/react/icons';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { spaHomePage } from '../../constants';
+import { Popover, PopoverContent } from '@carbon/react';
+import { Close } from '@carbon/react/icons';
+import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
-import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
+  eventsMap?: Map<string, DailyAppointmentsCountByService>;
   dateTime: Dayjs;
   calendarSelectedDate: Dayjs;
   showAllServices?: boolean;
+  onSelectDate?: (isoDate: string) => void;
+  index?: number;
+  serviceColorMap?: Map<string, string>;
 }
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   dateTime,
   events,
+  eventsMap,
   calendarSelectedDate,
   showAllServices = false,
+  onSelectDate,
+  index,
+  serviceColorMap,
 }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const cellRef = useRef<HTMLDivElement | null>(null);
 
-  const currentData = useMemo(
-    () =>
-      events?.find(
-        (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),
-      ),
-    [dateTime, events],
+  const isToday = useMemo(() => dateTime.isSame(dayjs(), 'day'), [dateTime]);
+  const isCurrentMonth = useMemo(() => isSameMonth(dateTime, calendarSelectedDate), [dateTime, calendarSelectedDate]);
+
+  const popoverAlign = useMemo(() => {
+    const isBelowFirstRow = index !== undefined ? index >= 7 : dateTime.date() > 7;
+    const isRightSide = index !== undefined ? index % 7 >= 4 : false;
+    if (isBelowFirstRow) {
+      return isRightSide ? 'top-right' : 'top-left';
+    }
+    return isRightSide ? 'bottom-right' : 'bottom-left';
+  }, [index, dateTime]);
+
+  const dateFormatted = useMemo(
+    () => ({
+      dayNumber: dateTime.format('D'),
+      popoverDate: dateTime.format('ddd, MMM D'),
+      isoDate: dateTime.format('YYYY-MM-DD'),
+    }),
+    [dateTime],
   );
 
+  const currentData = useMemo(() => {
+    if (eventsMap) {
+      return eventsMap.get(dateFormatted.isoDate);
+    }
+    return events?.find((event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dateFormatted.isoDate);
+  }, [events, eventsMap, dateFormatted.isoDate]);
+
+  const totalCount = currentData?.services?.reduce((sum, { count = 0 }) => sum + count, 0) ?? 0;
+
+  const maxVisible = layout === 'small-desktop' ? 2 : 3;
+
   const visibleServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return currentData.services;
-      return currentData.services.slice(0, layout === 'small-desktop' ? 2 : 4);
-    }
-    return [];
-  }, [currentData, showAllServices, layout]);
+    if (!currentData?.services) return [];
+    return showAllServices ? currentData.services : currentData.services.slice(0, maxVisible);
+  }, [currentData, showAllServices, maxVisible]);
 
-  const hasHiddenServices = useMemo(() => {
-    if (currentData?.services) {
-      if (showAllServices) return false;
-      return layout === 'small-desktop' ? currentData.services.length > 2 : currentData.services.length > 4;
-    }
-    return false;
-  }, [currentData?.services, layout, showAllServices]);
+  const hasHidden = useMemo(() => {
+    if (!currentData?.services || showAllServices) return false;
+    return currentData.services.length > maxVisible;
+  }, [currentData?.services, showAllServices, maxVisible]);
 
-  const navigateToAppointmentsByDate = (serviceUuid: string) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
+  const handleCellClick = () => {
+    if (totalCount === 0) return;
+    setIsPopoverOpen((prev) => !prev);
   };
 
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (cellRef.current && !cellRef.current.contains(e.target as Node)) {
+      setIsPopoverOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPopoverOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isPopoverOpen, handleClickOutside]);
+
   return (
-    <div
-      onClick={() => navigateToAppointmentsByDate('')}
-      className={classNames(
-        styles[isSameMonth(dateTime, calendarSelectedDate) ? 'monthly-cell' : 'monthly-cell-disabled'],
-        showAllServices
-          ? {}
-          : {
-              [styles.smallDesktop]: layout === 'small-desktop',
-              [styles.largeDesktop]: layout !== 'small-desktop',
-            },
-      )}>
-      {isSameMonth(dateTime, calendarSelectedDate) && (
-        <div>
-          <span className={classNames(styles.totals)}>
-            {currentData?.services ? (
-              <div role="button" tabIndex={0}>
-                <User size={16} />
-                <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
-              </div>
-            ) : (
-              <div />
-            )}
-            <b className={styles.calendarDate}>{dateTime.format('D')}</b>
-          </span>
-          {currentData?.services && (
-            <div className={styles.currentData}>
-              {visibleServices.map(({ serviceName, serviceUuid, count }, i) => (
-                <div
-                  key={`${serviceUuid}-${count}-${i}`}
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateToAppointmentsByDate(serviceUuid);
-                  }}
-                  className={styles.serviceArea}>
-                  <span>{serviceName}</span>
-                  <span>{count}</span>
-                </div>
-              ))}
-              {hasHiddenServices ? (
-                <MonthlyWorkloadViewExpanded
-                  count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
-                  events={events}
-                  dateTime={dateTime}
-                  calendarSelectedDate={calendarSelectedDate}
-                />
-              ) : (
-                ''
-              )}
-            </div>
+    <Popover open={isPopoverOpen} align={popoverAlign} ref={cellRef} data-testid="popover-container">
+      <div
+        onClick={handleCellClick}
+        data-testid={`workload-cell-${dateFormatted.isoDate}`}
+        data-popover-open={isPopoverOpen}
+        className={classNames(
+          styles[isCurrentMonth ? 'monthly-cell' : 'monthly-cell-disabled'],
+          {
+            [styles['monthly-cell-today']]: isToday,
+            [styles['monthly-cell-clickable']]: totalCount > 0,
+            [styles.popoverOpen]: isPopoverOpen,
+          },
+          !showAllServices && {
+            [styles.smallDesktop]: layout === 'small-desktop',
+            [styles.largeDesktop]: layout !== 'small-desktop',
+          },
+        )}>
+        <div className={styles.cellHeader}>
+          {isToday ? (
+            <span className={styles.todayCircle} data-testid="today-indicator">
+              {dateFormatted.dayNumber}
+            </span>
+          ) : (
+            <span
+              className={isCurrentMonth ? styles.dateNumber : styles.dateNumberOtherMonth}
+              data-testid={isCurrentMonth ? 'current-month-day' : 'other-month-day'}>
+              {dateFormatted.dayNumber}
+            </span>
+          )}
+          {totalCount > 0 && (
+            <span className={styles.totalBadge}>
+              {totalCount} {totalCount === 1 ? t('appt', 'appt') : t('appts', 'appts')}
+            </span>
           )}
         </div>
-      )}
-    </div>
+
+        {currentData?.services && currentData.services.length > 0 && (
+          <div className={styles.currentData} data-testid="current-data">
+            {visibleServices.map(({ serviceName, serviceUuid, count }, i) => {
+              const color = serviceColorMap?.get(serviceUuid ?? '');
+              return (
+                <div
+                  key={`${serviceUuid}-${i}`}
+                  className={styles.serviceArea}
+                  data-testid={`service-area-${serviceUuid}`}
+                  style={color ? { backgroundColor: `${color}21` } : undefined}>
+                  <span
+                    className={styles.swatch}
+                    style={{ backgroundColor: color }}
+                    data-testid={`service-swatch-${serviceUuid}`}
+                  />
+                  <span className={styles.serviceName}>{serviceName}</span>
+                  <span className={styles.serviceCount}>{count}</span>
+                </div>
+              );
+            })}
+            {hasHidden && (
+              <button
+                className={styles.showMoreItems}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPopoverOpen(true);
+                }}>
+                +{currentData.services.length - maxVisible} {t('more', 'more')}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      <PopoverContent>
+        <div className={styles.popoverCard} onClick={(e) => e.stopPropagation()} data-testid="popover-card">
+          <div className={styles.popoverHeader}>
+            <div className={styles.popoverTitleGroup}>
+              <span className={styles.popoverDate}>{dateFormatted.popoverDate}</span>
+              <span className={styles.popoverSubtitle}>
+                {t('appointmentCount', '{{count}} appointment(s)', { count: totalCount })}
+              </span>
+            </div>
+            <button
+              className={styles.popoverCloseBtn}
+              onClick={() => setIsPopoverOpen(false)}
+              aria-label={t('close', 'Close')}>
+              <Close size={16} />
+            </button>
+          </div>
+          <div className={styles.popoverDivider} />
+          <div className={styles.popoverServiceList} data-testid="popover-service-list">
+            {currentData?.services?.map(({ serviceName, serviceUuid, count }, i) => {
+              const color = serviceColorMap?.get(serviceUuid ?? '');
+              return (
+                <div key={`${serviceUuid}-${i}`} className={styles.popoverServiceRow}>
+                  <span className={styles.swatch} style={{ backgroundColor: color }} />
+                  <span className={styles.popoverServiceName}>{serviceName}</span>
+                  <span className={styles.popoverServiceCount}>{count}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className={styles.popoverDivider} />
+          <button
+            className={styles.openDayViewLink}
+            onClick={() => {
+              setIsPopoverOpen(false);
+              onSelectDate?.(dateFormatted.isoDate);
+            }}>
+            {t('openDayView', 'Open day view')} &rarr;
+          </button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 
-export default MonthlyWorkloadView;
+export default React.memo(MonthlyWorkloadView);

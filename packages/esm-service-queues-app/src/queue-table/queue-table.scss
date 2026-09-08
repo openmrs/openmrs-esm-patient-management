@@ -4,7 +4,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .defaultQueueTable {
-  margin: layout.$spacing-05;
+  margin: layout.$spacing-05 0 0;
 }
 
 .container {
@@ -41,16 +41,6 @@
 
   :global(.cds--inline-loading) {
     justify-content: end;
-  }
-}
-
-.filterContainer {
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: layout.$spacing-05;
   }
 }
 
@@ -142,17 +132,13 @@
 }
 
 .expandedActiveVisitRow {
-  td {
+  > td {
     padding: layout.$spacing-03;
 
     > div {
       max-height: max-content !important;
       background-color: $ui-02;
     }
-  }
-
-  th[colspan] td[colspan] > div:first-child {
-    padding: 0 layout.$spacing-05;
   }
 }
 

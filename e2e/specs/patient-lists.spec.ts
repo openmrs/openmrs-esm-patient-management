@@ -12,6 +12,14 @@ test.beforeEach(async ({ api }) => {
   cohort = await generateRandomCohort(api);
 });
 
+test.afterEach(async ({ api }) => {
+  if (cohortMember) {
+    await removePatientFromCohort(api, cohortMember.uuid);
+  }
+  await deleteCohort(api, cohortUuid);
+  await deleteCohort(api, cohort.uuid);
+});
+
 test('Create and edit a patient list', async ({ page }) => {
   const patientListPage = new PatientListsPage(page);
 
@@ -79,12 +87,4 @@ test('Manage patients in a list', async ({ api, page, patient }) => {
     await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
     cohortMember = null;
   });
-});
-
-test.afterEach(async ({ api }) => {
-  if (cohortMember) {
-    await removePatientFromCohort(api, cohortMember.uuid);
-  }
-  await deleteCohort(api, cohortUuid);
-  await deleteCohort(api, cohort.uuid);
 });

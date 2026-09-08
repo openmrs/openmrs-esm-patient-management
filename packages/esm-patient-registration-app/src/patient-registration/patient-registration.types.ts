@@ -113,8 +113,9 @@ export type Patient = {
     attributes: Array<AttributeValue>;
     addresses: Array<Record<string, string>>;
     dead: boolean;
-    deathDate?: string;
-    causeOfDeath?: string;
+    deathDate?: string | null;
+    causeOfDeath?: string | null;
+    causeOfDeathNonCoded?: string | null;
   };
 };
 
@@ -152,6 +153,11 @@ export interface RelationshipValue {
    */
   initialrelationshipTypeValue?: string;
   uuid?: string;
+  /**
+   * Client-side identifier for a relationship that has not been saved yet.
+   * Used as a stable React key until the server assigns a uuid. Never sent to the server.
+   */
+  clientId?: string;
 }
 
 export interface FormValues {

@@ -243,6 +243,10 @@ export interface BedTag {
   uuid?: string;
 }
 
+export interface QueueEntry {
+  uuid: string;
+}
+
 export interface EMRConfiguration {
   dispositionDescriptor?: {
     dispositionConcept?: { uuid?: string };

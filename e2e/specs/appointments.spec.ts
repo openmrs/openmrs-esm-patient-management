@@ -32,6 +32,14 @@ const getBusinessDay = (daysFromToday: number, hour: number): dayjs.Dayjs => {
 
 let visit: Visit;
 
+test.afterEach(async ({ api, page }) => {
+  if (visit) {
+    await endVisit(api, visit.uuid);
+    visit = undefined;
+  }
+  await page.evaluate(() => window.sessionStorage.clear());
+});
+
 test('Add, edit and cancel an appointment from patient chart', async ({ api, page, patient }) => {
   visit = await startVisit(api, patient.uuid);
   const appointmentsPage = new PatientChartAppointmentsPage(page);
@@ -45,7 +53,7 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
   });
 
   await test.step('And I select the first service', async () => {
-    await page.selectOption('select#service', { index: 1 });
+    await page.locator('select#service').selectOption({ index: 1 });
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -96,7 +104,7 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
   });
 
   await test.step('And I change the service to the second one', async () => {
-    await page.selectOption('select#service', { index: 2 });
+    await page.locator('select#service').selectOption({ index: 2 });
   });
 
   await test.step('And I change the appointment time to 2:00 PM', async () => {
@@ -178,7 +186,7 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   });
 
   await test.step('And I select the first service', async () => {
-    await page.selectOption('select#service', { index: 1 });
+    await page.locator('select#service').selectOption({ index: 1 });
   });
 
   await test.step('And I make appointment as “Scheduled”', async () => {
@@ -186,6 +194,7 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   });
 
   const now = dayjs();
+
   await test.step('And I set the appointment date to today', async () => {
     const dateInput = page.getByTestId('datePickerInput');
     const dateDayInput = dateInput.getByRole('spinbutton', { name: /day/i });
@@ -278,6 +287,7 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   await test.step('Then the bulk status change modal should appear', async () => {
     await expect(page.getByRole('heading', { name: 'Change appointments status' })).toBeVisible();
   });
+
   await test.step('When I select "Completed" as the new status', async () => {
     await page.getByRole('combobox', { name: 'Select status' }).click();
     await page.getByRole('option', { name: 'Completed' }).locator('div').click();
@@ -342,12 +352,4 @@ test('Add and edit an appointment from appointments dashboard', async ({ page, p
   await test.step('Then I should see a success message confirming the appointment was edited', async () => {
     await expect(page.getByText('Appointment edited', { exact: true })).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api, page }) => {
-  if (visit) {
-    await endVisit(api, visit.uuid);
-    visit = undefined;
-  }
-  await page.evaluate(() => window.sessionStorage.clear());
 });

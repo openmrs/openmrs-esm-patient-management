@@ -6,7 +6,7 @@
   "dose": "מנה",
   "encounterType": "סוג המפגש",
   "endDate": "End date",
-  "filterActiveVisits": "Filter active visits",
+  "filterActiveVisits": "סינון ביקורים פעילים",
   "filterTable": "סנן טבלה",
   "indication": "Indication",
   "medications": "תרופות",
@@ -28,6 +28,6 @@
   "thereIsNoInformationToDisplayHere": "אין מידע להצגה כאן",
   "time": "זמן",
   "totalVisits": "Total Visits Today",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
+  "viewPatientChartFor": "הצגת תרשים מטופל עבור {{patientName}}",
   "visitSummary": "סיכום הביקור"
 }

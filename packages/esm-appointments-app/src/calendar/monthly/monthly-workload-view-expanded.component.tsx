@@ -13,23 +13,22 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
   events,
   dateTime,
   calendarSelectedDate,
+  onSelectDate,
+  serviceColorMap,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const popoverRef = useRef(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
 
-  const handleClickOutside = useCallback((event) => {
-    if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
       setIsOpen(false);
     }
   }, []);
 
   useEffect(() => {
     document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [handleClickOutside]);
 
   return (
@@ -47,7 +46,9 @@ const MonthlyWorkloadViewExpanded: React.FC<MonthlyWorkloadViewExpandedProps> = 
           events={events}
           dateTime={dateTime}
           calendarSelectedDate={calendarSelectedDate}
-          showAllServices={true}
+          showAllServices
+          onSelectDate={onSelectDate}
+          serviceColorMap={serviceColorMap}
         />
       </PopoverContent>
     </Popover>

@@ -6,7 +6,6 @@ import { dashboardMeta } from './dashboard.meta';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-service-queues-app';
-const swrRefreshIntervalInMs = 60000;
 
 const options = {
   featureName: 'serviceQueues',
@@ -16,9 +15,6 @@ const options = {
 export const root = getAsyncLifecycle(() => import('./root.component'), {
   featureName: 'service-queues-app-root',
   moduleName,
-  swrConfig: {
-    refreshInterval: swrRefreshIntervalInMs,
-  },
 });
 
 export const queueTableByStatusMenu = getAsyncLifecycle(
@@ -28,9 +24,6 @@ export const queueTableByStatusMenu = getAsyncLifecycle(
 export const queueTableByStatusView = getAsyncLifecycle(() => import('./views/queue-table-by-status-view.component'), {
   featureName: 'queue-table-by-status-view',
   moduleName,
-  swrConfig: {
-    refreshInterval: swrRefreshIntervalInMs,
-  },
 });
 
 export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options);
@@ -38,20 +31,7 @@ export const outpatientSideNav = getAsyncLifecycle(() => import('./side-menu/sid
 // t('serviceQueues', 'Service queues')
 export const serviceQueuesDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const clearAllQueueEntriesModal = getAsyncLifecycle(
-  () => import('./modals/clear-queue-entries-modal/clear-queue-entries.modal'),
-  {
-    featureName: 'clear all queue entries and end visits',
-    moduleName,
-  },
-);
-
 export const pastVisitSummary = getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options);
-
-export const metricsCardCheckedInPatients = getAsyncLifecycle(
-  () => import('./metrics/metrics-cards/checked-in-patients.extension'),
-  options,
-);
 
 export const metricsCardWaitingPatients = getAsyncLifecycle(
   () => import('./metrics/metrics-cards/waiting-patients.extension'),
@@ -70,11 +50,6 @@ export const callQueueEntryModal = getAsyncLifecycle(() => import('./modals/call
 
 export const moveQueueEntryModal = getAsyncLifecycle(() => import('./modals/move-queue-entry.modal'), {
   featureName: 'move queue entry',
-  moduleName,
-});
-
-export const transitionQueueEntryModal = getAsyncLifecycle(() => import('./modals/transition-queue-entry.modal'), {
-  featureName: 'transition queue entry',
   moduleName,
 });
 
@@ -107,6 +82,14 @@ export const addOrMoveModal = getAsyncLifecycle(() => import('./modals/add-or-mo
   featureName: 'add or move modal',
   moduleName,
 });
+
+export const changeQueueLocationModal = getAsyncLifecycle(
+  () => import('./modals/change-queue-location/change-queue-location.modal'),
+  {
+    featureName: 'change queue location modal',
+    moduleName,
+  },
+);
 
 export const transitionOverflowMenuItem = getAsyncLifecycle(
   () => import('./add-or-move-button/add-or-move-overflow-menu-item.extension'),

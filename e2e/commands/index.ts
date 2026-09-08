@@ -3,4 +3,5 @@ export * from './cohort-operations';
 export * from './encounter-operations';
 export * from './location-operations';
 export * from './patient-operations';
+export * from './queue-operations';
 export * from './visit-operations';
