@@ -1,5 +1,7 @@
 {
   "actions": "Tindakan",
+  "activeQueueEntriesUnavailable": "Cannot check the patient’s current queues",
+  "activeQueueEntriesUnavailableDetail": "The list shows all services, including the queues this patient is already in. If you select one of those, the system rejects the entry when you save.",
   "addAPatientToThisList": "Add a patient to this list",
   "addedPatientToQueue": "Pasien ditambahkan ke antrian",
   "addingPatientToQueue": "Adding patient to queue",
@@ -94,6 +96,7 @@
   "patientAttendingService": "Pasien menggunakan layanan",
   "patientGender": "Gender",
   "patientId": "Patient Id",
+  "patientInEveryQueueAtLocation": "This patient is already in every queue at this location",
   "patientName": "Nama pasien",
   "patientRemoved": "Pasien dihapus",
   "patientRemovedFailed": "Gagal menghapus pasien dari antrian",

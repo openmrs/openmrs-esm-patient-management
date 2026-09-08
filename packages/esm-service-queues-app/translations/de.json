@@ -1,5 +1,7 @@
 {
   "actions": "Aktionen",
+  "activeQueueEntriesUnavailable": "Cannot check the patient’s current queues",
+  "activeQueueEntriesUnavailableDetail": "The list shows all services, including the queues this patient is already in. If you select one of those, the system rejects the entry when you save.",
   "addAPatientToThisList": "Ein Patient zur Liste hinzufügen",
   "addedPatientToQueue": "Patient in die Warteschlange hinzufügen",
   "addingPatientToQueue": "Patienten zur Warteschlange hinzufügen",
@@ -94,6 +96,7 @@
   "patientAttendingService": "Betreuung der Patienten",
   "patientGender": "Geschlecht",
   "patientId": "ID des Patienten",
+  "patientInEveryQueueAtLocation": "This patient is already in every queue at this location",
   "patientName": "Patientenname",
   "patientRemoved": "Patient wurde entfernt",
   "patientRemovedFailed": "Fehler beim Entfernen des Patienten aus der Warteschlange",
