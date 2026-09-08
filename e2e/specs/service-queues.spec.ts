@@ -9,8 +9,8 @@ test('Add patient with visit to queue', async ({ api, page, patient }) => {
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
 
-  await test.step('When I go to the Appointments page in the patient chart', async () => {
-    await serviceQueuesPage.goto();
+  await test.step('When I go to the waiting list on the Service queues page', async () => {
+    await serviceQueuesPage.gotoWaitingList();
   });
 
   await test.step('And I click on the “Add a patient to this list” button', async () => {
