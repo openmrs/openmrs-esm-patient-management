@@ -15,16 +15,15 @@ const clinicOverviewTabIndex = 0;
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
-  const { clinicAdministratorScreen } = useConfig<ConfigObject>();
+  const {
+    clinicAdministratorScreen: { privilege },
+  } = useConfig<ConfigObject>();
   const session = useSession();
   const [selectedTabIndex, setSelectedTabIndex] = useState(clinicOverviewTabIndex);
 
   // Until the session resolves, fall back to the standard dashboard rather than to nothing: the tab
   // strip appearing a moment late is a far smaller cost than a blank Service Queues page.
-  const showClinicOverview =
-    clinicAdministratorScreen.enabled &&
-    Boolean(session?.user) &&
-    userHasAccess(clinicAdministratorScreen.privilege, session.user);
+  const showClinicOverview = Boolean(session?.user) && userHasAccess(privilege, session.user);
 
   if (!showClinicOverview) {
     return (

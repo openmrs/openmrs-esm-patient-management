@@ -45,12 +45,10 @@ vi.mocked(useQueueEntries).mockReturnValue({
   mutate: vi.fn(),
 });
 
-function givenConfig(clinicAdministratorScreen: Partial<ConfigObject['clinicAdministratorScreen']> = {}) {
-  const defaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
+function givenConfig() {
   mockUseConfig.mockReturnValue({
-    ...defaults,
+    ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
     visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    clinicAdministratorScreen: { ...defaults.clinicAdministratorScreen, ...clinicAdministratorScreen },
   });
 }
 
@@ -81,8 +79,7 @@ describe('Home Component', () => {
     });
   });
 
-  it('shows no tabs at all for a user without access, so their dashboard is unchanged', () => {
-    givenConfig({ enabled: true });
+  it('shows no tabs at all for a user without the privilege, so their dashboard is unchanged', () => {
     mockUserHasAccess.mockReturnValue(false);
 
     render(<Home />);
@@ -93,7 +90,6 @@ describe('Home Component', () => {
 
   // A session that has not resolved a user yet must not blank the whole page.
   it('falls back to the standard dashboard when the session carries no user', () => {
-    givenConfig({ enabled: true });
     mockUserHasAccess.mockReturnValue(true);
     mockUseSession.mockReturnValue({ authenticated: false } as ReturnType<typeof useSession>);
 
@@ -103,17 +99,8 @@ describe('Home Component', () => {
     expect(screen.getByTestId('header-metrics')).toBeInTheDocument();
   });
 
-  it('shows no tabs while the screen is disabled, even for a user with access', () => {
-    mockUserHasAccess.mockReturnValue(true);
-
-    render(<Home />);
-
-    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
-  });
-
   describe('for a clinic administrator', () => {
     beforeEach(() => {
-      givenConfig({ enabled: true });
       mockUserHasAccess.mockReturnValue(true);
     });
 
