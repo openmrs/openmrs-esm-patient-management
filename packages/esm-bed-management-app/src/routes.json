@@ -62,6 +62,10 @@
     {
       "name": "new-bed-type-modal",
       "component": "newBedTypeModal"
+    },
+    {
+      "name": "delete-bed-confirmation-modal",
+      "component": "deleteBedConfirmationModal"
     }
   ],
   "workspaceGroups2": [
