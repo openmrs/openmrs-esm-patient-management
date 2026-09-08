@@ -205,7 +205,8 @@ describe('QueueEntryActionModal', () => {
     const mockSubmitAction = vi.fn().mockRejectedValue({
       responseBody: {
         error: {
-          message: '[queue.entry.duplicate.patient]',
+          message: 'Invalid Submission',
+          globalErrors: [{ code: 'queue.entry.error.duplicate', message: 'This patient is already in this queue' }],
         },
       },
     });
