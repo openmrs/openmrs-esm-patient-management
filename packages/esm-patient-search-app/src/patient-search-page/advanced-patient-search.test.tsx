@@ -14,7 +14,12 @@ import { type PatientSearchResponse } from '../types';
 import { mockAdvancedSearchResults } from '__mocks__';
 import { PatientSearchContext } from '../patient-search-context';
 import { useInfinitePatientSearch } from '../patient-search.resource';
-import { usePersonAttributeType } from './refine-search/person-attributes.resource';
+import {
+  useAttributeConceptAnswers,
+  useConfiguredAnswerConcepts,
+  useLocations,
+  usePersonAttributeType,
+} from './refine-search/person-attributes.resource';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 
 const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
@@ -26,6 +31,9 @@ vi.mock('../patient-search.resource', () => ({
 }));
 
 vi.mock('./refine-search/person-attributes.resource', () => ({
+  useAttributeConceptAnswers: vi.fn(),
+  useConfiguredAnswerConcepts: vi.fn(),
+  useLocations: vi.fn(),
   usePersonAttributeType: vi.fn(),
 }));
 
@@ -301,6 +309,70 @@ describe('AdvancedPatientSearchComponent', () => {
       renderComponent({ inTabletOrOverlay: true });
       const container = screen.getByText(/Refine search/i);
       expect(container).toBeInTheDocument();
+    });
+  });
+
+  describe.each(['org.openmrs.Concept', 'org.openmrs.Location'])('Clearing %s attributes', (format) => {
+    const attributeTypeUuid = '8d87236c-c2cc-11de-8d13-0010c6dffd0f';
+    const answer = { uuid: '1ce1b7d4-c865-4178-82b0-5932e51503d6', display: 'Community Outreach' };
+
+    beforeEach(() => {
+      const config: PatientSearchConfig = getDefaultsFromConfigSchema(configSchema);
+      config.search.searchFilterFields.personAttributes = [{ attributeTypeUuid }];
+      mockUseConfig.mockReturnValue(config);
+      mockUsePersonAttributeType.mockReturnValue({
+        data: { uuid: attributeTypeUuid, display: 'Health Center', format },
+        isLoading: false,
+        error: null,
+      });
+      vi.mocked(useConfiguredAnswerConcepts).mockReturnValue({
+        configuredConceptAnswers: [],
+        isLoadingConfiguredAnswers: false,
+      });
+      vi.mocked(useAttributeConceptAnswers).mockReturnValue({
+        conceptAnswers: [answer],
+        isLoadingConceptAnswers: false,
+        errorFetchingConceptAnswers: null,
+      });
+      vi.mocked(useLocations).mockReturnValue({
+        locations: [
+          { resource: { id: answer.uuid, name: answer.display, resourceType: 'Location', status: 'active' } },
+        ],
+        isLoading: false,
+        loadingNewData: false,
+        error: null,
+      });
+    });
+
+    it('restores results when an applied attribute selection is cleared', async () => {
+      renderComponent();
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText(answer.display));
+      await user.click(screen.getByRole('button', { name: /^apply/i }));
+      expect(screen.getByRole('heading', { name: '1 search result' })).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /clear selected item/i }));
+      await user.click(screen.getByRole('button', { name: /^apply/i }));
+
+      expect(screen.getByRole('heading', { name: '2 search result' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Apply', exact: true })).toBeInTheDocument();
+    });
+
+    it('keeps patients without the attribute when a cleared selection is applied', async () => {
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: mockSearchResults.data.map((patient) => ({ ...patient, attributes: [] })),
+      });
+      renderComponent();
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText(answer.display));
+      await user.click(screen.getByRole('button', { name: /clear selected item/i }));
+      await user.click(screen.getByRole('button', { name: /^apply/i }));
+
+      expect(screen.getByRole('heading', { name: '2 search result' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Apply', exact: true })).toBeInTheDocument();
     });
   });
 });
