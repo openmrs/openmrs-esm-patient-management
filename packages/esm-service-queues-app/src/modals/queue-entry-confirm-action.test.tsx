@@ -156,7 +156,7 @@ describe('EndQueueEntryModal', () => {
     expect(closeModal).toHaveBeenCalled();
   });
 
-  it('shows the failure message without the error code used to detect duplicates', async () => {
+  it('shows the global error message instead of the generic validation message', async () => {
     mockOpenmrsFetch.mockRejectedValue({
       responseBody: {
         error: {
@@ -173,7 +173,7 @@ describe('EndQueueEntryModal', () => {
     await user.click(screen.getByRole('button', { name: /Remove/ }));
 
     expect(showSnackbar).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: 'error', subtitle: 'Invalid Submission' }),
+      expect.objectContaining({ kind: 'error', subtitle: 'This patient is already in this queue' }),
     );
   });
 });

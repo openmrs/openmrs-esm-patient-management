@@ -21,7 +21,7 @@ import { postQueueEntry } from './queue-fields.resource';
 import { useMutateQueueEntries, useQueueEntries } from '../../hooks/useQueueEntries';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useQueues } from '../../hooks/useQueues';
-import { isDuplicateQueueEntryError } from '../../modals/queue-entry-error.utils';
+import { getErrorMessage, isDuplicateQueueEntryError } from '../../modals/queue-entry-error.utils';
 import { useServiceQueuesStore } from '../../store/store';
 
 export interface QueueFieldsProps {
@@ -152,7 +152,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
               title: t('queueEntryError', 'Error adding patient to the queue'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: error?.message ?? t('unknownError', 'An unknown error occurred'),
+              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             });
           }
           throw error;
@@ -233,7 +233,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
                     }
                   }}>
                   <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                  {queueLocations?.map((location) => (
+                  {queueLocations.map((location) => (
                     <SelectItem key={location.id} text={location.name} value={location.id}>
                       {location.name}
                     </SelectItem>

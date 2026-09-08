@@ -7,6 +7,7 @@ export function getErrorMessage(error: unknown): string {
         rawMessage?: string;
         translatedMessage?: string;
         message?: string;
+        globalErrors?: Array<{ message?: string }>;
       };
     };
     message?: string;
@@ -15,6 +16,7 @@ export function getErrorMessage(error: unknown): string {
   return (
     err?.responseBody?.error?.rawMessage ||
     err?.responseBody?.error?.translatedMessage ||
+    err?.responseBody?.error?.globalErrors?.[0]?.message ||
     err?.responseBody?.error?.message ||
     err?.message ||
     ''

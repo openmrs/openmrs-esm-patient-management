@@ -153,6 +153,30 @@ describe('QueueFields', () => {
     expect(mockPostQueueEntry).not.toHaveBeenCalled();
   });
 
+  it('clears a prefilled service once the entries show the patient is already in it', async () => {
+    const user = userEvent.setup();
+    mockUseServiceQueuesStore.mockReturnValue({ selectedServiceUuid: mockQueueTriage.uuid } as any);
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: true } as any);
+    let onSubmit: (visit: Visit) => Promise<any>;
+
+    const { rerender } = render(
+      <QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={(cb) => (onSubmit = cb)} />,
+    );
+    await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
+
+    mockUseQueueEntries.mockReturnValue({
+      queueEntries: [{ queue: { uuid: mockQueueTriage.uuid } }],
+      isLoading: false,
+    } as any);
+    // A new setOnSubmit reference gets past React.memo so the updated mock is read
+    rerender(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={(cb) => (onSubmit = cb)} />);
+
+    expect(screen.getByTitle(/select a queue service/i)).toHaveValue('');
+    expect(screen.queryByRole('option', { name: mockQueueTriage.name })).not.toBeInTheDocument();
+    await expect(onSubmit(mockVisitAlice)).rejects.toThrow(/validation/i);
+    expect(mockPostQueueEntry).not.toHaveBeenCalled();
+  });
+
   it('warns and refreshes the entries when the backend rejects a duplicate queue entry', async () => {
     const user = userEvent.setup();
     const duplicateError = {
