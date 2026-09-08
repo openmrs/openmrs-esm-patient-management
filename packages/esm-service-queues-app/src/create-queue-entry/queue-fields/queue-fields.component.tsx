@@ -166,6 +166,20 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   }, [onSubmit, setOnSubmit]);
 
   useEffect(() => {
+    if (!isLoadingQueueLocations) {
+      if (queueLocation) {
+        if (!queueLocations.some((l) => l.id === queueLocation)) {
+          setValue('queueLocation', '');
+        }
+      } else if (sessionLocation?.uuid) {
+        if (queueLocations.some((l) => l.id === sessionLocation.uuid)) {
+          setValue('queueLocation', sessionLocation.uuid);
+        }
+      }
+    }
+  }, [isLoadingQueueLocations, queueLocation, sessionLocation, queueLocations, setValue]);
+
+  useEffect(() => {
     if (queueLocation && queueService) {
       const isServiceValid = memoizedQueues.some((queue) => queue.uuid === queueService);
       if (!isServiceValid) {
