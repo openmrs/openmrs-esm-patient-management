@@ -14,7 +14,7 @@ export function useQueuesMutable() {
   const { data, ...rest } = useSWR<{ data: { results: Array<Queue> } }, Error>(queuesMutationKey, openmrsFetch);
 
   const queues = useMemo(
-    () => data?.data?.results.sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
+    () => data?.data?.results.slice().sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
     [data?.data?.results],
   );
 
@@ -28,7 +28,7 @@ export function useQueueRooms() {
   const { data, ...rest } = useSWR<{ data: { results: Array<QueueRoom> } }, Error>(queueRoomsMutationKey, openmrsFetch);
 
   const queueRooms = useMemo(
-    () => data?.data?.results.sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
+    () => data?.data?.results.slice().sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
     [data?.data?.results],
   );
 
