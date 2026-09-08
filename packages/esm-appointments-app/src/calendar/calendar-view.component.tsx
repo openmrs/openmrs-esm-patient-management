@@ -1,15 +1,10 @@
 import React from 'react';
 import { type Dayjs } from 'dayjs';
-import { type CalendarViewMode, type DailyAppointmentsCountByService } from '../types';
+import { type CalendarViewMode, type DailyAppointmentsCountByService, type LegendService } from '../types';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
 import ServicesLegend from './services-legend.component';
-
-export interface LegendService {
-  uuid: string;
-  name: string;
-}
 
 interface CalendarViewProps {
   viewMode: CalendarViewMode;

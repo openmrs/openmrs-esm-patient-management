@@ -1,34 +1,43 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiSelect } from '@carbon/react';
+import { type AppointmentService } from '../types';
 import styles from './filter.scss';
 
-export interface ServiceFilterOption {
-  uuid: string;
-  label: string;
-  color?: string;
-}
-
 interface ServiceFilterProps {
-  options: ServiceFilterOption[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
+  services: Array<Pick<AppointmentService, 'uuid' | 'name'>>;
+  serviceColorMap?: Map<string, string>;
+  selectedServiceUuids: string[];
+  onServiceChange: (selectedServiceUuids: string[]) => void;
 }
 
 type ServiceItem = { id: string; label: string; color?: string };
 
-const ServiceFilter: React.FC<ServiceFilterProps> = ({ options, selected, onChange }) => {
+const ServiceFilter: React.FC<ServiceFilterProps> = ({
+  services,
+  serviceColorMap,
+  selectedServiceUuids,
+  onServiceChange,
+}) => {
   const { t } = useTranslation();
 
   const items = useMemo<ServiceItem[]>(
-    () => options.map((option) => ({ id: option.uuid, label: option.label, color: option.color })),
-    [options],
+    () =>
+      services.map((service) => ({
+        id: service.uuid,
+        label: service.name,
+        color: serviceColorMap?.get(service.uuid),
+      })),
+    [services, serviceColorMap],
   );
-  const selectedItems = useMemo(() => items.filter((item) => selected.includes(item.id)), [items, selected]);
+  const selectedItems = useMemo(
+    () => items.filter((item) => selectedServiceUuids.includes(item.id)),
+    [items, selectedServiceUuids],
+  );
 
   const handleChange = useCallback(
-    ({ selectedItems }: { selectedItems: Array<ServiceItem> }) => onChange(selectedItems.map((item) => item.id)),
-    [onChange],
+    ({ selectedItems }: { selectedItems: Array<ServiceItem> }) => onServiceChange(selectedItems.map((item) => item.id)),
+    [onServiceChange],
   );
 
   const renderItem = useCallback((item: ServiceItem | null) => {

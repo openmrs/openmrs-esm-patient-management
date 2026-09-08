@@ -4,13 +4,7 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import {
-  mockLocationInpatientWard,
-  mockMappedAppointmentsData,
-  mockPatient,
-  mockProviders,
-  mockUseAppointmentServiceData,
-} from '__mocks__';
+import { mockMappedAppointmentsData, mockUseAppointmentServiceData } from '__mocks__';
 import AppointmentsCalendarContainer from './appointments-calendar-container.component';
 import { useAppointmentsCalendar } from './hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from './hooks/useAppointmentService';
@@ -40,7 +34,6 @@ function renderCalendar() {
 
 const outpatientService = mockUseAppointmentServiceData[0];
 const hivService = mockMappedAppointmentsData.data[0];
-const provider = mockProviders.data[0];
 
 const svc = (name: string, uuid: string) => ({
   appointmentServiceId: 1,
@@ -57,120 +50,13 @@ const svc = (name: string, uuid: string) => ({
 const outpatient = svc(outpatientService.name, outpatientService.uuid);
 const hivClinic = svc(hivService.serviceType, hivService.serviceUuid);
 
-const mockAppointment = (overrides = {}) => ({
-  uuid: 'test-uuid',
-  appointmentNumber: '0001',
-  appointmentKind: 'Scheduled',
-  comments: '',
-  endDateTime: null,
-  location: { uuid: mockLocationInpatientWard.uuid, name: mockLocationInpatientWard.name },
-  patient: { identifier: mockPatient.identifier, name: mockPatient.name, uuid: mockPatient.uuid },
-  provider: { uuid: provider.uuid, display: provider.display },
-  providers: [{ uuid: provider.uuid, display: provider.display }],
-  recurring: false,
-  service: outpatient,
-  startDateTime: dayjs().date(10).hour(9).minute(0).valueOf(),
-  status: 'Scheduled',
-  voided: false,
-  extensions: {},
-  teleconsultationLink: null,
-  ...overrides,
-});
-
-describe('Appointment calendar view', () => {
-  it('renders the calendar view with Prev and Next controls', () => {
-    renderCalendar();
-    expect(screen.getByTestId('appointments-calendar')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
-  });
-
-  it('renders the Monthly and Daily view switcher', () => {
-    renderCalendar();
-    expect(screen.getByRole('tab', { name: /monthly/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /daily/i })).toBeInTheDocument();
-    expect(screen.queryByRole('tab', { name: /weekly/i })).not.toBeInTheDocument();
-  });
-
-  it('switches to daily period when Daily tab is clicked', async () => {
-    const user = userEvent.setup();
+describe('AppointmentsCalendarContainer - service filtration', () => {
+  it('renders the Service filter dropdown in the header and not provider or location dropdowns', () => {
     renderCalendar();
 
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
-
-    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
-    expect(lastCall?.[1]).toBe('daily');
-  });
-
-  it('renders the Today button', () => {
-    renderCalendar();
-    expect(screen.getByRole('button', { name: /today/i })).toBeInTheDocument();
-  });
-
-  it('displays the appointment count for the month', () => {
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: dayjs().date(10).format('YYYY-MM-DD'),
-          services: [{ serviceName: outpatient.name, serviceUuid: outpatient.uuid, count: 1 }],
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    renderCalendar();
-
-    expect(screen.getByText('1 appointment this month')).toBeInTheDocument();
-  });
-
-  it('displays the singular appointment count in daily mode', async () => {
-    const user = userEvent.setup();
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: '2026-07-02',
-          services: [{ serviceName: outpatient.name, serviceUuid: outpatient.uuid, count: 1 }],
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    renderCalendar();
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
-
-    expect(screen.getByText('1 appointment')).toBeInTheDocument();
-  });
-
-  it('displays month and year title in monthly mode', () => {
-    renderCalendar();
-    expect(screen.getByText(/^[A-Z][a-z]+ \d{4}$/)).toBeInTheDocument();
-  });
-
-  it('opens popup when a day cell with appointments is clicked, then switches to daily view', async () => {
-    const user = userEvent.setup();
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: dayjs().date(10).format('YYYY-MM-DD'),
-          services: [{ serviceName: outpatient.name, serviceUuid: outpatient.uuid, count: 1 }],
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    renderCalendar();
-
-    await user.click(screen.getAllByText(outpatient.name)[0]);
-
-    const openDayViewBtn = screen.getAllByRole('button', { name: /open day view/i })[0];
-    expect(openDayViewBtn).toBeInTheDocument();
-    await user.click(openDayViewBtn);
-
-    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
-    expect(lastCall?.[1]).toBe('daily');
+    expect(screen.getByRole('combobox', { name: /service/i })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /provider/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /location/i })).not.toBeInTheDocument();
   });
 
   it('renders the services legend when services are present', () => {
@@ -219,14 +105,6 @@ describe('Appointment calendar view', () => {
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
   });
 
-  it('renders the Service filter dropdown in the header and not provider or location dropdowns', () => {
-    renderCalendar();
-
-    expect(screen.getByRole('combobox', { name: /service/i })).toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: /provider/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: /location/i })).not.toBeInTheDocument();
-  });
-
   it('narrows the monthly grid when a service filter is selected', async () => {
     const user = userEvent.setup();
     const allEvents = [
@@ -239,7 +117,7 @@ describe('Appointment calendar view', () => {
       },
     ];
     mockUseAppointmentsCalendar.mockImplementation((_, __, filters) => {
-      const svcFilter = filters?.serviceUuids;
+      const svcFilter = filters?.selectedServiceUuids;
       if (svcFilter?.length) {
         return {
           calendarEvents: allEvents

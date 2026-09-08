@@ -83,11 +83,11 @@ describe('useAppointmentsCalendar', () => {
     ]);
   });
 
-  it('filters services client-side when serviceUuids is specified', async () => {
+  it('filters services client-side when selectedServiceUuids is specified', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: mockSummaryData } as FetchResponse);
 
     const { result } = renderHook(
-      () => useAppointmentsCalendar('2026-08-15', 'monthly', { serviceUuids: [outpatientService.uuid] }),
+      () => useAppointmentsCalendar('2026-08-15', 'monthly', { selectedServiceUuids: [outpatientService.uuid] }),
       { wrapper },
     );
 

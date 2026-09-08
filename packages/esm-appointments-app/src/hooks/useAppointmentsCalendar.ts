@@ -3,7 +3,7 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
-import { type DailyAppointmentsCountByService } from '../types';
+import { type CalendarViewMode, type DailyAppointmentsCountByService } from '../types';
 
 interface AppointmentCountMapEntry {
   allAppointmentsCount: number;
@@ -17,10 +17,14 @@ interface AppointmentSummaryResponse {
   appointmentCountMap: Map<string, AppointmentCountMapEntry>;
 }
 
+export interface CalendarFilters {
+  selectedServiceUuids?: string[];
+}
+
 export const useAppointmentsCalendar = (
   forDate: string | null,
-  period: string,
-  filters?: { serviceUuids?: string[] },
+  period: CalendarViewMode,
+  filters?: CalendarFilters,
 ) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
   const url =
@@ -34,10 +38,10 @@ export const useAppointmentsCalendar = (
 
   const results: DailyAppointmentsCountByService[] = useMemo(() => {
     if (!data?.data) return [];
-    const activeServiceUuids = filters?.serviceUuids;
+    const selectedServiceUuids = filters?.selectedServiceUuids;
     return data.data.reduce((acc: DailyAppointmentsCountByService[], service) => {
       const serviceUuid = service.appointmentService.uuid;
-      if (activeServiceUuids?.length && !activeServiceUuids.includes(serviceUuid)) {
+      if (selectedServiceUuids?.length && !selectedServiceUuids.includes(serviceUuid)) {
         return acc;
       }
       const serviceName = service.appointmentService.name;
@@ -54,12 +58,12 @@ export const useAppointmentsCalendar = (
       });
       return acc;
     }, []);
-  }, [data?.data, filters?.serviceUuids]);
+  }, [data?.data, filters?.selectedServiceUuids]);
 
   return { isLoading, calendarEvents: results, error };
 };
 
-function evaluateAppointmentCalendarDates(forDate: string | null, period: string) {
+function evaluateAppointmentCalendarDates(forDate: string | null, period: CalendarViewMode) {
   if (!forDate) {
     return { startDate: null, endDate: null };
   }

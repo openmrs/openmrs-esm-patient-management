@@ -7,7 +7,7 @@ import ServiceFilter from './filter/service-filter.component';
 import CalendarPageHeader from './calendar/header/calendar-page-header.component';
 import CalendarView from './calendar/calendar-view.component';
 import { buildServiceColorMap } from './calendar/utils/calendar-colors';
-import { type CalendarViewMode } from './types';
+import { type CalendarViewMode, type LegendService } from './types';
 import styles from './calendar/appointments-calendar-view-view.scss';
 
 const AppointmentsCalendarContainer: React.FC = () => {
@@ -15,39 +15,35 @@ const AppointmentsCalendarContainer: React.FC = () => {
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
 
-  const { selectedServiceUuids, serviceTypes, serviceOptions, onServiceChange } = useServiceFilter();
+  const { selectedServiceUuids, serviceTypes, onServiceChange } = useServiceFilter();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
   const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode, {
-    serviceUuids: selectedServiceUuids,
+    selectedServiceUuids,
   });
 
   const appointmentCount = useMemo(
     () =>
       (calendarEvents ?? []).reduce(
-        (sum, event) => sum + (event.services ?? []).reduce((s, svc) => s + (svc.count ?? 0), 0),
+        (totalCount, event) =>
+          totalCount + (event.services ?? []).reduce((serviceCount, service) => serviceCount + (service.count ?? 0), 0),
         0,
       ),
     [calendarEvents],
   );
 
-  const legendServices = useMemo(() => {
-    const map = new Map<string, { uuid: string; name: string }>();
+  const legendServices = useMemo<LegendService[]>(() => {
+    const legendMap = new Map<string, LegendService>();
     (calendarEvents ?? []).forEach((event) => {
-      event.services?.forEach((svc) => {
-        const key = svc.serviceUuid || svc.serviceName;
-        if (svc.serviceName && key && !map.has(key)) {
-          map.set(key, { name: svc.serviceName, uuid: svc.serviceUuid ?? key });
+      event.services?.forEach((service) => {
+        const key = service.serviceUuid || service.serviceName;
+        if (service.serviceName && key && !legendMap.has(key)) {
+          legendMap.set(key, { name: service.serviceName, uuid: service.serviceUuid ?? key });
         }
       });
     });
-    return Array.from(map.values());
+    return Array.from(legendMap.values());
   }, [calendarEvents]);
-
-  const serviceOptionsWithColor = useMemo(
-    () => serviceOptions.map((option) => ({ ...option, color: serviceColorMap.get(option.uuid) })),
-    [serviceOptions, serviceColorMap],
-  );
 
   const handlePrev = useCallback(() => {
     setCalendarSelectedDate((d) => (viewMode === 'monthly' ? d.subtract(1, 'month') : d.subtract(1, 'day')));
@@ -70,7 +66,12 @@ const AppointmentsCalendarContainer: React.FC = () => {
     <div data-testid="appointments-calendar" className={styles.backgroundColor}>
       <CalendarPageHeader
         filterElement={
-          <ServiceFilter options={serviceOptionsWithColor} selected={selectedServiceUuids} onChange={onServiceChange} />
+          <ServiceFilter
+            services={serviceTypes}
+            serviceColorMap={serviceColorMap}
+            selectedServiceUuids={selectedServiceUuids}
+            onServiceChange={onServiceChange}
+          />
         }
       />
       <CalendarView
