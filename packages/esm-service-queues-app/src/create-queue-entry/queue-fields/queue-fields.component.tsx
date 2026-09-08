@@ -54,11 +54,11 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
 
   // A patient cannot be added to a queue they are already in, so those queues are left out below
-  const { queueEntries, isLoading: isLoadingQueueEntries } = useQueueEntries(
-    { patient: patientUuid, isEnded: false },
-    'custom:(uuid,queue:(uuid))',
-    Boolean(patientUuid),
-  );
+  const {
+    queueEntries,
+    isLoading: isLoadingQueueEntries,
+    error: queueEntriesError,
+  } = useQueueEntries({ patient: patientUuid, isEnded: false }, 'custom:(uuid,queue:(uuid))', Boolean(patientUuid));
   const activeQueueUuids = useMemo(() => new Set(queueEntries.map((entry) => entry.queue?.uuid)), [queueEntries]);
 
   const {
@@ -285,6 +285,17 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
               )
             }
           />
+          {queueEntriesError && (
+            <InlineNotification
+              kind="warning"
+              lowContrast
+              title={t('activeQueueEntriesUnavailable', 'Cannot check the patient’s current queues')}
+              subtitle={t(
+                'activeQueueEntriesUnavailableDetail',
+                'The list shows all services, including the queues this patient is already in. If you select one of those, the system rejects the entry when you save.',
+              )}
+            />
+          )}
         </FormGroup>
       )}
       {/* Status section of the form would go here; historical version of this code can be found at

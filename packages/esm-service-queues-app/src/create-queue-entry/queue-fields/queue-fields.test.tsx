@@ -130,6 +130,19 @@ describe('QueueFields', () => {
     expect(screen.queryByText(/no services configured/i)).not.toBeInTheDocument();
   });
 
+  it('warns when the active queue entry lookup fails and offers every service', async () => {
+    const user = userEvent.setup();
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false, error: new Error('boom') } as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    await user.selectOptions(screen.getByTitle(/select a queue location/i), '1');
+
+    expect(screen.getByRole('option', { name: mockQueueTriage.name })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: mockQueueSurgery.name })).toBeInTheDocument();
+    expect(screen.getByText(/cannot check the patient’s current queues/i)).toBeInTheDocument();
+  });
+
   it('reports a location with no services configured as a misconfiguration', async () => {
     const user = userEvent.setup();
     mockUseQueues.mockReturnValue({ queues: [] } as any);
