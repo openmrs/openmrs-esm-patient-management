@@ -11,7 +11,9 @@ interface PatientSearchResultsProps {
 }
 
 interface EmptyStateProps {
+  /** Already translated. Defaults to the no-results message. */
   title?: string;
+  /** Already translated. Defaults to the hint to search by patient ID. */
   hint?: string;
 }
 
