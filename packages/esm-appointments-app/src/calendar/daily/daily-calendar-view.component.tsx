@@ -209,13 +209,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
           {timelineRanges.map((range) => {
             const key = rangeKey(range.kind, range.h0, range.h1);
             const count = rangeCounts.get(key) ?? 0;
-            const isLive = range.kind === 'live';
-            let defaultState: RangeDisplayState;
-            if (isLive) {
-              defaultState = 'normal';
-            } else {
-              defaultState = count > 0 ? 'normal' : 'collapsed';
-            }
+            const defaultState: RangeDisplayState = count > 0 ? 'normal' : 'collapsed';
             const state: RangeDisplayState = rangeStates.get(key) ?? defaultState;
 
             if (state === 'collapsed') {

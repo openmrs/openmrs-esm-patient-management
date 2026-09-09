@@ -99,9 +99,9 @@ describe('DailyCalendarView', () => {
     });
     expect(screen.getAllByText('0 appointment(s)')).toHaveLength(3);
     expect(screen.queryAllByTestId(/^hour-row-/)).toHaveLength(0);
-    expect(screen.getByRole('button', { name: /12 AM – 8 AM/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /8 AM – 5 PM/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /5 PM – 12 AM/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /12 AM – 8 AM, 0 appointment\(s\), Expand/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /8 AM – 5 PM, 0 appointment\(s\), Expand/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /5 PM – 12 AM, 0 appointment\(s\), Expand/ })).toBeInTheDocument();
   });
 
   it('reports the appointment count to the parent', async () => {
