@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
-import { getCalendarFormat } from '../calendar-utils';
+import { useCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
 
 interface CalendarHeaderProps {
@@ -29,15 +29,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onToday,
 }) => {
   const { t } = useTranslation();
-  const { locale, calendar } = getCalendarFormat();
+  const { locale, calendarId: calendar } = useCalendarFormat();
 
   const dateLabel = useMemo(() => {
     const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
+    const [year, month, day] = isoDate.split('-').map(Number);
+    const dateAtNoon = new Date(year, month - 1, day, 12, 0, 0);
 
     if (viewMode === 'monthly') {
-      return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', calendar }).format(
-        new Date(isoDate + 'T00:00:00'),
-      );
+      return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', calendar }).format(dateAtNoon);
     }
     return new Intl.DateTimeFormat(locale, {
       weekday: 'long',
@@ -45,7 +45,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       month: 'long',
       day: 'numeric',
       calendar,
-    }).format(new Date(isoDate + 'T00:00:00'));
+    }).format(dateAtNoon);
   }, [viewMode, calendarSelectedDate, locale, calendar]);
 
   const countLabel = useMemo(() => {

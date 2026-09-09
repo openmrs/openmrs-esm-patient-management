@@ -3,6 +3,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import dayjs, { type Dayjs } from 'dayjs';
 import { type DailyAppointmentsCountByService } from '../../types';
 import { monthDays } from '../../helpers';
+import { useCalendarFormat } from '../calendar-utils';
 import MonthlyHeader from './monthly-header.component';
 import MonthlyViewWorkload from './monthly-workload-view.component';
 import styles from '../appointments-calendar-view-view.scss';
@@ -16,8 +17,14 @@ interface MonthlyCalendarViewProps {
   serviceColorMap?: Map<string, string>;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate, serviceColorMap }) => {
-  const gridDayCells = useMemo(() => monthDays(calendarSelectedDate), [calendarSelectedDate]);
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
+  events,
+  calendarSelectedDate,
+  onSelectDate,
+  serviceColorMap,
+}) => {
+  const { locale, calendarId, calendar } = useCalendarFormat();
+  const gridDayCells = useMemo(() => monthDays(calendarSelectedDate, calendar), [calendarSelectedDate, calendar]);
 
   const eventsMap = useMemo(() => {
     const map = new Map<string, DailyAppointmentsCountByService>();
@@ -33,7 +40,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calen
 
   return (
     <div className={styles.calendarViewContainer}>
-      <MonthlyHeader />
+      <MonthlyHeader locale={locale} calendarId={calendarId} />
       <div className={styles.wrapper}>
         <div className={styles.monthlyCalendar}>
           {gridDayCells.map((dateTime, i) => (
@@ -46,6 +53,9 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calen
               calendarSelectedDate={calendarSelectedDate}
               onSelectDate={onSelectDate}
               serviceColorMap={serviceColorMap}
+              locale={locale}
+              calendarId={calendarId}
+              calendar={calendar}
             />
           ))}
         </div>

@@ -5,8 +5,10 @@ import { Popover, PopoverContent } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { type Calendar } from '@internationalized/date';
 import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
+import { formatLocalDayNumber, formatLocalPopoverDate } from '../calendar-utils';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -18,6 +20,9 @@ export interface MonthlyWorkloadViewProps {
   onSelectDate?: (isoDate: string) => void;
   index?: number;
   serviceColorMap?: Map<string, string>;
+  locale?: string;
+  calendarId?: string;
+  calendar?: Calendar;
 }
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
@@ -29,6 +34,9 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   onSelectDate,
   index,
   serviceColorMap,
+  locale = 'en',
+  calendarId = 'gregory',
+  calendar,
 }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -36,7 +44,10 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   const cellRef = useRef<HTMLDivElement | null>(null);
 
   const isToday = useMemo(() => dateTime.isSame(dayjs(), 'day'), [dateTime]);
-  const isCurrentMonth = useMemo(() => isSameMonth(dateTime, calendarSelectedDate), [dateTime, calendarSelectedDate]);
+  const isCurrentMonth = useMemo(
+    () => isSameMonth(dateTime, calendarSelectedDate, calendar),
+    [dateTime, calendarSelectedDate, calendar],
+  );
 
   const popoverAlign = useMemo(() => {
     const isBelowFirstRow = index !== undefined ? index >= 7 : dateTime.date() > 7;
@@ -47,14 +58,14 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
     return isRightSide ? 'bottom-right' : 'bottom-left';
   }, [index, dateTime]);
 
-  const dateFormatted = useMemo(
-    () => ({
-      dayNumber: dateTime.format('D'),
-      popoverDate: dateTime.format('ddd, MMM D'),
-      isoDate: dateTime.format('YYYY-MM-DD'),
-    }),
-    [dateTime],
-  );
+  const dateFormatted = useMemo(() => {
+    const isoDate = dateTime.format('YYYY-MM-DD');
+    return {
+      dayNumber: formatLocalDayNumber(isoDate, locale, calendarId),
+      popoverDate: formatLocalPopoverDate(isoDate, locale, calendarId),
+      isoDate,
+    };
+  }, [dateTime, locale, calendarId]);
 
   const currentData = useMemo(() => {
     if (eventsMap) {

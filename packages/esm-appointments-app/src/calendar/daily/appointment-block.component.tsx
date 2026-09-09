@@ -8,14 +8,15 @@ interface AppointmentBlockProps {
   block: PositionedBlock;
   onClick: () => void;
   serviceColorMap?: Map<string, string>;
+  locale?: string;
 }
 
-const AppointmentBlock: React.FC<AppointmentBlockProps> = ({ block, onClick, serviceColorMap }) => {
+const AppointmentBlock: React.FC<AppointmentBlockProps> = ({ block, onClick, serviceColorMap, locale = 'en' }) => {
   const { t } = useTranslation();
   const { appointment, lane, lanes, topPx, heightPx } = block;
   const color = serviceColorMap?.get(appointment.service.uuid) ?? getFallbackServiceColor(appointment.service.uuid);
   const provider = appointment.providers?.[0]?.display ?? appointment.providers?.[0]?.name ?? '—';
-  const timeRange = formatTimeRange(block.s, block.e);
+  const timeRange = formatTimeRange(block.s, block.e, locale);
   const oneLine = heightPx < ONE_LINE_HEIGHT_THRESHOLD_PX;
   const patientName = appointment.patient?.name ?? '—';
   const statusLabel = appointment.status ? t(appointment.status, appointment.status) : '';

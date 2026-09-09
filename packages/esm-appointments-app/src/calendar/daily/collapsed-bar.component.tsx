@@ -13,11 +13,19 @@ interface CollapsedBarProps {
   state?: RangeDisplayState;
   expanded?: boolean;
   count: number;
+  locale?: string;
 }
 
-const CollapsedBar: React.FC<CollapsedBarProps> = ({ range, onToggle, state, expanded = false, count }) => {
+const CollapsedBar: React.FC<CollapsedBarProps> = ({
+  range,
+  onToggle,
+  state,
+  expanded = false,
+  count,
+  locale = 'en',
+}) => {
   const { t } = useTranslation();
-  const rangeLabel = `${formatHourLabel(range.h0)} – ${formatHourLabel((range.h1 + 1) % 24)}`;
+  const rangeLabel = `${formatHourLabel(range.h0, locale)} – ${formatHourLabel((range.h1 + 1) % 24, locale)}`;
   const countText = t('appointmentCount', '{{count}} appointment', {
     count,
     defaultValue_other: '{{count}} appointments',

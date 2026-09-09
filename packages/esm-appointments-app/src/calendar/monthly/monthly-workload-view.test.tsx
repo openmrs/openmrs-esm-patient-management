@@ -4,8 +4,14 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { useLayoutType } from '@openmrs/esm-framework';
+import type * as EsmFramework from '@openmrs/esm-framework';
 import MonthlyWorkloadView from './monthly-workload-view.component';
 import { type DailyAppointmentsCountByService } from '../../types';
+
+vi.mock('@openmrs/esm-framework', async (importOriginal) => {
+  const actual = await importOriginal<typeof EsmFramework>();
+  return { ...actual, useLayoutType: vi.fn() };
+});
 
 const mockUseLayoutType = vi.mocked(useLayoutType);
 

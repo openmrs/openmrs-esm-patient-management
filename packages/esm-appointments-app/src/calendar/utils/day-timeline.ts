@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { type Appointment } from '../../types';
-import { formatAMPM } from '../../helpers/functions';
+import { formatTime } from '../../helpers/functions';
 
 export const HOUR_HEIGHT_PX = 128;
 export const MIN_BLOCK_HEIGHT_PX = 26;
@@ -230,11 +230,18 @@ export function buildTimelineRanges(
   return ranges;
 }
 
-export function formatTimeRange(sMin: number, eMin: number): string {
+/**
+ * Formats a time range from start/end minutes-of-day to a localized display string.
+ *
+ * @param sMin   - Start time in minutes of day (0–1439)
+ * @param eMin   - End time in minutes of day (0–1439)
+ * @param locale - BCP-47 locale string (defaults to 'en' for backward compatibility)
+ */
+export function formatTimeRange(sMin: number, eMin: number, locale = 'en'): string {
   const formatMinute = (minute: number): string => {
     const normalized = ((minute % 1440) + 1440) % 1440;
     const d = new Date(0, 0, 1, Math.floor(normalized / MINUTES_PER_HOUR), normalized % MINUTES_PER_HOUR);
-    return formatAMPM(d);
+    return formatTime(d, locale);
   };
   return `${formatMinute(sMin)} – ${formatMinute(eMin)}`;
 }

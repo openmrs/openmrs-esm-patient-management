@@ -1,45 +1,71 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
+import { type Calendar } from '@internationalized/date';
 import { launchWorkspace2, type Workspace2DefinitionProps, restBaseUrl } from '@openmrs/esm-framework';
 import { AppointmentStatus } from '../types';
 import { appointmentsFormWorkspace, omrsDateFormat } from '../constants';
+import { isSameLocalMonth, buildMonthGrid } from '../calendar/utils/intl-calendar';
 
 export const buildAppointmentsUrl = (isoDate: string): string => {
   const startOfDay = dayjs(isoDate).startOf('day').format(omrsDateFormat);
   return `${restBaseUrl}/appointments?forDate=${encodeURIComponent(startOfDay)}`;
 };
 
-export const formatAMPM = (date: Date): string => {
-  const hours24 = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours24 >= 12 ? 'PM' : 'AM';
-  const hours12 = hours24 % 12 || 12; // Convert 0 to 12
-  const minutesStr = minutes < 10 ? `0${minutes}` : minutes.toString();
-  return `${hours12}:${minutesStr} ${ampm}`;
+export const formatTime = (date: Date, locale = 'en'): string => {
+  return new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' } as Intl.DateTimeFormatOptions).format(
+    date,
+  );
 };
 
-export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs) => {
-  return cellDate.isSame(currentDate, 'month');
+export const formatAMPM = (date: Date): string => formatTime(date, 'en');
+
+/**
+ * Returns true when two Dayjs dates fall in the same month.
+ *
+ * When a `calendar` object is provided the comparison is made in the local
+ * calendar system (e.g., Ethiopian months) rather than the Gregorian month.
+ * Falls back to a pure Gregorian comparison when no calendar is supplied.
+ *
+ * @param cellDate    - The cell date to test
+ * @param currentDate - The currently selected/displayed date
+ * @param calendar    - Optional @internationalized/date Calendar object
+ */
+export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs, calendar?: Calendar) => {
+  if (!calendar || calendar.identifier === 'gregory') {
+    return cellDate.isSame(currentDate, 'month');
+  }
+  return isSameLocalMonth(cellDate.format('YYYY-MM-DD'), currentDate.format('YYYY-MM-DD'), calendar);
 };
 
-export const monthDays = (currentDate: Dayjs) => {
+/**
+ * Builds the list of Dayjs dates that should appear in the monthly calendar grid.
+ *
+ * When a `calendar` object is provided the grid respects the local calendar
+ * month boundaries (e.g., Ethiopian months of 30 days, 13-month year).
+ * Leading/trailing days from adjacent months fill out complete 7-day rows.
+ *
+ * @param currentDate - The currently selected date (Gregorian Dayjs)
+ * @param calendar    - Optional @internationalized/date Calendar object
+ */
+export const monthDays = (currentDate: Dayjs, calendar?: Calendar): Dayjs[] => {
+  if (calendar && calendar.identifier !== 'gregory') {
+    return buildMonthGrid(currentDate, calendar).map((iso) => dayjs(iso));
+  }
+
   const monthStart = dayjs(currentDate).startOf('month');
   const monthEnd = dayjs(currentDate).endOf('month');
-  const monthDays = dayjs(currentDate).daysInMonth();
+  const daysInMonth = dayjs(currentDate).daysInMonth();
   const lastMonth = dayjs(currentDate).subtract(1, 'month');
   const nextMonth = dayjs(currentDate).add(1, 'month');
-  let days: Dayjs[] = [];
+  const days: Dayjs[] = [];
 
   for (let i = lastMonth.daysInMonth() - monthStart.day() + 1; i <= lastMonth.daysInMonth(); i++) {
     days.push(lastMonth.date(i));
   }
-
-  for (let i = 1; i <= monthDays; i++) {
+  for (let i = 1; i <= daysInMonth; i++) {
     days.push(currentDate.date(i));
   }
-
   const dayLen = days.length > 30 ? 7 : 14;
-
   for (let i = 1; i < dayLen - monthEnd.day(); i++) {
     days.push(nextMonth.date(i));
   }

@@ -7,6 +7,7 @@ import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { type Appointment } from '../../types';
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
 import { appointmentsFormWorkspace } from '../../constants';
+import { useCalendarFormat } from '../calendar-utils';
 import {
   buildHourSlots,
   buildTimelineRanges,
@@ -37,6 +38,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
   selectedServiceUuids = [],
 }) => {
   const { t } = useTranslation();
+  const { locale } = useCalendarFormat();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
   const { appointments, isLoading, error } = useAppointmentsByDate(isoDate);
 
@@ -149,13 +151,14 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
               onBlockClick={handleBlockClick}
               onOpenTable={handleOpenTable}
               serviceColorMap={serviceColorMap}
+              locale={locale}
             />,
           );
         }
       }
       return rows;
     },
-    [slotByHour, handleBlockClick, handleOpenTable, serviceColorMap],
+    [slotByHour, handleBlockClick, handleOpenTable, serviceColorMap, locale],
   );
 
   if (isLoading) {
@@ -181,7 +184,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
 
   const tableAppointments = tableHour != null ? (slotByHour.get(tableHour)?.allAppointments ?? []) : [];
   const hourRangeLabel =
-    tableHour != null ? `${formatHourLabel(tableHour)} – ${formatHourLabel((tableHour + 1) % 24)}` : '';
+    tableHour != null ? `${formatHourLabel(tableHour, locale)} – ${formatHourLabel((tableHour + 1) % 24, locale)}` : '';
 
   return (
     <div ref={containerRef} className={styles.container} data-testid="daily-calendar">
@@ -235,6 +238,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
                   state="collapsed"
                   onToggle={() => toggleRange(key, count, defaultState)}
                   count={count}
+                  locale={locale}
                 />
               );
             }
@@ -248,6 +252,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
                   state={state}
                   onToggle={() => toggleRange(key, count, defaultState)}
                   count={count}
+                  locale={locale}
                 />
                 {renderHourRange(range.h0, range.h1, state, filterEmpty)}
               </React.Fragment>

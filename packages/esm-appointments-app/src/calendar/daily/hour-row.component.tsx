@@ -11,10 +11,11 @@ interface HourRowProps {
   onBlockClick: (appointment: Appointment) => void;
   onOpenTable: (hour: number) => void;
   serviceColorMap?: Map<string, string>;
+  locale?: string;
 }
 
-const HourRow: React.FC<HourRowProps> = ({ slot, onBlockClick, onOpenTable, serviceColorMap }) => {
-  const hourLabel = formatHourLabel(slot.hour);
+const HourRow: React.FC<HourRowProps> = ({ slot, onBlockClick, onOpenTable, serviceColorMap, locale = 'en' }) => {
+  const hourLabel = formatHourLabel(slot.hour, locale);
   const minHeightStyle = { minHeight: `${slot.minHeightPx}px` };
 
   return (
@@ -37,6 +38,7 @@ const HourRow: React.FC<HourRowProps> = ({ slot, onBlockClick, onOpenTable, serv
               block={block}
               onClick={() => onBlockClick(block.appointment)}
               serviceColorMap={serviceColorMap}
+              locale={locale}
             />
           ))
         ) : (

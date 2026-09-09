@@ -7,6 +7,7 @@ import ServiceFilter from './filter/service-filter.component';
 import CalendarPageHeader from './calendar/header/calendar-page-header.component';
 import CalendarView from './calendar/calendar-view.component';
 import { buildServiceColorMap } from './calendar/utils/calendar-colors';
+import { useCalendarFormat, addLocalMonth } from './calendar/calendar-utils';
 import { type CalendarViewMode, type LegendService } from './types';
 import styles from './calendar/appointments-calendar-view-view.scss';
 
@@ -15,6 +16,8 @@ const AppointmentsCalendarContainer: React.FC = () => {
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
   const [dailyAppointmentCount, setDailyAppointmentCount] = useState<number | null>(null);
+
+  const { calendar } = useCalendarFormat();
 
   const { selectedServiceUuids, serviceTypes, onServiceChange } = useServiceFilter();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
@@ -50,21 +53,21 @@ const AppointmentsCalendarContainer: React.FC = () => {
 
   const handlePrev = useCallback(() => {
     if (viewMode === 'monthly') {
-      setCalendarSelectedDate((d) => d.subtract(1, 'month'));
+      setCalendarSelectedDate((d) => dayjs(addLocalMonth(d, -1, calendar)));
     } else {
       setDailyAppointmentCount(null);
       setCalendarSelectedDate((d) => d.subtract(1, 'day'));
     }
-  }, [viewMode]);
+  }, [viewMode, calendar]);
 
   const handleNext = useCallback(() => {
     if (viewMode === 'monthly') {
-      setCalendarSelectedDate((d) => d.add(1, 'month'));
+      setCalendarSelectedDate((d) => dayjs(addLocalMonth(d, 1, calendar)));
     } else {
       setDailyAppointmentCount(null);
       setCalendarSelectedDate((d) => d.add(1, 'day'));
     }
-  }, [viewMode]);
+  }, [viewMode, calendar]);
 
   const handleToday = useCallback(() => {
     if (viewMode === 'daily') {

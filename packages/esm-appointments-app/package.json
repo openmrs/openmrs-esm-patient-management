@@ -40,6 +40,7 @@
   "dependencies": {
     "@carbon/react": "^1.83.0",
     "@hookform/resolvers": "^3.9.1",
+    "@internationalized/date": "^3.5.0",
     "classnames": "^2.3.2",
     "formik": "^2.2.9",
     "lodash-es": "^4.17.15",
