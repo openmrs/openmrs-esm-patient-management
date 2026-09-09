@@ -327,4 +327,58 @@ describe('DailyCalendarView', () => {
     expect(screen.queryByTestId('hour-row-11')).not.toBeInTheDocument();
     expect(screen.queryByTestId('hour-row-19')).not.toBeInTheDocument();
   });
+
+  it('filters appointments by selectedServiceUuids', async () => {
+    const serviceA = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
+    const serviceB = 'f3fd0df1-fd49-5e3c-bf7d-60d93fb41c01';
+
+    const apptA = appointmentAt('09:00', 'appt-1'); // has serviceA (Outpatient)
+    const apptB = mockAppointment({
+      uuid: 'appt-2',
+      startDateTime: new Date('2026-06-09T09:15:00').getTime(),
+      endDateTime: new Date('2026-06-09T09:30:00').getTime(),
+      patient: { identifier: '100XYZ', name: 'Jane Smith', uuid: 'patient-jane' },
+      service: { ...mockAppointment().service, uuid: serviceB, name: 'Dental' },
+    });
+
+    mockOpenmrsFetch.mockResolvedValue({ data: [apptA, apptB] } as FetchResponse);
+
+    const onCountChange = vi.fn();
+    renderWithSwr(
+      <DailyCalendarView
+        {...defaultProps}
+        selectedServiceUuids={[serviceA]}
+        onAppointmentCountChange={onCountChange}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('John Wilson')).toBeInTheDocument();
+      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+      expect(onCountChange).toHaveBeenLastCalledWith(1);
+    });
+  });
+
+  it('shows empty state when all appointments are filtered out', async () => {
+    const serviceA = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
+    const otherService = 'other-service-uuid';
+
+    const appt = appointmentAt('09:00', 'appt-1'); // has serviceA
+    mockOpenmrsFetch.mockResolvedValue({ data: [appt] } as FetchResponse);
+
+    const onCountChange = vi.fn();
+    renderWithSwr(
+      <DailyCalendarView
+        {...defaultProps}
+        selectedServiceUuids={[otherService]}
+        onAppointmentCountChange={onCountChange}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('daily-empty-state')).toBeInTheDocument();
+      expect(screen.queryByText('John Wilson')).not.toBeInTheDocument();
+      expect(onCountChange).toHaveBeenLastCalledWith(0);
+    });
+  });
 });

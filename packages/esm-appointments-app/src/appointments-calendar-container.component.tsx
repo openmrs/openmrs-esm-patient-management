@@ -14,6 +14,7 @@ const AppointmentsCalendarContainer: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
+  const [dailyAppointmentCount, setDailyAppointmentCount] = useState<number | null>(null);
 
   const { selectedServiceUuids, serviceTypes, onServiceChange } = useServiceFilter();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
@@ -22,7 +23,7 @@ const AppointmentsCalendarContainer: React.FC = () => {
     selectedServiceUuids,
   });
 
-  const appointmentCount = useMemo(
+  const monthlyAppointmentCount = useMemo(
     () =>
       (calendarEvents ?? []).reduce(
         (totalCount, event) =>
@@ -31,6 +32,8 @@ const AppointmentsCalendarContainer: React.FC = () => {
       ),
     [calendarEvents],
   );
+
+  const appointmentCount = viewMode === 'daily' ? dailyAppointmentCount : monthlyAppointmentCount;
 
   const legendServices = useMemo<LegendService[]>(() => {
     const legendMap = new Map<string, LegendService>();
@@ -46,18 +49,39 @@ const AppointmentsCalendarContainer: React.FC = () => {
   }, [calendarEvents]);
 
   const handlePrev = useCallback(() => {
-    setCalendarSelectedDate((d) => (viewMode === 'monthly' ? d.subtract(1, 'month') : d.subtract(1, 'day')));
+    if (viewMode === 'monthly') {
+      setCalendarSelectedDate((d) => d.subtract(1, 'month'));
+    } else {
+      setDailyAppointmentCount(null);
+      setCalendarSelectedDate((d) => d.subtract(1, 'day'));
+    }
   }, [viewMode]);
 
   const handleNext = useCallback(() => {
-    setCalendarSelectedDate((d) => (viewMode === 'monthly' ? d.add(1, 'month') : d.add(1, 'day')));
+    if (viewMode === 'monthly') {
+      setCalendarSelectedDate((d) => d.add(1, 'month'));
+    } else {
+      setDailyAppointmentCount(null);
+      setCalendarSelectedDate((d) => d.add(1, 'day'));
+    }
   }, [viewMode]);
 
-  const handleToday = useCallback(() => setCalendarSelectedDate(dayjs()), []);
+  const handleToday = useCallback(() => {
+    if (viewMode === 'daily') {
+      setDailyAppointmentCount(null);
+    }
+    setCalendarSelectedDate(dayjs());
+  }, [viewMode]);
 
-  const handleViewModeChange = useCallback((mode: CalendarViewMode) => setViewMode(mode), []);
+  const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
+    if (mode === 'daily') {
+      setDailyAppointmentCount(null);
+    }
+    setViewMode(mode);
+  }, []);
 
   const handleSelectDate = useCallback((isoDate: string) => {
+    setDailyAppointmentCount(null);
     setCalendarSelectedDate(dayjs(isoDate));
     setViewMode('daily');
   }, []);
@@ -81,6 +105,8 @@ const AppointmentsCalendarContainer: React.FC = () => {
         appointmentCount={appointmentCount}
         legendServices={legendServices}
         serviceColorMap={serviceColorMap}
+        selectedServiceUuids={selectedServiceUuids}
+        onDailyCountChange={setDailyAppointmentCount}
         onViewModeChange={handleViewModeChange}
         onPrev={handlePrev}
         onNext={handleNext}

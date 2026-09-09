@@ -10,9 +10,11 @@ interface CalendarViewProps {
   viewMode: CalendarViewMode;
   calendarSelectedDate: Dayjs;
   events: Array<DailyAppointmentsCountByService>;
-  appointmentCount: number;
+  appointmentCount?: number | null;
   legendServices: Array<LegendService>;
   serviceColorMap: Map<string, string>;
+  selectedServiceUuids?: string[];
+  onDailyCountChange?: (count: number | null) => void;
   onViewModeChange: (mode: CalendarViewMode) => void;
   onPrev: () => void;
   onNext: () => void;
@@ -27,6 +29,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   appointmentCount,
   legendServices,
   serviceColorMap,
+  selectedServiceUuids,
+  onDailyCountChange,
   onViewModeChange,
   onPrev,
   onNext,
@@ -53,7 +57,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         />
       )}
       {viewMode === 'daily' && (
-        <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
+        <DailyCalendarView
+          calendarSelectedDate={calendarSelectedDate}
+          serviceColorMap={serviceColorMap}
+          selectedServiceUuids={selectedServiceUuids}
+          onAppointmentCountChange={onDailyCountChange}
+        />
       )}
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />
     </>

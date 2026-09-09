@@ -25,6 +25,7 @@ interface DailyCalendarViewProps {
   calendarSelectedDate: Dayjs;
   onAppointmentCountChange?: (count: number | null) => void;
   serviceColorMap?: Map<string, string>;
+  selectedServiceUuids?: string[];
 }
 
 const rangeKey = (kind: string, h0: number, h1: number) => `${kind}-${h0}-${h1}`;
@@ -33,10 +34,18 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
   calendarSelectedDate,
   onAppointmentCountChange,
   serviceColorMap,
+  selectedServiceUuids = [],
 }) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
   const { appointments, isLoading, error } = useAppointmentsByDate(isoDate);
+
+  const filteredAppointments = useMemo(() => {
+    if (!selectedServiceUuids || selectedServiceUuids.length === 0) {
+      return appointments;
+    }
+    return appointments.filter((appt) => appt.service?.uuid && selectedServiceUuids.includes(appt.service.uuid));
+  }, [appointments, selectedServiceUuids]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(DEFAULT_CONTAINER_WIDTH_PX);
@@ -67,7 +76,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
   const laneCeiling = useMemo(() => getLaneCeiling(containerWidth), [containerWidth]);
 
   const { timelineRanges, slotByHour, rangeCounts } = useMemo(() => {
-    const slots = buildHourSlots(appointments, laneCeiling);
+    const slots = buildHourSlots(filteredAppointments, laneCeiling);
     const ranges = buildTimelineRanges();
     const byHour = new Map<number, HourSlot>(slots.map((slot) => [slot.hour, slot]));
     const counts = new Map<string, number>();
@@ -85,7 +94,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
       slotByHour: byHour,
       rangeCounts: counts,
     };
-  }, [appointments, laneCeiling]);
+  }, [filteredAppointments, laneCeiling]);
 
   useEffect(() => {
     setRangeStates(new Map());
@@ -94,8 +103,8 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
   }, [isoDate, onAppointmentCountChange]);
 
   useEffect(() => {
-    onAppointmentCountChange?.(isLoading ? null : appointments.length);
-  }, [appointments, isLoading, onAppointmentCountChange]);
+    onAppointmentCountChange?.(isLoading ? null : filteredAppointments.length);
+  }, [filteredAppointments, isLoading, onAppointmentCountChange]);
 
   const handleBlockClick = useCallback((appointment: Appointment) => {
     if (appointment?.patient?.uuid) {
@@ -199,7 +208,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
         </div>
       ) : (
         <div className={styles.dayBody} role="list">
-          {appointments.length === 0 && (
+          {filteredAppointments.length === 0 && (
             <div className={styles.emptyStateBanner} data-testid="daily-empty-state">
               <p className={styles.emptyStateText}>
                 {t('noAppointmentsScheduledForDate', 'No appointments scheduled for this date')}
