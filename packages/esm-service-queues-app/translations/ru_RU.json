@@ -1,5 +1,7 @@
 {
   "actions": "Действия",
+  "activeQueueEntriesUnavailable": "Cannot check the patient’s current queues",
+  "activeQueueEntriesUnavailableDetail": "The list shows all services, including the queues this patient is already in. If you select one of those, the system rejects the entry when you save.",
   "addAPatientToThisList": "Добавить в список",
   "addedPatientToQueue": "Пациент помещен в очередь",
   "addingPatientToQueue": "Добавляю пациента в очередь",
@@ -94,6 +96,7 @@
   "patientAttendingService": "Пациент обслуживается",
   "patientGender": "Пол",
   "patientId": "ID пациента",
+  "patientInEveryQueueAtLocation": "This patient is already in every queue at this location",
   "patientName": "Имя пациента",
   "patientRemoved": "Пациент удалён",
   "patientRemovedFailed": "Ошибка при удалении пациента из очереди",
