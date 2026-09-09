@@ -19,8 +19,9 @@
 
 .emptyStateContent {
   @include type.type-style('heading-compact-01');
-  color: var(--cds-text-secondary);
+  color: $text-02;
   margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
 }
 
 .gridFlow {

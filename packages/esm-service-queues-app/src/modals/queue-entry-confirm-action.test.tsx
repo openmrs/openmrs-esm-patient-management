@@ -155,4 +155,25 @@ describe('EndQueueEntryModal', () => {
     expect(mockMutateQueueEntries).toHaveBeenCalled();
     expect(closeModal).toHaveBeenCalled();
   });
+
+  it('shows the global error message instead of the generic validation message', async () => {
+    mockOpenmrsFetch.mockRejectedValue({
+      responseBody: {
+        error: {
+          message: 'Invalid Submission',
+          globalErrors: [{ code: 'queue.entry.error.duplicate', message: 'This patient is already in this queue' }],
+        },
+      },
+    });
+
+    const user = userEvent.setup();
+
+    renderWithSwr(<RemoveQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
+
+    await user.click(screen.getByRole('button', { name: /Remove/ }));
+
+    expect(showSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'error', subtitle: 'This patient is already in this queue' }),
+    );
+  });
 });
