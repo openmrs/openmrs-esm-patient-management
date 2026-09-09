@@ -17,6 +17,8 @@ interface CalendarHeaderProps {
   onToday: () => void;
 }
 
+const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
+
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewMode,
   calendarSelectedDate,
@@ -63,7 +65,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   }, [viewMode, appointmentCount, t]);
 
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
-  const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
 
   return (
     <div className={styles.calendarHeaderContainer}>
