@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "Vârstă",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Luna nașterii",
   "nextPage": "Pagina următoare",
   "noPatientChartsFoundMessage": "Ne pare rău, nu au fost găsite fișe de pacient",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "No recently viewed patients",
   "other": "Altul",
   "postcode": "Cod poștal",
