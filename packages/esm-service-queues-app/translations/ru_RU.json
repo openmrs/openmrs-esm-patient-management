@@ -1,5 +1,7 @@
 {
   "actions": "Действия",
+  "activeQueueEntriesUnavailable": "Невозможно проверить состояние очередей пациента",
+  "activeQueueEntriesUnavailableDetail": "Отражены все направления, включая очереди в которых пациент уже находится. Если вы выберите одно из них система не примет изменения при операции сохранения.",
   "addAPatientToThisList": "Добавить в список",
   "addedPatientToQueue": "Пациент помещен в очередь",
   "addingPatientToQueue": "Добавляю пациента в очередь",
@@ -94,6 +96,7 @@
   "patientAttendingService": "Пациент обслуживается",
   "patientGender": "Пол",
   "patientId": "ID пациента",
+  "patientInEveryQueueAtLocation": "Пациент уже в каждой очереди этой локации",
   "patientName": "Имя пациента",
   "patientRemoved": "Пациент удалён",
   "patientRemovedFailed": "Ошибка при удалении пациента из очереди",
