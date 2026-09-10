@@ -1,9 +1,10 @@
-import React, { forwardRef, useCallback } from 'react';
+﻿import React, { forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
+import { useMinSearchCharacters } from '../patient-search.resource';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
@@ -12,8 +13,9 @@ interface PatientSearchProps extends PatientSearchResponse {
 }
 
 const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
+  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, query, setPage, totalResults }, ref) => {
     const { t } = useTranslation();
+    const { minSearchCharacters } = useMinSearchCharacters();
 
     const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
 
@@ -45,6 +47,25 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
               </div>
             </Tile>
           </Layer>
+        </div>
+      );
+    }
+
+    if (query.trim().length < minSearchCharacters) {
+      return (
+        <div className={styles.searchResultsContainer}>
+          <div className={styles.searchResults}>
+            <Layer>
+              <Tile className={styles.emptySearchResultsTile}>
+                <EmptyCardIllustration />
+                <p className={styles.emptyResultText}>
+                  {t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+                    count: minSearchCharacters,
+                  })}
+                </p>
+              </Tile>
+            </Layer>
+          </div>
         </div>
       );
     }
