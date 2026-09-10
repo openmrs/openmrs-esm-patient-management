@@ -65,7 +65,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
-  const { selectedServiceUuid } = useServiceQueuesStore();
+  const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const {
@@ -78,7 +78,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
     clearErrors,
   } = useForm({
     defaultValues: {
-      queueLocation: sessionLocation?.uuid ?? '',
+      queueLocation: selectedQueueLocationUuid ?? sessionLocation?.uuid ?? '',
       queueService: selectedServiceUuid ?? '',
       priority: '',
     },
@@ -164,20 +164,6 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   useEffect(() => {
     setOnSubmit?.(onSubmit);
   }, [onSubmit, setOnSubmit]);
-
-  useEffect(() => {
-    if (!isLoadingQueueLocations) {
-      if (queueLocation) {
-        if (!queueLocations.some((l) => l.id === queueLocation)) {
-          setValue('queueLocation', '');
-        }
-      } else if (sessionLocation?.uuid) {
-        if (queueLocations.some((l) => l.id === sessionLocation.uuid)) {
-          setValue('queueLocation', sessionLocation.uuid);
-        }
-      }
-    }
-  }, [isLoadingQueueLocations, queueLocation, sessionLocation, queueLocations, setValue]);
 
   useEffect(() => {
     if (queueLocation && queueService) {
