@@ -90,7 +90,7 @@ export const defaultColumnConfig: ColumnConfig = {
 };
 
 export const defaultQueueTable: TableDefinitions = {
-  columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+  columns: ['patient-name', 'coming-from', 'priority', 'queue-number', 'queue', 'wait-time', 'actions'],
   appliedTo: [{ queue: '', status: '' }],
 };
 

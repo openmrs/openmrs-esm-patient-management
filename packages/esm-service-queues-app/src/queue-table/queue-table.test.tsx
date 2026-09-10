@@ -5,7 +5,13 @@ import { screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { mockPriorityNonUrgent, mockPriorityUrgent, mockQueueEntries, mockSession } from '__mocks__';
+import {
+  mockPriorityNonUrgent,
+  mockPriorityUrgent,
+  mockQueueEntries,
+  mockQueueEntryAlice,
+  mockSession,
+} from '__mocks__';
 import QueueTable from './queue-table.component';
 
 const mockUseSession = vi.mocked(useSession);
@@ -82,7 +88,7 @@ describe('QueueTable', () => {
     expect(rows).toHaveLength(1); // should only have the header row
 
     const headerRow = rows[0];
-    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
+    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /queue number/i, /queue/i, /wait time/i, /actions/i];
     const headers = within(headerRow).getAllByRole('columnheader');
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
@@ -92,15 +98,22 @@ describe('QueueTable', () => {
   });
 
   it('renders queue entries with default columns', () => {
+    mockUseConfig.mockReturnValue({
+      ...configDefaults,
+      visitQueueNumberAttributeUuid: 'queue-number-visit-attr-type-uuid',
+    });
+
     renderQueueTable({ queueEntries: mockQueueEntries });
 
     for (const entry of mockQueueEntries) {
       const patientName = entry.patient.person.display;
       const row = screen.getByText(patientName).closest('tr');
 
-      expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
       expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
     }
+
+    const aliceRow = screen.getByText(mockQueueEntryAlice.patient.person.display).closest('tr');
+    expect(within(aliceRow).getByText('42')).toBeInTheDocument();
   });
 
   it('allows modifying the columns of the table applied to all queues and statuses', () => {
@@ -126,6 +139,11 @@ describe('QueueTable', () => {
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
     }
+
+    for (const entry of mockQueueEntries) {
+      const row = screen.getByText(entry.patient.person.display).closest('tr');
+      expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
+    }
   });
 
   it('will use the correct default table even when not provided explicitly in the config', () => {
@@ -138,7 +156,7 @@ describe('QueueTable', () => {
 
     const rows = screen.queryAllByRole('row');
     const headerRow = rows[0];
-    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
+    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /queue number/i, /queue/i, /wait time/i, /actions/i];
     const headers = within(headerRow).getAllByRole('columnheader');
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);

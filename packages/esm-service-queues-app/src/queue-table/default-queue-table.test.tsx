@@ -99,7 +99,7 @@ describe('DefaultQueueTable', () => {
       /name/i,
       /priority/i,
       /coming from/i,
-      /status/i,
+      /queue number/i,
       /^queue$/i,
       /wait time/i,
       /actions/i,
