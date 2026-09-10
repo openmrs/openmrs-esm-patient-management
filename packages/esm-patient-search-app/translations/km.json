@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "អាយុ",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Month of Birth",
   "nextPage": "ទំbពbរ័bបន្ទាប់",
   "noPatientChartsFoundMessage": "សូមអភ័យទោស រកមិនឃើញតារាងអ្នកជំងឺទេ។",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "No recently viewed patients",
   "other": "ផ្សេងទៀត",
   "postcode": "លេខកូដប្រៃសណីយ៍",
