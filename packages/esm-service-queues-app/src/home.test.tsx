@@ -45,10 +45,11 @@ vi.mocked(useQueueEntries).mockReturnValue({
   mutate: vi.fn(),
 });
 
-function givenConfig() {
+function givenConfig(overrides: Partial<ConfigObject> = {}) {
   mockUseConfig.mockReturnValue({
     ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
     visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    ...overrides,
   });
 }
 
@@ -99,6 +100,17 @@ describe('Home Component', () => {
     expect(screen.getByTestId('header-metrics')).toBeInTheDocument();
   });
 
+  // userHasAccess grants every user access when the privilege is falsy, so an empty config must not.
+  it('shows no tabs when the privilege is configured empty, rather than opening them to everyone', () => {
+    givenConfig({ clinicAdministratorScreen: { privilege: '' } });
+    mockUserHasAccess.mockReturnValue(true);
+
+    render(<Home />);
+
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
+  });
+
   describe('for a clinic administrator', () => {
     beforeEach(() => {
       mockUserHasAccess.mockReturnValue(true);
@@ -107,6 +119,7 @@ describe('Home Component', () => {
     it('opens on the clinic overview, since an administrator wants every queue first', () => {
       render(<Home />);
 
+      expect(mockUserHasAccess).toHaveBeenCalledWith('App: Service Queues Clinic Administrator', { uuid: 'user-1' });
       expect(screen.getByRole('tab', { name: /clinic overview/i })).toHaveAttribute('aria-selected', 'true');
       expect(screen.getByTestId('clinic-overview')).toBeInTheDocument();
     });

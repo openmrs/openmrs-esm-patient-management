@@ -138,6 +138,21 @@ describe('ClinicOverview', () => {
     expect(screen.getAllByRole('columnheader')).toHaveLength(7);
   });
 
+  it('shows a retired queue by name with a Retired tag and no link', () => {
+    givenMetrics({
+      rollups: [
+        ...rollups,
+        rollup({ ...queue('q4', 'Old triage', 'Outpatient clinic', 'Triage'), retired: true }, 1, 0, 5),
+      ],
+    });
+    render(<ClinicOverview />);
+
+    const oldTriage = screen.getByRole('row', { name: /old triage/i });
+    expect(within(oldTriage).getAllByRole('cell')[0]).toHaveTextContent(/^Old triage\s*Retired$/);
+    expect(screen.queryByRole('link', { name: /old triage/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Clinician review' })).toBeInTheDocument();
+  });
+
   it('puts the queue with the longest wait first', () => {
     render(<ClinicOverview />);
 

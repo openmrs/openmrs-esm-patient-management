@@ -13,7 +13,7 @@ import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 interface QueueTablesForAllStatusesProps {
   selectedQueue?: Queue; // absent if the uuid matched no queue
   isLoadingQueue: boolean;
-  errorFetchingQueue: Error;
+  errorFetchingQueue: Error | undefined | null;
 }
 
 /**
@@ -39,8 +39,6 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     );
   }
 
-  // The queue list leaves out retired queues, but the clinic overview links whatever the queue entries
-  // report, so a retired queue resolves to nothing here, and does so without erroring.
   if (errorFetchingQueue || !selectedQueue) {
     return (
       <InlineNotification

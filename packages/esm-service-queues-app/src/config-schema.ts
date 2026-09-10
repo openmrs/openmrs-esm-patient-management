@@ -166,9 +166,7 @@ export const configSchema = {
         'The privilege that grants a clinic-wide monitoring tab on the Service Queues dashboard, opened ' +
         'first, with the standard waiting list on a second tab. Users without the privilege see no tabs ' +
         'and their dashboard is unchanged. Must match the privilege defined in your distribution content; ' +
-        'until it is attached to a role, only System Developers see the tab. ' +
-        'Requires queue module 3.1.0 or newer: earlier versions of /queue-entry-metric understand neither ' +
-        '`groupBy` nor the open-wait metric names, and the tab shows an empty clinic rather than an error.',
+        'until it is attached to a role, only System Developers see the tab.',
     },
   },
   concepts: {

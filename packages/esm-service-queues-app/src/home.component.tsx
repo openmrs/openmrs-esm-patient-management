@@ -22,8 +22,10 @@ const Home: React.FC = () => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(clinicOverviewTabIndex);
 
   // Until the session resolves, fall back to the standard dashboard rather than to nothing: the tab
-  // strip appearing a moment late is a far smaller cost than a blank Service Queues page.
-  const showClinicOverview = Boolean(session?.user) && userHasAccess(privilege, session.user);
+  // strip appearing a moment late is a far smaller cost than a blank Service Queues page. An empty
+  // privilege must hide the tabs rather than open them to everyone, since userHasAccess grants access
+  // to every user when the privilege is falsy.
+  const showClinicOverview = Boolean(privilege) && Boolean(session?.user) && userHasAccess(privilege, session.user);
 
   if (!showClinicOverview) {
     return (

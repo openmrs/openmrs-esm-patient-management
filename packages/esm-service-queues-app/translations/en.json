@@ -146,6 +146,7 @@
   "removePatient": "Remove patient",
   "removePatientFromQueue": "Remove {{patient}} from queue?",
   "requeue": "Requeue",
+  "retired": "Retired",
   "room": "Room",
   "save": "Save",
   "saving": "Saving",

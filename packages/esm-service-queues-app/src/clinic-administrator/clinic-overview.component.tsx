@@ -10,6 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ConfigurableLink, ErrorState, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -45,11 +46,17 @@ const ClinicOverview: React.FC = () => {
       {
         key: 'queue',
         header: t('queue', 'Queue'),
-        renderCell: ({ queue }) => (
-          <ConfigurableLink to={`${spaBasePath}/service-queues/queue-table-by-status/${queue.uuid}`}>
-            {queue.display}
-          </ConfigurableLink>
-        ),
+        // A retired queue has no page to link to, since the queue list leaves retired queues out.
+        renderCell: ({ queue }) =>
+          queue.retired ? (
+            <>
+              {queue.display} <Tag type="gray">{t('retired', 'Retired')}</Tag>
+            </>
+          ) : (
+            <ConfigurableLink to={`${spaBasePath}/service-queues/queue-table-by-status/${queue.uuid}`}>
+              {queue.display}
+            </ConfigurableLink>
+          ),
       },
       { key: 'location', header: t('location', 'Location') },
       { key: 'service', header: t('service', 'Service') },
@@ -123,7 +130,12 @@ const ClinicOverview: React.FC = () => {
     <>
       <div className={metricsStyles.metricsBorder} data-testid="clinic-administrator-metrics">
         {totalsCards.map(({ key, title, value }) => (
-          <QueueMetricTile key={key} headerLabel={title} value={isLoading || error || value == null ? '--' : value} />
+          <QueueMetricTile
+            key={key}
+            headerLabel={title}
+            value={error || value == null ? '--' : value}
+            isLoading={isLoading}
+          />
         ))}
       </div>
 

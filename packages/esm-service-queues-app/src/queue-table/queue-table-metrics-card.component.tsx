@@ -1,17 +1,18 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Layer, Tile } from '@carbon/react';
+import { Layer, SkeletonText, Tile } from '@carbon/react';
 import { useQueueEntriesMetrics } from '../hooks/useQueueEntries';
 import styles from './queue-table-metrics-card.scss';
 
 interface QueueMetricTileProps {
   value: React.ReactNode;
   headerLabel: string;
+  isLoading?: boolean;
   children?: React.ReactNode;
 }
 
 /** One tile in a metrics strip, for a figure the caller already has. */
-export const QueueMetricTile: React.FC<QueueMetricTileProps> = ({ value, headerLabel, children }) => {
+export const QueueMetricTile: React.FC<QueueMetricTileProps> = ({ value, headerLabel, isLoading, children }) => {
   return (
     <Layer
       className={classNames(styles.container, {
@@ -24,9 +25,7 @@ export const QueueMetricTile: React.FC<QueueMetricTileProps> = ({ value, headerL
             {children}
           </div>
         </div>
-        <div>
-          <label className={styles.valueLabel}>{value}</label>
-        </div>
+        <div>{isLoading ? <SkeletonText /> : <label className={styles.valueLabel}>{value}</label>}</div>
       </Tile>
     </Layer>
   );
@@ -36,15 +35,22 @@ interface QueueTableMetricsCardProps {
   queueUuid?: string;
   status?: string;
   headerLabel: string;
+  isLoading?: boolean;
   children?: React.ReactNode;
 }
 
 /** A tile that counts a queue and status for itself. */
-const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({ queueUuid, status, headerLabel, children }) => {
+const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
+  queueUuid,
+  status,
+  headerLabel,
+  isLoading,
+  children,
+}) => {
   const { count } = useQueueEntriesMetrics({ queue: queueUuid, status: status, isEnded: false });
 
   return (
-    <QueueMetricTile headerLabel={headerLabel} value={count}>
+    <QueueMetricTile headerLabel={headerLabel} value={count} isLoading={isLoading}>
       {children}
     </QueueMetricTile>
   );

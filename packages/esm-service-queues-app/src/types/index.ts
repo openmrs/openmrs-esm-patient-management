@@ -178,6 +178,7 @@ export type QueueTableColumnFunction = (
 export interface Queue {
   uuid: string;
   display: string;
+  retired?: boolean;
   name: string;
   description: string;
   location: Location;
