@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { formatDurationBetween } from '@openmrs/esm-framework';
+import { useCurrentTime } from '../../hooks/useCurrentTime';
 import { type WaitTimeThresholdConfig } from '../../config-schema';
 import styles from './queue-duration.scss';
 
@@ -23,20 +24,15 @@ function getWaitTimeColor(totalMinutes: number, thresholds: WaitTimeThresholdCon
 }
 
 function DurationString({ startedAt, endedAt, thresholds }: QueueDurationProps) {
-  const [currentTime, setCurrentTime] = useState(dayjs());
+  const currentTime = useCurrentTime();
 
-  useEffect(() => {
-    const handle = setInterval(() => setCurrentTime(dayjs()), 60000);
-    return () => clearInterval(handle);
-  }, []);
-
-  const referenceTime = endedAt ?? currentTime.toDate();
+  const referenceTime = endedAt ?? currentTime;
   const color = getWaitTimeColor(dayjs(referenceTime).diff(startedAt, 'minutes'), thresholds);
 
   return (
     <span className={classNames(color && styles[color])}>
       {formatDurationBetween(startedAt, referenceTime, {
-        largestUnit: 'hour',
+        largestUnit: 'day',
         smallestUnit: 'minute',
         formatOptions: { style: 'long', minutesDisplay: 'always' },
       })}
