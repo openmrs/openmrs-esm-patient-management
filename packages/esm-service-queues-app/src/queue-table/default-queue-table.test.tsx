@@ -15,6 +15,7 @@ import { renderWithSwr } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { useQueueLocations } from '../create-queue-entry/hooks/useQueueLocations';
 import { useQueueEntries } from '../hooks/useQueueEntries';
+import { type Concept } from '../types';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -136,6 +137,94 @@ describe('DefaultQueueTable', () => {
 
     expect(screen.getByRole('heading', { name: /waiting list \(1\)/i })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Alice Johnson/i })).not.toBeInTheDocument();
+  });
+
+  describe('when scoped to one status of one queue', () => {
+    beforeEach(() => {
+      mockQueueLocations.mockReturnValue({ queueLocations: [], isLoading: false, error: null });
+      mockUseQueueEntries.mockReturnValue({
+        queueEntries: [],
+        isLoading: false,
+        error: undefined,
+        totalCount: 0,
+        isValidating: false,
+        mutate: vi.fn(),
+      });
+    });
+
+    it('heads the table with the status and offers to add a patient to a waiting list', () => {
+      const waitingStatus = {
+        uuid: getDefaultsFromConfigSchema<ConfigObject>(configSchema).concepts.waitingStatusConceptUuid,
+        display: 'Waiting',
+      } as Concept;
+
+      renderWithSwr(<DefaultQueueTable queueUuid="queue-uuid" status={waitingStatus} />);
+
+      expect(mockUseQueueEntries).toHaveBeenCalledWith({
+        queue: 'queue-uuid',
+        isEnded: false,
+        status: waitingStatus.uuid,
+      });
+      expect(screen.getByRole('heading', { name: /waiting \(0\)/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /add a patient to this list/i })).toBeInTheDocument();
+    });
+
+    it('does not offer to add a patient to a finished-service list', () => {
+      const finishedStatus = { uuid: 'finished-service-uuid', display: 'Finished service' } as Concept;
+
+      renderWithSwr(<DefaultQueueTable queueUuid="queue-uuid" status={finishedStatus} />);
+
+      expect(screen.getByRole('heading', { name: /finished service \(0\)/i })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /add a patient to this list/i })).not.toBeInTheDocument();
+    });
+  });
+
+  // `waitingStatusConceptUuid` says which status the list shows; `defaultStatusConceptUuid` says
+  // which one a new entry starts in. A deployment may separate the two.
+  describe('when the waiting and starting statuses differ', () => {
+    const waitingStatus = { uuid: 'waiting-status-uuid', display: 'Waiting' } as Concept;
+    const startingStatus = { uuid: 'triaged-status-uuid', display: 'Triaged' } as Concept;
+
+    beforeEach(() => {
+      const defaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
+      mockUseConfig.mockReturnValue({
+        ...defaults,
+        concepts: {
+          ...defaults.concepts,
+          defaultStatusConceptUuid: startingStatus.uuid,
+          waitingStatusConceptUuid: waitingStatus.uuid,
+        },
+      });
+      mockQueueLocations.mockReturnValue({ queueLocations: [], isLoading: false, error: null });
+      mockUseQueueEntries.mockReturnValue({
+        queueEntries: [],
+        isLoading: false,
+        error: undefined,
+        totalCount: 0,
+        isValidating: false,
+        mutate: vi.fn(),
+      });
+    });
+
+    it('offers to add a patient on the table the patient will land in', () => {
+      renderWithSwr(<DefaultQueueTable queueUuid="queue-uuid" status={startingStatus} />);
+
+      expect(screen.getByRole('button', { name: /add a patient to this list/i })).toBeInTheDocument();
+    });
+
+    it('does not offer to add a patient to a table they would not appear in', () => {
+      renderWithSwr(<DefaultQueueTable queueUuid="queue-uuid" status={waitingStatus} />);
+
+      expect(screen.queryByRole('button', { name: /add a patient to this list/i })).not.toBeInTheDocument();
+    });
+
+    // The dashboard's own list is where a user adds a patient, whatever status they start in.
+    it('keeps the control on the unscoped waiting list', async () => {
+      rendeDefaultQueueTable();
+
+      await screen.findByRole('table');
+      expect(screen.getByRole('button', { name: /add a patient to this list/i })).toBeInTheDocument();
+    });
   });
 });
 
