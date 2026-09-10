@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "Возраст",
   "ageBelowMinimum": "Введите возраст не менее {{min}}",
   "ageOutOfRange": "Введите возраст между {{min}} и {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Месяц рождения",
   "nextPage": "Следующая страница",
   "noPatientChartsFoundMessage": "К сожалению, карты пациентов не найдены",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "Нет недавно просмотренных пациентов",
   "other": "Другое",
   "postcode": "Почтовый индекс",
