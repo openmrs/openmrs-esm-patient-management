@@ -50,6 +50,7 @@ const AddPatientToQueueModal: React.FC<AddPatientToQueueModalProps> = ({ modalTi
       <ModalHeader closeModal={closeModal} title={modalTitle} />
       <ModalBody>
         <QueueFields
+          patientUuid={activeVisit?.patient?.uuid}
           setOnSubmit={(onSubmit) => setCallback({ submitQueueEntry: onSubmit })}
           defaultInitialServiceQueue={config.defaultInitialServiceQueue}
         />
