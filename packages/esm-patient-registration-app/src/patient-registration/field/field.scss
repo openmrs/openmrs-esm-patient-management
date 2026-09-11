@@ -49,7 +49,8 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.dobField > :global(.cds--content-switcher) {
+.dobField > :global(.cds--content-switcher),
+.radioField > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
@@ -90,7 +91,8 @@
   margin-left: layout.$spacing-02;
 }
 
-.dobContentSwitcherLabel {
+.dobContentSwitcherLabel,
+.radioContentSwitcherLabel {
   margin-bottom: layout.$spacing-03;
 }
 

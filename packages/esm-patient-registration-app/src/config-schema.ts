@@ -1,15 +1,29 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
 import _default from 'yup/lib/locale';
 
+export interface HideIfCondition {
+  fieldId: string;
+  value?: string;
+  notEquals?: string;
+}
+
+export interface HideIfAgeCondition {
+  operator: '<' | '>' | '<=' | '>=' | '==';
+  value: number;
+}
+
 export interface SectionDefinition {
   id: string;
   name?: string;
   fields: Array<string>;
+  hideIf?: HideIfCondition;
+  hideIfAge?: HideIfAgeCondition;
 }
 
 export interface FieldDefinition {
   id: string;
   type: string;
+  displayStyle?: 'dropdown' | 'radio';
   label?: string;
   uuid: string;
   placeholder?: string;
@@ -23,6 +37,8 @@ export interface FieldDefinition {
   locationTag?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
+  hideIf?: HideIfCondition;
+  hideIfAge?: HideIfAgeCondition;
 }
 
 export interface CustomConceptAnswer {
@@ -146,6 +162,16 @@ export const esmPatientRegistrationSchema = {
           _type: Type.String,
         },
       },
+      hideIf: {
+        _type: Type.Object,
+        _default: null,
+        _description: 'Skip logic: Hide this section if a field has a certain value.',
+      },
+      hideIfAge: {
+        _type: Type.Object,
+        _default: null,
+        _description: 'Skip logic: Hide this section based on patient age.',
+      },
     },
   },
   fieldDefinitions: {
@@ -232,6 +258,21 @@ export const esmPatientRegistrationSchema = {
             _description: 'The custom label for the answer concept.',
           },
         },
+      },
+      hideIf: {
+        _type: Type.Object,
+        _default: null,
+        _description: 'Skip logic: Hide this field if another field has a certain value.',
+      },
+      hideIfAge: {
+        _type: Type.Object,
+        _default: null,
+        _description: 'Skip logic: Hide this field based on patient age.',
+      },
+      displayStyle: {
+        _type: Type.String,
+        _default: 'dropdown',
+        _description: 'How to render coded person attributes. Can be "dropdown" or "radio".',
       },
     },
     // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
