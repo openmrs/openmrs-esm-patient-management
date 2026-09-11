@@ -34,7 +34,7 @@ describe('filterOutUndefinedPatientIdentifiers', () => {
 });
 
 describe('shouldHideElement', () => {
-  const mockConfig = {
+  const mockConfig: any = {
     fieldDefinitions: [
       { id: 'testField1', type: 'person attribute', uuid: '123' },
       { id: 'testField2', type: 'person attribute', uuid: '456' },
@@ -43,7 +43,7 @@ describe('shouldHideElement', () => {
 
   it('should return false if there is no hideIf or hideIfAge condition', () => {
     const fieldDef: any = { id: 'test' };
-    expect(shouldHideElement(fieldDef, {}, mockConfig, 25)).toBe(false);
+    expect(shouldHideElement(fieldDef, {} as any, mockConfig, 25)).toBe(false);
   });
 
   describe('hideIf (Equals)', () => {
@@ -53,16 +53,16 @@ describe('shouldHideElement', () => {
     };
 
     it('should show (return false) if the prerequisite field is empty/undefined', () => {
-      expect(shouldHideElement(fieldDef, {}, mockConfig, 25)).toBe(false);
-      expect(shouldHideElement(fieldDef, { attributes: { '456': '' } }, mockConfig, 25)).toBe(false);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, 25)).toBe(false);
+      expect(shouldHideElement(fieldDef, { attributes: { '456': '' } } as any, mockConfig, 25)).toBe(false);
     });
 
     it('should show (return false) if the prerequisite field does not match the target value', () => {
-      expect(shouldHideElement(fieldDef, { attributes: { '456': 'No' } }, mockConfig, 25)).toBe(false);
+      expect(shouldHideElement(fieldDef, { attributes: { '456': 'No' } } as any, mockConfig, 25)).toBe(false);
     });
 
     it('should hide (return true) if the prerequisite field matches the target value', () => {
-      expect(shouldHideElement(fieldDef, { attributes: { '456': 'Yes' } }, mockConfig, 25)).toBe(true);
+      expect(shouldHideElement(fieldDef, { attributes: { '456': 'Yes' } } as any, mockConfig, 25)).toBe(true);
     });
   });
 
@@ -73,15 +73,15 @@ describe('shouldHideElement', () => {
     };
 
     it('should hide (return true) if the prerequisite field is empty/undefined', () => {
-      expect(shouldHideElement(fieldDef, {}, mockConfig, 25)).toBe(true);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, 25)).toBe(true);
     });
 
     it('should hide (return true) if the prerequisite field does not match the notEquals value (e.g. is No)', () => {
-      expect(shouldHideElement(fieldDef, { attributes: { '456': 'No' } }, mockConfig, 25)).toBe(true);
+      expect(shouldHideElement(fieldDef, { attributes: { '456': 'No' } } as any, mockConfig, 25)).toBe(true);
     });
 
     it('should show (return false) if the prerequisite field equals the notEquals value', () => {
-      expect(shouldHideElement(fieldDef, { attributes: { '456': 'Yes' } }, mockConfig, 25)).toBe(false);
+      expect(shouldHideElement(fieldDef, { attributes: { '456': 'Yes' } } as any, mockConfig, 25)).toBe(false);
     });
   });
 
@@ -92,17 +92,17 @@ describe('shouldHideElement', () => {
     };
 
     it('should hide if age matches the condition (e.g. < 18)', () => {
-      expect(shouldHideElement(fieldDef, {}, mockConfig, 10)).toBe(true);
-      expect(shouldHideElement(fieldDef, {}, mockConfig, 17)).toBe(true);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, 10)).toBe(true);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, 17)).toBe(true);
     });
 
     it('should show if age does not match the condition', () => {
-      expect(shouldHideElement(fieldDef, {}, mockConfig, 18)).toBe(false);
-      expect(shouldHideElement(fieldDef, {}, mockConfig, 25)).toBe(false);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, 18)).toBe(false);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, 25)).toBe(false);
     });
 
     it('should show (return false) if age is undefined and a hideIfAge condition exists', () => {
-      expect(shouldHideElement(fieldDef, {}, mockConfig, undefined)).toBe(false);
+      expect(shouldHideElement(fieldDef, {} as any, mockConfig, undefined)).toBe(false);
     });
   });
 });
