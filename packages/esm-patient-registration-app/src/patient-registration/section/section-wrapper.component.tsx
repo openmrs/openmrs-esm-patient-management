@@ -6,7 +6,7 @@ import { type RegistrationConfig, type SectionDefinition } from '../../config-sc
 import { Section } from './section.component';
 import styles from './section.scss';
 import { usePatientRegistrationContext } from '../patient-registration-context';
-import { shouldHideElement } from '../patient-registration-utils';
+import { getAgeInYears, shouldHideElement } from '../patient-registration-utils';
 
 export interface SectionWrapperProps {
   sectionDefinition: SectionDefinition;
@@ -18,9 +18,7 @@ export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps
   const config = useConfig<RegistrationConfig>();
   const { values } = usePatientRegistrationContext();
 
-  const ageInYears = values.birthdate
-    ? new Date().getFullYear() - new Date(values.birthdate).getFullYear()
-    : (values.yearsEstimated ?? undefined);
+  const ageInYears = getAgeInYears(values);
 
   if (shouldHideElement(sectionDefinition, values, config, ageInYears)) {
     return null;

@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Field } from 'formik';
+import { Field, getIn } from 'formik';
 import { Layer, Select, SelectItem, ContentSwitcher, Switch } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
@@ -34,6 +34,15 @@ export function CodedPersonAttributeField({
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
   const [error, setError] = useState(false);
+
+  const validate = useCallback(
+    (value: string) => {
+      if (required && !value) {
+        return t('attributeFieldRequired', 'This field is required');
+      }
+    },
+    [required, t],
+  );
 
   useEffect(() => {
     if (!answerConceptSetUuid && !customConceptAnswers.length) {
@@ -95,25 +104,39 @@ export function CodedPersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Layer>
-          <Field name={fieldName}>
-            {({ field, form: { touched, errors, setFieldValue }, meta }) => {
+          <Field name={fieldName} validate={validate}>
+            {({ field, form: { touched, errors, submitCount, setFieldValue, setFieldTouched }, meta }) => {
+              const fieldError = (meta.error || getIn(errors, fieldName)) as string | undefined;
+              const isFieldTouched = meta.touched || Boolean(getIn(touched, fieldName)) || submitCount > 0;
+              const isInvalid = Boolean(isFieldTouched && fieldError);
+              const errorMessage = fieldError;
+
               if (displayStyle === 'radio') {
                 return (
-                  <div className={classNames(styles.attributeField, styles.radioField)}>
+                  <div
+                    className={classNames(styles.attributeField, styles.radioField, {
+                      [styles.radioFieldInvalid]: isInvalid,
+                    })}>
                     <div className={styles.radioContentSwitcherLabel}>
-                      <span className={styles.label01}>{label ?? personAttributeType?.display}</span>
+                      <span className={classNames(styles.label01, { [styles.dangerLabel01]: isInvalid })}>
+                        {label ?? personAttributeType?.display}
+                      </span>
                     </div>
                     <ContentSwitcher
                       id={id}
                       size="md"
                       onChange={(e) => {
                         setFieldValue(fieldName, e.name);
+                        setFieldTouched(fieldName, true, false);
                       }}
                       selectedIndex={answers.findIndex((a) => a.uuid === field.value)}>
                       {answers.map((answer) => (
                         <Switch key={answer.uuid} name={answer.uuid} text={answer.label} />
                       ))}
                     </ContentSwitcher>
+                    {isInvalid && errorMessage && (
+                      <div className={styles.radioFieldError}>{t(errorMessage, errorMessage)}</div>
+                    )}
                   </div>
                 );
               }
@@ -123,7 +146,8 @@ export function CodedPersonAttributeField({
                     id={id}
                     name={`person-attribute-${personAttributeType.uuid}`}
                     labelText={label ?? personAttributeType?.display}
-                    invalid={errors[fieldName] && touched[fieldName]}
+                    invalid={isInvalid}
+                    invalidText={errorMessage ? t(errorMessage, errorMessage) : undefined}
                     required={required}
                     {...field}>
                     <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />
