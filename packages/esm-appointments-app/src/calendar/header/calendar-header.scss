@@ -4,13 +4,26 @@
 
 .calendarHeaderContainer {
   display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: colors.$gray-10;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.backRow {
+  display: flex;
+  align-items: center;
+  padding: layout.$spacing-03 layout.$spacing-05;
+}
+
+.controlsRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: layout.$spacing-03;
   padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
-  border-bottom: 1px solid colors.$gray-20;
 }
 
 .navigationSection {
@@ -91,4 +104,30 @@
     color: colors.$white !important;
     box-shadow: none !important;
   }
+}
+
+.backButton {
+  color: colors.$blue-60 !important;
+
+  :global(.cds--btn__icon) {
+    fill: colors.$blue-60;
+  }
+
+  &:hover {
+    color: colors.$blue-70 !important;
+    background-color: colors.$blue-10 !important;
+
+    :global(.cds--btn__icon) {
+      fill: colors.$blue-70;
+    }
+  }
+}
+
+.backButtonIcon {
+  display: inline-flex;
+  align-self: center;
+  flex-shrink: 0;
+  fill: colors.$blue-60 !important;
+  vertical-align: middle;
+  margin-right: layout.$spacing-02;
 }
