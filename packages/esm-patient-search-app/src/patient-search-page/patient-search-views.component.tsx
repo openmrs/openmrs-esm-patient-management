@@ -1,9 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { SWRConfig } from 'swr';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
+import { activeVisitSwrConfig } from '../utils/swr-config';
 import styles from './patient-search-lg.scss';
 
 interface PatientSearchResultsProps {
@@ -69,11 +71,15 @@ export const ErrorState: React.FC = () => {
 };
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
+  // A row calls `useVisit` from its own body, so the config has to sit above the rows to reach it.
+  // The photo keeps its stricter config nested inside the banner.
   return (
-    <div data-openmrs-role="Search Results">
-      {searchResults.map((patient) => (
-        <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
-      ))}
-    </div>
+    <SWRConfig value={activeVisitSwrConfig}>
+      <div data-openmrs-role="Search Results">
+        {searchResults.map((patient) => (
+          <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
+        ))}
+      </div>
+    </SWRConfig>
   );
 };

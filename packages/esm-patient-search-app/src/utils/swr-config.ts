@@ -12,3 +12,14 @@ export const searchResultSwrConfig: SWRConfiguration = {
   revalidateOnReconnect: false,
   dedupingInterval: 180_000, // 3 minutes
 };
+
+/**
+ * SWR settings for the active visit lookup each search result makes. A visit can start while a
+ * result set is on screen, so unlike {@link searchResultSwrConfig} every revalidation trigger stays
+ * on and `dedupingInterval` acts as a TTL instead: mount, focus and reconnect all fire, but SWR
+ * serves them from the cached entry until the interval lapses. An explicit `mutate()` — what the
+ * visit store fans out when a visit starts — is never deduped and always fetches.
+ */
+export const activeVisitSwrConfig: SWRConfiguration = {
+  dedupingInterval: 180_000, // 3 minutes
+};
