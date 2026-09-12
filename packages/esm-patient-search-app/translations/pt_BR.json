@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "Idade",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Mês de nascimento",
   "nextPage": "Próxima página",
   "noPatientChartsFoundMessage": "Desculpe, não foram encontrados prontuários de pacientes",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "Nenhum paciente visualizado recentemente",
   "other": "Outros",
   "postcode": "Código postal",

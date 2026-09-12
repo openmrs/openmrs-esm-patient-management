@@ -42,8 +42,8 @@ test('Edit an encounter from the Previous visit tab of a queue entry', async ({ 
   const serviceQueuesPage = new ServiceQueuesPage(page);
   const [firstName, lastName] = patient.person.display.split(' ');
 
-  await test.step('When I go to the Service queues page', async () => {
-    await serviceQueuesPage.goto();
+  await test.step('When I go to the waiting list on the Service queues page', async () => {
+    await serviceQueuesPage.gotoWaitingList();
   });
 
   await test.step("And I expand the patient's queue entry", async () => {
