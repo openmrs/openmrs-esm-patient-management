@@ -5,63 +5,91 @@
 .calendarHeaderContainer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: layout.$spacing-03;
-  padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
-  border-bottom: 1px solid colors.$gray-20;
-}
-
-.navigationSection {
-  display: flex;
-  align-items: center;
-  gap: layout.$spacing-03;
-}
-
-.navGroup {
-  display: flex;
-  align-items: center;
   gap: layout.$spacing-05;
+  margin: layout.$spacing-05 layout.$spacing-05 0;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  flex-wrap: wrap;
+}
+
+.todayButton {
+  height: 2rem;
+  padding: 0 layout.$spacing-04;
+  background: colors.$white;
+  border: 1px solid var(--brand-03);
+  color: var(--brand-03);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+
+  &:focus {
+    outline: 2px solid var(--brand-03);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: colors.$white;
+    }
+  }
 }
 
 .navButtonGroup {
   display: flex;
   align-items: center;
-  border: 1px solid colors.$gray-30;
+}
 
-  :global(.cds--btn--ghost.cds--btn--icon-only) {
-    border: none;
-    border-radius: 0;
+.navButton {
+  width: 2rem;
+  height: 2rem;
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  color: colors.$gray-100;
+  font-size: 1rem;
+  cursor: pointer;
 
-    &:hover {
-      background-color: colors.$gray-10;
-    }
+  &:hover {
+    background-color: colors.$gray-10;
+  }
 
-    &:focus:not(:focus-visible) {
-      box-shadow: none;
-      outline: none;
-    }
+  &:focus {
+    outline: 2px solid var(--brand-03);
+    outline-offset: -2px;
   }
 }
 
-.navDivider {
-  width: 0.5px;
-  height: 2rem;
-  background-color: colors.$gray-30;
+.navButtonLast {
+  border-left: none;
 }
 
 .dateLabel {
-  @include type.type-style('heading-compact-02');
+  font-size: 1.25rem;
+  font-weight: 600;
   color: colors.$gray-100;
   white-space: nowrap;
 }
 
+.countLabel {
+  font-size: 0.8125rem;
+  color: colors.$gray-70;
+  white-space: nowrap;
+}
+
 .switcherSection {
+  margin-left: auto;
+  flex: none;
   display: flex;
   align-items: center;
-  gap: layout.$spacing-04;
-  flex-wrap: wrap;
 
   :global(.cds--content-switcher) {
     --cds-layer-selected-inverse: var(--brand-03);
@@ -70,6 +98,7 @@
     --cds-focus: var(--brand-03);
     --cds-border-subtle-00: var(--brand-03);
     border-color: var(--brand-03) !important;
+    border-radius: 0;
   }
 
   :global(.cds--content-switcher-btn) {
@@ -77,6 +106,9 @@
     min-width: fit-content;
     color: var(--brand-03);
     border-color: var(--brand-03);
+    padding: 0 18px;
+    font-size: 0.875rem;
+
     &:focus {
       box-shadow: inset 0 0 0 2px var(--brand-03) !important;
       outline: none !important;
