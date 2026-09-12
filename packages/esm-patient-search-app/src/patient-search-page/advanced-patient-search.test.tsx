@@ -14,7 +14,12 @@ import { type PatientSearchResponse } from '../types';
 import { mockAdvancedSearchResults } from '__mocks__';
 import { PatientSearchContext } from '../patient-search-context';
 import { useInfinitePatientSearch } from '../patient-search.resource';
-import { usePersonAttributeType } from './refine-search/person-attributes.resource';
+import {
+  useAttributeConceptAnswers,
+  useConfiguredAnswerConcepts,
+  useLocations,
+  usePersonAttributeType,
+} from './refine-search/person-attributes.resource';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 
 const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
@@ -26,6 +31,9 @@ vi.mock('../patient-search.resource', () => ({
 }));
 
 vi.mock('./refine-search/person-attributes.resource', () => ({
+  useAttributeConceptAnswers: vi.fn(),
+  useConfiguredAnswerConcepts: vi.fn(),
+  useLocations: vi.fn(),
   usePersonAttributeType: vi.fn(),
 }));
 
@@ -131,6 +139,38 @@ describe('AdvancedPatientSearchComponent', () => {
       await user.click(screen.getByRole('button', { name: /apply/i }));
 
       expect(screen.getByText(/0 search result/)).toBeInTheDocument();
+      expect(screen.getByText('No patients match these filters')).toBeInTheDocument();
+      expect(screen.getByText(/remove or change a filter/i)).toBeInTheDocument();
+    });
+
+    it('keeps loading while later pages are still arriving and no loaded row matches the filters', async () => {
+      // Page 1 of a broad search has landed and holds one man; the rest of the pages are in flight.
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: [mockAdvancedSearchResults[0]] as unknown as PatientSearchResponse['data'],
+        isValidating: true,
+        currentPage: 1,
+        totalResultsForQuery: 100,
+      });
+      renderComponent();
+
+      await user.click(screen.getByRole('tab', { name: /female/i }));
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByRole('heading', { name: /searching/i })).toBeInTheDocument();
+      expect(screen.queryByText('No patients match these filters')).not.toBeInTheDocument();
+      expect(screen.queryByText(/sorry, no patient charts were found/i)).not.toBeInTheDocument();
+    });
+
+    it('keeps the no-results message when the query itself found no patients', async () => {
+      mockUseInfinitePatientSearch.mockReturnValue({ ...mockSearchResults, data: [], totalResults: 0 });
+      renderComponent();
+
+      await user.click(screen.getByRole('tab', { name: /female/i }));
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/sorry, no patient charts were found/i)).toBeInTheDocument();
+      expect(screen.queryByText('No patients match these filters')).not.toBeInTheDocument();
     });
 
     it('filters by age correctly', async () => {
@@ -162,6 +202,52 @@ describe('AdvancedPatientSearchComponent', () => {
       // const patientBanners = screen.getAllByRole('banner');
       // expect(patientBanners).toHaveLength(1);
       // expect(within(patientBanners[0]).getByText(/Joseph Davis/i)).toBeInTheDocument();
+    });
+
+    it('does not match a patient without a birthdate to a date of birth filter', async () => {
+      const [patient] = mockAdvancedSearchResults;
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: [
+          { ...patient, person: { ...patient.person, birthdate: null, age: null } },
+        ] as unknown as PatientSearchResponse['data'],
+      });
+      renderComponent();
+
+      await user.type(screen.getByRole('spinbutton', { name: /day of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /month of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /year of birth/i }), '1970');
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/0 search result/)).toBeInTheDocument();
+    });
+
+    it('matches the date of birth as stored, whatever timezone the backend serialised it in', async () => {
+      // Tests run in UTC, where `new Date` would read this birthdate as 31 December 1939.
+      const [patient] = mockAdvancedSearchResults;
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: [
+          { ...patient, person: { ...patient.person, birthdate: '1940-01-01T00:00:00.000+0300' } },
+        ] as unknown as PatientSearchResponse['data'],
+      });
+      renderComponent();
+
+      await user.type(screen.getByRole('spinbutton', { name: /day of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /month of birth/i }), '1');
+      await user.type(screen.getByRole('spinbutton', { name: /year of birth/i }), '1940');
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/1 search result/)).toBeInTheDocument();
+    });
+
+    it('ignores surrounding whitespace in the postcode filter', async () => {
+      renderComponent();
+
+      await user.type(screen.getByRole('textbox', { name: /postcode/i }), ' 20839 ');
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/1 search result/)).toBeInTheDocument();
     });
 
     it('filters by person attribute correctly', async () => {
@@ -223,6 +309,70 @@ describe('AdvancedPatientSearchComponent', () => {
       renderComponent({ inTabletOrOverlay: true });
       const container = screen.getByText(/Refine search/i);
       expect(container).toBeInTheDocument();
+    });
+  });
+
+  describe.each(['org.openmrs.Concept', 'org.openmrs.Location'])('Clearing %s attributes', (format) => {
+    const attributeTypeUuid = '8d87236c-c2cc-11de-8d13-0010c6dffd0f';
+    const answer = { uuid: '1ce1b7d4-c865-4178-82b0-5932e51503d6', display: 'Community Outreach' };
+
+    beforeEach(() => {
+      const config: PatientSearchConfig = getDefaultsFromConfigSchema(configSchema);
+      config.search.searchFilterFields.personAttributes = [{ attributeTypeUuid }];
+      mockUseConfig.mockReturnValue(config);
+      mockUsePersonAttributeType.mockReturnValue({
+        data: { uuid: attributeTypeUuid, display: 'Health Center', format },
+        isLoading: false,
+        error: null,
+      });
+      vi.mocked(useConfiguredAnswerConcepts).mockReturnValue({
+        configuredConceptAnswers: [],
+        isLoadingConfiguredAnswers: false,
+      });
+      vi.mocked(useAttributeConceptAnswers).mockReturnValue({
+        conceptAnswers: [answer],
+        isLoadingConceptAnswers: false,
+        errorFetchingConceptAnswers: null,
+      });
+      vi.mocked(useLocations).mockReturnValue({
+        locations: [
+          { resource: { id: answer.uuid, name: answer.display, resourceType: 'Location', status: 'active' } },
+        ],
+        isLoading: false,
+        loadingNewData: false,
+        error: null,
+      });
+    });
+
+    it('restores results when an applied attribute selection is cleared', async () => {
+      renderComponent();
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText(answer.display));
+      await user.click(screen.getByRole('button', { name: /^apply/i }));
+      expect(screen.getByRole('heading', { name: '1 search result' })).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /clear selected item/i }));
+      await user.click(screen.getByRole('button', { name: /^apply/i }));
+
+      expect(screen.getByRole('heading', { name: '2 search result' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Apply', exact: true })).toBeInTheDocument();
+    });
+
+    it('keeps patients without the attribute when a cleared selection is applied', async () => {
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: mockSearchResults.data.map((patient) => ({ ...patient, attributes: [] })),
+      });
+      renderComponent();
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText(answer.display));
+      await user.click(screen.getByRole('button', { name: /clear selected item/i }));
+      await user.click(screen.getByRole('button', { name: /^apply/i }));
+
+      expect(screen.getByRole('heading', { name: '2 search result' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Apply', exact: true })).toBeInTheDocument();
     });
   });
 });

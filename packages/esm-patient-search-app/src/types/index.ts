@@ -75,7 +75,10 @@ export interface PatientSearchResponse {
   isLoading: boolean;
   isValidating: boolean;
   setPage: (page: number | ((_page: number) => number)) => Promise<unknown[] | undefined>;
+  /** The number of results for the query that `data` belongs to. Use this to describe `data`. */
   totalResults: number;
+  /** The number of results for the query being searched for. Use this to size page requests. */
+  totalResultsForQuery: number;
 }
 
 export interface AdvancedPatientSearchState {

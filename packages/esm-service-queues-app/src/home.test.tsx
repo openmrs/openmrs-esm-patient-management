@@ -1,13 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import userEvent from '@testing-library/user-event';
+import { getDefaultsFromConfigSchema, useConfig, userHasAccess, useSession } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from './config-schema';
 import { useQueueEntries } from './hooks/useQueueEntries';
 import { updateSelectedQueueLocationName } from './store/store';
 import Home from './home.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseSession = vi.mocked(useSession);
+const mockUserHasAccess = vi.mocked(userHasAccess);
 
 vi.mock('./hooks/useQueues', () => ({
   useQueues: vi.fn(() => ({ queues: [] })),
@@ -22,6 +25,17 @@ vi.mock('./hooks/useQueueEntries', async () => ({
   useQueueEntries: vi.fn(),
 }));
 
+// ExtensionSlot renders nothing without registered extensions, so stand the metrics row in for it.
+vi.mock('./metrics/metrics-container.component', () => ({
+  __esModule: true,
+  default: vi.fn(() => <div data-testid="header-metrics">Clinic Metrics</div>),
+}));
+
+vi.mock('./clinic-administrator/clinic-overview.component', () => ({
+  __esModule: true,
+  default: vi.fn(() => <div data-testid="clinic-overview">Clinic Overview</div>),
+}));
+
 vi.mocked(useQueueEntries).mockReturnValue({
   queueEntries: [],
   isLoading: false,
@@ -31,13 +45,23 @@ vi.mocked(useQueueEntries).mockReturnValue({
   mutate: vi.fn(),
 });
 
-mockUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
-  visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-});
+function givenConfig(overrides: Partial<ConfigObject> = {}) {
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
+    visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    ...overrides,
+  });
+}
 
 describe('Home Component', () => {
   beforeEach(() => {
+    givenConfig();
+    mockUseSession.mockReturnValue({
+      authenticated: true,
+      sessionId: 'session-1',
+      user: { uuid: 'user-1' },
+    } as ReturnType<typeof useSession>);
+    mockUserHasAccess.mockReturnValue(false);
     updateSelectedQueueLocationName('Test Location');
   });
 
@@ -53,6 +77,83 @@ describe('Home Component', () => {
 
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+    });
+  });
+
+  it('shows no tabs at all for a user without the privilege, so their dashboard is unchanged', () => {
+    mockUserHasAccess.mockReturnValue(false);
+
+    render(<Home />);
+
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('clinic-overview')).not.toBeInTheDocument();
+  });
+
+  // A session that has not resolved a user yet must not blank the whole page.
+  it('falls back to the standard dashboard when the session carries no user', () => {
+    mockUserHasAccess.mockReturnValue(true);
+    mockUseSession.mockReturnValue({ authenticated: false } as ReturnType<typeof useSession>);
+
+    render(<Home />);
+
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.getByTestId('header-metrics')).toBeInTheDocument();
+  });
+
+  // userHasAccess grants every user access when the privilege is falsy, so an empty config must not.
+  it('shows no tabs when the privilege is configured empty, rather than opening them to everyone', () => {
+    givenConfig({ clinicAdministratorScreen: { privilege: '' } });
+    mockUserHasAccess.mockReturnValue(true);
+
+    render(<Home />);
+
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
+  });
+
+  describe('for a clinic administrator', () => {
+    beforeEach(() => {
+      mockUserHasAccess.mockReturnValue(true);
+    });
+
+    it('opens on the clinic overview, since an administrator wants every queue first', () => {
+      render(<Home />);
+
+      expect(mockUserHasAccess).toHaveBeenCalledWith('App: Service Queues Clinic Administrator', { uuid: 'user-1' });
+      expect(screen.getByRole('tab', { name: /clinic overview/i })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByTestId('clinic-overview')).toBeInTheDocument();
+    });
+
+    it('keeps the standard dashboard reachable on the second tab', async () => {
+      const user = userEvent.setup();
+      render(<Home />);
+
+      await user.click(screen.getByRole('tab', { name: /waiting list/i }));
+
+      expect(screen.getByRole('table', { name: /queue table/i })).toBeInTheDocument();
+    });
+
+    it('leaves the unselected tab unmounted rather than polling behind the one on screen', async () => {
+      const user = userEvent.setup();
+      render(<Home />);
+
+      expect(screen.queryByRole('table', { name: /queue table/i })).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('tab', { name: /waiting list/i }));
+
+      expect(screen.queryByTestId('clinic-overview')).not.toBeInTheDocument();
+    });
+
+    // The overview carries its own clinic totals, so the header's metrics would duplicate them.
+    it('shows the header metrics only alongside the waiting list', async () => {
+      const user = userEvent.setup();
+      render(<Home />);
+
+      expect(screen.queryByTestId('header-metrics')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('tab', { name: /waiting list/i }));
+
+      expect(screen.getByTestId('header-metrics')).toBeInTheDocument();
     });
   });
 });
