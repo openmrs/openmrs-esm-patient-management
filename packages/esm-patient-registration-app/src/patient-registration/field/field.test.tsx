@@ -315,7 +315,9 @@ describe('Field', () => {
       renderWithContext(
         <Formik initialValues={{}} onSubmit={vi.fn()}>
           <Form>
-            <Field name="invalidField" />
+            <PatientRegistrationContextProvider value={initialContextValues}>
+              <Field name="invalidField" />
+            </PatientRegistrationContextProvider>
           </Form>
         </Formik>,
         ResourcesContextProvider,

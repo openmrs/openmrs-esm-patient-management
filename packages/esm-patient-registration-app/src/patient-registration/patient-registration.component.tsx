@@ -14,7 +14,12 @@ import {
   usePatientPhoto,
 } from '@openmrs/esm-framework';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
-import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
+import {
+  cancelRegistration,
+  filterOutUndefinedPatientIdentifiers,
+  scrollIntoView,
+  shouldHideElement,
+} from './patient-registration-utils';
 import { getValidationSchema } from './validation/patient-registration-validation';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { PatientRegistrationContextProvider } from './patient-registration-context';
@@ -212,13 +217,20 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               </h4>
               {showDummyDataInput && <DummyDataInput setValues={props.setValues} />}
               <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-              {sections.map((section) => (
-                <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
-                  <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                    <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
-                  </Link>
-                </div>
-              ))}
+              {sections
+                .filter((section) => {
+                  const ageInYears = props.values.birthdate
+                    ? new Date().getFullYear() - new Date(props.values.birthdate).getFullYear()
+                    : (props.values.yearsEstimated ?? undefined);
+                  return !shouldHideElement(section, props.values, config, ageInYears);
+                })
+                .map((section) => (
+                  <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
+                    <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
+                      <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
+                    </Link>
+                  </div>
+                ))}
               <hr className={styles.divider} />
               <Button
                 className={styles.submitButton}

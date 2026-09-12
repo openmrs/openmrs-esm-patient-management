@@ -6,6 +6,13 @@ import {
   type PatientIdentifierValue,
   type PatientUuidMapType,
 } from './patient-registration.types';
+import {
+  type FieldDefinition,
+  type HideIfAgeCondition,
+  type HideIfCondition,
+  type RegistrationConfig,
+  type SectionDefinition,
+} from '../config-schema';
 
 export function scrollIntoView(viewId: string) {
   document.getElementById(viewId)?.scrollIntoView({
@@ -116,3 +123,60 @@ export const filterOutUndefinedPatientIdentifiers = (patientIdentifiers: Identif
 
 export const latestFirstEncounter = (a: Encounter, b: Encounter) =>
   new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
+
+export function shouldHideElement(
+  element: { hideIf?: HideIfCondition; hideIfAge?: HideIfAgeCondition },
+  values: FormValues,
+  config: RegistrationConfig,
+  ageInYears?: number,
+): boolean {
+  if (element.hideIf) {
+    const { fieldId, value, notEquals } = element.hideIf as any;
+
+    // Find the field definition to know how to look up its value
+    const fieldDef = config.fieldDefinitions.find((f) => f.id === fieldId);
+    let currentValue: any;
+
+    if (fieldDef) {
+      if (fieldDef.type === 'person attribute') {
+        currentValue = values.attributes?.[fieldDef.uuid];
+      } else if (fieldDef.type === 'obs') {
+        currentValue = values.obs?.[fieldDef.uuid];
+      }
+    } else {
+      // It might be a built-in field or boolean flag at the root
+      currentValue = values[fieldId];
+    }
+
+    // Convert string 'true' / 'false' if needed, or simple equality
+    if (value !== undefined && String(currentValue) === String(value)) {
+      return true;
+    }
+    if (notEquals !== undefined && String(currentValue) !== String(notEquals)) {
+      return true;
+    }
+  }
+
+  if (element.hideIfAge && ageInYears !== undefined) {
+    const { operator, value } = element.hideIfAge;
+    switch (operator) {
+      case '<':
+        if (ageInYears < value) return true;
+        break;
+      case '>':
+        if (ageInYears > value) return true;
+        break;
+      case '<=':
+        if (ageInYears <= value) return true;
+        break;
+      case '>=':
+        if (ageInYears >= value) return true;
+        break;
+      case '==':
+        if (ageInYears === value) return true;
+        break;
+    }
+  }
+
+  return false;
+}

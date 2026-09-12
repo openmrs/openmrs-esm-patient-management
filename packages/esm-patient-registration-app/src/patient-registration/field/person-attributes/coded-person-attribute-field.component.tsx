@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
-import { Layer, Select, SelectItem } from '@carbon/react';
+import { Layer, Select, SelectItem, ContentSwitcher, Switch } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
@@ -15,6 +15,7 @@ export interface CodedPersonAttributeFieldProps {
   label?: string;
   customConceptAnswers: Array<{ uuid: string; label?: string }>;
   required: boolean;
+  displayStyle?: 'dropdown' | 'radio';
 }
 
 export function CodedPersonAttributeField({
@@ -24,6 +25,7 @@ export function CodedPersonAttributeField({
   label,
   customConceptAnswers,
   required,
+  displayStyle,
 }: CodedPersonAttributeFieldProps) {
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
     customConceptAnswers.length ? '' : answerConceptSetUuid,
@@ -94,7 +96,27 @@ export function CodedPersonAttributeField({
       {!isLoadingConceptAnswers ? (
         <Layer>
           <Field name={fieldName}>
-            {({ field, form: { touched, errors }, meta }) => {
+            {({ field, form: { touched, errors, setFieldValue }, meta }) => {
+              if (displayStyle === 'radio') {
+                return (
+                  <div className={classNames(styles.attributeField, styles.radioField)}>
+                    <div className={styles.radioContentSwitcherLabel}>
+                      <span className={styles.label01}>{label ?? personAttributeType?.display}</span>
+                    </div>
+                    <ContentSwitcher
+                      id={id}
+                      size="md"
+                      onChange={(e) => {
+                        setFieldValue(fieldName, e.name);
+                      }}
+                      selectedIndex={answers.findIndex((a) => a.uuid === field.value)}>
+                      {answers.map((answer) => (
+                        <Switch key={answer.uuid} name={answer.uuid} text={answer.label} />
+                      ))}
+                    </ContentSwitcher>
+                  </div>
+                );
+              }
               return (
                 <>
                   <Select
