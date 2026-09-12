@@ -23,6 +23,9 @@ import { mapToFhirPatient } from '../../../utils/fhir-mapper';
 import { searchResultSwrConfig } from '../../../utils/swr-config';
 import styles from './patient-banner.scss';
 
+/** Lighter-weight view that's what we actually need for checking for active visits */
+const activeVisitRepresentation = 'custom:(uuid,startDatetime,stopDatetime,patient:(uuid))';
+
 interface ClickablePatientContainerProps {
   children: React.ReactNode;
   patient: fhir.Patient;
@@ -40,7 +43,7 @@ const PatientBanner = React.memo(
   ({ patient, patientUuid, hideActionsOverflow: hideActionsOverflowProp }: PatientBannerProps) => {
     const layout = useLayoutType();
     const isTablet = layout === 'tablet';
-    const { activeVisit } = useVisit(patientUuid);
+    const { activeVisit } = useVisit(patientUuid, activeVisitRepresentation);
     const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
       usePatientSearchContext() ?? {};
     // if context2 is present, we use the new workspace v2 APIs,
