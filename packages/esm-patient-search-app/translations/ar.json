@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "العمر",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "شهر الميلاد",
   "nextPage": "الصفحة التالية",
   "noPatientChartsFoundMessage": "عذرًا، لم يتم العثور على سجلات المرضى",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "No recently viewed patients",
   "other": "آخر",
   "postcode": "الرمز البريدي",
