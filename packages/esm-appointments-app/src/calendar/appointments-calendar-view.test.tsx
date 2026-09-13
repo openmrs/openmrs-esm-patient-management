@@ -187,4 +187,16 @@ describe('Appointment calendar view', () => {
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
   });
+
+  it('does not display a 0 appointment count while monthly data is still loading', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: true,
+      error: null,
+    });
+
+    renderCalendar();
+
+    expect(screen.queryByText(/0 appointment this month/i)).not.toBeInTheDocument();
+  });
 });
