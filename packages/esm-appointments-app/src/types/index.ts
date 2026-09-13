@@ -158,6 +158,11 @@ export enum DurationPeriod {
 
 export type CalendarViewMode = 'monthly' | 'daily';
 
+export interface LegendService {
+  uuid: string;
+  name: string;
+}
+
 export interface Identifier {
   identifier: string;
   identifierName?: string;
