@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch } from '@carbon/react';
+import { Button, ContentSwitcher, Switch } from '@carbon/react';
+import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
@@ -68,16 +69,24 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         {t('today', 'Today')}
       </button>
       <div className={styles.navButtonGroup}>
-        <button type="button" aria-label={t('previous', 'Previous')} className={styles.navButton} onClick={onPrev}>
-          ‹
-        </button>
-        <button
-          type="button"
-          aria-label={t('next', 'Next')}
+        <Button
+          hasIconOnly
+          kind="ghost"
+          size="sm"
+          renderIcon={ChevronLeft}
+          iconDescription={t('previous', 'Previous')}
+          className={styles.navButton}
+          onClick={onPrev}
+        />
+        <Button
+          hasIconOnly
+          kind="ghost"
+          size="sm"
+          renderIcon={ChevronRight}
+          iconDescription={t('next', 'Next')}
           className={`${styles.navButton} ${styles.navButtonLast}`}
-          onClick={onNext}>
-          ›
-        </button>
+          onClick={onNext}
+        />
       </div>
       <span className={styles.dateLabel}>{dateLabel}</span>
       <span className={styles.countLabel}>{countLabel}</span>

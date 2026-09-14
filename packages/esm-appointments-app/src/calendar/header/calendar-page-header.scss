@@ -17,20 +17,17 @@
   flex-wrap: wrap;
   gap: layout.$spacing-04;
   margin: 0 layout.$spacing-03 0 layout.$spacing-05;
+}
 
-  :global(.cds--btn) {
-    height: 38px !important;
-    min-height: 38px !important;
-    max-height: 38px !important;
-    box-sizing: border-box !important;
-  }
+.newAppointmentButton {
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  box-sizing: border-box !important;
+  padding-left: layout.$spacing-05 !important;
+  padding-right: layout.$spacing-05 !important;
 
-  :global(.cds--btn--primary) {
-    padding-left: layout.$spacing-05 !important;
-    padding-right: layout.$spacing-05 !important;
-  }
-
-  :global(.cds--btn--primary .cds--btn__icon) {
+  :global(.cds--btn__icon) {
     position: static !important;
     margin-left: layout.$spacing-03 !important;
     flex-shrink: 0;

@@ -18,7 +18,12 @@ const CalendarPageHeader: React.FC<CalendarPageHeaderProps> = ({ filterElement }
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={t('calendar', 'Calendar')} />
       <div className={styles.actions}>
         {filterElement && <div className={styles.filters}>{filterElement}</div>}
-        <Button kind="primary" renderIcon={Add} size="md" onClick={() => launchCreateAppointmentForm(t)}>
+        <Button
+          className={styles.newAppointmentButton}
+          kind="primary"
+          renderIcon={Add}
+          size="md"
+          onClick={() => launchCreateAppointmentForm(t)}>
           {t('newAppointment', 'New appointment')}
         </Button>
       </div>

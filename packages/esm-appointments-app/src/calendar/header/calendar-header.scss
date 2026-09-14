@@ -51,20 +51,34 @@
 
 .navButton {
   width: 2rem;
+  min-width: 2rem;
+  max-width: 2rem;
   height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: colors.$white;
   border: 1px solid colors.$gray-20;
   color: colors.$gray-100;
-  font-size: 1rem;
   cursor: pointer;
 
   &:hover {
     background-color: colors.$gray-10;
+    color: colors.$gray-100;
   }
 
   &:focus {
     outline: 2px solid var(--brand-03);
     outline-offset: -2px;
+    box-shadow: none;
+  }
+
+  :global(.cds--btn__icon) {
+    margin: 0;
+    position: static;
   }
 }
 
@@ -97,30 +111,51 @@
     --cds-border-interactive: var(--brand-03);
     --cds-focus: var(--brand-03);
     --cds-border-subtle-00: var(--brand-03);
+    --cds-border-subtle-01: var(--brand-03);
+    --cds-border-subtle: var(--brand-03);
+    --cds-border-strong-01: var(--brand-03);
+    --cds-border-inverse: var(--brand-03);
     border-color: var(--brand-03) !important;
-    border-radius: 0;
+    border-radius: 0 !important;
   }
 
   :global(.cds--content-switcher-btn) {
     white-space: nowrap;
     min-width: fit-content;
     color: var(--brand-03);
-    border-color: var(--brand-03);
+    border-color: var(--brand-03) !important;
+    border-radius: 0 !important;
     padding: 0 18px;
     font-size: 0.875rem;
 
-    &:focus {
-      box-shadow: inset 0 0 0 2px var(--brand-03) !important;
+    &:focus,
+    &:focus-visible,
+    &:focus-within,
+    &:active,
+    &:hover {
       outline: none !important;
+      box-shadow: none !important;
+      border-color: var(--brand-03) !important;
+    }
+
+    &::after,
+    &::before {
+      border-color: var(--brand-03) !important;
+      outline: none !important;
+      border-radius: 0 !important;
     }
   }
 
   :global(.cds--content-switcher-btn.cds--content-switcher--selected),
   :global(.cds--content-switcher-btn.cds--content-switcher--selected:hover),
-  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus) {
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus),
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus-visible),
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:active) {
     background-color: var(--brand-03) !important;
     border-color: var(--brand-03) !important;
     color: colors.$white !important;
+    outline: none !important;
     box-shadow: none !important;
+    border-radius: 0 !important;
   }
 }
