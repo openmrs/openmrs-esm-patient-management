@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "Età",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Mese di nascita",
   "nextPage": "Pagina successiva",
   "noPatientChartsFoundMessage": "Nessuna scheda paziente trovata",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "No recently viewed patients",
   "other": "Altro",
   "postcode": "CAP",

@@ -12,6 +12,8 @@ interface PatientSearchComponentProps {
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
   searchResults: Array<SearchedPatient>;
+  /** True when the refine filters, not the query, left the results empty. */
+  emptiedByFilters?: boolean;
   isLoading: boolean;
   fetchError: Error | null;
 }
@@ -21,6 +23,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   stickyPagination,
   inTabletOrOverlay,
   searchResults,
+  emptiedByFilters = false,
   isLoading,
   fetchError,
 }) => {
@@ -62,11 +65,18 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     if (!isLoading && (!results || results.length === 0)) {
-      return <EmptyState />;
+      return emptiedByFilters ? (
+        <EmptyState
+          title={t('noPatientsMatchFilters', 'No patients match these filters')}
+          hint={t('adjustFiltersHint', 'Remove or change a filter to see more patients')}
+        />
+      ) : (
+        <EmptyState />
+      );
     }
 
     return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+  }, [emptiedByFilters, fetchError, isLoading, results, t]);
 
   return (
     <div

@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "Idade",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Mês de Nascimento",
   "nextPage": "Próxima página",
   "noPatientChartsFoundMessage": "Desculpe, nenhum prontuário de utente foi encontrado",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "No recently viewed patients",
   "other": "Outro",
   "postcode": "Caixa Postal",

@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Remove or change a filter to see more patients",
   "age": "Tuổi",
   "ageBelowMinimum": "Enter an age of at least {{min}}",
   "ageOutOfRange": "Enter an age between {{min}} and {{max}}",
@@ -26,6 +27,7 @@
   "monthOfBirth": "Tháng sinh",
   "nextPage": "Trang tiếp theo",
   "noPatientChartsFoundMessage": "Xin lỗi, không tìm thấy biểu đồ bệnh nhân",
+  "noPatientsMatchFilters": "No patients match these filters",
   "noRecentlyViewedPatients": "No recently viewed patients",
   "other": "Khác",
   "postcode": "Mã bưu chính",

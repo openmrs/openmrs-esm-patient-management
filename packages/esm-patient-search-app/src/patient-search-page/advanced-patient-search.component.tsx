@@ -166,6 +166,16 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     return searchResults;
   }, [filtersApplied, filters, searchResults]);
 
+  // The filters run over the rows loaded so far. While later pages are still arriving, an empty
+  // filtered set proves nothing, so keep the loading state rather than declaring no matches; between
+  // waves `isValidating` drops for a render before the next wave is requested, hence the page check.
+  const stillLoadingPages = isValidating || pagesNeeded > currentPage;
+  const filteredIsEmpty = filtersApplied > 0 && filteredResults?.length === 0;
+  const loadingFilteredResults = filteredIsEmpty && stillLoadingPages;
+
+  // Only the filters can be blamed when the query itself found patients and every page has landed.
+  const emptiedByFilters = filteredIsEmpty && (searchResults?.length ?? 0) > 0 && !stillLoadingPages;
+
   return (
     <div
       className={classNames({
@@ -186,9 +196,10 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           query={query}
           stickyPagination={stickyPagination}
           inTabletOrOverlay={inTabletOrOverlay}
-          isLoading={isLoading}
+          isLoading={isLoading || loadingFilteredResults}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}
+          emptiedByFilters={emptiedByFilters}
         />
       </div>
       {inTabletOrOverlay && (
