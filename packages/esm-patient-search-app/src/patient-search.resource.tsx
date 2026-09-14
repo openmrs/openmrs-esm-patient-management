@@ -22,7 +22,8 @@ function fetcher<T>(url: string) {
 type InfinitePatientSearchResponse = FetchResponse<{
   results: Array<SearchedPatient>;
   links: Array<{ rel: 'prev' | 'next' }>;
-  totalCount: number;
+  /** Only requested for the first page; see `buildUrl` in `useInfinitePatientSearch`. */
+  totalCount?: number;
 }>;
 
 const patientProperties = [
