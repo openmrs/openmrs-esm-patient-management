@@ -22,6 +22,8 @@
   "female": "Female",
   "filtersAppliedText": "search queries added",
   "male": "Male",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Month of Birth",
   "nextPage": "Next page",
   "noPatientChartsFoundMessage": "Sorry, no patient charts were found",

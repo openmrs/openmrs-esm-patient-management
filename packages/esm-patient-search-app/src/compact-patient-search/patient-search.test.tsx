@@ -7,13 +7,6 @@ import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
-import { useMinSearchCharacters } from '../patient-search.resource';
-
-vi.mock('../patient-search.resource', () => ({
-  useMinSearchCharacters: vi.fn(),
-}));
-
-const mockUseMinSearchCharacters = vi.mocked(useMinSearchCharacters);
 
 // The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
 // Stub it to render every row, letting the result assertions run.
@@ -34,7 +27,9 @@ const defaultProps = {
   fetchError: null,
   hasMore: false,
   isLoading: false,
+  isLoadingMinSearchCharacters: false,
   isValidating: false,
+  minSearchCharacters: 3,
   setPage: vi.fn(),
   totalResults: 1,
   query: 'John',
@@ -45,11 +40,6 @@ const mockUseConfig = vi.mocked(useConfig);
 describe('PatientSearch', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
-    mockUseMinSearchCharacters.mockReturnValue({
-      minSearchCharacters: 3,
-      isLoadingMinSearchCharacters: false,
-      error: undefined,
-    });
   });
 
   it('renders a loading state when search results are being fetched', () => {

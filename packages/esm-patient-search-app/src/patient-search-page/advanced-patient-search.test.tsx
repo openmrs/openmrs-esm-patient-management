@@ -56,6 +56,8 @@ const mockSearchResults: PatientSearchResponse = {
   setPage: vi.fn(),
   hasMore: false,
   isLoading: false,
+  isLoadingMinSearchCharacters: false,
+  minSearchCharacters: 3,
   fetchError: null,
 };
 

@@ -73,7 +73,9 @@ export interface PatientSearchResponse {
   fetchError: Error;
   hasMore: boolean;
   isLoading: boolean;
+  isLoadingMinSearchCharacters?: boolean;
   isValidating: boolean;
+  minSearchCharacters?: number;
   setPage: (page: number | ((_page: number) => number)) => Promise<unknown[] | undefined>;
   totalResults: number;
 }

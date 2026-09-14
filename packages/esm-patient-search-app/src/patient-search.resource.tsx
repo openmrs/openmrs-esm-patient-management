@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import {
   omrsOfflineCachingStrategyHttpHeaderName,
@@ -69,6 +70,8 @@ export function useInfinitePatientSearch(
   resultsToFetch: number = 10,
   customRepresentation: string = patientSearchCustomRepresentation,
 ): PatientSearchResponse {
+  const { minSearchCharacters, isLoadingMinSearchCharacters } = useMinSearchCharacters();
+
   const getUrl = useCallback(
     (
       page: number,
@@ -93,7 +96,7 @@ export function useInfinitePatientSearch(
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const shouldFetch = isSearching && Boolean(searchQuery);
+  const shouldFetch = isSearching && !isLoadingMinSearchCharacters && searchQuery.trim().length >= minSearchCharacters;
 
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
     shouldFetch ? getUrl : null,
@@ -120,8 +123,21 @@ export function useInfinitePatientSearch(
       setPage: setSize,
       currentPage: size,
       totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
+      minSearchCharacters,
+      isLoadingMinSearchCharacters,
     }),
-    [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size],
+    [
+      shouldFetch,
+      mappedData,
+      isLoading,
+      error,
+      data,
+      isValidating,
+      setSize,
+      size,
+      minSearchCharacters,
+      isLoadingMinSearchCharacters,
+    ],
   );
 }
 
@@ -263,7 +279,10 @@ export function useRestPatients(
 
 export function useMinSearchCharacters() {
   const url = `${restBaseUrl}/systemsetting?q=minSearchCharacters&v=custom:(property,value)`;
-  const { data, isLoading, error } = useSWR<FetchResponse<{ results: Array<{ value: string }> }>, Error>(url, fetcher);
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ results: Array<{ value: string }> }>, Error>(
+    url,
+    fetcher,
+  );
 
   const minSearchCharacters = data?.data?.results?.[0]?.value ? parseInt(data.data.results[0].value, 10) : 3;
 

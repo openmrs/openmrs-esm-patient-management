@@ -41,7 +41,9 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     setPage,
     hasMore,
     isLoading,
+    isLoadingMinSearchCharacters,
     fetchError,
+    minSearchCharacters,
   } = useInfinitePatientSearch(query, includeDead, !!query, 50);
 
   useEffect(() => {
@@ -149,7 +151,9 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           stickyPagination={stickyPagination}
           inTabletOrOverlay={inTabletOrOverlay}
           isLoading={isLoading}
+          isLoadingMinSearchCharacters={isLoadingMinSearchCharacters}
           fetchError={fetchError}
+          minSearchCharacters={minSearchCharacters}
           searchResults={filteredResults ?? []}
         />
       </div>

@@ -4,7 +4,6 @@ import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
-import { useMinSearchCharacters } from '../patient-search.resource';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 import { SWRConfig } from 'swr';
@@ -14,9 +13,22 @@ interface PatientSearchProps extends PatientSearchResponse {
 }
 
 const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, query, setPage, totalResults }, ref) => {
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isLoadingMinSearchCharacters = false,
+      isValidating,
+      minSearchCharacters = 0,
+      query,
+      setPage,
+      totalResults,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
-    const { minSearchCharacters } = useMinSearchCharacters();
 
     const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
 
@@ -52,7 +64,7 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
       );
     }
 
-    if (query.trim().length < minSearchCharacters) {
+    if (!isLoadingMinSearchCharacters && query.trim().length < minSearchCharacters) {
       return (
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
