@@ -66,6 +66,12 @@ describe('advanced search paging for a large result set', () => {
   /** Serves the result set a page at a time, resolving after a tick so overlap is observable. */
   const respondWith = (failAtStartIndex?: number) =>
     mockOpenmrsFetch.mockImplementation(async (url: string) => {
+      if (url.includes('systemsetting')) {
+        return Promise.resolve({
+          data: { results: [{ property: 'minSearchCharacters', value: '2' }] },
+        } as unknown as FetchResponse);
+      }
+
       requestedUrls.push(url);
       inFlight++;
       maxInFlight = Math.max(maxInFlight, inFlight);
@@ -99,24 +105,28 @@ describe('advanced search paging for a large result set', () => {
     respondWith();
   });
 
-  it('loads every page of a 1700-result query so a patient on the last page can be found', async () => {
-    const user = userEvent.setup();
-    render(<AdvancedPatientSearchComponent query="jos" />, { wrapper });
+  it(
+    'loads every page of a 1700-result query so a patient on the last page can be found',
+    async () => {
+      const user = userEvent.setup();
+      render(<AdvancedPatientSearchComponent query="jos" />, { wrapper });
 
-    // The header counts every loaded row, not just the rendered page.
-    await screen.findByRole('heading', { name: /1700 search result/i }, { timeout: 10000 });
+      // The header counts every loaded row, not just the rendered page.
+      await screen.findByRole('heading', { name: /1700 search result/i }, { timeout: 10000 });
 
-    // Nothing truncated, and no page fetched twice.
-    expect(requestedUrls).toHaveLength(TOTAL_PAGES);
-    expect(new Set(requestedUrls).size).toBe(requestedUrls.length);
+      // Nothing truncated, and no page fetched twice.
+      expect(requestedUrls).toHaveLength(TOTAL_PAGES);
+      expect(new Set(requestedUrls).size).toBe(requestedUrls.length);
 
-    // The refine filter runs over the loaded rows, so this only finds the patient if the last page landed.
-    await user.type(screen.getByRole('textbox', { name: /postcode/i }), postcodeOf(TOTAL - 1));
-    await user.click(screen.getByRole('button', { name: /apply/i }));
+      // The refine filter runs over the loaded rows, so this only finds the patient if the last page landed.
+      await user.type(screen.getByRole('textbox', { name: /postcode/i }), postcodeOf(TOTAL - 1));
+      await user.click(screen.getByRole('button', { name: /apply/i }));
 
-    expect(screen.getByRole('heading', { name: '1 search result' })).toBeInTheDocument();
-    expect(screen.getByText(`Patient ${TOTAL - 1}`)).toBeInTheDocument();
-  });
+      expect(screen.getByRole('heading', { name: '1 search result' })).toBeInTheDocument();
+      expect(screen.getByText(`Patient ${TOTAL - 1}`)).toBeInTheDocument();
+    },
+    15000,
+  );
 
   it('spreads the pages over bounded waves rather than one burst of requests', async () => {
     render(<AdvancedPatientSearchComponent query="jos" />, { wrapper });

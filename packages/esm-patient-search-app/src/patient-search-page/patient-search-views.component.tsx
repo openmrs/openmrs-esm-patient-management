@@ -15,8 +15,8 @@ interface PatientSearchResultsProps {
 interface EmptyStateProps {
   /** Already translated. Defaults to the no-results message. */
   title?: string;
-  /** Already translated. Defaults to the hint to search by patient ID. */
-  hint?: string;
+  /** Already translated. Defaults to the hint to search by patient ID. Pass null to hide the hint entirely. */
+  hint?: string | null;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ title, hint }) => {
@@ -28,11 +28,13 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ title, hint }) => {
         <p className={styles.emptyResultText}>
           {title ?? t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
         </p>
-        <p className={styles.actionText}>
-          <span>
-            {hint ?? t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
-          </span>
-        </p>
+        {hint !== null && (
+          <p className={styles.actionText}>
+            <span>
+              {hint ?? t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+            </span>
+          </p>
+        )}
       </Tile>
     </Layer>
   );
