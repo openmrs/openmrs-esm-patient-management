@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
@@ -15,7 +15,6 @@ interface PatientSearchComponentProps {
   /** True when the refine filters, not the query, left the results empty. */
   emptiedByFilters?: boolean;
   isLoading: boolean;
-  isLoadingMinSearchCharacters: boolean;
   fetchError: Error | null;
   minSearchCharacters: number;
 }
@@ -27,7 +26,6 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   searchResults,
   emptiedByFilters = false,
   isLoading,
-  isLoadingMinSearchCharacters,
   fetchError,
   minSearchCharacters,
 }) => {
@@ -68,7 +66,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       return <ErrorState />;
     }
 
-    if (!isLoading && !isLoadingMinSearchCharacters && (!results || results.length === 0)) {
+    if (!isLoading && (!results || results.length === 0)) {
       const tooFewCharacters = query.trim().length < minSearchCharacters;
 
       if (tooFewCharacters) {
@@ -93,7 +91,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     return <PatientSearchResults searchResults={results} />;
-  }, [emptiedByFilters, fetchError, isLoading, isLoadingMinSearchCharacters, results, query, minSearchCharacters, t]);
+  }, [emptiedByFilters, fetchError, isLoading, results, query, minSearchCharacters, t]);
 
   return (
     <div

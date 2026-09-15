@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite, { type SWRInfiniteResponse } from 'swr/infinite';
@@ -150,8 +150,7 @@ export function useInfinitePatientSearch(
 
   // Blocked while the minimum-character setting is still loading (so a temporary fallback can't let
   // a too-short query through), and while the trimmed query is shorter than the configured minimum.
-  const shouldFetch =
-    isSearching && !isLoadingMinSearchCharacters && searchQuery.trim().length >= minSearchCharacters;
+  const shouldFetch = isSearching && !isLoadingMinSearchCharacters && searchQuery.trim().length >= minSearchCharacters;
   const firstPageUrl = shouldFetch ? buildUrl(0) : null;
 
   // The count for the query being fetched, read through the cache rather than off `data`:
@@ -389,7 +388,9 @@ export function useMinSearchCharacters() {
     fetcher,
   );
 
-  const minSearchCharacters = data?.data?.results?.[0]?.value ? parseInt(data.data.results[0].value, 10) : 3;
+  const value = data?.data?.results?.[0]?.value;
+  // Core falls back to 2 when the setting is missing or contains non-numeric characters.
+  const minSearchCharacters = value && !/\D/.test(value) ? parseInt(value, 10) : 2;
 
   return { minSearchCharacters, isLoadingMinSearchCharacters: isLoading, error };
 }

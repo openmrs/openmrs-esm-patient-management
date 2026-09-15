@@ -64,7 +64,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     return count;
   }, [filters]);
 
-    const {
+  const {
     data: searchResults,
     currentPage,
     setPage,
@@ -198,8 +198,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           query={query}
           stickyPagination={stickyPagination}
           inTabletOrOverlay={inTabletOrOverlay}
-          isLoading={isLoading || loadingFilteredResults}
-          isLoadingMinSearchCharacters={isLoadingMinSearchCharacters}
+          isLoading={isLoading || isLoadingMinSearchCharacters || loadingFilteredResults}
           fetchError={fetchError}
           minSearchCharacters={minSearchCharacters}
           searchResults={filteredResults ?? []}

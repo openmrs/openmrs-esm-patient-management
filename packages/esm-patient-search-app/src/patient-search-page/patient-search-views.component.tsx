@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SWRConfig } from 'swr';
 import { Layer, Tile } from '@carbon/react';
