@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type AppointmentService } from '../types';
+import { type LegendService } from '../types';
 import styles from './services-legend.scss';
 
 interface ServicesLegendProps {
-  services: Array<{ uuid: string; name: string }>;
+  services: Array<LegendService>;
   serviceColorMap?: Map<string, string>;
 }
 
