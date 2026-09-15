@@ -14,7 +14,14 @@ import {
   usePatientPhoto,
 } from '@openmrs/esm-framework';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
-import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
+import {
+  cancelRegistration,
+  filterOutUndefinedPatientIdentifiers,
+  getAgeInYears,
+  sanitizeFormValuesForSkipLogic,
+  scrollIntoView,
+  shouldHideElement,
+} from './patient-registration-utils';
 import { getValidationSchema } from './validation/patient-registration-validation';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { PatientRegistrationContextProvider } from './patient-registration-context';
@@ -24,6 +31,7 @@ import { type CapturePhotoProps, type FormValues } from './patient-registration.
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt.component';
+import { SkipLogicCleanup } from './skip-logic-cleanup.component';
 import styles from './patient-registration.scss';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
@@ -86,7 +94,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
-    const updatedFormValues = { ...values, identifiers: filterOutUndefinedPatientIdentifiers(values.identifiers) };
+    const sanitizedValues = sanitizeFormValuesForSkipLogic(values, config);
+    const updatedFormValues = {
+      ...sanitizedValues,
+      identifiers: filterOutUndefinedPatientIdentifiers(sanitizedValues.identifiers),
+    };
     try {
       await savePatientForm(
         !inEditMode,
@@ -201,6 +213,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       validationSchema={validationSchema}>
       {(props) => (
         <Form className={styles.form}>
+          <SkipLogicCleanup
+            values={props.values}
+            config={config}
+            setFieldValue={props.setFieldValue}
+            setFieldError={props.setFieldError}
+            setFieldTouched={props.setFieldTouched}
+          />
           <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
           <div className={styles.formContainer}>
             {/* Navigation Sidebar */}
@@ -212,13 +231,15 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               </h4>
               {showDummyDataInput && <DummyDataInput setValues={props.setValues} />}
               <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-              {sections.map((section) => (
-                <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
-                  <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                    <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
-                  </Link>
-                </div>
-              ))}
+              {sections
+                .filter((section) => !shouldHideElement(section, props.values, config, getAgeInYears(props.values)))
+                .map((section) => (
+                  <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
+                    <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
+                      <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
+                    </Link>
+                  </div>
+                ))}
               <hr className={styles.divider} />
               <Button
                 className={styles.submitButton}
