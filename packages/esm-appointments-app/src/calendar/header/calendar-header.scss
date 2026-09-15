@@ -5,63 +5,105 @@
 .calendarHeaderContainer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: layout.$spacing-03;
-  padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
-  border-bottom: 1px solid colors.$gray-20;
-}
-
-.navigationSection {
-  display: flex;
-  align-items: center;
-  gap: layout.$spacing-03;
-}
-
-.navGroup {
-  display: flex;
-  align-items: center;
   gap: layout.$spacing-05;
+  margin: layout.$spacing-05 layout.$spacing-05 0;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  flex-wrap: wrap;
+}
+
+.todayButton {
+  height: 2rem;
+  padding: 0 layout.$spacing-04;
+  background: colors.$white;
+  border: 1px solid var(--brand-03);
+  color: var(--brand-03);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+
+  &:focus {
+    outline: 2px solid var(--brand-03);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: colors.$white;
+    }
+  }
 }
 
 .navButtonGroup {
   display: flex;
   align-items: center;
-  border: 1px solid colors.$gray-30;
+}
 
-  :global(.cds--btn--ghost.cds--btn--icon-only) {
-    border: none;
-    border-radius: 0;
+.navButton {
+  width: 2rem;
+  min-width: 2rem;
+  max-width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  color: colors.$gray-100;
+  cursor: pointer;
 
-    &:hover {
-      background-color: colors.$gray-10;
-    }
+  &:hover {
+    background-color: colors.$gray-10;
+    color: colors.$gray-100;
+  }
 
-    &:focus:not(:focus-visible) {
-      box-shadow: none;
-      outline: none;
-    }
+  &:focus {
+    outline: 2px solid var(--brand-03);
+    outline-offset: -2px;
+    box-shadow: none;
+  }
+
+  :global(.cds--btn__icon) {
+    margin: 0;
+    position: static;
   }
 }
 
-.navDivider {
-  width: 0.5px;
-  height: 2rem;
-  background-color: colors.$gray-30;
+.navButtonLast {
+  border-left: none;
 }
 
 .dateLabel {
-  @include type.type-style('heading-compact-02');
+  font-size: 1.25rem;
+  font-weight: 600;
   color: colors.$gray-100;
   white-space: nowrap;
 }
 
+.countLabel {
+  font-size: 0.8125rem;
+  color: colors.$gray-70;
+  white-space: nowrap;
+}
+
 .switcherSection {
+  margin-left: auto;
+  flex: none;
   display: flex;
   align-items: center;
-  gap: layout.$spacing-04;
-  flex-wrap: wrap;
 
   :global(.cds--content-switcher) {
     --cds-layer-selected-inverse: var(--brand-03);
@@ -69,26 +111,51 @@
     --cds-border-interactive: var(--brand-03);
     --cds-focus: var(--brand-03);
     --cds-border-subtle-00: var(--brand-03);
+    --cds-border-subtle-01: var(--brand-03);
+    --cds-border-subtle: var(--brand-03);
+    --cds-border-strong-01: var(--brand-03);
+    --cds-border-inverse: var(--brand-03);
     border-color: var(--brand-03) !important;
+    border-radius: 0 !important;
   }
 
   :global(.cds--content-switcher-btn) {
     white-space: nowrap;
     min-width: fit-content;
     color: var(--brand-03);
-    border-color: var(--brand-03);
-    &:focus {
-      box-shadow: inset 0 0 0 2px var(--brand-03) !important;
+    border-color: var(--brand-03) !important;
+    border-radius: 0 !important;
+    padding: 0 18px;
+    font-size: 0.875rem;
+
+    &:focus,
+    &:focus-visible,
+    &:focus-within,
+    &:active,
+    &:hover {
       outline: none !important;
+      box-shadow: none !important;
+      border-color: var(--brand-03) !important;
+    }
+
+    &::after,
+    &::before {
+      border-color: var(--brand-03) !important;
+      outline: none !important;
+      border-radius: 0 !important;
     }
   }
 
   :global(.cds--content-switcher-btn.cds--content-switcher--selected),
   :global(.cds--content-switcher-btn.cds--content-switcher--selected:hover),
-  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus) {
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus),
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus-visible),
+  :global(.cds--content-switcher-btn.cds--content-switcher--selected:active) {
     background-color: var(--brand-03) !important;
     border-color: var(--brand-03) !important;
     color: colors.$white !important;
+    outline: none !important;
     box-shadow: none !important;
+    border-radius: 0 !important;
   }
 }
