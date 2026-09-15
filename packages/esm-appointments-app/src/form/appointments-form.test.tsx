@@ -228,6 +228,59 @@ describe('AppointmentForm', () => {
     });
   });
 
+  it('allows scheduling an appointment without a provider when requireProvider is false', async () => {
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentTypes: ['Scheduled', 'WalkIn'],
+      requireProvider: false,
+    });
+    mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
+    mockCheckAppointmentConflict.mockResolvedValue({ status: 204, data: {} } as FetchResponse);
+    mockSaveAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
+
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('combobox', { name: /select a provider/i })).not.toBeInTheDocument();
+
+    const locationSelect = screen.getByRole('combobox', { name: /select a location/i });
+    const serviceSelect = screen.getByRole('combobox', { name: /select a service/i });
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /select the type of appointment/i });
+    const dateInput = screen.getByRole('textbox', { name: /^date$/i });
+    const dateAppointmentIssuedInput = screen.getByRole('textbox', { name: /date appointment issued/i });
+    const timeInput = screen.getByRole('textbox', { name: /time/i });
+    const timeFormat = screen.getByRole('combobox', { name: /time/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(locationSelect, ['Inpatient Ward']);
+    await user.selectOptions(serviceSelect, ['Outpatient']);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await user.selectOptions(appointmentTypeSelect, ['Scheduled']);
+
+    const date = '2024-01-04';
+    const time = '09:30';
+
+    fireEvent.change(dateInput, { target: { value: date } });
+    fireEvent.change(timeInput, { target: { value: time } });
+    await user.selectOptions(timeFormat, 'AM');
+    await user.click(dateAppointmentIssuedInput);
+    fireEvent.change(dateAppointmentIssuedInput, { target: { value: date } });
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await user.click(saveButton);
+
+    expect(mockSaveAppointment).toHaveBeenCalledTimes(1);
+    expect(mockSaveAppointment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        providers: [],
+      }),
+      new AbortController(),
+    );
+  });
+
   it('renders an error snackbar if there was a problem scheduling an appointment', async () => {
     const user = userEvent.setup();
 
