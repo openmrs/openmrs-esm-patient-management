@@ -66,3 +66,8 @@ export const deletePatient = async (api: APIRequestContext, uuid: string) => {
 export function getPatientIdentifierStr(patient: Patient) {
   return patient.identifiers[0].display.split('=')[1].trim();
 }
+
+export function getPatientNames(patient: Patient) {
+  const [firstName, lastName] = patient.person.display.split(' ');
+  return { firstName, lastName, fullName: `${firstName} ${lastName}` };
+}
