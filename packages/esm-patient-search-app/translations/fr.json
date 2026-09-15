@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Erreur lors de la mise à jour des patients reçus récemment",
   "female": "Femme",
   "male": "Homme",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Mois de naissance",
   "nextPage": "Page suivante",
   "noPatientChartsFoundMessage": "Désolé, aucun dossier de patient n'a été trouvé",

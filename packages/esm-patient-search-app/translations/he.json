@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "שגיאה בעדכון מטופלים שנצפו לאחרונה",
   "female": "נקבה",
   "male": "זכר",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "חודש הלידה",
   "nextPage": "הדף הבא",
   "noPatientChartsFoundMessage": "מצטערים, לא נמצאו כרטיסי מטופלים",
