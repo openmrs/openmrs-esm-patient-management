@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type BedPostPayload, type BedTag, type BedTagMap } from '../../types';
+import { type AdmissionLocation, type BedPostPayload, type BedTag, type BedTagMap, type BedType } from '../../types';
 
-interface BedForm {
+export interface BedForm {
   bedNumber: string;
   bedType: string;
   row: number;
@@ -79,12 +79,16 @@ async function createBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise
 
 async function updateBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise<void> {
   try {
-    const existingMappingsResponse = await openmrsFetch(`${restBaseUrl}/admissionLocation?v=full`);
+    const existingMappingsResponse = await openmrsFetch<{ results: Array<AdmissionLocation> }>(
+      `${restBaseUrl}/admissionLocation?v=full`,
+    );
     const allBeds = existingMappingsResponse.data?.results?.flatMap((location) => location.bedLayouts || []) || [];
     const targetBed = allBeds.find((bed) => bed.bedUuid === bedUuid);
     const existingMappings = targetBed?.bedTagMaps || [];
-    const existingTagIds = existingMappings.map((m) => m.bedTag?.uuid).filter(Boolean);
-    const newTagIds = bedTags.map((t) => t.uuid).filter(Boolean);
+    const existingTagIds: string[] = existingMappings
+      .map((m) => m.bedTag?.uuid)
+      .filter((id): id is string => Boolean(id));
+    const newTagIds: string[] = bedTags.map((t) => t.uuid).filter((id): id is string => Boolean(id));
     const tagsToAdd = bedTags.filter((t) => t.uuid && !existingTagIds.includes(t.uuid));
     const tagsToRemove = existingMappings.filter((m) => m.bedTag?.uuid && !newTagIds.includes(m.bedTag.uuid));
     const deletePromises = tagsToRemove.map((mapping) =>
@@ -122,9 +126,9 @@ export async function getBedTagMappings(bedUuid: string): Promise<BedTag[]> {
           if (bedLayout.bedUuid === bedUuid) {
             return (
               bedLayout.bedTagMaps?.map((tagMap: BedTagMap) => ({
-                uuid: tagMap.bedTag?.uuid,
-                id: tagMap.bedTag?.uuid,
-                name: tagMap.bedTag?.name,
+                uuid: tagMap.bedTag.uuid,
+                id: tagMap.bedTag.uuid,
+                name: tagMap.bedTag.name,
               })) || []
             );
           }
@@ -134,7 +138,7 @@ export async function getBedTagMappings(bedUuid: string): Promise<BedTag[]> {
 
     return [];
   } catch (error) {
-    throw new Error(`Failed to fetch bed tag mappings for bed UUID ${bedUuid}: ${error.message}`);
+    throw new Error(`...${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -159,11 +163,11 @@ export function useBedTagMappings(bedUuid?: string) {
 
 export function useBedType() {
   const locationsUrl = `${restBaseUrl}/bedtype`;
-  const { data, error, isLoading } = useSWR<{ data }>(locationsUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<BedType> } }>(locationsUrl, openmrsFetch);
 
   const bedTypes = useMemo(() => {
     const rawData = data?.data?.results ?? [];
-    const uniqueBedTypes = [];
+    const uniqueBedTypes: Array<BedType> = [];
 
     rawData.forEach((response) => {
       if (!uniqueBedTypes.some((bedType) => bedType.name === response.name)) {
