@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Eroare la actualizarea pacienților vizualizați recent",
   "female": "Femeie",
   "male": "Bărbat",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Luna nașterii",
   "nextPage": "Pagina următoare",
   "noPatientChartsFoundMessage": "Ne pare rău, nu au fost găsite fișe de pacient",

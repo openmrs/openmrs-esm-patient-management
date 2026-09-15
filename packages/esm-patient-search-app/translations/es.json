@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Error al actualizar pacientes recientemente vistos",
   "female": "Femenino",
   "male": "Masculino",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Mes de Nacimiento",
   "nextPage": "Siguiente página",
   "noPatientChartsFoundMessage": "Lo sentimos, no se han encontrado historias clínicas de pacientes",

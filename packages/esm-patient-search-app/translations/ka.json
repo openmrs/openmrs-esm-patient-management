@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Error updating recently viewed patients",
   "female": "მდედრი",
   "male": "მამრი",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "დაბადების თვე",
   "nextPage": "შემდეგი გვერდი",
   "noPatientChartsFoundMessage": "Sorry, no patient charts were found",

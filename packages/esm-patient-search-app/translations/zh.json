@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "更新最近查看患者时出错",
   "female": "女性",
   "male": "男性",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "出生月份",
   "nextPage": "下一页",
   "noPatientChartsFoundMessage": "抱歉，未找到患者记录。",
