@@ -24,10 +24,15 @@ RUN apk update && \
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=frontend /etc/nginx/nginx.conf /etc/nginx/nginx.conf
-# this assumes that NOTHING in the framework is in a subdirectory
-COPY --from=frontend /usr/share/nginx/html/* /usr/share/nginx/html/
+COPY --from=frontend /usr/share/nginx/html/ /usr/share/nginx/html/
 COPY --from=frontend /usr/local/bin/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
+
+# remove the nightly image's precompressed importmap and routes registry;
+# nginx serves .br/.gz variants first, and these would shadow the freshly
+# assembled plain files copied in below
+RUN rm -f /usr/share/nginx/html/importmap.json.br /usr/share/nginx/html/importmap.json.gz \
+  /usr/share/nginx/html/routes.registry.json.br /usr/share/nginx/html/routes.registry.json.gz
 
 COPY --from=dev /app/spa/ /usr/share/nginx/html/
 

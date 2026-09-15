@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { type APIRequestContext, type Page, expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
 import { type EMRConfiguration, type Encounter } from './types';
 
 export const createEncounter = async (
@@ -35,6 +36,33 @@ export const createEncounter = async (
       obs: observations,
     },
   });
+  expect(encounterRes.ok()).toBeTruthy();
+  return await encounterRes.json();
+};
+
+/**
+ * Records a visit note against an existing visit, dated inside that visit's window because the backend
+ * rejects an encounter dated outside it. `E2E_ADMISSION_ENCOUNTER_TYPE_UUID` holds the Visit Note
+ * encounter type despite its name, as `createEncounter` above also relies on.
+ */
+export const createVisitNoteEncounter = async (
+  api: APIRequestContext,
+  patientId: string,
+  visit: Visit,
+  note: string,
+  locationUuid?: string,
+): Promise<Encounter> => {
+  const encounterRes = await api.post('encounter', {
+    data: {
+      encounterDatetime: dayjs(visit.startDatetime).add(1, 'hour').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+      patient: patientId,
+      location: locationUuid || process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
+      encounterType: process.env.E2E_ADMISSION_ENCOUNTER_TYPE_UUID,
+      visit: visit.uuid,
+      obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: note }],
+    },
+  });
+
   expect(encounterRes.ok()).toBeTruthy();
   return await encounterRes.json();
 };
@@ -105,14 +133,11 @@ export const waitForAdmissionToBeProcessed = async (
   let admissionFound = false;
   let lastResponse: any = null;
 
-  // eslint-disable-next-line playwright/no-conditional-in-test
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const response = await api.get(`emrapi/inpatient/admission?currentInpatientLocation=${wardLocationUuid}`);
 
-    // eslint-disable-next-line playwright/no-conditional-in-test
     if (response.ok()) {
       const data = await response.json();
-      // eslint-disable-next-line playwright/no-conditional-in-test
       const results = data.results || [];
       lastResponse = { results, totalResults: results.length };
 
@@ -123,7 +148,6 @@ export const waitForAdmissionToBeProcessed = async (
         return admissionPatientUuid === patientUuid && admission.visit?.uuid;
       });
 
-      // eslint-disable-next-line playwright/no-conditional-in-test
       if (admissionFound) {
         break;
       }
@@ -131,16 +155,12 @@ export const waitForAdmissionToBeProcessed = async (
       lastResponse = { status: response.status(), statusText: response.statusText() };
     }
 
-    // eslint-disable-next-line playwright/no-conditional-in-test
     if (attempt < maxAttempts - 1) {
-      // eslint-disable-next-line playwright/no-wait-for-timeout
       await page.waitForTimeout(delayMs);
     }
   }
 
-  // eslint-disable-next-line playwright/no-conditional-in-test
   if (!admissionFound) {
-    // eslint-disable-next-line playwright/no-conditional-in-test
     const debugInfo = lastResponse
       ? ` Last API response: ${JSON.stringify(lastResponse)}`
       : ' No successful API responses received.';
@@ -151,7 +171,6 @@ export const waitForAdmissionToBeProcessed = async (
   }
 
   // Give the UI time to refresh its SWR cache with the updated admission data
-  // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(uiCacheRefreshDelayMs);
 };
 
@@ -175,13 +194,11 @@ export const waitForAdmissionRequestToBeProcessed = async (
   let requestFound = false;
   let lastResponse: any = null;
 
-  // eslint-disable-next-line playwright/no-conditional-in-test
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const response = await api.get(
       `emrapi/inpatient/request?dispositionType=ADMIT,TRANSFER&dispositionLocation=${wardLocationUuid}`,
     );
 
-    // eslint-disable-next-line playwright/no-conditional-in-test
     if (response.ok()) {
       const data = await response.json();
       const results = data.results || [];
@@ -192,7 +209,6 @@ export const waitForAdmissionRequestToBeProcessed = async (
         return requestPatientUuid === patientUuid;
       });
 
-      // eslint-disable-next-line playwright/no-conditional-in-test
       if (requestFound) {
         break;
       }
@@ -200,16 +216,12 @@ export const waitForAdmissionRequestToBeProcessed = async (
       lastResponse = { status: response.status(), statusText: response.statusText() };
     }
 
-    // eslint-disable-next-line playwright/no-conditional-in-test
     if (attempt < maxAttempts - 1) {
-      // eslint-disable-next-line playwright/no-wait-for-timeout
       await page.waitForTimeout(delayMs);
     }
   }
 
-  // eslint-disable-next-line playwright/no-conditional-in-test
   if (!requestFound) {
-    // eslint-disable-next-line playwright/no-conditional-in-test
     const debugInfo = lastResponse
       ? ` Last API response: ${JSON.stringify(lastResponse)}`
       : ' No successful API responses received.';
@@ -220,6 +232,5 @@ export const waitForAdmissionRequestToBeProcessed = async (
   }
 
   // Give the UI time to refresh its SWR cache with the updated request data
-  // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(uiCacheRefreshDelayMs);
 };

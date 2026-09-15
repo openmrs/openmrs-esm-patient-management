@@ -4,11 +4,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .defaultQueueTable {
-  margin: layout.$spacing-05;
-}
-
-.container {
-  border: 1px solid colors.$gray-20;
+  margin: layout.$spacing-05 0 0;
 }
 
 .tableSection {
@@ -24,14 +20,6 @@
   background-color: colors.$gray-10;
 }
 
-.headerButtons {
-  display: flex;
-
-  .filterSearch {
-    margin-left: layout.$spacing-05;
-  }
-}
-
 .loaderContainer {
   display: flex;
   flex: 0.25;
@@ -44,16 +32,6 @@
   }
 }
 
-.filterContainer {
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: layout.$spacing-05;
-  }
-}
-
 .search {
   max-width: 16rem;
   display: inline;
@@ -61,15 +39,6 @@
   input {
     background-color: $ui-02 !important;
   }
-}
-
-.statusTableContainer {
-  padding: layout.$spacing-05;
-  background-color: colors.$gray-10;
-}
-
-.statusTableHeader {
-  padding: layout.$spacing-03 0;
 }
 
 .tableHeader {
@@ -142,17 +111,13 @@
 }
 
 .expandedActiveVisitRow {
-  td {
+  > td {
     padding: layout.$spacing-03;
 
     > div {
       max-height: max-content !important;
       background-color: $ui-02;
     }
-  }
-
-  th[colspan] td[colspan] > div:first-child {
-    padding: 0 layout.$spacing-05;
   }
 }
 
@@ -188,10 +153,6 @@ html[dir='rtl'] {
       }
     }
   }
-}
-
-.tabList {
-  padding-left: layout.$spacing-05;
 }
 
 .tileContainer {

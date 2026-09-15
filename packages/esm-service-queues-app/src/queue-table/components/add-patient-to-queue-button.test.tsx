@@ -33,7 +33,7 @@ describe('AddPatientToQueueButton', () => {
       showCheckedInPatientsBeforeSearch: true,
     });
     render(<AddPatientToQueueButton />);
-    await user.click(screen.getByRole('button', { name: /add patient to queue/i }));
+    await user.click(screen.getByRole('button', { name: /add a patient to this list/i }));
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       'queue-patient-search-workspace',
       expect.objectContaining({ preSearchContent: expect.any(Function) }),
@@ -48,7 +48,7 @@ describe('AddPatientToQueueButton', () => {
       showCheckedInPatientsBeforeSearch: false,
     });
     render(<AddPatientToQueueButton />);
-    await user.click(screen.getByRole('button', { name: /add patient to queue/i }));
+    await user.click(screen.getByRole('button', { name: /add a patient to this list/i }));
     expect(mockLaunchWorkspace2).toHaveBeenCalled();
     expect(launchProps()).not.toHaveProperty('preSearchContent');
   });

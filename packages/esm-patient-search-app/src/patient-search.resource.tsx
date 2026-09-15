@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from 'react';
-import useSWR from 'swr';
+﻿import { useCallback, useEffect, useMemo, useRef } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import useSWRInfinite from 'swr/infinite';
+import useSWRInfinite, { type SWRInfiniteResponse } from 'swr/infinite';
 import {
   omrsOfflineCachingStrategyHttpHeaderName,
   openmrsFetch,
@@ -45,6 +45,57 @@ export const getUserPropertiesUrl = (userUuid: string) =>
   `${restBaseUrl}/user/${userUuid}?v=${encodeURIComponent(userPropertiesRepresentation)}`;
 
 /**
+ * Refreshes page 1 of an infinite search the first time a given query becomes active.
+ *
+ * The searches in this module set `revalidateFirstPage: false` so that appending a page does not
+ * re-fetch page 1. SWR has no notion of cache expiry, so that flag alone would pin a query's
+ * results — including an empty result — for as long as the SPA stays loaded: neither remounting
+ * the search UI nor refocusing the window causes `useSWRInfinite` to re-fetch a page it already
+ * holds. A clerk who searches for a patient, registers them, and searches again would keep seeing
+ * the cached "no results".
+ *
+ * Passing a per-page predicate to `mutate` revalidates page 1 alone, leaving the already-loaded
+ * pages (and their object identities) untouched, so the append optimization is preserved. This
+ * fires once per query: a query is "reopened" when its key changes, or when the search is cleared
+ * and the same term is entered again.
+ *
+ * @param firstPageUrl The page 1 URL of the active query, or null when the search is inactive
+ * @param mutate The `mutate` returned by the `useSWRInfinite` call being bounded
+ */
+function useRevalidateFirstPageOnce<T>(firstPageUrl: string | null, mutate: SWRInfiniteResponse<T>['mutate']) {
+  const { cache } = useSWRConfig();
+  const revalidatedUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Closing the search resets this, so re-entering the same term revalidates again.
+    if (!firstPageUrl) {
+      revalidatedUrlRef.current = null;
+      return;
+    }
+
+    if (revalidatedUrlRef.current === firstPageUrl) {
+      return;
+    }
+
+    revalidatedUrlRef.current = firstPageUrl;
+
+    // An uncached page 1 is fetched by SWR regardless, so mutating would only duplicate it. Note
+    // that `data` cannot stand in for this check: `keepPreviousData` leaves the outgoing query's
+    // results in place while a new query has nothing cached.
+    if (cache.get(firstPageUrl)?.data === undefined) {
+      return;
+    }
+
+    // The pages are written back unchanged rather than passing `undefined`, which would clear the
+    // cache entry and put the hook back into its loading state, flashing a skeleton over results
+    // that are already on screen.
+    void mutate((currentPages) => currentPages, {
+      revalidate: (_pageData, pageKey) => pageKey === firstPageUrl,
+    });
+  }, [cache, firstPageUrl, mutate]);
+}
+
+/**
  * A custom React hook for implementing infinite scrolling patient search.
  *
  * @param searchQuery - The string to search for in patient records.
@@ -61,7 +112,10 @@ export const getUserPropertiesUrl = (userUuid: string) =>
  *   - isValidating: Boolean indicating if new data is being loaded
  *   - setPage: Function to load the next page of results
  *   - currentPage: The current page number
- *   - totalResults: The total number of results for the search query
+ *   - totalResults: The number of results for the query the returned `data` belongs to
+ *   - totalResultsForQuery: The number of results for the query currently being searched for
+ *   - minSearchCharacters: The configured minimum number of characters required before a search runs
+ *   - isLoadingMinSearchCharacters: Whether the minimum character setting is still being fetched
  */
 export function useInfinitePatientSearch(
   searchQuery: string,
@@ -70,25 +124,22 @@ export function useInfinitePatientSearch(
   resultsToFetch: number = 10,
   customRepresentation: string = patientSearchCustomRepresentation,
 ): PatientSearchResponse {
+  const { cache } = useSWRConfig();
   const { minSearchCharacters, isLoadingMinSearchCharacters } = useMinSearchCharacters();
 
-  const getUrl = useCallback(
-    (
-      page: number,
-      prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
-    ) => {
-      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
-        return null;
-      }
-
+  const buildUrl = useCallback(
+    (page: number) => {
       const baseUrl = `${restBaseUrl}/patient`;
       const params = new URLSearchParams({
         q: searchQuery,
         v: customRepresentation,
         includeDead: includeDead.toString(),
         limit: resultsToFetch.toString(),
-        totalCount: 'true',
-        ...(page ? { startIndex: (page * resultsToFetch).toString() } : {}),
+        // Only page 1's count is ever read (see below), so only page 1 asks for it. This is about
+        // asking for what we use rather than about backend cost: the patient search handler hands
+        // back a `NeedsPaging`, whose count is the size of the list it has already built in memory,
+        // so `totalCount=true` does not make the REST module run a separate count query here.
+        ...(page ? { startIndex: (page * resultsToFetch).toString() } : { totalCount: 'true' }),
       });
 
       return `${baseUrl}?${params.toString()}`;
@@ -96,22 +147,58 @@ export function useInfinitePatientSearch(
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const shouldFetch = isSearching && !isLoadingMinSearchCharacters && searchQuery.trim().length >= minSearchCharacters;
+  // Blocked while the minimum-character setting is still loading (so a temporary fallback can't let
+  // a too-short query through), and while the trimmed query is shorter than the configured minimum.
+  const shouldFetch =
+    isSearching && !isLoadingMinSearchCharacters && searchQuery.trim().length >= minSearchCharacters;
+  const firstPageUrl = shouldFetch ? buildUrl(0) : null;
 
-  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<InfinitePatientSearchResponse, Error>(
-    shouldFetch ? getUrl : null,
-    fetcher,
-    { keepPreviousData: true },
+  // The count for the query being fetched, read through the cache rather than off `data`:
+  // `keepPreviousData` leaves the outgoing query's pages in `data` while a new query loads, so
+  // `data[0]` would report the wrong query's total — and callers size their page requests from it.
+  const totalCount = firstPageUrl ? cache.get(firstPageUrl)?.data?.data?.totalCount : undefined;
+
+  // Pages are fetched in parallel, so appending one costs a round trip rather than a round trip per
+  // page walked. The trade-off is that SWR no longer passes the previous page to `getKey`, so the
+  // end of the result set is recognised from the total page 1 reports instead of its `next` link.
+  // Until that total is known there is nothing to page through, so only page 1 is requested.
+  const getUrl = useCallback(
+    (page: number) => {
+      if (page > 0) {
+        const total = cache.get(buildUrl(0))?.data?.data?.totalCount;
+        if (total === undefined || page * resultsToFetch >= total) {
+          return null;
+        }
+      }
+
+      return buildUrl(page);
+    },
+    [buildUrl, cache, resultsToFetch],
   );
+
+  // Re-fetching page 1 on every page load would cost a round trip and replace the rendered rows'
+  // objects, breaking the identity they memoize on. See `useRevalidateFirstPageOnce` for how the
+  // resulting staleness is bounded.
+  const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<
+    InfinitePatientSearchResponse,
+    Error
+  >(shouldFetch ? getUrl : null, fetcher, { keepPreviousData: true, revalidateFirstPage: false, parallel: true });
+
+  useRevalidateFirstPageOnce(firstPageUrl, mutate);
 
   // Filter out null patients and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
-  // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData = shouldFetch
-    ? (data
-        ?.flatMap((res) => res.data?.results ?? [])
-        ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
-    : null;
+  // (in the hook) to ensure all consumers receive clean, valid data. Memoized because consumers
+  // key their own memos off this array's identity.
+  const mappedData = useMemo(
+    () =>
+      shouldFetch
+        ? (data
+            ?.flatMap((res) => res.data?.results ?? [])
+            ?.filter((patient): patient is SearchedPatient => patient !== null && patient.person !== null) ?? null)
+        : null,
+    [shouldFetch, data],
+  );
 
   return useMemo(
     () => ({
@@ -122,7 +209,11 @@ export function useInfinitePatientSearch(
       isValidating,
       setPage: setSize,
       currentPage: size,
+      // Describes the rows in `data`, which under `keepPreviousData` are the outgoing query's until
+      // the new first page lands — so a view can print this above the rows it is rendering without
+      // the count and the list disagreeing mid-query.
       totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
+      totalResultsForQuery: totalCount ?? 0,
       minSearchCharacters,
       isLoadingMinSearchCharacters,
     }),
@@ -135,6 +226,7 @@ export function useInfinitePatientSearch(
       isValidating,
       setSize,
       size,
+      totalCount,
       minSearchCharacters,
       isLoadingMinSearchCharacters,
     ],
@@ -243,24 +335,33 @@ export function useRestPatients(
 
   const shouldFetch = isSearching && patientUuids !== null && patientUuids.length > 0;
 
+  // One patient per page, so fetch them in parallel; safe because the page URLs depend only on the
+  // index, never on the previous page.
   const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<FetchResponse<SearchedPatient>, Error>(
     shouldFetch ? getPatientUrl : null,
     fetcher,
     {
       keepPreviousData: true,
+      revalidateFirstPage: false,
+      revalidateOnMount: true,
+      parallel: true,
       initialSize: patientUuids ? Math.min(resultsToFetch, patientUuids.length) : 0,
     },
   );
 
   // Filter out null, voided, and patients with null person property to prevent errors
   // when components access patient.person properties. This filtering happens at the source
-  // (in the hook) to ensure all consumers receive clean, valid data.
-  const mappedData =
-    data
-      ?.flatMap((res) => res.data)
-      ?.filter(
-        (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
-      ) ?? null;
+  // (in the hook) to ensure all consumers receive clean, valid data. Memoized because consumers
+  // key their own memos off this array's identity.
+  const mappedData = useMemo(
+    () =>
+      data
+        ?.flatMap((res) => res.data)
+        ?.filter(
+          (patient): patient is SearchedPatient => patient !== null && !patient.voided && patient.person !== null,
+        ) ?? null,
+    [data],
+  );
 
   return useMemo(
     () => ({
@@ -272,6 +373,9 @@ export function useRestPatients(
       setPage: setSize,
       currentPage: size,
       totalResults: patientUuids?.length ?? 0,
+      // This hook pages a list it already holds, so there is no in-flight query for the count to
+      // lag behind.
+      totalResultsForQuery: patientUuids?.length ?? 0,
     }),
     [mappedData, isLoading, error, patientUuids, size, isValidating, setSize],
   );

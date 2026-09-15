@@ -34,6 +34,14 @@ test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+  await changeToDefaultLocation(api);
+});
+
 test('Discharge a patient from a ward', async ({ page, api }) => {
   const wardPage = new WardPage(page);
   const patientName = wardPatient.person?.display;
@@ -105,12 +113,4 @@ test('Discharge a patient from a ward', async ({ page, api }) => {
   await test.step('And the patient should no longer be listed in the ward', async () => {
     await expect(page.getByText(patientName, { exact: true })).toBeHidden();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
-  await changeToDefaultLocation(api);
 });

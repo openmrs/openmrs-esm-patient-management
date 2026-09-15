@@ -62,6 +62,7 @@ describe('QueueScreen component', () => {
     render(<QueueScreen />);
 
     expect(screen.getByText('No active tickets to display')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveClass('cds--layer-two');
   });
 
   test('renders table with active tickets when data is loaded', () => {

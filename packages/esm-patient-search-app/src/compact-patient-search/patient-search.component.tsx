@@ -6,7 +6,6 @@ import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
-import { SWRConfig } from 'swr';
 
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
@@ -33,7 +32,7 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
     const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
 
     // Only show the full skeleton when there is nothing to show
-    if (isLoading && !searchResults?.length) {
+    if ((isLoading || isLoadingMinSearchCharacters) && !searchResults?.length) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
@@ -64,7 +63,7 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
       );
     }
 
-    if (!isLoadingMinSearchCharacters && query.trim().length < minSearchCharacters) {
+    if (query.trim().length < minSearchCharacters) {
       return (
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
@@ -92,22 +91,13 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
                 count: totalResults,
               })}
             </p>
-            {/* Set SWRConfig to minimize revalidations of, e.g., the patient photo */}
-            <SWRConfig
-              value={{
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false,
-                dedupingInterval: 180_000, // 3 minutes
-              }}>
-              <CompactPatientBanner
-                ref={ref}
-                patients={searchResults}
-                hasMore={hasMore}
-                isValidating={isValidating}
-                fetchMore={fetchMore}
-              />
-            </SWRConfig>
+            <CompactPatientBanner
+              ref={ref}
+              patients={searchResults}
+              hasMore={hasMore}
+              isValidating={isValidating}
+              fetchMore={fetchMore}
+            />
           </div>
         </div>
       );

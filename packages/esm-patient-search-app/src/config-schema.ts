@@ -51,7 +51,7 @@ export const configSchema = {
         max: {
           _type: Type.Number,
           _default: 0,
-          _description: 'The maximum value for the age field',
+          _description: 'The maximum value for the age field. 0 means no maximum.',
         },
       },
       postcode: {

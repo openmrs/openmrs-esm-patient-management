@@ -1,40 +1,22 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .tileContainer {
-  border: 1px solid $ui-03;
-  min-height: 7.875rem;
-  height: 100%;
-  padding: layout.$spacing-05;
+  background-color: transparent;
+  padding: 0;
 }
 
 .tileHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: layout.$spacing-03;
+  margin-bottom: layout.$spacing-02;
 }
 
 .headerLabelContainer {
   display: flex;
-  height: layout.$spacing-07;
   align-items: center;
-
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-
-    label {
-      @include type.type-style('heading-compact-01');
-      color: $text-02;
-      margin-right: layout.$spacing-03;
-    }
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: layout.$spacing-05;
-  }
 }
 
 .link {
@@ -49,7 +31,7 @@
 }
 
 .headerLabel {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('body-compact-02');
   color: $text-02;
 }
 
@@ -62,36 +44,13 @@
 
 .metricItem {
   display: inline-block;
-  flex-direction: column;
-}
-
-.metricLabel {
-  @include type.type-style('label-01');
-  color: $text-02;
-  margin-bottom: layout.$spacing-02;
+  flex: 1;
 }
 
 .metricValue {
-  @include type.type-style('heading-04');
+  @include type.type-style('heading-03');
   color: $ui-05;
   margin: 0;
-}
-
-.mainItem {
-  margin-right: layout.$spacing-07;
-}
-
-.smallItem {
-  flex-direction: row;
-}
-
-.smallValue {
-  font-size: 1rem !important;
-  margin-top: layout.$spacing-02;
-}
-
-.red {
-  color: colors.$red-50;
 }
 
 // Overriding styles for RTL support

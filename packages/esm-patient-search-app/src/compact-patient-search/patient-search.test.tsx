@@ -51,6 +51,19 @@ describe('PatientSearch', () => {
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
   });
 
+  it('renders a loading state while the minimum character setting is still loading', () => {
+    renderPatientSearch({
+      isLoading: false,
+      isLoadingMinSearchCharacters: true,
+      data: [],
+      query: 'Jo',
+    });
+
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.queryByText(/please enter at least/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/no patient charts were found/i)).not.toBeInTheDocument();
+  });
+
   it('keeps showing existing results (no skeleton) while a new query is loading', () => {
     const birthdate = '1990-01-01T00:00:00.000+0000';
     const existingResults: Array<SearchedPatient> = [

@@ -30,6 +30,13 @@ test.beforeEach(async ({ api, page, emrConfiguration }) => {
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
 });
 
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
+});
+
 test('Add a patient note to an inpatient admission', async ({ page, api }) => {
   const fullName = wardPatient.person?.display;
   const wardPage = new WardPage(page);
@@ -131,11 +138,4 @@ test('Add a patient note to an inpatient admission', async ({ page, api }) => {
     await expect(page.getByRole('dialog').getByText('Sample patient note - edited')).toBeVisible();
     await expect(page.getByText('Sample patient note', { exact: true })).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  await retireBedType(api, bedType.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });

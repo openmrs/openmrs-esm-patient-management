@@ -203,4 +203,34 @@ describe('Patient registration validation', () => {
     const validationError = await validateFormValues(invalidFormValues);
     expect(validationError.errors).toContain('Death date cannot be in future');
   });
+
+  it('should allow deathDate to be the same calendar day as birthdate', async () => {
+    const formValues = {
+      ...validFormValues,
+      birthdate: new Date('1990-01-01'),
+      deathDate: new Date('1990-01-01'),
+    };
+    const validationError = await validateFormValues(formValues);
+    expect(validationError).toBeFalsy();
+  });
+
+  it('should throw an error when deathDate is the day before birthdate', async () => {
+    const invalidFormValues = {
+      ...validFormValues,
+      birthdate: new Date('1990-01-01'),
+      deathDate: new Date('1989-12-31'),
+    };
+    const validationError = await validateFormValues(invalidFormValues);
+    expect(validationError.errors).toContain('Death date and time cannot be before the birthday');
+  });
+
+  it('should allow deathDate to be later than birthdate', async () => {
+    const formValues = {
+      ...validFormValues,
+      birthdate: new Date('1990-01-01'),
+      deathDate: new Date('2020-06-15'),
+    };
+    const validationError = await validateFormValues(formValues);
+    expect(validationError).toBeFalsy();
+  });
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
@@ -11,34 +11,27 @@ interface PatientSearchResultsProps {
 }
 
 interface EmptyStateProps {
-  query?: string;
-  minSearchCharacters?: number;
+  /** Already translated. Defaults to the no-results message. */
+  title?: string;
+  /** Already translated. Defaults to the hint to search by patient ID. Pass null to hide the hint entirely. */
+  hint?: string | null;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ query = '', minSearchCharacters = 0 }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ title, hint }) => {
   const { t } = useTranslation();
-  const tooFewCharacters = query.trim().length < minSearchCharacters;
   return (
     <Layer>
       <Tile className={styles.emptySearchResultsTile}>
         <EmptyCardIllustration />
-        {tooFewCharacters ? (
-          <p className={styles.emptyResultText}>
-            {t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
-              count: minSearchCharacters,
-            })}
+        <p className={styles.emptyResultText}>
+          {title ?? t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
+        </p>
+        {hint !== null && (
+          <p className={styles.actionText}>
+            <span>
+              {hint ?? t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+            </span>
           </p>
-        ) : (
-          <>
-            <p className={styles.emptyResultText}>
-              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
-            </p>
-            <p className={styles.actionText}>
-              <span>
-                {t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
-              </span>
-            </p>
-          </>
         )}
       </Tile>
     </Layer>
