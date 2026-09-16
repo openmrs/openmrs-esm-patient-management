@@ -18,6 +18,7 @@ import EmptyState from '../empty-state/empty-state.component';
 import QueueDuration from '../queue-table/components/queue-duration.component';
 import { QueueMetricTile } from '../queue-table/queue-table-metrics-card.component';
 import { useServiceQueuesStore } from '../store/store';
+import { useConcept } from '../hooks/useConcept';
 import { useClinicQueueMetrics, type QueueRollup } from '../hooks/useClinicQueueMetrics';
 import { formatWaitTimeInMinutes } from '../wait-time';
 import { spaBasePath } from '../constants';
@@ -37,8 +38,13 @@ interface RollupColumn {
 const ClinicOverview: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { waitTimeThresholds } = useConfig<ConfigObject>();
+  const {
+    waitTimeThresholds,
+    concepts: { defaultTransitionStatus },
+  } = useConfig<ConfigObject>();
   const { selectedQueueLocationUuid, selectedServiceUuid } = useServiceQueuesStore();
+  const { concept: inServiceStatus } = useConcept(defaultTransitionStatus);
+  const inServiceLabel = inServiceStatus?.display ?? t('inService', 'In Service');
   const { rollups, totals, isLoading, error } = useClinicQueueMetrics(selectedQueueLocationUuid, selectedServiceUuid);
 
   const columns: Array<RollupColumn> = useMemo(
@@ -61,7 +67,7 @@ const ClinicOverview: React.FC = () => {
       { key: 'location', header: t('location', 'Location') },
       { key: 'service', header: t('service', 'Service') },
       { key: 'waiting', header: t('waiting', 'Waiting') },
-      { key: 'attending', header: t('attending', 'Attending') },
+      { key: 'attending', header: inServiceLabel },
       {
         key: 'averageWait',
         header: t('averageWait', 'Average wait'),
@@ -82,7 +88,7 @@ const ClinicOverview: React.FC = () => {
           ),
       },
     ],
-    [t, waitTimeThresholds],
+    [t, inServiceLabel, waitTimeThresholds],
   );
 
   const rows = useMemo(
@@ -108,7 +114,7 @@ const ClinicOverview: React.FC = () => {
 
   const totalsCards = [
     { key: 'waiting', title: t('waiting', 'Waiting'), value: totals.waiting },
-    { key: 'attending', title: t('attending', 'Attending'), value: totals.attending },
+    { key: 'attending', title: inServiceLabel, value: totals.attending },
     {
       key: 'averageWait',
       title: t('averageWait', 'Average wait'),

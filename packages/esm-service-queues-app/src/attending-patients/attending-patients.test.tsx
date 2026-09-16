@@ -4,15 +4,21 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
+import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import { type QueueEntry } from '../types';
+import type { Concept, QueueEntry } from '../types';
 import AttendingPatients from './attending-patients.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseQueueEntries = vi.mocked(useQueueEntries);
+const mockUseConcept = vi.mocked(useConcept);
 
 vi.mock('../hooks/useQueueEntries', () => ({
   useQueueEntries: vi.fn(),
+}));
+
+vi.mock('../hooks/useConcept', () => ({
+  useConcept: vi.fn(),
 }));
 
 const queueEntry = {
@@ -56,6 +62,22 @@ describe('AttendingPatients', () => {
       ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
       customPatientChartUrl: 'someUrl',
     });
+    mockUseConcept.mockReturnValue({ concept: undefined, error: undefined, isLoading: true });
+  });
+
+  it('titles the section with the configured in-service status, as the metrics tile does', () => {
+    mockEntries([]);
+    const { concepts } = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
+    mockUseConcept.mockReturnValue({
+      concept: { uuid: concepts.defaultTransitionStatus, display: 'In Service' } as Concept,
+      error: undefined,
+      isLoading: false,
+    });
+
+    render(<AttendingPatients />);
+
+    expect(mockUseConcept).toHaveBeenCalledWith(concepts.defaultTransitionStatus);
+    expect(screen.getByRole('heading', { name: 'In Service' })).toBeInTheDocument();
   });
 
   it('renders a card per in-service patient with a translated gender, their age and their queue', () => {
@@ -73,7 +95,8 @@ describe('AttendingPatients', () => {
     mockEntries([]);
     render(<AttendingPatients />);
 
-    expect(screen.getByText('Attending')).toBeInTheDocument();
+    // Falls back to the default label until the status concept has loaded.
+    expect(screen.getByRole('heading', { name: 'In Service' })).toBeInTheDocument();
     expect(screen.getByText('No patients are currently being attended to')).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveClass('cds--layer-two');
   });
