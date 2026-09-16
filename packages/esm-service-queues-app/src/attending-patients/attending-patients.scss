@@ -25,16 +25,28 @@
 }
 
 .card {
+  position: relative;
   display: flex;
   flex: 0 1 22rem;
-  flex-direction: column;
   background-color: $ui-02;
   border: 1px solid $ui-03;
-  text-decoration: none;
 
   &:hover {
     background-color: $ui-03;
   }
+}
+
+.cardLink {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.actionsMenu {
+  position: absolute;
+  top: layout.$spacing-03;
+  right: layout.$spacing-03;
 }
 
 .cardSkeleton {
@@ -52,7 +64,7 @@
   display: flex;
   align-items: center;
   gap: layout.$spacing-05;
-  padding: layout.$spacing-05;
+  padding: layout.$spacing-05 layout.$spacing-09 layout.$spacing-05 layout.$spacing-05;
 }
 
 .details {

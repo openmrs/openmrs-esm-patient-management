@@ -193,7 +193,13 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
   );
 }
 
-function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
+export function ActionOverflowMenuItem({
+  actionKey,
+  queueEntry,
+}: {
+  actionKey: QueueEntryAction;
+  queueEntry: QueueEntry;
+}) {
   const { t } = useTranslation();
   const actionPropsByKey = useActionPropsByKey();
 

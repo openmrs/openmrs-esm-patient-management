@@ -15,6 +15,7 @@ const mockUseConcept = vi.mocked(useConcept);
 
 vi.mock('../hooks/useQueueEntries', () => ({
   useQueueEntries: vi.fn(),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
 
 vi.mock('../hooks/useConcept', () => ({
@@ -137,6 +138,20 @@ describe('AttendingPatients', () => {
       status: concepts.defaultTransitionStatus,
       isEnded: false,
     });
+  });
+
+  it('offers the queue entry actions from a menu that sits outside the patient chart link', async () => {
+    const user = userEvent.setup();
+    mockEntries([{ ...queueEntry, previousQueueEntry: { uuid: 'qe-0' } } as unknown as QueueEntry]);
+    render(<AttendingPatients />);
+
+    const menuButton = screen.getByRole('button', { name: 'Actions menu' });
+    expect(screen.getByRole('link')).not.toContainElement(menuButton);
+
+    await user.click(menuButton);
+    // Carbon leaves the opened menu `visibility: hidden` under jsdom, so read the items' text directly.
+    const items = screen.getAllByRole('menuitem', { hidden: true }).map((item) => item.textContent);
+    expect(items).toEqual(['Move', 'Edit', 'Remove patient', 'Undo transition']);
   });
 
   it('does not offer "View all" when everything already fits', () => {

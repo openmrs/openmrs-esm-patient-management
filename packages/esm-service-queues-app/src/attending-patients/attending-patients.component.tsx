@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Layer, SkeletonPlaceholder, Tag } from '@carbon/react';
+import { Button, Layer, OverflowMenu, SkeletonPlaceholder, Tag } from '@carbon/react';
 import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
 import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { ActionOverflowMenuItem } from '../queue-table/cells/queue-table-action-cell.component';
 import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
@@ -85,6 +86,7 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
 };
 
 function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
+  const { t } = useTranslation();
   const { customPatientChartUrl, priorityConfigs } = useConfig<ConfigObject>();
   const { person } = queueEntry.patient;
 
@@ -95,27 +97,38 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
     .filter(Boolean)
     .join(' · ');
 
+  // The menu sits outside the link so opening it does not navigate to the patient chart.
   return (
-    <ConfigurableLink
-      className={styles.card}
-      to={customPatientChartUrl}
-      templateParams={{ patientUuid: queueEntry.patient.uuid }}>
-      <div className={styles.patient}>
-        <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
-        <div className={styles.details}>
-          <span className={styles.name}>{person?.display}</span>
-          <p className={styles.demographics}>{demographics}</p>
+    <div className={styles.card}>
+      <div className={styles.actionsMenu}>
+        <OverflowMenu iconDescription={t('actionsMenu', 'Actions menu')} flipped size="sm">
+          <ActionOverflowMenuItem actionKey="move" queueEntry={queueEntry} />
+          <ActionOverflowMenuItem actionKey="edit" queueEntry={queueEntry} />
+          <ActionOverflowMenuItem actionKey="remove" queueEntry={queueEntry} />
+          <ActionOverflowMenuItem actionKey="undo" queueEntry={queueEntry} />
+        </OverflowMenu>
+      </div>
+      <ConfigurableLink
+        className={styles.cardLink}
+        to={customPatientChartUrl}
+        templateParams={{ patientUuid: queueEntry.patient.uuid }}>
+        <div className={styles.patient}>
+          <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
+          <div className={styles.details}>
+            <span className={styles.name}>{person?.display}</span>
+            <p className={styles.demographics}>{demographics}</p>
+          </div>
         </div>
-      </div>
-      <div className={styles.serviceRow}>
-        <span className={styles.service}>{queueEntry.queue?.display}</span>
-        <QueuePriority
-          priority={queueEntry.priority}
-          priorityComment={queueEntry.priorityComment ?? undefined}
-          priorityConfigs={priorityConfigs}
-        />
-      </div>
-    </ConfigurableLink>
+        <div className={styles.serviceRow}>
+          <span className={styles.service}>{queueEntry.queue?.display}</span>
+          <QueuePriority
+            priority={queueEntry.priority}
+            priorityComment={queueEntry.priorityComment ?? undefined}
+            priorityConfigs={priorityConfigs}
+          />
+        </div>
+      </ConfigurableLink>
+    </div>
   );
 }
 
