@@ -1,0 +1,39 @@
+name: POC - Publish Patient Search App
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Configure GitHub Packages
+        run: |
+          yarn config set npmScopes.teenthofabud.npmRegistryServer "https://npm.pkg.github.com"
+          yarn config set npmScopes.teenthofabud.npmAlwaysAuth true
+          yarn config set npmScopes.teenthofabud.npmAuthToken '${NODE_AUTH_TOKEN}'
+
+      - name: Publish Patient Search App
+        run: yarn workspace @teenthofabud/esm-patient-search-app npm publish --tag poc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

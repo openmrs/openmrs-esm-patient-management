@@ -1,5 +1,5 @@
 {
-  "name": "@openmrs/esm-patient-search-app",
+  "name": "@teenthofabud/esm-patient-search-app",
   "version": "11.1.0",
   "description": "Patient search microfrontend for O3",
   "browser": "dist/openmrs-esm-patient-search-app.js",

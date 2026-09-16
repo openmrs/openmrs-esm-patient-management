@@ -2865,26 +2865,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-search-app@workspace:packages/esm-patient-search-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-search-app@workspace:packages/esm-patient-search-app"
-  dependencies:
-    "@carbon/react": "npm:^1.83.0"
-    "@tanstack/react-virtual": "npm:^3.13.6"
-    classnames: "npm:^2.3.2"
-    lodash-es: "npm:^4.17.15"
-    openmrs: "npm:next"
-    react-hook-form: "npm:^7.54.0"
-    vitest: "npm:^4.1.2"
-  peerDependencies:
-    "@openmrs/esm-framework": 10.x
-    react: 18.x
-    react-i18next: 16.x
-    react-router-dom: 6.x
-    swr: 2.x
-  languageName: unknown
-  linkType: soft
-
 "@openmrs/esm-react-utils@npm:10.0.1-pre.5426":
   version: 10.0.1-pre.5426
   resolution: "@openmrs/esm-react-utils@npm:10.0.1-pre.5426"
@@ -4776,6 +4756,26 @@ __metadata:
   checksum: 10/e55c70b5d3f68894804f645fe67738bbcca5d5ced333f96c2bda0d4c6f3198e5f97a3a18021b1491e850a2b4a64bdaafab250a6ee8bb1f312e6d5179656c35d7
   languageName: node
   linkType: hard
+
+"@teenthofabud/esm-patient-search-app@workspace:packages/esm-patient-search-app":
+  version: 0.0.0-use.local
+  resolution: "@teenthofabud/esm-patient-search-app@workspace:packages/esm-patient-search-app"
+  dependencies:
+    "@carbon/react": "npm:^1.83.0"
+    "@tanstack/react-virtual": "npm:^3.13.6"
+    classnames: "npm:^2.3.2"
+    lodash-es: "npm:^4.17.15"
+    openmrs: "npm:next"
+    react-hook-form: "npm:^7.54.0"
+    vitest: "npm:^4.1.2"
+  peerDependencies:
+    "@openmrs/esm-framework": 10.x
+    react: 18.x
+    react-i18next: 16.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
 
 "@testing-library/dom@npm:^10.4.1":
   version: 10.4.1
