@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Error updating recently viewed patients",
   "female": "ស្រី",
   "male": "ប្រុស",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Month of Birth",
   "nextPage": "ទំbពbរ័bបន្ទាប់",
   "noPatientChartsFoundMessage": "សូមអភ័យទោស រកមិនឃើញតារាងអ្នកជំងឺទេ។",

@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Errore nell'aggiornamento dei pazienti visualizzati di recente",
   "female": "Femmina",
   "male": "Maschio",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Mese di nascita",
   "nextPage": "Pagina successiva",
   "noPatientChartsFoundMessage": "Nessuna scheda paziente trovata",

@@ -16,6 +16,7 @@ interface PatientSearchComponentProps {
   emptiedByFilters?: boolean;
   isLoading: boolean;
   fetchError: Error | null;
+  minSearchCharacters: number;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -26,6 +27,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   emptiedByFilters = false,
   isLoading,
   fetchError,
+  minSearchCharacters,
 }) => {
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
@@ -65,6 +67,19 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     if (!isLoading && (!results || results.length === 0)) {
+      const tooFewCharacters = query.trim().length < minSearchCharacters;
+
+      if (tooFewCharacters) {
+        return (
+          <EmptyState
+            title={t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+              count: minSearchCharacters,
+            })}
+            hint={null}
+          />
+        );
+      }
+
       return emptiedByFilters ? (
         <EmptyState
           title={t('noPatientsMatchFilters', 'No patients match these filters')}
@@ -76,7 +91,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     return <PatientSearchResults searchResults={results} />;
-  }, [emptiedByFilters, fetchError, isLoading, results, t]);
+  }, [emptiedByFilters, fetchError, isLoading, results, query, minSearchCharacters, t]);
 
   return (
     <div
