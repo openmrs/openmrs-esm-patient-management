@@ -4,6 +4,7 @@ import { Button, Layer, SkeletonPlaceholder, Tag } from '@carbon/react';
 import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
 import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
 import { type ConfigObject } from '../config-schema';
@@ -24,6 +25,8 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
     concepts: { defaultTransitionStatus },
   } = useConfig<ConfigObject>();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
+  const { concept: inServiceStatus } = useConcept(defaultTransitionStatus);
+  const heading = inServiceStatus?.display ?? t('inService', 'In Service');
 
   const searchCriteria = useMemo(
     () =>
@@ -46,7 +49,7 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h4 className={styles.heading}>{t('attending', 'Attending')}</h4>
+        <h4 className={styles.heading}>{heading}</h4>
         {!isLoading && !error && <Tag type="gray">{queueEntries.length}</Tag>}
         {queueEntries.length > collapsedCardCount && (
           <Button
@@ -65,7 +68,7 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
           ))}
         </div>
       ) : error ? (
-        <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
+        <ErrorState error={error} headerTitle={heading} />
       ) : queueEntries.length === 0 ? (
         <Layer role="status">
           <EmptyState displayText={t('noOneBeingAttended', 'No patients are currently being attended to')} />
