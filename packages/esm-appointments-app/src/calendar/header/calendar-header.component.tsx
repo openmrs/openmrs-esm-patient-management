@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, Switch } from '@carbon/react';
+import { ContentSwitcher, Switch } from '@carbon/react';
 import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
@@ -10,17 +10,21 @@ import styles from './calendar-header.scss';
 interface CalendarHeaderProps {
   viewMode: CalendarViewMode;
   calendarSelectedDate: Dayjs;
+  appointmentCount?: number | null;
   onViewModeChange: (mode: CalendarViewMode) => void;
   onPrev: () => void;
   onNext: () => void;
+  onToday: () => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewMode,
   calendarSelectedDate,
+  appointmentCount,
   onViewModeChange,
   onPrev,
   onNext,
+  onToday,
 }) => {
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
@@ -33,45 +37,61 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         new Date(isoDate + 'T00:00:00'),
       );
     }
-    return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric', calendar }).format(
-      new Date(isoDate + 'T00:00:00'),
-    );
+    return new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      calendar,
+    }).format(new Date(isoDate + 'T00:00:00'));
   }, [viewMode, calendarSelectedDate, locale, calendar]);
+
+  const countLabel = useMemo(() => {
+    if (appointmentCount == null) {
+      return '';
+    }
+    if (viewMode === 'daily') {
+      return t('appointmentCount', '{{count}} appointment', {
+        count: appointmentCount,
+        defaultValue_other: '{{count}} appointments',
+      });
+    }
+    return t('appointmentsThisMonth', '{{count}} appointment this month', {
+      count: appointmentCount,
+      defaultValue_other: '{{count}} appointments this month',
+    });
+  }, [viewMode, appointmentCount, t]);
 
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
   const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
 
   return (
     <div className={styles.calendarHeaderContainer}>
-      <div className={styles.navigationSection}>
-        <div className={styles.navGroup}>
-          <div className={styles.navButtonGroup}>
-            <Button
-              hasIconOnly
-              kind="ghost"
-              size="sm"
-              renderIcon={ChevronLeft}
-              iconDescription={t('previous', 'Previous')}
-              onClick={onPrev}
-            />
-            <span className={styles.navDivider} />
-            <Button
-              hasIconOnly
-              kind="ghost"
-              size="sm"
-              renderIcon={ChevronRight}
-              iconDescription={t('next', 'Next')}
-              onClick={onNext}
-            />
-          </div>
-          <span className={styles.dateLabel}>{dateLabel}</span>
-        </div>
+      <button type="button" className={styles.todayButton} onClick={onToday}>
+        {t('today', 'Today')}
+      </button>
+      <div className={styles.navButtonGroup}>
+        <button type="button" aria-label={t('previous', 'Previous')} className={styles.navButton} onClick={onPrev}>
+          <ChevronLeft size={16} />
+        </button>
+        <button
+          type="button"
+          aria-label={t('next', 'Next')}
+          className={`${styles.navButton} ${styles.navButtonLast}`}
+          onClick={onNext}>
+          <ChevronRight size={16} />
+        </button>
       </div>
+      <span className={styles.dateLabel}>{dateLabel}</span>
+      <span className={styles.countLabel}>{countLabel}</span>
       <div className={styles.switcherSection}>
         <ContentSwitcher
           selectedIndex={viewModeIndex}
           size="sm"
-          onChange={({ index }) => onViewModeChange(VIEW_MODES[index as number])}>
+          onChange={({ index }) => {
+            const nextMode = index != null ? VIEW_MODES[index as number] : undefined;
+            if (nextMode) onViewModeChange(nextMode);
+          }}>
           <Switch name="monthly" text={t('monthly', 'Monthly')} />
           <Switch name="daily" text={t('daily', 'Daily')} />
         </ContentSwitcher>
