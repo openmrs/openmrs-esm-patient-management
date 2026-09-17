@@ -69,7 +69,7 @@ describe('AttendingPatients', () => {
     mockEntries([]);
     const { concepts } = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
     mockUseConcept.mockReturnValue({
-      concept: { uuid: concepts.defaultTransitionStatus, display: 'In Service' } as Concept,
+      concept: { uuid: concepts.defaultTransitionStatus, display: 'Being seen' } as Concept,
       error: undefined,
       isLoading: false,
     });
@@ -77,7 +77,7 @@ describe('AttendingPatients', () => {
     render(<AttendingPatients />);
 
     expect(mockUseConcept).toHaveBeenCalledWith(concepts.defaultTransitionStatus);
-    expect(screen.getByRole('heading', { name: 'In Service' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Being seen' })).toBeInTheDocument();
   });
 
   it('renders a card per in-service patient with a translated gender, their age and their queue', () => {
