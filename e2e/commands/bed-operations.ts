@@ -1,7 +1,11 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import { type BedType, type Bed } from './types';
 
-export const generateRandomBed = async (api: APIRequestContext, bedType: BedType): Promise<Bed> => {
+export const generateRandomBed = async (
+  api: APIRequestContext,
+  bedType: BedType,
+  locationUuid: string,
+): Promise<Bed> => {
   const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
   const bedNumber = `B${randomString}${Math.floor(Math.random() * 100)}`;
 
@@ -10,7 +14,7 @@ export const generateRandomBed = async (api: APIRequestContext, bedType: BedType
       bedNumber: bedNumber.substring(0, 10),
       bedType: bedType.name,
       column: Math.floor(Math.random() * 100) + 1,
-      locationUuid: process.env.E2E_WARD_LOCATION_UUID,
+      locationUuid: locationUuid,
       row: Math.floor(Math.random() * 100) + 1,
       status: 'AVAILABLE',
     },
