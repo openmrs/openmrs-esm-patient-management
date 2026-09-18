@@ -8,37 +8,13 @@ interface AddressFields {
   addressField: string;
 }
 
-/**
- * The address hierarchy module serves these endpoints from legacy `.form` handlers that
- * content-negotiate: given a browser-style `Accept` header, they can answer with a 200 response
- * carrying an OpenMRS HTML page instead of the expected JSON array. `openmrsFetch` parses the
- * response body in a try / catch, so such a response resolves as a success with `data` left
- * `undefined`. Treat a body that isn't the expected array as a failed request rather than as an
- * empty result, so that callers fall through to their error state instead of silently rendering an
- * address section with no fields.
- */
-async function fetchAddressHierarchyEntries<T>(url: string): Promise<FetchResponse<Array<T>>> {
-  const response = await openmrsFetch<Array<T>>(url);
-
-  if (!Array.isArray(response?.data)) {
-    throw new Error(
-      `Expected a JSON array of address hierarchy entries from ${url}, but the response body could not be parsed as one`,
-    );
-  }
-
-  return response;
-}
-
 export function useOrderedAddressHierarchyLevels() {
   const url = '/module/addresshierarchy/ajax/getOrderedAddressHierarchyLevels.form';
-  const { data, isLoading, error } = useSWRImmutable<FetchResponse<Array<AddressFields>>, Error>(
-    url,
-    fetchAddressHierarchyEntries<AddressFields>,
-  );
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<Array<AddressFields>>, Error>(url, openmrsFetch);
 
   const results = useMemo(
     () => ({
-      orderedFields: data?.data?.map((field) => field.addressField) ?? [],
+      orderedFields: data?.data?.map((field) => field.addressField),
       isLoadingFieldOrder: isLoading,
       errorFetchingFieldOrder: error,
     }),
@@ -54,7 +30,7 @@ export function useAddressEntries(fetchResults, searchString) {
     fetchResults
       ? `module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form?searchString=${encodedSearchString}`
       : null,
-    fetchAddressHierarchyEntries<{ name: string }>,
+    openmrsFetch,
   );
 
   useEffect(() => {
@@ -65,7 +41,7 @@ export function useAddressEntries(fetchResults, searchString) {
 
   const results = useMemo(
     () => ({
-      entries: data?.data?.map((item) => item.name) ?? [],
+      entries: data?.data?.map((item) => item.name),
       isLoadingAddressEntries: isLoading,
       errorFetchingAddressEntries: error,
     }),
@@ -138,7 +114,7 @@ export function useAddressHierarchy(searchString: string, separator: string) {
     searchString
       ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=${separator}&searchString=${searchString}`
       : null,
-    fetchAddressHierarchyEntries<{ address: string }>,
+    openmrsFetch,
   );
 
   const results = useMemo(
@@ -165,7 +141,7 @@ export function useAddressHierarchyWithParentSearch(addressField: string, parent
     query
       ? `/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form?addressField=${addressField}&limit=20&searchString=${query}&parentUuid=${parentid}`
       : null,
-    fetchAddressHierarchyEntries<{ uuid: string; name: string }>,
+    openmrsFetch,
   );
 
   const results = useMemo(

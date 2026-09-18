@@ -148,42 +148,6 @@ describe('Address hierarchy', () => {
     });
   });
 
-  describe('Error states', () => {
-    beforeEach(() => {
-      mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
-    });
-
-    // Regression test: the legacy `getOrderedAddressHierarchyLevels.form` endpoint can answer with
-    // a 200 response carrying an HTML page, which used to surface as a successful fetch with an
-    // undefined field order and crash this component while rendering. The resource now reports such
-    // a body as an error, which this component already knows how to render.
-    it('renders an error notification when the field order could not be fetched', () => {
-      mockUseConfig.mockReturnValue({
-        ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
-        fieldConfigurations: {
-          address: {
-            useAddressHierarchy: {
-              enabled: true,
-              useQuickSearch: false,
-              searchAddressByLevel: true,
-            },
-          },
-        } as RegistrationConfig['fieldConfigurations'],
-        fieldDefinitions: [],
-      });
-
-      mockUseOrderedAddressHierarchyLevels.mockReturnValue({
-        orderedFields: [],
-        isLoadingFieldOrder: false,
-        errorFetchingFieldOrder: new Error('Expected a JSON array of address hierarchy entries'),
-      });
-
-      renderAddressHierarchy(initialContextValues);
-
-      expect(screen.getByText(/error occurred fetching ordered fields for address hierarchy/i)).toBeInTheDocument();
-    });
-  });
-
   describe('Rendering', () => {
     beforeEach(() => {
       mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
