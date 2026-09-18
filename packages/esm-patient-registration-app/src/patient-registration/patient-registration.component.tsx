@@ -31,7 +31,6 @@ import { type CapturePhotoProps, type FormValues } from './patient-registration.
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt.component';
-import { SkipLogicCleanup } from './skip-logic-cleanup.component';
 import styles from './patient-registration.scss';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
@@ -213,13 +212,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       validationSchema={validationSchema}>
       {(props) => (
         <Form className={styles.form}>
-          <SkipLogicCleanup
-            values={props.values}
-            config={config}
-            setFieldValue={props.setFieldValue}
-            setFieldError={props.setFieldError}
-            setFieldTouched={props.setFieldTouched}
-          />
           <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
           <div className={styles.formContainer}>
             {/* Navigation Sidebar */}

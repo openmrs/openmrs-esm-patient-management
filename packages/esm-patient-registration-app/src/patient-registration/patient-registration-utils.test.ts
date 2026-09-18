@@ -5,7 +5,7 @@ import {
   getHiddenFieldIds,
   sanitizeFormValuesForSkipLogic,
 } from './patient-registration-utils';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
 
 describe('filterOutUndefinedPatientIdentifiers', () => {
   const getIdentifiers = (autoGeneration = true, manualEntryEnabled = false) => ({
@@ -40,10 +40,27 @@ describe('filterOutUndefinedPatientIdentifiers', () => {
 });
 
 describe('getAgeInYears', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should calculate age from birthdate correctly', () => {
-    const currentYear = new Date().getFullYear();
-    const values = { birthdate: `${currentYear - 30}-05-15` } as any;
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-17T12:00:00'));
+    const values = { birthdate: '1996-05-15' } as any;
     expect(getAgeInYears(values)).toBe(30);
+  });
+
+  it('does not count a birthday that has not happened yet this year', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-17T12:00:00'));
+    expect(getAgeInYears({ birthdate: new Date('2008-12-25T00:00:00') } as any)).toBe(17);
+  });
+
+  it('counts a birthday that has already happened this year', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-17T12:00:00'));
+    expect(getAgeInYears({ birthdate: new Date('2008-01-15T00:00:00') } as any)).toBe(18);
   });
 
   it('should fallback to yearsEstimated when birthdate is absent', () => {
@@ -212,9 +229,9 @@ describe('getHiddenFieldIds and sanitizeFormValuesForSkipLogic', () => {
     // Visible field is retained
     expect(sanitized.attributes['ref-uuid']).toBe('No');
 
-    // Hidden person attributes are reset to empty string
-    expect(sanitized.attributes['hidden-attr-uuid']).toBe('');
-    expect(sanitized.attributes['sec-field-uuid']).toBe('');
+    // Hidden person attributes are deleted rather than set to empty string
+    expect(sanitized.attributes['hidden-attr-uuid']).toBeUndefined();
+    expect(sanitized.attributes['sec-field-uuid']).toBeUndefined();
 
     // Hidden obs is removed
     expect(sanitized.obs['adult-obs-uuid']).toBeUndefined();
@@ -239,5 +256,40 @@ describe('getHiddenFieldIds and sanitizeFormValuesForSkipLogic', () => {
     expect(sanitized.attributes['hidden-attr-uuid']).toBe('Valid answer');
     expect(sanitized.attributes['sec-field-uuid']).toBe('Valid section answer');
     expect(sanitized.obs['adult-obs-uuid']).toBe('Valid obs answer');
+  });
+
+  it('does not delete built-in fields when a section containing built-in fields is hidden', () => {
+    const configWithBuiltinSection: any = {
+      sections: ['hiddenBuiltinSection'],
+      sectionDefinitions: [
+        {
+          id: 'hiddenBuiltinSection',
+          name: 'Hidden Built-in Section',
+          hideIf: { fieldId: 'triggerField', value: 'hide' },
+          fields: ['gender', 'dob', 'name', 'id', 'unmatchedCustomField'],
+        },
+      ],
+      fieldDefinitions: [{ id: 'triggerField', type: 'person attribute', uuid: 'trigger-uuid' }],
+    };
+
+    const values: any = {
+      gender: 'female',
+      birthdate: '2000-01-01',
+      givenName: 'Jane',
+      familyName: 'Doe',
+      identifiers: { OpenMRSId: { identifierValue: '123' } },
+      unmatchedCustomField: 'some-value',
+      attributes: {
+        'trigger-uuid': 'hide',
+      },
+    };
+
+    const sanitized = sanitizeFormValuesForSkipLogic(values, configWithBuiltinSection);
+    expect(sanitized.gender).toBe('female');
+    expect(sanitized.birthdate).toBe('2000-01-01');
+    expect(sanitized.givenName).toBe('Jane');
+    expect(sanitized.familyName).toBe('Doe');
+    expect(sanitized.identifiers).toBeDefined();
+    expect((sanitized as any).unmatchedCustomField).toBe('some-value');
   });
 });

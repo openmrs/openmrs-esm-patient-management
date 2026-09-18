@@ -127,7 +127,16 @@ export const latestFirstEncounter = (a: Encounter, b: Encounter) =>
 
 export function getAgeInYears(values: FormValues): number | undefined {
   if (values?.birthdate) {
-    return new Date().getFullYear() - new Date(values.birthdate).getFullYear();
+    const birthDate = new Date(values.birthdate);
+    if (!isNaN(birthDate.getTime())) {
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
   }
   return values?.yearsEstimated ?? undefined;
 }
@@ -247,7 +256,7 @@ export function sanitizeFormValuesForSkipLogic(values: FormValues, config: Regis
       if (fieldDef) {
         if (fieldDef.type === 'person attribute') {
           if (sanitizedValues.attributes && fieldDef.uuid in sanitizedValues.attributes) {
-            sanitizedValues.attributes[fieldDef.uuid] = '';
+            delete sanitizedValues.attributes[fieldDef.uuid];
           }
         } else if (fieldDef.type === 'obs') {
           if (sanitizedValues.obs && fieldDef.uuid in sanitizedValues.obs) {
@@ -255,10 +264,12 @@ export function sanitizeFormValuesForSkipLogic(values: FormValues, config: Regis
           }
         }
       } else {
+        // Explicit allowlist of clearable built-in fields. Core fields (name, gender, dob, id)
+        // are never deleted so that hiding a section with built-in fields does not break submit.
         if (fieldId === 'phone') {
           const phoneUuid = config.fieldConfigurations?.phone?.personAttributeUuid;
           if (phoneUuid && sanitizedValues.attributes && phoneUuid in sanitizedValues.attributes) {
-            sanitizedValues.attributes[phoneUuid] = '';
+            delete sanitizedValues.attributes[phoneUuid];
           }
         } else if (fieldId === 'causeOfDeath') {
           sanitizedValues.deathCause = '';
@@ -266,8 +277,6 @@ export function sanitizeFormValuesForSkipLogic(values: FormValues, config: Regis
         } else if (fieldId === 'dateAndTimeOfDeath') {
           sanitizedValues.deathDate = '';
           sanitizedValues.deathTime = '';
-        } else if (fieldId in sanitizedValues) {
-          delete (sanitizedValues as any)[fieldId];
         }
       }
     });
