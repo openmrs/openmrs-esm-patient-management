@@ -4,15 +4,16 @@ import { Button, Layer, OverflowMenu, SkeletonPlaceholder, Tag } from '@carbon/r
 import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
 import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
-import { ActionOverflowMenuItem } from '../queue-table/cells/queue-table-action-cell.component';
+import { useActionOverflowMenuItems } from '../queue-table/cells/queue-table-action-cell.component';
 import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
-import { type ConfigObject } from '../config-schema';
+import { type ConfigObject, type QueueEntryAction } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './attending-patients.scss';
 
 const collapsedCardCount = 3;
+const cardActions: QueueEntryAction[] = ['move', 'edit', 'remove', 'undo'];
 
 interface AttendingPatientsProps {
   /** Scope to a single queue. Without it, the selected location and service are used. */
@@ -89,6 +90,7 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
   const { t } = useTranslation();
   const { customPatientChartUrl, priorityConfigs } = useConfig<ConfigObject>();
   const { person } = queueEntry.patient;
+  const actionItems = useActionOverflowMenuItems(cardActions, queueEntry);
 
   const demographics = [
     person?.gender ? getGenderLabel(person.gender) : null,
@@ -97,17 +99,9 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
     .filter(Boolean)
     .join(' · ');
 
-  // The menu sits outside the link so opening it does not navigate to the patient chart.
+  // The menu sits beside the link, not over it, so its hitbox never overlaps the patient chart link.
   return (
     <div className={styles.card}>
-      <div className={styles.actionsMenu}>
-        <OverflowMenu iconDescription={t('actionsMenu', 'Actions menu')} flipped size="sm">
-          <ActionOverflowMenuItem actionKey="move" queueEntry={queueEntry} />
-          <ActionOverflowMenuItem actionKey="edit" queueEntry={queueEntry} />
-          <ActionOverflowMenuItem actionKey="remove" queueEntry={queueEntry} />
-          <ActionOverflowMenuItem actionKey="undo" queueEntry={queueEntry} />
-        </OverflowMenu>
-      </div>
       <ConfigurableLink
         className={styles.cardLink}
         to={customPatientChartUrl}
@@ -128,6 +122,11 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
           />
         </div>
       </ConfigurableLink>
+      <div className={styles.actionsMenu}>
+        <OverflowMenu iconDescription={t('actionsMenu', 'Actions menu')} flipped size="sm">
+          {actionItems}
+        </OverflowMenu>
+      </div>
     </div>
   );
 }

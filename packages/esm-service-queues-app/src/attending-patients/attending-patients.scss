@@ -25,7 +25,6 @@
 }
 
 .card {
-  position: relative;
   display: flex;
   flex: 0 1 22rem;
   background-color: $ui-02;
@@ -43,10 +42,12 @@
   text-decoration: none;
 }
 
+// Small overflow menu button plus the gap to the card edge.
+$actions-menu-width: layout.$spacing-07 + layout.$spacing-03;
+
 .actionsMenu {
-  position: absolute;
-  top: layout.$spacing-03;
-  right: layout.$spacing-03;
+  width: $actions-menu-width;
+  padding: layout.$spacing-03 layout.$spacing-03 0 0;
 }
 
 .cardSkeleton {
@@ -64,7 +65,7 @@
   display: flex;
   align-items: center;
   gap: layout.$spacing-05;
-  padding: layout.$spacing-05 layout.$spacing-09 layout.$spacing-05 layout.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 .details {
@@ -80,6 +81,8 @@
   gap: layout.$spacing-03;
   margin-top: auto;
   padding: layout.$spacing-03 layout.$spacing-05;
+  // The menu column beside the link is empty below the button, so the row extends under it to reach the card edge.
+  margin-right: -$actions-menu-width;
   border-top: 1px solid $ui-03;
 }
 
