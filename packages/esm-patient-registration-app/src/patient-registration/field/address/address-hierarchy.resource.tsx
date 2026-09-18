@@ -30,12 +30,8 @@ function isSerializedServerException(body: unknown): body is SerializedServerExc
 }
 
 /**
- * These addresshierarchy endpoints are legacy `.form` handlers rather than part of the REST API,
- * and they do not use HTTP status codes to report failure: when the module throws, they answer
- * HTTP 200 with a body that is a serialized Java exception (an object with `message`,
- * `localizedMessage`, `stackTrace` and `cause`) instead of the expected array of entries. They can
- * likewise answer 200 with an empty or null body. A successful status therefore does not imply a
- * usable payload, and SWR has no error of its own to report.
+ * The legacy `.form` handler do not use HTTP status codes to report failures. Instead, they
+ * return serialized exceptions. When this occurs, we treat it like an error.
  *
  * Validate the body here so that anything which is not the expected array is surfaced through
  * SWR's `error`, letting callers fall through to their existing error states instead of mapping
