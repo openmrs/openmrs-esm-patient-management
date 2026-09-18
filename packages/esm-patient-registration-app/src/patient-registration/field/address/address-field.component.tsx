@@ -64,7 +64,7 @@ export const AddressComponent: React.FC = () => {
       return [];
     }
 
-    const orderMap = Object.fromEntries(orderedFields.map((field, indx) => [field, indx]));
+    const orderMap = Object.fromEntries((orderedFields ?? []).map((field, indx) => [field, indx]));
 
     return [...addressLayout].sort(
       (existingField1, existingField2) => orderMap[existingField1.name] - orderMap[existingField2.name],
