@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Ошибка при обновлении списка недавно просмотренных пациентов",
   "female": "Женский",
   "male": "Мужской",
+  "minCharactersRequired_one": "Минимальное количество символов для начала поиска {{count}}",
+  "minCharactersRequired_other": "Минимальное количество символов для начала поиска {{count}}",
   "monthOfBirth": "Месяц рождения",
   "nextPage": "Следующая страница",
   "noPatientChartsFoundMessage": "К сожалению, карты пациентов не найдены",

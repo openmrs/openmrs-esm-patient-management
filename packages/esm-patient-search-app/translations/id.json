@@ -24,6 +24,8 @@
   "errorUpdatingRecentlyViewedPatients": "Gagal memperbarui pasien yang baru dilihat",
   "female": "Perempuan",
   "male": "Laki-laki",
+  "minCharactersRequired_one": "Please enter at least {{count}} characters to search",
+  "minCharactersRequired_other": "Please enter at least {{count}} characters to search",
   "monthOfBirth": "Bulan Lahir",
   "nextPage": "Halaman berikutnya",
   "noPatientChartsFoundMessage": "Maaf, tidak ada bagan pasien yang ditemukan",

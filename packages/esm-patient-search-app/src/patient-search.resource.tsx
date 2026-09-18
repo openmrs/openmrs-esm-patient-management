@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite, { type SWRInfiniteResponse } from 'swr/infinite';
 import {
   omrsOfflineCachingStrategyHttpHeaderName,
@@ -22,7 +23,8 @@ function fetcher<T>(url: string) {
 type InfinitePatientSearchResponse = FetchResponse<{
   results: Array<SearchedPatient>;
   links: Array<{ rel: 'prev' | 'next' }>;
-  totalCount: number;
+  /** Only requested for the first page; see `buildUrl` in `useInfinitePatientSearch`. */
+  totalCount?: number;
 }>;
 
 const patientProperties = [
@@ -113,6 +115,8 @@ function useRevalidateFirstPageOnce<T>(firstPageUrl: string | null, mutate: SWRI
  *   - currentPage: The current page number
  *   - totalResults: The number of results for the query the returned `data` belongs to
  *   - totalResultsForQuery: The number of results for the query currently being searched for
+ *   - minSearchCharacters: The configured minimum number of characters required before a search runs
+ *   - isLoadingMinSearchCharacters: Whether the minimum character setting is still being fetched
  */
 export function useInfinitePatientSearch(
   searchQuery: string,
@@ -122,6 +126,7 @@ export function useInfinitePatientSearch(
   customRepresentation: string = patientSearchCustomRepresentation,
 ): PatientSearchResponse {
   const { cache } = useSWRConfig();
+  const { minSearchCharacters, isLoadingMinSearchCharacters } = useMinSearchCharacters();
 
   const buildUrl = useCallback(
     (page: number) => {
@@ -143,7 +148,9 @@ export function useInfinitePatientSearch(
     [searchQuery, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const shouldFetch = isSearching && Boolean(searchQuery);
+  // Blocked while the minimum-character setting is still loading (so a temporary fallback can't let
+  // a too-short query through), and while the trimmed query is shorter than the configured minimum.
+  const shouldFetch = isSearching && !isLoadingMinSearchCharacters && searchQuery.trim().length >= minSearchCharacters;
   const firstPageUrl = shouldFetch ? buildUrl(0) : null;
 
   // The count for the query being fetched, read through the cache rather than off `data`:
@@ -207,8 +214,22 @@ export function useInfinitePatientSearch(
       // the count and the list disagreeing mid-query.
       totalResults: shouldFetch ? (data?.[0]?.data?.totalCount ?? 0) : 0,
       totalResultsForQuery: totalCount ?? 0,
+      minSearchCharacters,
+      isLoadingMinSearchCharacters,
     }),
-    [shouldFetch, mappedData, isLoading, error, data, isValidating, setSize, size, totalCount],
+    [
+      shouldFetch,
+      mappedData,
+      isLoading,
+      error,
+      data,
+      isValidating,
+      setSize,
+      size,
+      totalCount,
+      minSearchCharacters,
+      isLoadingMinSearchCharacters,
+    ],
   );
 }
 
@@ -358,4 +379,18 @@ export function useRestPatients(
     }),
     [mappedData, isLoading, error, patientUuids, size, isValidating, setSize],
   );
+}
+
+export function useMinSearchCharacters() {
+  const url = `${restBaseUrl}/systemsetting?q=minSearchCharacters&v=custom:(property,value)`;
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ results: Array<{ value: string }> }>, Error>(
+    url,
+    fetcher,
+  );
+
+  const value = data?.data?.results?.[0]?.value;
+  // Core falls back to 2 when the setting is missing or contains non-numeric characters.
+  const minSearchCharacters = value && !/\D/.test(value) ? parseInt(value, 10) : 2;
+
+  return { minSearchCharacters, isLoadingMinSearchCharacters: isLoading, error };
 }
