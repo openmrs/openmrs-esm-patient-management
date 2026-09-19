@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { saveBedTag, useBedTags, useLocationsWithAdmissionTag } from '../summary/summary.resource';
+import { saveBedTag } from '../summary/summary.resource';
 import { type BedTagData } from '../types';
 import BedTagsAdministrationForm from './bed-tags-admin-form.modal';
 
@@ -12,8 +12,6 @@ interface BedTagFormProps {
 
 const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
   const { t } = useTranslation();
-  const { admissionLocations } = useLocationsWithAdmissionTag();
-  const { bedTags } = useBedTags();
   const headerTitle = t('createBedTag', 'Create bed tag');
 
   const initialData: BedTagData = {
@@ -54,8 +52,6 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ closeModal, mutate }) => {
 
   return (
     <BedTagsAdministrationForm
-      allLocations={admissionLocations}
-      availableBedTags={bedTags}
       handleCreateBedTag={handleCreateBedTag}
       headerTitle={headerTitle}
       initialData={initialData}
