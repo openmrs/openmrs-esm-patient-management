@@ -1,17 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Layer, SkeletonPlaceholder, Tag } from '@carbon/react';
+import { Button, Layer, OverflowMenu, SkeletonPlaceholder, Tag } from '@carbon/react';
 import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
 import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { useActionOverflowMenuItems } from '../queue-table/cells/queue-table-action-cell.component';
 import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
-import { type ConfigObject } from '../config-schema';
+import { type ConfigObject, type QueueEntryAction } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './attending-patients.scss';
 
 const collapsedCardCount = 3;
+const cardActions: QueueEntryAction[] = ['move', 'edit', 'remove', 'undo'];
 
 interface AttendingPatientsProps {
   /** Scope to a single queue. Without it, the selected location and service are used. */
@@ -85,8 +87,10 @@ const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
 };
 
 function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
+  const { t } = useTranslation();
   const { customPatientChartUrl, priorityConfigs } = useConfig<ConfigObject>();
   const { person } = queueEntry.patient;
+  const actionItems = useActionOverflowMenuItems(cardActions, queueEntry);
 
   const demographics = [
     person?.gender ? getGenderLabel(person.gender) : null,
@@ -95,27 +99,35 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
     .filter(Boolean)
     .join(' · ');
 
+  // The menu sits beside the link, not over it, so its hitbox never overlaps the patient chart link.
   return (
-    <ConfigurableLink
-      className={styles.card}
-      to={customPatientChartUrl}
-      templateParams={{ patientUuid: queueEntry.patient.uuid }}>
-      <div className={styles.patient}>
-        <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
-        <div className={styles.details}>
-          <span className={styles.name}>{person?.display}</span>
-          <p className={styles.demographics}>{demographics}</p>
+    <div className={styles.card}>
+      <ConfigurableLink
+        className={styles.cardLink}
+        to={customPatientChartUrl}
+        templateParams={{ patientUuid: queueEntry.patient.uuid }}>
+        <div className={styles.patient}>
+          <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
+          <div className={styles.details}>
+            <span className={styles.name}>{person?.display}</span>
+            <p className={styles.demographics}>{demographics}</p>
+          </div>
         </div>
+        <div className={styles.serviceRow}>
+          <span className={styles.service}>{queueEntry.queue?.display}</span>
+          <QueuePriority
+            priority={queueEntry.priority}
+            priorityComment={queueEntry.priorityComment ?? undefined}
+            priorityConfigs={priorityConfigs}
+          />
+        </div>
+      </ConfigurableLink>
+      <div className={styles.actionsMenu}>
+        <OverflowMenu iconDescription={t('actionsMenu', 'Actions menu')} flipped size="sm">
+          {actionItems}
+        </OverflowMenu>
       </div>
-      <div className={styles.serviceRow}>
-        <span className={styles.service}>{queueEntry.queue?.display}</span>
-        <QueuePriority
-          priority={queueEntry.priority}
-          priorityComment={queueEntry.priorityComment ?? undefined}
-          priorityConfigs={priorityConfigs}
-        />
-      </div>
-    </ConfigurableLink>
+    </div>
   );
 }
 
