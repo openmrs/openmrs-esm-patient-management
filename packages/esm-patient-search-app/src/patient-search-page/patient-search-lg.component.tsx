@@ -12,8 +12,11 @@ interface PatientSearchComponentProps {
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
   searchResults: Array<SearchedPatient>;
+  /** True when the refine filters, not the query, left the results empty. */
+  emptiedByFilters?: boolean;
   isLoading: boolean;
   fetchError: Error | null;
+  minSearchCharacters: number;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -21,8 +24,10 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   stickyPagination,
   inTabletOrOverlay,
   searchResults,
+  emptiedByFilters = false,
   isLoading,
   fetchError,
+  minSearchCharacters,
 }) => {
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
@@ -62,11 +67,31 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     if (!isLoading && (!results || results.length === 0)) {
-      return <EmptyState />;
+      const tooFewCharacters = query.trim().length < minSearchCharacters;
+
+      if (tooFewCharacters) {
+        return (
+          <EmptyState
+            title={t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+              count: minSearchCharacters,
+            })}
+            hint={null}
+          />
+        );
+      }
+
+      return emptiedByFilters ? (
+        <EmptyState
+          title={t('noPatientsMatchFilters', 'No patients match these filters')}
+          hint={t('adjustFiltersHint', 'Remove or change a filter to see more patients')}
+        />
+      ) : (
+        <EmptyState />
+      );
     }
 
     return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+  }, [emptiedByFilters, fetchError, isLoading, results, query, minSearchCharacters, t]);
 
   return (
     <div

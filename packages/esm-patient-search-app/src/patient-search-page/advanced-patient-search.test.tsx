@@ -63,6 +63,8 @@ const mockSearchResults: PatientSearchResponse = {
   setPage: vi.fn(),
   hasMore: false,
   isLoading: false,
+  isLoadingMinSearchCharacters: false,
+  minSearchCharacters: 3,
   fetchError: null,
 };
 
@@ -131,6 +133,56 @@ describe('AdvancedPatientSearchComponent', () => {
     expect(screen.getByText(/2 search result/)).toBeInTheDocument();
   });
 
+  it('shows the loading state while the minimum character setting is loading', () => {
+    mockUseInfinitePatientSearch.mockReturnValue({
+      ...mockSearchResults,
+      data: null,
+      totalResults: 0,
+      totalResultsForQuery: 0,
+      isLoadingMinSearchCharacters: true,
+    });
+
+    renderComponent();
+
+    expect(screen.getByRole('heading', { name: 'Searching...' })).toBeInTheDocument();
+    expect(screen.getAllByRole('banner')).toHaveLength(5);
+    expect(screen.queryByRole('heading', { name: /0 search result/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/no patient charts were found/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/please enter at least/i)).not.toBeInTheDocument();
+  });
+
+  it('shows a message asking for more characters when the query is too short', () => {
+    mockUseInfinitePatientSearch.mockReturnValue({
+      ...mockSearchResults,
+      data: [],
+      totalResults: 0,
+    });
+
+    render(
+      <Wrapper>
+        <AdvancedPatientSearchComponent query="Jo" />
+      </Wrapper>,
+    );
+
+    expect(screen.getByText(/please enter at least 3 characters to search/i)).toBeInTheDocument();
+  });
+
+  it('shows the no-results message when enough characters were entered but nothing matched', () => {
+    mockUseInfinitePatientSearch.mockReturnValue({
+      ...mockSearchResults,
+      data: [],
+      totalResults: 0,
+    });
+
+    render(
+      <Wrapper>
+        <AdvancedPatientSearchComponent query="Joseph" />
+      </Wrapper>,
+    );
+
+    expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
+  });
+
   describe('Filtering', () => {
     it('filters by gender correctly', async () => {
       renderComponent();
@@ -139,6 +191,38 @@ describe('AdvancedPatientSearchComponent', () => {
       await user.click(screen.getByRole('button', { name: /apply/i }));
 
       expect(screen.getByText(/0 search result/)).toBeInTheDocument();
+      expect(screen.getByText('No patients match these filters')).toBeInTheDocument();
+      expect(screen.getByText(/remove or change a filter/i)).toBeInTheDocument();
+    });
+
+    it('keeps loading while later pages are still arriving and no loaded row matches the filters', async () => {
+      // Page 1 of a broad search has landed and holds one man; the rest of the pages are in flight.
+      mockUseInfinitePatientSearch.mockReturnValue({
+        ...mockSearchResults,
+        data: [mockAdvancedSearchResults[0]] as unknown as PatientSearchResponse['data'],
+        isValidating: true,
+        currentPage: 1,
+        totalResultsForQuery: 100,
+      });
+      renderComponent();
+
+      await user.click(screen.getByRole('tab', { name: /female/i }));
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByRole('heading', { name: /searching/i })).toBeInTheDocument();
+      expect(screen.queryByText('No patients match these filters')).not.toBeInTheDocument();
+      expect(screen.queryByText(/sorry, no patient charts were found/i)).not.toBeInTheDocument();
+    });
+
+    it('keeps the no-results message when the query itself found no patients', async () => {
+      mockUseInfinitePatientSearch.mockReturnValue({ ...mockSearchResults, data: [], totalResults: 0 });
+      renderComponent();
+
+      await user.click(screen.getByRole('tab', { name: /female/i }));
+      await user.click(screen.getByRole('button', { name: /apply/i }));
+
+      expect(screen.getByText(/sorry, no patient charts were found/i)).toBeInTheDocument();
+      expect(screen.queryByText('No patients match these filters')).not.toBeInTheDocument();
     });
 
     it('filters by age correctly', async () => {

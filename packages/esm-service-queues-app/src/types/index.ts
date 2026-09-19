@@ -175,14 +175,10 @@ export type QueueTableColumnFunction = (
   config?: ColumnConfig,
 ) => QueueTableColumn;
 
-export interface QueueTableTabConfig {
-  columns: QueueTableColumn[];
-  tabNameI18nKey?: string;
-}
-
 export interface Queue {
   uuid: string;
   display: string;
+  retired?: boolean;
   name: string;
   description: string;
   location: Location;

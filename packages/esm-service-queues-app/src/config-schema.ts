@@ -90,7 +90,7 @@ export const defaultColumnConfig: ColumnConfig = {
 };
 
 export const defaultQueueTable: TableDefinitions = {
-  columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+  columns: ['patient-name', 'coming-from', 'priority', 'queue-number', 'queue', 'wait-time', 'actions'],
   appliedTo: [{ queue: '', status: '' }],
 };
 
@@ -157,6 +157,17 @@ export const configSchema = {
       'and matched on the queue screen to trigger the blinking ticket display. Change to match ' +
       'what your digital signage expects (e.g. "Now serving"). ' +
       'Avoid "completed", which the queue backend treats as a signal to remove the ticket.',
+  },
+  clinicAdministratorScreen: {
+    privilege: {
+      _type: Type.String,
+      _default: 'App: Service Queues Clinic Administrator',
+      _description:
+        'The privilege that grants a clinic-wide monitoring tab on the Service Queues dashboard, opened ' +
+        'first, with the standard waiting list on a second tab. Users without the privilege see no tabs ' +
+        'and their dashboard is unchanged. Must match the privilege defined in your distribution content; ' +
+        'until it is attached to a role, only System Developers see the tab.',
+    },
   },
   concepts: {
     defaultPriorityConceptUuid: {
@@ -478,6 +489,9 @@ export interface ConfigObject {
   waitTimeThresholds: Array<WaitTimeThresholdConfig>;
   appointmentStatuses: Array<string>;
   callingStatus: string;
+  clinicAdministratorScreen: {
+    privilege: string;
+  };
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;

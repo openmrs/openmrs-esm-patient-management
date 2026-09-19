@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDuration, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { MetricsCard, MetricsCardBody, MetricsCardHeader, MetricsCardItem } from './metrics-card.component';
 import { useAverageWaitTime } from '../metrics.resource';
 import { useServiceQueuesStore } from '../../store/store';
+import { formatWaitTimeInMinutes } from '../../wait-time';
 import { type ConfigObject } from '../../config-schema';
 
 export default function AverageWaitTimeExtension() {
@@ -34,17 +35,8 @@ export default function AverageWaitTimeExtension() {
     <MetricsCard>
       <MetricsCardHeader title={t('avgWaitTime', 'Avg. wait time')} />
       <MetricsCardBody>
-        <MetricsCardItem value={isLoading || error || !hasWaitTime ? '--' : formatWaitTime(totalMinutes)} />
+        <MetricsCardItem value={isLoading || error || !hasWaitTime ? '--' : formatWaitTimeInMinutes(totalMinutes)} />
       </MetricsCardBody>
     </MetricsCard>
-  );
-}
-
-// Formats whole minutes like the table's "Wait time" column (see QueueDuration). Only call with a finite
-// number — Intl.DurationFormat rejects NaN.
-function formatWaitTime(totalMinutes: number) {
-  return formatDuration(
-    { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 },
-    { style: 'long', minutesDisplay: 'always' },
   );
 }

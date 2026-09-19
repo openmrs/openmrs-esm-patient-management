@@ -1,4 +1,5 @@
 {
+  "adjustFiltersHint": "Измените или уберите фильтр для отображения остальных пациентов",
   "age": "Возраст",
   "ageBelowMinimum": "Введите возраст не менее {{min}}",
   "ageOutOfRange": "Введите возраст между {{min}} и {{max}}",
@@ -23,9 +24,12 @@
   "errorUpdatingRecentlyViewedPatients": "Ошибка при обновлении списка недавно просмотренных пациентов",
   "female": "Женский",
   "male": "Мужской",
+  "minCharactersRequired_one": "Минимальное количество символов для начала поиска {{count}}",
+  "minCharactersRequired_other": "Минимальное количество символов для начала поиска {{count}}",
   "monthOfBirth": "Месяц рождения",
   "nextPage": "Следующая страница",
   "noPatientChartsFoundMessage": "К сожалению, карты пациентов не найдены",
+  "noPatientsMatchFilters": "Нет пациентов удовлетворяющим заданным фильтрам",
   "noRecentlyViewedPatients": "Нет недавно просмотренных пациентов",
   "other": "Другое",
   "postcode": "Почтовый индекс",
