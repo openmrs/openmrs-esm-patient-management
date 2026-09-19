@@ -58,7 +58,7 @@
     "sass": "^1.29.0",
     "sass-loader": "^10.1.0",
     "swc-loader": "^0.2.3",
-    "swr": "2.2.5",
+    "swr": "2.5.1",
     "turbo": "^2.5.2",
     "typedoc": "^0.22.15",
     "typescript": "^5.0.0",
