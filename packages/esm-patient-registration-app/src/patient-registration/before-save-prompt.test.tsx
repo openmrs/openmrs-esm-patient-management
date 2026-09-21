@@ -195,5 +195,16 @@ describe('BeforeSavePrompt component', () => {
         });
       });
     });
+
+    it('passes a redirect URL outside the SPA through unchanged', async () => {
+      mockGetOpenmrsSpaBase.mockReturnValue('/openmrs/spa');
+      renderBeforeSavePrompt(true, '/openmrs/patientDashboard.form?patientId=abc-123');
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith({
+          to: '/openmrs/patientDashboard.form?patientId=abc-123',
+        });
+      });
+    });
   });
 });
