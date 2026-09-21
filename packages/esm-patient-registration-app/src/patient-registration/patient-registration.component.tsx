@@ -147,7 +147,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
-  const getDescription = (errors: FormikErrors<FormValues>): JSX.Element => {
+  const getDescription = (errors: FormikErrors<FormValues>): React.JSX.Element => {
     return (
       <ul style={{ listStyle: 'inside' }}>
         {Object.keys(errors).map((error, index) => {
