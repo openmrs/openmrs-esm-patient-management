@@ -2799,6 +2799,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/eslint-config": "npm:^2.0.0"
     "@openmrs/esm-framework": "npm:next"
+    "@openmrs/prettier-config": "npm:^1.0.0"
     "@playwright/test": "npm:^1.53.2"
     "@swc/core": "npm:^1.2.165"
     "@testing-library/dom": "npm:^10.4.1"
@@ -2827,7 +2828,7 @@ __metadata:
     jsdom: "npm:^28.0.0"
     lint-staged: "npm:^15.2.1"
     openmrs: "npm:next"
-    prettier: "npm:^3.1.1"
+    prettier: "npm:3.9.8"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-i18next: "npm:^16.0.0"
@@ -3046,6 +3047,15 @@ __metadata:
     swr: 2.x
   languageName: unknown
   linkType: soft
+
+"@openmrs/prettier-config@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@openmrs/prettier-config@npm:1.0.0"
+  peerDependencies:
+    prettier: ^3.0.0
+  checksum: 10/774fa686feaa3224006e4a0afc0220a5ae43e3b5d59109a602dbfa7a6220e3da5a3f8cc9a25052ff04829f02cb9f08a8cae2258f72e5f6a98d755204f6035241
+  languageName: node
+  linkType: hard
 
 "@openmrs/rspack-config@npm:10.0.1-pre.5452":
   version: 10.0.1-pre.5452
@@ -14252,12 +14262,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.1.1":
-  version: 3.6.2
-  resolution: "prettier@npm:3.6.2"
+"prettier@npm:3.9.8":
+  version: 3.9.8
+  resolution: "prettier@npm:3.9.8"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10/1213691706bcef1371d16ef72773c8111106c3533b660b1cc8ec158bd109cdf1462804125f87f981f23c4a3dba053b6efafda30ab0114cc5b4a725606bb9ff26
+  checksum: 10/4ac262aaf9a5e221b02cc17447ebe7aa9689be59b85ab9de8152cd7422fb363ed3e09da6df585fa19ab1fc6cffebdc3ea34db1a75c978536aeba3f87bfd06ab3
   languageName: node
   linkType: hard
 
