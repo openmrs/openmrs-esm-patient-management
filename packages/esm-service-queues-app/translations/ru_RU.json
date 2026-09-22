@@ -63,7 +63,7 @@
   "errorUpdatingQueueRoom": "Ошибка при обновлении пункта обслуживания",
   "failedToLoadLocations": "Не удалось загрузить локацию",
   "failedToLoadServices": "Ошибка загрузки профилей",
-  "inService": "In Service",
+  "inService": "Доступно",
   "invalidColumnConfig": "Неверная конфигурация столбцов",
   "invalidQueue": "Неверная очередь",
   "invalidTimeFormat": "Неверный формат времени",

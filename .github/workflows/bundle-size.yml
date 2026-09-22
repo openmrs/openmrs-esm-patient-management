@@ -8,17 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TURBO_API: 'http://127.0.0.1:9080'
-      TURBO_TOKEN: 'turbo-token'
-      TURBO_TEAM: ${{ github.repository_owner }}
-
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: 🛠️ Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '22.x'
           cache: 'yarn'
@@ -27,13 +22,12 @@ jobs:
         run: yarn install --immutable
 
       - name: 🚀 Setup Turborepo cache server
-        uses: felixmosh/turborepo-gh-artifacts@v4
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+        # Actions-cache backed: entries written by a pull_request run are scoped to that
+        # PR's merge ref, so a PR cannot plant an entry a build on main would restore.
+        uses: rharkor/caching-for-turbo@2238fae6eb9a9936f92356f54cb3660200d105e7 # v2.5.1
 
       - name: 📊 Compute bundle size report
-        uses: preactjs/compressed-size-action@v2
+        uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # 2.10.0
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           minimum-change-threshold: 10000 # 10 KB
