@@ -140,13 +140,15 @@ describe('AttendingPatients', () => {
     });
   });
 
-  it('offers the queue entry actions from a menu that sits outside the patient chart link', async () => {
+  it('offers the queue entry actions from a menu in the queue row, which sits outside the patient chart link', async () => {
     const user = userEvent.setup();
     mockEntries([{ ...queueEntry, previousQueueEntry: { uuid: 'qe-0' } } as unknown as QueueEntry]);
     render(<AttendingPatients />);
 
     const menuButton = screen.getByRole('button', { name: 'Actions menu' });
-    expect(screen.getByRole('link')).not.toContainElement(menuButton);
+    const link = screen.getByRole('link');
+    expect(link).not.toContainElement(menuButton);
+    expect(link).not.toHaveTextContent('Outpatient Triage');
 
     await user.click(menuButton);
     // Carbon leaves the opened menu `visibility: hidden` under jsdom, so read the items' text directly.

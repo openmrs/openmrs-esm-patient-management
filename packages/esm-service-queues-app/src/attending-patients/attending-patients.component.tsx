@@ -99,7 +99,7 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
     .filter(Boolean)
     .join(' · ');
 
-  // The menu sits beside the link, not over it, so its hitbox never overlaps the patient chart link.
+  // The service row sits below the link, so the card's bottom bar and its menu are outside the chart link's hitbox.
   return (
     <div className={styles.card}>
       <ConfigurableLink
@@ -113,16 +113,14 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
             <p className={styles.demographics}>{demographics}</p>
           </div>
         </div>
-        <div className={styles.serviceRow}>
-          <span className={styles.service}>{queueEntry.queue?.display}</span>
-          <QueuePriority
-            priority={queueEntry.priority}
-            priorityComment={queueEntry.priorityComment ?? undefined}
-            priorityConfigs={priorityConfigs}
-          />
-        </div>
       </ConfigurableLink>
-      <div className={styles.actionsMenu}>
+      <div className={styles.serviceRow}>
+        <span className={styles.service}>{queueEntry.queue?.display}</span>
+        <QueuePriority
+          priority={queueEntry.priority}
+          priorityComment={queueEntry.priorityComment ?? undefined}
+          priorityConfigs={priorityConfigs}
+        />
         <OverflowMenu iconDescription={t('actionsMenu', 'Actions menu')} flipped size="sm">
           {actionItems}
         </OverflowMenu>

@@ -27,27 +27,18 @@
 .card {
   display: flex;
   flex: 0 1 22rem;
+  flex-direction: column;
   background-color: $ui-02;
   border: 1px solid $ui-03;
+}
+
+.cardLink {
+  flex: 1;
+  text-decoration: none;
 
   &:hover {
     background-color: $ui-03;
   }
-}
-
-.cardLink {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  text-decoration: none;
-}
-
-// Small overflow menu button plus the gap to the card edge.
-$actions-menu-width: layout.$spacing-07 + layout.$spacing-03;
-
-.actionsMenu {
-  width: $actions-menu-width;
-  padding: layout.$spacing-03 layout.$spacing-03 0 0;
 }
 
 .cardSkeleton {
@@ -77,12 +68,8 @@ $actions-menu-width: layout.$spacing-07 + layout.$spacing-03;
 .serviceRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: layout.$spacing-03;
-  margin-top: auto;
-  padding: layout.$spacing-03 layout.$spacing-05;
-  // The menu column beside the link is empty below the button, so the row extends under it to reach the card edge.
-  margin-right: -$actions-menu-width;
+  padding: layout.$spacing-02 layout.$spacing-03 layout.$spacing-02 layout.$spacing-05;
   border-top: 1px solid $ui-03;
 }
 
@@ -94,6 +81,7 @@ $actions-menu-width: layout.$spacing-07 + layout.$spacing-03;
 
 .service {
   @include type.type-style('body-compact-01');
+  flex: 1;
   color: $ui-05;
 }
 
