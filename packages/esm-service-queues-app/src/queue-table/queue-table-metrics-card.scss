@@ -33,7 +33,7 @@
 }
 
 .valueLabel {
-  font-size: x-large;
+  @include type.type-style('heading-03');
   display: block;
   overflow-wrap: break-word;
 }
