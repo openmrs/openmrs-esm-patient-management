@@ -78,7 +78,7 @@ function QueueTable({
 
   const rows =
     paginatedQueueEntries?.map((queueEntry) => {
-      const row: { id: string; [key: string]: JSX.Element | string } = { id: queueEntry.uuid };
+      const row: { id: string; [key: string]: React.JSX.Element | string } = { id: queueEntry.uuid };
       columns.forEach(({ key, CellComponent }) => {
         row[key] = <CellComponent key={key} queueEntry={queueEntry} />;
       });
