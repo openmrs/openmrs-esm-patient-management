@@ -6,20 +6,33 @@ import { type PatientSearchResponse } from '../types';
 import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
-import { SWRConfig } from 'swr';
 
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
 }
 
 const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isLoadingMinSearchCharacters = false,
+      isValidating,
+      minSearchCharacters = 0,
+      query,
+      setPage,
+      totalResults,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
 
     const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
 
     // Only show the full skeleton when there is nothing to show
-    if (isLoading && !searchResults?.length) {
+    if ((isLoading || isLoadingMinSearchCharacters) && !searchResults?.length) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
@@ -50,6 +63,25 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
       );
     }
 
+    if (query.trim().length < minSearchCharacters) {
+      return (
+        <div className={styles.searchResultsContainer}>
+          <div className={styles.searchResults}>
+            <Layer>
+              <Tile className={styles.emptySearchResultsTile}>
+                <EmptyCardIllustration />
+                <p className={styles.emptyResultText}>
+                  {t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+                    count: minSearchCharacters,
+                  })}
+                </p>
+              </Tile>
+            </Layer>
+          </div>
+        </div>
+      );
+    }
+
     if (searchResults?.length) {
       return (
         <div className={styles.searchResultsContainer}>
@@ -59,22 +91,13 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
                 count: totalResults,
               })}
             </p>
-            {/* Set SWRConfig to minimize revalidations of, e.g., the patient photo */}
-            <SWRConfig
-              value={{
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false,
-                dedupingInterval: 180_000, // 3 minutes
-              }}>
-              <CompactPatientBanner
-                ref={ref}
-                patients={searchResults}
-                hasMore={hasMore}
-                isValidating={isValidating}
-                fetchMore={fetchMore}
-              />
-            </SWRConfig>
+            <CompactPatientBanner
+              ref={ref}
+              patients={searchResults}
+              hasMore={hasMore}
+              isValidating={isValidating}
+              fetchMore={fetchMore}
+            />
           </div>
         </div>
       );

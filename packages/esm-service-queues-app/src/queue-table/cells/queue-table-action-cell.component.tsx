@@ -44,7 +44,7 @@ function normalizeActions(actionKeys: ConfigurableQueueEntryAction[], configKey:
 function useActionPropsByKey() {
   const {
     callingStatus,
-    concepts: { defaultStatusConceptUuid },
+    concepts: { waitingStatusConceptUuid },
     visitQueueNumberAttributeUuid,
   } = useConfig<ConfigObject>();
   const { mutateQueueEntries } = useMutateQueueEntries();
@@ -73,7 +73,7 @@ function useActionPropsByKey() {
           }
         },
         showIf: (queueEntry: QueueEntry) => {
-          return queueEntry.status.uuid === defaultStatusConceptUuid;
+          return queueEntry.status.uuid === waitingStatusConceptUuid;
         },
       },
       move: {
@@ -111,6 +111,7 @@ function useActionPropsByKey() {
             size: 'sm',
           });
         },
+        isDelete: true,
       },
       delete: {
         // t('deleteEntry', 'Delete entry'),
@@ -145,7 +146,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [callingStatus, defaultStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [callingStatus, waitingStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
   return actionPropsByKey;
 }
 
@@ -193,31 +194,35 @@ function ActionButton({ actionKey, queueEntry }: { actionKey: QueueEntryAction; 
   );
 }
 
-function ActionOverflowMenuItem({ actionKey, queueEntry }: { actionKey: QueueEntryAction; queueEntry: QueueEntry }) {
+// Carbon's OverflowMenu clones each direct child with the ref and focus handlers its keyboard navigation
+// relies on, so the visible items are returned as plain OverflowMenuItems rather than wrapped in a component.
+export function useActionOverflowMenuItems(actionKeys: QueueEntryAction[], queueEntry: QueueEntry) {
   const { t } = useTranslation();
   const actionPropsByKey = useActionPropsByKey();
 
-  const actionProps = actionPropsByKey[actionKey];
-  if (!actionProps) {
-    console.error(`Service queue table configuration uses unknown action in 'action.overflowMenu': ${actionKey}`);
-    return null;
-  }
+  return actionKeys.flatMap((actionKey) => {
+    const actionProps = actionPropsByKey[actionKey];
+    if (!actionProps) {
+      console.error(`Service queue table configuration uses unknown action in 'action.overflowMenu': ${actionKey}`);
+      return [];
+    }
 
-  if (actionProps.showIf && !actionProps.showIf(queueEntry)) {
-    return null;
-  }
+    if (actionProps.showIf && !actionProps.showIf(queueEntry)) {
+      return [];
+    }
 
-  return (
-    <OverflowMenuItem
-      key={actionKey}
-      className={styles.menuItem}
-      aria-label={t(actionProps.label, actionProps.text)}
-      hasDivider
-      isDelete={actionProps.isDelete}
-      onClick={() => actionProps.onClick(queueEntry)}
-      itemText={t(actionProps.label, actionProps.text)}
-    />
-  );
+    return [
+      <OverflowMenuItem
+        key={actionKey}
+        className={styles.menuItem}
+        aria-label={t(actionProps.label, actionProps.text)}
+        hasDivider
+        isDelete={actionProps.isDelete}
+        onClick={() => actionProps.onClick(queueEntry)}
+        itemText={t(actionProps.label, actionProps.text)}
+      />,
+    ];
+  });
 }
 
 export const queueTableActionColumn: QueueTableColumnFunction = (key, header, config: ActionsColumnConfig) => {
@@ -230,7 +235,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
     const layout = useLayoutType();
     const actionPropsByKey = useActionPropsByKey();
 
-    const [buttonComponents, overflowMenuComponents] = useMemo(() => {
+    const [buttonComponents, overflowMenuKeys] = useMemo(() => {
       const declaredButtonComponents = buttons
         .map((actionKey) => {
           const actionProps = actionPropsByKey[actionKey];
@@ -251,7 +256,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
         const defaultAction = overflowMenu.find((actionKey) => {
           const actionProps = actionPropsByKey[actionKey];
           if (!actionProps) {
-            // Logged by ActionOverflowMenuItem when it renders this key.
+            // Logged by useActionOverflowMenuItems when it renders this key.
             return false;
           }
           return !actionProps.showIf || actionProps.showIf(queueEntry);
@@ -268,12 +273,9 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
         overflowMenuKeys = overflowMenu;
       }
 
-      const overflowMenuComponents = overflowMenuKeys.map((actionKey) => (
-        <ActionOverflowMenuItem key={actionKey} actionKey={actionKey} queueEntry={queueEntry} />
-      ));
-
-      return [[...declaredButtonComponents, fallbackActionComponent], overflowMenuComponents];
+      return [[...declaredButtonComponents, fallbackActionComponent], overflowMenuKeys];
     }, [queueEntry, actionPropsByKey]);
+    const overflowMenuComponents = useActionOverflowMenuItems(overflowMenuKeys, queueEntry);
 
     return (
       <div className={styles.actionsCell}>

@@ -1,27 +1,40 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { SWRConfig } from 'swr';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
+import { activeVisitSwrConfig } from '../utils/swr-config';
 import styles from './patient-search-lg.scss';
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
 }
 
-export const EmptyState: React.FC = () => {
+interface EmptyStateProps {
+  /** Already translated. Defaults to the no-results message. */
+  title?: string;
+  /** Already translated. Defaults to the hint to search by patient ID. Pass null to hide the hint entirely. */
+  hint?: string | null;
+}
+
+export const EmptyState: React.FC<EmptyStateProps> = ({ title, hint }) => {
   const { t } = useTranslation();
   return (
     <Layer>
       <Tile className={styles.emptySearchResultsTile}>
         <EmptyCardIllustration />
         <p className={styles.emptyResultText}>
-          {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
+          {title ?? t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
         </p>
-        <p className={styles.actionText}>
-          <span>{t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}</span>
-        </p>
+        {hint !== null && (
+          <p className={styles.actionText}>
+            <span>
+              {hint ?? t('trySearchWithPatientUniqueID', "Try to search again using the patient's unique ID number")}
+            </span>
+          </p>
+        )}
       </Tile>
     </Layer>
   );
@@ -60,11 +73,15 @@ export const ErrorState: React.FC = () => {
 };
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
+  // A row calls `useVisit` from its own body, so the config has to sit above the rows to reach it.
+  // The photo keeps its stricter config nested inside the banner.
   return (
-    <div data-openmrs-role="Search Results">
-      {searchResults.map((patient) => (
-        <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
-      ))}
-    </div>
+    <SWRConfig value={activeVisitSwrConfig}>
+      <div data-openmrs-role="Search Results">
+        {searchResults.map((patient) => (
+          <PatientBanner key={patient.uuid} patientUuid={patient.uuid} patient={patient} />
+        ))}
+      </div>
+    </SWRConfig>
   );
 };

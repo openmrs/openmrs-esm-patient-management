@@ -1,0 +1,45 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.servicesLegend {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background-color: colors.$gray-10;
+  margin-top: layout.$spacing-03;
+  min-height: layout.$spacing-07;
+  box-sizing: border-box;
+
+  .legendTitle {
+    @include type.type-style('heading-compact-01');
+    font-weight: 700;
+    color: colors.$gray-100;
+  }
+
+  .legendItems {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: layout.$spacing-05;
+  }
+
+  .legendItem {
+    display: flex;
+    align-items: center;
+    gap: layout.$spacing-02;
+    @include type.type-style('body-compact-01');
+    color: colors.$gray-80;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    min-width: 0.5rem;
+    min-height: 0.5rem;
+    border-radius: 0.125rem;
+    flex-shrink: 0;
+  }
+}

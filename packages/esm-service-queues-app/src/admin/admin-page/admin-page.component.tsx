@@ -11,12 +11,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { EmptyCardIllustration, ErrorState, launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace2, useLayoutType } from '@openmrs/esm-framework';
 import { useQueueRooms, useQueuesMutable } from '../queue-admin.resource';
+import EmptyState from '../../empty-state/empty-state.component';
 import QueueActionMenu from './queue-action-menu.component';
 import QueueRoomActionMenu from './queue-room-action-menu.component';
 import styles from './admin-page.scss';
@@ -112,7 +112,7 @@ const AdminPage = () => {
         ) : queuesError ? (
           <ErrorState error={queuesError} headerTitle={t('queues', 'Queues')} />
         ) : (
-          <Layer>
+          <Layer className={styles.tableSection}>
             <DataTable
               rows={queueTableRows}
               headers={queueTableHeaders}
@@ -146,12 +146,7 @@ const AdminPage = () => {
                 </TableContainer>
               )}
             </DataTable>
-            {queueTableRows.length === 0 && (
-              <Tile className={styles.emptyState}>
-                <EmptyCardIllustration />
-                <p>{t('noQueuesToDisplay', 'No queues to display')}</p>
-              </Tile>
-            )}
+            {queueTableRows.length === 0 && <EmptyState displayText={t('noQueuesToDisplay', 'No queues to display')} />}
           </Layer>
         )}
       </div>
@@ -171,7 +166,7 @@ const AdminPage = () => {
         ) : queueRoomsError ? (
           <ErrorState error={queueRoomsError} headerTitle={t('queueRooms', 'Queue rooms')} />
         ) : (
-          <Layer>
+          <Layer className={styles.tableSection}>
             <DataTable
               rows={queueRoomTableRows}
               headers={queueRoomTableHeaders}
@@ -206,10 +201,7 @@ const AdminPage = () => {
               )}
             </DataTable>
             {queueRoomTableRows.length === 0 && (
-              <Tile className={styles.emptyState}>
-                <EmptyCardIllustration />
-                <p className={styles.emptyStateContent}>{t('noQueueRoomsToDisplay', 'No queue rooms to display')}</p>
-              </Tile>
+              <EmptyState displayText={t('noQueueRoomsToDisplay', 'No queue rooms to display')} />
             )}
           </Layer>
         )}
