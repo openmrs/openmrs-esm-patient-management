@@ -281,15 +281,6 @@ export async function findRealPatientListsWithoutPatient(
   }));
 }
 
-// This entire model is a little bit special since it not only displays the "real" patient lists (i.e. data from
-// the cohorts/backend), but also a fake patient list which doesn't really exist in the backend:
-// The offline patient list.
-// When a patient is added to the offline list, that patient should become available offline, i.e.
-// a dynamic offline data entry must be created.
-// This is why the following abstracts away the differences between the real and the fake patient lists.
-// The component doesn't really care about which is which - the only thing that matters is that the
-// data can be fetched and that there is an "add patient" function.
-
 export function useAddablePatientLists(patientUuid: string) {
   const config = useConfig<PatientListManagementConfig>();
   return useSWR(['addablePatientLists', patientUuid], async () => {
