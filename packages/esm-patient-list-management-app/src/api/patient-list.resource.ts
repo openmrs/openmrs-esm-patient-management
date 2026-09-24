@@ -7,9 +7,6 @@ import {
   refetchCurrentUser,
   restBaseUrl,
   fhirBaseUrl,
-  getDynamicOfflineDataEntries,
-  syncDynamicOfflineData,
-  putDynamicOfflineData,
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
@@ -284,50 +281,17 @@ export async function findRealPatientListsWithoutPatient(
   }));
 }
 
-export async function findFakePatientListsWithoutPatient(
-  patientUuid: string,
-  t: TFunction,
-): Promise<Array<AddablePatientListViewModel>> {
-  const offlinePatients = await getDynamicOfflineDataEntries('patient');
-  const isPatientOnOfflineList = offlinePatients.some((x) => x.identifier === patientUuid);
-  return isPatientOnOfflineList
-    ? []
-    : [
-        {
-          id: 'fake-offline-patient-list',
-          displayName: t('offlinePatients', 'Offline patients'),
-          async addPatient() {
-            await putDynamicOfflineData('patient', patientUuid);
-            await syncDynamicOfflineData('patient', patientUuid);
-          },
-        },
-      ];
-}
-
-// This entire model is a little bit special since it not only displays the "real" patient lists (i.e. data from
-// the cohorts/backend), but also a fake patient list which doesn't really exist in the backend:
-// The offline patient list.
-// When a patient is added to the offline list, that patient should become available offline, i.e.
-// a dynamic offline data entry must be created.
-// This is why the following abstracts away the differences between the real and the fake patient lists.
-// The component doesn't really care about which is which - the only thing that matters is that the
-// data can be fetched and that there is an "add patient" function.
-
 export function useAddablePatientLists(patientUuid: string) {
-  const { t } = useTranslation();
   const config = useConfig<PatientListManagementConfig>();
   return useSWR(['addablePatientLists', patientUuid], async () => {
-    // Using Promise.allSettled instead of Promise.all here because some distros might not have the
-    // cohort module installed, leading to the real patient list call failing.
-    // In that case we still want to show fake lists and *not* error out here.
-    const [fakeLists, realLists] = await Promise.allSettled([
-      findFakePatientListsWithoutPatient(patientUuid, t),
-      findRealPatientListsWithoutPatient(patientUuid, config.myListCohortTypeUUID, config.systemListCohortTypeUUID),
-    ]);
-
-    return [
-      ...(fakeLists.status === 'fulfilled' ? fakeLists.value : []),
-      ...(realLists.status === 'fulfilled' ? realLists.value : []),
-    ];
+    try {
+      return await findRealPatientListsWithoutPatient(
+        patientUuid,
+        config.myListCohortTypeUUID,
+        config.systemListCohortTypeUUID,
+      );
+    } catch {
+      return [];
+    }
   });
 }
