@@ -6,6 +6,7 @@ import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
 import Header from '../header/header.component';
 import ListsTable from '../lists-table/lists-table.component';
+import AllPatientsTable from '../all-patients-table/all-patients-table.component';
 import styles from './lists-dashboard.scss';
 
 const TabIndices = {
@@ -13,6 +14,7 @@ const TabIndices = {
   SYSTEM_LISTS: 1,
   MY_LISTS: 2,
   ALL_LISTS: 3,
+  ALL_PATIENTS: 4,
 } as const;
 
 function usePatientListFilterForCurrentTab(selectedTab: number) {
@@ -63,19 +65,24 @@ const ListsDashboard: React.FC = () => {
                 <Tab data-tutorial-target="all-patient-lists-tab" className={styles.tab}>
                   {t('allLists', 'All lists')}
                 </Tab>
+                <Tab className={styles.tab}>{t('allPatients', 'All patients')}</Tab>
               </TabList>
             </Tabs>
           </div>
           <div className={styles.listsTableContainer}>
-            <ListsTable
-              error={error}
-              headers={tableHeaders}
-              isLoading={isLoading}
-              key={`tab-${selectedTab}`}
-              listType={patientListFilter.label}
-              patientLists={patientLists}
-              refetch={mutate}
-            />
+            {selectedTab === TabIndices.ALL_PATIENTS ? (
+              <AllPatientsTable />
+            ) : (
+              <ListsTable
+                error={error}
+                headers={tableHeaders}
+                isLoading={isLoading}
+                key={`tab-${selectedTab}`}
+                listType={patientListFilter.label}
+                patientLists={patientLists}
+                refetch={mutate}
+              />
+            )}
           </div>
         </div>
       </section>

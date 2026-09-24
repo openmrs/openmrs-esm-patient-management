@@ -12,6 +12,7 @@ export interface TextPersonAttributeFieldProps {
   validationRegex?: string;
   label?: string;
   required?: boolean;
+  hideOptionalLabel?: boolean;
 }
 
 export function TextPersonAttributeField({
@@ -20,6 +21,7 @@ export function TextPersonAttributeField({
   validationRegex,
   label,
   required,
+  hideOptionalLabel,
 }: TextPersonAttributeFieldProps) {
   const { t } = useTranslation();
 
@@ -49,6 +51,7 @@ export function TextPersonAttributeField({
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}
               required={required}
+              hideOptionalLabel={hideOptionalLabel}
             />
           );
         }}
