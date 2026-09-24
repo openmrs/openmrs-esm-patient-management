@@ -22,12 +22,6 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 
 export const patientSearchIcon = getAsyncLifecycle(() => import('./patient-search-icon'), options);
 
-// This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
-export const patientSearchButton = getAsyncLifecycle(
-  () => import('./patient-search-button/patient-search-button.component'),
-  options,
-);
-
 // This extension is not compatible with the tablet view.
 export const patientSearchBar = getAsyncLifecycle(() => import('./compact-patient-search.extension'), options);
 
