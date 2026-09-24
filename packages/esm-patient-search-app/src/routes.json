@@ -28,15 +28,5 @@
       "slot": "start-visit-button-slot2",
       "offline": true
     }
-  ],
-  "workspaces": [
-    {
-      "component": "patientSearchWorkspace",
-      "groups": ["ward-patient-admission-requests"],
-      "name": "patient-search-workspace",
-      "title": "searchPatient",
-      "type": "patient-search-workspace",
-      "width": "narrow"
-    }
   ]
 }
