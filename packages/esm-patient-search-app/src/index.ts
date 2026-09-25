@@ -1,12 +1,4 @@
-import {
-  defineConfigSchema,
-  fetchCurrentPatient,
-  fhirBaseUrl,
-  getAsyncLifecycle,
-  makeUrl,
-  messageOmrsServiceWorker,
-  setupDynamicOfflineDataHandler,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
 const moduleName = '@openmrs/esm-patient-search-app';
@@ -48,25 +40,4 @@ export const patientSearchStartVisitButton2 = getAsyncLifecycle(
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-
-  setupDynamicOfflineDataHandler({
-    id: 'esm-patient-search-app:patient',
-    type: 'patient',
-    displayName: 'Patient search',
-    async isSynced(patientUuid) {
-      const expectedUrls = [`${fhirBaseUrl}/Patient/${patientUuid}`];
-      const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
-      const cache = await caches.open('omrs-spa-cache-v1');
-      const keys = (await cache.keys()).map((key) => key.url);
-      return absoluteExpectedUrls.every((url) => keys.includes(url));
-    },
-    async sync(patientUuid) {
-      await messageOmrsServiceWorker({
-        type: 'registerDynamicRoute',
-        pattern: `${fhirBaseUrl}/Patient/${patientUuid}`,
-      });
-
-      await fetchCurrentPatient(patientUuid);
-    },
-  });
 }

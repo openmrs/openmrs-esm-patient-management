@@ -41,7 +41,6 @@ function renderDemographicsSectionWithFormik(
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <DemographicsSection fields={fields} />

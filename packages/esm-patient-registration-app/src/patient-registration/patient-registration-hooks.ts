@@ -3,25 +3,15 @@ import { camelCase } from 'lodash-es';
 import { v4 } from 'uuid';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import {
-  type FetchResponse,
-  type OpenmrsResource,
-  getSynchronizationItems,
-  openmrsFetch,
-  restBaseUrl,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { type FetchResponse, type OpenmrsResource, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../config-schema';
-import { patientRegistration } from '../constants';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 import {
   type Encounter,
   type FormValues,
   type PatientIdentifierResponse,
-  type PatientRegistration,
   type PatientUuidMapType,
   type PersonAttributeResponse,
-  type AddressProperties,
 } from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,
@@ -41,7 +31,6 @@ interface DeathInfoResults {
 }
 
 export function useInitialFormValues(
-  isLoadingPatientToEdit: boolean,
   patientToEdit: fhir.Patient,
   patientUuid: string,
 ): [FormValues, Dispatch<FormValues>] {
@@ -79,38 +68,23 @@ export function useInitialFormValues(
   });
 
   useEffect(() => {
-    (async () => {
-      if (patientToEdit) {
-        const birthdateEstimated = !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate);
-        const [years = 0, months = 0] = patientToEdit.birthDate.split('-').map((val) => parseInt(val));
-        const estimatedMonthsAvailable = patientToEdit.birthDate.split('-').length > 1;
-        const yearsEstimated = birthdateEstimated ? Math.floor(dayjs().diff(patientToEdit.birthDate, 'month') / 12) : 0;
-        const monthsEstimated =
-          birthdateEstimated && estimatedMonthsAvailable ? dayjs().diff(patientToEdit.birthDate, 'month') % 12 : 0;
-
-        setInitialFormValues((currentValues) => ({
-          ...currentValues,
-          ...getFormValuesFromFhirPatient(patientToEdit),
-          address: getAddressFieldValuesFromFhirPatient(patientToEdit),
-          ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
-          birthdateEstimated: !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate),
-          yearsEstimated,
-          monthsEstimated,
-        }));
-      } else if (!isLoadingPatientToEdit && patientUuid) {
-        const registration = await getPatientRegistration(patientUuid);
-
-        if (!registration._patientRegistrationData.formValues) {
-          console.error(
-            `Found a queued offline patient registration for patient ${patientUuid}, but without form values. Not using these values.`,
-          );
-          return;
-        }
-
-        setInitialFormValues(registration._patientRegistrationData.formValues);
-      }
-    })();
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+    if (patientToEdit) {
+      const birthdateEstimated = !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate);
+      const estimatedMonthsAvailable = patientToEdit.birthDate.split('-').length > 1;
+      const yearsEstimated = birthdateEstimated ? Math.floor(dayjs().diff(patientToEdit.birthDate, 'month') / 12) : 0;
+      const monthsEstimated =
+        birthdateEstimated && estimatedMonthsAvailable ? dayjs().diff(patientToEdit.birthDate, 'month') % 12 : 0;
+      setInitialFormValues((currentValues) => ({
+        ...currentValues,
+        ...getFormValuesFromFhirPatient(patientToEdit),
+        address: getAddressFieldValuesFromFhirPatient(patientToEdit),
+        ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
+        birthdateEstimated: !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate),
+        yearsEstimated,
+        monthsEstimated,
+      }));
+    }
+  }, [patientToEdit]);
 
   // Set initial patient death info
   useEffect(() => {
@@ -161,7 +135,6 @@ export function useInitialFormValues(
         }),
         {},
       );
-
       setInitialFormValues((initialFormValues) => ({
         ...initialFormValues,
         attributes: personAttributes,
@@ -182,39 +155,8 @@ export function useInitialFormValues(
   return [initialFormValues, setInitialFormValues];
 }
 
-type AddressFieldValues = Partial<Record<AddressProperties, string>>;
-
-export function useInitialAddressFieldValues(
-  fallback: AddressFieldValues = {},
-  isLoadingPatientToEdit: boolean,
-  patientToEdit: fhir.Patient,
-  patientUuid: string,
-): [AddressFieldValues, Dispatch<AddressFieldValues>] {
-  const fallbackRef = useRef(fallback);
-  const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<AddressFieldValues>(fallbackRef.current);
-
-  useEffect(() => {
-    (async () => {
-      if (patientToEdit) {
-        setInitialAddressFieldValues((currentValues) => ({
-          ...currentValues,
-          address: getAddressFieldValuesFromFhirPatient(patientToEdit),
-        }));
-      } else if (!isLoadingPatientToEdit && patientUuid) {
-        const registration = await getPatientRegistration(patientUuid);
-        setInitialAddressFieldValues(
-          registration?._patientRegistrationData.initialAddressFieldValues ?? fallbackRef.current,
-        );
-      }
-    })();
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
-
-  return [initialAddressFieldValues, setInitialAddressFieldValues];
-}
-
 export function usePatientUuidMap(
   fallback: PatientUuidMapType = {},
-  isLoadingPatientToEdit: boolean,
   patientToEdit: fhir.Patient,
   patientUuid: string,
 ): [PatientUuidMapType, Dispatch<PatientUuidMapType>] {
@@ -223,31 +165,13 @@ export function usePatientUuidMap(
   const { data: attributes } = useInitialPersonAttributes(patientUuid);
 
   useEffect(() => {
-    const abortController = new AbortController();
-
-    async function updatePatientMap() {
-      if (patientToEdit) {
-        setPatientUuidMap((prevMap) => ({
-          ...prevMap,
-          ...getPatientUuidMapFromFhirPatient(patientToEdit),
-        }));
-      } else if (!isLoadingPatientToEdit && patientUuid) {
-        try {
-          const registration = await getPatientRegistration(patientUuid);
-          if (!abortController.signal.aborted) {
-            setPatientUuidMap(registration?._patientRegistrationData.patientUuidMap ?? fallbackRef.current);
-          }
-        } catch (error) {
-          if (!abortController.signal.aborted) {
-            console.error('Failed to get patient registration:', error);
-          }
-        }
-      }
+    if (patientToEdit) {
+      setPatientUuidMap((prevMap) => ({
+        ...prevMap,
+        ...getPatientUuidMapFromFhirPatient(patientToEdit),
+      }));
     }
-
-    updatePatientMap();
-    return () => abortController.abort();
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [patientToEdit]);
 
   useEffect(() => {
     if (attributes) {
@@ -261,18 +185,13 @@ export function usePatientUuidMap(
   return [patientUuidMap, setPatientUuidMap];
 }
 
-async function getPatientRegistration(patientUuid: string) {
-  const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
-  return items.find((item) => item._patientRegistrationData.formValues.patientUuid === patientUuid);
-}
-
 export function useInitialPatientIdentifiers(patientUuid: string): {
   data: FormValues['identifiers'];
   isLoading: boolean;
 } {
   const shouldFetch = !!patientUuid;
 
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
+  const { data, isLoading } = useSWR<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
     shouldFetch
       ? `${restBaseUrl}/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`
       : null,
@@ -327,7 +246,7 @@ function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) 
 
 function useInitialPersonAttributes(personUuid: string) {
   const shouldFetch = !!personUuid;
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
+  const { data, isLoading } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
     shouldFetch
       ? `${restBaseUrl}/person/${personUuid}/attribute?v=custom:(uuid,display,attributeType:(uuid,display,format),value)`
       : null,
@@ -343,7 +262,7 @@ function useInitialPersonAttributes(personUuid: string) {
 }
 
 function useInitialPersonDeathInfo(personUuid: string) {
-  const { data, error, isLoading } = useSWR<FetchResponse<DeathInfoResults>, Error>(
+  const { data, isLoading } = useSWR<FetchResponse<DeathInfoResults>, Error>(
     !!personUuid
       ? `${restBaseUrl}/person/${personUuid}?v=custom:(uuid,display,causeOfDeath,dead,deathDate,causeOfDeathNonCoded)`
       : null,

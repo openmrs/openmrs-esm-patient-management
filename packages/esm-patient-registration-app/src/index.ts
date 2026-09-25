@@ -1,7 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName } from './constants';
-import { setupOffline } from './offline';
 import addPatientLinkComponent from './add-patient-link.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -13,7 +12,6 @@ const options = {
 
 export function startupApp() {
   defineConfigSchema(moduleName, esmPatientRegistrationSchema);
-  setupOffline();
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
