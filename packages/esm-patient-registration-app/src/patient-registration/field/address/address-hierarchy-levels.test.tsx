@@ -19,10 +19,8 @@ import { AddressComponent } from './address-field.component';
 /**
  * Regression test for O3-5912.
  *
- * A stubbed patient registration provider previously shadowed the real `setFieldValue`, so
- * changing a parent left dependent fields populated. These tests render the real AddressComponent,
- * drive the real combo inputs, and assert on the resulting Formik values. Nothing in the hierarchy
- * hooks is mocked: the data comes from `openmrsFetch`.
+ * These tests render the real AddressComponent, drive the real combo inputs, and assert on the
+ * resulting Formik values. Nothing in the hierarchy hooks is mocked: the data comes from `openmrsFetch`.
  */
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
