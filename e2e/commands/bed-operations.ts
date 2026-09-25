@@ -4,7 +4,7 @@ import { type BedType, type Bed } from './types';
 export const generateRandomBed = async (
   api: APIRequestContext,
   bedType: BedType,
-  locationUuid: string,
+  locationUuid = process.env.E2E_WARD_LOCATION_UUID,
 ): Promise<Bed> => {
   const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
   const bedNumber = `B${randomString}${Math.floor(Math.random() * 100)}`;
@@ -14,7 +14,7 @@ export const generateRandomBed = async (
       bedNumber: bedNumber.substring(0, 10),
       bedType: bedType.name,
       column: Math.floor(Math.random() * 100) + 1,
-      locationUuid: locationUuid,
+      locationUuid,
       row: Math.floor(Math.random() * 100) + 1,
       status: 'AVAILABLE',
     },

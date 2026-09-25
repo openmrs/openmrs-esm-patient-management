@@ -81,6 +81,14 @@ export class WardPage {
       .click();
   }
 
+  async clickTransferPatientButton(patientName: string) {
+    await this.page
+      .locator('[class*="admissionRequestCard"]')
+      .filter({ hasText: patientName })
+      .getByRole('button', { name: 'Transfer patient', exact: true })
+      .click();
+  }
+
   async selectBedForAdmission(bedNumber: string) {
     // if the ward contains many beds, the bed selection will be a dropdown instead of radio buttons. Handle both cases.
     const bedDropdown = this.page.getByRole('combobox', { name: 'Choose an option' });
