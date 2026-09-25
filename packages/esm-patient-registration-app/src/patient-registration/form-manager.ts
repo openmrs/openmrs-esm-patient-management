@@ -335,9 +335,12 @@ export class FormManager {
       Object.entries(values.attributes)
         .filter(([, value]) => !!value)
         .forEach(([key, value]) => {
+          // Saved attributes of formats like Location load as `{ uuid, display }` references, but the
+          // REST API only accepts the uuid when saving them. Other values, such as booleans, are sent as loaded.
+          const loadedValue: unknown = value;
           attributes.push({
             attributeType: key,
-            value,
+            value: typeof loadedValue === 'object' ? (loadedValue as { uuid: string }).uuid : value,
           });
         });
     }

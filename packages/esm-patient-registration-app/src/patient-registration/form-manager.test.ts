@@ -226,6 +226,29 @@ describe('FormManager', () => {
     });
   });
 
+  describe('getPatientAttributes', () => {
+    it('sends the uuid of a saved location attribute rather than its REST reference', () => {
+      const values: FormValues = {
+        ...formValues,
+        attributes: {
+          'health-center-uuid': { uuid: 'site-23-uuid', display: 'Site 23' } as unknown as string,
+          'referred-by-uuid': 'Kisumu Clinic',
+          // Boolean and number attributes load from the REST API as JSON booleans and numbers
+          'test-patient-uuid': true as unknown as string,
+          'household-size-uuid': 5 as unknown as string,
+          'cleared-attribute-uuid': null,
+        },
+      };
+
+      expect(FormManager.getPatientAttributes(values)).toEqual([
+        { attributeType: 'health-center-uuid', value: 'site-23-uuid' },
+        { attributeType: 'referred-by-uuid', value: 'Kisumu Clinic' },
+        { attributeType: 'test-patient-uuid', value: true },
+        { attributeType: 'household-size-uuid', value: 5 },
+      ]);
+    });
+  });
+
   describe('getDeletedNames', () => {
     const patientUuid = 'patient-uuid';
     const patientUuidMap = { additionalNameUuid: 'additional-name-uuid' };
