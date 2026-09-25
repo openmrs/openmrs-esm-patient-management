@@ -2,22 +2,18 @@ import {
   type FetchResponse,
   getConfig,
   openmrsFetch,
-  queueSynchronizationItem,
   restBaseUrl,
   type Session,
   type StyleguideConfigObject,
   toOmrsIsoString,
 } from '@openmrs/esm-framework';
-import { patientRegistration } from '../constants';
 import {
-  type AddressProperties,
   type AttributeValue,
   type CapturePhotoProps,
   type Encounter,
   type FormValues,
   type Patient,
   type PatientIdentifier,
-  type PatientRegistration,
   type PatientUuidMapType,
   type RelationshipValue,
 } from './patient-registration.types';
@@ -36,8 +32,6 @@ import {
   updateRelationship,
 } from './patient-registration.resource';
 import { type RegistrationConfig } from '../config-schema';
-
-type AddressFieldValues = Partial<Record<AddressProperties, string>>;
 
 function getSettledValuesOrThrow<T>(results: Array<PromiseSettledResult<T>>): Array<T> {
   const rejectedResult = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
@@ -59,68 +53,25 @@ export type SavePatientForm = (
   isNewPatient: boolean,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
-  initialAddressFieldValues: AddressFieldValues,
   capturePhotoProps: CapturePhotoProps,
   currentLocation: string,
   initialIdentifierValues: FormValues['identifiers'],
   currentUser: Session,
   config: RegistrationConfig,
   savePatientTransactionManager: SavePatientTransactionManager,
-  abortController?: AbortController,
 ) => Promise<string | void>;
 
 export class FormManager {
-  static savePatientFormOffline: SavePatientForm = async (
-    isNewPatient,
-    values,
-    patientUuidMap,
-    initialAddressFieldValues,
-    capturePhotoProps,
-    currentLocation,
-    initialIdentifierValues,
-    currentUser,
-    config,
-  ) => {
-    const syncItem: PatientRegistration = {
-      fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(isNewPatient, values, patientUuidMap, initialAddressFieldValues, [], config),
-      ),
-      _patientRegistrationData: {
-        isNewPatient,
-        formValues: values,
-        patientUuidMap,
-        initialAddressFieldValues,
-        capturePhotoProps,
-        currentLocation,
-        initialIdentifierValues,
-        currentUser,
-        config,
-        savePatientTransactionManager: new SavePatientTransactionManager(),
-      },
-    };
-
-    await queueSynchronizationItem(patientRegistration, syncItem, {
-      id: values.patientUuid,
-      displayName: 'Patient registration',
-      patientUuid: syncItem.fhirPatient.id,
-      dependencies: [],
-    });
-
-    return null;
-  };
-
   static savePatientFormOnline: SavePatientForm = async (
     isNewPatient,
     values,
     patientUuidMap,
-    initialAddressFieldValues,
     capturePhotoProps,
     currentLocation,
     initialIdentifierValues,
     currentUser,
     config,
     savePatientTransactionManager,
-    abortController,
   ) => {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
       isNewPatient,
@@ -139,14 +90,7 @@ export class FormManager {
       ]),
     );
 
-    const createdPatient = FormManager.getPatientToCreate(
-      isNewPatient,
-      values,
-      patientUuidMap,
-      initialAddressFieldValues,
-      patientIdentifiers,
-      config,
-    );
+    const createdPatient = FormManager.getPatientToCreate(values, patientUuidMap, patientIdentifiers, config);
 
     const savePatientResponse = await savePatient(
       createdPatient,
@@ -331,10 +275,8 @@ export class FormManager {
   }
 
   static getPatientToCreate(
-    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: AddressFieldValues,
     identifiers: Array<PatientIdentifier>,
     config?: RegistrationConfig,
   ): Patient {
@@ -442,39 +384,6 @@ export class FormManager {
       ...(deathCause === config?.freeTextFieldConceptUuid
         ? { causeOfDeathNonCoded: nonCodedCauseOfDeath, causeOfDeath: null }
         : { causeOfDeath: deathCause, causeOfDeathNonCoded: null }),
-    };
-  }
-
-  static mapPatientToFhirPatient(patient: Partial<Patient>): fhir.Patient {
-    // Important:
-    // When changing this code, ideally assume that `patient` can be missing any attribute.
-    // The `fhir.Patient` provides us with the benefit that all properties are nullable and thus
-    // not required (technically, at least). -> Even if we cannot map some props here, we still
-    // provide a valid fhir.Patient object. The various patient chart modules should be able to handle
-    // such missing props correctly (and should be updated if they don't).
-
-    // Mapping inspired by:
-    // https://github.com/openmrs/openmrs-module-fhir/blob/669b3c52220bb9abc622f815f4dc0d8523687a57/api/src/main/java/org/openmrs/module/fhir/api/util/FHIRPatientUtil.java#L36
-    // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
-    // Update as required.
-    return {
-      id: patient.uuid,
-      gender: patient.person?.gender,
-      birthDate: patient.person?.birthdate,
-      deceasedBoolean: patient.person.dead,
-      deceasedDateTime: patient.person.deathDate,
-      name: patient.person?.names?.map((name) => ({
-        given: [name.givenName, name.middleName].filter(Boolean),
-        family: name.familyName,
-      })),
-      address: patient.person?.addresses.map((address) => ({
-        city: address.cityVillage,
-        country: address.country,
-        postalCode: address.postalCode,
-        state: address.stateProvince,
-        use: 'home',
-      })),
-      telecom: patient.person.attributes?.filter((attribute) => attribute.attributeType === 'Telephone Number'),
     };
   }
 }

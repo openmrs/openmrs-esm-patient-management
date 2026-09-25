@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText, InlineNotification } from '@carbon/react';
-import { type Session, useConfig, useConnectivity } from '@openmrs/esm-framework';
+import { type Session, useConfig } from '@openmrs/esm-framework';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import {
   type PatientRegistrationContextProps,
@@ -21,7 +21,6 @@ export const AddressComponent: React.FC = () => {
   const { setFieldValue } = usePatientRegistrationContext();
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
-  const isOnline = useConnectivity();
   const {
     fieldConfigurations: {
       address: {
@@ -81,7 +80,7 @@ export const AddressComponent: React.FC = () => {
     );
   }
 
-  if (!addressHierarchyEnabled || !isOnline) {
+  if (!addressHierarchyEnabled) {
     return (
       <AddressComponentContainer>
         {addressLayout.map((attributes, index) => (
