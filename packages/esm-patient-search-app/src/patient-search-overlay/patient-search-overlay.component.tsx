@@ -4,7 +4,7 @@ import { type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchWorkspace from '../patient-search-workspace/patient-search.workspace';
 import Overlay from '../ui-components/overlay.component';
 
-interface PatientSearchOverlayProps extends PatientSearchContextProps {
+interface PatientSearchOverlayProps extends Pick<PatientSearchContextProps, 'patientClickSideEffect'> {
   onClose: () => void;
   query?: string;
 }
