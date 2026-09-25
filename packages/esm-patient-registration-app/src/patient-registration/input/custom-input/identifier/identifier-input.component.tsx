@@ -9,7 +9,6 @@ import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-
 import { Input } from '../../basic-input/input/input.component';
 import { usePatientRegistrationContext } from '../../../patient-registration-context';
 import { useResourcesContext } from '../../../../resources-context';
-import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { type PatientIdentifierValue } from '../../../patient-registration.types';
 import styles from '../../input.scss';
 
@@ -22,7 +21,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig<RegistrationConfig>();
   const { identifierTypes } = useResourcesContext();
-  const { isOffline, values, setFieldValue } = usePatientRegistrationContext();
+  const { values, setFieldValue } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
@@ -32,8 +31,6 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
   const name = `identifiers.${fieldName}.identifierValue`;
   const [identifierField, identifierFieldMeta] = useField(name);
-
-  const disabled = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
   const defaultPatientIdentifierTypesMap = useMemo(() => {
     const map = {};
@@ -121,7 +118,6 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
               id={name}
               labelText={identifierName}
               name={name}
-              disabled={disabled}
               required={required}
               invalid={errors[name] && touched[name]}
               invalidText={errors[name] && t(errors[name])}
@@ -153,7 +149,6 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
               kind="ghost"
               onClick={handleEdit}
               iconDescription={t('editIdentifierTooltip', 'Edit')}
-              disabled={disabled}
               hasIconOnly>
               <Edit size={16} />
             </Button>
@@ -166,7 +161,6 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
               kind="ghost"
               onClick={handleReset}
               iconDescription={t('resetIdentifierTooltip', 'Reset')}
-              disabled={disabled}
               hasIconOnly>
               <Reset size={16} />
             </Button>
@@ -179,7 +173,6 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
               kind="ghost"
               onClick={handleDelete}
               iconDescription={t('deleteIdentifierTooltip', 'Delete')}
-              disabled={disabled}
               hasIconOnly>
               <TrashCan size={16} />
             </Button>

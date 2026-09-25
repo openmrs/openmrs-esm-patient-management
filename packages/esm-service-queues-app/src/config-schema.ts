@@ -472,9 +472,9 @@ export const configSchema = {
         .filter((col) => queueNumberColumnDefs.map((d) => d.id).includes(col));
       return Boolean(
         config.visitQueueNumberAttributeUuid ||
-          queueNumberColumnsUsed.every(
-            (columnId) => queueNumberColumnDefs.find((d) => d.id === columnId).config.visitQueueNumberAttributeUuid,
-          ),
+        queueNumberColumnsUsed.every(
+          (columnId) => queueNumberColumnDefs.find((d) => d.id === columnId).config.visitQueueNumberAttributeUuid,
+        ),
       );
     }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
   ],

@@ -7,7 +7,7 @@ import { Formik, useFormikContext } from 'formik';
 import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { type Resources } from '../../../offline.resources';
+import { type Resources } from '../../../registration.resource';
 import { type AddressTemplate } from '../../patient-registration.types';
 import {
   PatientRegistrationContextProvider,

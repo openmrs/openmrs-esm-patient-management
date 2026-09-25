@@ -7,7 +7,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
 import { renderWithContext } from 'tools';
 import { ResourcesContextProvider } from '../../../../resources-context';
-import { type Resources } from '../../../../offline.resources';
+import { type Resources } from '../../../../registration.resource';
 import {
   PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
@@ -95,7 +95,6 @@ const mockContextValues: PatientRegistrationContextProps = {
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
-  isOffline: false,
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),

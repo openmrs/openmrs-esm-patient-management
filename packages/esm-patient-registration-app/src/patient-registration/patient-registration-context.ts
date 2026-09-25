@@ -10,7 +10,6 @@ export interface PatientRegistrationContextProps {
   identifierTypes: Array<PatientIdentifierType>;
   inEditMode: boolean;
   initialFormValues: FormValues;
-  isOffline: boolean;
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   setFieldTouched: FormikHelpers<FormValues>['setFieldTouched'];
   setFieldValue: FormikHelpers<FormValues>['setFieldValue'];

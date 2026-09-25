@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { renderWithContext } from 'tools';
-import { type Resources } from '../../../offline.resources';
+import { type Resources } from '../../../registration.resource';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
@@ -67,7 +67,6 @@ async function renderAddressSearchWithFormik(
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <AddressSearchComponent addressLayout={allFields} />
@@ -314,7 +313,6 @@ describe('Testing address search bar', () => {
               setCapturePhotoProps: vi.fn(),
               setFieldTouched: vi.fn().mockResolvedValue(undefined),
               currentPhoto: '',
-              isOffline: false,
               initialFormValues: formValuesRef,
             }}>
             <AddressSearchComponent addressLayout={allFields} />

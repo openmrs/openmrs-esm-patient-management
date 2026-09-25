@@ -46,7 +46,6 @@ const renderDobFieldWithFormik = (
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <DobField />
@@ -88,7 +87,6 @@ const renderDobField = (initialValues: Partial<FormValues> = {}) => {
             setCapturePhotoProps: vi.fn(),
             setFieldTouched: vi.fn().mockResolvedValue(undefined),
             currentPhoto: '',
-            isOffline: false,
             initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,
           }}>
           <DobField />
