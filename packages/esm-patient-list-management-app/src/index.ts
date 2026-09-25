@@ -2,7 +2,6 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmr
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
-import { setupOffline } from './offline';
 
 const moduleName = '@openmrs/esm-patient-list-management-app';
 
@@ -14,7 +13,6 @@ const options = {
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  setupOffline();
   defineConfigSchema(moduleName, configSchema);
 }
 

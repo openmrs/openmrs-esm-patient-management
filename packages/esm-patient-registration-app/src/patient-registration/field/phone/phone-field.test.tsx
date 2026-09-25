@@ -38,7 +38,6 @@ const renderPhoneField = () => {
             setCapturePhotoProps: vi.fn(),
             setFieldTouched: vi.fn().mockResolvedValue(undefined),
             currentPhoto: '',
-            isOffline: false,
             initialFormValues: initialFormValues,
           }}>
           <PhoneField />

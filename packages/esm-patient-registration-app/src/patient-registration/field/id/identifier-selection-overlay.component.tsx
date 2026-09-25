@@ -4,10 +4,6 @@ import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } fr
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type FormValues, type PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
-import {
-  isUniqueIdentifierTypeForOffline,
-  shouldBlockPatientIdentifierInOfflineMode,
-} from '../../input/custom-input/identifier/utils';
 import { initializeIdentifier, setIdentifierSource } from './id-field.component';
 import { useResourcesContext } from '../../../resources-context';
 import Overlay from '../../ui-components/overlay/overlay.component';
@@ -21,7 +17,7 @@ interface PatientIdentifierOverlayProps {
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ closeOverlay, setFieldValue }) => {
   const layout = useLayoutType();
   const { identifierTypes } = useResourcesContext();
-  const { isOffline, values, initialFormValues } = usePatientRegistrationContext();
+  const { values, initialFormValues } = usePatientRegistrationContext();
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(values.identifiers);
   const [searchString, setSearchString] = useState('');
   const { t } = useTranslation();
@@ -94,7 +90,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
           // De-selecting shouldn't be allowed if the identifier was selected earlier and is present in the form.
           // If the user wants to de-select an identifier-type already present in the form, they'll need to delete the particular identifier from the form itself.
           values.identifiers[identifierType.fieldName];
-        const isDisabledOffline = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
         return (
           <div key={identifierType.uuid} className={styles.space05}>
@@ -102,9 +97,9 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
               id={identifierType.uuid}
               value={identifierType.uuid}
               labelText={identifierType.name}
-              onChange={(e, { checked }) => handleCheckingIdentifier(identifierType, checked)}
+              onChange={(_, { checked }) => handleCheckingIdentifier(identifierType, checked)}
               checked={!!patientIdentifier}
-              disabled={isDisabled || (isOffline && isDisabledOffline)}
+              disabled={isDisabled}
             />
             {patientIdentifier &&
               identifierType?.identifierSources?.length > 0 &&
@@ -133,11 +128,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
                         name={source.uuid}
                         value={source.uuid}
                         className={styles.radioButton}
-                        disabled={
-                          isOffline &&
-                          isUniqueIdentifierTypeForOffline(identifierType) &&
-                          source.autoGenerationOption?.manualEntryEnabled
-                        }
                       />
                     ))}
                   </RadioButtonGroup>
@@ -151,7 +141,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
       unsavedIdentifierTypes,
       defaultPatientIdentifierTypesMap,
       values.identifiers,
-      isOffline,
+
       handleCheckingIdentifier,
       t,
     ],
