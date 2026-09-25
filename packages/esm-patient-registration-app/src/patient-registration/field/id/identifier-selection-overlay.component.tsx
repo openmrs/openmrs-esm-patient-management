@@ -141,7 +141,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
       unsavedIdentifierTypes,
       defaultPatientIdentifierTypesMap,
       values.identifiers,
-
       handleCheckingIdentifier,
       t,
     ],
