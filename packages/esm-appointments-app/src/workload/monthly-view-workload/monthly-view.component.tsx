@@ -1,8 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
-import { formatDate } from '@openmrs/esm-framework';
 import { monthDays } from '../../helpers';
+import { useCalendarFormat, formatLocalDayNumber } from '../../calendar/calendar-utils';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import MonthlyWorkloadCard from './monthlyWorkCard';
 import styles from './monthly-workload.scss';
@@ -19,11 +18,25 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   dateToDisplay = '',
   onDateClick,
 }) => {
-  const { t } = useTranslation();
   const selectedDate = useSelectedDate();
-  const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
+  const { locale, calendarId, calendar } = useCalendarFormat();
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
-  const daysInWeeks = daysInWeek.map((day) => t(day));
+
+  // Localized month and year header string
+  const [y, m, d] = dayjs(monthViewDate).format('YYYY-MM-DD').split('-').map(Number);
+  const headerDateString = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'long',
+    calendar: calendarId,
+  } as Intl.DateTimeFormatOptions).format(new Date(y, m - 1, d, 12, 0, 0));
+
+  // Ordered weekday names in the local calendar starting Sunday (Jan 4, 1970 was a Sunday)
+  const daysInWeeks = Array.from({ length: 7 }, (_, i) => {
+    const refDate = new Date(1970, 0, 4 + i);
+    return new Intl.DateTimeFormat(locale, { weekday: 'short', calendar: calendarId } as Intl.DateTimeFormatOptions)
+      .format(refDate)
+      .toUpperCase();
+  });
 
   const handleClick = (date: Date) => {
     if (onDateClick) {
@@ -35,9 +48,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
     <div className={styles.calendarViewContainer}>
       <>
         <div className={styles.container}></div>
-        <span className={styles.headerContainer}>
-          {formatDate(new Date(monthViewDate), { day: false, time: false, noToday: true })}
-        </span>
+        <span className={styles.headerContainer}>{headerDateString}</span>
         <div className={styles.workLoadCard}>
           {daysInWeeks?.map((day, i) => (
             <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />
@@ -45,7 +56,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
-            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
+            {monthDays(dayjs(monthViewDate), calendar).map((dateTime, i) => (
               <div
                 onClick={() => handleClick(dayjs(dateTime).toDate())}
                 key={i}
@@ -58,6 +69,9 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   key={i}
                   date={dateTime}
                   isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
+                  locale={locale}
+                  calendarId={calendarId}
+                  calendar={calendar}
                   count={
                     calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
                       ?.count ?? 0
