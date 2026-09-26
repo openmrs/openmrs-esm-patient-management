@@ -31,43 +31,40 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
 
   const { mutateQueueEntries } = useMutateQueueEntries();
 
-  const launchEditPriorityModal = useCallback(() => {
-    const endedAt = new Date();
-    updateQueueEntry(
-      mappedQueueEntry.visitUuid,
-      mappedQueueEntry.queueUuid,
-      mappedQueueEntry.queueUuid,
-      mappedQueueEntry.queueEntryUuid,
-      mappedQueueEntry.patientUuid,
-      mappedQueueEntry.priority?.uuid,
-      defaultTransitionStatus,
-      endedAt,
-      mappedQueueEntry.sortWeight,
-    ).then(
-      () => {
-        serveQueueEntry(mappedQueueEntry.queue.name, mappedQueueEntry.visitQueueNumber, 'serving').then(
-          ({ status }) => {
-            showSnackbar({
-              isLowContrast: true,
-              title: t('success', 'Success'),
-              kind: 'success',
-              subtitle: t('patientAttendingService', 'Patient attending service'),
-            });
-            closeModal();
-            mutateQueueEntries();
-            navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
-          },
-        );
-      },
-      (error) => {
-        showSnackbar({
-          title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
-          kind: 'error',
-          isLowContrast: false,
-          subtitle: error?.message,
-        });
-      },
-    );
+  const launchEditPriorityModal = useCallback(async () => {
+    try {
+      const endedAt = new Date();
+      await updateQueueEntry(
+        mappedQueueEntry.visitUuid,
+        mappedQueueEntry.queueUuid,
+        mappedQueueEntry.queueUuid,
+        mappedQueueEntry.queueEntryUuid,
+        mappedQueueEntry.patientUuid,
+        mappedQueueEntry.priority?.uuid,
+        defaultTransitionStatus,
+        endedAt,
+        mappedQueueEntry.sortWeight,
+      );
+
+      await serveQueueEntry(mappedQueueEntry.queue.name, mappedQueueEntry.visitQueueNumber, 'serving');
+
+      showSnackbar({
+        isLowContrast: true,
+        title: t('success', 'Success'),
+        kind: 'success',
+        subtitle: t('patientAttendingService', 'Patient attending service'),
+      });
+      closeModal();
+      mutateQueueEntries();
+      navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
+    } catch (error) {
+      showSnackbar({
+        title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
+        kind: 'error',
+        isLowContrast: false,
+        subtitle: error?.message,
+      });
+    }
   }, [
     closeModal,
     defaultTransitionStatus,
