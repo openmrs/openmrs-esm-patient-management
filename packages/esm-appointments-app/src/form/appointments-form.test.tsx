@@ -49,9 +49,7 @@ const existingAppointment = {
   provider: { uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'Dr. Cook' },
   providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', response: 'ACCEPTED' }],
   recurring: false,
-  voided: false,
-  extensions: {},
-  teleconsultationLink: null,
+
   dateAppointmentScheduled: '2024-01-04T00:00:00.000Z',
 };
 
