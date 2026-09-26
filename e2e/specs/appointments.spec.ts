@@ -146,7 +146,10 @@ test('Add, edit and cancel an appointment from patient chart', async ({ api, pag
   });
 
   await test.step('And I confirm the cancellation by clicking the "Cancel appointment" button', async () => {
-    await page.getByRole('button', { name: 'danger Cancel appointment' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /cancel appointment/i })
+      .click();
   });
 
   await test.step('Then I should see a success message confirming the appointment was cancelled', async () => {
