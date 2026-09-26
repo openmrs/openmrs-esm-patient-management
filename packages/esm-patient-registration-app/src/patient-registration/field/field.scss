@@ -49,7 +49,8 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.dobField > :global(.cds--content-switcher) {
+.dobField > :global(.cds--content-switcher),
+.radioField > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
@@ -90,7 +91,8 @@
   margin-left: layout.$spacing-02;
 }
 
-.dobContentSwitcherLabel {
+.dobContentSwitcherLabel,
+.radioContentSwitcherLabel {
   margin-bottom: layout.$spacing-03;
 }
 
@@ -168,4 +170,14 @@
   letter-spacing: 0.32px;
   line-height: 1.34;
   margin: layout.$spacing-02 0 0;
+}
+
+.dangerLabel01 {
+  @include type.type-style('label-01');
+  color: colors.$red-60;
+}
+
+.radioFieldInvalid > :global(.cds--content-switcher) {
+  outline: 2px solid colors.$red-60;
+  outline-offset: -1px;
 }
