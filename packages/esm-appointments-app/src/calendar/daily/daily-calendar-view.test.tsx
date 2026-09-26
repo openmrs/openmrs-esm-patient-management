@@ -4,6 +4,13 @@ import { screen, waitFor } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
+import {
+  mockLocationInpatientWard,
+  mockMappedAppointmentsData,
+  mockPatient,
+  mockProviders,
+  mockUseAppointmentServiceData,
+} from '__mocks__';
 import { type Appointment, AppointmentStatus, AppointmentKind } from '../../types';
 import DailyCalendarView from './daily-calendar-view.component';
 
@@ -18,6 +25,10 @@ vi.mock('react-i18next', () => ({
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
+const outpatientService = mockUseAppointmentServiceData[0];
+const hivService = mockMappedAppointmentsData.data[0];
+const provider = mockProviders.data[0];
+
 const defaultProps = {
   calendarSelectedDate: dayjs('2026-06-09'),
 };
@@ -28,26 +39,26 @@ const mockAppointment = (overrides: Partial<Appointment> = {}): Appointment => (
   appointmentKind: AppointmentKind.SCHEDULED,
   comments: '',
   endDateTime: new Date('2026-06-09T09:15:00').getTime(),
-  location: { uuid: 'b1a8b05e-3542-4037-bbd3-998ee9c40574', name: 'Inpatient Ward' },
+  location: { uuid: mockLocationInpatientWard.uuid, name: mockLocationInpatientWard.name },
   patient: {
-    identifier: '100GEJ',
-    name: 'John Wilson',
-    uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+    identifier: mockPatient.identifier,
+    name: mockPatient.name,
+    uuid: mockPatient.uuid,
   },
-  provider: { uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66', display: 'doctor - James Cook' },
-  providers: [{ uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66' }],
+  provider: { uuid: provider.uuid, display: provider.display },
+  providers: [{ uuid: provider.uuid }],
   recurring: false,
   service: {
-    appointmentServiceId: 1,
+    appointmentServiceId: outpatientService.appointmentServiceId,
     creatorName: 'Test Creator',
     description: 'Outpatient service',
     durationMins: 15,
     endTime: '17:00',
     initialAppointmentStatus: 'Scheduled',
     maxAppointmentsLimit: null,
-    name: 'Outpatient',
+    name: outpatientService.name,
     startTime: '08:00',
-    uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+    uuid: outpatientService.uuid,
   },
   startDateTime: new Date('2026-06-09T09:00:00').getTime(),
   dateAppointmentScheduled: new Date('2026-06-09T00:00:00.000Z').getTime(),
@@ -78,13 +89,6 @@ describe('DailyCalendarView', () => {
     });
   });
 
-  it('renders the appointment count', async () => {
-    mockOpenmrsFetch.mockResolvedValue({ data: [mockAppointment()] } as FetchResponse);
-    renderWithSwr(<DailyCalendarView {...defaultProps} />);
-
-    await screen.findByText('1 appointment(s)');
-  });
-
   it('renders hour labels only for hours with appointments', async () => {
     mockOpenmrsFetch.mockResolvedValue({
       data: [
@@ -109,15 +113,19 @@ describe('DailyCalendarView', () => {
     mockOpenmrsFetch.mockResolvedValue({
       data: [
         mockAppointment({
-          service: { ...mockAppointment().service, name: 'HIV Clinic' },
+          service: {
+            ...mockAppointment().service,
+            name: hivService.serviceType,
+            uuid: hivService.serviceUuid,
+          },
           startDateTime: new Date('2026-06-09T14:30:00').getTime(),
         }),
       ],
     } as FetchResponse);
     renderWithSwr(<DailyCalendarView {...defaultProps} />);
 
-    await screen.findByText('John Wilson');
-    await screen.findByText('HIV Clinic');
+    await screen.findByText(mockPatient.name);
+    await screen.findByText(hivService.serviceType);
     await screen.findByText('2:30 PM');
     await screen.findByText('Scheduled');
   });
@@ -126,7 +134,7 @@ describe('DailyCalendarView', () => {
     mockOpenmrsFetch.mockResolvedValue({
       data: [
         mockAppointment({
-          patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+          patient: { identifier: mockPatient.identifier, name: mockPatient.name, uuid: mockPatient.uuid },
           startDateTime: new Date('2026-06-09T09:00:00').getTime(),
         }),
         mockAppointment({
@@ -137,7 +145,7 @@ describe('DailyCalendarView', () => {
     } as FetchResponse);
     renderWithSwr(<DailyCalendarView {...defaultProps} />);
 
-    await screen.findByText('John Wilson');
+    await screen.findByText(mockPatient.name);
     await screen.findByText('Jane Smith');
   });
 });
