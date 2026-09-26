@@ -608,7 +608,7 @@ describe('Updating an existing patient record', () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      { patientSaved: false },
+      { patientSaved: false, generatedIdentifiers: {}, addedIdentifiers: {} },
     );
   });
 });
