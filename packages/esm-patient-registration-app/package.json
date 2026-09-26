@@ -38,7 +38,6 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
   },
   "dependencies": {
-    "@carbon/react": "^1.83.0",
     "classnames": "^2.3.2",
     "formik": "^2.1.5",
     "lodash-es": "^4.17.15",
@@ -46,6 +45,7 @@
     "yup": "^0.29.1"
   },
   "peerDependencies": {
+    "@carbon/react": "1.x",
     "@openmrs/esm-framework": "10.x",
     "dayjs": "1.x",
     "react": "18.x",
@@ -54,6 +54,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@carbon/react": "^1.83.0",
     "openmrs": "next",
     "vitest": "^4.1.2"
   }
