@@ -45,8 +45,10 @@ export function getDosage(strength: string, doseNumber: number) {
   if (concentrationStartIndex >= 0) {
     strengthUnits = strength.substring(i, concentrationStartIndex);
     const j = strength.substring(concentrationStartIndex + 1).search(/\D/);
-    const concentrationQuantity = parseInt(strength.substr(concentrationStartIndex + 1, j));
-    const concentrationUnits = strength.substring(concentrationStartIndex + 1 + j);
+    const start = concentrationStartIndex + 1;
+    const end = j === -1 ? strength.length : start + j;
+    const concentrationQuantity = parseInt(strength.substring(start, end));
+    const concentrationUnits = strength.substring(end);
     return `${doseNumber} ${strengthUnits} (${
       (doseNumber / strengthQuantity) * concentrationQuantity
     } ${concentrationUnits})`;
