@@ -58,13 +58,6 @@ function evaluateAppointmentCalendarDates(forDate: string | null, period: string
     };
   }
 
-  if (period === 'weekly') {
-    return {
-      startDate: dayjs(forDate).startOf('week').format(omrsDateFormat),
-      endDate: dayjs(forDate).endOf('week').format(omrsDateFormat),
-    };
-  }
-
   return {
     startDate: dayjs(forDate).startOf('month').format(omrsDateFormat),
     endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),

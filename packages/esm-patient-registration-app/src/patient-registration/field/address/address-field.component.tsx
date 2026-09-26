@@ -1,15 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText, InlineNotification } from '@carbon/react';
-import { type Session, useConfig, useConnectivity } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
-import {
-  type PatientRegistrationContextProps,
-  PatientRegistrationContextProvider,
-  usePatientRegistrationContext,
-} from '../../patient-registration-context';
-import { ResourcesContextProvider, useResourcesContext } from '../../../resources-context';
-import { type AddressTemplate } from '../../patient-registration.types';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { useResourcesContext } from '../../../resources-context';
 import { Input } from '../../input/basic-input/input/input.component';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
@@ -21,7 +16,6 @@ export const AddressComponent: React.FC = () => {
   const { setFieldValue } = usePatientRegistrationContext();
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
-  const isOnline = useConnectivity();
   const {
     fieldConfigurations: {
       address: {
@@ -64,7 +58,7 @@ export const AddressComponent: React.FC = () => {
       return [];
     }
 
-    const orderMap = Object.fromEntries(orderedFields.map((field, indx) => [field, indx]));
+    const orderMap = Object.fromEntries((orderedFields ?? []).map((field, indx) => [field, indx]));
 
     return [...addressLayout].sort(
       (existingField1, existingField2) => orderMap[existingField1.name] - orderMap[existingField2.name],
@@ -81,7 +75,7 @@ export const AddressComponent: React.FC = () => {
     );
   }
 
-  if (!addressHierarchyEnabled || !isOnline) {
+  if (!addressHierarchyEnabled) {
     return (
       <AddressComponentContainer>
         {addressLayout.map((attributes, index) => (
@@ -144,35 +138,16 @@ export const AddressComponent: React.FC = () => {
 
 const AddressComponentContainer = ({ children }) => {
   const { t } = useTranslation();
-  const contextValue = useMemo(
-    () =>
-      ({
-        fieldConfigurations: {},
-        setFieldValue: async () => {},
-        values: {},
-      }) as unknown as PatientRegistrationContextProps,
-    [],
-  );
 
   return (
-    <ResourcesContextProvider
-      value={{
-        addressTemplate: {} as AddressTemplate,
-        currentSession: {} as Session,
-        identifierTypes: [],
-        relationshipTypes: { results: [] },
-      }}>
-      <PatientRegistrationContextProvider value={contextValue}>
-        <div>
-          <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-          <div
-            style={{
-              paddingBottom: '5%',
-            }}>
-            {children}
-          </div>
-        </div>
-      </PatientRegistrationContextProvider>
-    </ResourcesContextProvider>
+    <div>
+      <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+      <div
+        style={{
+          paddingBottom: '5%',
+        }}>
+        {children}
+      </div>
+    </div>
   );
 };

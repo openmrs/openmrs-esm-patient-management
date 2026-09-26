@@ -137,7 +137,6 @@ vi.mock('./patient-registration-hooks', async () => {
   return {
     ...actual,
     useInitialFormValues: vi.fn().mockReturnValue([defaultInitialFormValues, vi.fn()]),
-    useInitialAddressFieldValues: vi.fn().mockReturnValue([{}, vi.fn()]),
     usePatientUuidMap: vi.fn().mockReturnValue([{}, vi.fn()]),
   };
 });
@@ -295,7 +294,7 @@ describe('Registering a new patient', () => {
 
   it('should render all the required fields and sections', async () => {
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={vi.fn()} />,
+      <PatientRegistration savePatientForm={vi.fn()} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -327,7 +326,7 @@ describe('Registering a new patient', () => {
     const user = userEvent.setup();
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />,
+      <PatientRegistration savePatientForm={FormManager.savePatientFormOnline} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -346,6 +345,9 @@ describe('Registering a new patient', () => {
           gender: expect.stringMatching(/^M$/),
           names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
           dead: false,
+          deathDate: null,
+          causeOfDeath: null,
+          causeOfDeathNonCoded: null,
           uuid: expect.anything(),
         },
         uuid: expect.anything(),
@@ -359,7 +361,7 @@ describe('Registering a new patient', () => {
     const mockSavePatientForm = vi.fn();
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />,
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -377,7 +379,7 @@ describe('Registering a new patient', () => {
     mockUseConfig.mockReturnValue(configWithObs);
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />,
+      <PatientRegistration savePatientForm={FormManager.savePatientFormOnline} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -415,7 +417,7 @@ describe('Registering a new patient', () => {
     mockUseConfig.mockReturnValue(configWithObs);
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />,
+      <PatientRegistration savePatientForm={FormManager.savePatientFormOnline} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -520,7 +522,7 @@ describe('Updating an existing patient record', () => {
     ]);
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />,
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -601,14 +603,12 @@ describe('Updating an existing patient record', () => {
         yearsEstimated: 0,
       },
       expect.anything(),
-      expect.anything(),
       null,
       undefined,
       expect.anything(),
       expect.anything(),
       expect.anything(),
       { patientSaved: false },
-      expect.anything(),
     );
   });
 });

@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useId, useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@openmrs/esm-framework';
 import { type Control } from 'react-hook-form';
@@ -35,15 +35,20 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
   onSubmit,
 }) => {
   const { t } = useTranslation();
+  const headingId = useId();
 
   const renderSearchFields = useMemo(() => {
     const fields: Array<SearchFieldConfig> = [];
 
     Object.entries(config.search.searchFilterFields).forEach(([fieldName, fieldConfig]) => {
       if (fieldName !== 'personAttributes' && (fieldConfig as BuiltInFieldConfig).enabled) {
+        const { min, max } = fieldConfig as BuiltInFieldConfig;
         fields.push({
           name: fieldName,
           type: fieldName as SearchFieldType,
+          ...(min !== undefined ? { min } : {}),
+          // A configured maximum of 0 means no maximum: Carbon marks any value above `max` invalid.
+          ...(max ? { max } : {}),
         });
       }
     });
@@ -109,8 +114,11 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
           </p>
         ) : (
           <div className={styles.refineSearchBannerFilterInfo}>
-            <span className={classNames(styles.filtersAppliedCount, styles.bodyShort01)}>{filtersApplied}</span>{' '}
-            <p className={styles.bodyShort01}>{t('filtersAppliedText', 'search queries added')}</p>
+            <p className={styles.bodyShort01}>
+              <Trans i18nKey="searchQueriesAdded" count={filtersApplied} values={{ count: filtersApplied }}>
+                <span className={styles.filtersAppliedCount}>{'{{count}}'}</span> search queries added
+              </Trans>
+            </p>
             <Button kind="ghost" onClick={onResetFields} className={styles.refineSearchDialogOpener} size="sm">
               {t('clear', 'Clear')}
             </Button>
@@ -129,7 +137,9 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
         <div className={styles.refineSearchDialogContainer}>
           <div className={styles.refineSearchDialog}>
             <div className={styles.refineSearchDialogHeader}>
-              <p className={styles.bodyShort01}>{t('refineSearchHeaderText', 'Add additional search criteria')}</p>
+              <p id={headingId} className={styles.bodyShort01}>
+                {t('refineSearchHeaderText', 'Add additional search criteria')}
+              </p>
               <Button
                 kind="ghost"
                 onClick={onToggleDialog}
@@ -139,7 +149,7 @@ export const RefineSearchTablet: React.FC<RefineSearchTabletProps> = ({
                 {t('refineSearch', 'Refine search')}
               </Button>
             </div>
-            <form onSubmit={onSubmit} role="refine-search-tablet">
+            <form onSubmit={onSubmit} aria-labelledby={headingId}>
               {renderSearchFields}
               <div className={classNames(styles.buttonSet, styles.paddedButtons)}>
                 <Button kind="secondary" size="xl" onClick={onResetFields} className={styles.button}>

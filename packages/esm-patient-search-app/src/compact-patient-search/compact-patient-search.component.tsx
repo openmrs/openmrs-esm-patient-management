@@ -9,7 +9,6 @@ import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import RecentlySearchedPatients from './recently-searched-patients.component';
-import { type SearchedPatient } from '../types';
 import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
@@ -33,6 +32,12 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const debouncedSearchTerm = useDebounce(searchTerm);
+
+  // On the search page the term comes from the URL, so follow it when the route changes (a browser
+  // back or forward, or a link to another query) rather than reading it once on mount.
+  useEffect(() => {
+    setSearchTerm(initialSearchTerm ?? '');
+  }, [initialSearchTerm]);
   const hasSearchTerm = Boolean(debouncedSearchTerm?.trim());
 
   const config = useConfig<PatientSearchConfig>();
@@ -86,18 +91,29 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   const handlePatientSelection = useCallback(
-    (evt: KeyboardEvent, index: number, patients: Array<SearchedPatient>) => {
+    (evt: KeyboardEvent, index: number) => {
+      if (isSearchPage) {
+        return;
+      }
       evt.preventDefault();
-      if (patients) {
-        addViewedPatientAndCloseSearchResults(patients[index].uuid);
+      const patient = (hasSearchTerm ? searchedPatients : recentPatients)?.[index];
+      if (patient) {
+        addViewedPatientAndCloseSearchResults(patient.uuid);
         navigate({
           to: interpolateString(config.search.patientChartUrl, {
-            patientUuid: patients[index].uuid,
+            patientUuid: patient.uuid,
           }),
         });
       }
     },
-    [addViewedPatientAndCloseSearchResults, config.search.patientChartUrl],
+    [
+      addViewedPatientAndCloseSearchResults,
+      config.search.patientChartUrl,
+      hasSearchTerm,
+      isSearchPage,
+      searchedPatients,
+      recentPatients,
+    ],
   );
 
   const focusedResult = useArrowNavigation(
@@ -106,6 +122,10 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     handleFocusToInput,
     -1,
     searchContainerRef,
+    {
+      key: JSON.stringify([isSearchPage, searchTerm, debouncedSearchTerm]),
+      patientUuids: (hasSearchTerm ? searchedPatients : recentPatients)?.map(({ uuid }) => uuid) ?? [],
+    },
   );
 
   useEffect(() => {

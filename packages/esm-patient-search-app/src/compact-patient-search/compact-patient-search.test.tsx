@@ -7,7 +7,8 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { getDefaultsFromConfigSchema, navigate, useConfig, useSession } from '@openmrs/esm-framework';
 import { renderWithRouter } from 'tools';
 import { mockSession } from '__mocks__';
@@ -67,10 +68,69 @@ describe('CompactPatientSearchComponent', () => {
     mockUseArrowNavigation.mockReturnValue(-1);
   });
 
+  it.each([
+    { initialSearchTerm: 'John', expectedUuid: 'search-patient' },
+    { initialSearchTerm: '', expectedUuid: 'recent-patient' },
+  ])(
+    'opens the displayed patient on keyboard selection for "$initialSearchTerm"',
+    async ({ initialSearchTerm, expectedUuid }) => {
+      const onPatientSelect = vi.fn();
+      const searchPatients = buildPatients(1).map((patient) => ({ ...patient, uuid: 'search-patient' }));
+      const recentPatients = buildPatients(1).map((patient) => ({ ...patient, uuid: 'recent-patient' }));
+      mockUseInfinitePatientSearch.mockReturnValue(buildSearchResponse(searchPatients));
+      mockUseRestPatients.mockReturnValue(buildSearchResponse(recentPatients));
+
+      renderWithRouter(
+        <CompactPatientSearchComponent
+          isSearchPage={false}
+          initialSearchTerm={initialSearchTerm}
+          onPatientSelect={onPatientSelect}
+        />,
+      );
+
+      const onEnter = mockUseArrowNavigation.mock.calls.at(-1)[1];
+      const event = new KeyboardEvent('keydown', { key: 'Enter', cancelable: true });
+      await act(async () => onEnter(event, 0));
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(mockNavigate).toHaveBeenCalledWith({ to: expect.stringContaining(`/patient/${expectedUuid}/chart/`) });
+      expect(onPatientSelect).toHaveBeenCalledTimes(1);
+      expect(mockUseRecentlyViewedPatients.mock.results.at(-1).value.updateRecentlyViewedPatients).toHaveBeenCalledWith(
+        expectedUuid,
+      );
+    },
+  );
+
+  it('does not select a hidden header result on the advanced search page', async () => {
+    mockUseInfinitePatientSearch.mockReturnValue(buildSearchResponse(buildPatients(1)));
+    const onPatientSelect = vi.fn();
+    renderWithRouter(
+      <CompactPatientSearchComponent isSearchPage initialSearchTerm="John" onPatientSelect={onPatientSelect} />,
+    );
+
+    const event = new KeyboardEvent('keydown', { key: 'Enter', cancelable: true });
+    await act(async () => mockUseArrowNavigation.mock.calls.at(-1)[1](event, 0));
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(onPatientSelect).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
+
   it('renders a compact search bar', () => {
     renderWithRouter(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
 
     expect(screen.getByPlaceholderText(/Search for a patient by name or identifier number/i)).toBeInTheDocument();
+  });
+
+  it('follows the search term from the URL when it changes on the search page', () => {
+    const { rerender } = render(<CompactPatientSearchComponent isSearchPage initialSearchTerm="John" />, {
+      wrapper: MemoryRouter,
+    });
+    expect(screen.getByRole('searchbox')).toHaveValue('John');
+
+    // A browser back or forward changes the query in the URL without remounting the header.
+    rerender(<CompactPatientSearchComponent isSearchPage initialSearchTerm="Mary" />);
+    expect(screen.getByRole('searchbox')).toHaveValue('Mary');
   });
 
   it('renders search results when search term is not empty', async () => {

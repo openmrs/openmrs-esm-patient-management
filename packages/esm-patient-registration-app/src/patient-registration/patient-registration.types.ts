@@ -1,6 +1,4 @@
-import { type OpenmrsResource, type Session } from '@openmrs/esm-framework';
-import { type RegistrationConfig } from '../config-schema';
-import { type SavePatientTransactionManager } from './form-manager';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 interface NameValue {
   uuid: string;
@@ -71,30 +69,6 @@ export interface PatientIdentifier {
   preferred?: boolean;
 }
 
-export interface PatientRegistration {
-  id?: number;
-  /**
-   * The preliminary patient in the FHIR format.
-   */
-  fhirPatient: fhir.Patient;
-  /**
-   * Internal data collected by patient-registration. Required for later syncing and editing.
-   * Not supposed to be used outside of this module.
-   */
-  _patientRegistrationData: {
-    isNewPatient: boolean;
-    formValues: FormValues;
-    patientUuidMap: PatientUuidMapType;
-    initialAddressFieldValues: Partial<Record<AddressProperties, string>>;
-    capturePhotoProps: CapturePhotoProps;
-    currentLocation: string;
-    initialIdentifierValues: FormValues['identifiers'];
-    currentUser: Session;
-    config: RegistrationConfig;
-    savePatientTransactionManager: SavePatientTransactionManager;
-  };
-}
-
 export type Relationship = {
   relationshipType: string;
   personA: string;
@@ -113,8 +87,9 @@ export type Patient = {
     attributes: Array<AttributeValue>;
     addresses: Array<Record<string, string>>;
     dead: boolean;
-    deathDate?: string;
-    causeOfDeath?: string;
+    deathDate?: string | null;
+    causeOfDeath?: string | null;
+    causeOfDeathNonCoded?: string | null;
   };
 };
 
@@ -152,6 +127,11 @@ export interface RelationshipValue {
    */
   initialrelationshipTypeValue?: string;
   uuid?: string;
+  /**
+   * Client-side identifier for a relationship that has not been saved yet.
+   * Used as a stable React key until the server assigns a uuid. Never sent to the server.
+   */
+  clientId?: string;
 }
 
 export interface FormValues {

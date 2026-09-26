@@ -1,32 +1,18 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { Layer, Tile } from '@carbon/react';
+import { Layer, SkeletonText, Tile } from '@carbon/react';
 import { useQueueEntriesMetrics } from '../hooks/useQueueEntries';
 import styles from './queue-table-metrics-card.scss';
 
-interface QueueTableMetricsCardProps {
-  value?: number;
-  queueUuid?: string;
-  status?: string;
+interface QueueMetricTileProps {
+  value: React.ReactNode;
   headerLabel: string;
+  isLoading?: boolean;
   children?: React.ReactNode;
 }
 
-const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
-  value,
-  queueUuid,
-  status,
-  headerLabel,
-  children,
-}) => {
-  const { t } = useTranslation();
-  const { count } = useQueueEntriesMetrics({
-    queue: queueUuid,
-    status: status,
-    isEnded: false,
-  });
-
+/** One tile in a metrics strip, for a figure the caller already has. */
+export const QueueMetricTile: React.FC<QueueMetricTileProps> = ({ value, headerLabel, isLoading, children }) => {
   return (
     <Layer
       className={classNames(styles.container, {
@@ -39,11 +25,34 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
             {children}
           </div>
         </div>
-        <div>
-          <label className={styles.valueLabel}>{!isNaN(value) ? value : count}</label>
-        </div>
+        <div>{isLoading ? <SkeletonText /> : <label className={styles.valueLabel}>{value}</label>}</div>
       </Tile>
     </Layer>
+  );
+};
+
+interface QueueTableMetricsCardProps {
+  queueUuid?: string;
+  status?: string;
+  headerLabel: string;
+  isLoading?: boolean;
+  children?: React.ReactNode;
+}
+
+/** A tile that counts a queue and status for itself. */
+const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
+  queueUuid,
+  status,
+  headerLabel,
+  isLoading,
+  children,
+}) => {
+  const { count } = useQueueEntriesMetrics({ queue: queueUuid, status: status, isEnded: false });
+
+  return (
+    <QueueMetricTile headerLabel={headerLabel} value={count} isLoading={isLoading}>
+      {children}
+    </QueueMetricTile>
   );
 };
 

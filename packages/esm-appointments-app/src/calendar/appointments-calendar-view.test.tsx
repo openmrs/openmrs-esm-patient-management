@@ -15,6 +15,14 @@ vi.mock('../hooks/useAppointmentsByDate', () => ({
   useAppointmentsByDate: vi.fn().mockReturnValue({ appointments: [], isLoading: false }),
 }));
 
+vi.mock('../hooks/useAppointmentService', () => ({
+  useAppointmentServices: vi.fn().mockReturnValue({
+    serviceTypes: [{ uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', name: 'HIV Clinic' }],
+    isLoading: false,
+    error: null,
+  }),
+}));
+
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
 
 function renderCalendar() {
@@ -58,27 +66,17 @@ describe('Appointment calendar view', () => {
     expect(initialDate.diff(latestRequestedDate(), 'month')).toBe(1);
   });
 
-  it('renders the Monthly, Weekly, Daily view switcher', () => {
+  it('renders the Monthly and Daily view switcher', () => {
     renderCalendar();
     expect(screen.getByRole('tab', { name: /monthly/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /weekly/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /daily/i })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: /weekly/i })).not.toBeInTheDocument();
   });
 
   it('defaults to monthly period on initial render', () => {
     renderCalendar();
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('monthly');
-  });
-
-  it('switches to weekly period when Weekly tab is clicked', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
-    expect(lastCall?.[1]).toBe('weekly');
   });
 
   it('switches to daily period when Daily tab is clicked', async () => {
@@ -89,32 +87,6 @@ describe('Appointment calendar view', () => {
 
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('daily');
-  });
-
-  it('advances by 7 days when Next is clicked in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    const dateBeforeNav = latestRequestedDate();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-    await user.click(screen.getByRole('button', { name: /next/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
-
-    expect(latestRequestedDate().diff(dateBeforeNav, 'day')).toBe(7);
-  });
-
-  it('rewinds by 7 days when Prev is clicked in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    const dateBeforeNav = latestRequestedDate();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-    await user.click(screen.getByRole('button', { name: /previous/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
-
-    expect(dateBeforeNav.diff(latestRequestedDate(), 'day')).toBe(7);
   });
 
   it('advances by 1 day when Next is clicked in daily mode', async () => {
@@ -148,39 +120,71 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText(/^[A-Z][a-z]+ \d{4}$/)).toBeInTheDocument();
   });
 
-  it('displays week range title in weekly mode', async () => {
-    const user = userEvent.setup();
-    renderCalendar();
-
-    await user.click(screen.getByRole('tab', { name: /weekly/i }));
-
-    expect(screen.getByText(/\w{3} \d{1,2} – \w{3} \d{1,2}, \d{4}/)).toBeInTheDocument();
-  });
-
-  it('switches to daily view when a day cell with appointments is clicked in monthly mode', async () => {
+  it('opens popup when a day cell with appointments is clicked in monthly mode, then switches to daily view when Open day view is clicked', async () => {
     const user = userEvent.setup();
     const today = dayjs().format('YYYY-MM-DD');
     mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [{ appointmentDate: today, services: [{ serviceName: 'Gen', serviceUuid: 'u1', count: 5 }] }],
+      calendarEvents: [
+        {
+          appointmentDate: today,
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 5 }],
+        },
+      ],
       isLoading: false,
       error: null,
     });
 
     renderCalendar();
 
-    await user.click(screen.getByRole('button', { name: '5' }));
+    await user.click(screen.getAllByText('Outpatient')[0]);
+
+    const openDayViewBtn = screen.getAllByRole('button', { name: /open day view/i })[0];
+    expect(openDayViewBtn).toBeInTheDocument();
+    await user.click(openDayViewBtn);
 
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('daily');
   });
 
-  it('displays full date title in daily mode', async () => {
-    const user = userEvent.setup();
+  it('renders the services legend when services are present', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
     renderCalendar();
 
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
+    expect(screen.getByText('Services')).toBeInTheDocument();
+    expect(screen.getAllByText('HIV Clinic').length).toBeGreaterThanOrEqual(1);
+  });
 
-    const titles = screen.getAllByText(/^[A-Z][a-z]+ \d{1,2}, \d{4}$/);
-    expect(titles.length).toBeGreaterThanOrEqual(1);
+  it('shows the same color for a service in both legend and monthly views', () => {
+    const today = dayjs().format('YYYY-MM-DD');
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: today,
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    const legendSwatch = screen.getByTestId('legend-swatch-53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1');
+    const cellSwatch = screen.getByTestId('service-swatch-53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1');
+
+    expect(legendSwatch).toBeInTheDocument();
+    expect(cellSwatch).toBeInTheDocument();
+    expect(legendSwatch.style.backgroundColor).toBeTruthy();
+    expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
   });
 });
