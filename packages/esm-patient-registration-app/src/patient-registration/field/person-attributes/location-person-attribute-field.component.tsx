@@ -21,7 +21,7 @@ interface LocationOption {
 }
 
 /** A location reference, in the shape the REST API returns for a saved attribute. */
-type LocationAttributeValue = { uuid: string; display?: string } | string | null;
+type LocationAttributeValue = { uuid: string; display?: string } | null;
 
 export function LocationPersonAttributeField({
   personAttributeType,
@@ -49,8 +49,8 @@ export function LocationPersonAttributeField({
     return prevLocationOptions.current;
   }, [locations, isLoading, loadingNewData]);
 
-  const savedUuid = typeof meta.value === 'string' ? meta.value : (meta.value?.uuid ?? '');
-  const savedLabel = typeof meta.value === 'object' ? meta.value?.display : undefined;
+  const savedUuid = meta.value?.uuid ?? '';
+  const savedLabel = meta.value?.display;
 
   // Built from the saved value rather than from the search results, and kept referentially stable,
   // because ComboBox resets its input to the label of `selectedItem` whenever that prop changes.
