@@ -39,7 +39,6 @@ function renderDeathInfoSectionWithFormik(fields: string[] = [], initialValues: 
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <DeathInfoSection fields={fields} />

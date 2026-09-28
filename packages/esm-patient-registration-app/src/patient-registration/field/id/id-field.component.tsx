@@ -61,7 +61,7 @@ export function deleteIdentifierType(identifiers: FormValues['identifiers'], ide
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useResourcesContext();
   const isLoading = !identifierTypes?.length;
-  const { values, setFieldValue, initialFormValues, isOffline } = usePatientRegistrationContext();
+  const { values, setFieldValue, initialFormValues } = usePatientRegistrationContext();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
@@ -107,7 +107,7 @@ export const Identifiers: React.FC = () => {
     [setShowIdentifierOverlay],
   );
 
-  if (isLoading && !isOffline) {
+  if (isLoading) {
     return (
       <div className={styles.halfWidthInDesktopView}>
         <div className={styles.identifierLabelText}>
