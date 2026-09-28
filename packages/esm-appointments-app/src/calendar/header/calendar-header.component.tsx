@@ -49,11 +49,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <Button
           kind="ghost"
           size="sm"
-          iconDescription={t('back', 'Back')}
-          onClick={() => navigate(-1)}
+          renderIcon={ArrowLeft}
+          onClick={() => navigate('/')}
           className={styles.backButton}>
-          <ArrowLeft className={styles.backButtonIcon} />
-          {t('back', 'Back')}
+          <span>{t('back', 'Back')}</span>
         </Button>
       </div>
       <div className={styles.controlsRow}>

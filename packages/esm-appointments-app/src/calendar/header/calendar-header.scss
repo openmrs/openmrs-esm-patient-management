@@ -17,6 +17,21 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
+.backButton {
+  padding-left: 0 !important;
+
+  //render the icon before text
+  svg {
+    order: 1;
+    margin-right: layout.$spacing-03;
+    margin-left: 0;
+  }
+
+  span {
+    order: 2;
+  }
+}
+
 .controlsRow {
   display: flex;
   align-items: center;
@@ -104,30 +119,4 @@
     color: colors.$white !important;
     box-shadow: none !important;
   }
-}
-
-.backButton {
-  color: colors.$blue-60 !important;
-
-  :global(.cds--btn__icon) {
-    fill: colors.$blue-60;
-  }
-
-  &:hover {
-    color: colors.$blue-70 !important;
-    background-color: colors.$blue-10 !important;
-
-    :global(.cds--btn__icon) {
-      fill: colors.$blue-70;
-    }
-  }
-}
-
-.backButtonIcon {
-  display: inline-flex;
-  align-self: center;
-  flex-shrink: 0;
-  fill: colors.$blue-60 !important;
-  vertical-align: middle;
-  margin-right: layout.$spacing-02;
 }
