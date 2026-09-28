@@ -33,6 +33,12 @@ export interface PatientRegistrationProps {
 }
 
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
+  const { patientUuid } = useParams();
+
+  return <PatientRegistrationForm key={patientUuid ?? 'new-patient'} savePatientForm={savePatientForm} />;
+};
+
+const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
   const { t } = useTranslation();
   const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
