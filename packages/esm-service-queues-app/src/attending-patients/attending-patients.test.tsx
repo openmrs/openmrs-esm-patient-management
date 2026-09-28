@@ -15,6 +15,7 @@ const mockUseConcept = vi.mocked(useConcept);
 
 vi.mock('../hooks/useQueueEntries', () => ({
   useQueueEntries: vi.fn(),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
 }));
 
 vi.mock('../hooks/useConcept', () => ({
@@ -137,6 +138,31 @@ describe('AttendingPatients', () => {
       status: concepts.defaultTransitionStatus,
       isEnded: false,
     });
+  });
+
+  it('offers the queue entry actions from a menu in the queue row, which sits outside the patient chart link', async () => {
+    const user = userEvent.setup();
+    mockEntries([{ ...queueEntry, previousQueueEntry: { uuid: 'qe-0' } } as unknown as QueueEntry]);
+    render(<AttendingPatients />);
+
+    const menuButton = screen.getByRole('button', { name: 'Actions menu' });
+    const link = screen.getByRole('link');
+    expect(link).not.toContainElement(menuButton);
+    expect(link).not.toHaveTextContent('Outpatient Triage');
+
+    await user.click(menuButton);
+    // Carbon leaves the opened menu `visibility: hidden` under jsdom, so read the items' text directly.
+    const items = screen.getAllByRole('menuitem', { hidden: true });
+    expect(items.map((item) => item.textContent)).toEqual(['Move', 'Edit', 'Remove patient', 'Undo transition']);
+
+    // Arrow keys move between the items, and wrap from the last one back to the first.
+    const [move, edit, , undo] = items;
+    move.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(edit).toHaveFocus();
+    undo.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(move).toHaveFocus();
   });
 
   it('does not offer "View all" when everything already fits', () => {

@@ -28,12 +28,12 @@
 }
 
 .headerLabel {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('body-compact-02');
   color: $text-02;
 }
 
 .valueLabel {
-  font-size: x-large;
+  @include type.type-style('heading-03');
   display: block;
   overflow-wrap: break-word;
 }

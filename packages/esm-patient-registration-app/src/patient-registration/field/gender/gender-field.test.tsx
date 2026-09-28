@@ -54,7 +54,6 @@ const renderGenderFieldWithFormik = (
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <GenderField />
@@ -93,7 +92,6 @@ const renderGenderField = (initialValues: Partial<FormValues> = {}) => {
             setCapturePhotoProps: vi.fn(),
             setFieldTouched: vi.fn().mockResolvedValue(undefined),
             currentPhoto: '',
-            isOffline: false,
             initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,
           }}>
           <GenderField />

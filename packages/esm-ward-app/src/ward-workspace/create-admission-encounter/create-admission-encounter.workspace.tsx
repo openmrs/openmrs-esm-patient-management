@@ -68,7 +68,7 @@ const CreateAdmissionEncounterWorkspace: React.FC<
   const hasError =
     errorLoadingPatient || errorLoadingVisit || errorLoadingBed || errorInpatientAdmission || errorInpatientRequests;
 
-  let content: JSX.Element = null;
+  let content: React.JSX.Element = null;
   let showFooter = false;
   let showAdmitAction = false;
   let footerWardPatient: WardPatient = null;

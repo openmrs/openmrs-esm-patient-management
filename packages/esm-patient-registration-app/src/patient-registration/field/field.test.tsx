@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
-import { type Resources } from '../../offline.resources';
+import { type Resources } from '../../registration.resource';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
 import { PatientRegistrationContextProvider } from '../patient-registration-context';
 import { ResourcesContextProvider } from '../../resources-context';
@@ -100,7 +100,6 @@ const initialContextValues = {
   identifierTypes: [],
   inEditMode: false,
   initialFormValues: {} as FormValues,
-  isOffline: false,
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setFieldTouched: vi.fn(),
@@ -278,7 +277,6 @@ describe('Field', () => {
       identifierTypes: [],
       inEditMode: false,
       initialFormValues: { identifiers: { openmrsID } } as unknown as FormValues,
-      isOffline: false,
       setCapturePhotoProps: vi.fn(),
       setFieldValue: vi.fn(),
       setInitialFormValues: vi.fn(),

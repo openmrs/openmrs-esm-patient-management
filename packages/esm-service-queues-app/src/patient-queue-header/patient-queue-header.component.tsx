@@ -5,7 +5,7 @@ import type { ConfigObject } from '../config-schema';
 import styles from './patient-queue-header.scss';
 
 interface PatientQueueHeaderProps {
-  title?: string | JSX.Element;
+  title?: string | React.JSX.Element;
   actions?: React.ReactNode;
 }
 

@@ -62,7 +62,15 @@ const BeforeSavePrompt: FC<BeforeSavePromptProps> = ({ when, redirect }) => {
 
   useEffect(() => {
     if (typeof target === 'string') {
-      navigate({ to: `\${openmrsSpaBase}/${getUrlWithoutPrefix(target)}` });
+      const urlWithoutPrefix = getUrlWithoutPrefix(target);
+
+      // `target` does not necessarily point inside the SPA. It may be a legacy OpenMRS
+      // page, either configured via `links.submitButton` or navigated to from within the
+      // form. Such a URL has no SPA-relative portion to extract, so pass it through
+      // unchanged and let `navigate` choose between single-spa routing and a page load.
+      navigate({
+        to: typeof urlWithoutPrefix === 'string' ? `\${openmrsSpaBase}/${urlWithoutPrefix}` : target,
+      });
     }
   }, [target]);
 

@@ -30,6 +30,10 @@
   flex-direction: column;
   background-color: $ui-02;
   border: 1px solid $ui-03;
+}
+
+.cardLink {
+  flex: 1;
   text-decoration: none;
 
   &:hover {
@@ -64,10 +68,8 @@
 .serviceRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: layout.$spacing-03;
-  margin-top: auto;
-  padding: layout.$spacing-03 layout.$spacing-05;
+  padding: layout.$spacing-02 layout.$spacing-03 layout.$spacing-02 layout.$spacing-05;
   border-top: 1px solid $ui-03;
 }
 
@@ -79,6 +81,7 @@
 
 .service {
   @include type.type-style('body-compact-01');
+  flex: 1;
   color: $ui-05;
 }
 
