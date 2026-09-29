@@ -46,7 +46,6 @@
   "searchingText": "Ricerca in corso...",
   "searchLocationPersonAttribute": "Cerca sede",
   "searchPatient": "Cerca paziente",
-  "searchPatientButton": "Pulsante Ricerca Paziente",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "Risultati della ricerca",

@@ -46,7 +46,6 @@
   "searchingText": "搜索中...",
   "searchLocationPersonAttribute": "搜索地点",
   "searchPatient": "搜索患者",
-  "searchPatientButton": "搜索患者按钮",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "搜索结果",
