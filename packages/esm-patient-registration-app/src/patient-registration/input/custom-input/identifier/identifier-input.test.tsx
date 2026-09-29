@@ -1,9 +1,9 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
 import { renderWithContext } from 'tools';
 import { ResourcesContextProvider } from '../../../../resources-context';
@@ -104,6 +104,7 @@ const mockContextValues: PatientRegistrationContextProps = {
 };
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUserHasAccess = vi.mocked(UserHasAccess);
 
 /**
  * Helper to render IdentifierInput component with Formik.
@@ -210,6 +211,30 @@ describe('IdentifierInput component', () => {
       enablePreferredSelection();
       renderIdentifierInput(openmrsID);
       expect(screen.getByRole('radio', { name: /preferred/i })).toBeChecked();
+    });
+
+    describe('without the Edit Patient Identifiers privilege', () => {
+      beforeEach(() => {
+        mockUserHasAccess.mockImplementation(({ privilege, children }) =>
+          privilege === 'Edit Patient Identifiers' ? null : <>{children}</>,
+        );
+      });
+
+      afterEach(() => {
+        mockUserHasAccess.mockImplementation(({ children }) => <>{children}</>);
+      });
+
+      it('hides the preferred option when editing an existing patient', () => {
+        enablePreferredSelection();
+        renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: true });
+        expect(screen.queryByRole('radio', { name: /preferred/i })).not.toBeInTheDocument();
+      });
+
+      it('shows the preferred option when registering a new patient', () => {
+        enablePreferredSelection();
+        renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: false });
+        expect(screen.getByRole('radio', { name: /preferred/i })).toBeInTheDocument();
+      });
     });
 
     it('marks the selected identifier as the only preferred identifier', async () => {

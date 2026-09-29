@@ -57,7 +57,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { defaultPatientIdentifierTypes, fieldConfigurations } = useConfig<RegistrationConfig>();
   const allowPreferredSelection = fieldConfigurations?.identifier?.allowPreferredSelection;
   const { identifierTypes } = useResourcesContext();
-  const { values, setFieldValue, initialFormValues } = usePatientRegistrationContext();
+  const { values, setFieldValue, initialFormValues, inEditMode } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
@@ -165,6 +165,18 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     }
   };
 
+  const preferredRadioButton = allowPreferredSelection && (
+    <RadioButton
+      id={`identifiers.${fieldName}.preferred`}
+      name="preferredIdentifier"
+      value={fieldName}
+      labelText={t('preferredIdentifierLabel', 'Preferred')}
+      checked={!!preferred}
+      onChange={handleSelectPreferred}
+      className={styles.preferredIdentifier}
+    />
+  );
+
   const showEditButton = !required && hideInputField && (!!initialValue || manualEntryEnabled);
   const showResetButton =
     (!!initialValue && initialValue !== identifierValue) || (!hideInputField && manualEntryEnabled);
@@ -200,16 +212,11 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
         </div>
       )}
       <div className={styles.actionButtonContainer}>
-        {allowPreferredSelection && (
-          <RadioButton
-            id={`identifiers.${fieldName}.preferred`}
-            name="preferredIdentifier"
-            value={fieldName}
-            labelText={t('preferredIdentifierLabel', 'Preferred')}
-            checked={!!preferred}
-            onChange={handleSelectPreferred}
-            className={styles.preferredIdentifier}
-          />
+        {/* Changing the preferred identifier of an existing patient updates their saved identifiers */}
+        {inEditMode ? (
+          <UserHasAccess privilege="Edit Patient Identifiers">{preferredRadioButton}</UserHasAccess>
+        ) : (
+          preferredRadioButton
         )}
         {showEditButton && (
           <UserHasAccess privilege="Edit Patient Identifiers">
