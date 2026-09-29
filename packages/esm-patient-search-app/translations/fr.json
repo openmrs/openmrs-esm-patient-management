@@ -46,7 +46,6 @@
   "searchingText": "Recherche en cours",
   "searchLocationPersonAttribute": "Sélectionnez un emplacement",
   "searchPatient": "Rechercher un patient",
-  "searchPatientButton": "Bouton de recherche d'un patient",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "Résultats de recherche",
