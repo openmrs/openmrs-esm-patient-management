@@ -46,7 +46,6 @@
   "searchingText": "جاري البحث...",
   "searchLocationPersonAttribute": "Search location",
   "searchPatient": "Search Patient",
-  "searchPatientButton": "Search Patient Button",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "نتائج البحث",
