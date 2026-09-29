@@ -5,6 +5,7 @@ import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
 import { requeueQueueEntry } from './call-queue-entry.resource';
+import { getErrorMessage } from '../queue-entry-error.utils';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type QueueEntry } from '../../types';
 import styles from './call-queue-entry.scss';
@@ -56,6 +57,20 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
             closeModal();
             mutateQueueEntries();
             navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
+          },
+          // The queue entry has already been transitioned at this point, so only the ticket display is out of date.
+          (error) => {
+            showSnackbar({
+              title: t(
+                'patientMovedButNotCalled',
+                'The patient has been moved on in the queue, but the ticket display was not updated',
+              ),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
+            });
+            closeModal();
+            mutateQueueEntries();
           },
         );
       },

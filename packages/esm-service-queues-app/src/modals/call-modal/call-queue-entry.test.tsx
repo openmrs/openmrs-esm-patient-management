@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockQueueEntryAlice } from '__mocks__';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { serveQueueEntry, updateQueueEntry } from '../../service-queues.resource';
@@ -11,6 +11,8 @@ import CallQueueEntryModal from './call-queue-entry.modal';
 
 const mockNavigate = vi.mocked(navigate);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockServeQueueEntry = vi.mocked(serveQueueEntry);
 
 vi.mock('../../service-queues.resource', async () => ({
   ...((await vi.importActual('../../service-queues.resource')) as object),
@@ -71,5 +73,28 @@ describe('MoveQueueEntryModal', () => {
     expect(updateQueueEntry).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalled();
     expect(serveQueueEntry).toHaveBeenCalled();
+  });
+
+  it('reports a failed ticket display update after the patient has been moved on', async () => {
+    const user = userEvent.setup();
+    mockServeQueueEntry.mockRejectedValueOnce({
+      message: 'Server responded with 500 (Internal Server Error)',
+      responseBody: { error: { message: 'Ticket display service is unavailable' } },
+    });
+
+    const closeModal = vi.fn();
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={closeModal} />);
+
+    await user.click(screen.getByText('Serve'));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'The patient has been moved on in the queue, but the ticket display was not updated',
+        subtitle: 'Ticket display service is unavailable',
+      }),
+    );
+    expect(closeModal).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });
