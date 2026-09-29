@@ -79,7 +79,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
           title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
           kind: 'error',
           isLowContrast: false,
-          subtitle: error?.message,
+          subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
         });
       },
     );
@@ -115,7 +115,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
           title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
           kind: 'error',
           isLowContrast: false,
-          subtitle: error?.message,
+          subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
         });
       },
     );

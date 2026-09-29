@@ -13,6 +13,13 @@ const mockNavigate = vi.mocked(navigate);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockServeQueueEntry = vi.mocked(serveQueueEntry);
+const mockUpdateQueueEntry = vi.mocked(updateQueueEntry);
+const mockRequeueQueueEntry = vi.mocked(requeueQueueEntry);
+
+const serverError = {
+  message: 'Server responded with 500 (Internal Server Error)',
+  responseBody: { error: { message: 'Queue entry could not be updated' } },
+};
 
 vi.mock('../../service-queues.resource', async () => ({
   ...((await vi.importActual('../../service-queues.resource')) as object),
@@ -96,5 +103,38 @@ describe('MoveQueueEntryModal', () => {
     );
     expect(closeModal).toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows the message the server sent when serving the patient fails', async () => {
+    const user = userEvent.setup();
+    mockUpdateQueueEntry.mockRejectedValueOnce(serverError);
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={vi.fn()} />);
+
+    await user.click(screen.getByText('Serve'));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Error updating queue entry',
+        subtitle: 'Queue entry could not be updated',
+      }),
+    );
+    expect(mockServeQueueEntry).not.toHaveBeenCalled();
+  });
+
+  it('shows the message the server sent when requeueing the patient fails', async () => {
+    const user = userEvent.setup();
+    mockRequeueQueueEntry.mockRejectedValueOnce(serverError);
+    render(<CallQueueEntryModal queueEntry={mockQueueEntryAlice} closeModal={vi.fn()} />);
+
+    await user.click(screen.getByText('Requeue'));
+
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Error updating queue entry',
+        subtitle: 'Queue entry could not be updated',
+      }),
+    );
   });
 });
