@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { WorkspaceContainer, launchWorkspace2 } from '@openmrs/esm-framework';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import ListDetails from './list-details/list-details.component';
 import ListsDashboard from './lists-dashboard/lists-dashboard.component';
 
@@ -35,7 +35,6 @@ const RootComponent: React.FC = () => {
         <Route path="/" element={<ListsDashboard />} />
         <Route path="/:patientListUuid" element={<ListDetails />} />
       </Routes>
-      <WorkspaceContainer contextKey="patient-lists" />
     </BrowserRouter>
   );
 };
