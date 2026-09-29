@@ -18,7 +18,7 @@ import type {
   IdentifierSource,
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
-import IdentifierInput from './identifier-input.component';
+import IdentifierInput, { promoteFallbackPreferredIdentifier } from './identifier-input.component';
 
 const mockIdentifierTypes = [
   {
@@ -233,6 +233,85 @@ describe('IdentifierInput component', () => {
         openMrsId: { ...openmrsID, preferred: false },
         ssn: { ...ssn, preferred: true },
       });
+    });
+  });
+
+  describe('Deleting the preferred identifier', () => {
+    const ssnTypeUuid = 'a71403f3-8584-4289-ab41-2b4e5570bd45';
+    const optionalIdentifier = (identifierTypeUuid: string, identifierValue: string, preferred = false) =>
+      ({
+        ...openmrsID,
+        identifierTypeUuid,
+        identifierValue,
+        autoGeneration: false,
+        required: false,
+        preferred,
+      }) as PatientIdentifierValue;
+
+    it('promotes the primary identifier type', () => {
+      const result = promoteFallbackPreferredIdentifier(
+        {
+          ssn: optionalIdentifier(ssnTypeUuid, 'A-1234567'),
+          openMrsId: optionalIdentifier(openmrsID.identifierTypeUuid, ''),
+        },
+        mockIdentifierTypes,
+        {},
+      );
+      expect(result.openMrsId.preferred).toBe(true);
+      expect(result.ssn.preferred).toBe(false);
+    });
+
+    it('promotes the identifier that was preferred when the form was loaded', () => {
+      const result = promoteFallbackPreferredIdentifier(
+        { first: optionalIdentifier('type-1', '111'), second: optionalIdentifier('type-2', '222') },
+        [],
+        { second: optionalIdentifier('type-2', '222', true) },
+      );
+      expect(result.first.preferred).toBe(false);
+      expect(result.second.preferred).toBe(true);
+    });
+
+    it('promotes the first identifier that has a value', () => {
+      const result = promoteFallbackPreferredIdentifier(
+        { empty: optionalIdentifier('type-1', ''), filled: optionalIdentifier('type-2', '222') },
+        [],
+        {},
+      );
+      expect(result.empty.preferred).toBe(false);
+      expect(result.filled.preferred).toBe(true);
+    });
+
+    it('leaves the identifiers unchanged when one is still preferred', () => {
+      const identifiers = {
+        first: optionalIdentifier('type-1', '111', true),
+        second: optionalIdentifier('type-2', '222'),
+      };
+      expect(promoteFallbackPreferredIdentifier(identifiers, mockIdentifierTypes, {})).toBe(identifiers);
+    });
+
+    it('marks a remaining identifier as preferred when the preferred row is deleted', async () => {
+      const user = userEvent.setup();
+      const setFieldValue = vi.fn();
+      const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+      mockUseConfig.mockReturnValue({
+        ...defaults,
+        fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection: true } },
+      });
+      const other = optionalIdentifier('type-1', '111');
+      const deleted = optionalIdentifier('type-2', '222', true);
+      renderIdentifierInput(
+        deleted,
+        'deleted',
+        {},
+        {
+          setFieldValue,
+          values: { ...mockInitialFormValues, identifiers: { other, deleted } },
+        },
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+      expect(setFieldValue).toHaveBeenCalledWith('identifiers', { other: { ...other, preferred: true } });
     });
   });
 

@@ -9,8 +9,43 @@ import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-
 import { Input } from '../../basic-input/input/input.component';
 import { usePatientRegistrationContext } from '../../../patient-registration-context';
 import { useResourcesContext } from '../../../../resources-context';
-import { type PatientIdentifierValue } from '../../../patient-registration.types';
+import type { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../../patient-registration.types';
 import styles from '../../input.scss';
+
+/**
+ * When the preferred identifier is deleted, marks another of the remaining identifiers as preferred so the
+ * patient is not left without one. Falls back to the primary identifier type, then to the identifier that was
+ * preferred when the form was loaded, then to the first identifier that has (or will be generated) a value.
+ */
+export function promoteFallbackPreferredIdentifier(
+  identifiers: FormValues['identifiers'],
+  identifierTypes: Array<PatientIdentifierType>,
+  initialIdentifiers: FormValues['identifiers'],
+): FormValues['identifiers'] {
+  const remaining = Object.entries(identifiers);
+  if (remaining.some(([, identifier]) => identifier.preferred)) {
+    return identifiers;
+  }
+
+  const primaryTypeUuids = new Set(identifierTypes?.filter((type) => type.isPrimary).map((type) => type.uuid));
+  const hasValue = (identifier: PatientIdentifierValue) =>
+    !!identifier.identifierValue || (!!identifier.autoGeneration && !!identifier.selectedSource);
+
+  const [fallbackFieldName] =
+    remaining.find(([, identifier]) => primaryTypeUuids.has(identifier.identifierTypeUuid)) ??
+    remaining.find(([fieldName, identifier]) => initialIdentifiers?.[fieldName]?.preferred && hasValue(identifier)) ??
+    remaining.find(([, identifier]) => hasValue(identifier)) ??
+    [];
+
+  if (!fallbackFieldName) {
+    return identifiers;
+  }
+
+  return {
+    ...identifiers,
+    [fallbackFieldName]: { ...identifiers[fallbackFieldName], preferred: true },
+  };
+}
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
@@ -22,7 +57,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { defaultPatientIdentifierTypes, fieldConfigurations } = useConfig<RegistrationConfig>();
   const allowPreferredSelection = fieldConfigurations?.identifier?.allowPreferredSelection;
   const { identifierTypes } = useResourcesContext();
-  const { values, setFieldValue } = usePatientRegistrationContext();
+  const { values, setFieldValue, initialFormValues } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
@@ -96,6 +131,16 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     );
   };
 
+  const deleteIdentifier = () => {
+    const remainingIdentifiers = deleteIdentifierType(values.identifiers, fieldName);
+    setFieldValue(
+      'identifiers',
+      allowPreferredSelection && preferred
+        ? promoteFallbackPreferredIdentifier(remainingIdentifiers, identifierTypes, initialFormValues?.identifiers)
+        : remainingIdentifiers,
+    );
+  };
+
   const handleDelete = () => {
     /*
     If there is an initialValue to the identifier, a confirmation modal seeking
@@ -108,7 +153,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
         closeModal: () => dispose(),
         deleteIdentifier: (isConfirmed) => {
           if (isConfirmed) {
-            setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
+            deleteIdentifier();
           }
           dispose();
         },
@@ -116,7 +161,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
         identifierValue: initialValue,
       });
     } else {
-      setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
+      deleteIdentifier();
     }
   };
 
