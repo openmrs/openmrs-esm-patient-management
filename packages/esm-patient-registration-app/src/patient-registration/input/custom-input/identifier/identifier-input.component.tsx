@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useField, Field } from 'formik';
-import { Button } from '@carbon/react';
+import { Button, RadioButton } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { type RegistrationConfig } from '../../../../config-schema';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
@@ -19,14 +19,16 @@ interface IdentifierInputProps {
 
 const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
-  const { defaultPatientIdentifierTypes } = useConfig<RegistrationConfig>();
+  const { defaultPatientIdentifierTypes, fieldConfigurations } = useConfig<RegistrationConfig>();
+  const allowPreferredSelection = fieldConfigurations?.identifier?.allowPreferredSelection;
   const { identifierTypes } = useResourcesContext();
   const { values, setFieldValue } = usePatientRegistrationContext();
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
   );
-  const { autoGeneration, initialValue, identifierValue, identifierName, required, selectedSource } = patientIdentifier;
+  const { autoGeneration, initialValue, identifierValue, identifierName, preferred, required, selectedSource } =
+    patientIdentifier;
   const manualEntryEnabled = selectedSource?.autoGenerationOption?.manualEntryEnabled;
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
   const name = `identifiers.${fieldName}.identifierValue`;
@@ -80,6 +82,18 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
       ...setIdentifierSource(identifierType?.identifierSources?.[0], initialValue, initialValue),
       ...(autoGeneration && manualEntryEnabled && { identifierValue: initialValue ?? '' }),
     });
+  };
+
+  const handleSelectPreferred = () => {
+    setFieldValue(
+      'identifiers',
+      Object.fromEntries(
+        Object.entries(values.identifiers).map(([identifierFieldName, identifier]) => [
+          identifierFieldName,
+          { ...identifier, preferred: identifierFieldName === fieldName },
+        ]),
+      ),
+    );
   };
 
   const handleDelete = () => {
@@ -141,6 +155,17 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
         </div>
       )}
       <div className={styles.actionButtonContainer}>
+        {allowPreferredSelection && (
+          <RadioButton
+            id={`identifiers.${fieldName}.preferred`}
+            name="preferredIdentifier"
+            value={fieldName}
+            labelText={t('preferredIdentifierLabel', 'Preferred')}
+            checked={!!preferred}
+            onChange={handleSelectPreferred}
+            className={styles.preferredIdentifier}
+          />
+        )}
         {showEditButton && (
           <UserHasAccess privilege="Edit Patient Identifiers">
             <Button

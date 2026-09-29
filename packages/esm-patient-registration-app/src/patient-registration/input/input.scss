@@ -117,5 +117,11 @@
 }
 
 .actionButtonContainer {
+  display: flex;
+  align-items: center;
   margin-left: layout.$spacing-05;
+}
+
+.preferredIdentifier {
+  margin-right: layout.$spacing-03;
 }

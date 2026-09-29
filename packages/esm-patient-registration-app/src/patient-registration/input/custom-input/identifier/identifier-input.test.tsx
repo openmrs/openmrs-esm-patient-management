@@ -112,11 +112,12 @@ function renderIdentifierInput(
   patientIdentifier: PatientIdentifierValue,
   fieldName: string = 'openMrsId',
   initialValues: Record<string, any> = {},
+  contextValues: Partial<PatientRegistrationContextProps> = {},
 ) {
   return renderWithContext(
     <Formik initialValues={initialValues} onSubmit={vi.fn()}>
       <Form>
-        <PatientRegistrationContextProvider value={mockContextValues}>
+        <PatientRegistrationContextProvider value={{ ...mockContextValues, ...contextValues }}>
           <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
         </PatientRegistrationContextProvider>
       </Form>
@@ -185,6 +186,53 @@ describe('IdentifierInput component', () => {
         required: false,
       });
       expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+  });
+
+  describe('Preferred identifier', () => {
+    const enablePreferredSelection = () => {
+      const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+      mockUseConfig.mockReturnValue({
+        ...defaults,
+        fieldConfigurations: {
+          ...defaults.fieldConfigurations,
+          identifier: { allowPreferredSelection: true },
+        },
+      });
+    };
+
+    it('does not show the preferred option by default', () => {
+      renderIdentifierInput(openmrsID);
+      expect(screen.queryByRole('radio', { name: /preferred/i })).not.toBeInTheDocument();
+    });
+
+    it('shows the preferred option checked for the preferred identifier when enabled', () => {
+      enablePreferredSelection();
+      renderIdentifierInput(openmrsID);
+      expect(screen.getByRole('radio', { name: /preferred/i })).toBeChecked();
+    });
+
+    it('marks the selected identifier as the only preferred identifier', async () => {
+      const user = userEvent.setup();
+      const setFieldValue = vi.fn();
+      const ssn = { ...openmrsID, identifierName: 'SSN', preferred: false };
+      enablePreferredSelection();
+      renderIdentifierInput(
+        ssn,
+        'ssn',
+        {},
+        {
+          setFieldValue,
+          values: { ...mockInitialFormValues, identifiers: { openMrsId: openmrsID, ssn } },
+        },
+      );
+
+      await user.click(screen.getByRole('radio', { name: /preferred/i }));
+
+      expect(setFieldValue).toHaveBeenCalledWith('identifiers', {
+        openMrsId: { ...openmrsID, preferred: false },
+        ssn: { ...ssn, preferred: true },
+      });
     });
   });
 

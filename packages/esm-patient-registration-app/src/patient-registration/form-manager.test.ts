@@ -149,6 +149,88 @@ describe('FormManager', () => {
     });
   });
 
+  describe('changing the preferred identifier of an existing patient', () => {
+    const existingIdentifier = (uuid: string, value: string, preferred: boolean) => ({
+      identifierUuid: uuid,
+      identifierName: value,
+      required: false,
+      initialValue: value,
+      identifierValue: value,
+      identifierTypeUuid: `${value}-type`,
+      preferred,
+      autoGeneration: false,
+      selectedSource: null,
+    });
+
+    const updateRequests = () =>
+      mockOpenmrsFetch.mock.calls.filter(([url]) => url.includes('/patient/patient-uuid/identifier/'));
+
+    it('updates the preferred flag of both the previously and the newly preferred identifiers', async () => {
+      const initialIdentifiers = {
+        arv: existingIdentifier('arv-uuid', 'arv', true),
+        pdc: existingIdentifier('pdc-uuid', 'pdc', false),
+      };
+
+      await FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        {
+          arv: { ...initialIdentifiers.arv, preferred: false },
+          pdc: { ...initialIdentifiers.pdc, preferred: true },
+        },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      expect(updateRequests()).toEqual([
+        [
+          expect.stringContaining('/identifier/arv-uuid'),
+          expect.objectContaining({ body: { identifier: 'arv', preferred: false } }),
+        ],
+        [
+          expect.stringContaining('/identifier/pdc-uuid'),
+          expect.objectContaining({ body: { identifier: 'pdc', preferred: true } }),
+        ],
+      ]);
+    });
+
+    it('does not update identifiers whose value and preferred flag are unchanged', async () => {
+      const initialIdentifiers = {
+        arv: existingIdentifier('arv-uuid', 'arv', true),
+        pdc: existingIdentifier('pdc-uuid', 'pdc', false),
+      };
+
+      await FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        { ...initialIdentifiers },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      expect(updateRequests()).toEqual([]);
+    });
+
+    it('sends only the identifier value when just the value changed', async () => {
+      const initialIdentifiers = { arv: existingIdentifier('arv-uuid', 'arv', true) };
+
+      await FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        { arv: { ...initialIdentifiers.arv, identifierValue: 'arv-2' } },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      expect(updateRequests()).toEqual([
+        [expect.stringContaining('/identifier/arv-uuid'), expect.objectContaining({ body: { identifier: 'arv-2' } })],
+      ]);
+    });
+  });
+
   describe('getPatientDeathInfo', () => {
     const config = { freeTextFieldConceptUuid: 'free-text-uuid' } as RegistrationConfig;
 

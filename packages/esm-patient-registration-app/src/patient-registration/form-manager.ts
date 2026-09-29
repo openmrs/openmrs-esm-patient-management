@@ -234,6 +234,11 @@ export class FormManager {
           }
         }
 
+        // The identifier sub-resource does not clear `preferred` on the patient's other identifiers,
+        // so every existing identifier whose preferred flag changed needs to be updated explicitly.
+        const initialPreferred = initialIdentifierValues?.[identifierFieldName]?.preferred;
+        const preferredChanged = !!initialValue && !!preferred !== !!initialPreferred;
+
         const identifierToCreate = {
           uuid: identifierUuid,
           identifier,
@@ -249,8 +254,13 @@ export class FormManager {
               await addPatientIdentifier(patientUuid, identifierToCreate);
               savePatientTransactionManager.addedIdentifiers[identifierFieldName] = identifier;
             }
-          } else if (initialValue !== identifier) {
-            await updatePatientIdentifier(patientUuid, identifierUuid, identifierToCreate.identifier);
+          } else if (initialValue !== identifier || preferredChanged) {
+            await updatePatientIdentifier(
+              patientUuid,
+              identifierUuid,
+              identifierToCreate.identifier,
+              preferredChanged ? preferred : undefined,
+            );
           }
         }
 
