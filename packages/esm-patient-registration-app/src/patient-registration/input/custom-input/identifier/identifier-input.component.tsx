@@ -171,6 +171,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
       name="preferredIdentifier"
       value={fieldName}
       labelText={t('preferredIdentifierLabel', 'Preferred')}
+      aria-label={t('markIdentifierAsPreferred', 'Mark {{identifierName}} as preferred', { identifierName })}
       checked={!!preferred}
       onChange={handleSelectPreferred}
       className={styles.preferredIdentifier}
