@@ -4,11 +4,9 @@ import { type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchWorkspace from '../patient-search-workspace/patient-search.workspace';
 import Overlay from '../ui-components/overlay.component';
 
-interface PatientSearchOverlayProps extends PatientSearchContextProps {
+interface PatientSearchOverlayProps extends Pick<PatientSearchContextProps, 'patientClickSideEffect'> {
   onClose: () => void;
-  handleSearchTermUpdated?: (value: string) => void;
   query?: string;
-  header?: string;
 }
 
 /**
@@ -21,24 +19,12 @@ interface PatientSearchOverlayProps extends PatientSearchContextProps {
  * Although similar looking, this overlay behaves somewhat differently from a regular
  * workspace, and has its own overlay logic.
  */
-const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
-  onClose,
-  query = '',
-  header,
-  handleSearchTermUpdated,
-  nonNavigationSelectPatientAction,
-  patientClickSideEffect,
-}) => {
+const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query = '', patientClickSideEffect }) => {
   const { t } = useTranslation();
 
   return (
-    <Overlay header={header ?? t('searchResults', 'Search results')} close={onClose}>
-      <PatientSearchWorkspace
-        initialQuery={query}
-        handleSearchTermUpdated={handleSearchTermUpdated}
-        nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
-        patientClickSideEffect={patientClickSideEffect}
-      />
+    <Overlay header={t('searchResults', 'Search results')} close={onClose}>
+      <PatientSearchWorkspace initialQuery={query} patientClickSideEffect={patientClickSideEffect} />
     </Overlay>
   );
 };

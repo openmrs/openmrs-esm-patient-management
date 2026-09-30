@@ -46,7 +46,6 @@
   "searchingText": "Mencari...",
   "searchLocationPersonAttribute": "Cari lokasi",
   "searchPatient": "Cari pasien",
-  "searchPatientButton": "Tombol Cari Pasien",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "Hasil pencarian",
