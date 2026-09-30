@@ -93,7 +93,7 @@ describe('CurrentVisit', () => {
     );
 
     const form = { uuid: 'form-1' };
-    onEditEncounter({ uuid: 'encounter-2', form } as Encounter, false);
+    onEditEncounter({ uuid: 'encounter-2', form }, false);
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       serviceQueuesPatientFormEntryWorkspace,
       { form, encounterUuid: 'encounter-2' },
