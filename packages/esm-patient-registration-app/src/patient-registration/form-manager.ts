@@ -234,10 +234,10 @@ export class FormManager {
           }
         }
 
-        // The identifier sub-resource does not clear `preferred` on the patient's other identifiers,
-        // so every existing identifier whose preferred flag changed needs to be updated explicitly.
+        // Marking an identifier as preferred through the identifier sub-resource also clears the flag on the
+        // patient's other identifiers, so only the newly preferred identifier needs updating.
         const initialPreferred = initialIdentifierValues?.[identifierFieldName]?.preferred;
-        const preferredChanged = !!initialValue && !!preferred !== !!initialPreferred;
+        const becamePreferred = !!initialValue && !!preferred && !initialPreferred;
 
         const identifierToCreate = {
           uuid: identifierUuid,
