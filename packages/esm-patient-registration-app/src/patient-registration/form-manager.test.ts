@@ -165,7 +165,7 @@ describe('FormManager', () => {
     const updateRequests = () =>
       mockOpenmrsFetch.mock.calls.filter(([url]) => url.includes('/patient/patient-uuid/identifier/'));
 
-    it('updates the preferred flag of both the previously and the newly preferred identifiers', async () => {
+    it('marks only the newly preferred identifier as preferred', async () => {
       const initialIdentifiers = {
         arv: existingIdentifier('arv-uuid', 'arv', true),
         pdc: existingIdentifier('pdc-uuid', 'pdc', false),
@@ -184,10 +184,6 @@ describe('FormManager', () => {
       );
 
       expect(updateRequests()).toEqual([
-        [
-          expect.stringContaining('/identifier/arv-uuid'),
-          expect.objectContaining({ body: { identifier: 'arv', preferred: false } }),
-        ],
         [
           expect.stringContaining('/identifier/pdc-uuid'),
           expect.objectContaining({ body: { identifier: 'pdc', preferred: true } }),

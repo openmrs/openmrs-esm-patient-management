@@ -254,12 +254,12 @@ export class FormManager {
               await addPatientIdentifier(patientUuid, identifierToCreate);
               savePatientTransactionManager.addedIdentifiers[identifierFieldName] = identifier;
             }
-          } else if (initialValue !== identifier || preferredChanged) {
+          } else if (initialValue !== identifier || becamePreferred) {
             await updatePatientIdentifier(
               patientUuid,
               identifierUuid,
               identifierToCreate.identifier,
-              preferredChanged ? preferred : undefined,
+              becamePreferred || undefined,
             );
           }
         }
