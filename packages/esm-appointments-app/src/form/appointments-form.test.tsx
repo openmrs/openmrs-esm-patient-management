@@ -5,6 +5,7 @@
  * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
  */
 import React from 'react';
+import dayjs from 'dayjs';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, screen } from '@testing-library/react';
@@ -141,6 +142,25 @@ describe('AppointmentForm', () => {
     expect(screen.getByRole('textbox', { name: /time/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
+  });
+
+  it('defaults the appointment date to the local date in timezones behind UTC', async () => {
+    // Date-only strings like "2024-01-04" are parsed by `new Date()` as UTC midnight, which is the previous
+    // local day anywhere behind UTC. The suite runs in UTC, so switch zones to exercise that case.
+    const originalTz = process.env.TZ;
+    process.env.TZ = 'America/New_York';
+
+    try {
+      mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
+
+      renderWithSwr(<AppointmentForm {...defaultProps} />);
+
+      await waitForLoadingToFinish();
+
+      expect(screen.getByRole('textbox', { name: /^date$/i })).toHaveValue(dayjs().format('DD/MM/YYYY'));
+    } finally {
+      process.env.TZ = originalTz;
+    }
   });
 
   it('closes the workspace when the cancel button is clicked', async () => {
