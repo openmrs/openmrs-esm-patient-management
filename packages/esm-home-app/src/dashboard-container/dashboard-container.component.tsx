@@ -1,13 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  useLayoutType,
-  isDesktop,
-  ExtensionSlot,
-  WorkspaceContainer,
-  useConfig,
-  useAssignedExtensions,
-} from '@openmrs/esm-framework';
+import { useLayoutType, isDesktop, ExtensionSlot, useConfig, useAssignedExtensions } from '@openmrs/esm-framework';
 import type { DashboardConfig } from '../types/index';
 import styles from './dashboard-container.scss';
 import classNames from 'classnames';
@@ -37,7 +30,6 @@ export default function DashboardContainer() {
           state={{ dashboardTitle: activeDashboard?.name }}
         />
       </section>
-      <WorkspaceContainer overlay contextKey="home" />
     </div>
   );
 }
