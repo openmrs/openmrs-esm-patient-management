@@ -3,11 +3,10 @@ import dayjs from 'dayjs';
 import { vi, describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
+import { useMonthlyCalendarDistribution } from './workload.resource';
 import Workload from './workload.component';
 
 vi.mock('./workload.resource', () => ({
-  useCalendarDistribution: vi.fn().mockReturnValue([]),
   useMonthlyCalendarDistribution: vi.fn().mockReturnValue([]),
 }));
 
@@ -19,7 +18,6 @@ vi.mock('../hooks/useAppointmentService', () => ({
   }),
 }));
 
-const mockUseCalendarDistribution = vi.mocked(useCalendarDistribution);
 const mockUseMonthlyCalendarDistribution = vi.mocked(useMonthlyCalendarDistribution);
 
 describe('Workload', () => {
@@ -31,10 +29,8 @@ describe('Workload', () => {
     );
 
     const today = dayjs().format('YYYY-MM-DD');
-    const [, , calendarDate] = mockUseCalendarDistribution.mock.calls.at(-1);
     const [, , monthlyDate] = mockUseMonthlyCalendarDistribution.mock.calls.at(-1);
 
-    expect(dayjs(calendarDate).format('YYYY-MM-DD')).toBe(today);
     expect(dayjs(monthlyDate).format('YYYY-MM-DD')).toBe(today);
   });
 
@@ -53,10 +49,8 @@ describe('Workload', () => {
       </BrowserRouter>,
     );
 
-    const [, , calendarDate] = mockUseCalendarDistribution.mock.calls.at(-1);
     const [, , monthlyDate] = mockUseMonthlyCalendarDistribution.mock.calls.at(-1);
 
-    expect(calendarDate).toBe(appointmentDate);
     expect(monthlyDate).toBe(appointmentDate);
   });
 });

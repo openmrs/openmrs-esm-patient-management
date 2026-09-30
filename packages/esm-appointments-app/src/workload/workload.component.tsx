@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
+import { useMonthlyCalendarDistribution } from './workload.resource';
 import MonthlyCalendarView from './monthly-view-workload/monthly-view.component';
 import styles from './workload.scss';
 
@@ -24,8 +24,6 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
   if (appointmentDate && appointmentDate !== displayDate) {
     setDisplayDate(appointmentDate);
   }
-
-  const calendarWorkload = useCalendarDistribution(serviceUuid, selectedTab === 0 ? 'week' : 'month', displayDate);
 
   const monthlyCalendarWorkload = useMonthlyCalendarDistribution(
     serviceUuid,

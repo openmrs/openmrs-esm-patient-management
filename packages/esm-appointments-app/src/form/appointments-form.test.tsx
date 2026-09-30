@@ -91,9 +91,6 @@ vi.mock('../hooks/useProviders', async () => ({
 
 vi.mock('../workload/workload.resource', async () => ({
   ...((await vi.importActual('../workload/workload.resource')) as object),
-  getMonthlyCalendarDistribution: vi.fn(),
-  useAppointmentSummary: vi.fn(),
-  useCalendarDistribution: vi.fn(),
   useMonthlyCalendarDistribution: vi.fn().mockReturnValue([]),
   useMonthlyAppointmentSummary: vi.fn().mockReturnValue([]),
 }));
