@@ -1,0 +1,55 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border: none;
+  border-bottom: 1px solid var(--cds-border-subtle, #e0e0e0);
+  cursor: pointer;
+  background: var(--cds-layer-01, #fafafa);
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  box-sizing: border-box;
+  appearance: none;
+
+  &:hover {
+    background: var(--cds-layer-hover, #f4f4f4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cds-focus);
+    outline-offset: -2px;
+  }
+}
+
+.rangeLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cds-text-primary, #161616);
+}
+
+.pill {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 2px 10px;
+  background: var(--cds-layer-accent-01, #e0e0e0);
+  color: var(--cds-text-secondary, #6f6f6f);
+  white-space: nowrap;
+}
+
+.toggle {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--cds-link-primary, #017d79);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.toggleIcon {
+  fill: currentColor;
+}

@@ -1,0 +1,252 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.header {
+  border-block: none;
+  height: auto !important;
+  min-height: layout.$spacing-12;
+  align-items: center;
+  padding-block: layout.$spacing-03;
+  background-color: colors.$gray-10;
+}
+
+.actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: layout.$spacing-04;
+  margin: 0 layout.$spacing-03 0 layout.$spacing-05;
+
+  :global(.cds--btn) {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    box-sizing: border-box !important;
+  }
+
+  :global(.cds--btn--primary) {
+    padding-left: layout.$spacing-05 !important;
+    padding-right: layout.$spacing-05 !important;
+  }
+
+  :global(.cds--btn--primary .cds--btn__icon) {
+    position: static !important;
+    margin-left: layout.$spacing-03 !important;
+    flex-shrink: 0;
+  }
+}
+
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: layout.$spacing-04;
+  flex-wrap: wrap;
+
+  :global(.cds--label) {
+    font-size: 0.75rem;
+    color: colors.$gray-60;
+    margin-bottom: layout.$spacing-02;
+  }
+
+  :global(.cds--list-box) {
+    background: colors.$white;
+    border: 1px solid colors.$gray-50;
+    border-bottom: 1px solid colors.$gray-100;
+    height: 2.375rem !important;
+    min-height: 2.375rem !important;
+    max-height: 2.375rem !important;
+    box-sizing: border-box !important;
+    min-width: 9.375rem;
+    font-size: 0.8125rem;
+    color: colors.$gray-100;
+    cursor: pointer;
+    position: relative;
+  }
+
+  :global(.cds--list-box[data-open]) {
+    outline: 2px solid var(--brand-03, colors.$teal-70) !important;
+    outline-offset: -2px;
+  }
+
+  :global(.cds--list-box__field) {
+    height: 100%;
+    padding-inline-start: layout.$spacing-03 !important;
+    padding-inline-end: layout.$spacing-06 !important;
+    gap: layout.$spacing-01;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  :global(.cds--list-box__field:focus),
+  :global(.cds--list-box__field:focus-within),
+  :global(.cds--list-box:focus),
+  :global(.cds--list-box:focus-within) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  :global(.cds--list-box[data-open] .cds--list-box__field) {
+    outline: none !important;
+  }
+
+  :global(.cds--list-box__label) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: colors.$gray-100;
+    font-size: 0.8125rem;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding-inline-end: 0 !important;
+  }
+
+  :global(.cds--tag--filter) {
+    flex-shrink: 0;
+    background: var(--brand-03, colors.$teal-70);
+    color: colors.$white;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 0.625rem;
+    padding: 1px 4px 1px 6px;
+    gap: 2px;
+    height: 1.125rem;
+    min-height: 1.125rem;
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &:focus,
+    &:focus-within,
+    &:active {
+      outline: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    :global(.cds--tag__label) {
+      color: colors.$white;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    :global(.cds--tag__close-icon) {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 50%;
+      outline: none !important;
+      box-shadow: none !important;
+
+      &:focus,
+      &:active {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+
+      svg {
+        fill: colors.$white;
+        width: 0.5rem;
+        height: 0.5rem;
+      }
+    }
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    color: colors.$gray-70;
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  :global(.cds--list-box__menu) {
+    background: colors.$white;
+    border: 1px solid var(--brand-03, colors.$teal-70);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 17.5rem;
+    overflow-x: hidden;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  :global(.cds--list-box__menu-item) {
+    block-size: auto;
+  }
+
+  :global(.cds--list-box__menu-item--active) {
+    background: colors.$blue-10;
+  }
+
+  :global(.cds--multi-select .cds--list-box__menu-item__option) {
+    padding: layout.$spacing-03 layout.$spacing-04;
+    margin: 0;
+    box-sizing: border-box;
+    block-size: auto;
+    line-height: 1.3;
+    border-block-start: none;
+    border-block-end: 1px solid colors.$gray-10;
+  }
+
+  :global(.cds--multi-select .cds--list-box__menu-item__option .cds--checkbox-wrapper) {
+    min-inline-size: 0;
+    align-items: center;
+  }
+
+  :global(.cds--multi-select .cds--list-box__menu-item__option .cds--checkbox-label) {
+    position: relative;
+    display: block;
+    padding-inline-start: 1.625rem !important;
+    min-inline-size: 0;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    font-size: 0.875rem;
+    color: colors.$gray-100;
+    line-height: 1.3;
+  }
+
+  :global(.cds--list-box__menu-item .cds--checkbox-label-text) {
+    padding-inline-start: 0 !important;
+    padding-left: 0 !important;
+    margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+  }
+
+  :global(.cds--checkbox-label) {
+    font-size: 0.875rem;
+    color: colors.$gray-100;
+  }
+
+  :global(.cds--checkbox-label::before) {
+    top: calc(50% - 8px) !important;
+    margin-block: 0 !important;
+    border: 1px solid colors.$gray-50;
+    border-radius: 2px;
+    background: colors.$white;
+  }
+
+  :global(.cds--checkbox-label::after) {
+    top: calc(50% - 5px) !important;
+    margin-block: 0 !important;
+  }
+
+  :global(.cds--checkbox:checked + .cds--checkbox-label::before) {
+    background: var(--brand-03, colors.$teal-70);
+    border: 1px solid var(--brand-03, colors.$teal-70);
+  }
+
+  :global(.cds--checkbox:checked + .cds--checkbox-label::after) {
+    border-block-end: 1.5px solid colors.$white;
+    border-inline-start: 1.5px solid colors.$white;
+  }
+}
