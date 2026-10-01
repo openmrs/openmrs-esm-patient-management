@@ -191,6 +191,35 @@ describe('FormManager', () => {
       ]);
     });
 
+    it('waits for each identifier write before sending the next one', async () => {
+      const initialIdentifiers = {
+        arv: existingIdentifier('arv-uuid', 'arv', true),
+        pdc: existingIdentifier('pdc-uuid', 'pdc', false),
+      };
+      const firstUpdate = createDeferred<FetchResponse>();
+      mockOpenmrsFetch.mockReturnValueOnce(firstUpdate.promise);
+
+      const savePromise = FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        {
+          arv: { ...initialIdentifiers.arv, identifierValue: 'arv-2', preferred: false },
+          pdc: { ...initialIdentifiers.pdc, preferred: true },
+        },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      await vi.waitFor(() => expect(updateRequests()).toHaveLength(1));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(updateRequests()).toHaveLength(1);
+
+      firstUpdate.resolve(successfulResponse);
+      await savePromise;
+      expect(updateRequests()).toHaveLength(2);
+    });
+
     it('does not update identifiers whose value and preferred flag are unchanged', async () => {
       const initialIdentifiers = {
         arv: existingIdentifier('arv-uuid', 'arv', true),
