@@ -29,6 +29,15 @@
   }
 }
 
+.noPaddingContainer {
+  background: colors.$gray-10;
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+    overflow: visible;
+  }
+}
+
 .toolbarContent {
   align-items: center;
 }

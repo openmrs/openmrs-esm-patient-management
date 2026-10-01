@@ -127,8 +127,16 @@ export function buildServiceColorMap(services: ReadonlyArray<{ uuid: string }>):
 
 export const CALENDAR_HOURS: ReadonlyArray<number> = Array.from({ length: 24 }, (_, i) => i) as ReadonlyArray<number>;
 
-export function formatHourLabel(hour: number): string {
-  const h = hour % 12 || 12;
-  const period = hour < 12 ? 'AM' : 'PM';
-  return `${h} ${period}`;
+/**
+ * Formats an hour (0–23) to a localized time label using the user's locale.
+ * Automatically uses 12-hour or 24-hour format depending on the locale
+ * (e.g., "9 AM" for en-US, "09:00" for de-DE, "09:00" for am-ET).
+ *
+ * @param hour   - Hour in 24-hour format (0–23)
+ * @param locale - BCP-47 locale string (defaults to 'en' for backward compatibility)
+ */
+export function formatHourLabel(hour: number, locale = 'en'): string {
+  return new Intl.DateTimeFormat(locale, { hour: 'numeric' } as Intl.DateTimeFormatOptions).format(
+    new Date(1970, 0, 1, hour, 0, 0),
+  );
 }

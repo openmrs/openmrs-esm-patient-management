@@ -1,0 +1,42 @@
+.row {
+  display: flex;
+  min-height: var(--hour-height, 8rem);
+  height: auto;
+  border-bottom: 1px solid var(--cds-border-subtle, #e0e0e0);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.hourLabel {
+  font-size: 11px;
+  color: var(--cds-text-secondary, #6f6f6f);
+  white-space: nowrap;
+  min-width: 72px;
+  width: 72px;
+  padding: 9px 8px 0 0;
+  text-align: right;
+  border-right: 1px solid var(--cds-border-subtle, #e0e0e0);
+  background: var(--cds-layer-01, #fff);
+  flex-shrink: 0;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-height: var(--hour-height, 8rem);
+  box-sizing: border-box;
+}
+
+.slot {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: var(--hour-height, 8rem);
+  height: auto;
+  background: var(--cds-layer-01, #fff);
+}
+
+.empty {
+  height: 100%;
+  min-height: var(--hour-height, 8rem);
+}
