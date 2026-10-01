@@ -15,6 +15,7 @@ const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockServeQueueEntry = vi.mocked(serveQueueEntry);
 const mockUpdateQueueEntry = vi.mocked(updateQueueEntry);
 const mockRequeueQueueEntry = vi.mocked(requeueQueueEntry);
+const mockMutateQueueEntries = vi.fn();
 
 const serverError = {
   message: 'Server responded with 500 (Internal Server Error)',
@@ -28,7 +29,7 @@ vi.mock('../../service-queues.resource', async () => ({
 }));
 
 vi.mock('../../hooks/useQueueEntries', () => ({
-  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: mockMutateQueueEntries }),
 }));
 
 vi.mock('./call-queue-entry.resource', () => ({
@@ -102,6 +103,7 @@ describe('MoveQueueEntryModal', () => {
       }),
     );
     expect(closeModal).toHaveBeenCalled();
+    expect(mockMutateQueueEntries).toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 

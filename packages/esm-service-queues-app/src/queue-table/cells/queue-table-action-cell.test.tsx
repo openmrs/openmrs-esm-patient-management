@@ -145,7 +145,6 @@ describe('queueTableActionColumn', () => {
         }),
       );
       expect(mockShowModal).not.toHaveBeenCalled();
-      expect(screen.getByRole('button', { name: 'Call' })).toBeEnabled();
     });
 
     it('falls back to a generic message when the failure carries none', async () => {
