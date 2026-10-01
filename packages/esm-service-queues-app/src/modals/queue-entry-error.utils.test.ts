@@ -30,6 +30,10 @@ describe('getErrorMessage', () => {
     ).toBe(fetchErrorMessage);
   });
 
+  it('falls back to the error message when the body is too long', () => {
+    expect(getErrorMessage({ message: fetchErrorMessage, responseBody: 'a'.repeat(501) })).toBe(fetchErrorMessage);
+  });
+
   it('falls back to the error message when the body is an empty string', () => {
     expect(getErrorMessage({ message: fetchErrorMessage, responseBody: '' })).toBe(fetchErrorMessage);
   });
