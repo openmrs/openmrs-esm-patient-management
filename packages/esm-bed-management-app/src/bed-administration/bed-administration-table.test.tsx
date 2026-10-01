@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import BedAdministrationTable from './bed-administration-table.component';
@@ -192,6 +192,24 @@ describe('BedAdministrationTable', () => {
     renderWithSwr(<BedAdministrationTable />);
 
     expect(screen.getByTitle(/loading/i)).toBeInTheDocument();
+  });
+
+  it('opens deletion confirmation for the selected available bed', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(<BedAdministrationTable />);
+
+    await user.click(screen.getAllByRole('button', { name: 'Delete bed' })[0]);
+
+    expect(showModal).toHaveBeenCalledWith('delete-bed-modal', {
+      bed: mockBeds[0][0],
+      mutateBeds: mockMutateBeds,
+      closeModal: expect.any(Function),
+    });
+  });
+
+  it('disables deletion of occupied beds', () => {
+    renderWithSwr(<BedAdministrationTable />);
+    expect(screen.getByRole('button', { name: 'Occupied beds cannot be deleted' })).toBeDisabled();
   });
 
   it('renders the page header with correct title', () => {
