@@ -40,6 +40,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             id={fieldDefinition?.id}
             customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
             required={fieldDefinition.validation?.required ?? false}
+            displayStyle={fieldDefinition.displayStyle}
           />
         );
       case 'org.openmrs.Location':
