@@ -633,16 +633,39 @@ describe('FormManager', () => {
         },
       );
 
-      await vi.waitFor(() => {
-        expect(mockAddPatientIdentifier).toHaveBeenCalled();
-        expect(mockDeletePatientIdentifier).toHaveBeenCalled();
-      });
+      await vi.waitFor(() => expect(mockAddPatientIdentifier).toHaveBeenCalled());
       await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(mockDeletePatientIdentifier).not.toHaveBeenCalled();
       expect(saveSettled).toBe(false);
       expect(mockSavePatient).not.toHaveBeenCalled();
 
       identifierCreation.resolve(successfulResponse);
       await expect(savePromise).rejects.toBe(error);
+      expect(mockDeletePatientIdentifier).toHaveBeenCalled();
+      expect(mockSavePatient).not.toHaveBeenCalled();
+    });
+
+    it('does not delete identifiers when an identifier write fails', async () => {
+      const error = new Error('Identifier creation failed');
+      mockAddPatientIdentifier.mockRejectedValue(error);
+      const newIdentifier = {
+        ...formValues.identifiers.foo,
+        identifierUuid: '',
+        initialValue: '',
+        identifierValue: 'new-identifier',
+        autoGeneration: false,
+      };
+      const removedIdentifier = {
+        ...formValues.identifiers.foo,
+        identifierUuid: 'removed-identifier-uuid',
+        initialValue: 'removed-identifier',
+        identifierValue: 'removed-identifier',
+      };
+
+      await expect(saveExistingPatient({ identifiers: { newIdentifier } }, {}, { removedIdentifier })).rejects.toBe(
+        error,
+      );
+      expect(mockDeletePatientIdentifier).not.toHaveBeenCalled();
       expect(mockSavePatient).not.toHaveBeenCalled();
     });
   });

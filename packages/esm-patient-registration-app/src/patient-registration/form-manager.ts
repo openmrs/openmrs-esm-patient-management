@@ -200,7 +200,7 @@ export class FormManager {
         ([, { identifierValue, autoGeneration, selectedSource }]) =>
           identifierValue || (autoGeneration && selectedSource),
       )
-      .map(async ([identifierFieldName, patientIdentifier]) => {
+      .map(([identifierFieldName, patientIdentifier]) => async () => {
         const {
           identifierTypeUuid,
           identifierValue,
@@ -267,6 +267,13 @@ export class FormManager {
         return identifierToCreate;
       });
 
+    // Save identifiers sequentially because changing the preferred identifier can update other identifiers.
+    // Finish writes before deleting identifiers so replacements exist before their predecessors are removed.
+    const identifiers: Array<PatientIdentifier> = [];
+    for (const sendIdentifierRequest of identifierTypeRequests) {
+      identifiers.push(await sendIdentifierRequest());
+    }
+
     /*
       If there was initially an identifier assigned to the patient,
       which is now not present in the patientIdentifiers(values.identifiers),
@@ -282,13 +289,7 @@ export class FormManager {
           )
       : [];
 
-    const [identifierResults, identifierDeletionResults] = await Promise.all([
-      Promise.allSettled(identifierTypeRequests),
-      Promise.allSettled(identifierDeletionRequests),
-    ]);
-
-    const identifiers = getSettledValuesOrThrow(identifierResults);
-    getSettledValuesOrThrow(identifierDeletionResults);
+    getSettledValuesOrThrow(await Promise.allSettled(identifierDeletionRequests));
     return identifiers;
   }
 
