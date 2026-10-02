@@ -213,10 +213,32 @@ describe('IdentifierInput component', () => {
       expect(screen.getByRole('radio', { name: /preferred/i })).toBeChecked();
     });
 
+    describe('label of an optional identifier', () => {
+      const ssn = { ...openmrsID, identifierName: 'SSN', required: false, autoGeneration: false };
+
+      it('does not mark the preferred identifier as optional', () => {
+        enablePreferredSelection();
+        renderIdentifierInput({ ...ssn, preferred: true }, 'ssn');
+        expect(screen.getByLabelText('SSN')).toBeInTheDocument();
+        expect(screen.queryByLabelText(/SSN \(optional\)/)).not.toBeInTheDocument();
+      });
+
+      it('marks an identifier that is not preferred as optional', () => {
+        enablePreferredSelection();
+        renderIdentifierInput({ ...ssn, preferred: false }, 'ssn');
+        expect(screen.getByLabelText(/SSN \(optional\)/)).toBeInTheDocument();
+      });
+
+      it('marks the preferred identifier as optional when preferred selection is disabled', () => {
+        renderIdentifierInput({ ...ssn, preferred: true }, 'ssn');
+        expect(screen.getByLabelText(/SSN \(optional\)/)).toBeInTheDocument();
+      });
+    });
+
     describe('without the Edit Patient Identifiers privilege', () => {
       beforeEach(() => {
-        mockUserHasAccess.mockImplementation(({ privilege, children }) =>
-          privilege === 'Edit Patient Identifiers' ? null : <>{children}</>,
+        mockUserHasAccess.mockImplementation(({ privilege, fallback, children }) =>
+          privilege === 'Edit Patient Identifiers' ? <>{fallback}</> : <>{children}</>,
         );
       });
 
@@ -224,22 +246,45 @@ describe('IdentifierInput component', () => {
         mockUserHasAccess.mockImplementation(({ children }) => <>{children}</>);
       });
 
-      it('hides the preferred option when editing an existing patient', () => {
+      it('shows a read-only preferred option when editing an existing patient', async () => {
+        const user = userEvent.setup();
+        const setFieldValue = vi.fn();
         enablePreferredSelection();
-        renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: true });
-        expect(screen.queryByRole('radio', { name: /preferred/i })).not.toBeInTheDocument();
+        renderIdentifierInput({ ...openmrsID, preferred: false }, 'openMrsId', {}, { inEditMode: true, setFieldValue });
+
+        const radio = screen.getByRole('radio', { name: /preferred/i });
+        expect(radio).toBeDisabled();
+        expect(radio).not.toBeChecked();
+
+        await user.click(radio);
+        expect(setFieldValue).not.toHaveBeenCalled();
       });
 
-      it('shows the preferred option when registering a new patient', () => {
+      it('shows which identifier is preferred in the read-only option', () => {
+        enablePreferredSelection();
+        renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: true });
+        const radio = screen.getByRole('radio', { name: /preferred/i });
+        expect(radio).toBeDisabled();
+        expect(radio).toBeChecked();
+      });
+
+      it('shows an enabled preferred option when registering a new patient', () => {
         enablePreferredSelection();
         renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: false });
-        expect(screen.getByRole('radio', { name: /preferred/i })).toBeInTheDocument();
+        expect(screen.getByRole('radio', { name: /preferred/i })).toBeEnabled();
       });
+    });
+
+    it('shows an enabled preferred option when editing with the Edit Patient Identifiers privilege', () => {
+      enablePreferredSelection();
+      renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: true });
+      expect(screen.getByRole('radio', { name: /preferred/i })).toBeEnabled();
     });
 
     it('marks the selected identifier as the only preferred identifier', async () => {
       const user = userEvent.setup();
       const setFieldValue = vi.fn();
+      const setFieldTouched = vi.fn();
       const ssn = { ...openmrsID, identifierName: 'SSN', preferred: false };
       enablePreferredSelection();
       renderIdentifierInput(
@@ -248,6 +293,7 @@ describe('IdentifierInput component', () => {
         {},
         {
           setFieldValue,
+          setFieldTouched,
           values: { ...mockInitialFormValues, identifiers: { openMrsId: openmrsID, ssn } },
         },
       );
@@ -258,6 +304,8 @@ describe('IdentifierInput component', () => {
         openMrsId: { ...openmrsID, preferred: false },
         ssn: { ...ssn, preferred: true },
       });
+      // Marking the value as touched shows the missing-value error without waiting for blur or submit
+      expect(setFieldTouched).toHaveBeenCalledWith('identifiers.ssn.identifierValue', true, false);
     });
   });
 
