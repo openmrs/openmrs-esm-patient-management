@@ -22,7 +22,7 @@
   & > div:nth-child(2) {
     margin: layout.$spacing-05;
 
-    & > p:last-child {
+    & > :last-child {
       white-space: nowrap;
       @include type.type-style('heading-04');
     }
