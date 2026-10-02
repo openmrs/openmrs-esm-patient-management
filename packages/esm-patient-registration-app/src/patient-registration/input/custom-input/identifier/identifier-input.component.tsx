@@ -55,7 +55,7 @@ interface IdentifierInputProps {
 const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes, fieldConfigurations } = useConfig<RegistrationConfig>();
-  const allowPreferredSelection = fieldConfigurations?.identifier?.allowPreferredSelection;
+  const allowPreferredSelection = Boolean(fieldConfigurations?.identifier?.allowPreferredSelection);
   const { identifierTypes } = useResourcesContext();
   const { values, setFieldValue, initialFormValues, inEditMode } = usePatientRegistrationContext();
   const identifierType = useMemo(
