@@ -10,17 +10,23 @@ import styles from './calendar-header.scss';
 interface CalendarHeaderProps {
   viewMode: CalendarViewMode;
   calendarSelectedDate: Dayjs;
+  appointmentCount: number;
   onViewModeChange: (mode: CalendarViewMode) => void;
   onPrev: () => void;
   onNext: () => void;
+  onToday: () => void;
 }
+
+const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewMode,
   calendarSelectedDate,
+  appointmentCount,
   onViewModeChange,
   onPrev,
   onNext,
+  onToday,
 }) => {
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
@@ -33,40 +39,57 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         new Date(isoDate + 'T00:00:00'),
       );
     }
-    return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric', calendar }).format(
-      new Date(isoDate + 'T00:00:00'),
-    );
+    return new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      calendar,
+    }).format(new Date(isoDate + 'T00:00:00'));
   }, [viewMode, calendarSelectedDate, locale, calendar]);
 
+  const countLabel = useMemo(() => {
+    if (viewMode === 'daily') {
+      return t('appointmentCount', '{{count}} appointment', {
+        count: appointmentCount,
+        defaultValue_other: '{{count}} appointments',
+      });
+    }
+    return t('appointmentsThisMonth', '{{count}} appointment this month', {
+      count: appointmentCount,
+      defaultValue_other: '{{count}} appointments this month',
+    });
+  }, [viewMode, appointmentCount, t]);
+
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
-  const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
 
   return (
     <div className={styles.calendarHeaderContainer}>
-      <div className={styles.navigationSection}>
-        <div className={styles.navGroup}>
-          <div className={styles.navButtonGroup}>
-            <Button
-              hasIconOnly
-              kind="ghost"
-              size="sm"
-              renderIcon={ChevronLeft}
-              iconDescription={t('previous', 'Previous')}
-              onClick={onPrev}
-            />
-            <span className={styles.navDivider} />
-            <Button
-              hasIconOnly
-              kind="ghost"
-              size="sm"
-              renderIcon={ChevronRight}
-              iconDescription={t('next', 'Next')}
-              onClick={onNext}
-            />
-          </div>
-          <span className={styles.dateLabel}>{dateLabel}</span>
-        </div>
+      <button type="button" className={styles.todayButton} onClick={onToday}>
+        {t('today', 'Today')}
+      </button>
+      <div className={styles.navButtonGroup}>
+        <Button
+          hasIconOnly
+          kind="ghost"
+          size="sm"
+          renderIcon={ChevronLeft}
+          iconDescription={t('previous', 'Previous')}
+          className={styles.navButton}
+          onClick={onPrev}
+        />
+        <Button
+          hasIconOnly
+          kind="ghost"
+          size="sm"
+          renderIcon={ChevronRight}
+          iconDescription={t('next', 'Next')}
+          className={`${styles.navButton} ${styles.navButtonLast}`}
+          onClick={onNext}
+        />
       </div>
+      <span className={styles.dateLabel}>{dateLabel}</span>
+      <span className={styles.countLabel}>{countLabel}</span>
       <div className={styles.switcherSection}>
         <ContentSwitcher
           selectedIndex={viewModeIndex}

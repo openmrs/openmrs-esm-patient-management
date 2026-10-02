@@ -1,0 +1,24 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.filterOptionLabel {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+}
+
+.serviceColorSwatch {
+  position: absolute;
+  top: calc(50% - 5px);
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.filterOptionTextWithColor {
+  display: block;
+  padding-left: 18px;
+}
