@@ -71,6 +71,7 @@ const CallQueueEntryModal: React.FC<CallQueueEntryModalProps> = ({ closeModal, q
             });
             closeModal();
             mutateQueueEntries();
+            navigate({ to: `\${openmrsSpaBase}/patient/${mappedQueueEntry.patientUuid}/chart` });
           },
         );
       },

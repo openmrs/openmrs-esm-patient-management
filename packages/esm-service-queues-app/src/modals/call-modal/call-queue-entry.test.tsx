@@ -104,7 +104,9 @@ describe('MoveQueueEntryModal', () => {
     );
     expect(closeModal).toHaveBeenCalled();
     expect(mockMutateQueueEntries).toHaveBeenCalled();
-    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: `\${openmrsSpaBase}/patient/${mockQueueEntryAlice.patient.uuid}/chart`,
+    });
   });
 
   it('shows the message the server sent when serving the patient fails', async () => {
