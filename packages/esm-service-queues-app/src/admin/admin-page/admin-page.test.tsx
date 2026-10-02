@@ -20,10 +20,13 @@ describe('AdminPage', () => {
   it('renders the service queues page header above the queues and queue rooms', () => {
     render(<AdminPage />);
 
-    expect(screen.getByTestId('patient-queue-header')).toBeInTheDocument();
-    expect(screen.getByText('Service Queues Admin')).toBeInTheDocument();
-    expect(screen.getByText('ServiceQueuesPictogram')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Queues' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Queue rooms' })).toBeInTheDocument();
+    const header = screen.getByTestId('patient-queue-header');
+    expect(header).toHaveTextContent('Service Queues Admin');
+    expect(header).toHaveTextContent('ServiceQueuesPictogram');
+
+    for (const name of ['Queues', 'Queue rooms']) {
+      const sectionHeading = screen.getByRole('heading', { name });
+      expect(header.compareDocumentPosition(sectionHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
   });
 });
