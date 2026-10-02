@@ -4,13 +4,41 @@
 
 .calendarHeaderContainer {
   display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: colors.$gray-10;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.backRow {
+  display: flex;
+  align-items: center;
+  padding: layout.$spacing-03 layout.$spacing-05;
+}
+
+.backButton {
+  padding-left: 0 !important;
+
+  //render the icon before text
+  svg {
+    order: 1;
+    margin-right: layout.$spacing-03;
+    margin-left: 0;
+  }
+
+  span {
+    order: 2;
+  }
+}
+
+.controlsRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: layout.$spacing-03;
   padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
-  border-bottom: 1px solid colors.$gray-20;
 }
 
 .navigationSection {
