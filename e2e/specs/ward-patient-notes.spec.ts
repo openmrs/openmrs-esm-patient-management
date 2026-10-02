@@ -1,8 +1,7 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import {
-  changeToWardLocation,
   deletePatient,
   endVisit,
   generateRandomPatient,
@@ -21,7 +20,6 @@ let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api, page, emrConfiguration }) => {
-  await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
