@@ -72,7 +72,7 @@ export const Autosuggest = <Suggestion = unknown,>({
       <label className="cds--label">{labelText}</label>
       <Layer className={classNames({ [styles.invalid]: invalid })}>
         <Search
-          id="autosuggest"
+          id={searchProps.id ?? `autosuggest-${name}`}
           onChange={handleChange}
           onClear={handleClear}
           ref={searchBox}
