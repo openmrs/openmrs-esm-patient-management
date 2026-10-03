@@ -53,9 +53,6 @@ export interface Appointment {
   uuid: string;
   additionalInfo?: string | null;
   serviceTypes?: Array<ServiceTypes> | null;
-  voided: boolean;
-  extensions: {};
-  teleconsultationLink: string | null;
 }
 
 export interface AppointmentsFetchResponse {

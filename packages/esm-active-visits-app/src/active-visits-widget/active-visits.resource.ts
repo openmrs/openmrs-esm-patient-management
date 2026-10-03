@@ -137,7 +137,7 @@ export function useActiveVisits() {
   };
 
   const formattedActiveVisits: Array<ActiveVisit> = data
-    ? [].concat(...data?.map((res) => res?.data?.results?.map(mapVisitProperties)))
+    ? [].concat(...data?.map((res) => res?.data?.results?.map(mapVisitProperties) ?? []))
     : [];
 
   return {
