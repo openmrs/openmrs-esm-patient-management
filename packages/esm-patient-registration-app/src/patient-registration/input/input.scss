@@ -117,5 +117,21 @@
 }
 
 .actionButtonContainer {
+  display: flex;
+  align-items: center;
   margin-left: layout.$spacing-05;
+}
+
+.preferredIdentifier {
+  margin-right: layout.$spacing-03;
+}
+
+.identifierActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Fits two md icon buttons, so the Preferred radio sits in the same spot on every row
+.reserveActionSpace {
+  min-width: layout.$spacing-11;
 }

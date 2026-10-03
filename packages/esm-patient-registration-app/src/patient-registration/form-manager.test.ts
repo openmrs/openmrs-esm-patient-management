@@ -149,6 +149,113 @@ describe('FormManager', () => {
     });
   });
 
+  describe('changing the preferred identifier of an existing patient', () => {
+    const existingIdentifier = (uuid: string, value: string, preferred: boolean) => ({
+      identifierUuid: uuid,
+      identifierName: value,
+      required: false,
+      initialValue: value,
+      identifierValue: value,
+      identifierTypeUuid: `${value}-type`,
+      preferred,
+      autoGeneration: false,
+      selectedSource: null,
+    });
+
+    const updateRequests = () =>
+      mockOpenmrsFetch.mock.calls.filter(([url]) => url.includes('/patient/patient-uuid/identifier/'));
+
+    it('marks only the newly preferred identifier as preferred', async () => {
+      const initialIdentifiers = {
+        arv: existingIdentifier('arv-uuid', 'arv', true),
+        pdc: existingIdentifier('pdc-uuid', 'pdc', false),
+      };
+
+      await FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        {
+          arv: { ...initialIdentifiers.arv, preferred: false },
+          pdc: { ...initialIdentifiers.pdc, preferred: true },
+        },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      expect(updateRequests()).toEqual([
+        [
+          expect.stringContaining('/identifier/pdc-uuid'),
+          expect.objectContaining({ body: { identifier: 'pdc', preferred: true } }),
+        ],
+      ]);
+    });
+
+    it('waits for each identifier write before sending the next one', async () => {
+      const initialIdentifiers = {
+        arv: existingIdentifier('arv-uuid', 'arv', true),
+        pdc: existingIdentifier('pdc-uuid', 'pdc', false),
+      };
+      const firstUpdate = createDeferred<FetchResponse>();
+      mockOpenmrsFetch.mockReturnValueOnce(firstUpdate.promise);
+
+      const savePromise = FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        {
+          arv: { ...initialIdentifiers.arv, identifierValue: 'arv-2', preferred: false },
+          pdc: { ...initialIdentifiers.pdc, preferred: true },
+        },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      await vi.waitFor(() => expect(updateRequests()).toHaveLength(1));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(updateRequests()).toHaveLength(1);
+
+      firstUpdate.resolve(successfulResponse);
+      await savePromise;
+      expect(updateRequests()).toHaveLength(2);
+    });
+
+    it('does not update identifiers whose value and preferred flag are unchanged', async () => {
+      const initialIdentifiers = {
+        arv: existingIdentifier('arv-uuid', 'arv', true),
+        pdc: existingIdentifier('pdc-uuid', 'pdc', false),
+      };
+
+      await FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        { ...initialIdentifiers },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      expect(updateRequests()).toEqual([]);
+    });
+
+    it('sends only the identifier value when just the value changed', async () => {
+      const initialIdentifiers = { arv: existingIdentifier('arv-uuid', 'arv', true) };
+
+      await FormManager.savePatientIdentifiers(
+        false,
+        'patient-uuid',
+        { arv: { ...initialIdentifiers.arv, identifierValue: 'arv-2' } },
+        initialIdentifiers,
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+
+      expect(updateRequests()).toEqual([
+        [expect.stringContaining('/identifier/arv-uuid'), expect.objectContaining({ body: { identifier: 'arv-2' } })],
+      ]);
+    });
+  });
+
   describe('getPatientDeathInfo', () => {
     const config = { freeTextFieldConceptUuid: 'free-text-uuid' } as RegistrationConfig;
 
@@ -526,16 +633,39 @@ describe('FormManager', () => {
         },
       );
 
-      await vi.waitFor(() => {
-        expect(mockAddPatientIdentifier).toHaveBeenCalled();
-        expect(mockDeletePatientIdentifier).toHaveBeenCalled();
-      });
+      await vi.waitFor(() => expect(mockAddPatientIdentifier).toHaveBeenCalled());
       await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(mockDeletePatientIdentifier).not.toHaveBeenCalled();
       expect(saveSettled).toBe(false);
       expect(mockSavePatient).not.toHaveBeenCalled();
 
       identifierCreation.resolve(successfulResponse);
       await expect(savePromise).rejects.toBe(error);
+      expect(mockDeletePatientIdentifier).toHaveBeenCalled();
+      expect(mockSavePatient).not.toHaveBeenCalled();
+    });
+
+    it('does not delete identifiers when an identifier write fails', async () => {
+      const error = new Error('Identifier creation failed');
+      mockAddPatientIdentifier.mockRejectedValue(error);
+      const newIdentifier = {
+        ...formValues.identifiers.foo,
+        identifierUuid: '',
+        initialValue: '',
+        identifierValue: 'new-identifier',
+        autoGeneration: false,
+      };
+      const removedIdentifier = {
+        ...formValues.identifiers.foo,
+        identifierUuid: 'removed-identifier-uuid',
+        initialValue: 'removed-identifier',
+        identifierValue: 'removed-identifier',
+      };
+
+      await expect(saveExistingPatient({ identifiers: { newIdentifier } }, {}, { removedIdentifier })).rejects.toBe(
+        error,
+      );
+      expect(mockDeletePatientIdentifier).not.toHaveBeenCalled();
       expect(mockSavePatient).not.toHaveBeenCalled();
     });
   });
