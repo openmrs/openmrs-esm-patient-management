@@ -5,7 +5,7 @@ import { useField, Field } from 'formik';
 import { Button, RadioButton } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { type RegistrationConfig } from '../../../../config-schema';
-import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
+import { showModal, useConfig, userHasAccess, UserHasAccess, useSession } from '@openmrs/esm-framework';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
 import { Input } from '../../basic-input/input/input.component';
 import { usePatientRegistrationContext } from '../../../patient-registration-context';
@@ -59,6 +59,8 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const allowPreferredSelection = Boolean(fieldConfigurations?.identifier?.allowPreferredSelection);
   const { identifierTypes } = useResourcesContext();
   const { values, setFieldValue, setFieldTouched, initialFormValues, inEditMode } = usePatientRegistrationContext();
+  const session = useSession();
+  const canEditIdentifiers = userHasAccess('Edit Patient Identifiers', session?.user);
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
@@ -137,9 +139,12 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
 
   const deleteIdentifier = () => {
     const remainingIdentifiers = deleteIdentifierType(values.identifiers, fieldName);
+    // For an existing patient, saving the promoted fallback needs the edit privilege. Without it, leave the choice
+    // to the backend, which picks a new preferred identifier when the deleted one is purged.
+    const canPromoteFallback = !inEditMode || canEditIdentifiers;
     setFieldValue(
       'identifiers',
-      allowPreferredSelection && preferred
+      allowPreferredSelection && preferred && canPromoteFallback
         ? promoteFallbackPreferredIdentifier(remainingIdentifiers, identifierTypes, initialFormValues?.identifiers)
         : remainingIdentifiers,
     );

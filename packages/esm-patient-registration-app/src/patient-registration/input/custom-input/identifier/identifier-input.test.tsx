@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import { getDefaultsFromConfigSchema, useConfig, UserHasAccess } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, userHasAccess, UserHasAccess } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
 import { renderWithContext } from 'tools';
 import { ResourcesContextProvider } from '../../../../resources-context';
@@ -105,6 +105,7 @@ const mockContextValues: PatientRegistrationContextProps = {
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUserHasAccess = vi.mocked(UserHasAccess);
+const mockUserHasAccessCheck = vi.mocked(userHasAccess);
 
 /**
  * Helper to render IdentifierInput component with Formik.
@@ -362,30 +363,42 @@ describe('IdentifierInput component', () => {
       expect(promoteFallbackPreferredIdentifier(identifiers, mockIdentifierTypes, {})).toBe(identifiers);
     });
 
-    it('marks a remaining identifier as preferred when the preferred row is deleted', async () => {
-      const user = userEvent.setup();
-      const setFieldValue = vi.fn();
-      const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
-      mockUseConfig.mockReturnValue({
-        ...defaults,
-        fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection: true } },
-      });
-      const other = optionalIdentifier('type-1', '111');
-      const deleted = optionalIdentifier('type-2', '222', true);
-      renderIdentifierInput(
-        deleted,
-        'deleted',
-        {},
-        {
-          setFieldValue,
-          values: { ...mockInitialFormValues, identifiers: { other, deleted } },
-        },
-      );
+    it.each`
+      inEditMode | canEditIdentifiers | promotesFallback
+      ${false}   | ${false}           | ${true}
+      ${true}    | ${true}            | ${true}
+      ${true}    | ${false}           | ${false}
+    `(
+      'when the preferred row is deleted (edit mode: $inEditMode, can edit identifiers: $canEditIdentifiers), promotes a fallback: $promotesFallback',
+      async ({ inEditMode, canEditIdentifiers, promotesFallback }) => {
+        const user = userEvent.setup();
+        const setFieldValue = vi.fn();
+        const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+        mockUseConfig.mockReturnValue({
+          ...defaults,
+          fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection: true } },
+        });
+        mockUserHasAccessCheck.mockReturnValue(canEditIdentifiers);
+        const other = optionalIdentifier('type-1', '111');
+        const deleted = optionalIdentifier('type-2', '222', true);
+        renderIdentifierInput(
+          deleted,
+          'deleted',
+          {},
+          {
+            inEditMode,
+            setFieldValue,
+            values: { ...mockInitialFormValues, identifiers: { other, deleted } },
+          },
+        );
 
-      await user.click(screen.getByRole('button', { name: 'Delete' }));
+        await user.click(screen.getByRole('button', { name: 'Delete' }));
 
-      expect(setFieldValue).toHaveBeenCalledWith('identifiers', { other: { ...other, preferred: true } });
-    });
+        // Without promotion, the backend picks the new preferred identifier when the deleted one is purged
+        expect(setFieldValue).toHaveBeenCalledWith('identifiers', { other: { ...other, preferred: promotesFallback } });
+        expect(mockUserHasAccessCheck).toHaveBeenCalledWith('Edit Patient Identifiers', undefined);
+      },
+    );
   });
 
   describe('Auto-generated identifier', () => {
