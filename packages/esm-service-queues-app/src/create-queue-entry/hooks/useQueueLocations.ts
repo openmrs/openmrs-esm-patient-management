@@ -6,7 +6,7 @@ export function useQueueLocations() {
   const { data, error, isLoading } = useFhirFetchAll<fhir.Location>(apiUrl);
 
   const queueLocations = useMemo(
-    () => data?.map((response) => response).sort((a, b) => a.name.localeCompare(b.name, getLocale())) ?? [],
+    () => data?.slice().sort((a, b) => a.name.localeCompare(b.name, getLocale())) ?? [],
     [data],
   );
 

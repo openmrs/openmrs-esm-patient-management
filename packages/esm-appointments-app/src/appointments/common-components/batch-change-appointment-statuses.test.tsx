@@ -65,9 +65,7 @@ const mockAppointment1: Appointment = {
   additionalInfo: null,
   providers: [{ uuid: 'person-1', display: 'Dr James Cook' }],
   recurring: false,
-  voided: false,
-  teleconsultationLink: null,
-  extensions: {},
+
   endDateTime: null,
   dateAppointmentScheduled: null,
 };
