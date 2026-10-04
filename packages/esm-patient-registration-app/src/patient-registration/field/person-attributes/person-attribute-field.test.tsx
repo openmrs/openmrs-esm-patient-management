@@ -2,7 +2,8 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { useConceptAnswers } from '../field.resource';
@@ -306,6 +307,49 @@ describe('PersonAttributeField', () => {
 
       const select = screen.getByRole('combobox', { name: /referred by/i });
       expect(select).not.toBeRequired();
+    });
+  });
+  describe.each(['org.openmrs.util.AttributableDate', 'java.util.Date'])('Date format (%s)', (format) => {
+    const uuid = 'b29617e3-c49e-5893-8dc7-e06b125a0264';
+    const dateFieldDefinition: FieldDefinition = {
+      id: 'consentDate',
+      label: 'Date of consent',
+      type: 'person attribute',
+      uuid,
+      showHeading: false,
+    };
+
+    beforeEach(() => {
+      mockUsePersonAttributeType.mockReturnValue({
+        data: { ...mockPersonAttributeType, uuid, format, display: 'Consent Date', name: 'Consent Date' },
+        isLoading: false,
+        error: null,
+      });
+    });
+
+    it('enters the date with a date picker and keeps it as YYYY-MM-DD, as the server stores it', async () => {
+      const { getFormValues } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
+
+      fireEvent.change(screen.getByLabelText('Date of consent'), { target: { value: '2026-09-20' } });
+
+      await waitFor(() => expect(getFormValues().attributes[uuid]).toBe('2026-09-20'));
+    });
+
+    it('shows the day of a saved value, which the server answers as an ISO date-time', () => {
+      renderPersonAttributeFieldWithFormik(dateFieldDefinition, {
+        attributes: { [uuid]: '2026-09-20T00:00:00.000+0000' },
+      } as never);
+
+      expect(screen.getByLabelText('Date of consent')).toHaveValue('20/09/2026');
+    });
+
+    it('stops at today when future dates are not allowed', () => {
+      vi.mocked(OpenmrsDatePicker).mockClear();
+      renderPersonAttributeFieldWithFormik({ ...dateFieldDefinition, allowFutureDates: false });
+
+      const props = vi.mocked(OpenmrsDatePicker).mock.calls.at(-1)[0];
+      expect(props.maxDate).toBeInstanceOf(Date);
+      expect(props.minDate).toBeUndefined();
     });
   });
 });

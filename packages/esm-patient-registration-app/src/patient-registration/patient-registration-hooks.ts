@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { type FetchResponse, type OpenmrsResource, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../config-schema';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
+import { isDateFormat } from './field/person-attributes/person-attributes.resource';
 import {
   type Encounter,
   type FormValues,
@@ -131,7 +132,10 @@ export function useInitialFormValues(
           [attribute.attributeType.uuid]:
             attribute.attributeType.format === 'org.openmrs.Concept' && typeof attribute.value === 'object'
               ? attribute.value?.uuid
-              : attribute.value,
+              : isDateFormat(attribute.attributeType.format) && typeof attribute.value === 'string'
+                ? // A date loads as an ISO date-time; saving it unchanged must send the YYYY-MM-DD it was saved as.
+                  attribute.value.slice(0, 10)
+                : attribute.value,
         }),
         {},
       );
