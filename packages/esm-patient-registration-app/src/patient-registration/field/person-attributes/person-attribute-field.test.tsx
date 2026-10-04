@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Form, Formik } from 'formik';
+import { Form, Formik, type FormikTouched } from 'formik';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
@@ -46,11 +46,13 @@ const renderPersonAttributeFieldWithFormik = (
   };
 
   let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
+  let formTouchedRef: FormikTouched<FormValues> = {};
 
   const utils = render(
     <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
+      {({ setFieldValue, values, setFieldTouched, touched }) => {
         formValuesRef = { ...initialFormValues, ...values } as FormValues;
+        formTouchedRef = touched;
         return (
           <Form>
             <PersonAttributeField fieldDefinition={fieldDefinition} />
@@ -63,6 +65,7 @@ const renderPersonAttributeFieldWithFormik = (
   return {
     ...utils,
     getFormValues: () => formValuesRef,
+    getFormTouched: () => formTouchedRef,
   };
 };
 
@@ -333,6 +336,14 @@ describe('PersonAttributeField', () => {
       fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
 
       await waitFor(() => expect(getFormValues().attributes[uuid]).toBe('2026-09-20'));
+    });
+
+    it('marks the field as touched when a date is selected', async () => {
+      const { getFormTouched } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
+
+      fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
+
+      await waitFor(() => expect(getFormTouched().attributes?.[uuid]).toBe(true));
     });
 
     it('renders a saved date', () => {

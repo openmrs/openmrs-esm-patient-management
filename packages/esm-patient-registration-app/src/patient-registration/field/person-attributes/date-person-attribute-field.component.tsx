@@ -34,15 +34,18 @@ export function DatePersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Layer>
         <Field name={fieldName}>
-          {({ field, form: { touched, errors, setFieldValue }, meta }) => {
+          {({ field, form: { touched, errors, setFieldValue, setFieldTouched }, meta }) => {
             return (
               <OpenmrsDatePicker
                 id={id}
                 isRequired={required}
                 labelText={label ?? personAttributeType?.display}
                 value={field.value ? dayjs(field.value).toDate() : null}
-                // Date attributes are saved in the YYYY-MM-DD format
-                onChange={(date: Date) => setFieldValue(fieldName, date ? dayjs(date).format('YYYY-MM-DD') : '')}
+                onChange={(date: Date) => {
+                  // Date attributes are saved in the YYYY-MM-DD format
+                  setFieldValue(fieldName, date ? dayjs(date).format('YYYY-MM-DD') : '');
+                  setFieldTouched(fieldName, true, false);
+                }}
                 isInvalid={errors[fieldName] && touched[fieldName]}
                 invalidText={t(meta.error)}
                 minDate={!pastDatesAllowed ? new Date() : undefined}
