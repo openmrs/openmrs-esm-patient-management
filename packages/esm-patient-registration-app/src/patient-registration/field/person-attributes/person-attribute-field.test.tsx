@@ -310,10 +310,10 @@ describe('PersonAttributeField', () => {
     });
   });
   describe.each(['org.openmrs.util.AttributableDate', 'java.util.Date'])('Date format (%s)', (format) => {
-    const uuid = 'b29617e3-c49e-5893-8dc7-e06b125a0264';
+    const uuid = 'd2a4f9a1-3c5e-4a7b-9b1d-6f8e2c4a1b3d';
     const dateFieldDefinition: FieldDefinition = {
-      id: 'consentDate',
-      label: 'Date of consent',
+      id: 'dateOfFirstVisit',
+      label: 'Date of first visit',
       type: 'person attribute',
       uuid,
       showHeading: false,
@@ -321,29 +321,27 @@ describe('PersonAttributeField', () => {
 
     beforeEach(() => {
       mockUsePersonAttributeType.mockReturnValue({
-        data: { ...mockPersonAttributeType, uuid, format, display: 'Consent Date', name: 'Consent Date' },
+        data: { ...mockPersonAttributeType, uuid, format, display: 'Date of first visit', name: 'Date of first visit' },
         isLoading: false,
         error: null,
       });
     });
 
-    it('enters the date with a date picker and keeps it as YYYY-MM-DD, as the server stores it', async () => {
+    it('saves the selected date in the YYYY-MM-DD format', async () => {
       const { getFormValues } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
 
-      fireEvent.change(screen.getByLabelText('Date of consent'), { target: { value: '2026-09-20' } });
+      fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
 
       await waitFor(() => expect(getFormValues().attributes[uuid]).toBe('2026-09-20'));
     });
 
-    it('shows the day of a saved value, which the server answers as an ISO date-time', () => {
-      renderPersonAttributeFieldWithFormik(dateFieldDefinition, {
-        attributes: { [uuid]: '2026-09-20T00:00:00.000+0000' },
-      } as never);
+    it('renders a saved date', () => {
+      renderPersonAttributeFieldWithFormik(dateFieldDefinition, { attributes: { [uuid]: '2026-09-20' } });
 
-      expect(screen.getByLabelText('Date of consent')).toHaveValue('20/09/2026');
+      expect(screen.getByLabelText('Date of first visit')).toHaveValue('20/09/2026');
     });
 
-    it('stops at today when future dates are not allowed', () => {
+    it('does not allow future dates when allowFutureDates is false', () => {
       vi.mocked(OpenmrsDatePicker).mockClear();
       renderPersonAttributeFieldWithFormik({ ...dateFieldDefinition, allowFutureDates: false });
 

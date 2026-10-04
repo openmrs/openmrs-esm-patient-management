@@ -2,7 +2,6 @@ import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-fram
 import useSWRImmutable from 'swr/immutable';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 
-/** The person attribute formats the registration form enters with a date picker. */
 export const dateFormats = ['org.openmrs.util.AttributableDate', 'java.util.Date'];
 
 export const isDateFormat = (format: string) => dateFormats.includes(format);

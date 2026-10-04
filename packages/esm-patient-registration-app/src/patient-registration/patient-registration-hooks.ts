@@ -133,7 +133,7 @@ export function useInitialFormValues(
             attribute.attributeType.format === 'org.openmrs.Concept' && typeof attribute.value === 'object'
               ? attribute.value?.uuid
               : isDateFormat(attribute.attributeType.format) && typeof attribute.value === 'string'
-                ? // A date loads as an ISO date-time; saving it unchanged must send the YYYY-MM-DD it was saved as.
+                ? // Date attributes are returned as ISO date-times, but saved in the YYYY-MM-DD format
                   attribute.value.slice(0, 10)
                 : attribute.value,
         }),
