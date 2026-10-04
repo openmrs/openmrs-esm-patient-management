@@ -4,6 +4,7 @@ import _default from 'yup/lib/locale';
 export interface SectionDefinition {
   id: string;
   name?: string;
+  description?: string;
   fields: Array<string>;
 }
 
@@ -135,6 +136,12 @@ export const esmPatientRegistrationSchema = {
       name: {
         _type: Type.String,
         _description: 'The title to display at the top of the section.',
+      },
+      description: {
+        _type: Type.String,
+        _default: '',
+        _description:
+          'Text to show above the fields, such as a consent statement the registering user reads to the patient.',
       },
       fields: {
         _type: Type.Array,

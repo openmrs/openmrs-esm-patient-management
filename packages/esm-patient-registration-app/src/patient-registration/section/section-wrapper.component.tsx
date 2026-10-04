@@ -32,6 +32,11 @@ export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps
       </span>
       <div style={{ margin: '1rem 0 1rem' }}>
         <Tile>
+          {sectionDefinition.description && (
+            <p className={styles.sectionDescription}>
+              {t(`${sectionDefinition.id}SectionDescription`, sectionDefinition.description)}
+            </p>
+          )}
           <Section sectionDefinition={sectionDefinition} />
         </Tile>
       </div>

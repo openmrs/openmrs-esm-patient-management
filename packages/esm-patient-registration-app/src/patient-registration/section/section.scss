@@ -19,3 +19,9 @@
 .isDeadFieldContainer {
   margin-bottom: layout.$spacing-05;
 }
+
+.sectionDescription {
+  @include type.type-style('body-01');
+  margin-bottom: layout.$spacing-06;
+  white-space: pre-line;
+}
