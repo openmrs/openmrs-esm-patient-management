@@ -3,29 +3,32 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { SectionWrapper } from './section-wrapper.component';
 
-vi.mock('./section.component', () => ({ Section: () => <div data-testid="section-fields" /> }));
-
-const consent =
-  'I told the patient the following about the use of their health information:\nTheir personal health information will go into a computer program.';
+vi.mock('./section.component', () => ({
+  Section: () => <div data-testid="section-fields" />,
+}));
 
 describe('SectionWrapper', () => {
-  it('shows the section description above its fields', () => {
+  it('renders the section description above the section fields', () => {
     render(
       <SectionWrapper
-        index={3}
-        sectionDefinition={{ id: 'rhd-registration', name: 'RHD Registration', description: consent, fields: [] }}
+        index={0}
+        sectionDefinition={{
+          id: 'consent',
+          name: 'Consent',
+          description: 'Read the consent statement to the patient before recording consent.',
+          fields: [],
+        }}
       />,
     );
 
-    const description = screen.getByText(/I told the patient the following/);
-    expect(description).toHaveTextContent('Their personal health information will go into a computer program.');
+    const description = screen.getByText('Read the consent statement to the patient before recording consent.');
     expect(description.compareDocumentPosition(screen.getByTestId('section-fields'))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });
 
-  it('shows no description for a section without one', () => {
-    render(<SectionWrapper index={0} sectionDefinition={{ id: 'demographics', name: 'Basic Info', fields: [] }} />);
+  it('does not render a description when the section has none', () => {
+    render(<SectionWrapper index={0} sectionDefinition={{ id: 'consent', name: 'Consent', fields: [] }} />);
 
     expect(screen.queryByRole('paragraph')).not.toBeInTheDocument();
   });

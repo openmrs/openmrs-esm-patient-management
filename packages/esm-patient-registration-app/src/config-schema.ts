@@ -139,9 +139,7 @@ export const esmPatientRegistrationSchema = {
       },
       description: {
         _type: Type.String,
-        _default: '',
-        _description:
-          'Text to show above the fields, such as a consent statement the registering user reads to the patient.',
+        _description: 'Optional text to display above the fields of the section, such as a consent statement.',
       },
       fields: {
         _type: Type.Array,
