@@ -68,6 +68,9 @@ export interface RegistrationConfig {
         month: number;
       };
     };
+    identifier: {
+      allowPreferredSelection: boolean;
+    };
     phone: {
       personAttributeUuid: string;
       validation?: {
@@ -358,6 +361,14 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _validators: [validators.inRange(0, 11)],
         },
+      },
+    },
+    identifier: {
+      allowPreferredSelection: {
+        _type: Type.Boolean,
+        _default: false,
+        _description:
+          'Whether to display a "Preferred" option next to each identifier, allowing the user to choose which identifier is the preferred one. When disabled, the identifier of the primary identifier type is marked as preferred.',
       },
     },
     phone: {
