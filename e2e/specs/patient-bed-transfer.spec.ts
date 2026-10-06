@@ -1,8 +1,9 @@
-import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, type APIRequestContext } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Bed, type BedType } from '../commands/types';
 import { test } from '../core';
 import {
+  changeLocation,
   deleteBed,
   dischargePatientFromBed,
   generateBedType,
@@ -24,17 +25,6 @@ let destinationBed: Bed | undefined;
 let bedType: BedType | undefined;
 let visit: Visit | undefined;
 let destinationWardName: string;
-
-async function setSessionLocation(page: Page, locationUuid: string) {
-  const token = Buffer.from(`${process.env.E2E_USER_ADMIN_USERNAME}:${process.env.E2E_USER_ADMIN_PASSWORD}`).toString(
-    'base64',
-  );
-  const response = await page.request.post(`${process.env.E2E_BASE_URL}/ws/rest/v1/session`, {
-    headers: { Authorization: `Basic ${token}` },
-    data: { sessionLocation: locationUuid, locale: 'en' },
-  });
-  expect(response.ok()).toBeTruthy();
-}
 
 async function getTransferState(api: APIRequestContext, patientUuid: string) {
   const responses = await Promise.all([
@@ -123,7 +113,7 @@ test('Transfer an admitted patient to a bed in another ward', async ({ page, api
   const fullName = patient.person.display;
 
   await test.step('Given the patient is admitted to the source ward and bed', async () => {
-    await setSessionLocation(page, sourceWardUuid);
+    await changeLocation(page, sourceWardUuid);
     await wardPage.goTo();
     await waitForAdmissionRequestToBeProcessed(api, page, patient.uuid, sourceWardUuid);
     await wardPage.clickManageAdmissionRequests();
@@ -161,7 +151,7 @@ test('Transfer an admitted patient to a bed in another ward', async ({ page, api
   });
 
   await test.step('When I accept the transfer into the destination bed', async () => {
-    await setSessionLocation(page, destinationWardUuid);
+    await changeLocation(page, destinationWardUuid);
     await wardPage.goTo();
     await waitForAdmissionRequestToBeProcessed(api, page, patient.uuid, destinationWardUuid);
     await wardPage.clickManageAdmissionRequests();
@@ -190,7 +180,7 @@ test('Transfer an admitted patient to a bed in another ward', async ({ page, api
         .filter({ hasText: fullName })
         .getByText(destinationBed.bedNumber, { exact: true }),
     ).toBeVisible();
-    await setSessionLocation(page, sourceWardUuid);
+    await changeLocation(page, sourceWardUuid);
     await wardPage.goTo();
     await expect(
       page.locator(`[id="bed-${sourceBed.bedNumber}"]`).getByText('Empty bed', { exact: true }),

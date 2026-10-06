@@ -8,7 +8,7 @@ import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useAppContext, type DefaultWorkspaceProps } from '@openmrs/esm-framework';
+import { useAppContext } from '@openmrs/esm-framework';
 import { mockInpatientRequestAlice, mockLocationInpatientWard, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import useWardLocation from '../../hooks/useWardLocation';

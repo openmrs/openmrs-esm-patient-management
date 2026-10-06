@@ -1,7 +1,7 @@
 import React from 'react';
 import { DataTableSkeleton } from '@carbon/react';
 import { useParams } from 'react-router-dom';
-import { usePatient, useLayoutType, isDesktop, WorkspaceContainer, launchWorkspace2 } from '@openmrs/esm-framework';
+import { usePatient, useLayoutType, isDesktop, launchWorkspace2 } from '@openmrs/esm-framework';
 import PatientAppointmentsDetailedSummary from './patient-appointments-detailed-summary.extension';
 import PatientAppointmentsHeader from './patient-appointments-header.component';
 import styles from './patient-appointments-overview.scss';
@@ -29,7 +29,6 @@ const PatientAppointmentsOverview: React.FC = () => {
           launchWorkspace2('appointments-form-workspace', { patientUuid, appointment });
         }}
       />
-      <WorkspaceContainer overlay contextKey={`patient/${params.patientUuid}`} />
     </div>
   );
 };
