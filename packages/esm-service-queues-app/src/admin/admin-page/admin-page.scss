@@ -5,7 +5,7 @@
 .adminPage {
   padding: layout.$spacing-05;
   background-color: var(--cds-background);
-  min-height: 100vh;
+  min-height: calc(100vh - var(--omrs-navbar-height) - layout.$spacing-12);
 }
 
 .section {
