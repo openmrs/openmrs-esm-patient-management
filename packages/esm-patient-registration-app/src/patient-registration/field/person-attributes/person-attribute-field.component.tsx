@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InlineNotification, TextInputSkeleton } from '@carbon/react';
 import { type FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
+import { DatePersonAttributeField } from './date-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
 import { LocationPersonAttributeField } from './location-person-attribute-field.component';
@@ -40,6 +41,18 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             id={fieldDefinition?.id}
             customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
             required={fieldDefinition.validation?.required ?? false}
+          />
+        );
+      case 'org.openmrs.util.AttributableDate':
+      case 'java.util.Date':
+        return (
+          <DatePersonAttributeField
+            personAttributeType={personAttributeType}
+            label={fieldDefinition.label}
+            id={fieldDefinition?.id}
+            required={fieldDefinition.validation?.required ?? false}
+            allowPastDates={fieldDefinition.allowPastDates}
+            allowFutureDates={fieldDefinition.allowFutureDates}
           />
         );
       case 'org.openmrs.Location':
