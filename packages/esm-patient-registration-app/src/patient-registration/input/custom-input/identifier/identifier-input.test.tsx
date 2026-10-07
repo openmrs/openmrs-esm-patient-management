@@ -1,13 +1,13 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, userHasAccess, UserHasAccess } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
 import { renderWithContext } from 'tools';
 import { ResourcesContextProvider } from '../../../../resources-context';
-import { type Resources } from '../../../../offline.resources';
+import { type Resources } from '../../../../registration.resource';
 import {
   PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
@@ -18,7 +18,7 @@ import type {
   IdentifierSource,
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
-import IdentifierInput from './identifier-input.component';
+import IdentifierInput, { promoteFallbackPreferredIdentifier } from './identifier-input.component';
 
 const mockIdentifierTypes = [
   {
@@ -95,7 +95,6 @@ const mockContextValues: PatientRegistrationContextProps = {
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
-  isOffline: false,
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),
@@ -105,6 +104,8 @@ const mockContextValues: PatientRegistrationContextProps = {
 };
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUserHasAccess = vi.mocked(UserHasAccess);
+const mockUserHasAccessCheck = vi.mocked(userHasAccess);
 
 /**
  * Helper to render IdentifierInput component with Formik.
@@ -113,11 +114,12 @@ function renderIdentifierInput(
   patientIdentifier: PatientIdentifierValue,
   fieldName: string = 'openMrsId',
   initialValues: Record<string, any> = {},
+  contextValues: Partial<PatientRegistrationContextProps> = {},
 ) {
   return renderWithContext(
     <Formik initialValues={initialValues} onSubmit={vi.fn()}>
       <Form>
-        <PatientRegistrationContextProvider value={mockContextValues}>
+        <PatientRegistrationContextProvider value={{ ...mockContextValues, ...contextValues }}>
           <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
         </PatientRegistrationContextProvider>
       </Form>
@@ -187,6 +189,216 @@ describe('IdentifierInput component', () => {
       });
       expect(screen.getByText('Delete')).toBeInTheDocument();
     });
+  });
+
+  describe('Preferred identifier', () => {
+    const enablePreferredSelection = () => {
+      const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+      mockUseConfig.mockReturnValue({
+        ...defaults,
+        fieldConfigurations: {
+          ...defaults.fieldConfigurations,
+          identifier: { allowPreferredSelection: true },
+        },
+      });
+    };
+
+    it('does not show the preferred option by default', () => {
+      renderIdentifierInput(openmrsID);
+      expect(screen.queryByRole('radio', { name: /preferred/i })).not.toBeInTheDocument();
+    });
+
+    it('shows the preferred option checked for the preferred identifier when enabled', () => {
+      enablePreferredSelection();
+      renderIdentifierInput(openmrsID);
+      expect(screen.getByRole('radio', { name: /preferred/i })).toBeChecked();
+    });
+
+    describe('label of an optional identifier', () => {
+      const ssn = { ...openmrsID, identifierName: 'SSN', required: false, autoGeneration: false };
+
+      it('does not mark the preferred identifier as optional', () => {
+        enablePreferredSelection();
+        renderIdentifierInput({ ...ssn, preferred: true }, 'ssn');
+        expect(screen.getByLabelText('SSN')).toBeInTheDocument();
+        expect(screen.queryByLabelText(/SSN \(optional\)/)).not.toBeInTheDocument();
+      });
+
+      it('marks an identifier that is not preferred as optional', () => {
+        enablePreferredSelection();
+        renderIdentifierInput({ ...ssn, preferred: false }, 'ssn');
+        expect(screen.getByLabelText(/SSN \(optional\)/)).toBeInTheDocument();
+      });
+
+      it('marks the preferred identifier as optional when preferred selection is disabled', () => {
+        renderIdentifierInput({ ...ssn, preferred: true }, 'ssn');
+        expect(screen.getByLabelText(/SSN \(optional\)/)).toBeInTheDocument();
+      });
+    });
+
+    describe('without the Edit Patient Identifiers privilege', () => {
+      beforeEach(() => {
+        mockUserHasAccess.mockImplementation(({ privilege, fallback, children }) =>
+          privilege === 'Edit Patient Identifiers' ? <>{fallback}</> : <>{children}</>,
+        );
+      });
+
+      afterEach(() => {
+        mockUserHasAccess.mockImplementation(({ children }) => <>{children}</>);
+      });
+
+      it('shows a read-only preferred option when editing an existing patient', async () => {
+        const user = userEvent.setup();
+        const setFieldValue = vi.fn();
+        enablePreferredSelection();
+        renderIdentifierInput({ ...openmrsID, preferred: false }, 'openMrsId', {}, { inEditMode: true, setFieldValue });
+
+        const radio = screen.getByRole('radio', { name: /preferred/i });
+        expect(radio).toBeDisabled();
+        expect(radio).not.toBeChecked();
+
+        await user.click(radio);
+        expect(setFieldValue).not.toHaveBeenCalled();
+      });
+
+      it('shows which identifier is preferred in the read-only option', () => {
+        enablePreferredSelection();
+        renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: true });
+        const radio = screen.getByRole('radio', { name: /preferred/i });
+        expect(radio).toBeDisabled();
+        expect(radio).toBeChecked();
+      });
+
+      it('shows an enabled preferred option when registering a new patient', () => {
+        enablePreferredSelection();
+        renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: false });
+        expect(screen.getByRole('radio', { name: /preferred/i })).toBeEnabled();
+      });
+    });
+
+    it('shows an enabled preferred option when editing with the Edit Patient Identifiers privilege', () => {
+      enablePreferredSelection();
+      renderIdentifierInput(openmrsID, 'openMrsId', {}, { inEditMode: true });
+      expect(screen.getByRole('radio', { name: /preferred/i })).toBeEnabled();
+    });
+
+    it('marks the selected identifier as the only preferred identifier', async () => {
+      const user = userEvent.setup();
+      const setFieldValue = vi.fn();
+      const setFieldTouched = vi.fn();
+      const ssn = { ...openmrsID, identifierName: 'SSN', preferred: false };
+      enablePreferredSelection();
+      renderIdentifierInput(
+        ssn,
+        'ssn',
+        {},
+        {
+          setFieldValue,
+          setFieldTouched,
+          values: { ...mockInitialFormValues, identifiers: { openMrsId: openmrsID, ssn } },
+        },
+      );
+
+      await user.click(screen.getByRole('radio', { name: /preferred/i }));
+
+      expect(setFieldValue).toHaveBeenCalledWith('identifiers', {
+        openMrsId: { ...openmrsID, preferred: false },
+        ssn: { ...ssn, preferred: true },
+      });
+      // Marking the value as touched shows the missing-value error without waiting for blur or submit
+      expect(setFieldTouched).toHaveBeenCalledWith('identifiers.ssn.identifierValue', true, false);
+    });
+  });
+
+  describe('Deleting the preferred identifier', () => {
+    const ssnTypeUuid = 'a71403f3-8584-4289-ab41-2b4e5570bd45';
+    const optionalIdentifier = (identifierTypeUuid: string, identifierValue: string, preferred = false) =>
+      ({
+        ...openmrsID,
+        identifierTypeUuid,
+        identifierValue,
+        autoGeneration: false,
+        required: false,
+        preferred,
+      }) as PatientIdentifierValue;
+
+    it('promotes the primary identifier type', () => {
+      const result = promoteFallbackPreferredIdentifier(
+        {
+          ssn: optionalIdentifier(ssnTypeUuid, 'A-1234567'),
+          openMrsId: optionalIdentifier(openmrsID.identifierTypeUuid, ''),
+        },
+        mockIdentifierTypes,
+        {},
+      );
+      expect(result.openMrsId.preferred).toBe(true);
+      expect(result.ssn.preferred).toBe(false);
+    });
+
+    it('promotes the identifier that was preferred when the form was loaded', () => {
+      const result = promoteFallbackPreferredIdentifier(
+        { first: optionalIdentifier('type-1', '111'), second: optionalIdentifier('type-2', '222') },
+        [],
+        { second: optionalIdentifier('type-2', '222', true) },
+      );
+      expect(result.first.preferred).toBe(false);
+      expect(result.second.preferred).toBe(true);
+    });
+
+    it('promotes the first identifier that has a value', () => {
+      const result = promoteFallbackPreferredIdentifier(
+        { empty: optionalIdentifier('type-1', ''), filled: optionalIdentifier('type-2', '222') },
+        [],
+        {},
+      );
+      expect(result.empty.preferred).toBe(false);
+      expect(result.filled.preferred).toBe(true);
+    });
+
+    it('leaves the identifiers unchanged when one is still preferred', () => {
+      const identifiers = {
+        first: optionalIdentifier('type-1', '111', true),
+        second: optionalIdentifier('type-2', '222'),
+      };
+      expect(promoteFallbackPreferredIdentifier(identifiers, mockIdentifierTypes, {})).toBe(identifiers);
+    });
+
+    it.each`
+      inEditMode | canEditIdentifiers | promotesFallback
+      ${false}   | ${false}           | ${true}
+      ${true}    | ${true}            | ${true}
+      ${true}    | ${false}           | ${false}
+    `(
+      'when the preferred row is deleted (edit mode: $inEditMode, can edit identifiers: $canEditIdentifiers), promotes a fallback: $promotesFallback',
+      async ({ inEditMode, canEditIdentifiers, promotesFallback }) => {
+        const user = userEvent.setup();
+        const setFieldValue = vi.fn();
+        const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+        mockUseConfig.mockReturnValue({
+          ...defaults,
+          fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection: true } },
+        });
+        mockUserHasAccessCheck.mockReturnValue(canEditIdentifiers);
+        const other = optionalIdentifier('type-1', '111');
+        const deleted = optionalIdentifier('type-2', '222', true);
+        renderIdentifierInput(
+          deleted,
+          'deleted',
+          {},
+          {
+            inEditMode,
+            setFieldValue,
+            values: { ...mockInitialFormValues, identifiers: { other, deleted } },
+          },
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+        // Without promotion, the backend picks the new preferred identifier when the deleted one is purged
+        expect(setFieldValue).toHaveBeenCalledWith('identifiers', { other: { ...other, preferred: promotesFallback } });
+        expect(mockUserHasAccessCheck).toHaveBeenCalledWith('Edit Patient Identifiers', undefined);
+      },
+    );
   });
 
   describe('Auto-generated identifier', () => {

@@ -1,6 +1,6 @@
 {
   "actions": "Действия",
-  "actionsMenu": "Actions menu",
+  "actionsMenu": "Действия",
   "activeQueueEntriesUnavailable": "Невозможно проверить состояние очередей пациента",
   "activeQueueEntriesUnavailableDetail": "Отражены все направления, включая очереди в которых пациент уже находится. Если вы выберите одно из них система не примет изменения при операции сохранения.",
   "addAPatientToThisList": "Добавить в список",

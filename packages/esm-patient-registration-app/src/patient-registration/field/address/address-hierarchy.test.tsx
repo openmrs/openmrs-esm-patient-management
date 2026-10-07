@@ -7,7 +7,7 @@ import { mockedAddressTemplate, mockedOrderedFields, mockOpenmrsId, mockPatient,
 import { renderWithContext } from 'tools';
 import { type AddressTemplate } from '../../patient-registration.types';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { type Resources } from '../../../offline.resources';
+import { type Resources } from '../../../registration.resource';
 import {
   PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
@@ -57,7 +57,6 @@ const initialContextValues: PatientRegistrationContextProps = {
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
-  isOffline: false,
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setFieldTouched: vi.fn(),

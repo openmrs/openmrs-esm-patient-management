@@ -29,7 +29,7 @@ import { useResourcesContext } from '../resources-context';
 import { SectionWrapper } from './section/section-wrapper.component';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
-import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import { useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt.component';
 import styles from './patient-registration.scss';
 
@@ -37,10 +37,15 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
-  isOffline: boolean;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
+  const { patientUuid } = useParams();
+
+  return <PatientRegistrationForm key={patientUuid ?? 'new-patient'} savePatientForm={savePatientForm} />;
+};
+
+const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
   const { t } = useTranslation();
   const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
@@ -48,19 +53,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const config = useConfig<RegistrationConfig>();
 
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(
-    isLoadingPatientToEdit,
-    patientToEdit,
-    uuidOfPatientToEdit,
-  );
-  const [initialAddressFieldValues] = useInitialAddressFieldValues(
-    {},
-    isLoadingPatientToEdit,
-    patientToEdit,
-    uuidOfPatientToEdit,
-  );
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientToEdit, uuidOfPatientToEdit);
 
-  const [patientUuidMap] = usePatientUuidMap({}, isLoadingPatientToEdit, patientToEdit, uuidOfPatientToEdit);
+  const [patientUuidMap] = usePatientUuidMap({}, patientToEdit, uuidOfPatientToEdit);
 
   const [target, setTarget] = useState<undefined | string>();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
@@ -90,7 +85,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.sectionDefinitions]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
-    const abortController = new AbortController();
     helpers.setSubmitting(true);
 
     const sanitizedValues = sanitizeFormValuesForSkipLogic(values, config);
@@ -103,14 +97,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         !inEditMode,
         updatedFormValues,
         patientUuidMap,
-        initialAddressFieldValues,
         capturePhotoProps,
         location,
         initialFormValues['identifiers'],
         currentSession,
         config,
         savePatientTransactionManager.current,
-        abortController,
       );
 
       showSnackbar({
@@ -189,19 +181,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setFieldTouched: formikProps.setFieldTouched,
       setCapturePhotoProps,
       currentPhoto: photo?.imageSrc,
-      isOffline,
       initialFormValues: formikProps.initialValues,
       setInitialFormValues,
     }),
-    [
-      identifierTypes,
-      validationSchema,
-      inEditMode,
-      setCapturePhotoProps,
-      photo?.imageSrc,
-      isOffline,
-      setInitialFormValues,
-    ],
+    [identifierTypes, validationSchema, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues],
   );
 
   return (

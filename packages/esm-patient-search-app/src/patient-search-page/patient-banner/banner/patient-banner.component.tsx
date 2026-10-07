@@ -44,8 +44,7 @@ const PatientBanner = React.memo(
     const layout = useLayoutType();
     const isTablet = layout === 'tablet';
     const { activeVisit } = useVisit(patientUuid, activeVisitRepresentation);
-    const { nonNavigationSelectPatientAction, hidePatientSearch, handleReturnToSearchList } =
-      usePatientSearchContext() ?? {};
+    const { nonNavigationSelectPatientAction } = usePatientSearchContext() ?? {};
     // if context2 is present, we use the new workspace v2 APIs,
     // else, default to the old ones
     const context2 = usePatientSearchContext2();
@@ -125,8 +124,6 @@ const PatientBanner = React.memo(
                   <ExtensionSlot
                     name="start-visit-button-slot"
                     state={{
-                      handleReturnToSearchList,
-                      hidePatientSearch,
                       patientUuid,
                       patient: fhirMappedPatient,
                     }}

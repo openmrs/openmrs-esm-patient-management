@@ -2,22 +2,18 @@ import {
   type FetchResponse,
   getConfig,
   openmrsFetch,
-  queueSynchronizationItem,
   restBaseUrl,
   type Session,
   type StyleguideConfigObject,
   toOmrsIsoString,
 } from '@openmrs/esm-framework';
-import { patientRegistration } from '../constants';
 import {
-  type AddressProperties,
   type AttributeValue,
   type CapturePhotoProps,
   type Encounter,
   type FormValues,
   type Patient,
   type PatientIdentifier,
-  type PatientRegistration,
   type PatientUuidMapType,
   type RelationshipValue,
 } from './patient-registration.types';
@@ -36,8 +32,6 @@ import {
   updateRelationship,
 } from './patient-registration.resource';
 import { type RegistrationConfig } from '../config-schema';
-
-type AddressFieldValues = Partial<Record<AddressProperties, string>>;
 
 function getSettledValuesOrThrow<T>(results: Array<PromiseSettledResult<T>>): Array<T> {
   const rejectedResult = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
@@ -59,68 +53,25 @@ export type SavePatientForm = (
   isNewPatient: boolean,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
-  initialAddressFieldValues: AddressFieldValues,
   capturePhotoProps: CapturePhotoProps,
   currentLocation: string,
   initialIdentifierValues: FormValues['identifiers'],
   currentUser: Session,
   config: RegistrationConfig,
   savePatientTransactionManager: SavePatientTransactionManager,
-  abortController?: AbortController,
 ) => Promise<string | void>;
 
 export class FormManager {
-  static savePatientFormOffline: SavePatientForm = async (
-    isNewPatient,
-    values,
-    patientUuidMap,
-    initialAddressFieldValues,
-    capturePhotoProps,
-    currentLocation,
-    initialIdentifierValues,
-    currentUser,
-    config,
-  ) => {
-    const syncItem: PatientRegistration = {
-      fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(isNewPatient, values, patientUuidMap, initialAddressFieldValues, [], config),
-      ),
-      _patientRegistrationData: {
-        isNewPatient,
-        formValues: values,
-        patientUuidMap,
-        initialAddressFieldValues,
-        capturePhotoProps,
-        currentLocation,
-        initialIdentifierValues,
-        currentUser,
-        config,
-        savePatientTransactionManager: new SavePatientTransactionManager(),
-      },
-    };
-
-    await queueSynchronizationItem(patientRegistration, syncItem, {
-      id: values.patientUuid,
-      displayName: 'Patient registration',
-      patientUuid: syncItem.fhirPatient.id,
-      dependencies: [],
-    });
-
-    return null;
-  };
-
   static savePatientFormOnline: SavePatientForm = async (
     isNewPatient,
     values,
     patientUuidMap,
-    initialAddressFieldValues,
     capturePhotoProps,
     currentLocation,
     initialIdentifierValues,
     currentUser,
     config,
     savePatientTransactionManager,
-    abortController,
   ) => {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
       isNewPatient,
@@ -128,6 +79,7 @@ export class FormManager {
       values.identifiers,
       initialIdentifierValues,
       currentLocation,
+      savePatientTransactionManager,
     );
 
     getSettledValuesOrThrow(
@@ -139,14 +91,7 @@ export class FormManager {
       ]),
     );
 
-    const createdPatient = FormManager.getPatientToCreate(
-      isNewPatient,
-      values,
-      patientUuidMap,
-      initialAddressFieldValues,
-      patientIdentifiers,
-      config,
-    );
+    const createdPatient = FormManager.getPatientToCreate(values, patientUuidMap, patientIdentifiers, config);
 
     const savePatientResponse = await savePatient(
       createdPatient,
@@ -244,16 +189,18 @@ export class FormManager {
     patientIdentifiers: FormValues['identifiers'], // values.identifiers
     initialIdentifierValues: FormValues['identifiers'], // Initial identifiers assigned to the patient
     location: string,
+    savePatientTransactionManager: SavePatientTransactionManager,
   ): Promise<Array<PatientIdentifier>> {
-    let identifierTypeRequests = Object.values(patientIdentifiers)
+    let identifierTypeRequests = Object.entries(patientIdentifiers)
       /* Since default identifier-types will be present on the form and are also in the not-required state,
         therefore we might be running into situations when there's no value and no source associated,
         hence filtering these fields out.
       */
       .filter(
-        ({ identifierValue, autoGeneration, selectedSource }) => identifierValue || (autoGeneration && selectedSource),
+        ([, { identifierValue, autoGeneration, selectedSource }]) =>
+          identifierValue || (autoGeneration && selectedSource),
       )
-      .map(async (patientIdentifier) => {
+      .map(([identifierFieldName, patientIdentifier]) => async () => {
         const {
           identifierTypeUuid,
           identifierValue,
@@ -267,12 +214,30 @@ export class FormManager {
         const autoGenerationManualEntry =
           autoGeneration && selectedSource?.autoGenerationOption?.manualEntryEnabled && !!identifierValue;
 
-        const identifier =
-          !autoGeneration || autoGenerationManualEntry
-            ? identifierValue
-            : await (
-                await generateIdentifier(selectedSource.uuid)
-              ).data.identifier;
+        let identifier: string;
+
+        if (!autoGeneration || autoGenerationManualEntry) {
+          identifier = identifierValue;
+        } else {
+          // Reuse the value generated by an earlier attempt of this submission so a retry
+          // does not consume another identifier from the source.
+          const generated = savePatientTransactionManager.generatedIdentifiers[identifierFieldName];
+
+          if (generated?.sourceUuid === selectedSource.uuid) {
+            identifier = generated.identifier;
+          } else {
+            identifier = (await generateIdentifier(selectedSource.uuid)).data.identifier;
+            savePatientTransactionManager.generatedIdentifiers[identifierFieldName] = {
+              sourceUuid: selectedSource.uuid,
+              identifier,
+            };
+          }
+        }
+
+        // Marking an identifier as preferred through the identifier sub-resource also clears the flag on the
+        // patient's other identifiers, so only the newly preferred identifier needs updating.
+        const initialPreferred = initialIdentifierValues?.[identifierFieldName]?.preferred;
+        const becamePreferred = !!initialValue && !!preferred && !initialPreferred;
 
         const identifierToCreate = {
           uuid: identifierUuid,
@@ -284,14 +249,30 @@ export class FormManager {
 
         if (!isNewPatient) {
           if (!initialValue) {
-            await addPatientIdentifier(patientUuid, identifierToCreate);
-          } else if (initialValue !== identifier) {
-            await updatePatientIdentifier(patientUuid, identifierUuid, identifierToCreate.identifier);
+            // Skip additions that already succeeded in an earlier attempt of this submission.
+            if (savePatientTransactionManager.addedIdentifiers[identifierFieldName] !== identifier) {
+              await addPatientIdentifier(patientUuid, identifierToCreate);
+              savePatientTransactionManager.addedIdentifiers[identifierFieldName] = identifier;
+            }
+          } else if (initialValue !== identifier || becamePreferred) {
+            await updatePatientIdentifier(
+              patientUuid,
+              identifierUuid,
+              identifierToCreate.identifier,
+              becamePreferred || undefined,
+            );
           }
         }
 
         return identifierToCreate;
       });
+
+    // Save identifiers sequentially because changing the preferred identifier can update other identifiers.
+    // Finish writes before deleting identifiers so replacements exist before their predecessors are removed.
+    const identifiers: Array<PatientIdentifier> = [];
+    for (const sendIdentifierRequest of identifierTypeRequests) {
+      identifiers.push(await sendIdentifierRequest());
+    }
 
     /*
       If there was initially an identifier assigned to the patient,
@@ -308,13 +289,7 @@ export class FormManager {
           )
       : [];
 
-    const [identifierResults, identifierDeletionResults] = await Promise.all([
-      Promise.allSettled(identifierTypeRequests),
-      Promise.allSettled(identifierDeletionRequests),
-    ]);
-
-    const identifiers = getSettledValuesOrThrow(identifierResults);
-    getSettledValuesOrThrow(identifierDeletionResults);
+    getSettledValuesOrThrow(await Promise.allSettled(identifierDeletionRequests));
     return identifiers;
   }
 
@@ -331,10 +306,8 @@ export class FormManager {
   }
 
   static getPatientToCreate(
-    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: AddressFieldValues,
     identifiers: Array<PatientIdentifier>,
     config?: RegistrationConfig,
   ): Patient {
@@ -393,9 +366,12 @@ export class FormManager {
       Object.entries(values.attributes)
         .filter(([, value]) => !!value)
         .forEach(([key, value]) => {
+          // Saved attributes of formats like Location load as `{ uuid, display }` references, but the
+          // REST API only accepts the uuid when saving them. Other values, such as booleans, are sent as loaded.
+          const loadedValue: unknown = value;
           attributes.push({
             attributeType: key,
-            value,
+            value: typeof loadedValue === 'object' ? (loadedValue as { uuid: string }).uuid : value,
           });
         });
     }
@@ -444,41 +420,21 @@ export class FormManager {
         : { causeOfDeath: deathCause, causeOfDeathNonCoded: null }),
     };
   }
-
-  static mapPatientToFhirPatient(patient: Partial<Patient>): fhir.Patient {
-    // Important:
-    // When changing this code, ideally assume that `patient` can be missing any attribute.
-    // The `fhir.Patient` provides us with the benefit that all properties are nullable and thus
-    // not required (technically, at least). -> Even if we cannot map some props here, we still
-    // provide a valid fhir.Patient object. The various patient chart modules should be able to handle
-    // such missing props correctly (and should be updated if they don't).
-
-    // Mapping inspired by:
-    // https://github.com/openmrs/openmrs-module-fhir/blob/669b3c52220bb9abc622f815f4dc0d8523687a57/api/src/main/java/org/openmrs/module/fhir/api/util/FHIRPatientUtil.java#L36
-    // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
-    // Update as required.
-    return {
-      id: patient.uuid,
-      gender: patient.person?.gender,
-      birthDate: patient.person?.birthdate,
-      deceasedBoolean: patient.person.dead,
-      deceasedDateTime: patient.person.deathDate,
-      name: patient.person?.names?.map((name) => ({
-        given: [name.givenName, name.middleName].filter(Boolean),
-        family: name.familyName,
-      })),
-      address: patient.person?.addresses.map((address) => ({
-        city: address.cityVillage,
-        country: address.country,
-        postalCode: address.postalCode,
-        state: address.stateProvince,
-        use: 'home',
-      })),
-      telecom: patient.person.attributes?.filter((attribute) => attribute.attributeType === 'Telephone Number'),
-    };
-  }
 }
 
+interface GeneratedIdentifier {
+  sourceUuid: string;
+  identifier: string;
+}
+
+/**
+ * Tracks which parts of a patient save already completed so a retry of the same submission only
+ * repeats the work that failed.
+ */
 export class SavePatientTransactionManager {
   patientSaved = false;
+  /** Auto-generated identifier values, keyed by identifier field name. */
+  generatedIdentifiers: Record<string, GeneratedIdentifier> = {};
+  /** Identifier values already added to an existing patient, keyed by identifier field name. */
+  addedIdentifiers: Record<string, string> = {};
 }

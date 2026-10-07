@@ -7,9 +7,11 @@ export type TextInputProps = React.ComponentProps<typeof TextInput>;
 
 interface InputProps extends TextInputProps {
   checkWarning?(value: string): string;
+  /** Omits the "(optional)" suffix from the label of a field that is not natively required. */
+  hideOptionalLabel?: boolean;
 }
 
-export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
+export const Input: React.FC<InputProps> = ({ checkWarning, hideOptionalLabel, ...props }) => {
   const [field, meta] = useField(props.name);
   const { t } = useTranslation();
 
@@ -44,7 +46,8 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     return undefined;
   }, [checkWarning, invalidText, value, t]);
 
-  const labelText = props.required ? props.labelText : `${props.labelText} (${t('optional', 'optional')})`;
+  const labelText =
+    props.required || hideOptionalLabel ? props.labelText : `${props.labelText} (${t('optional', 'optional')})`;
 
   return (
     <div style={{ marginBottom: '1rem' }}>

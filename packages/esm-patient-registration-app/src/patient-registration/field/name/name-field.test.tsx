@@ -48,7 +48,6 @@ const renderNameFieldWithFormik = (
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <NameField />
