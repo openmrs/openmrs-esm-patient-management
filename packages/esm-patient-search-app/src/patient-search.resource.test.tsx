@@ -25,11 +25,18 @@ const pageOfResults = (query: string) =>
     },
   } as unknown as FetchResponse);
 
+const minSearchCharactersResponse = () =>
+  Promise.resolve({
+    data: { results: [{ property: 'minSearchCharacters', value: '2' }] },
+  } as unknown as FetchResponse);
+
 describe('useInfinitePatientSearch', () => {
   beforeEach(() => {
     vi.useRealTimers();
     mockOpenmrsFetch.mockReset();
-    mockOpenmrsFetch.mockImplementation((url: string) => pageOfResults(queryOf(url)));
+    mockOpenmrsFetch.mockImplementation((url: string) =>
+      url.includes('systemsetting') ? minSearchCharactersResponse() : pageOfResults(queryOf(url)),
+    );
   });
 
   // Regression test for O3-5714: without `keepPreviousData`, a query change resets
@@ -82,6 +89,121 @@ describe('useInfinitePatientSearch', () => {
     expect(result.current.hasMore).toBe(false);
     expect(result.current.totalResults).toBe(0);
   });
+
+  it('sends no request and returns no data when the query is below the configured minimum', async () => {
+    const { result } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false, true, 10), {
+      wrapper,
+      initialProps: { q: 'J' }, // 1 character, below the mocked minimum of 2
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(mockOpenmrsFetch).not.toHaveBeenCalledWith(expect.stringContaining('/patient?'), expect.anything());
+    expect(result.current.data).toBeNull();
+    expect(result.current.totalResults).toBe(0);
+  });
+
+  it('sends a request and returns data when the query exactly meets the configured minimum', async () => {
+    const { result } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false, true, 10), {
+      wrapper,
+      initialProps: { q: 'Jo' }, // 2 characters, exactly the mocked minimum
+    });
+
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+    expect(result.current.data?.[0].uuid).toBe('Jo-0');
+  });
+
+  it('uses the configured minimum and measures the trimmed query', async () => {
+    mockOpenmrsFetch.mockImplementation((url: string) =>
+      url.includes('systemsetting')
+        ? Promise.resolve({ data: { results: [{ value: '4' }] } } as FetchResponse)
+        : pageOfResults(queryOf(url)),
+    );
+    const { result, rerender } = renderHook(({ q }) => useInfinitePatientSearch(q, false), {
+      wrapper,
+      initialProps: { q: ' Jo ' },
+    });
+
+    await waitFor(() => expect(result.current.isLoadingMinSearchCharacters).toBe(false));
+    expect(result.current.minSearchCharacters).toBe(4);
+    expect(mockOpenmrsFetch.mock.calls.some(([url]) => String(url).includes('/patient?'))).toBe(false);
+
+    rerender({ q: 'John' });
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+  });
+
+  it.each([undefined, '', 'abc', '3abc', '3.5', '-1', ' 3', '3\n'])(
+    'falls back to two characters when the setting is %j',
+    async (value) => {
+      mockOpenmrsFetch.mockImplementation((url: string) =>
+        url.includes('systemsetting')
+          ? Promise.resolve({ data: { results: value === undefined ? [] : [{ value }] } } as FetchResponse)
+          : pageOfResults(queryOf(url)),
+      );
+      const { result, rerender } = renderHook(({ q }) => useInfinitePatientSearch(q, false), {
+        wrapper,
+        initialProps: { q: 'J' },
+      });
+
+      await waitFor(() => expect(result.current.isLoadingMinSearchCharacters).toBe(false));
+      expect(result.current.minSearchCharacters).toBe(2);
+      expect(mockOpenmrsFetch.mock.calls.some(([url]) => String(url).includes('/patient?'))).toBe(false);
+
+      rerender({ q: 'Jo' });
+      await waitFor(() => expect(result.current.data).toHaveLength(10));
+    },
+  );
+
+  it('uses the default minimum when fetching the setting fails', async () => {
+    mockOpenmrsFetch.mockImplementation((url: string) =>
+      url.includes('systemsetting') ? Promise.reject(new Error('Setting unavailable')) : pageOfResults(queryOf(url)),
+    );
+
+    const { result } = renderHook(() => useInfinitePatientSearch('Jo', false), { wrapper });
+
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+    expect(result.current.minSearchCharacters).toBe(2);
+  });
+
+  it('waits for the minimum character setting to finish loading before sending any request', async () => {
+    // The setting request never resolves, simulating it still being in flight.
+    mockOpenmrsFetch.mockImplementation((url: string) =>
+      url.includes('systemsetting') ? new Promise(() => {}) : pageOfResults(queryOf(url)),
+    );
+
+    const { result } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false, true, 10), {
+      wrapper,
+      initialProps: { q: 'Joseph' }, // well above any plausible minimum
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(mockOpenmrsFetch).not.toHaveBeenCalledWith(expect.stringContaining('/patient?'), expect.anything());
+    expect(result.current.data).toBeNull();
+  });
+
+  it('hides previous results and stops further requests once the query is shortened below the minimum', async () => {
+    const { result, rerender } = renderHook(({ q }: { q: string }) => useInfinitePatientSearch(q, false, true, 10), {
+      wrapper,
+      initialProps: { q: 'Jo' },
+    });
+
+    await waitFor(() => expect(result.current.data).toHaveLength(10));
+
+    mockOpenmrsFetch.mockClear();
+    rerender({ q: 'J' }); // shortened back down to 1 character, below the mocked minimum of 2
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(mockOpenmrsFetch).not.toHaveBeenCalledWith(expect.stringContaining('/patient?'), expect.anything());
+    expect(result.current.data).toBeNull();
+  });
 });
 
 // `revalidateFirstPage: false` stops SWR from ever re-fetching a page it already holds, and SWR has
@@ -98,6 +220,12 @@ describe('useInfinitePatientSearch page 1 revalidation', () => {
   /** Serves `total` patients in pages of 10, so page boundaries and `hasMore` behave realistically. */
   const respondWith = (total: number) =>
     mockOpenmrsFetch.mockImplementation((url: string) => {
+      if (url.includes('systemsetting')) {
+        return Promise.resolve({
+          data: { results: [{ property: 'minSearchCharacters', value: '2' }] },
+        } as unknown as FetchResponse);
+      }
+
       requestedUrls.push(url);
       const params = new URL(url, 'http://localhost').searchParams;
       const startIndex = Number(params.get('startIndex') ?? 0);
@@ -361,6 +489,12 @@ describe('useInfinitePatientSearch parallel paging', () => {
   /** Serves `total` patients in pages of 10, resolving after a tick so overlap is observable. */
   const respondWith = (total: number) =>
     mockOpenmrsFetch.mockImplementation(async (url: string) => {
+      if (url.includes('systemsetting')) {
+        return Promise.resolve({
+          data: { results: [{ property: 'minSearchCharacters', value: '2' }] },
+        } as unknown as FetchResponse);
+      }
+
       requestedUrls.push(url);
       inFlight++;
       maxInFlight = Math.max(maxInFlight, inFlight);

@@ -1,0 +1,16 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.longestWaitPatient {
+  @include type.type-style('label-01');
+  display: block;
+  color: $text-02;
+}
+
+// Inset to match the table, which pads its container by the same amount.
+.emptyState,
+.errorState,
+.tableSkeleton {
+  margin: 0 layout.$spacing-05;
+}

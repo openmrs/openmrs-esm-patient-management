@@ -1,30 +1,61 @@
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, QUEUE_ENTRY_ALREADY_ENDED_ERROR } from '../constants';
 
+const MAX_PLAIN_TEXT_ERROR_LENGTH = 500;
+
+// `openmrsFetch` sets `responseBody` to the raw response text when it isn't JSON. Some endpoints
+// (e.g. `queueutil/assignticket`) send plain-text error messages, but proxy error pages also arrive
+// this way, so markup and overly long bodies are ignored.
+function getPlainTextResponseBody(responseBody: unknown): string {
+  if (typeof responseBody !== 'string') {
+    return '';
+  }
+
+  const text = responseBody.trim();
+  if (!text || text.length > MAX_PLAIN_TEXT_ERROR_LENGTH || /<[a-z!/?][^>]*>/i.test(text)) {
+    return '';
+  }
+
+  return text;
+}
+
 export function getErrorMessage(error: unknown): string {
   const err = error as {
-    responseBody?: {
-      error?: {
-        rawMessage?: string;
-        translatedMessage?: string;
-        message?: string;
-      };
-    };
+    responseBody?:
+      | string
+      | {
+          error?: {
+            rawMessage?: string;
+            translatedMessage?: string;
+            message?: string;
+            globalErrors?: Array<{ message?: string }>;
+          };
+        };
     message?: string;
   };
+  const responseBody = typeof err?.responseBody === 'object' ? err.responseBody : undefined;
 
   return (
-    err?.responseBody?.error?.rawMessage ||
-    err?.responseBody?.error?.translatedMessage ||
-    err?.responseBody?.error?.message ||
+    responseBody?.error?.rawMessage ||
+    responseBody?.error?.translatedMessage ||
+    responseBody?.error?.globalErrors?.[0]?.message ||
+    responseBody?.error?.message ||
+    getPlainTextResponseBody(err?.responseBody) ||
     err?.message ||
     ''
   );
 }
 
+// Validation failures carry a generic "Invalid Submission" message, with the code identifying the
+// actual problem in `globalErrors`.
+function getGlobalErrorCodes(error: unknown): Array<string> {
+  const err = error as { responseBody?: { error?: { globalErrors?: Array<{ code?: string }> } } };
+  return (err?.responseBody?.error?.globalErrors ?? []).map((globalError) => globalError.code).filter(Boolean);
+}
+
 // Note: Detection relies on matching a substring from the backend's IllegalStateException
 // message ("Cannot transition a queue entry that has already ended") because the REST
 // response does not include a structured error code for this case — unlike duplicate
-// entry errors which use a bracketed code. If the backend message changes, this will
+// entry errors, which report one in `globalErrors`. If the backend message changes, this will
 // silently fall through to the generic error handler, which is an acceptable degradation.
 // See: https://github.com/openmrs/openmrs-module-queue/blob/1a82392a444d/api/src/main/java/org/openmrs/module/queue/api/impl/QueueEntryServiceImpl.java#L117
 export function isAlreadyEndedQueueEntryError(error: unknown): boolean {
@@ -32,5 +63,5 @@ export function isAlreadyEndedQueueEntryError(error: unknown): boolean {
 }
 
 export function isDuplicateQueueEntryError(error: unknown): boolean {
-  return getErrorMessage(error).includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
+  return getGlobalErrorCodes(error).includes(DUPLICATE_QUEUE_ENTRY_ERROR_CODE);
 }

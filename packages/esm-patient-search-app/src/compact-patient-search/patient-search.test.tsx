@@ -27,7 +27,9 @@ const defaultProps = {
   fetchError: null,
   hasMore: false,
   isLoading: false,
+  isLoadingMinSearchCharacters: false,
   isValidating: false,
+  minSearchCharacters: 3,
   setPage: vi.fn(),
   totalResults: 1,
   query: 'John',
@@ -36,7 +38,9 @@ const defaultProps = {
 const mockUseConfig = vi.mocked(useConfig);
 
 describe('PatientSearch', () => {
-  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+  });
 
   it('renders a loading state when search results are being fetched', () => {
     renderPatientSearch({
@@ -45,6 +49,19 @@ describe('PatientSearch', () => {
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('renders a loading state while the minimum character setting is still loading', () => {
+    renderPatientSearch({
+      isLoading: false,
+      isLoadingMinSearchCharacters: true,
+      data: [],
+      query: 'Jo',
+    });
+
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.queryByText(/please enter at least/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/no patient charts were found/i)).not.toBeInTheDocument();
   });
 
   it('keeps showing existing results (no skeleton) while a new query is loading', () => {
@@ -81,6 +98,17 @@ describe('PatientSearch', () => {
     expect(screen.getByText(/no patient charts were found/i)).toBeInTheDocument();
     expect(screen.getByText(/try to search again using the patient's unique ID number/i)).toBeInTheDocument();
     expect(screen.queryByText(/recent search result/i)).not.toBeInTheDocument();
+  });
+
+  it('renders a message telling the user to enter more characters when the query is too short', () => {
+    renderPatientSearch({
+      isLoading: false,
+      data: [],
+      query: 'Jo',
+    });
+
+    expect(screen.getByText(/please enter at least 3 characters to search/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no patient charts were found/i)).not.toBeInTheDocument();
   });
 
   it('renders an error state when search results fail to fetch', () => {

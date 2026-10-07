@@ -1,7 +1,7 @@
 import { type APIRequestContext, type Page, test as base } from '@playwright/test';
 import { api, emrConfiguration } from '../fixtures';
 import { type Patient } from '../commands/types';
-import { generateRandomPatient, deletePatient } from '../commands';
+import { changeToWardLocation, generateRandomPatient, deletePatient } from '../commands';
 import type { EmrApiConfigurationResponse } from '../../packages/esm-ward-app/src/hooks/useEmrConfiguration';
 
 // This file sets up our custom test harness using the custom fixtures.
@@ -31,4 +31,17 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     },
     { scope: 'test', auto: true },
   ],
+});
+
+// Ward specs use their own server session, logged in at the ward location, so a location change in one spec
+// cannot reach the shared session that the other specs use.
+export const wardTest = test.extend({
+  // eslint-disable-next-line no-empty-pattern
+  storageState: async ({}, use) => {
+    await use({ cookies: [], origins: [] });
+  },
+  page: async ({ page }, use) => {
+    await changeToWardLocation(page);
+    await use(page);
+  },
 });

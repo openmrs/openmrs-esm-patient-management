@@ -1,37 +1,49 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Layer, SkeletonPlaceholder, Tag, Tile } from '@carbon/react';
-import {
-  age,
-  ConfigurableLink,
-  EmptyCardIllustration,
-  ErrorState,
-  getCoreTranslation,
-  PatientPhoto,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { Button, Layer, OverflowMenu, SkeletonPlaceholder, Tag } from '@carbon/react';
+import { age, ConfigurableLink, ErrorState, getCoreTranslation, PatientPhoto, useConfig } from '@openmrs/esm-framework';
+import EmptyState from '../empty-state/empty-state.component';
 import QueuePriority from '../queue-table/components/queue-priority.component';
+import { useActionOverflowMenuItems } from '../queue-table/cells/queue-table-action-cell.component';
+import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useServiceQueuesStore } from '../store/store';
-import { type ConfigObject } from '../config-schema';
+import { type ConfigObject, type QueueEntryAction } from '../config-schema';
 import { type QueueEntry } from '../types';
 import styles from './attending-patients.scss';
 
 const collapsedCardCount = 3;
+const cardActions: QueueEntryAction[] = ['move', 'edit', 'remove', 'undo'];
+
+interface AttendingPatientsProps {
+  /** Scope to a single queue. Without it, the selected location and service are used. */
+  queueUuid?: string;
+}
 
 // Renders patients currently being attended (queue entries with an "In Service" status) as cards.
-const AttendingPatients: React.FC = () => {
+const AttendingPatients: React.FC<AttendingPatientsProps> = ({ queueUuid }) => {
   const { t } = useTranslation();
   const {
     concepts: { defaultTransitionStatus },
   } = useConfig<ConfigObject>();
   const { selectedServiceUuid, selectedQueueLocationUuid } = useServiceQueuesStore();
-  const { queueEntries, isLoading, error } = useQueueEntries({
-    service: selectedServiceUuid,
-    location: selectedQueueLocationUuid,
-    status: defaultTransitionStatus,
-    isEnded: false,
-  });
+  const { concept: inServiceStatus } = useConcept(defaultTransitionStatus);
+  const heading = inServiceStatus?.display ?? t('inService', 'In Service');
+
+  const searchCriteria = useMemo(
+    () =>
+      queueUuid
+        ? { queue: queueUuid, status: defaultTransitionStatus, isEnded: false }
+        : {
+            service: selectedServiceUuid,
+            location: selectedQueueLocationUuid,
+            status: defaultTransitionStatus,
+            isEnded: false,
+          },
+    [queueUuid, selectedServiceUuid, selectedQueueLocationUuid, defaultTransitionStatus],
+  );
+
+  const { queueEntries, isLoading, error } = useQueueEntries(searchCriteria);
   const [showAll, setShowAll] = useState(false);
 
   const visibleEntries = showAll ? queueEntries : queueEntries.slice(0, collapsedCardCount);
@@ -39,7 +51,7 @@ const AttendingPatients: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h4 className={styles.heading}>{t('attending', 'Attending')}</h4>
+        <h4 className={styles.heading}>{heading}</h4>
         {!isLoading && !error && <Tag type="gray">{queueEntries.length}</Tag>}
         {queueEntries.length > collapsedCardCount && (
           <Button
@@ -58,15 +70,10 @@ const AttendingPatients: React.FC = () => {
           ))}
         </div>
       ) : error ? (
-        <ErrorState error={error} headerTitle={t('attending', 'Attending')} />
+        <ErrorState error={error} headerTitle={heading} />
       ) : queueEntries.length === 0 ? (
         <Layer role="status">
-          <Tile className={styles.emptyState}>
-            <EmptyCardIllustration />
-            <p className={styles.emptyStateContent}>
-              {t('noOneBeingAttended', 'No patients are currently being attended to')}
-            </p>
-          </Tile>
+          <EmptyState displayText={t('noOneBeingAttended', 'No patients are currently being attended to')} />
         </Layer>
       ) : (
         <div className={styles.cards}>
@@ -80,8 +87,10 @@ const AttendingPatients: React.FC = () => {
 };
 
 function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
+  const { t } = useTranslation();
   const { customPatientChartUrl, priorityConfigs } = useConfig<ConfigObject>();
   const { person } = queueEntry.patient;
+  const actionItems = useActionOverflowMenuItems(cardActions, queueEntry);
 
   const demographics = [
     person?.gender ? getGenderLabel(person.gender) : null,
@@ -90,18 +99,21 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
     .filter(Boolean)
     .join(' · ');
 
+  // The service row sits below the link, so the card's bottom bar and its menu are outside the chart link's hitbox.
   return (
-    <ConfigurableLink
-      className={styles.card}
-      to={customPatientChartUrl}
-      templateParams={{ patientUuid: queueEntry.patient.uuid }}>
-      <div className={styles.patient}>
-        <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
-        <div className={styles.details}>
-          <span className={styles.name}>{person?.display}</span>
-          <p className={styles.demographics}>{demographics}</p>
+    <div className={styles.card}>
+      <ConfigurableLink
+        className={styles.cardLink}
+        to={customPatientChartUrl}
+        templateParams={{ patientUuid: queueEntry.patient.uuid }}>
+        <div className={styles.patient}>
+          <PatientPhoto patientUuid={queueEntry.patient.uuid} patientName={person?.display ?? ''} />
+          <div className={styles.details}>
+            <span className={styles.name}>{person?.display}</span>
+            <p className={styles.demographics}>{demographics}</p>
+          </div>
         </div>
-      </div>
+      </ConfigurableLink>
       <div className={styles.serviceRow}>
         <span className={styles.service}>{queueEntry.queue?.display}</span>
         <QueuePriority
@@ -109,8 +121,11 @@ function AttendingPatientCard({ queueEntry }: { queueEntry: QueueEntry }) {
           priorityComment={queueEntry.priorityComment ?? undefined}
           priorityConfigs={priorityConfigs}
         />
+        <OverflowMenu iconDescription={t('actionsMenu', 'Actions menu')} flipped size="sm">
+          {actionItems}
+        </OverflowMenu>
       </div>
-    </ConfigurableLink>
+    </div>
   );
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import classNames from 'classnames';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -47,11 +47,13 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     }
   }, []);
 
+  const { mutate } = useSWRConfig();
+
   const mutateCohortMembers = useCallback(() => {
     const key = `${restBaseUrl}/cohortm/cohortmember?patient=${patientUuid}&v=custom:(uuid,patient:ref,cohort:(uuid,name,startDate,endDate))`;
 
     return mutate((k) => typeof k === 'string' && k === key);
-  }, [patientUuid]);
+  }, [mutate, patientUuid]);
 
   const handleSubmit = useCallback(() => {
     setIsSubmitting(true);

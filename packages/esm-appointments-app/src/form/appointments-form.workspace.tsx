@@ -203,7 +203,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
   const defaultStartDate = appointment?.startDateTime
     ? new Date(appointment?.startDateTime)
     : selectedDate
-      ? new Date(selectedDate)
+      ? dayjs(selectedDate).toDate()
       : new Date();
   const defaultEndDate = recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
   const defaultEndDateText = recurringPattern?.endDate

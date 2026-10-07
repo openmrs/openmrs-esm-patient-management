@@ -4,15 +4,22 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
+import { useConcept } from '../hooks/useConcept';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import { type QueueEntry } from '../types';
+import type { Concept, QueueEntry } from '../types';
 import AttendingPatients from './attending-patients.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseQueueEntries = vi.mocked(useQueueEntries);
+const mockUseConcept = vi.mocked(useConcept);
 
 vi.mock('../hooks/useQueueEntries', () => ({
   useQueueEntries: vi.fn(),
+  useMutateQueueEntries: () => ({ mutateQueueEntries: vi.fn() }),
+}));
+
+vi.mock('../hooks/useConcept', () => ({
+  useConcept: vi.fn(),
 }));
 
 const queueEntry = {
@@ -56,6 +63,22 @@ describe('AttendingPatients', () => {
       ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
       customPatientChartUrl: 'someUrl',
     });
+    mockUseConcept.mockReturnValue({ concept: undefined, error: undefined, isLoading: true });
+  });
+
+  it('titles the section with the configured in-service status, as the metrics tile does', () => {
+    mockEntries([]);
+    const { concepts } = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
+    mockUseConcept.mockReturnValue({
+      concept: { uuid: concepts.defaultTransitionStatus, display: 'Being seen' } as Concept,
+      error: undefined,
+      isLoading: false,
+    });
+
+    render(<AttendingPatients />);
+
+    expect(mockUseConcept).toHaveBeenCalledWith(concepts.defaultTransitionStatus);
+    expect(screen.getByRole('heading', { name: 'Being seen' })).toBeInTheDocument();
   });
 
   it('renders a card per in-service patient with a translated gender, their age and their queue', () => {
@@ -73,7 +96,8 @@ describe('AttendingPatients', () => {
     mockEntries([]);
     render(<AttendingPatients />);
 
-    expect(screen.getByText('Attending')).toBeInTheDocument();
+    // Falls back to the default label until the status concept has loaded.
+    expect(screen.getByRole('heading', { name: 'In Service' })).toBeInTheDocument();
     expect(screen.getByText('No patients are currently being attended to')).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveClass('cds--layer-two');
   });
@@ -101,6 +125,44 @@ describe('AttendingPatients', () => {
 
     await user.click(screen.getByRole('button', { name: 'Show less' }));
     expect(screen.queryByText('Patient 3')).not.toBeInTheDocument();
+  });
+
+  it('uses the queue when given rather than the selected location and service', () => {
+    mockEntries([queueEntry]);
+    const { concepts } = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
+
+    render(<AttendingPatients queueUuid="q1" />);
+
+    expect(mockUseQueueEntries).toHaveBeenCalledWith({
+      queue: 'q1',
+      status: concepts.defaultTransitionStatus,
+      isEnded: false,
+    });
+  });
+
+  it('offers the queue entry actions from a menu in the queue row, which sits outside the patient chart link', async () => {
+    const user = userEvent.setup();
+    mockEntries([{ ...queueEntry, previousQueueEntry: { uuid: 'qe-0' } } as unknown as QueueEntry]);
+    render(<AttendingPatients />);
+
+    const menuButton = screen.getByRole('button', { name: 'Actions menu' });
+    const link = screen.getByRole('link');
+    expect(link).not.toContainElement(menuButton);
+    expect(link).not.toHaveTextContent('Outpatient Triage');
+
+    await user.click(menuButton);
+    // Carbon leaves the opened menu `visibility: hidden` under jsdom, so read the items' text directly.
+    const items = screen.getAllByRole('menuitem', { hidden: true });
+    expect(items.map((item) => item.textContent)).toEqual(['Move', 'Edit', 'Remove patient', 'Undo transition']);
+
+    // Arrow keys move between the items, and wrap from the last one back to the first.
+    const [move, edit, , undo] = items;
+    move.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(edit).toHaveFocus();
+    undo.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(move).toHaveFocus();
   });
 
   it('does not offer "View all" when everything already fits', () => {

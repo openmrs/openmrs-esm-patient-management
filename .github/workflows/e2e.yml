@@ -9,23 +9,18 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  TURBO_API: 'http://127.0.0.1:9080'
-  TURBO_TOKEN: 'turbo-token'
-  TURBO_TEAM: ${{ github.repository_owner }}
-
 jobs:
   run_e2e_tests:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: 📋 Copy test environment variables
         run: cp example.env .env
 
       - name: 🛠️ Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '22.x'
           cache: 'yarn'
@@ -37,10 +32,9 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: 🚀 Setup local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v4
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+        # Actions-cache backed: entries written by a pull_request run are scoped to that
+        # PR's merge ref, so a PR cannot plant an entry a build on main would restore.
+        uses: rharkor/caching-for-turbo@2238fae6eb9a9936f92356f54cb3660200d105e7 # v2.5.1
 
       - name: 🏗️ Build apps
         run: yarn turbo run build --color --concurrency=5
@@ -59,7 +53,7 @@ jobs:
         run: docker stop $(docker ps -a -q)
 
       - name: 📤 Upload Report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: playwright-report

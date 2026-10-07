@@ -149,7 +149,7 @@ const ConceptAttributeField: React.FC<ConceptAttributeFieldProps> = ({
           items={items}
           itemToString={(item: OpenmrsResource) => item?.display}
           selectedItem={items.sort((a, b) => a.display.localeCompare(b.display)).find((item) => item.uuid === value)}
-          onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
+          onChange={({ selectedItem }) => onChange(selectedItem?.uuid ?? '')}
           placeholder={t('selectOption', 'Select an option')}
           size={isTablet ? 'lg' : 'md'}
         />
@@ -210,7 +210,7 @@ const LocationAttributeField: React.FC<LocationAttributeFieldProps> = ({
             titleText={t(attributeDisplay)}
             items={locationOptions}
             selectedItem={locationOptions.find((option) => option.value === value)}
-            onChange={({ selectedItem }) => onChange(selectedItem?.value)}
+            onChange={({ selectedItem }) => onChange(selectedItem?.value ?? '')}
             onInputChange={(inputValue) => {
               if (inputValue && !locationOptions.find(({ label }) => label === inputValue)) {
                 setSearchQuery(inputValue);

@@ -184,7 +184,6 @@ const renderObsFieldWithFormik = (
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <ObsField fieldDefinition={fieldDefinition} />

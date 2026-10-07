@@ -4,6 +4,9 @@
 
 .container {
   flex-grow: 1;
+  // Without this the card cannot shrink below its widest line, so a long value such as
+  // "1 day, 1 hour, 56 minutes" pushes the whole metrics strip wide instead of wrapping.
+  min-width: 0;
 }
 
 /* Tablet viewport */
@@ -25,12 +28,14 @@
 }
 
 .headerLabel {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('body-compact-02');
   color: $text-02;
 }
 
 .valueLabel {
-  font-size: x-large;
+  @include type.type-style('heading-03');
+  display: block;
+  overflow-wrap: break-word;
 }
 
 .headerLabelContainer {

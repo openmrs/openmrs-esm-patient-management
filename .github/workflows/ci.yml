@@ -2,13 +2,24 @@ name: OpenMRS CI
 
 on:
   workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release version bump'
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      custom_version:
+        description: 'Custom version (e.g. 12.5.0). If set, overrides the version bump above.'
+        required: false
+      publish_only:
+        description: 'Re-Publish only (For recovering from a failed npm publish. Skips the version bump, commit, and tag. Set "Custom version" to the existing release version, e.g. 12.4.0.)'
+        type: boolean
+        default: false
+        required: false
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  release:
-    types:
-      - created
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -22,11 +33,13 @@ jobs:
       verify_command: yarn verify
 
   release:
-    if: github.event_name != 'workflow_dispatch'
     needs: build
     uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/release-frontend-module.yml@main
     with:
       support_patch_branches: true
+      release_type: ${{ inputs.release_type }}
+      release_version: ${{ inputs.custom_version }}
+      publish_only: ${{ inputs.publish_only || false }}
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       BOT_PAT: ${{ secrets.OMRS_BOT_GH_TOKEN }}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../../../config-schema';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { useResourcesContext } from '../../../resources-context';
 import type {
@@ -61,12 +62,16 @@ export function deleteIdentifierType(identifiers: FormValues['identifiers'], ide
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useResourcesContext();
   const isLoading = !identifierTypes?.length;
-  const { values, setFieldValue, initialFormValues, isOffline } = usePatientRegistrationContext();
+  const { values, setFieldValue, initialFormValues } = usePatientRegistrationContext();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
-  const config = useConfig();
+  const config = useConfig<RegistrationConfig>();
   const { defaultPatientIdentifierTypes } = config;
+  // The Preferred option takes up room next to each identifier, so give long identifiers the full width
+  const sectionClassName = config.fieldConfigurations?.identifier?.allowPreferredSelection
+    ? undefined
+    : styles.halfWidthInDesktopView;
 
   useEffect(() => {
     if (identifierTypes) {
@@ -107,9 +112,9 @@ export const Identifiers: React.FC = () => {
     [setShowIdentifierOverlay],
   );
 
-  if (isLoading && !isOffline) {
+  if (isLoading) {
     return (
-      <div className={styles.halfWidthInDesktopView}>
+      <div className={sectionClassName} data-testid="identifiers-section">
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
         </div>
@@ -121,7 +126,7 @@ export const Identifiers: React.FC = () => {
   }
 
   return (
-    <div className={styles.halfWidthInDesktopView}>
+    <div className={sectionClassName} data-testid="identifiers-section">
       <UserHasAccess privilege={['Get Identifier Types', 'Add Patient Identifiers']}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>

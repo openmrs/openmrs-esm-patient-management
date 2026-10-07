@@ -73,7 +73,9 @@ export interface PatientSearchResponse {
   fetchError: Error;
   hasMore: boolean;
   isLoading: boolean;
+  isLoadingMinSearchCharacters?: boolean;
   isValidating: boolean;
+  minSearchCharacters?: number;
   setPage: (page: number | ((_page: number) => number)) => Promise<unknown[] | undefined>;
   /** The number of results for the query that `data` belongs to. Use this to describe `data`. */
   totalResults: number;

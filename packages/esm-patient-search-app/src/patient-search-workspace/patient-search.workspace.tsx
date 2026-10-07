@@ -6,23 +6,16 @@ import PatientSearchBar from '../patient-search-bar/patient-search-bar.component
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
 export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
-  handleSearchTermUpdated?: (value: string) => void;
-  hidePatientSearch?: () => void;
   initialQuery?: string;
-  showPatientSearch?: () => void;
 }
 
 /**
- * The workspace allows other apps to include patient search functionality.
+ * Renders the patient search bar and results inside PatientSearchOverlay.
  */
 const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
-  handleReturnToSearchList,
-  handleSearchTermUpdated,
-  hidePatientSearch,
   initialQuery,
   nonNavigationSelectPatientAction,
   patientClickSideEffect,
-  showPatientSearch,
 }) => {
   const {
     search: { disableTabletSearchOnKeyUp },
@@ -33,29 +26,16 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
-  const onSearchTermChange = useCallback(
-    (value: string) => {
-      setSearchTerm(value);
-      void (handleSearchTermUpdated && handleSearchTermUpdated(value));
-    },
-    [handleSearchTermUpdated],
-  );
+  const onSearchTermChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
 
-  const contextValue = useMemo(
+  const contextValue: PatientSearchContextProps = useMemo(
     () => ({
-      handleReturnToSearchList,
-      hidePatientSearch,
       nonNavigationSelectPatientAction,
       patientClickSideEffect,
-      showPatientSearch,
     }),
-    [
-      handleReturnToSearchList,
-      hidePatientSearch,
-      nonNavigationSelectPatientAction,
-      patientClickSideEffect,
-      showPatientSearch,
-    ],
+    [nonNavigationSelectPatientAction, patientClickSideEffect],
   );
 
   return (
