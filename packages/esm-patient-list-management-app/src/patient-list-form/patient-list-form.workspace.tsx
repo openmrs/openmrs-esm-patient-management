@@ -122,7 +122,9 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
           ? typeof error.responseBody === 'string'
             ? error.responseBody
             : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
-          : (error as any)?.message;
+          : error instanceof Error
+            ? error.message
+            : undefined;
 
       showSnackbar({
         title: patientListDetails
