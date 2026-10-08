@@ -105,3 +105,15 @@ describe('esmPatientRegistrationSchema registrationObs.encounterTypeUuid validat
     });
   });
 });
+
+describe('esmPatientRegistrationSchema fieldDefinitions type validator', () => {
+  const [validateType] = esmPatientRegistrationSchema.fieldDefinitions._elements.type._validators;
+
+  it.each(['person attribute', 'obs', 'text'])('accepts %s', (type) => {
+    expect(validateType(type)).toBeUndefined();
+  });
+
+  it('rejects an unknown type', () => {
+    expect(validateType('textarea')).toMatch(/one of/i);
+  });
+});

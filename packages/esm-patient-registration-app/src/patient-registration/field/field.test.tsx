@@ -2,6 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
@@ -297,6 +298,52 @@ describe('Field', () => {
       mockResourcesContextValue,
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
+  });
+
+  it('should render the label of a text field and no input', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'I consent to being a part of the study.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('I consent to being a part of the study.')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('should translate the label of a text field under its id suffixed with Text', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'I consent to being a part of the study.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+    const translate = vi
+      .spyOn(useTranslation(), 't')
+      .mockImplementation((key: string) => (key === 'studyConsentStatementText' ? 'Ninakubali' : key));
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('Ninakubali')).toBeInTheDocument();
+    translate.mockRestore();
+  });
+
+  it('should keep the line breaks of a text field label', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'First paragraph.\nSecond paragraph.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('First paragraph.\nSecond paragraph.', { normalizer: (text) => text })).toHaveClass(
+      'textField',
+    );
   });
 
   it.each([

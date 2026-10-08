@@ -164,8 +164,9 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _description: "How this field's data will be stored—a person attribute or an obs.",
-        _validators: [validators.oneOf(['person attribute', 'obs'])],
+        _description:
+          "How this field's data will be stored—a person attribute or an obs. A field of type `text` stores nothing and displays its `label`, such as a consent statement.",
+        _validators: [validators.oneOf(['person attribute', 'obs', 'text'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -179,7 +180,8 @@ export const esmPatientRegistrationSchema = {
       label: {
         _type: Type.String,
         _default: '',
-        _description: 'The label of the input. By default, uses the metadata `display` attribute.',
+        _description:
+          'The label of the input. By default, uses the metadata `display` attribute. For a field of type `text`, the text to display, translatable under the key `<id>Text`, e.g. `studyConsentStatementText`.',
       },
       placeholder: {
         _type: Type.String,
