@@ -314,7 +314,7 @@ describe('Field', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
-  it('should translate the label of a text field under its id', () => {
+  it('should translate the label of a text field under its id suffixed with Text', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldDefinitions: [
@@ -323,12 +323,27 @@ describe('Field', () => {
     });
     const translate = vi
       .spyOn(useTranslation(), 't')
-      .mockImplementation((key: string) => (key === 'studyConsentStatement' ? 'Ninakubali' : key));
+      .mockImplementation((key: string) => (key === 'studyConsentStatementText' ? 'Ninakubali' : key));
 
     render(<Field name="studyConsentStatement" />);
 
     expect(screen.getByText('Ninakubali')).toBeInTheDocument();
     translate.mockRestore();
+  });
+
+  it('should keep the line breaks of a text field label', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'First paragraph.\nSecond paragraph.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('First paragraph.\nSecond paragraph.', { normalizer: (text) => text })).toHaveClass(
+      'textField',
+    );
   });
 
   it.each([

@@ -181,7 +181,7 @@ export const esmPatientRegistrationSchema = {
         _type: Type.String,
         _default: '',
         _description:
-          'The label of the input. By default, uses the metadata `display` attribute. For a field of type `text`, the text to display, translatable under the field `id`.',
+          'The label of the input. By default, uses the metadata `display` attribute. For a field of type `text`, the text to display, translatable under the key `<id>Text`, e.g. `studyConsentStatementText`.',
       },
       placeholder: {
         _type: Type.String,

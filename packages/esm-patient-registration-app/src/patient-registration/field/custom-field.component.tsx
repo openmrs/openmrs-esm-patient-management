@@ -21,7 +21,7 @@ export function CustomField({ name }: CustomFieldProps) {
   } else if (fieldDefinition.type === 'obs') {
     return <ObsField fieldDefinition={fieldDefinition} />;
   } else if (fieldDefinition.type === 'text') {
-    return <p className={styles.textField}>{t(fieldDefinition.id, fieldDefinition.label)}</p>;
+    return <p className={styles.textField}>{t(`${fieldDefinition.id}Text`, fieldDefinition.label)}</p>;
   } else if (fieldDefinition.type === 'address') {
     return <AddressField fieldDefinition={fieldDefinition} />;
   } else {
