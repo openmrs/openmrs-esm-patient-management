@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { AddressField } from './address/custom-address-field.component';
 import { ObsField } from './obs/obs-field.component';
@@ -11,6 +12,7 @@ export interface CustomFieldProps {
 }
 
 export function CustomField({ name }: CustomFieldProps) {
+  const { t } = useTranslation();
   const config = useConfig<RegistrationConfig>();
   const fieldDefinition = config.fieldDefinitions.filter((def) => def.id === name)[0];
 
@@ -19,7 +21,7 @@ export function CustomField({ name }: CustomFieldProps) {
   } else if (fieldDefinition.type === 'obs') {
     return <ObsField fieldDefinition={fieldDefinition} />;
   } else if (fieldDefinition.type === 'text') {
-    return <p className={styles.textField}>{fieldDefinition.label}</p>;
+    return <p className={styles.textField}>{t(fieldDefinition.id, fieldDefinition.label)}</p>;
   } else if (fieldDefinition.type === 'address') {
     return <AddressField fieldDefinition={fieldDefinition} />;
   } else {
