@@ -13,6 +13,12 @@ interface BedForm {
   uuid?: string;
 }
 
+export function deleteBed(bedUuid: string, reason: string): Promise<FetchResponse> {
+  return openmrsFetch(`${restBaseUrl}/bed/${encodeURIComponent(bedUuid)}?reason=${encodeURIComponent(reason)}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): Promise<FetchResponse<BedForm>> {
   const response = await openmrsFetch(`${restBaseUrl}/bed`, {
     method: 'POST',
