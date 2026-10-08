@@ -313,6 +313,44 @@ describe('Field', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
+  it.each([
+    [false, true],
+    [true, false],
+  ])(
+    'limits the Identifiers section to half width on desktop: %s preferred selection -> %s',
+    (allowPreferredSelection, isHalfWidth) => {
+      const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+      mockUseConfig.mockReturnValue({
+        ...defaults,
+        fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection } },
+      });
+
+      renderWithContext(
+        <Formik initialValues={{}} onSubmit={vi.fn()}>
+          <Form>
+            <PatientRegistrationContextProvider
+              value={{
+                ...initialContextValues,
+                initialFormValues: { identifiers: {} } as FormValues,
+                values: { identifiers: {} } as FormValues,
+              }}>
+              <Field name="id" />
+            </PatientRegistrationContextProvider>
+          </Form>
+        </Formik>,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      const section = screen.getByTestId('identifiers-section');
+      if (isHalfWidth) {
+        expect(section).toHaveClass('halfWidthInDesktopView');
+      } else {
+        expect(section).not.toHaveClass('halfWidthInDesktopView');
+      }
+    },
+  );
+
   it('should return null and report an error for an invalid field name', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 

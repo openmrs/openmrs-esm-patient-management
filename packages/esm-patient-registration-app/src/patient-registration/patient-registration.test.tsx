@@ -8,7 +8,7 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { useParams } from 'react-router-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -283,6 +283,40 @@ const fillRequiredFields = async () => {
   await user.click(genderInput);
 };
 
+const renderWithOptionalPreferredSsn = (savePatientForm: SavePatientForm = vi.fn()) => {
+  const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+  mockUseConfig.mockReturnValue({
+    ...defaultConfig,
+    ...mockOpenmrsConfig,
+    sectionDefinitions: [
+      { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'id'] },
+      { id: 'contact', name: 'Contact Info', fields: ['address'] },
+    ],
+    defaultPatientIdentifierTypes: ['ssn-uuid'],
+    fieldConfigurations: {
+      ...defaultConfig.fieldConfigurations,
+      ...mockOpenmrsConfig.fieldConfigurations,
+      identifier: { allowPreferredSelection: true },
+    },
+  });
+  renderWithContext(<PatientRegistration savePatientForm={savePatientForm} />, ResourcesContextProvider, {
+    ...mockResourcesContextValue,
+    identifierTypes: [
+      {
+        uuid: 'ssn-uuid',
+        name: 'SSN',
+        fieldName: 'ssn',
+        format: null,
+        formatDescription: null,
+        isPrimary: false,
+        required: false,
+        uniquenessBehavior: null,
+        identifierSources: [],
+      },
+    ],
+  });
+};
+
 describe('Registering a new patient', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
@@ -369,6 +403,38 @@ describe('Registering a new patient', () => {
     await screen.findByRole('heading', { name: /create new patient/i });
     await user.click(screen.getByRole('button', { name: /register patient/i }));
 
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
+  });
+
+  it('shows the missing-value error as soon as an empty identifier is marked as preferred', async () => {
+    const user = userEvent.setup();
+    renderWithOptionalPreferredSsn();
+
+    await user.click(await screen.findByRole('radio', { name: /mark ssn as preferred/i }));
+
+    const ssnInput = screen.getByRole('textbox', { name: 'SSN' });
+    expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
+    expect(ssnInput).toHaveAttribute('aria-invalid', 'true');
+
+    await user.type(ssnInput, '123-45-6789');
+
+    await waitFor(() => expect(screen.queryByText('Identifier value is required')).not.toBeInTheDocument());
+    expect(ssnInput).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('explains on the field why an empty preferred identifier blocks registration', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    renderWithOptionalPreferredSsn(mockSavePatientForm);
+
+    await fillRequiredFields();
+    await user.click(await screen.findByRole('radio', { name: /mark ssn as preferred/i }));
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    const ssnInput = await screen.findByRole('textbox', { name: 'SSN' });
+    expect(screen.queryByRole('textbox', { name: /ssn \(optional\)/i })).not.toBeInTheDocument();
+    expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
+    expect(ssnInput).toHaveAttribute('aria-invalid', 'true');
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 

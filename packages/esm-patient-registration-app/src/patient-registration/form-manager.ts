@@ -200,7 +200,7 @@ export class FormManager {
         ([, { identifierValue, autoGeneration, selectedSource }]) =>
           identifierValue || (autoGeneration && selectedSource),
       )
-      .map(async ([identifierFieldName, patientIdentifier]) => {
+      .map(([identifierFieldName, patientIdentifier]) => async () => {
         const {
           identifierTypeUuid,
           identifierValue,
@@ -234,6 +234,11 @@ export class FormManager {
           }
         }
 
+        // Marking an identifier as preferred through the identifier sub-resource also clears the flag on the
+        // patient's other identifiers, so only the newly preferred identifier needs updating.
+        const initialPreferred = initialIdentifierValues?.[identifierFieldName]?.preferred;
+        const becamePreferred = !!initialValue && !!preferred && !initialPreferred;
+
         const identifierToCreate = {
           uuid: identifierUuid,
           identifier,
@@ -249,13 +254,25 @@ export class FormManager {
               await addPatientIdentifier(patientUuid, identifierToCreate);
               savePatientTransactionManager.addedIdentifiers[identifierFieldName] = identifier;
             }
-          } else if (initialValue !== identifier) {
-            await updatePatientIdentifier(patientUuid, identifierUuid, identifierToCreate.identifier);
+          } else if (initialValue !== identifier || becamePreferred) {
+            await updatePatientIdentifier(
+              patientUuid,
+              identifierUuid,
+              identifierToCreate.identifier,
+              becamePreferred || undefined,
+            );
           }
         }
 
         return identifierToCreate;
       });
+
+    // Save identifiers sequentially because changing the preferred identifier can update other identifiers.
+    // Finish writes before deleting identifiers so replacements exist before their predecessors are removed.
+    const identifiers: Array<PatientIdentifier> = [];
+    for (const sendIdentifierRequest of identifierTypeRequests) {
+      identifiers.push(await sendIdentifierRequest());
+    }
 
     /*
       If there was initially an identifier assigned to the patient,
@@ -272,13 +289,7 @@ export class FormManager {
           )
       : [];
 
-    const [identifierResults, identifierDeletionResults] = await Promise.all([
-      Promise.allSettled(identifierTypeRequests),
-      Promise.allSettled(identifierDeletionRequests),
-    ]);
-
-    const identifiers = getSettledValuesOrThrow(identifierResults);
-    getSettledValuesOrThrow(identifierDeletionResults);
+    getSettledValuesOrThrow(await Promise.allSettled(identifierDeletionRequests));
     return identifiers;
   }
 

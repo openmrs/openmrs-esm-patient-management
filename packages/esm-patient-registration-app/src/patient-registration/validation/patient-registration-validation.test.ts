@@ -73,6 +73,39 @@ describe('Patient registration validation', () => {
     expect(validationError).toBeFalsy();
   });
 
+  it('should require a value for the preferred identifier when preferred selection is enabled', async () => {
+    const config = (await getConfig('@openmrs/esm-patient-registration-app')) as unknown as RegistrationConfig;
+    const validationSchema = getValidationSchema(
+      {
+        ...config,
+        fieldConfigurations: { ...config.fieldConfigurations, identifier: { allowPreferredSelection: true } },
+      },
+      (key: string, defaultValue: string) => defaultValue,
+    );
+    const formValues = {
+      ...validFormValues,
+      identifiers: {
+        ...validFormValues.identifiers,
+        passportId: { required: false, preferred: true, identifierValue: '' },
+      },
+    };
+
+    await expect(validationSchema.validate(formValues, { abortEarly: false })).rejects.toMatchObject({
+      errors: ['Identifier value is required'],
+    });
+  });
+
+  it('should not require a value for the preferred identifier when preferred selection is disabled', async () => {
+    const validationError = await validateFormValues({
+      ...validFormValues,
+      identifiers: {
+        ...validFormValues.identifiers,
+        passportId: { required: false, preferred: true, identifierValue: '' },
+      },
+    });
+    expect(validationError).toBeFalsy();
+  });
+
   it('should require givenName', async () => {
     const invalidFormValues = {
       ...validFormValues,
