@@ -4,7 +4,6 @@ import _default from 'yup/lib/locale';
 export interface SectionDefinition {
   id: string;
   name?: string;
-  description?: string;
   fields: Array<string>;
 }
 
@@ -68,6 +67,9 @@ export interface RegistrationConfig {
         dayOfMonth: number;
         month: number;
       };
+    };
+    identifier: {
+      allowPreferredSelection: boolean;
     };
     phone: {
       personAttributeUuid: string;
@@ -137,10 +139,6 @@ export const esmPatientRegistrationSchema = {
         _type: Type.String,
         _description: 'The title to display at the top of the section.',
       },
-      description: {
-        _type: Type.String,
-        _description: 'Optional text to display above the fields of the section, such as a consent statement.',
-      },
       fields: {
         _type: Type.Array,
         _default: [],
@@ -166,8 +164,9 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _description: "How this field's data will be stored—a person attribute or an obs.",
-        _validators: [validators.oneOf(['person attribute', 'obs'])],
+        _description:
+          "How this field's data will be stored—a person attribute or an obs. A field of type `text` stores nothing and displays its `label`, such as a consent statement.",
+        _validators: [validators.oneOf(['person attribute', 'obs', 'text'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -363,6 +362,14 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _validators: [validators.inRange(0, 11)],
         },
+      },
+    },
+    identifier: {
+      allowPreferredSelection: {
+        _type: Type.Boolean,
+        _default: false,
+        _description:
+          'Whether to display a "Preferred" option next to each identifier, allowing the user to choose which identifier is the preferred one. When disabled, the identifier of the primary identifier type is marked as preferred.',
       },
     },
     phone: {

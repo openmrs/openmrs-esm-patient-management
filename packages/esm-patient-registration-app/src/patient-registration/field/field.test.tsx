@@ -299,6 +299,20 @@ describe('Field', () => {
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
 
+  it('should render the label of a text field and no input', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'I consent to being a part of the study.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('I consent to being a part of the study.')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
   it('should return null and report an error for an invalid field name', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
