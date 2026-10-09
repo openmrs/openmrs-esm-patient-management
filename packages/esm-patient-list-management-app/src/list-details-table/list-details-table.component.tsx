@@ -34,6 +34,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { addPatientToList, removePatientFromList } from '../api/patient-list.resource';
+import type { PatientListPatient } from '../api/types';
 import styles from './list-details-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -140,13 +141,13 @@ interface ListDetailsTableProps {
   pagination: {
     usePagination: boolean;
     currentPage: number;
-    onChange(props: any): any;
+    onChange(props: { page: number; pageSize: number }): void;
     pageSize: number;
     totalItems: number;
     pagesUnknown?: boolean;
     lastPage?: boolean;
   };
-  patients;
+  patients: Array<PatientListPatient>;
   cohortUuid: string;
   style?: CSSProperties;
 }
@@ -154,9 +155,9 @@ interface ListDetailsTableProps {
 interface PatientTableColumn {
   key: string;
   header: string;
-  getValue?(patient: any): any;
+  getValue?(patient: PatientListPatient): React.ReactNode;
   link?: {
-    getUrl(patient: any): string;
+    getUrl(patient: PatientListPatient): string;
   };
 }
 
@@ -188,7 +189,8 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
     return debouncedSearchTerm
       ? fuzzy
           .filter(debouncedSearchTerm, patients, {
-            extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
+            extract: (patient: PatientListPatient) =>
+              `${patient.name ?? ''} ${patient.identifier ?? ''} ${patient.sex ?? ''}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
           .map((result) => result.original)
@@ -197,23 +199,26 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
 
   const tableRows = useMemo(
     () =>
-      filteredPatients?.map((patient) => ({
-        id: patient.identifier,
-        identifier: patient.identifier,
-        membershipUuid: patient.membershipUuid,
-        name: columns.find((column) => column.key === 'name')?.link ? (
-          <ConfigurableLink
-            className={styles.link}
-            to={columns.find((column) => column.key === 'name')?.link?.getUrl(patient)}>
-            {patient.name}
-          </ConfigurableLink>
-        ) : (
-          patient.name
-        ),
-        sex: patient.sex,
-        startDate: patient.startDate,
-        mobile: patient.mobile || '--',
-      })) ?? [],
+      filteredPatients?.map((patient, index) => {
+        const rowId = patient.identifier || patient.membershipUuid || patient.uuid || `patient-${index}`;
+        return {
+          id: rowId,
+          identifier: patient.identifier ?? '--',
+          membershipUuid: patient.membershipUuid,
+          name: columns.find((column) => column.key === 'name')?.link ? (
+            <ConfigurableLink
+              className={styles.link}
+              to={columns.find((column) => column.key === 'name')?.link?.getUrl(patient)}>
+              {patient.name ?? '--'}
+            </ConfigurableLink>
+          ) : (
+            (patient.name ?? '--')
+          ),
+          sex: patient.sex ?? '--',
+          startDate: patient.startDate ?? '--',
+          mobile: patient.mobile || '--',
+        };
+      }) ?? [],
     [columns, filteredPatients],
   );
 
@@ -246,9 +251,12 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   );
 
   const handleLaunchRemovePatientFromListModal = useCallback(
-    async (currentPatient) => {
+    async (currentPatient?: PatientListPatient) => {
+      if (!currentPatient) {
+        return;
+      }
       const dispose = showModal('remove-patient-from-list-modal', {
-        patientName: currentPatient.name,
+        patientName: currentPatient.name ?? '',
         membershipUuid: currentPatient.membershipUuid,
         onConfirm: async (membershipUuidToRemove: string) => handleRemovePatientFromList(membershipUuidToRemove),
         close: () => dispose(),
@@ -258,7 +266,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   );
 
   const handleAddPatientToList = useCallback(
-    async (patient) => {
+    async (patient: string) => {
       const alreadyInList = patients.some((p) => patient === p.uuid);
 
       if (alreadyInList) {
@@ -396,7 +404,9 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => {
-                      const currentPatient = patients.find((patient) => patient.identifier === row.id);
+                      const currentPatient = patients.find(
+                        (patient) => (patient.identifier || patient.membershipUuid || patient.uuid) === row.id,
+                      );
 
                       return (
                         <TableRow
