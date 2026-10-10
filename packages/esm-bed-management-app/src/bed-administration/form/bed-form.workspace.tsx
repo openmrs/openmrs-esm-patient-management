@@ -36,9 +36,11 @@ const OCCUPANCY_STATUSES = ['AVAILABLE', 'OCCUPIED'] as const;
 type OccupancyStatus = (typeof OCCUPANCY_STATUSES)[number];
 
 const BedFormWorkspace: React.FC<Workspace2DefinitionProps<BedFormWorkspaceConfig>> = ({
-  workspaceProps: { bed, mutateBeds, defaultLocation },
+  workspaceProps,
   closeWorkspace,
 }) => {
+  const bed = workspaceProps?.bed;
+  const defaultLocation = workspaceProps?.defaultLocation;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -149,6 +151,10 @@ const BedFormWorkspace: React.FC<Workspace2DefinitionProps<BedFormWorkspaceConfi
       reset(updatedDefaults);
     }
   }, [bedTagMappings, getDefaultValues, isLoadingBedTags, isEditing, reset]);
+  if (!workspaceProps) {
+    return null;
+  }
+  const { mutateBeds } = workspaceProps;
 
   const createBedPayload = (data: BedFormType) => ({
     ...(isEditing && { uuid: bed.uuid }),

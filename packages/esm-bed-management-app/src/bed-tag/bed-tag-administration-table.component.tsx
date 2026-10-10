@@ -106,8 +106,8 @@ const BedTagAdministrationTable: React.FC = () => {
   ];
 
   const tableRows = useMemo(() => {
-    return bedTags?.map((entry) => ({
-      id: entry.id,
+    return (bedTags ?? []).map((entry, index) => ({
+      id: entry.id ?? entry.uuid ?? `bed-tag-${index}`,
       name: entry?.name,
       actions: (
         <>
