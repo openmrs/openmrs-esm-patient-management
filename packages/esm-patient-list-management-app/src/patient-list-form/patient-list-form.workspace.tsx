@@ -40,8 +40,11 @@ type CohortFormData = z.infer<ReturnType<typeof createCohortSchema>>;
 export interface PatientListFormWorkspaceProps {
   /** Existing patient list to edit. If not provided, creates a new list. */
   patientListDetails?: OpenmrsCohort;
-  /** Callback triggered after successful create/edit operation */
-  onSuccess?: () => void;
+  /**
+   * Callback triggered after successful create/edit operation.
+   * When a new list is created, it receives the UUID of the created list.
+   */
+  onSuccess?: (createdListUuid?: string) => void;
 }
 
 const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFormWorkspaceProps>> = ({
@@ -153,14 +156,14 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
         ...cohortDetails,
         location: session?.sessionLocation?.uuid,
       } as NewCohortDataPayload)
-        .then(() => {
+        .then((response) => {
           showSnackbar({
             title: t('created', 'Created'),
             subtitle: `${t('listCreated', 'List created successfully')}`,
             kind: 'success',
             isLowContrast: true,
           });
-          onSuccess();
+          onSuccess(response?.uuid);
           setIsSubmitting(false);
           closeWorkspace({ discardUnsavedChanges: true });
         })

@@ -1,13 +1,14 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { navigate } from '@openmrs/esm-framework';
+import { render, screen, waitFor } from '@testing-library/react';
+import { launchWorkspace2, showModal } from '@openmrs/esm-framework';
 import { useAddablePatientLists } from '../api/patient-list.resource';
 import { mockPatient } from '__mocks__';
 import AddPatient from './add-patient.modal';
 
-const mockNavigate = vi.mocked(navigate);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
+const mockShowModal = vi.mocked(showModal);
 const mockUseAddablePatientLists = vi.mocked(useAddablePatientLists);
 const mockCloseModal = vi.fn();
 
@@ -17,6 +18,8 @@ vi.mock('../api/patient-list.resource', () => ({
 
 describe('AddPatientModal', () => {
   beforeEach(() => {
+    mockLaunchWorkspace2.mockClear();
+    mockShowModal.mockClear();
     mockUseAddablePatientLists.mockReturnValue({
       data: [
         { id: 'list1', displayName: 'List 1', addPatient: vi.fn() },
@@ -77,16 +80,43 @@ describe('AddPatientModal', () => {
     expect(screen.queryByText('List 2')).not.toBeInTheDocument();
   });
 
-  it('clicking the "Create new list" button opens the create list form', async () => {
+  it('clicking the "Create new list" button closes the modal and opens the create list form', async () => {
     const user = userEvent.setup();
     render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
 
-    const createNewListButton = screen.getByRole('button', { name: /create new patient list/i });
-    await user.click(createNewListButton);
+    await user.click(screen.getByRole('button', { name: /create new patient list/i }));
 
-    expect(mockNavigate).toHaveBeenCalledWith({
-      to: window.getOpenmrsSpaBase() + 'home/patient-lists?create=true',
-    });
+    expect(mockCloseModal).toHaveBeenCalled();
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'patient-list-form-workspace',
+      expect.objectContaining({ onSuccess: expect.any(Function) }),
+    );
+  });
+
+  it('reopens the modal with the new list preselected after the list is created', async () => {
+    const user = userEvent.setup();
+    render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+    await user.click(screen.getByRole('button', { name: /create new patient list/i }));
+
+    const { onSuccess } = mockLaunchWorkspace2.mock.calls[0][1] as {
+      onSuccess: (createdListUuid?: string) => Promise<void>;
+    };
+    await onSuccess('list2');
+
+    await waitFor(() =>
+      expect(mockShowModal).toHaveBeenCalledWith(
+        'add-patient-to-patient-list-modal',
+        expect.objectContaining({ patientUuid: mockPatient.uuid, preselectedListId: 'list2' }),
+      ),
+    );
+  });
+
+  it('checks the preselected list when one is provided', () => {
+    render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} preselectedListId="list2" />);
+
+    expect(screen.getByLabelText('List 2')).toBeChecked();
+    expect(screen.getByLabelText('List 1')).not.toBeChecked();
   });
 
   it('clicking the "Cancel" button closes the modal', async () => {

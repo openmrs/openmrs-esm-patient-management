@@ -14,7 +14,14 @@ import {
   Search,
   Tile,
 } from '@carbon/react';
-import { getCoreTranslation, navigate, restBaseUrl, showSnackbar, usePagination } from '@openmrs/esm-framework';
+import {
+  getCoreTranslation,
+  launchWorkspace2,
+  restBaseUrl,
+  showModal,
+  showSnackbar,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { type AddablePatientListViewModel } from '../api/types';
 import { useAddablePatientLists } from '../api/patient-list.resource';
 import styles from './add-patient.scss';
@@ -22,22 +29,36 @@ import styles from './add-patient.scss';
 interface AddPatientProps {
   closeModal: () => void;
   patientUuid: string;
+  /** UUID of a list to pre-check, e.g. one the user just created from this modal. */
+  preselectedListId?: string;
 }
 
-const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
+const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, preselectedListId }) => {
   const { t } = useTranslation();
   const { data, isLoading } = useAddablePatientLists(patientUuid);
   const [searchValue, setSearchValue] = useState('');
-  const [selected, setSelected] = useState<Array<string>>([]);
+  const [selected, setSelected] = useState<Array<string>>(preselectedListId ? [preselectedListId] : []);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreateNewList = useCallback(() => {
-    navigate({
-      to: window.getOpenmrsSpaBase() + 'home/patient-lists?create=true',
-    });
+  const { mutate } = useSWRConfig();
 
+  const handleCreateNewList = useCallback(() => {
     closeModal();
-  }, [closeModal]);
+
+    launchWorkspace2('patient-list-form-workspace', {
+      onSuccess: async (createdListUuid?: string) => {
+        // Refresh the addable lists so the new list is present when the modal reopens
+        await mutate(['addablePatientLists', patientUuid]);
+
+        const dispose = showModal('add-patient-to-patient-list-modal', {
+          closeModal: () => dispose(),
+          patientUuid,
+          preselectedListId: createdListUuid,
+          size: 'sm',
+        });
+      },
+    });
+  }, [closeModal, mutate, patientUuid]);
 
   const handleSelectionChanged = useCallback((patientListId: string, listSelected: boolean) => {
     if (listSelected) {
@@ -46,8 +67,6 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       setSelected((prev) => prev.filter((x) => x !== patientListId));
     }
   }, []);
-
-  const { mutate } = useSWRConfig();
 
   const mutateCohortMembers = useCallback(() => {
     const key = `${restBaseUrl}/cohortm/cohortmember?patient=${patientUuid}&v=custom:(uuid,patient:ref,cohort:(uuid,name,startDate,endDate))`;
