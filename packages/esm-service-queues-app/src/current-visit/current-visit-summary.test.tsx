@@ -29,8 +29,8 @@ describe('CurrentVisit', () => {
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText('Visit Type')).toBeInTheDocument();
-    expect(screen.getByText('Scheduled for today')).toBeInTheDocument();
-    expect(screen.getByText('On time')).toBeInTheDocument();
+    expect(screen.queryByText('Scheduled for today')).not.toBeInTheDocument();
+    expect(screen.queryByText('On time')).not.toBeInTheDocument();
   });
   it('renders a loading skeleton when fetching data', async () => {
     useVisitMock.mockReturnValue({

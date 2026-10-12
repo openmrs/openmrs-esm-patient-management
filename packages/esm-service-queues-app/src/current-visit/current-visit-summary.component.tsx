@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, DataTableSkeleton } from '@carbon/react';
+import { DataTableSkeleton } from '@carbon/react';
 import { getGlobalStore } from '@openmrs/esm-framework';
 import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
 import { useVisit } from './current-visit.resource';
@@ -65,12 +65,6 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
     <div className={styles.wrapper}>
       <div className={styles.headingContainer}>
         <p className={styles.heading}>{visit.visitType?.display}</p>
-        <div className={styles.subHeading}>
-          {t('scheduledToday', 'Scheduled for today')}{' '}
-          <Tag size="sm" type="blue">
-            {t('onTime', 'On time')}
-          </Tag>
-        </div>
       </div>
       <div className={styles.visitContainer}>
         <CurrentVisitDetails encounters={visit.encounters} patientUuid={patientUuid} visit={visit} />
