@@ -1,11 +1,22 @@
 import React, { useEffect, useRef } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Button, Tag, DataTableSkeleton } from '@carbon/react';
+import { Button, DataTableSkeleton, DefinitionTooltip, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { attach, ExtensionSlot, getGlobalStore, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
+import {
+  attach,
+  ExtensionSlot,
+  formatDate,
+  formatTime,
+  getGlobalStore,
+  launchWorkspace2,
+  useConfig,
+  usePatient,
+} from '@openmrs/esm-framework';
+import { type AppointmentStatus, type ConfigObject } from '../config-schema';
 import { serviceQueuesPatientVitalsWorkspace, serviceQueuesVisitNotesWorkspace } from '../constants';
 import { getEditEncounterHandler } from '../edit-encounter';
-import { useVisit } from './current-visit.resource';
+import { type TodaysAppointment, useTodaysAppointments, useVisit } from './current-visit.resource';
 import styles from './current-visit.scss';
 
 const vitalsInfoSlot = 'service-queues-current-visit-vitals-slot';
@@ -17,6 +28,67 @@ attach(visitSummarySlot, 'visit-summary');
 // External workspaces that don't share the useVisit SWR key, so we revalidate the visit when
 // they close rather than relying on the form to mutate it.
 const VISIT_REFRESHING_WORKSPACES = new Set([serviceQueuesVisitNotesWorkspace, serviceQueuesPatientVitalsWorkspace]);
+
+// Formats values the same way as `getAttributeValue` in openmrs-esm-patient-chart
+// (`patient-banner-tags/visit-attribute-tags.extension.tsx`), except that object values
+// (e.g. a location or provider) show their display name instead of crashing the render.
+const getAttributeValue = (attributeType, value) => {
+  switch (attributeType?.datatypeClassname) {
+    case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
+      return value?.display;
+    case 'org.openmrs.customdatatype.datatype.DateDatatype':
+      // The saved value is midnight in the server's offset, so read only the date part
+      // as local midnight. Otherwise a browser behind the server shows the previous day.
+      return formatDate(dayjs(String(value).split('T')[0]).toDate(), { mode: 'wide' });
+    default:
+      return typeof value === 'object' && value !== null ? value.display : value;
+  }
+};
+
+const AppointmentSummary: React.FC<{ appointment: TodaysAppointment }> = ({ appointment }) => {
+  const { t } = useTranslation();
+
+  const statusLabels: Record<AppointmentStatus, string> = {
+    Requested: t('appointmentRequested', 'Requested'),
+    WaitList: t('appointmentWaitList', 'Wait list'),
+    Scheduled: t('appointmentScheduled', 'Scheduled'),
+    Arrived: t('appointmentArrived', 'Arrived'),
+    CheckedIn: t('appointmentCheckedIn', 'Checked in'),
+    Completed: t('appointmentCompleted', 'Completed'),
+    Cancelled: t('appointmentCancelled', 'Cancelled'),
+    Missed: t('appointmentMissed', 'Missed'),
+  };
+
+  // Providers removed from an appointment stay on it with a CANCELLED response. The backend
+  // returns providers in no fixed order, so sort them to always show the same one first.
+  const providerNames = appointment.providers
+    .filter(({ response, name }) => response !== 'CANCELLED' && name)
+    .map(({ name }) => name)
+    .sort((a, b) => a.localeCompare(b));
+  const otherProviderCount = providerNames.length - 1;
+
+  return (
+    <span>
+      {t('appointmentSummary', '{{status}} · {{service}} at {{time}}', {
+        status: statusLabels[appointment.status] ?? appointment.status,
+        service: appointment.service.name,
+        time: formatTime(new Date(appointment.startDateTime)),
+      })}
+      {providerNames.length > 0 && <> {t('withProvider', 'with {{provider}}', { provider: providerNames[0] })}</>}
+      {otherProviderCount > 0 && (
+        <>
+          {' '}
+          <DefinitionTooltip definition={providerNames.slice(1).join(', ')} openOnHover>
+            {t('moreProviders', '+{{count}} providers', {
+              count: otherProviderCount,
+              defaultValue_one: '+{{count}} provider',
+            })}
+          </DefinitionTooltip>
+        </>
+      )}
+    </span>
+  );
+};
 
 interface WorkspaceStoreState {
   openedWindows: Array<{ openedWorkspaces: Array<{ workspaceName: string }> }>;
@@ -31,6 +103,12 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
   const { t } = useTranslation();
   const { visit, isLoading, mutate } = useVisit(visitUuid);
   const { patient } = usePatient(patientUuid);
+  const { appointmentStatuses, visitAttributeTypes } = useConfig<ConfigObject>();
+  const {
+    appointments,
+    isLoading: isLoadingAppointments,
+    error: appointmentsError,
+  } = useTodaysAppointments(patientUuid, appointmentStatuses);
 
   const openRefreshingWorkspacesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -69,6 +147,16 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
     return <p className={styles.bodyLong01}>{t('noActiveVisit', 'No active visit')}</p>;
   }
 
+  const attributeTags = visit.attributes
+    ?.filter((attribute) => visitAttributeTypes?.some(({ uuid }) => attribute?.attributeType?.uuid === uuid))
+    .map((attribute) => ({
+      attribute,
+      value: getAttributeValue(attribute?.attributeType, attribute?.value),
+    }))
+    .filter(({ value }) => value != null && value !== '');
+
+  const showAppointments = !isLoadingAppointments && !appointmentsError;
+
   const vitalsSlotState = {
     patientUuid,
     patient,
@@ -80,14 +168,13 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
   return (
     <>
       <div className={styles.headingContainer}>
-        <div>
+        <div className={styles.headingRow}>
           <p className={styles.heading}>{visit.visitType?.display}</p>
-          <div className={styles.subHeading}>
-            {t('scheduledToday', 'Scheduled for today')}{' '}
-            <Tag size="sm" type="blue">
-              {t('onTime', 'On time')}
+          {attributeTags?.map(({ attribute, value }) => (
+            <Tag key={attribute.uuid} size="sm" type="blue">
+              {value}
             </Tag>
-          </div>
+          ))}
         </div>
         <Button
           size="sm"
@@ -105,6 +192,24 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
           {t('visitNoteForm', 'Visit note form')}
         </Button>
       </div>
+      {showAppointments && (
+        <div className={styles.appointments}>
+          {appointments.length ? (
+            <>
+              <p className={styles.heading}>{t('todaysAppointments', "Today's appointments")}</p>
+              {appointments.map((appointment) => (
+                <div key={appointment.uuid} className={styles.subHeading}>
+                  <AppointmentSummary appointment={appointment} />
+                </div>
+              ))}
+            </>
+          ) : (
+            <div className={styles.subHeading}>
+              {t('noAppointmentsScheduledToday', 'No appointments scheduled for today')}
+            </div>
+          )}
+        </div>
+      )}
       <div className={styles.visitContainer}>
         {/* The vitals extension reads `patient` during render, before its own loading fallback. */}
         {patient && <ExtensionSlot name={vitalsInfoSlot} state={vitalsSlotState} />}

@@ -26,6 +26,18 @@ export type ConfigurableQueueEntryAction = QueueEntryAction | keyof typeof depre
 
 const configurableQueueEntryActions = [...queueEntryActions, ...Object.keys(deprecatedQueueEntryActions)];
 
+const appointmentStatusValues = [
+  'Requested',
+  'WaitList',
+  'Scheduled',
+  'Arrived',
+  'CheckedIn',
+  'Completed',
+  'Cancelled',
+  'Missed',
+] as const;
+export type AppointmentStatus = (typeof appointmentStatusValues)[number];
+
 const statusIcons = ['Group', 'InProgress'] as const;
 type StatusIcon = (typeof statusIcons)[number];
 
@@ -143,10 +155,11 @@ export const configSchema = {
   },
   appointmentStatuses: {
     _type: Type.Array,
-    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
-    _description: 'Configurable appointment status (status of appointments)',
+    _default: ['Scheduled', 'CheckedIn', 'Completed', 'Missed'],
+    _description: `Statuses of the patient's appointments for today to show in the current visit summary of the expanded queue table row. Available options: ${appointmentStatusValues.join(', ')}`,
     _elements: {
       _type: Type.String,
+      _validators: [validators.oneOf(appointmentStatusValues)],
     },
   },
   callingStatus: {
@@ -450,6 +463,19 @@ export const configSchema = {
     _default: false,
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
   },
+  visitAttributeTypes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.Object,
+      uuid: {
+        _type: Type.UUID,
+        _description: 'UUID of the visit attribute type',
+      },
+    },
+    _description:
+      'Visit attribute types whose values show as tags in the current visit summary of the expanded queue table row, like the visit attribute tags in the patient banner. The defaults are the Punctuality and Insurance Policy Number types from the reference application demo data.',
+    _default: [{ uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c' }, { uuid: 'aac48226-d143-4274-80e0-264db4e368ee' }],
+  },
   visitQueueNumberAttributeUuid: {
     _type: Type.UUID,
     _default: 'c0c579b0-8e59-401d-8a4a-976a0b183519',
@@ -487,7 +513,7 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
   waitTimeThresholds: Array<WaitTimeThresholdConfig>;
-  appointmentStatuses: Array<string>;
+  appointmentStatuses: Array<AppointmentStatus>;
   callingStatus: string;
   clinicAdministratorScreen: {
     privilege: string;
@@ -514,6 +540,7 @@ export interface ConfigObject {
   queueTables: TablesConfig;
   showCheckedInPatientsBeforeSearch: boolean;
   showRecommendedVisitTypeTab: boolean;
+  visitAttributeTypes: Array<{ uuid: string }>;
   visitQueueNumberAttributeUuid: string | null;
   visitTypeResourceUrl: string;
 }

@@ -1,6 +1,8 @@
+import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
-import { visitCustomRepresentation } from '../constants';
+import { type AppointmentStatus } from '../config-schema';
+import { omrsDateFormat, visitCustomRepresentation } from '../constants';
 
 export function useVisit(visitUuid?: string) {
   const apiUrl = `${restBaseUrl}/visit/${visitUuid}?v=${visitCustomRepresentation}`;
@@ -16,5 +18,43 @@ export function useVisit(visitUuid?: string) {
     isLoading,
     isValidating,
     mutate,
+  };
+}
+
+const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
+
+export interface TodaysAppointment {
+  uuid: string;
+  status: AppointmentStatus;
+  startDateTime: number;
+  service: { name: string };
+  // `name` is null for a provider that is not linked to a person, or whose person has no name.
+  providers: Array<{
+    uuid: string;
+    name: string | null;
+    response: 'AWAITING' | 'ACCEPTED' | 'REJECTED' | 'TENTATIVE' | 'CANCELLED';
+  }>;
+}
+
+export function useTodaysAppointments(patientUuid: string, statuses: Array<AppointmentStatus>) {
+  const startDate = dayjs().startOf('day').format(omrsDateFormat);
+  const endDate = dayjs().endOf('day').format(omrsDateFormat);
+
+  // The appointments module only exposes search via POST.
+  const { data, error, isLoading } = useSWR<{ data: Array<TodaysAppointment> }, Error>(
+    patientUuid ? [appointmentsSearchUrl, patientUuid, startDate] : null,
+    () =>
+      openmrsFetch(appointmentsSearchUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: { patientUuid, startDate, endDate },
+      }),
+  );
+
+  return {
+    // The backend returns these sorted by start time.
+    appointments: data?.data?.filter(({ status }) => statuses.includes(status)) ?? [],
+    error,
+    isLoading,
   };
 }
