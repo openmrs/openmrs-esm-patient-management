@@ -180,7 +180,23 @@ describe('PatientBanner without the workspace v2 context', () => {
     expect(legacySlotCall[0].state).toEqual(
       expect.objectContaining({
         patientUuid: patient.uuid,
-        patient: expect.objectContaining({ id: patient.uuid }),
+        patient: expect.objectContaining({ id: patient.uuid, birthDate: patient.person.birthdate }),
+      }),
+    );
+  });
+
+  it('maps an estimated birthdate to the year only for the legacy start visit button slot', () => {
+    render(
+      <PatientBanner
+        patient={{ ...patient, person: { ...patient.person, birthdateEstimated: true } }}
+        patientUuid={patient.uuid}
+      />,
+    );
+
+    const legacySlotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot');
+    expect(legacySlotCall?.[0].state).toEqual(
+      expect.objectContaining({
+        patient: expect.objectContaining({ birthDate: '1990' }),
       }),
     );
   });

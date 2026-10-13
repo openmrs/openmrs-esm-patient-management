@@ -35,7 +35,7 @@ export function mapToFhirPatient(patient: SearchedPatient) {
           },
         ]
       : [],
-    birthDate: patient.person.birthdate,
+    birthDate: patient.person.birthdateEstimated ? patient.person.birthdate.slice(0, 4) : patient.person.birthdate,
     deceasedBoolean: patient.person.dead,
     deceasedDateTime: patient.person.deathDate ?? undefined,
     gender: getGender(patient.person.gender),
