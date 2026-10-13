@@ -29,36 +29,54 @@ import styles from './add-patient.scss';
 interface AddPatientProps {
   closeModal: () => void;
   patientUuid: string;
-  /** UUID of a list to pre-check, e.g. one the user just created from this modal. */
-  preselectedListId?: string;
+  /** UUIDs of lists to pre-check, e.g. the earlier selection plus a list just created from this modal. */
+  preselectedListIds?: Array<string>;
 }
 
-const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, preselectedListId }) => {
+const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, preselectedListIds }) => {
   const { t } = useTranslation();
   const { data, isLoading } = useAddablePatientLists(patientUuid);
   const [searchValue, setSearchValue] = useState('');
-  const [selected, setSelected] = useState<Array<string>>(preselectedListId ? [preselectedListId] : []);
+  const [selected, setSelected] = useState<Array<string>>(preselectedListIds ?? []);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutate } = useSWRConfig();
 
-  const handleCreateNewList = useCallback(() => {
-    closeModal();
-
-    launchWorkspace2('patient-list-form-workspace', {
-      onSuccess: async (createdListUuid?: string) => {
-        // Refresh the addable lists so the new list is present when the modal reopens
-        await mutate(['addablePatientLists', patientUuid]);
-
+    const handleCreateNewList = useCallback(() => {
+      const reopenModal = (listIds: Array<string>) => {
         const dispose = showModal('add-patient-to-patient-list-modal', {
           closeModal: () => dispose(),
           patientUuid,
-          preselectedListId: createdListUuid,
+          preselectedListIds: listIds,
           size: 'sm',
         });
-      },
-    });
-  }, [closeModal, mutate, patientUuid]);
+      };
+
+      closeModal();
+
+      // No window or group props are passed on purpose: the chart's workspace group is already open,
+      // and null props count as compatible with it, so open chart work (e.g. an unsaved vitals draft)
+      // is left alone and no discard prompt appears.
+      Promise.resolve(
+        launchWorkspace2('patient-list-form-chart-workspace', {
+          onSuccess: async (createdListUuid?: string) => {
+            // Refresh the addable lists so the new list is present when the modal reopens
+            await mutate(['addablePatientLists', patientUuid]);
+            reopenModal(createdListUuid ? [...selected, createdListUuid] : selected);
+          },
+        }),
+      )
+        .then((launched) => {
+          // The user declined a close prompt, so the form never opened: restore the selection modal
+          if (launched === false) {
+            reopenModal(selected);
+          }
+        })
+        .catch((error) => {
+          console.error('Unable to open the create patient list form', error);
+          reopenModal(selected);
+        });
+    }, [closeModal, mutate, patientUuid, selected]);
 
   const handleSelectionChanged = useCallback((patientListId: string, listSelected: boolean) => {
     if (listSelected) {
@@ -75,6 +93,16 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, presel
   }, [mutate, patientUuid]);
 
   const handleSubmit = useCallback(() => {
+    const missingListIds = selected.filter((id) => !data?.some((list) => list.id === id));
+    if (missingListIds.length > 0) {
+      showSnackbar({
+        title: t('error', 'Error'),
+        kind: 'error',
+        subtitle: t('errorSelectedListNotLoaded', 'The selected list could not be loaded. Close this window and try again.'),
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     Promise.all(
       selected.map((selectedId) => {

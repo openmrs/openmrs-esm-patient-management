@@ -50,6 +50,11 @@
       "window": "patient-list-form-window"
     },
     {
+      "name": "patient-list-form-chart-workspace",
+      "component": "patientListFormWorkspace",
+      "window": "patient-lists"
+    },
+    {
       "name": "patient-list-search-workspace",
       "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
       "window": "patient-list-form-window"
