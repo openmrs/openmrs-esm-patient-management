@@ -46,7 +46,6 @@
   "searchingText": "Se caută...",
   "searchLocationPersonAttribute": "Caută locația",
   "searchPatient": "Caută pacient",
-  "searchPatientButton": "Buton căutare pacient",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "Rezultate căutare",

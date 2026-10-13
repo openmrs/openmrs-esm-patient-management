@@ -164,7 +164,12 @@ export async function addPatientIdentifier(patientUuid: string, patientIdentifie
   });
 }
 
-export async function updatePatientIdentifier(patientUuid: string, identifierUuid: string, identifier: string) {
+export async function updatePatientIdentifier(
+  patientUuid: string,
+  identifierUuid: string,
+  identifier: string,
+  preferred?: boolean,
+) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/identifier/${identifierUuid}`, {
     method: 'POST',
@@ -172,7 +177,7 @@ export async function updatePatientIdentifier(patientUuid: string, identifierUui
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
-    body: { identifier },
+    body: { identifier, ...(preferred !== undefined && { preferred }) },
   });
 }
 

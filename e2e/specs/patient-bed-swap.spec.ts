@@ -2,7 +2,6 @@ import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import type { Visit } from '@openmrs/esm-framework';
 import {
-  changeToWardLocation,
   deletePatient,
   dischargePatientFromBed,
   endVisit,
@@ -16,7 +15,7 @@ import {
   waitForAdmissionToBeProcessed,
 } from '../commands';
 import type { Bed, BedType, Patient } from '../commands/types';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import { WardPage } from '../pages';
 
 async function selectBedByLabel(page: Page, label: string) {
@@ -39,7 +38,6 @@ let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api, page, emrConfiguration }) => {
-  await changeToWardLocation(api);
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
   swapBed = await generateRandomBed(api, bedtype); // Generate the bed we'll swap to

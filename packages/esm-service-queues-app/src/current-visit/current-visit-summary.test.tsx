@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ExtensionSlot, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
+import { type Encounter, ExtensionSlot, launchWorkspace2, usePatient } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -81,11 +81,11 @@ describe('CurrentVisit', () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
     const { onEditEncounter } = getSlotState(visitSummarySlotName) as {
-      onEditEncounter: (encounter: { id: string; form?: unknown }, isVisitNote: boolean) => void;
+      onEditEncounter: (encounter: Encounter, isVisitNote: boolean) => void;
     };
 
     // The notes form keys "editing" off the encounter it is handed, so it has to arrive unchanged.
-    const noteEncounter = { id: 'encounter-1', rawDatetime: '2026-08-12T10:00:00.000+0000' };
+    const noteEncounter: Encounter = { uuid: 'encounter-1', encounterDatetime: '2026-08-12T10:00:00.000+0000' };
     onEditEncounter(noteEncounter, true);
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       serviceQueuesVisitNotesWorkspace,
@@ -93,7 +93,7 @@ describe('CurrentVisit', () => {
     );
 
     const form = { uuid: 'form-1' };
-    onEditEncounter({ id: 'encounter-2', form }, false);
+    onEditEncounter({ uuid: 'encounter-2', form }, false);
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       serviceQueuesPatientFormEntryWorkspace,
       { form, encounterUuid: 'encounter-2' },

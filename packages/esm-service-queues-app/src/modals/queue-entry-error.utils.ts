@@ -1,23 +1,45 @@
 import { DUPLICATE_QUEUE_ENTRY_ERROR_CODE, QUEUE_ENTRY_ALREADY_ENDED_ERROR } from '../constants';
 
+const MAX_PLAIN_TEXT_ERROR_LENGTH = 500;
+
+// `openmrsFetch` sets `responseBody` to the raw response text when it isn't JSON. Some endpoints
+// (e.g. `queueutil/assignticket`) send plain-text error messages, but proxy error pages also arrive
+// this way, so markup and overly long bodies are ignored.
+function getPlainTextResponseBody(responseBody: unknown): string {
+  if (typeof responseBody !== 'string') {
+    return '';
+  }
+
+  const text = responseBody.trim();
+  if (!text || text.length > MAX_PLAIN_TEXT_ERROR_LENGTH || /<[a-z!/?][^>]*>/i.test(text)) {
+    return '';
+  }
+
+  return text;
+}
+
 export function getErrorMessage(error: unknown): string {
   const err = error as {
-    responseBody?: {
-      error?: {
-        rawMessage?: string;
-        translatedMessage?: string;
-        message?: string;
-        globalErrors?: Array<{ message?: string }>;
-      };
-    };
+    responseBody?:
+      | string
+      | {
+          error?: {
+            rawMessage?: string;
+            translatedMessage?: string;
+            message?: string;
+            globalErrors?: Array<{ message?: string }>;
+          };
+        };
     message?: string;
   };
+  const responseBody = typeof err?.responseBody === 'object' ? err.responseBody : undefined;
 
   return (
-    err?.responseBody?.error?.rawMessage ||
-    err?.responseBody?.error?.translatedMessage ||
-    err?.responseBody?.error?.globalErrors?.[0]?.message ||
-    err?.responseBody?.error?.message ||
+    responseBody?.error?.rawMessage ||
+    responseBody?.error?.translatedMessage ||
+    responseBody?.error?.globalErrors?.[0]?.message ||
+    responseBody?.error?.message ||
+    getPlainTextResponseBody(err?.responseBody) ||
     err?.message ||
     ''
   );

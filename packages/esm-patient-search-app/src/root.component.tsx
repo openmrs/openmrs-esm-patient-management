@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { WorkspaceContainer } from '@openmrs/esm-framework';
 import PatientSearchPageComponent from './patient-search-page/patient-search-page.component';
 
 const PatientSearchRootComponent: React.FC = () => {
@@ -9,7 +8,6 @@ const PatientSearchRootComponent: React.FC = () => {
       <Routes>
         <Route path="search" element={<PatientSearchPageComponent />} />
       </Routes>
-      <WorkspaceContainer contextKey="search" />
     </BrowserRouter>
   );
 };

@@ -1,6 +1,4 @@
-import { type OpenmrsResource, type Session } from '@openmrs/esm-framework';
-import { type RegistrationConfig } from '../config-schema';
-import { type SavePatientTransactionManager } from './form-manager';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 interface NameValue {
   uuid: string;
@@ -69,30 +67,6 @@ export interface PatientIdentifier {
   identifierType?: string;
   location?: string;
   preferred?: boolean;
-}
-
-export interface PatientRegistration {
-  id?: number;
-  /**
-   * The preliminary patient in the FHIR format.
-   */
-  fhirPatient: fhir.Patient;
-  /**
-   * Internal data collected by patient-registration. Required for later syncing and editing.
-   * Not supposed to be used outside of this module.
-   */
-  _patientRegistrationData: {
-    isNewPatient: boolean;
-    formValues: FormValues;
-    patientUuidMap: PatientUuidMapType;
-    initialAddressFieldValues: Partial<Record<AddressProperties, string>>;
-    capturePhotoProps: CapturePhotoProps;
-    currentLocation: string;
-    initialIdentifierValues: FormValues['identifiers'];
-    currentUser: Session;
-    config: RegistrationConfig;
-    savePatientTransactionManager: SavePatientTransactionManager;
-  };
 }
 
 export type Relationship = {

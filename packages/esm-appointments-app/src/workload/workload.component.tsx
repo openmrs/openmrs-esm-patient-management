@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
-import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
+import { useMonthlyCalendarDistribution } from './workload.resource';
 import MonthlyCalendarView from './monthly-view-workload/monthly-view.component';
 import styles from './workload.scss';
 
 interface WorkloadProps {
   selectedService: string;
-  appointmentDate: Date;
+  /**
+   * When undefined, e.g., while the date field is being edited, the last defined date is shown instead,
+   * or the current date if there hasn't been one.
+   */
+  appointmentDate?: Date;
   onWorkloadDateChange: (pickedDate: Date) => void;
 }
 
@@ -16,12 +20,15 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
 
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const calendarWorkload = useCalendarDistribution(serviceUuid, selectedTab === 0 ? 'week' : 'month', appointmentDate);
+  const [displayDate, setDisplayDate] = useState(() => appointmentDate ?? new Date());
+  if (appointmentDate && appointmentDate !== displayDate) {
+    setDisplayDate(appointmentDate);
+  }
 
   const monthlyCalendarWorkload = useMonthlyCalendarDistribution(
     serviceUuid,
     selectedTab === 0 ? 'week' : 'month',
-    appointmentDate,
+    displayDate,
   );
 
   const handleDateClick = (pickedDate: Date) => onWorkloadDateChange(pickedDate);
@@ -30,7 +37,7 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
     <div className={styles.workLoadContainer}>
       <MonthlyCalendarView
         calendarWorkload={monthlyCalendarWorkload}
-        dateToDisplay={appointmentDate.toISOString()}
+        dateToDisplay={displayDate.toISOString()}
         onDateClick={handleDateClick}
       />
     </div>

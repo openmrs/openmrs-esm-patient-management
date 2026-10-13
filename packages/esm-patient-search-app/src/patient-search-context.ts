@@ -18,9 +18,6 @@ export interface PatientSearchContextProps {
    * just before navigation (or after nonNavigationSelectPatientAction is called).
    */
   patientClickSideEffect?: ((patientUuid: string, patient: fhir.Patient) => void) | (() => void);
-  handleReturnToSearchList?: () => void;
-  showPatientSearch?: () => void;
-  hidePatientSearch?: () => void;
 }
 
 export const PatientSearchContext = createContext<PatientSearchContextProps>(null);

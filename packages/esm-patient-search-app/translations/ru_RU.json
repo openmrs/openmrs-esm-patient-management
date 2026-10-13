@@ -46,7 +46,6 @@
   "searchingText": "Поиск...",
   "searchLocationPersonAttribute": "Поиск местоположения",
   "searchPatient": "Поиск пациента",
-  "searchPatientButton": "Кнопка поиска пациента",
   "searchQueriesAdded_one": "<0>{{count}}</0> поисковый запрос добавлен",
   "searchQueriesAdded_other": "<0>{{count}}</0> поисковых запросов добавлено",
   "searchResults": "Результаты поиска",

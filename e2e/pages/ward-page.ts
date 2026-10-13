@@ -11,6 +11,7 @@ export class WardPage {
   readonly cancelAdmissionRequestHeading = () => this.page.getByText('Cancel admission request');
   readonly transferButton = () => this.page.getByRole('button', { name: 'Transfers' });
   readonly swapButton = () => this.page.getByRole('tab', { name: 'Bed swap' });
+  readonly searchLocationInput = () => this.page.getByRole('searchbox', { name: 'Search locations' });
 
   async clickPatientCard(patientName: string) {
     // Wait for patient to be loaded - use first() to avoid strict mode violation
@@ -77,6 +78,14 @@ export class WardPage {
       .locator(`[class*="admissionRequestCard"]:has-text("${patientName}") button`)
       .filter({ hasText: 'Admit patient' })
       .first()
+      .click();
+  }
+
+  async clickTransferPatientButton(patientName: string) {
+    await this.page
+      .locator('[class*="admissionRequestCard"]')
+      .filter({ hasText: patientName })
+      .getByRole('button', { name: 'Transfer patient', exact: true })
       .click();
   }
 

@@ -13,6 +13,7 @@ function renderInput(
     name?: string;
     labelText?: string;
     required?: boolean;
+    hideOptionalLabel?: boolean;
     checkWarning?: (value: string) => string | undefined;
     placeholder?: string;
   } = {},
@@ -57,6 +58,14 @@ describe('Input component', () => {
       renderInput({ required: false });
 
       expect(screen.getByLabelText('Text (optional)')).toBeInTheDocument();
+    });
+
+    it('omits the optional label when hideOptionalLabel is set', () => {
+      renderInput({ required: false, hideOptionalLabel: true });
+
+      const input = screen.getByLabelText('Text');
+      expect(input).not.toBeRequired();
+      expect(screen.queryByLabelText('Text (optional)')).not.toBeInTheDocument();
     });
   });
 

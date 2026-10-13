@@ -1,7 +1,6 @@
 import { expect } from '@playwright/test';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import {
-  changeToWardLocation,
   deletePatient,
   endVisit,
   generateRandomPatient,
@@ -20,7 +19,6 @@ let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api, emrConfiguration }) => {
-  await changeToWardLocation(api);
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
