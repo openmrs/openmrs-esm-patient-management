@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -79,7 +79,12 @@ const getSlotState = (slotName: string) =>
 describe('CurrentVisit', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
-    mockUseTodaysAppointments.mockReturnValue({ appointments: [], error: null, isLoading: false });
+    mockUseTodaysAppointments.mockReturnValue({
+      appointments: [],
+      hasAppointmentsToday: false,
+      error: null,
+      isLoading: false,
+    });
     mockUsePatient.mockReturnValue({
       patient: mockPatient,
       patientUuid,
@@ -93,6 +98,10 @@ describe('CurrentVisit', () => {
       isValidating: false,
       mutate: vi.fn(),
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders visit details correctly', async () => {
@@ -111,7 +120,12 @@ describe('CurrentVisit', () => {
   });
 
   it('shows no appointment information while the appointments are loading', async () => {
-    mockUseTodaysAppointments.mockReturnValue({ appointments: todaysAppointments, error: null, isLoading: true });
+    mockUseTodaysAppointments.mockReturnValue({
+      appointments: todaysAppointments,
+      hasAppointmentsToday: true,
+      error: null,
+      isLoading: true,
+    });
 
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
@@ -122,6 +136,7 @@ describe('CurrentVisit', () => {
   it('shows no appointment information when the appointments request fails', async () => {
     mockUseTodaysAppointments.mockReturnValue({
       appointments: todaysAppointments,
+      hasAppointmentsToday: true,
       error: new Error('Internal server error'),
       isLoading: false,
     });
@@ -134,7 +149,12 @@ describe('CurrentVisit', () => {
 
   it("shows a line for each of today's appointments", async () => {
     const user = userEvent.setup();
-    mockUseTodaysAppointments.mockReturnValue({ appointments: todaysAppointments, error: null, isLoading: false });
+    mockUseTodaysAppointments.mockReturnValue({
+      appointments: todaysAppointments,
+      hasAppointmentsToday: true,
+      error: null,
+      isLoading: false,
+    });
 
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
@@ -151,7 +171,36 @@ describe('CurrentVisit', () => {
     expect(screen.queryByText(/Removed Provider/)).not.toBeInTheDocument();
   });
 
+  it("shows no appointment information when the patient's appointments today all have statuses that are not shown", async () => {
+    mockUseTodaysAppointments.mockReturnValue({
+      appointments: [],
+      hasAppointmentsToday: true,
+      error: null,
+      isLoading: false,
+    });
+
+    render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
+
+    expect(screen.queryByText("Today's appointments")).not.toBeInTheDocument();
+    expect(screen.queryByText('No appointments scheduled for today')).not.toBeInTheDocument();
+  });
+
+  it('shows no appointment information when no appointment statuses are configured', async () => {
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchema) as ConfigObject),
+      appointmentStatuses: [],
+    });
+
+    render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
+
+    expect(screen.queryByText("Today's appointments")).not.toBeInTheDocument();
+    expect(screen.queryByText('No appointments scheduled for today')).not.toBeInTheDocument();
+  });
+
   it('shows configured visit attributes as tags', async () => {
+    // Freeze the clock to the date attribute's day, so that the tag fails if it shows a time for today.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 13, 10, 0));
     const freeTextAttributeTypeUuid = 'free-text-attribute-type';
     const dateAttributeTypeUuid = 'date-attribute-type';
     const locationAttributeTypeUuid = 'location-attribute-type';
@@ -232,7 +281,7 @@ describe('CurrentVisit', () => {
 
     expect(screen.getByText('Late')).toBeInTheDocument();
     expect(screen.getByText('POL-123')).toBeInTheDocument();
-    expect(screen.getByText(formatDate(new Date(2026, 9, 13), { mode: 'wide' }))).toBeInTheDocument();
+    expect(screen.getByText(formatDate(new Date(2026, 9, 13), { mode: 'wide', time: false }))).toBeInTheDocument();
     expect(screen.getByText('Outpatient Clinic')).toBeInTheDocument();
     expect(screen.queryByText('Not shown')).not.toBeInTheDocument();
     // The configured attribute with an empty value gets no tag. An empty tag has no text or role to query by.

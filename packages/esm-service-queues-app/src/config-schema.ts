@@ -156,7 +156,7 @@ export const configSchema = {
   appointmentStatuses: {
     _type: Type.Array,
     _default: ['Scheduled', 'CheckedIn', 'Completed', 'Missed'],
-    _description: `Statuses of the patient's appointments for today to show in the current visit summary of the expanded queue table row. Available options: ${appointmentStatusValues.join(', ')}`,
+    _description: `Statuses of the patient's appointments for today to show in the current visit summary of the expanded queue table row. Set to an empty array to hide today's appointments. Available options: ${appointmentStatusValues.join(', ')}`,
     _elements: {
       _type: Type.String,
       _validators: [validators.oneOf(appointmentStatusValues)],

@@ -21,6 +21,7 @@
   "appointmentRequested": "Requested",
   "appointmentScheduled": "Scheduled",
   "appointmentSummary": "{{status}} · {{service}} at {{time}}",
+  "appointmentSummaryWithProvider": "{{status}} · {{service}} at {{time}} with {{provider}}",
   "appointmentWaitList": "Wait list",
   "averageWait": "Average wait",
   "avgWaitTime": "Avg. wait time",
@@ -210,6 +211,5 @@
   "waitingList": "Waiting list",
   "waitingListWithCount_one": "Waiting list ({{count}})",
   "waitingListWithCount_other": "Waiting list ({{count}})",
-  "waitTime": "Wait time",
-  "withProvider": "with {{provider}}"
+  "waitTime": "Wait time"
 }

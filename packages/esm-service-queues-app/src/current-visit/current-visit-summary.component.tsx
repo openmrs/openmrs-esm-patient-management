@@ -39,7 +39,7 @@ const getAttributeValue = (attributeType, value) => {
     case 'org.openmrs.customdatatype.datatype.DateDatatype':
       // The saved value is midnight in the server's offset, so read only the date part
       // as local midnight. Otherwise a browser behind the server shows the previous day.
-      return formatDate(dayjs(String(value).split('T')[0]).toDate(), { mode: 'wide' });
+      return formatDate(dayjs(String(value).split('T')[0]).toDate(), { mode: 'wide', time: false });
     default:
       return typeof value === 'object' && value !== null ? value.display : value;
   }
@@ -66,15 +66,20 @@ const AppointmentSummary: React.FC<{ appointment: TodaysAppointment }> = ({ appo
     .map(({ name }) => name)
     .sort((a, b) => a.localeCompare(b));
   const otherProviderCount = providerNames.length - 1;
+  const summaryValues = {
+    status: statusLabels[appointment.status] ?? appointment.status,
+    service: appointment.service.name,
+    time: formatTime(new Date(appointment.startDateTime)),
+  };
 
   return (
     <span>
-      {t('appointmentSummary', '{{status}} · {{service}} at {{time}}', {
-        status: statusLabels[appointment.status] ?? appointment.status,
-        service: appointment.service.name,
-        time: formatTime(new Date(appointment.startDateTime)),
-      })}
-      {providerNames.length > 0 && <> {t('withProvider', 'with {{provider}}', { provider: providerNames[0] })}</>}
+      {providerNames.length > 0
+        ? t('appointmentSummaryWithProvider', '{{status}} · {{service}} at {{time}} with {{provider}}', {
+            ...summaryValues,
+            provider: providerNames[0],
+          })
+        : t('appointmentSummary', '{{status}} · {{service}} at {{time}}', summaryValues)}
       {otherProviderCount > 0 && (
         <>
           {' '}
@@ -108,6 +113,7 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
     appointments,
     isLoading: isLoadingAppointments,
     error: appointmentsError,
+    hasAppointmentsToday,
   } = useTodaysAppointments(patientUuid, appointmentStatuses);
 
   const openRefreshingWorkspacesRef = useRef<Set<string>>(new Set());
@@ -155,7 +161,13 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
     }))
     .filter(({ value }) => value != null && value !== '');
 
-  const showAppointments = !isLoadingAppointments && !appointmentsError;
+  // An empty `appointmentStatuses` turns this section off. When the patient's only appointments today have
+  // statuses that are not shown, show nothing rather than say that there are no appointments.
+  const showAppointments =
+    appointmentStatuses.length > 0 &&
+    !isLoadingAppointments &&
+    !appointmentsError &&
+    (appointments.length > 0 || !hasAppointmentsToday);
 
   const vitalsSlotState = {
     patientUuid,

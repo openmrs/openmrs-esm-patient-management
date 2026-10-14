@@ -69,6 +69,17 @@ describe('useTodaysAppointments', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.appointments.map(({ status }) => status)).toEqual(['Scheduled', 'CheckedIn']);
+    expect(result.current.hasAppointmentsToday).toBe(true);
+  });
+
+  it('reports appointments today even when none have the given statuses', async () => {
+    mockAppointments('Arrived');
+
+    const { result } = renderHook(() => useTodaysAppointments(patientUuid, ['Scheduled']), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.appointments).toEqual([]);
+    expect(result.current.hasAppointmentsToday).toBe(true);
   });
 
   it('returns no appointments when the patient has none today', async () => {
@@ -77,10 +88,18 @@ describe('useTodaysAppointments', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(mockOpenmrsFetch).toHaveBeenCalled();
     expect(result.current.appointments).toEqual([]);
+    expect(result.current.hasAppointmentsToday).toBe(false);
   });
 
   it('does not fetch without a patient', async () => {
     const { result } = renderHook(() => useTodaysAppointments(undefined, ['Scheduled']), { wrapper });
+
+    expect(mockOpenmrsFetch).not.toHaveBeenCalled();
+    expect(result.current.appointments).toEqual([]);
+  });
+
+  it('does not fetch when no statuses are given', async () => {
+    const { result } = renderHook(() => useTodaysAppointments(patientUuid, []), { wrapper });
 
     expect(mockOpenmrsFetch).not.toHaveBeenCalled();
     expect(result.current.appointments).toEqual([]);

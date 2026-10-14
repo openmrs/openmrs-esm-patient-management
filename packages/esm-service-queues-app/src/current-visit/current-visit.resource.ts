@@ -40,9 +40,9 @@ export function useTodaysAppointments(patientUuid: string, statuses: Array<Appoi
   const startDate = dayjs().startOf('day').format(omrsDateFormat);
   const endDate = dayjs().endOf('day').format(omrsDateFormat);
 
-  // The appointments module only exposes search via POST.
+  // The appointments module only exposes search via POST. No statuses to show means there is nothing to fetch.
   const { data, error, isLoading } = useSWR<{ data: Array<TodaysAppointment> }, Error>(
-    patientUuid ? [appointmentsSearchUrl, patientUuid, startDate] : null,
+    patientUuid && statuses.length ? [appointmentsSearchUrl, patientUuid, startDate] : null,
     () =>
       openmrsFetch(appointmentsSearchUrl, {
         method: 'POST',
@@ -54,6 +54,8 @@ export function useTodaysAppointments(patientUuid: string, statuses: Array<Appoi
   return {
     // The backend returns these sorted by start time.
     appointments: data?.data?.filter(({ status }) => statuses.includes(status)) ?? [],
+    // Whether the patient has any appointment today, including those with statuses not shown.
+    hasAppointmentsToday: data?.data?.length > 0,
     error,
     isLoading,
   };
