@@ -40,7 +40,7 @@ export function mapToFhirPatient(patient: SearchedPatient) {
       ? formatPartialDate(patient.person.birthdate, {
           time: false,
           day: false,
-          month: patient.person.age === 0,
+          month: patient.person.age <= 5,
           year: true,
           noToday: true,
         })
