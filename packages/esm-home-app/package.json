@@ -5,7 +5,7 @@
   "browser": "dist/openmrs-esm-home-app.js",
   "main": "src/index.ts",
   "license": "MPL-2.0",
-  "homepage": "https://github.com/openmrs/openmrs-esm-home#readme",
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
   "scripts": {
     "start": "openmrs develop",
     "serve": "rspack serve --mode=development",
@@ -31,10 +31,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openmrs/openmrs-esm-home.git"
+    "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
   },
   "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-home/issues"
+    "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "peerDependencies": {
     "@carbon/react": "1.x",

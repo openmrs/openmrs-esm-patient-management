@@ -35,7 +35,7 @@
     "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
   },
   "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
+    "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
