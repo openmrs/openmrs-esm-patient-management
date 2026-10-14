@@ -314,7 +314,7 @@ describe('Field', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
-  it('should translate the label of a text field under its id suffixed with Text', () => {
+  it('should translate the label of a text field under its id suffixed with Text', ({ onTestFinished }) => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldDefinitions: [
@@ -324,11 +324,11 @@ describe('Field', () => {
     const translate = vi
       .spyOn(useTranslation(), 't')
       .mockImplementation((key: string) => (key === 'studyConsentStatementText' ? 'Ninakubali' : key));
+    onTestFinished(() => translate.mockRestore());
 
     render(<Field name="studyConsentStatement" />);
 
     expect(screen.getByText('Ninakubali')).toBeInTheDocument();
-    translate.mockRestore();
   });
 
   it('should keep the line breaks of a text field label', () => {
